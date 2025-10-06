@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AboutDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.help</a>
+</div>
+
+<h1>Coverage Summary for Class: AboutDialogViewModel (org.jabref.gui.help)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AboutDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.help;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanWrapper;
+&nbsp;import javafx.beans.property.ReadOnlyStringProperty;
+&nbsp;import javafx.beans.property.ReadOnlyStringWrapper;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.URLs;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BuildInfo;
+&nbsp;
+&nbsp;import com.google.common.collect.Lists;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class AboutDialogViewModel extends AbstractViewModel {
+&nbsp;    private final String changelogUrl;
+&nbsp;    private final String versionInfo;
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final Logger logger = LoggerFactory.getLogger(AboutDialogViewModel.class);</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper maintainers = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();</b>
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();</b>
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;
+<b class="nc">&nbsp;    public AboutDialogViewModel(DialogService dialogService, GuiPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {</b>
+<b class="nc">&nbsp;        this.dialogService = Objects.requireNonNull(dialogService);</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+<b class="nc">&nbsp;        this.clipBoardManager = Objects.requireNonNull(clipBoardManager);</b>
+<b class="nc">&nbsp;        String[] version = buildInfo.version.getFullVersion().split(&quot;--&quot;);</b>
+<b class="nc">&nbsp;        heading.set(&quot;JabRef &quot; + version[0]);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (version.length == 1) {</b>
+<b class="nc">&nbsp;            isDevelopmentVersion.set(false);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            isDevelopmentVersion.set(true);</b>
+<b class="nc">&nbsp;            String dev = Lists.newArrayList(version).stream().filter(string -&gt; !string.equals(version[0])).collect(</b>
+<b class="nc">&nbsp;                    Collectors.joining(&quot;--&quot;));</b>
+<b class="nc">&nbsp;            developmentVersion.set(dev);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        maintainers.set(buildInfo.maintainers);</b>
+<b class="nc">&nbsp;        license.set(Localization.lang(&quot;License&quot;) + &quot;:&quot;);</b>
+<b class="nc">&nbsp;        changelogUrl = buildInfo.version.getChangelogUrl();</b>
+&nbsp;
+<b class="nc">&nbsp;        String javafx_version = System.getProperty(&quot;javafx.runtime.version&quot;, BuildInfo.UNKNOWN_VERSION).toLowerCase(Locale.ROOT);</b>
+&nbsp;
+<b class="nc">&nbsp;        versionInfo = &quot;JabRef %s%n%s %s %s %nJava %s %nJavaFX %s&quot;.formatted(buildInfo.version, BuildInfo.OS,</b>
+&nbsp;                BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION, javafx_version);
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDevelopmentVersion() {
+<b class="nc">&nbsp;        return developmentVersion.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringProperty developmentVersionProperty() {
+<b class="nc">&nbsp;        return developmentVersion.getReadOnlyProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isIsDevelopmentVersion() {
+<b class="nc">&nbsp;        return isDevelopmentVersion.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty isDevelopmentVersionProperty() {
+<b class="nc">&nbsp;        return isDevelopmentVersion.getReadOnlyProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getVersionInfo() {
+<b class="nc">&nbsp;        return versionInfo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringProperty maintainersProperty() {
+<b class="nc">&nbsp;        return maintainers.getReadOnlyProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getMaintainers() {
+<b class="nc">&nbsp;        return maintainers.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringProperty headingProperty() {
+<b class="nc">&nbsp;        return heading.getReadOnlyProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getHeading() {
+<b class="nc">&nbsp;        return heading.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringProperty licenseProperty() {
+<b class="nc">&nbsp;        return license.getReadOnlyProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLicense() {
+<b class="nc">&nbsp;        return license.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getEnvironmentInfo() {
+<b class="nc">&nbsp;        return environmentInfo.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void copyVersionToClipboard() {
+<b class="nc">&nbsp;        clipBoardManager.setContent(versionInfo);</b>
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Copied version to clipboard&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openJabrefWebsite() {
+<b class="nc">&nbsp;        openWebsite(URLs.HOMEPAGE_URL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openExternalLibrariesWebsite() {
+<b class="nc">&nbsp;        openWebsite(URLs.LIBRARIES_URL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openGitHub() {
+<b class="nc">&nbsp;        openWebsite(URLs.GITHUB_URL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openChangeLog() {
+<b class="nc">&nbsp;        openWebsite(changelogUrl);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openLicense() {
+<b class="nc">&nbsp;        openWebsite(URLs.LICENSE_URL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openContributors() {
+<b class="nc">&nbsp;        openWebsite(URLs.CONTRIBUTORS_URL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openDonation() {
+<b class="nc">&nbsp;        openWebsite(URLs.DONATION_URL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void openWebsite(String url) {
+&nbsp;        try {
+<b class="nc">&nbsp;            NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Could not open website.&quot;), e);</b>
+<b class="nc">&nbsp;            logger.error(&quot;Could not open default browser.&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openPrivacyPolicy() {
+<b class="nc">&nbsp;        openWebsite(URLs.PRIVACY_POLICY_URL);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

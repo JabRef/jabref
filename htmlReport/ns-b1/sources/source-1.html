@@ -1,0 +1,456 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstCaseChanger</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst.util</a>
+</div>
+
+<h1>Coverage Summary for Class: BstCaseChanger (org.jabref.logic.bst.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BstCaseChanger</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/103)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/106)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BstCaseChanger$FormatMode</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/107)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/118)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bst.util;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public final class BstCaseChanger {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BstCaseChanger.class);</b>
+&nbsp;
+&nbsp;    // stores whether the char before the current char was a colon
+<b class="nc">&nbsp;    private boolean prevColon = true;</b>
+&nbsp;
+&nbsp;    // global variable to store the current brace level
+&nbsp;    private int braceLevel;
+&nbsp;
+<b class="nc">&nbsp;    public enum FormatMode {</b>
+&nbsp;        // First character and character after a &quot;:&quot; as upper case - everything else in lower case. Obey {}.
+<b class="nc">&nbsp;        TITLE_LOWERS(&#39;t&#39;),</b>
+&nbsp;
+&nbsp;        // All characters lower case - Obey {}
+<b class="nc">&nbsp;        ALL_LOWERS(&#39;l&#39;),</b>
+&nbsp;
+&nbsp;        // all characters upper case - Obey {}
+<b class="nc">&nbsp;        ALL_UPPERS(&#39;u&#39;);</b>
+&nbsp;
+&nbsp;        // the following would have to be done if the functionality of CaseChangers would be included here
+&nbsp;        // However, we decided against it and will probably do the other way round: https://github.com/JabRef/jabref/pull/215#issuecomment-146981624
+&nbsp;
+&nbsp;        // Each word should start with a capital letter
+&nbsp;        // EACH_FIRST_UPPERS(&#39;f&#39;),
+&nbsp;
+&nbsp;        // Converts all words to upper case, but converts articles, prepositions, and conjunctions to lower case
+&nbsp;        // Capitalizes first and last word
+&nbsp;        // Does not change words starting with &quot;{&quot;
+&nbsp;        // DIFFERENCE to old CaseChangers.TITLE: last word is NOT capitalized in all cases
+&nbsp;        // TITLE_UPPERS(&#39;T&#39;);
+&nbsp;
+&nbsp;        private final char asChar;
+&nbsp;
+<b class="nc">&nbsp;        FormatMode(char asChar) {</b>
+<b class="nc">&nbsp;            this.asChar = asChar;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public char asChar() {
+<b class="nc">&nbsp;            return asChar;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Convert bstFormat char into ENUM
+&nbsp;         *
+&nbsp;         * @throws IllegalArgumentException if char is not &#39;t&#39;, &#39;l&#39;, &#39;u&#39;
+&nbsp;         */
+&nbsp;        public static FormatMode of(final char bstFormat) {
+<b class="nc">&nbsp;            for (FormatMode mode : FormatMode.values()) {</b>
+<b class="nc">&nbsp;                if (mode.asChar == bstFormat) {</b>
+<b class="nc">&nbsp;                    return mode;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            throw new IllegalArgumentException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static FormatMode of(final String bstFormat) {
+<b class="nc">&nbsp;            return of(bstFormat.toLowerCase(Locale.ROOT).charAt(0));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private BstCaseChanger() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Changes case of the given string s
+&nbsp;     *
+&nbsp;     * @param s      the string to handle
+&nbsp;     * @param format the format
+&nbsp;     */
+&nbsp;    public static String changeCase(String s, FormatMode format) {
+<b class="nc">&nbsp;        return new BstCaseChanger().doChangeCase(s, format);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String doChangeCase(String s, FormatMode format) {
+<b class="nc">&nbsp;        char[] c = s.toCharArray();</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        int n = s.length();</b>
+&nbsp;
+<b class="nc">&nbsp;        while (i &lt; n) {</b>
+<b class="nc">&nbsp;            if (c[i] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                braceLevel++;</b>
+<b class="nc">&nbsp;                if ((braceLevel != 1) || ((i + 4) &gt; n) || (c[i + 1] != &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                    prevColon = false;</b>
+<b class="nc">&nbsp;                    sb.append(c[i]);</b>
+<b class="nc">&nbsp;                    i++;</b>
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;                if ((format == FormatMode.TITLE_LOWERS) &amp;&amp; ((i == 0) || (prevColon &amp;&amp; Character.isWhitespace(c[i - 1])))) {</b>
+<b class="nc">&nbsp;                    sb.append(&#39;{&#39;);</b>
+<b class="nc">&nbsp;                    i++;</b>
+<b class="nc">&nbsp;                    prevColon = false;</b>
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;                i = convertSpecialChar(sb, c, i, format);</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            if (c[i] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                sb.append(c[i]);</b>
+<b class="nc">&nbsp;                i++;</b>
+<b class="nc">&nbsp;                if (braceLevel == 0) {</b>
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Too many closing braces in string: {}&quot;, s);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    braceLevel--;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                prevColon = false;</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            if (braceLevel == 0) {</b>
+<b class="nc">&nbsp;                i = convertCharIfBraceLevelIsZero(c, i, sb, format);</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            sb.append(c[i]);</b>
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (braceLevel &gt; 0) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;No enough closing braces in string: {}&quot;, s);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * We&#39;re dealing with a special character (usually either an undotted `\i&#39;
+&nbsp;     * or `\j&#39;, or an accent like one in Table~3.1 of the \LaTeX\ manual, or a
+&nbsp;     * foreign character like one in Table~3.2) if the first character after the
+&nbsp;     * |left_brace| is a |backslash|; the special character ends with the
+&nbsp;     * matching |right_brace|. How we handle what is in between depends on the
+&nbsp;     * special character. In general, this code will do reasonably well if there
+&nbsp;     * is other stuff, too, between braces, but it doesn&#39;t try to do anything
+&nbsp;     * special with |colon|s.
+&nbsp;     *
+&nbsp;     * @param start the current position. It points to the opening brace
+&nbsp;     */
+&nbsp;    private int convertSpecialChar(StringBuilder sb, char[] c, int start, FormatMode format) {
+<b class="nc">&nbsp;        int i = start;</b>
+&nbsp;
+<b class="nc">&nbsp;        sb.append(c[i]);</b>
+<b class="nc">&nbsp;        i++; // skip over open brace</b>
+&nbsp;
+<b class="nc">&nbsp;        while ((i &lt; c.length) &amp;&amp; (braceLevel &gt; 0)) {</b>
+<b class="nc">&nbsp;            sb.append(c[i]);</b>
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;            // skip over the |backslash|
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;String&gt; s = BstCaseChanger.findSpecialChar(c, i);</b>
+<b class="nc">&nbsp;            if (s.isPresent()) {</b>
+<b class="nc">&nbsp;                i = convertAccented(c, i, s.get(), sb, format);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            while ((i &lt; c.length) &amp;&amp; (braceLevel &gt; 0) &amp;&amp; (c[i] != &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                if (c[i] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                    braceLevel--;</b>
+<b class="nc">&nbsp;                } else if (c[i] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                    braceLevel++;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                i = convertNonControl(c, i, sb, format);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return i;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert the given string according to the format character (title, lower,
+&nbsp;     * up) and append the result to the stringBuffer, return the updated
+&nbsp;     * position.
+&nbsp;     *
+&nbsp;     * @return the new position
+&nbsp;     */
+&nbsp;    private int convertAccented(char[] c, int start, String s, StringBuilder sb, FormatMode format) {
+<b class="nc">&nbsp;        int pos = start;</b>
+<b class="nc">&nbsp;        pos += s.length();</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (format) {</b>
+&nbsp;            case TITLE_LOWERS:
+&nbsp;            case ALL_LOWERS:
+<b class="nc">&nbsp;                if (&quot;L O OE AE AA&quot;.contains(s)) {</b>
+<b class="nc">&nbsp;                    sb.append(s.toLowerCase(Locale.ROOT));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    sb.append(s);</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            case ALL_UPPERS:
+<b class="nc">&nbsp;                if (&quot;l o oe ae aa&quot;.contains(s)) {</b>
+<b class="nc">&nbsp;                    sb.append(s.toUpperCase(Locale.ROOT));</b>
+<b class="nc">&nbsp;                } else if (&quot;i j ss&quot;.contains(s)) {</b>
+<b class="nc">&nbsp;                    sb.deleteCharAt(sb.length() - 1); // Kill backslash</b>
+<b class="nc">&nbsp;                    sb.append(s.toUpperCase(Locale.ROOT));</b>
+<b class="nc">&nbsp;                    while ((pos &lt; c.length) &amp;&amp; Character.isWhitespace(c[pos])) {</b>
+<b class="nc">&nbsp;                        pos++;</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    sb.append(s);</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            default:
+<b class="nc">&nbsp;                LOGGER.info(&quot;convertAccented - Unknown format: {}&quot;, format);</b>
+&nbsp;                break;
+&nbsp;        }
+<b class="nc">&nbsp;        return pos;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int convertNonControl(char[] c, int start, StringBuilder sb, FormatMode format) {
+<b class="nc">&nbsp;        int pos = start;</b>
+<b class="nc">&nbsp;        switch (format) {</b>
+&nbsp;            case TITLE_LOWERS,
+&nbsp;                 ALL_LOWERS -&gt; {
+<b class="nc">&nbsp;                sb.append(Character.toLowerCase(c[pos]));</b>
+<b class="nc">&nbsp;                pos++;</b>
+&nbsp;            }
+&nbsp;            case ALL_UPPERS -&gt; {
+<b class="nc">&nbsp;                sb.append(Character.toUpperCase(c[pos]));</b>
+<b class="nc">&nbsp;                pos++;</b>
+&nbsp;            }
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    LOGGER.info(&quot;convertNonControl - Unknown format: {}&quot;, format);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return pos;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int convertCharIfBraceLevelIsZero(char[] c, int start, StringBuilder sb, FormatMode format) {
+<b class="nc">&nbsp;        int i = start;</b>
+<b class="nc">&nbsp;        switch (format) {</b>
+&nbsp;            case TITLE_LOWERS -&gt; {
+<b class="nc">&nbsp;                if ((i == 0) || (prevColon &amp;&amp; Character.isWhitespace(c[i - 1]))) {</b>
+<b class="nc">&nbsp;                    sb.append(c[i]);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    sb.append(Character.toLowerCase(c[i]));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (c[i] == &#39;:&#39;) {</b>
+<b class="nc">&nbsp;                    prevColon = true;</b>
+<b class="nc">&nbsp;                } else if (!Character.isWhitespace(c[i])) {</b>
+<b class="nc">&nbsp;                    prevColon = false;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            case ALL_LOWERS -&gt;
+<b class="nc">&nbsp;                    sb.append(Character.toLowerCase(c[i]));</b>
+&nbsp;            case ALL_UPPERS -&gt;
+<b class="nc">&nbsp;                    sb.append(Character.toUpperCase(c[i]));</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    LOGGER.info(&quot;convertCharIfBraceLevelIsZero - Unknown format: {}&quot;, format);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        i++;</b>
+<b class="nc">&nbsp;        return i;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determine whether there starts a special char at pos (e.g., oe, AE). Return it as string.
+&nbsp;     * If nothing found, return Optional.empty()
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Also used by BibtexPurify
+&nbsp;     *
+&nbsp;     * @param c   the current &quot;String&quot;
+&nbsp;     * @param pos the position
+&nbsp;     * @return the special LaTeX character or null
+&nbsp;     */
+&nbsp;    public static Optional&lt;String&gt; findSpecialChar(char[] c, int pos) {
+<b class="nc">&nbsp;        if ((pos + 1) &lt; c.length) {</b>
+<b class="nc">&nbsp;            if ((c[pos] == &#39;o&#39;) &amp;&amp; (c[pos + 1] == &#39;e&#39;)) {</b>
+<b class="nc">&nbsp;                return Optional.of(&quot;oe&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;O&#39;) &amp;&amp; (c[pos + 1] == &#39;E&#39;)) {</b>
+<b class="nc">&nbsp;                return Optional.of(&quot;OE&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;a&#39;) &amp;&amp; (c[pos + 1] == &#39;e&#39;)) {</b>
+<b class="nc">&nbsp;                return Optional.of(&quot;ae&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;A&#39;) &amp;&amp; (c[pos + 1] == &#39;E&#39;)) {</b>
+<b class="nc">&nbsp;                return Optional.of(&quot;AE&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;s&#39;) &amp;&amp; (c[pos + 1] == &#39;s&#39;)) {</b>
+<b class="nc">&nbsp;                return Optional.of(&quot;ss&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;A&#39;) &amp;&amp; (c[pos + 1] == &#39;A&#39;)) {</b>
+<b class="nc">&nbsp;                return Optional.of(&quot;AA&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;a&#39;) &amp;&amp; (c[pos + 1] == &#39;a&#39;)) {</b>
+<b class="nc">&nbsp;                return Optional.of(&quot;aa&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (&quot;ijoOlL&quot;.indexOf(c[pos]) &gt;= 0) {</b>
+<b class="nc">&nbsp;            return Optional.of(String.valueOf(c[pos]));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

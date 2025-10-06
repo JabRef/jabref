@@ -1,0 +1,271 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SideEffectExecutor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.declarative.sideeffect</a>
+</div>
+
+<h1>Coverage Summary for Class: SideEffectExecutor (org.jabref.gui.walkthrough.declarative.sideeffect)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SideEffectExecutor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.declarative.sideeffect;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.CompletableFuture;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.TimeoutException;
+&nbsp;
+&nbsp;import javafx.animation.PauseTransition;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.beans.Observable;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.walkthrough.Walkthrough;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class SideEffectExecutor {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SideEffectExecutor.class);</b>
+&nbsp;
+&nbsp;    private @Nullable PauseTransition timeoutTransition;
+&nbsp;    private @Nullable InvalidationListener dependencyListener;
+<b class="nc">&nbsp;    private final List&lt;Observable&gt; currentDependencies = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /// Executes a side effect&#39;s forward action, waiting for the expected condition if
+&nbsp;    /// necessary.
+&nbsp;    ///
+&nbsp;    /// @param sideEffect  the side effect to execute
+&nbsp;    /// @param walkthrough the walkthrough context
+&nbsp;    /// @return true if the side effect was executed successfully, false otherwise
+&nbsp;    public boolean executeForward(@NonNull WalkthroughSideEffect sideEffect, @NonNull Walkthrough walkthrough) {
+<b class="nc">&nbsp;        return execute(sideEffect, walkthrough, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Executes a side effect&#39;s backward action.
+&nbsp;    ///
+&nbsp;    /// @param sideEffect  the side effect to execute
+&nbsp;    /// @param walkthrough the walkthrough context
+&nbsp;    /// @return true if the side effect was executed successfully, false otherwise
+&nbsp;    public boolean executeBackward(@NonNull WalkthroughSideEffect sideEffect, @NonNull Walkthrough walkthrough) {
+<b class="nc">&nbsp;        return execute(sideEffect, walkthrough, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean execute(@NonNull WalkthroughSideEffect sideEffect, @NonNull Walkthrough walkthrough, boolean forward) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Executing {} effect: {}&quot;, forward ? &quot;forward&quot; : &quot;backward&quot;, sideEffect.description());</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            if (forward) {</b>
+<b class="nc">&nbsp;                boolean conditionMet = waitForCondition(sideEffect);</b>
+<b class="nc">&nbsp;                if (!conditionMet) {</b>
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Expected condition not met for side effect: {}&quot;, sideEffect.description());</b>
+<b class="nc">&nbsp;                    notifyUser(Localization.lang(&quot;Side effect timeout&quot;),</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;The condition for &#39;%0&#39; was not met within the timeout period.&quot;, sideEffect.description()));</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return sideEffect.forward(walkthrough);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return sideEffect.backward(walkthrough);</b>
+&nbsp;            }
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error executing {} effect: {}&quot;, forward ? &quot;forward&quot; : &quot;backward&quot;, sideEffect.description(), e);</b>
+<b class="nc">&nbsp;            notifyUser(Localization.lang(&quot;Walkthrough side effect error&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;An error occurred while executing &#39;%0&#39;: %1&quot;, sideEffect.description(), e.getMessage()));</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            cleanUp();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean waitForCondition(@NonNull WalkthroughSideEffect sideEffect) {
+<b class="nc">&nbsp;        ExpectedCondition condition = sideEffect.expectedCondition();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (condition.evaluate()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Expected condition already met for: {}&quot;, sideEffect.description());</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CompletableFuture&lt;Boolean&gt; conditionFuture = new CompletableFuture&lt;&gt;();</b>
+<b class="nc">&nbsp;        startTimeout(sideEffect.timeoutMs(), () -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Timeout reached for side effect: {}&quot;, sideEffect.description());</b>
+<b class="nc">&nbsp;            conditionFuture.complete(false);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        setupDependencyMonitoring(sideEffect.dependencies(), () -&gt; {</b>
+<b class="nc">&nbsp;            if (condition.evaluate()) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Expected condition met via dependency change for: {}&quot;, sideEffect.description());</b>
+<b class="nc">&nbsp;                conditionFuture.complete(true);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return conditionFuture.get(sideEffect.timeoutMs() + 100, TimeUnit.MILLISECONDS);</b>
+&nbsp;        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Error waiting for condition: {}&quot;, e.getMessage());</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupDependencyMonitoring(@NonNull List&lt;Observable&gt; dependencies, @NonNull Runnable onDependencyChange) {
+<b class="nc">&nbsp;        cleanUpDependencies();</b>
+&nbsp;
+<b class="nc">&nbsp;        dependencyListener = _ -&gt; onDependencyChange.run();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Observable dependency : dependencies) {</b>
+<b class="nc">&nbsp;            dependency.addListener(dependencyListener);</b>
+<b class="nc">&nbsp;            currentDependencies.add(dependency);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void startTimeout(long timeoutMs, @NonNull Runnable onTimeout) {
+<b class="nc">&nbsp;        cancelTimeout();</b>
+&nbsp;
+<b class="nc">&nbsp;        timeoutTransition = new PauseTransition(Duration.millis(timeoutMs));</b>
+<b class="nc">&nbsp;        timeoutTransition.setOnFinished(_ -&gt; onTimeout.run());</b>
+<b class="nc">&nbsp;        timeoutTransition.play();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void cancelTimeout() {
+<b class="nc">&nbsp;        if (timeoutTransition != null) {</b>
+<b class="nc">&nbsp;            timeoutTransition.stop();</b>
+<b class="nc">&nbsp;            timeoutTransition = null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void cleanUpDependencies() {
+<b class="nc">&nbsp;        if (dependencyListener != null) {</b>
+<b class="nc">&nbsp;            for (Observable dependency : currentDependencies) {</b>
+<b class="nc">&nbsp;                dependency.removeListener(dependencyListener);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            currentDependencies.clear();</b>
+<b class="nc">&nbsp;            dependencyListener = null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void cleanUp() {
+<b class="nc">&nbsp;        cancelTimeout();</b>
+<b class="nc">&nbsp;        cleanUpDependencies();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void notifyUser(@NonNull String title, @NonNull String message) {
+&nbsp;        try {
+<b class="nc">&nbsp;            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);</b>
+<b class="nc">&nbsp;            dialogService.notify(title + message);</b>
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Failed to notify user about side effect issue&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

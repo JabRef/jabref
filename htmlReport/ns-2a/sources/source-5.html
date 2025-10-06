@@ -1,0 +1,153 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutomaticFieldEditorViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.edit.automaticfiededitor</a>
+</div>
+
+<h1>Coverage Summary for Class: AutomaticFieldEditorViewModel (org.jabref.gui.edit.automaticfiededitor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutomaticFieldEditorViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.edit.automaticfiededitor;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabView;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;
+&nbsp;public class AutomaticFieldEditorViewModel extends AbstractViewModel {
+&nbsp;    public static final String NAMED_COMPOUND_EDITS = &quot;EDIT_FIELDS&quot;;
+<b class="nc">&nbsp;    private final ObservableList&lt;AutomaticFieldEditorTab&gt; fieldEditorTabs = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final NamedCompoundEdit dialogEdits = new NamedCompoundEdit(NAMED_COMPOUND_EDITS);</b>
+&nbsp;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;
+<b class="nc">&nbsp;    public AutomaticFieldEditorViewModel(BibDatabase database, UndoManager undoManager, StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        fieldEditorTabs.addAll(</b>
+&nbsp;                new EditFieldContentTabView(database, stateManager),
+&nbsp;                new CopyOrMoveFieldContentTabView(database, stateManager),
+&nbsp;                new RenameFieldTabView(database, stateManager)
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public NamedCompoundEdit getDialogEdits() {
+<b class="nc">&nbsp;        return dialogEdits;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;AutomaticFieldEditorTab&gt; getFieldEditorTabs() {
+<b class="nc">&nbsp;        return fieldEditorTabs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void saveChanges() {
+<b class="nc">&nbsp;        dialogEdits.end();</b>
+<b class="nc">&nbsp;        undoManager.addEdit(dialogEdits);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cancelChanges() {
+<b class="nc">&nbsp;        dialogEdits.end();</b>
+<b class="nc">&nbsp;        dialogEdits.undo();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

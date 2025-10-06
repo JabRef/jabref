@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MsBibImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: MsBibImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MsBibImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MsBibImporter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilder;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.msbib.MSBibDatabase;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NullMarked;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.xml.sax.ErrorHandler;
+&nbsp;import org.xml.sax.InputSource;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;import org.xml.sax.SAXParseException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Importer for the MS Office 2007 XML bibliography format
+&nbsp; */
+&nbsp;@NullMarked
+<b class="nc">&nbsp;public class MsBibImporter extends Importer {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MsBibImporter.class);</b>
+&nbsp;    private static final String DISABLEDTD = &quot;http://apache.org/xml/features/disallow-doctype-decl&quot;;
+&nbsp;    private static final String DISABLEEXTERNALDTD = &quot;http://apache.org/xml/features/nonvalidating/load-external-dtd&quot;;
+<b class="nc">&nbsp;    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = makeSafeDocBuilderFactory(DocumentBuilderFactory.newInstance());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The correct behavior is to return false if it is certain that the file is
+&nbsp;     * not of the MsBib type, and true otherwise. Returning true is the safe choice
+&nbsp;     * if not certain.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(reader); // Required by test case</b>
+&nbsp;        Document docin;
+&nbsp;        try {
+<b class="nc">&nbsp;            DocumentBuilder dbuild = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();</b>
+<b class="nc">&nbsp;            dbuild.setErrorHandler(new ErrorHandler() {</b>
+&nbsp;                @Override
+&nbsp;                public void warning(SAXParseException exception) throws SAXException {
+&nbsp;                    // ignore warnings
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void fatalError(SAXParseException exception) throws SAXException {
+&nbsp;                    throw exception;
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void error(SAXParseException exception) throws SAXException {
+&nbsp;                    throw exception;
+&nbsp;                }
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            docin = dbuild.parse(new InputSource(reader));</b>
+&nbsp;        } catch (SAXException | ParserConfigurationException e) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return (docin == null) || docin.getDocumentElement().getTagName().contains(&quot;Sources&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(reader); // Required by test case</b>
+<b class="nc">&nbsp;        MSBibDatabase dbase = new MSBibDatabase();</b>
+<b class="nc">&nbsp;        return new ParserResult(dbase.importEntriesFromXml(reader));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;msbib&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;MSBib&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StandardFileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.XML;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Importer for the MS Office 2007 XML bibliography format.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * DocumentBuilderFactory makes a XXE safe Builder factory from dBuild. If not supported by current
+&nbsp;     * XML then returns original builder given and logs error.
+&nbsp;     *
+&nbsp;     * @param dBuild | DocumentBuilderFactory to be made XXE safe.
+&nbsp;     * @return If supported, XXE safe DocumentBuilderFactory. Else, returns original builder given
+&nbsp;     */
+&nbsp;    private static DocumentBuilderFactory makeSafeDocBuilderFactory(DocumentBuilderFactory dBuild) {
+<b class="nc">&nbsp;        String feature = null;</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            feature = DISABLEDTD;</b>
+<b class="nc">&nbsp;            dBuild.setFeature(feature, true);</b>
+&nbsp;
+<b class="nc">&nbsp;            feature = DISABLEEXTERNALDTD;</b>
+<b class="nc">&nbsp;            dBuild.setFeature(feature, false);</b>
+&nbsp;
+<b class="nc">&nbsp;            dBuild.setXIncludeAware(false);</b>
+<b class="nc">&nbsp;            dBuild.setExpandEntityReferences(false);</b>
+&nbsp;        } catch (ParserConfigurationException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Builder not fully configured. Feature:&#39;{}&#39; is probably not supported by current XML processor.&quot;, feature, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return dBuild;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

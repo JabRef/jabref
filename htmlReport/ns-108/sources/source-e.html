@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpecialFieldValue</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.field</a>
+</div>
+
+<h1>Coverage Summary for Class: SpecialFieldValue (org.jabref.model.entry.field)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpecialFieldValue</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.8%
+  </span>
+  <span class="absValue">
+    (21/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.field;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.entry.Keyword;
+&nbsp;
+<b class="fc">&nbsp;public enum SpecialFieldValue {</b>
+&nbsp;
+<b class="fc">&nbsp;    PRINTED(&quot;printed&quot;),</b>
+&nbsp;
+<b class="fc">&nbsp;    CLEAR_PRIORITY(null),</b>
+<b class="fc">&nbsp;    PRIORITY_HIGH(&quot;prio1&quot;),</b>
+<b class="fc">&nbsp;    PRIORITY_MEDIUM(&quot;prio2&quot;),</b>
+<b class="fc">&nbsp;    PRIORITY_LOW(&quot;prio3&quot;),</b>
+&nbsp;
+<b class="fc">&nbsp;    QUALITY_ASSURED(&quot;qualityAssured&quot;),</b>
+&nbsp;
+<b class="fc">&nbsp;    CLEAR_RANK(null),</b>
+<b class="fc">&nbsp;    RANK_1(&quot;rank1&quot;),</b>
+<b class="fc">&nbsp;    RANK_2(&quot;rank2&quot;),</b>
+<b class="fc">&nbsp;    RANK_3(&quot;rank3&quot;),</b>
+<b class="fc">&nbsp;    RANK_4(&quot;rank4&quot;),</b>
+<b class="fc">&nbsp;    RANK_5(&quot;rank5&quot;),</b>
+&nbsp;
+<b class="fc">&nbsp;    CLEAR_READ_STATUS(null),</b>
+<b class="fc">&nbsp;    READ(&quot;read&quot;),</b>
+<b class="fc">&nbsp;    SKIMMED(&quot;skimmed&quot;),</b>
+<b class="fc">&nbsp;    RELEVANT(&quot;relevant&quot;);</b>
+&nbsp;
+&nbsp;    // keyword used in keyword field
+&nbsp;    private final Optional&lt;Keyword&gt; keyword;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param keyword - The keyword to be used at BibTex&#39;s keyword field. May be &quot;null&quot; if no keyword is to be set
+&nbsp;     */
+<b class="fc">&nbsp;    SpecialFieldValue(String keyword) {</b>
+<b class="fc">&nbsp;        this.keyword = Optional.ofNullable(keyword).map(Keyword::new);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SpecialFieldValue getRating(int ranking) {
+<b class="nc">&nbsp;        return switch (ranking) {</b>
+&nbsp;            case 0 -&gt;
+<b class="nc">&nbsp;                    CLEAR_RANK;</b>
+&nbsp;            case 1 -&gt;
+<b class="nc">&nbsp;                    RANK_1;</b>
+&nbsp;            case 2 -&gt;
+<b class="nc">&nbsp;                    RANK_2;</b>
+&nbsp;            case 3 -&gt;
+<b class="nc">&nbsp;                    RANK_3;</b>
+&nbsp;            case 4 -&gt;
+<b class="nc">&nbsp;                    RANK_4;</b>
+&nbsp;            case 5 -&gt;
+<b class="nc">&nbsp;                    RANK_5;</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    throw new UnsupportedOperationException(ranking + &quot;is not a valid ranking&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Keyword&gt; getKeyword() {
+<b class="fc">&nbsp;        return keyword;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getFieldValue() {
+<b class="fc">&nbsp;        return keyword.map(Keyword::toString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int toRating() {
+<b class="nc">&nbsp;        return switch (this) {</b>
+&nbsp;            case CLEAR_RANK -&gt;
+<b class="nc">&nbsp;                    0;</b>
+&nbsp;            case RANK_1 -&gt;
+<b class="nc">&nbsp;                    1;</b>
+&nbsp;            case RANK_2 -&gt;
+<b class="nc">&nbsp;                    2;</b>
+&nbsp;            case RANK_3 -&gt;
+<b class="nc">&nbsp;                    3;</b>
+&nbsp;            case RANK_4 -&gt;
+<b class="nc">&nbsp;                    4;</b>
+&nbsp;            case RANK_5 -&gt;
+<b class="nc">&nbsp;                    5;</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    throw new UnsupportedOperationException(this + &quot;is not a valid ranking&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

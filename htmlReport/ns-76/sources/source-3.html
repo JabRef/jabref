@@ -1,0 +1,300 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreviewPanel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preview</a>
+</div>
+
+<h1>Coverage Summary for Class: PreviewPanel (org.jabref.gui.preview)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreviewPanel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preview;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.SeparatorMenuItem;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;import javafx.scene.input.DataFormat;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.theme.ThemeManager;
+&nbsp;import org.jabref.gui.util.DragDrop;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preview.PreviewLayout;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+&nbsp;/// Displays the entry preview
+&nbsp;///
+&nbsp;/// The instance is re-used at each tab. The code ensures that the panel is moved across tabs when the user switches the tab.
+&nbsp;public class PreviewPanel extends VBox implements PreviewControls {
+&nbsp;
+&nbsp;    private final ExternalFilesEntryLinker fileLinker;
+&nbsp;    private final KeyBindingRepository keyBindingRepository;
+&nbsp;    private final PreviewViewer previewView;
+&nbsp;    private final PreviewPreferences previewPreferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    private BibEntry entry;
+&nbsp;
+&nbsp;    public PreviewPanel(DialogService dialogService,
+&nbsp;                        KeyBindingRepository keyBindingRepository,
+&nbsp;                        GuiPreferences preferences,
+&nbsp;                        ThemeManager themeManager,
+&nbsp;                        TaskExecutor taskExecutor,
+<b class="nc">&nbsp;                        StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.keyBindingRepository = keyBindingRepository;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.previewPreferences = preferences.getPreviewPreferences();</b>
+<b class="nc">&nbsp;        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), dialogService, stateManager);</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();</b>
+<b class="nc">&nbsp;        previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, stateManager.searchQueryProperty());</b>
+<b class="nc">&nbsp;        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());</b>
+<b class="nc">&nbsp;        previewView.setContextMenu(createPopupMenu());</b>
+<b class="nc">&nbsp;        previewView.setOnDragDetected(this::onDragDetected);</b>
+<b class="nc">&nbsp;        previewView.setOnDragOver(PreviewPanel::onDragOver);</b>
+<b class="nc">&nbsp;        previewView.setOnDragDropped(this::onDragDropped);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.getChildren().add(previewView);</b>
+&nbsp;
+<b class="nc">&nbsp;        createKeyBindings();</b>
+<b class="nc">&nbsp;        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onDragDetected(MouseEvent event) {
+<b class="nc">&nbsp;        previewView.startFullDrag();</b>
+&nbsp;
+<b class="nc">&nbsp;        Dragboard dragboard = previewView.startDragAndDrop(TransferMode.COPY);</b>
+<b class="nc">&nbsp;        ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;        content.putHtml(previewView.getSelectionHtmlContent());</b>
+<b class="nc">&nbsp;        dragboard.setContent(content);</b>
+&nbsp;
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void onDragOver(DragEvent event) {
+<b class="nc">&nbsp;        if (event.getDragboard().hasFiles()) {</b>
+<b class="nc">&nbsp;            event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onDragDropped(DragEvent event) {
+<b class="nc">&nbsp;        boolean success = false;</b>
+<b class="nc">&nbsp;        if (event.getDragboard().hasContent(DataFormat.FILES)) {</b>
+<b class="nc">&nbsp;            TransferMode transferMode = event.getTransferMode();</b>
+<b class="nc">&nbsp;            List&lt;Path&gt; files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());</b>
+<b class="nc">&nbsp;            DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);</b>
+<b class="nc">&nbsp;            success = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        event.setDropCompleted(success);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createKeyBindings() {
+<b class="nc">&nbsp;        previewView.addEventFilter(KeyEvent.KEY_PRESSED, event -&gt; {</b>
+<b class="nc">&nbsp;            Optional&lt;KeyBinding&gt; keyBinding = keyBindingRepository.mapToKeyBinding(event);</b>
+<b class="nc">&nbsp;            if (keyBinding.isPresent()) {</b>
+<b class="nc">&nbsp;                if (keyBinding.get() == KeyBinding.COPY_PREVIEW) {</b>
+<b class="nc">&nbsp;                    previewView.copyPreviewHtmlToClipBoard();</b>
+<b class="nc">&nbsp;                    event.consume();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private ContextMenu createPopupMenu() {
+<b class="nc">&nbsp;        MenuItem copyCitationHtml = new MenuItem(Localization.lang(&quot;Copy citation (html)&quot;), IconTheme.JabRefIcons.COPY.getGraphicNode());</b>
+<b class="nc">&nbsp;        keyBindingRepository.getKeyCombination(KeyBinding.COPY_PREVIEW).ifPresent(copyCitationHtml::setAccelerator);</b>
+<b class="nc">&nbsp;        copyCitationHtml.setOnAction(_ -&gt; previewView.copyPreviewHtmlToClipBoard());</b>
+<b class="nc">&nbsp;        MenuItem copyCitationText = new MenuItem(Localization.lang(&quot;Copy citation (text)&quot;));</b>
+<b class="nc">&nbsp;        copyCitationText.setOnAction(_ -&gt; previewView.copyPreviewPlainTextToClipBoard());</b>
+<b class="nc">&nbsp;        MenuItem exportToClipboard = new MenuItem(Localization.lang(&quot;Export to clipboard&quot;));</b>
+<b class="nc">&nbsp;        exportToClipboard.setOnAction(_ -&gt; previewView.exportToClipBoard(stateManager));</b>
+<b class="nc">&nbsp;        MenuItem copySelection = new MenuItem(Localization.lang(&quot;Copy selection&quot;));</b>
+<b class="nc">&nbsp;        copySelection.setOnAction(_ -&gt; previewView.copySelectionToClipBoard());</b>
+<b class="nc">&nbsp;        MenuItem printEntryPreview = new MenuItem(Localization.lang(&quot;Print entry preview&quot;), IconTheme.JabRefIcons.PRINTED.getGraphicNode());</b>
+<b class="nc">&nbsp;        printEntryPreview.setOnAction(_ -&gt; previewView.print());</b>
+<b class="nc">&nbsp;        MenuItem previousPreviewLayout = new MenuItem(Localization.lang(&quot;Previous preview layout&quot;));</b>
+<b class="nc">&nbsp;        keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT).ifPresent(previousPreviewLayout::setAccelerator);</b>
+<b class="nc">&nbsp;        previousPreviewLayout.setOnAction(_ -&gt; this.previousPreviewStyle());</b>
+<b class="nc">&nbsp;        MenuItem nextPreviewLayout = new MenuItem(Localization.lang(&quot;Next preview layout&quot;));</b>
+<b class="nc">&nbsp;        keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT).ifPresent(nextPreviewLayout::setAccelerator);</b>
+<b class="nc">&nbsp;        nextPreviewLayout.setOnAction(_ -&gt; this.nextPreviewStyle());</b>
+&nbsp;
+<b class="nc">&nbsp;        ContextMenu menu = new ContextMenu();</b>
+<b class="nc">&nbsp;        menu.getItems().add(copyCitationHtml);</b>
+<b class="nc">&nbsp;        menu.getItems().add(copyCitationText);</b>
+<b class="nc">&nbsp;        menu.getItems().add(copySelection);</b>
+<b class="nc">&nbsp;        menu.getItems().add(printEntryPreview);</b>
+<b class="nc">&nbsp;        menu.getItems().add(new SeparatorMenuItem());</b>
+<b class="nc">&nbsp;        menu.getItems().add(nextPreviewLayout);</b>
+<b class="nc">&nbsp;        menu.getItems().add(previousPreviewLayout);</b>
+<b class="nc">&nbsp;        menu.getItems().add(new SeparatorMenuItem());</b>
+<b class="nc">&nbsp;        menu.getItems().add(exportToClipboard);</b>
+<b class="nc">&nbsp;        return menu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEntry(BibEntry entry) {
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        previewView.setEntry(entry);</b>
+<b class="nc">&nbsp;        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDatabase(@Nullable BibDatabaseContext databaseContext) {
+<b class="nc">&nbsp;        previewView.setDatabaseContext(databaseContext);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void print() {
+<b class="nc">&nbsp;        previewView.print();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void nextPreviewStyle() {
+<b class="nc">&nbsp;        cyclePreview(previewPreferences.getLayoutCyclePosition() + 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void previousPreviewStyle() {
+<b class="nc">&nbsp;        cyclePreview(previewPreferences.getLayoutCyclePosition() - 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void cyclePreview(int newPosition) {
+<b class="nc">&nbsp;        previewPreferences.setLayoutCyclePosition(newPosition);</b>
+&nbsp;
+<b class="nc">&nbsp;        PreviewLayout layout = previewPreferences.getSelectedPreviewLayout();</b>
+<b class="nc">&nbsp;        previewView.setLayout(layout);</b>
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Preview style changed to: %0&quot;, layout.getDisplayName()));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

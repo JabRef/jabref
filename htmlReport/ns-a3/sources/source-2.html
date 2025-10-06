@@ -1,0 +1,297 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JabRefChatLanguageModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.chatting.model</a>
+</div>
+
+<h1>Coverage Summary for Class: JabRefChatLanguageModel (org.jabref.logic.ai.chatting.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JabRefChatLanguageModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JabRefChatLanguageModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.chatting.model;
+&nbsp;
+&nbsp;import java.net.http.HttpClient;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.ai.chatting.AiChatLogic;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.ai.AiProvider;
+&nbsp;
+&nbsp;import com.google.common.util.concurrent.ThreadFactoryBuilder;
+&nbsp;import dev.langchain4j.data.message.ChatMessage;
+&nbsp;import dev.langchain4j.memory.ChatMemory;
+&nbsp;import dev.langchain4j.model.chat.ChatModel;
+&nbsp;import dev.langchain4j.model.chat.response.ChatResponse;
+&nbsp;import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
+&nbsp;import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
+&nbsp;import dev.langchain4j.model.mistralai.MistralAiChatModel;
+&nbsp;
+&nbsp;/**
+&nbsp; * Wrapper around langchain4j chat language model.
+&nbsp; * &lt;p&gt;
+&nbsp; * Notice, that the real chat model is created lazily, when it&#39;s needed. This is done, so API key is fetched only,
+&nbsp; * when user wants to chat with AI.
+&nbsp; */
+&nbsp;public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
+<b class="nc">&nbsp;    private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(5);</b>
+&nbsp;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;
+&nbsp;    private final HttpClient httpClient;
+<b class="nc">&nbsp;    private final ExecutorService executorService = Executors.newSingleThreadExecutor(</b>
+<b class="nc">&nbsp;            new ThreadFactoryBuilder().setNameFormat(&quot;ai-api-connection-pool-%d&quot;).build()</b>
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    private Optional&lt;ChatModel&gt; langchainChatModel = Optional.empty();</b>
+&nbsp;
+<b class="nc">&nbsp;    public JabRefChatLanguageModel(AiPreferences aiPreferences) {</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+<b class="nc">&nbsp;        this.httpClient = HttpClient.newBuilder().connectTimeout(CONNECTION_TIMEOUT).executor(executorService).build();</b>
+&nbsp;
+<b class="nc">&nbsp;        setupListeningToPreferencesChanges();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update the underlying {@link dev.langchain4j.model.chat.ChatModel} by current {@link AiPreferences} parameters.
+&nbsp;     * When the model is updated, the chat messages are not lost.
+&nbsp;     * See {@link AiChatLogic}, where messages are stored in {@link ChatMemory},
+&nbsp;     * and see {@link org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage}.
+&nbsp;     */
+&nbsp;    private void rebuild() {
+<b class="nc">&nbsp;        String apiKey = aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider());</b>
+<b class="nc">&nbsp;        if (!aiPreferences.getEnableAi() || (apiKey.isEmpty() &amp;&amp; aiPreferences.getAiProvider() != AiProvider.GPT4ALL)) {</b>
+<b class="nc">&nbsp;            langchainChatModel = Optional.empty();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        switch (aiPreferences.getAiProvider()) {</b>
+&nbsp;            case OPEN_AI -&gt;
+<b class="nc">&nbsp;                    langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));</b>
+&nbsp;
+&nbsp;            case GPT4ALL -&gt;
+<b class="nc">&nbsp;                    langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));</b>
+&nbsp;
+&nbsp;            case MISTRAL_AI -&gt;
+<b class="nc">&nbsp;                    langchainChatModel = Optional.of(MistralAiChatModel</b>
+<b class="nc">&nbsp;                            .builder()</b>
+<b class="nc">&nbsp;                            .apiKey(apiKey)</b>
+<b class="nc">&nbsp;                            .modelName(aiPreferences.getSelectedChatModel())</b>
+<b class="nc">&nbsp;                            .temperature(aiPreferences.getTemperature())</b>
+<b class="nc">&nbsp;                            .baseUrl(aiPreferences.getSelectedApiBaseUrl())</b>
+<b class="nc">&nbsp;                            .logRequests(true)</b>
+<b class="nc">&nbsp;                            .logResponses(true)</b>
+<b class="nc">&nbsp;                            .build()</b>
+&nbsp;                    );
+&nbsp;
+&nbsp;            case GEMINI -&gt; // NOTE: {@link GoogleAiGeminiChatModel} doesn&#39;t support API base url.
+<b class="nc">&nbsp;                    langchainChatModel = Optional.of(GoogleAiGeminiChatModel</b>
+<b class="nc">&nbsp;                            .builder()</b>
+<b class="nc">&nbsp;                            .apiKey(apiKey)</b>
+<b class="nc">&nbsp;                            .modelName(aiPreferences.getSelectedChatModel())</b>
+<b class="nc">&nbsp;                            .temperature(aiPreferences.getTemperature())</b>
+<b class="nc">&nbsp;                            .logRequestsAndResponses(true)</b>
+<b class="nc">&nbsp;                            .build()</b>
+&nbsp;                    );
+&nbsp;
+&nbsp;            case HUGGING_FACE -&gt; // NOTE: {@link HuggingFaceChatModel} doesn&#39;t support API base url.
+<b class="nc">&nbsp;                    langchainChatModel = Optional.of(HuggingFaceChatModel</b>
+<b class="nc">&nbsp;                            .builder()</b>
+<b class="nc">&nbsp;                            .accessToken(apiKey)</b>
+<b class="nc">&nbsp;                            .modelId(aiPreferences.getSelectedChatModel())</b>
+<b class="nc">&nbsp;                            .temperature(aiPreferences.getTemperature())</b>
+<b class="nc">&nbsp;                            .timeout(Duration.ofMinutes(2))</b>
+<b class="nc">&nbsp;                            .build()</b>
+&nbsp;                    );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupListeningToPreferencesChanges() {
+&nbsp;        // Setting &quot;langchainChatModel&quot; to &quot;Optional.empty()&quot; will trigger a rebuild on the next usage
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.enableAiProperty().addListener(_ -&gt; langchainChatModel = Optional.empty());</b>
+<b class="nc">&nbsp;        aiPreferences.aiProviderProperty().addListener(_ -&gt; langchainChatModel = Optional.empty());</b>
+<b class="nc">&nbsp;        aiPreferences.customizeExpertSettingsProperty().addListener(_ -&gt; langchainChatModel = Optional.empty());</b>
+<b class="nc">&nbsp;        aiPreferences.temperatureProperty().addListener(_ -&gt; langchainChatModel = Optional.empty());</b>
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.addListenerToChatModels(() -&gt; langchainChatModel = Optional.empty());</b>
+<b class="nc">&nbsp;        aiPreferences.addListenerToApiBaseUrls(() -&gt; langchainChatModel = Optional.empty());</b>
+<b class="nc">&nbsp;        aiPreferences.setApiKeyChangeListener(() -&gt; langchainChatModel = Optional.empty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ChatResponse chat(List&lt;ChatMessage&gt; list) {
+&nbsp;        // The rationale for RuntimeExceptions in this method:
+&nbsp;        // 1. langchain4j error handling is a mess, and it uses RuntimeExceptions
+&nbsp;        //    everywhere. Because this method implements a langchain4j interface,
+&nbsp;        //    we follow the same &quot;practice&quot;.
+&nbsp;        // 2. There is no way to encode error information from type system: nor
+&nbsp;        //    in the result type, nor &quot;throws&quot; in method signature. Actually,
+&nbsp;        //    it&#39;s possible, but langchain4j doesn&#39;t do it.
+&nbsp;
+<b class="nc">&nbsp;        if (langchainChatModel.isEmpty()) {</b>
+<b class="nc">&nbsp;            if (!aiPreferences.getEnableAi()) {</b>
+<b class="nc">&nbsp;                throw new RuntimeException(Localization.lang(&quot;In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab).&quot;));</b>
+<b class="nc">&nbsp;            } else if (aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty() &amp;&amp; aiPreferences.getAiProvider() != AiProvider.GPT4ALL) {</b>
+<b class="nc">&nbsp;                throw new RuntimeException(Localization.lang(&quot;In order to use AI chat, set an API key inside JabRef preferences (AI tab).&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                rebuild();</b>
+<b class="nc">&nbsp;                if (langchainChatModel.isEmpty()) {</b>
+<b class="nc">&nbsp;                    throw new RuntimeException(Localization.lang(&quot;Unable to chat with AI.&quot;));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return langchainChatModel.get().chat(list);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        httpClient.shutdownNow();</b>
+<b class="nc">&nbsp;        executorService.shutdownNow();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LayoutFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout</a>
+</div>
+
+<h1>Coverage Summary for Class: LayoutFormatter (org.jabref.logic.layout)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">LayoutFormatter</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout;
+&nbsp;
+&nbsp;/**
+&nbsp; * The LayoutFormatter is used for a Filter design-pattern.
+&nbsp; * &lt;p&gt;
+&nbsp; * Implementing classes have to accept a String and returned a formatted version of it.
+&nbsp; * &lt;p&gt;
+&nbsp; * Example:
+&nbsp; * &lt;p&gt;
+&nbsp; * &quot;John von Neumann&quot; =&gt; &quot;von Neumann, John&quot;
+&nbsp; */
+&nbsp;@FunctionalInterface
+&nbsp;public interface LayoutFormatter {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Failure Mode:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Formatters should be robust in the sense that they always return some relevant string.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the formatter can detect an invalid input it should return the original string otherwise it may simply return
+&nbsp;     * a wrong output.
+&nbsp;     *
+&nbsp;     * @param fieldText The text to layout.
+&nbsp;     * @return The layouted text.
+&nbsp;     */
+&nbsp;    String format(String fieldText);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

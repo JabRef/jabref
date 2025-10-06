@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NameFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: NameFormatter (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NameFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.bst.util.BstNameFormatter;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;
+&nbsp;/// This layout formatter uses the BibTeX `name.format$` method and provides ultimate flexibility.
+&nbsp;///
+&nbsp;/// The formatter needs a parameter with the following format:
+&nbsp;///
+&nbsp;/// ```
+&nbsp;/// &lt;case1&gt;@&lt;range11&gt;@&quot;&lt;format&gt;&quot;@&lt;range12&gt;@&quot;&lt;format&gt;&quot;@&lt;range13&gt;...@@
+&nbsp;/// &lt;case2&gt;@&lt;range21&gt;@...
+&nbsp;///```
+&nbsp;///
+&nbsp;/// Individual cases are separated by `@@` and items in a case by `@`.
+&nbsp;///
+&nbsp;/// Cases are just integers or the character `*` and tell the formatter to apply the following formats
+&nbsp;/// if there are less or equal authors given.
+&nbsp;/// The cases must be in strictly increasing order with `*` in the last position.
+&nbsp;///
+&nbsp;/// Example:
+&nbsp;/// - `case1 = 2`
+&nbsp;/// - `case2 = 3`
+&nbsp;/// - `case3 = *`
+&nbsp;///
+&nbsp;/// Ranges are either `&lt;integer&gt;..&lt;integer&gt;`, `&lt;integer&gt;` or `*` (using a 1-based index).
+&nbsp;/// Negative integers start from the end (`-1` = last author).
+&nbsp;///
+&nbsp;/// Example with `Joe Doe and Mary Jane and Bruce Bar and Arthur Kay`:
+&nbsp;/// - `1..3` → Joe, Mary, Bruce
+&nbsp;/// - `4..4` → Arthur
+&nbsp;/// - `*` → all authors
+&nbsp;/// - `2..-1` → Mary, Bruce, Arthur
+&nbsp;///
+&nbsp;/// The `&lt;format&gt;` uses the BibTeX formatter syntax:
+&nbsp;/// - The letters `v`, `f`, `l`, `j` indicate name parts (von, first, last, jr). Use them inside `{}` for full form.
+&nbsp;/// - A single letter (`v`, `f`, `l`, `j`) abbreviates the part.
+&nbsp;/// - Quotes must be escaped as `\&quot;` (not fully supported yet).
+&nbsp;///
+&nbsp;/// Example:
+&nbsp;/// - `&quot;{ll},{f}.&quot;` → `&quot;Joe Doe&quot;` becomes `&quot;Doe, J.&quot;`
+&nbsp;///
+&nbsp;/// Complete example:
+&nbsp;///
+&nbsp;/// Input:
+&nbsp;/// ```
+&nbsp;/// Joe Doe and Mary Jane and Bruce Bar and Arthur Kay
+&nbsp;///```
+&nbsp;///
+&nbsp;/// Output:
+&nbsp;/// ```
+&nbsp;/// Doe, J., Jane, M., Bar, B. and Kay, A.
+&nbsp;///```
+&nbsp;///
+&nbsp;/// Formatter parameter:
+&nbsp;/// ```
+&nbsp;/// 1@*@{ll},{f}.@@2@1@{ll},{f}.@2@ and {ll},{f}.@@*@1..-3@{ll},{f}., @-2@{ll},{f}.@-1@ and {ll},{f}.
+&nbsp;///```
+&nbsp;///
+&nbsp;/// This is troublesome to write, but it works.
+&nbsp;/// For more examples see the test cases.
+<b class="nc">&nbsp;public class NameFormatter implements LayoutFormatter {</b>
+&nbsp;
+&nbsp;    public static final String DEFAULT_FORMAT = &quot;1@*@{ff }{vv }{ll}{, jj}@@*@1@{ff }{vv }{ll}{, jj}@*@, {ff }{vv }{ll}{, jj}&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private String parameter = NameFormatter.DEFAULT_FORMAT;</b>
+&nbsp;
+&nbsp;    private static String format(String toFormat, AuthorList al, String[] formats) {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        int n = al.getNumberOfAuthors();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 1; i &lt;= al.getNumberOfAuthors(); i++) {</b>
+<b class="nc">&nbsp;            for (int j = 1; j &lt; formats.length; j += 2) {</b>
+<b class="nc">&nbsp;                if (&quot;*&quot;.equals(formats[j])) {</b>
+<b class="nc">&nbsp;                    sb.append(BstNameFormatter.formatName(toFormat, i, formats[j + 1]));</b>
+&nbsp;                    break;
+&nbsp;                } else {
+<b class="nc">&nbsp;                    String[] range = formats[j].split(&quot;\\.\\.&quot;);</b>
+&nbsp;
+&nbsp;                    int s;
+&nbsp;                    int e;
+<b class="nc">&nbsp;                    if (range.length == 2) {</b>
+<b class="nc">&nbsp;                        s = Integer.parseInt(range[0]);</b>
+<b class="nc">&nbsp;                        e = Integer.parseInt(range[1]);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        s = e = Integer.parseInt(range[0]);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (s &lt; 0) {</b>
+<b class="nc">&nbsp;                        s += n + 1;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (e &lt; 0) {</b>
+<b class="nc">&nbsp;                        e += n + 1;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (e &lt; s) {</b>
+<b class="nc">&nbsp;                        int temp = e;</b>
+<b class="nc">&nbsp;                        e = s;</b>
+<b class="nc">&nbsp;                        s = temp;</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if ((s &lt;= i) &amp;&amp; (i &lt;= e)) {</b>
+<b class="nc">&nbsp;                        sb.append(BstNameFormatter.formatName(toFormat, i, formats[j + 1]));</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String format(String toFormat, String inParameters) {
+<b class="nc">&nbsp;        AuthorList al = AuthorList.parse(toFormat);</b>
+&nbsp;        String parameters;
+&nbsp;
+<b class="nc">&nbsp;        if ((inParameters == null) || inParameters.isEmpty()) {</b>
+<b class="nc">&nbsp;            parameters = &quot;*:*:\&quot;{ff}{vv}{ll}{,jj} \&quot;&quot;;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            parameters = inParameters;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String[] cases = parameters.split(&quot;@@&quot;);</b>
+<b class="nc">&nbsp;        for (String aCase : cases) {</b>
+<b class="nc">&nbsp;            String[] formatString = aCase.split(&quot;@&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (formatString.length &lt; 3) {</b>
+&nbsp;                // Error
+<b class="nc">&nbsp;                return toFormat;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (&quot;*&quot;.equals(formatString[0])) {</b>
+<b class="nc">&nbsp;                return format(toFormat, al, formatString);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (al.getNumberOfAuthors() &lt;= Integer.parseInt(formatString[0])) {</b>
+<b class="nc">&nbsp;                    return format(toFormat, al, formatString);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return toFormat;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String fieldText) {
+<b class="nc">&nbsp;        return format(fieldText, parameter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setParameter(String parameter) {
+<b class="nc">&nbsp;        this.parameter = parameter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Map&lt;String, String&gt; getNameFormatters(NameFormatterPreferences prefs) {
+<b class="nc">&nbsp;        Objects.requireNonNull(prefs);</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, String&gt; result = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; names = prefs.getNameFormatterKey();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; formats = prefs.getNameFormatterValue();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; names.size(); i++) {</b>
+<b class="nc">&nbsp;            if (i &lt; formats.size()) {</b>
+<b class="nc">&nbsp;                result.put(names.get(i), formats.get(i));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                result.put(names.get(i), DEFAULT_FORMAT);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

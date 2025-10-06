@@ -1,0 +1,310 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChatPromptComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.ai.components.aichat.chatprompt</a>
+</div>
+
+<h1>Coverage Summary for Class: ChatPromptComponent (org.jabref.gui.ai.components.aichat.chatprompt)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChatPromptComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.ai.components.aichat.chatprompt;
+&nbsp;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.dlsc.gemsfx.ExpandingTextArea;
+&nbsp;
+&nbsp;public class ChatPromptComponent extends HBox {
+&nbsp;    // If current message that user is typing in prompt is non-existent, new, or empty, then we use
+&nbsp;    // this value in currentUserMessageScroll.
+&nbsp;    private static final int NEW_NON_EXISTENT_MESSAGE = -1;
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Consumer&lt;String&gt;&gt; sendCallback = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Consumer&lt;String&gt;&gt; retryCallback = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Runnable&gt; cancelCallback = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;String&gt; history = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;
+&nbsp;    // This property stores index of a user history message.
+&nbsp;    // When user scrolls history in the prompt, this value is updated.
+&nbsp;    // Whenever user edits the prompt, this value is reset to NEW_NON_EXISTENT_MESSAGE.
+<b class="nc">&nbsp;    private final IntegerProperty currentUserMessageScroll = new SimpleIntegerProperty(NEW_NON_EXISTENT_MESSAGE);</b>
+&nbsp;
+&nbsp;    // If the current content of the prompt is a history message, then this property is true.
+&nbsp;    // If user begins to edit or type a new text, then this property is false.
+<b class="nc">&nbsp;    private final BooleanProperty showingHistoryMessage = new SimpleBooleanProperty(false);</b>
+&nbsp;
+&nbsp;    @FXML private ExpandingTextArea userPromptTextArea;
+&nbsp;    @FXML private Button submitButton;
+&nbsp;
+<b class="nc">&nbsp;    public ChatPromptComponent() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;
+<b class="nc">&nbsp;        history.addListener((observable, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            currentUserMessageScroll.set(NEW_NON_EXISTENT_MESSAGE);</b>
+<b class="nc">&nbsp;            showingHistoryMessage.set(false);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSendCallback(Consumer&lt;String&gt; sendCallback) {
+<b class="nc">&nbsp;        this.sendCallback.set(sendCallback);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setRetryCallback(Consumer&lt;String&gt; retryCallback) {
+<b class="nc">&nbsp;        this.retryCallback.set(retryCallback);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCancelCallback(Runnable cancelCallback) {
+<b class="nc">&nbsp;        this.cancelCallback.set(cancelCallback);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;String&gt; getHistory() {
+<b class="nc">&nbsp;        return history;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        userPromptTextArea.setOnKeyPressed(keyEvent -&gt; {</b>
+<b class="nc">&nbsp;            if (keyEvent.getCode() == KeyCode.DOWN) {</b>
+&nbsp;                // Do not go down in the history.
+<b class="nc">&nbsp;                if (currentUserMessageScroll.get() != NEW_NON_EXISTENT_MESSAGE) {</b>
+<b class="nc">&nbsp;                    showingHistoryMessage.set(true);</b>
+<b class="nc">&nbsp;                    currentUserMessageScroll.set(currentUserMessageScroll.get() - 1);</b>
+&nbsp;
+&nbsp;                    // There could be two effects after setting the properties:
+&nbsp;                    // 1) User scrolls to a recent message, then we should properly update the prompt text.
+&nbsp;                    // 2) Scroll is set to -1 (which is NEW_NON_EXISTENT_MESSAGE) and we should clear the prompt text.
+&nbsp;                    // On the second event currentUserMessageScroll will be set to -1 and showingHistoryMessage
+&nbsp;                    // will be true (this is important).
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (keyEvent.getCode() == KeyCode.UP) {</b>
+&nbsp;                // [impl-&gt;req~ai.chat.new-message-based-on-previous~1]
+<b class="nc">&nbsp;                if ((currentUserMessageScroll.get() &lt; history.get().size() - 1) &amp;&amp; (userPromptTextArea.getText().isEmpty() || showingHistoryMessage.get())) {</b>
+&nbsp;                    // 1. We should not go up the maximum number of user messages.
+&nbsp;                    // 2. We can scroll history only on two conditions:
+&nbsp;                    //    1) The prompt is empty.
+&nbsp;                    //    2) User has already been scrolling the history.
+<b class="nc">&nbsp;                    showingHistoryMessage.set(true);</b>
+<b class="nc">&nbsp;                    currentUserMessageScroll.set(currentUserMessageScroll.get() + 1);</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // Cursor left/right should not stop history scrolling
+<b class="nc">&nbsp;                if (keyEvent.getCode() != KeyCode.RIGHT &amp;&amp; keyEvent.getCode() != KeyCode.LEFT) {</b>
+&nbsp;                    // It is okay to go back and forth in the prompt while showing a history message.
+&nbsp;                    // But if user begins doing something else, we should not track the history and reset
+&nbsp;                    // all the properties.
+<b class="nc">&nbsp;                    showingHistoryMessage.set(false);</b>
+<b class="nc">&nbsp;                    currentUserMessageScroll.set(NEW_NON_EXISTENT_MESSAGE);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (keyEvent.getCode() == KeyCode.ENTER) {</b>
+<b class="nc">&nbsp;                    if (keyEvent.isControlDown()) {</b>
+<b class="nc">&nbsp;                        userPromptTextArea.appendText(&quot;\n&quot;);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        onSendMessage();</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        currentUserMessageScroll.addListener((observable, oldValue, newValue) -&gt; {</b>
+&nbsp;            // When currentUserMessageScroll is reset, then its value is
+&nbsp;            // 1) either to NEW_NON_EXISTENT_MESSAGE,
+&nbsp;            // 2) or to a new history entry.
+<b class="nc">&nbsp;            if (newValue.intValue() != NEW_NON_EXISTENT_MESSAGE &amp;&amp; showingHistoryMessage.get()) {</b>
+<b class="nc">&nbsp;                if (userPromptTextArea.getCaretPosition() == 0 || !userPromptTextArea.getText().contains(&quot;\n&quot;)) {</b>
+&nbsp;                    // If there are new lines in the prompt, then it is ambiguous whether the user tries to scroll up or down in history or editing lines in the current prompt.
+&nbsp;                    // The easy way to get rid of this ambiguity is to disallow scrolling when there are new lines in the prompt.
+&nbsp;                    // But the exception to this situation is when the caret position is at the beginning of the prompt.
+<b class="nc">&nbsp;                    history.get().stream()</b>
+<b class="nc">&nbsp;                           .skip(newValue.intValue())</b>
+<b class="nc">&nbsp;                           .findFirst()</b>
+<b class="nc">&nbsp;                           .ifPresent(message -&gt; userPromptTextArea.setText(message));</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // When currentUserMessageScroll is set to NEW_NON_EXISTENT_MESSAGE, then we should:
+&nbsp;                // 1) either clear the prompt, if user scrolls down the most recent history entry.
+&nbsp;                // 2) do nothing, if user starts to edit the history entry.
+&nbsp;                // We distinguish these two cases by checking showingHistoryMessage, which is true for -1 message, and false for others.
+<b class="nc">&nbsp;                if (showingHistoryMessage.get()) {</b>
+<b class="nc">&nbsp;                    userPromptTextArea.setText(&quot;&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDisableToButtons(boolean disable) {
+<b class="nc">&nbsp;        this.getChildren().forEach(node -&gt; node.setDisable(disable));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void switchToErrorState(String userMessage) {
+<b class="nc">&nbsp;        this.getChildren().clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        Button retryButton = new Button(Localization.lang(&quot;Retry&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        retryButton.setOnAction(event -&gt; {</b>
+<b class="nc">&nbsp;            if (retryCallback.get() != null) {</b>
+<b class="nc">&nbsp;                retryCallback.get().accept(userMessage);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        Button cancelButton = new Button(Localization.lang(&quot;Cancel&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        cancelButton.setOnAction(event -&gt; {</b>
+<b class="nc">&nbsp;            if (cancelCallback.get() != null) {</b>
+<b class="nc">&nbsp;                cancelCallback.get().run();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        this.getChildren().add(retryButton);</b>
+<b class="nc">&nbsp;        this.getChildren().add(cancelButton);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void switchToNormalState() {
+<b class="nc">&nbsp;        this.getChildren().clear();</b>
+<b class="nc">&nbsp;        this.getChildren().add(userPromptTextArea);</b>
+<b class="nc">&nbsp;        this.getChildren().add(submitButton);</b>
+<b class="nc">&nbsp;        requestPromptFocus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void requestPromptFocus() {
+&nbsp;        // TODO: Check what would happen when programmer calls requestPromptFocus() while the component is in error state.
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; userPromptTextArea.requestFocus());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void onSendMessage() {
+<b class="nc">&nbsp;        String userPrompt = userPromptTextArea.getText().trim();</b>
+<b class="nc">&nbsp;        userPromptTextArea.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!userPrompt.isEmpty() &amp;&amp; sendCallback.get() != null) {</b>
+<b class="nc">&nbsp;            sendCallback.get().accept(userPrompt);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SemanticScholarCitationFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher.citation.semanticscholar</a>
+</div>
+
+<h1>Coverage Summary for Class: SemanticScholarCitationFetcher (org.jabref.logic.importer.fetcher.citation.semanticscholar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SemanticScholarCitationFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher.citation.semanticscholar;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.jooq.lambda.Unchecked;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
+&nbsp;    public static final String FETCHER_NAME = &quot;Semantic Scholar Citations Fetcher&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholarCitationFetcher.class);</b>
+&nbsp;
+&nbsp;    private static final String SEMANTIC_SCHOLAR_API = &quot;https://api.semanticscholar.org/graph/v1/&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Gson GSON = new Gson();</b>
+&nbsp;
+&nbsp;    private final ImporterPreferences importerPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public SemanticScholarCitationFetcher(ImporterPreferences importerPreferences) {</b>
+<b class="nc">&nbsp;        this.importerPreferences = importerPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAPIUrl(String entryPoint, BibEntry entry) {
+<b class="nc">&nbsp;        return SEMANTIC_SCHOLAR_API + &quot;paper/&quot; + &quot;DOI:&quot; + entry.getDOI().orElseThrow().asString() + &quot;/&quot; + entryPoint</b>
+&nbsp;                + &quot;?fields=&quot; + &quot;title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url&quot;
+&nbsp;                + &quot;&amp;limit=1000&quot;;
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getUrlForCitationCount(BibEntry entry) {
+<b class="nc">&nbsp;        return SEMANTIC_SCHOLAR_API + &quot;paper/&quot; + &quot;DOI:&quot; + entry.getDOI().orElseThrow().asString()</b>
+&nbsp;                + &quot;?fields=&quot; + &quot;citationCount&quot;
+&nbsp;                + &quot;&amp;limit=1&quot;;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; searchCitedBy(BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;        if (entry.getDOI().isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        URL citationsUrl;
+&nbsp;        try {
+<b class="nc">&nbsp;            citationsUrl = URLUtil.create(getAPIUrl(&quot;citations&quot;, entry));</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Cited URL {} &quot;, citationsUrl);</b>
+&nbsp;        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Malformed URL&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        URLDownload urlDownload = new URLDownload(citationsUrl);</b>
+&nbsp;
+<b class="nc">&nbsp;        importerPreferences.getApiKey(getName()).ifPresent(apiKey -&gt; urlDownload.addHeader(&quot;x-api-key&quot;, apiKey));</b>
+&nbsp;
+<b class="nc">&nbsp;        CitationsResponse citationsResponse = GSON</b>
+<b class="nc">&nbsp;                .fromJson(urlDownload.asString(), CitationsResponse.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        return citationsResponse.getData()</b>
+<b class="nc">&nbsp;                                .stream().filter(citationDataItem -&gt; citationDataItem.getCitingPaper() != null)</b>
+<b class="nc">&nbsp;                                .map(citationDataItem -&gt; citationDataItem.getCitingPaper().toBibEntry()).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public @NonNull List&lt;BibEntry&gt; searchCiting(@NonNull BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;        if (entry.getDOI().isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        URL referencesUrl;
+&nbsp;        try {
+<b class="nc">&nbsp;            referencesUrl = URLUtil.create(getAPIUrl(&quot;references&quot;, entry));</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Citing URL {} &quot;, referencesUrl);</b>
+&nbsp;        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Malformed URL&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        URLDownload urlDownload = new URLDownload(referencesUrl);</b>
+<b class="nc">&nbsp;        importerPreferences.getApiKey(getName()).ifPresent(apiKey -&gt; urlDownload.addHeader(&quot;x-api-key&quot;, apiKey));</b>
+<b class="nc">&nbsp;        String response = urlDownload.asString();</b>
+<b class="nc">&nbsp;        ReferencesResponse referencesResponse = GSON.fromJson(response, ReferencesResponse.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (referencesResponse.getData() == null) {</b>
+&nbsp;            // Get error message from citingPaperInfo.openAccessPdf.disclaimer
+<b class="nc">&nbsp;            JSONObject responseObject = new JSONObject(response);</b>
+<b class="nc">&nbsp;            Optional.ofNullable(responseObject.optJSONObject(&quot;citingPaperInfo&quot;))</b>
+<b class="nc">&nbsp;                    .flatMap(citingPaperInfo -&gt; Optional.ofNullable(citingPaperInfo.optJSONObject(&quot;openAccessPdf&quot;)))</b>
+<b class="nc">&nbsp;                    .flatMap(openAccessPdf -&gt; Optional.ofNullable(openAccessPdf.optString(&quot;disclaimer&quot;)))</b>
+<b class="nc">&nbsp;                    .ifPresent(Unchecked.consumer(disclaimer -&gt; {</b>
+<b class="nc">&nbsp;                                LOGGER.debug(&quot;Received a disclaimer from Semantic Scholar: {}&quot;, disclaimer);</b>
+<b class="nc">&nbsp;                                if (disclaimer.contains(&quot;references&quot;)) {</b>
+<b class="nc">&nbsp;                                    throw new FetcherException(Localization.lang(&quot;Restricted access to references: %0&quot;, disclaimer));</b>
+&nbsp;                                }
+&nbsp;                            }
+&nbsp;                    ));
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return referencesResponse.getData()</b>
+<b class="nc">&nbsp;                                 .stream()</b>
+<b class="nc">&nbsp;                                 .filter(citationDataItem -&gt; citationDataItem.getCitedPaper() != null)</b>
+<b class="nc">&nbsp;                                 .map(referenceDataItem -&gt; referenceDataItem.getCitedPaper().toBibEntry()).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;Integer&gt; searchCitationCount(BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;        if (entry.getDOI().isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;        URL referencesUrl;
+&nbsp;        try {
+<b class="nc">&nbsp;            referencesUrl = URLUtil.create(getUrlForCitationCount(entry));</b>
+&nbsp;        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Malformed URL&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        URLDownload urlDownload = new URLDownload(referencesUrl);</b>
+<b class="nc">&nbsp;        importerPreferences.getApiKey(getName()).ifPresent(apiKey -&gt; urlDownload.addHeader(&quot;x-api-key&quot;, apiKey));</b>
+&nbsp;        String result;
+&nbsp;        try {
+<b class="nc">&nbsp;            result = urlDownload.asString();</b>
+&nbsp;        } catch (FetcherException e) {
+<b class="nc">&nbsp;            e.getHttpResponse().ifPresent(Unchecked.consumer(response -&gt; {</b>
+<b class="nc">&nbsp;                Optional.ofNullable(response.responseBody())</b>
+<b class="nc">&nbsp;                        .map(JSONObject::new)</b>
+<b class="nc">&nbsp;                        .flatMap(json -&gt; Optional.ofNullable(json.getString(&quot;error&quot;))</b>
+<b class="nc">&nbsp;                                                 .map(Unchecked.function(error -&gt; {</b>
+<b class="nc">&nbsp;                                                     throw new FetcherException(referencesUrl, error, e);</b>
+&nbsp;                                                 })));
+&nbsp;            }));
+&nbsp;            throw e;
+&nbsp;        }
+<b class="nc">&nbsp;        PaperDetails paperDetails = GSON.fromJson(result, PaperDetails.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (paperDetails == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(paperDetails.getCitationCount());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return FETCHER_NAME;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

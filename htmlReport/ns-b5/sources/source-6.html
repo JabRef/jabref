@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationStyleGenerator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citationstyle</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationStyleGenerator (org.jabref.logic.citationstyle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationStyleGenerator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citationstyle;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import org.jbibtex.TokenMgrException;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Facade to unify the access to the citation style engine. Use these methods if you need rendered BibTeX item(s) in a
+&nbsp; * given journal style. This class uses {@link CSLAdapter} to create output.
+&nbsp; */
+&nbsp;public class CitationStyleGenerator {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleGenerator.class);</b>
+<b class="nc">&nbsp;    private static final CSLAdapter CSL_ADAPTER = new CSLAdapter();</b>
+&nbsp;
+&nbsp;    private CitationStyleGenerator() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a citation based on a given list of entries, .csl style source content and output format with a given {@link BibDatabaseContext}.
+&nbsp;     *
+&nbsp;     * @implNote The citation is generated using an external library which may take some time, debatable if it is better to call it from outside the main Thread.
+&nbsp;     */
+&nbsp;    public static String generateCitation(List&lt;BibEntry&gt; bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return CSL_ADAPTER.makeCitation(bibEntries, style, outputFormat, databaseContext, entryTypesManager).getText();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not generate BibEntry citation&quot;, e);</b>
+<b class="nc">&nbsp;            return Localization.lang(&quot;Cannot generate citation based on selected citation style.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a bibliography list in HTML format based on a given list of entries and .csl style source content with a default {@link BibDatabaseContext}.
+&nbsp;     *
+&nbsp;     * @implNote The bibliography is generated using an external library which may take some time, debatable if it is better to call it from outside the main Thread.
+&nbsp;     */
+&nbsp;    protected static String generateBibliography(List&lt;BibEntry&gt; bibEntries, String style, BibEntryTypesManager entryTypesManager) {
+<b class="nc">&nbsp;        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(bibEntries));</b>
+<b class="nc">&nbsp;        context.setMode(BibDatabaseMode.BIBLATEX);</b>
+<b class="nc">&nbsp;        return generateBibliography(bibEntries, style, CitationStyleOutputFormat.HTML, context, entryTypesManager).getFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a bibliography list based on a given list of entries, .csl style source content and output format with a given {@link BibDatabaseContext}.
+&nbsp;     *
+&nbsp;     * @implNote The bibliographies are generated using an external library which may take some time, debatable if it is better to call it from outside the main Thread.
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; generateBibliography(List&lt;BibEntry&gt; bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, databaseContext, entryTypesManager);</b>
+&nbsp;        } catch (IllegalArgumentException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not generate BibEntry bibliography. The CSL engine could not create a bibliography output for your item.&quot;, e);</b>
+<b class="nc">&nbsp;            return List.of(Localization.lang(&quot;Cannot generate bibliography based on selected citation style.&quot;));</b>
+&nbsp;        } catch (IOException | ArrayIndexOutOfBoundsException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not generate BibEntry bibliography&quot;, e);</b>
+<b class="nc">&nbsp;            return List.of(Localization.lang(&quot;Cannot generate bibliography based on selected citation style.&quot;));</b>
+&nbsp;        } catch (TokenMgrException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Bad character inside BibEntry&quot;, e);</b>
+&nbsp;            // sadly one cannot easily retrieve the bad char from the TokenMgrError
+<b class="nc">&nbsp;            return List.of(Localization.lang(&quot;Cannot generate bibliography based on selected citation style.&quot;) +</b>
+<b class="nc">&nbsp;                    outputFormat.getLineSeparator() +</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Bad character inside entry&quot;) +</b>
+<b class="nc">&nbsp;                    outputFormat.getLineSeparator() +</b>
+<b class="nc">&nbsp;                    e.getLocalizedMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

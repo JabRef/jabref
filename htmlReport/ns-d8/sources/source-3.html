@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbbreviationParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.journals</a>
+</div>
+
+<h1>Coverage Summary for Class: AbbreviationParser (org.jabref.logic.journals)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbbreviationParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.journals;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;
+&nbsp;import org.apache.commons.csv.CSVParser;
+&nbsp;import org.apache.commons.csv.CSVRecord;
+&nbsp;
+&nbsp;/**
+&nbsp; * Reads abbreviation files (CSV format) into a list of Abbreviations.
+&nbsp; */
+<b class="nc">&nbsp;public class AbbreviationParser {</b>
+<b class="nc">&nbsp;    private static final Character[] DELIMITERS = {&#39;;&#39;, &#39;,&#39;};</b>
+&nbsp;    private static final char NO_DELIMITER = &#39;\0&#39;; // empty char
+&nbsp;
+&nbsp;    // Ensures ordering while preventing duplicates
+<b class="nc">&nbsp;    private final LinkedHashSet&lt;Abbreviation&gt; abbreviations = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Read the given file, which should contain a list of journal names and their abbreviations. Each line should be
+&nbsp;     * formatted as: &quot;Full Journal Name,Abbr. Journal Name[,Shortest Unique Abbreviation]&quot;
+&nbsp;     * Tries to detect the delimiter, if comma or semicolon is used to ensure backwards compatibility
+&nbsp;     *
+&nbsp;     * @param file Path the given file
+&nbsp;     */
+&nbsp;    void readJournalListFromFile(Path file) throws IOException {
+<b class="nc">&nbsp;        char delimiter = detectDelimiter(file);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(file, StandardCharsets.UTF_8), AbbreviationFormat.getCSVFormatWithDelimiter(delimiter))) {</b>
+<b class="nc">&nbsp;            for (CSVRecord csvRecord : csvParser) {</b>
+<b class="nc">&nbsp;                String name = csvRecord.size() &gt; 0 ? csvRecord.get(0) : &quot;&quot;;</b>
+<b class="nc">&nbsp;                String abbreviation = csvRecord.size() &gt; 1 ? csvRecord.get(1) : &quot;&quot;;</b>
+<b class="nc">&nbsp;                String shortestUniqueAbbreviation = csvRecord.size() &gt; 2 ? csvRecord.get(2) : &quot;&quot;;</b>
+&nbsp;
+&nbsp;                // Check name and abbreviation
+<b class="nc">&nbsp;                if (name.isEmpty() || abbreviation.isEmpty()) {</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                Abbreviation abbreviationToAdd = new Abbreviation(name, abbreviation, shortestUniqueAbbreviation);</b>
+<b class="nc">&nbsp;                abbreviations.add(abbreviationToAdd);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private char detectDelimiter(Path file) throws IOException {
+<b class="nc">&nbsp;        try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {</b>
+<b class="nc">&nbsp;            String line = reader.readLine();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (line == null) {</b>
+<b class="nc">&nbsp;                return NO_DELIMITER;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Arrays.stream(DELIMITERS)</b>
+<b class="nc">&nbsp;                         .filter(s -&gt; line.contains(s.toString()))</b>
+<b class="nc">&nbsp;                         .findFirst()</b>
+<b class="nc">&nbsp;                         .orElse(NO_DELIMITER);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Collection&lt;Abbreviation&gt; getAbbreviations() {
+<b class="nc">&nbsp;        return abbreviations;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

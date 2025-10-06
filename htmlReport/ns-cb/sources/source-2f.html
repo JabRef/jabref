@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringerNatureFullTextFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringerNatureFullTextFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringerNatureFullTextFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FulltextFetcher;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;
+&nbsp;import kong.unirest.core.HttpResponse;
+&nbsp;import kong.unirest.core.JsonNode;
+&nbsp;import kong.unirest.core.Unirest;
+&nbsp;import kong.unirest.core.UnirestException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * FulltextFetcher implementation that attempts to find a PDF URL at SpringerLink.
+&nbsp; * &lt;p&gt;
+&nbsp; * Uses Springer API, see &lt;a href=&quot;https://dev.springer.com&quot;&gt;https://dev.springer.com&lt;/a&gt;
+&nbsp; */
+&nbsp;public class SpringerNatureFullTextFetcher implements FulltextFetcher, CustomizableKeyFetcher {
+&nbsp;    public static final String FETCHER_NAME = &quot;Springer&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SpringerNatureFullTextFetcher.class);</b>
+&nbsp;
+&nbsp;    // TODO: Update to the new [fulltext API](https://dev.springernature.com/docs/api-endpoints/fulltext-api/?source=jabref)
+&nbsp;    //       as well as [Open Access API](https://dev.springernature.com/docs/api-endpoints/open-access/?source=jabref)
+&nbsp;    //       Both APIs also [require separate API keys](https://dev.springernature.com/subscription/).
+&nbsp;    private static final String API_URL = &quot;https://api.springer.com/meta/v1/json&quot;;
+&nbsp;    private static final String CONTENT_HOST = &quot;link.springer.com&quot;;
+&nbsp;
+&nbsp;    private final ImporterPreferences importerPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public SpringerNatureFullTextFetcher(ImporterPreferences importerPreferences) {</b>
+<b class="nc">&nbsp;        this.importerPreferences = importerPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URL&gt; findFullText(BibEntry entry) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(entry);</b>
+&nbsp;
+&nbsp;        // Try unique DOI first
+<b class="nc">&nbsp;        Optional&lt;DOI&gt; doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (doi.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;        // Available in catalog?
+&nbsp;        try {
+<b class="nc">&nbsp;            HttpResponse&lt;JsonNode&gt; jsonResponse = Unirest.get(API_URL)</b>
+<b class="nc">&nbsp;                                                         .queryString(&quot;api_key&quot;, importerPreferences.getApiKey(getName()).orElse(&quot;&quot;))</b>
+<b class="nc">&nbsp;                                                         .queryString(&quot;q&quot;, &quot;doi:%s&quot;.formatted(doi.get().asString()))</b>
+<b class="nc">&nbsp;                                                         .asJson();</b>
+<b class="nc">&nbsp;            if (jsonResponse.getBody() != null) {</b>
+<b class="nc">&nbsp;                JSONObject json = jsonResponse.getBody().getObject();</b>
+<b class="nc">&nbsp;                int results = json.getJSONArray(&quot;result&quot;).getJSONObject(0).getInt(&quot;total&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (results &gt; 0) {</b>
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Fulltext PDF found @ Springer.&quot;);</b>
+<b class="nc">&nbsp;                    return Optional.of(new URI(&quot;http&quot;, null, CONTENT_HOST, -1, &quot;/content/pdf/%s.pdf&quot;.formatted(doi.get().asString()), null, null).toURL());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (UnirestException | URISyntaxException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;SpringerLink API request failed&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TrustLevel getTrustLevel() {
+<b class="nc">&nbsp;        return TrustLevel.PUBLISHER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return FETCHER_NAME;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

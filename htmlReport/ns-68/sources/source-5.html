@@ -1,0 +1,247 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExternalFileTypesTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.externalfiletypes</a>
+</div>
+
+<h1>Coverage Summary for Class: ExternalFileTypesTabViewModel (org.jabref.gui.preferences.externalfiletypes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExternalFileTypesTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.externalfiletypes;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFileTypesTabViewModel.class);</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;ExternalFileTypeItemViewModel&gt; fileTypes = FXCollections.observableArrayList();</b>
+&nbsp;
+&nbsp;    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+<b class="nc">&nbsp;    public ExternalFileTypesTabViewModel(ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) {</b>
+<b class="nc">&nbsp;        this.externalApplicationsPreferences = externalApplicationsPreferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        fileTypes.clear();</b>
+<b class="nc">&nbsp;        fileTypes.addAll(externalApplicationsPreferences.getExternalFileTypes().stream()</b>
+<b class="nc">&nbsp;                                                        .map(ExternalFileTypeItemViewModel::new)</b>
+<b class="nc">&nbsp;                                                        .toList());</b>
+<b class="nc">&nbsp;        fileTypes.sort(Comparator.comparing(ExternalFileTypeItemViewModel::getName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        Set&lt;ExternalFileType&gt; saveList = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        fileTypes.stream().map(ExternalFileTypeItemViewModel::toExternalFileType)</b>
+<b class="nc">&nbsp;                 .forEach(type -&gt; ExternalFileTypes.getDefaultExternalFileTypes().stream()</b>
+<b class="nc">&nbsp;                                                   .filter(type::equals).findAny()</b>
+<b class="nc">&nbsp;                                                   .ifPresentOrElse(saveList::add, () -&gt; saveList.add(type)));</b>
+&nbsp;
+<b class="nc">&nbsp;        externalApplicationsPreferences.getExternalFileTypes().clear();</b>
+<b class="nc">&nbsp;        externalApplicationsPreferences.getExternalFileTypes().addAll(saveList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetToDefaults() {
+<b class="nc">&nbsp;        fileTypes.setAll(ExternalFileTypes.getDefaultExternalFileTypes().stream()</b>
+<b class="nc">&nbsp;                                          .map(ExternalFileTypeItemViewModel::new)</b>
+<b class="nc">&nbsp;                                          .toList());</b>
+<b class="nc">&nbsp;        fileTypes.sort(Comparator.comparing(ExternalFileTypeItemViewModel::getName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean addNewType() {
+<b class="nc">&nbsp;        ExternalFileTypeItemViewModel item = new ExternalFileTypeItemViewModel();</b>
+<b class="nc">&nbsp;        showEditDialog(item, Localization.lang(&quot;Add new file type&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!isValidExternalFileType(item)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        fileTypes.add(item);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;ExternalFileTypeItemViewModel&gt; getFileTypes() {
+<b class="nc">&nbsp;        return fileTypes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void showEditDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new EditExternalFileTypeEntryDialog(item, dialogTitle, fileTypes));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean edit(ExternalFileTypeItemViewModel type) {
+<b class="nc">&nbsp;        ExternalFileTypeItemViewModel typeToModify = new ExternalFileTypeItemViewModel(type.toExternalFileType());</b>
+<b class="nc">&nbsp;        showEditDialog(typeToModify, Localization.lang(&quot;Edit file type&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (type.extensionProperty().get().equals(typeToModify.extensionProperty().get())) {</b>
+<b class="nc">&nbsp;            if (hasEmptyValue(typeToModify)) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;One of the fields is empty or invalid. Not saving.&quot;);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (!isValidExternalFileType(typeToModify)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        fileTypes.remove(type);</b>
+<b class="nc">&nbsp;        fileTypes.add(typeToModify);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void remove(ExternalFileTypeItemViewModel type) {
+<b class="nc">&nbsp;        fileTypes.remove(type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isValidExternalFileType(ExternalFileTypeItemViewModel item) {
+<b class="nc">&nbsp;        if (hasEmptyValue(item)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;One of the fields is empty or invalid. Not saving.&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!isUniqueExtension(item)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;File Extension already exists. Not saving.&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean hasEmptyValue(ExternalFileTypeItemViewModel item) {
+<b class="nc">&nbsp;        return item.getName().isEmpty() || item.extensionProperty().get().isEmpty() || item.mimetypeProperty().get().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isUniqueExtension(ExternalFileTypeItemViewModel item) {
+&nbsp;        // check extension need to be unique in the list
+<b class="nc">&nbsp;        String newExt = item.extensionProperty().get();</b>
+<b class="nc">&nbsp;        for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {</b>
+<b class="nc">&nbsp;            if (newExt.equalsIgnoreCase(fileTypeItem.extensionProperty().get())) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

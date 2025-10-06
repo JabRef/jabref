@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UnoCrossRef</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.uno</a>
+</div>
+
+<h1>Coverage Summary for Class: UnoCrossRef (org.jabref.model.openoffice.uno)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnoCrossRef</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.uno;
+&nbsp;
+&nbsp;import com.sun.star.beans.PropertyVetoException;
+&nbsp;import com.sun.star.beans.UnknownPropertyException;
+&nbsp;import com.sun.star.beans.XPropertySet;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.sun.star.lang.XMultiServiceFactory;
+&nbsp;import com.sun.star.text.ReferenceFieldPart;
+&nbsp;import com.sun.star.text.ReferenceFieldSource;
+&nbsp;import com.sun.star.text.XTextContent;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;import com.sun.star.uno.Exception;
+&nbsp;import com.sun.star.util.XRefreshable;
+&nbsp;
+&nbsp;public class UnoCrossRef {
+&nbsp;
+&nbsp;    private UnoCrossRef() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update TextFields, etc. We use it to refresh cross-references in the document.
+&nbsp;     */
+&nbsp;    public static void refresh(XTextDocument doc) {
+&nbsp;        // Refresh the document
+<b class="nc">&nbsp;        XRefreshable xRefresh = UnoCast.cast(XRefreshable.class, doc).get();</b>
+<b class="nc">&nbsp;        xRefresh.refresh();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Insert a clickable cross-reference to a reference mark, with a label containing the target&#39;s page number.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * May need a documentConnection.refresh() after, to update the text shown.
+&nbsp;     */
+&nbsp;    public static void insertReferenceToPageNumberOfReferenceMark(XTextDocument doc,
+&nbsp;                                                                  String referenceMarkName,
+&nbsp;                                                                  XTextRange cursor)
+&nbsp;            throws
+&nbsp;            CreationException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+&nbsp;        // based on: https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Reference_Marks
+<b class="nc">&nbsp;        XMultiServiceFactory msf = UnoCast.cast(XMultiServiceFactory.class, doc).get();</b>
+&nbsp;        // Create a &#39;GetReference&#39; text field to refer to the reference mark we just inserted,
+&nbsp;        // and get it&#39;s XPropertySet interface
+&nbsp;        XPropertySet xFieldProps;
+&nbsp;        try {
+<b class="nc">&nbsp;            String name = &quot;com.sun.star.text.textfield.GetReference&quot;;</b>
+<b class="nc">&nbsp;            xFieldProps = UnoCast.cast(XPropertySet.class, msf.createInstance(name)).get();</b>
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            throw new CreationException(e.getMessage());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+&nbsp;            // Set the SourceName of the GetReference text field to the referenceMarkName
+<b class="nc">&nbsp;            xFieldProps.setPropertyValue(&quot;SourceName&quot;, referenceMarkName);</b>
+&nbsp;        } catch (UnknownPropertyException ex) {
+<b class="nc">&nbsp;            throw new java.lang.IllegalStateException(&quot;The created GetReference does not have property &#39;SourceName&#39;&quot;);</b>
+&nbsp;        } catch (PropertyVetoException ex) {
+<b class="nc">&nbsp;            throw new java.lang.IllegalStateException(&quot;Caught PropertyVetoException on &#39;SourceName&#39;&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+&nbsp;            // specify that the source is a reference mark (could also be a footnote,
+&nbsp;            // bookmark or sequence field)
+<b class="nc">&nbsp;            xFieldProps.setPropertyValue(&quot;ReferenceFieldSource&quot;, ReferenceFieldSource.REFERENCE_MARK);</b>
+&nbsp;        } catch (UnknownPropertyException ex) {
+<b class="nc">&nbsp;            throw new java.lang.IllegalStateException(&quot;The created GetReference does not have property&quot;</b>
+&nbsp;                    + &quot; &#39;ReferenceFieldSource&#39;&quot;);
+&nbsp;        } catch (PropertyVetoException ex) {
+<b class="nc">&nbsp;            throw new java.lang.IllegalStateException(&quot;Caught PropertyVetoException on &#39;ReferenceFieldSource&#39;&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+&nbsp;            // We want the reference displayed as page number
+<b class="nc">&nbsp;            xFieldProps.setPropertyValue(&quot;ReferenceFieldPart&quot;, ReferenceFieldPart.PAGE);</b>
+&nbsp;        } catch (UnknownPropertyException ex) {
+<b class="nc">&nbsp;            throw new java.lang.IllegalStateException(&quot;The created GetReference does not have property&quot;</b>
+&nbsp;                    + &quot; &#39;ReferenceFieldPart&#39;&quot;);
+&nbsp;        } catch (PropertyVetoException ex) {
+<b class="nc">&nbsp;            throw new java.lang.IllegalStateException(&quot;Caught PropertyVetoException on &#39;ReferenceFieldPart&#39;&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Get the XTextContent interface of the GetReference text field
+<b class="nc">&nbsp;        XTextContent xRefContent = UnoCast.cast(XTextContent.class, xFieldProps).get();</b>
+&nbsp;
+&nbsp;        // Insert the text field
+<b class="nc">&nbsp;        cursor.getText().insertTextContent(cursor.getEnd(), xRefContent, false);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

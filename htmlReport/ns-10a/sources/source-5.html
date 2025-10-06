@@ -1,0 +1,154 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BiblatexSoftwareEntryTypeDefinitions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.types</a>
+</div>
+
+<h1>Coverage Summary for Class: BiblatexSoftwareEntryTypeDefinitions (org.jabref.model.entry.types)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BiblatexSoftwareEntryTypeDefinitions</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.5%
+  </span>
+  <span class="absValue">
+    (21/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.types;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypeBuilder;
+&nbsp;import org.jabref.model.entry.field.BiblatexSoftwareField;
+&nbsp;import org.jabref.model.entry.field.OrFields;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+<b class="nc">&nbsp;public class BiblatexSoftwareEntryTypeDefinitions {</b>
+<b class="fc">&nbsp;    private static final BibEntryType SOFTWARE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Software)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.URL, StandardField.VERSION, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.DATE, StandardField.DOI, StandardField.EPRINTTYPE, StandardField.EPRINTCLASS, StandardField.EPRINT,</b>
+&nbsp;                    StandardField.FILE, BiblatexSoftwareField.HALID, BiblatexSoftwareField.HALVERSION, StandardField.INSTITUTION, BiblatexSoftwareField.INTRODUCEDIN,
+&nbsp;                    BiblatexSoftwareField.LICENSE, StandardField.MONTH, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.PUBLISHER, StandardField.RELATED,
+&nbsp;                    BiblatexSoftwareField.RELATEDSTRING, BiblatexSoftwareField.REPOSITORY, BiblatexSoftwareField.SWHID, StandardField.URLDATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType SOFTWAREVERSION = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(BiblatexSoftwareEntryType.SoftwareVersion)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.URL, StandardField.YEAR, StandardField.VERSION)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.DATE, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, BiblatexSoftwareField.HALID, BiblatexSoftwareField.HALVERSION,</b>
+&nbsp;                    StandardField.INSTITUTION, BiblatexSoftwareField.INTRODUCEDIN, BiblatexSoftwareField.LICENSE, StandardField.MONTH, StandardField.NOTE, StandardField.ORGANIZATION,
+&nbsp;                    StandardField.PUBLISHER, StandardField.RELATED, BiblatexSoftwareField.RELATEDTYPE, BiblatexSoftwareField.RELATEDSTRING,
+&nbsp;                    BiblatexSoftwareField.REPOSITORY, BiblatexSoftwareField.SWHID, StandardField.SUBTITLE, StandardField.URLDATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType SOFTWAREMODULE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(BiblatexSoftwareEntryType.SoftwareModule)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.SUBTITLE, StandardField.URL, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.DATE, StandardField.DOI, StandardField.EPRINTTYPE, StandardField.EPRINTCLASS, StandardField.EPRINT,</b>
+&nbsp;                    StandardField.EDITOR, StandardField.FILE, BiblatexSoftwareField.HALID, BiblatexSoftwareField.HALVERSION, StandardField.INSTITUTION, BiblatexSoftwareField.INTRODUCEDIN,
+&nbsp;                    BiblatexSoftwareField.LICENSE, StandardField.MONTH, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.PUBLISHER, StandardField.RELATED,
+&nbsp;                    BiblatexSoftwareField.RELATEDSTRING, BiblatexSoftwareField.REPOSITORY, BiblatexSoftwareField.SWHID, StandardField.URLDATE, StandardField.VERSION)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType CODEFRAGMENT = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(BiblatexSoftwareEntryType.CodeFragment)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.URL)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.DATE, StandardField.DOI, StandardField.EPRINTTYPE, StandardField.EPRINTCLASS, StandardField.EPRINT,</b>
+&nbsp;                    StandardField.EDITOR, StandardField.FILE, BiblatexSoftwareField.HALID, BiblatexSoftwareField.HALVERSION, StandardField.INSTITUTION, BiblatexSoftwareField.INTRODUCEDIN,
+&nbsp;                    BiblatexSoftwareField.LICENSE, StandardField.MONTH, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.PUBLISHER, StandardField.RELATED,
+&nbsp;                    BiblatexSoftwareField.RELATEDSTRING, BiblatexSoftwareField.REPOSITORY, BiblatexSoftwareField.SWHID, StandardField.URLDATE, StandardField.VERSION)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final List&lt;BibEntryType&gt; ALL = Arrays.asList(SOFTWAREVERSION, SOFTWARE, SOFTWAREMODULE, CODEFRAGMENT);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,286 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProtectedTermsTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.protectedterms</a>
+</div>
+
+<h1>Coverage Summary for Class: ProtectedTermsTabViewModel (org.jabref.gui.preferences.protectedterms)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProtectedTermsTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/69)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.protectedterms;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.DialogPane;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.control.TextArea;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.protectedterms.ProtectedTermsList;
+&nbsp;import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+&nbsp;import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.util.OptionalUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsTabViewModel.class);</b>
+&nbsp;
+&nbsp;    private final ProtectedTermsLoader termsLoader;
+<b class="nc">&nbsp;    private final ListProperty&lt;ProtectedTermsListItemModel&gt; termsFilesProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final ProtectedTermsPreferences protectedTermsPreferences;
+&nbsp;
+&nbsp;    public ProtectedTermsTabViewModel(ProtectedTermsLoader termsLoader,
+&nbsp;                                      DialogService dialogService,
+<b class="nc">&nbsp;                                      GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.termsLoader = termsLoader;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();</b>
+<b class="nc">&nbsp;        this.filePreferences = preferences.getFilePreferences();</b>
+<b class="nc">&nbsp;        this.protectedTermsPreferences = preferences.getProtectedTermsPreferences();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        termsFilesProperty.clear();</b>
+<b class="nc">&nbsp;        termsFilesProperty.addAll(termsLoader.getProtectedTermsLists().stream().map(ProtectedTermsListItemModel::new).toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        List&lt;String&gt; enabledExternalList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; disabledExternalList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; enabledInternalList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; disabledInternalList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ProtectedTermsList list : termsFilesProperty.getValue().stream()</b>
+<b class="nc">&nbsp;                                                         .map(ProtectedTermsListItemModel::getTermsList).toList()) {</b>
+<b class="nc">&nbsp;            if (list.isInternalList()) {</b>
+<b class="nc">&nbsp;                if (list.isEnabled()) {</b>
+<b class="nc">&nbsp;                    enabledInternalList.add(list.getLocation());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    disabledInternalList.add(list.getLocation());</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (list.isEnabled()) {</b>
+<b class="nc">&nbsp;                    enabledExternalList.add(list.getLocation());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    disabledExternalList.add(list.getLocation());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        protectedTermsPreferences.setEnabledInternalTermLists(enabledInternalList);</b>
+<b class="nc">&nbsp;        protectedTermsPreferences.setEnabledExternalTermLists(enabledExternalList);</b>
+<b class="nc">&nbsp;        protectedTermsPreferences.setDisabledInternalTermLists(disabledInternalList);</b>
+<b class="nc">&nbsp;        protectedTermsPreferences.setDisabledExternalTermLists(disabledExternalList);</b>
+&nbsp;
+<b class="nc">&nbsp;        termsLoader.update(protectedTermsPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addFile() {
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(Localization.lang(&quot;Protected terms file&quot;), StandardFileType.TERMS)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(Localization.lang(&quot;Protected terms file&quot;), StandardFileType.TERMS)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(filePreferences.getWorkingDirectory())</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileDialogConfiguration)</b>
+<b class="nc">&nbsp;                     .ifPresent(file -&gt; {</b>
+<b class="nc">&nbsp;                         Path fileName = file.toAbsolutePath();</b>
+<b class="nc">&nbsp;                         termsFilesProperty.add(new ProtectedTermsListItemModel(ProtectedTermsLoader.readProtectedTermsListFromFile(fileName, true)));</b>
+&nbsp;                     });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeList(ProtectedTermsListItemModel itemModel) {
+<b class="nc">&nbsp;        ProtectedTermsList list = itemModel.getTermsList();</b>
+<b class="nc">&nbsp;        if (!list.isInternalList() &amp;&amp; dialogService.showConfirmationDialogAndWait(Localization.lang(&quot;Remove protected terms file&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Are you sure you want to remove the protected terms file?&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Remove protected terms file&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Cancel&quot;))) {</b>
+<b class="nc">&nbsp;            itemModel.enabledProperty().setValue(false);</b>
+<b class="nc">&nbsp;            if (!termsFilesProperty.remove(itemModel)) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Problem removing protected terms file&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void createNewFile() {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new NewProtectedTermsFileDialog(termsFilesProperty, dialogService, filePreferences));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void edit(ProtectedTermsListItemModel file) {
+<b class="nc">&nbsp;        Optional&lt;ExternalFileType&gt; termsFileType = OptionalUtil.&lt;ExternalFileType&gt;orElse(</b>
+<b class="nc">&nbsp;                ExternalFileTypes.getExternalFileTypeByExt(&quot;terms&quot;, externalApplicationsPreferences),</b>
+<b class="nc">&nbsp;                ExternalFileTypes.getExternalFileTypeByExt(&quot;txt&quot;, externalApplicationsPreferences)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String fileName = file.getTermsList().getLocation();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, fileName, termsFileType);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Problem open protected terms file editor&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void displayContent(ProtectedTermsListItemModel itemModel) {
+<b class="nc">&nbsp;        ProtectedTermsList list = itemModel.getTermsList();</b>
+<b class="nc">&nbsp;        TextArea listingView = new TextArea(list.getTermListing());</b>
+<b class="nc">&nbsp;        listingView.setEditable(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        ScrollPane scrollPane = new ScrollPane();</b>
+<b class="nc">&nbsp;        scrollPane.setFitToHeight(true);</b>
+<b class="nc">&nbsp;        scrollPane.setFitToWidth(true);</b>
+<b class="nc">&nbsp;        scrollPane.setContent(listingView);</b>
+&nbsp;
+<b class="nc">&nbsp;        DialogPane dialogPane = new DialogPane();</b>
+<b class="nc">&nbsp;        dialogPane.setContent(scrollPane);</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(list.getDescription() + &quot; - &quot; + list.getLocation(), dialogPane, ButtonType.OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void reloadList(ProtectedTermsListItemModel oldItemModel) {
+<b class="nc">&nbsp;        ProtectedTermsList oldList = oldItemModel.getTermsList();</b>
+<b class="nc">&nbsp;        ProtectedTermsList newList = ProtectedTermsLoader.readProtectedTermsListFromFile(Path.of(oldList.getLocation()), oldList.isEnabled());</b>
+<b class="nc">&nbsp;        int index = termsFilesProperty.indexOf(oldItemModel);</b>
+<b class="nc">&nbsp;        if (index &gt;= 0) {</b>
+<b class="nc">&nbsp;            termsFilesProperty.set(index, new ProtectedTermsListItemModel(newList));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Problem reloading protected terms file {}.&quot;, oldList.getLocation());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;ProtectedTermsListItemModel&gt; termsFilesProperty() {
+<b class="nc">&nbsp;        return termsFilesProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

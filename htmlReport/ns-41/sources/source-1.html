@@ -1,0 +1,152 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CheckForNewEntryTypesAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.importer.actions</a>
+</div>
+
+<h1>Coverage Summary for Class: CheckForNewEntryTypesAction (org.jabref.gui.importer.actions)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CheckForNewEntryTypesAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.importer.actions;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
+&nbsp;import org.jabref.logic.LibraryPreferences;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;
+&nbsp;/**
+&nbsp; * This action checks whether any new custom entry types were loaded from this
+&nbsp; * BIB file. If so, an offer to remember these entry types is given.
+&nbsp; */
+<b class="nc">&nbsp;public class CheckForNewEntryTypesAction implements GUIPostOpenAction {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+<b class="nc">&nbsp;        return !getListOfUnknownAndUnequalCustomizations(parserResult, preferences.getLibraryPreferences()).isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferencesService) {
+<b class="nc">&nbsp;        LibraryPreferences preferences = preferencesService.getLibraryPreferences();</b>
+<b class="nc">&nbsp;        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult, preferences);</b>
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult, preferences)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntryType&gt; getListOfUnknownAndUnequalCustomizations(ParserResult parserResult, LibraryPreferences preferences) {
+<b class="nc">&nbsp;        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult, preferences);</b>
+<b class="nc">&nbsp;        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        return parserResult.getEntryTypes()</b>
+<b class="nc">&nbsp;                           .stream()</b>
+<b class="nc">&nbsp;                           .filter(type -&gt; entryTypesManager.isDifferentCustomOrModifiedType(type, mode))</b>
+<b class="nc">&nbsp;                           .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibDatabaseMode getBibDatabaseModeFromParserResult(ParserResult parserResult, LibraryPreferences preferences) {
+<b class="nc">&nbsp;        return parserResult.getMetaData().getMode().orElse(preferences.getDefaultBibDatabaseMode());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

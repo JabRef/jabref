@@ -1,0 +1,363 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OvidImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: OvidImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OvidImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/130)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.EntryTypeFactory;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;/**
+&nbsp; * Imports an Ovid file.
+&nbsp; */
+<b class="nc">&nbsp;public class OvidImporter extends Importer {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern OVID_SOURCE_PATTERN = Pattern</b>
+<b class="nc">&nbsp;            .compile(&quot;Source ([ \\w&amp;\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern OVID_SOURCE_PATTERN_NO_ISSUE = Pattern</b>
+<b class="nc">&nbsp;            .compile(&quot;Source ([ \\w&amp;\\-,:]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern OVID_SOURCE_PATTERN_2 = Pattern.compile(</b>
+&nbsp;            &quot;([ \\w&amp;\\-,]+)\\. Vol ([0-9]+)\\(([\\w\\-]+)\\) ([A-Za-z]+) ([0-9][0-9][0-9][0-9]), ([0-9]+\\-?[0-9]+)&quot;);
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern INCOLLECTION_PATTERN = Pattern.compile(</b>
+&nbsp;            &quot;(.+)\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&amp;\\-,:]+)\\.[ ]+\\(pp. ([0-9]+\\-?[0-9]+?)\\).[A-Za-z0-9, ]+pp\\. &quot;
+&nbsp;                    + &quot;([\\w, ]+): ([\\w, ]+)&quot;);
+<b class="nc">&nbsp;    private static final Pattern BOOK_PATTERN = Pattern.compile(</b>
+&nbsp;            &quot;\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)&quot;);
+&nbsp;
+&nbsp;    private static final String OVID_PATTERN_STRING = &quot;&lt;[0-9]+&gt;&quot;;
+<b class="nc">&nbsp;    private static final Pattern OVID_PATTERN = Pattern.compile(OVID_PATTERN_STRING);</b>
+&nbsp;
+&nbsp;    private static final int MAX_ITEMS = 50;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;ovid&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;Ovid&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StandardFileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.TXT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Importer for the Ovid format.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+&nbsp;        String str;
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        while (((str = reader.readLine()) != null) &amp;&amp; (i &lt; MAX_ITEMS)) {</b>
+<b class="nc">&nbsp;            if (OvidImporter.OVID_PATTERN.matcher(str).find()) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; bibitems = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+&nbsp;        String line;
+<b class="nc">&nbsp;        while ((line = reader.readLine()) != null) {</b>
+<b class="nc">&nbsp;            if (!line.isEmpty() &amp;&amp; (line.charAt(0) != &#39; &#39;)) {</b>
+<b class="nc">&nbsp;                sb.append(&quot;__NEWFIELD__&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            sb.append(line);</b>
+<b class="nc">&nbsp;            sb.append(&#39;\n&#39;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String[] items = sb.toString().split(OVID_PATTERN_STRING);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 1; i &lt; items.length; i++) {</b>
+<b class="nc">&nbsp;            Map&lt;Field, String&gt; h = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;            String[] fields = items[i].split(&quot;__NEWFIELD__&quot;);</b>
+<b class="nc">&nbsp;            for (String field : fields) {</b>
+<b class="nc">&nbsp;                int linebreak = field.indexOf(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;                String fieldName = field.substring(0, linebreak).trim();</b>
+<b class="nc">&nbsp;                String content = field.substring(linebreak).trim();</b>
+&nbsp;
+&nbsp;                // Check if this is the author field (due to a minor special treatment for this field):
+<b class="nc">&nbsp;                boolean isAuthor = (fieldName.indexOf(&quot;Author&quot;) == 0)</b>
+<b class="nc">&nbsp;                        &amp;&amp; !fieldName.contains(&quot;Author Keywords&quot;)</b>
+<b class="nc">&nbsp;                        &amp;&amp; !fieldName.contains(&quot;Author e-mail&quot;);</b>
+&nbsp;
+&nbsp;                // Remove unnecessary dots at the end of lines, unless this is the author field,
+&nbsp;                // in which case a dot at the end could be significant:
+<b class="nc">&nbsp;                if (!isAuthor &amp;&amp; content.endsWith(&quot;.&quot;)) {</b>
+<b class="nc">&nbsp;                    content = content.substring(0, content.length() - 1);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (isAuthor) {</b>
+<b class="nc">&nbsp;                    h.put(StandardField.AUTHOR, content);</b>
+<b class="nc">&nbsp;                } else if (fieldName.startsWith(&quot;Title&quot;)) {</b>
+<b class="nc">&nbsp;                    content = content.replaceAll(&quot;\\[.+\\]&quot;, &quot;&quot;).trim();</b>
+<b class="nc">&nbsp;                    if (content.endsWith(&quot;.&quot;)) {</b>
+<b class="nc">&nbsp;                        content = content.substring(0, content.length() - 1);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    h.put(StandardField.TITLE, content);</b>
+<b class="nc">&nbsp;                } else if (fieldName.startsWith(&quot;Chapter Title&quot;)) {</b>
+<b class="nc">&nbsp;                    h.put(new UnknownField(&quot;chaptertitle&quot;), content);</b>
+<b class="nc">&nbsp;                } else if (fieldName.startsWith(&quot;Source&quot;)) {</b>
+&nbsp;                    Matcher matcher;
+<b class="nc">&nbsp;                    if ((matcher = OvidImporter.OVID_SOURCE_PATTERN.matcher(content)).find()) {</b>
+<b class="nc">&nbsp;                        h.put(StandardField.JOURNAL, matcher.group(1));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.VOLUME, matcher.group(2));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.ISSUE, matcher.group(3));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.PAGES, matcher.group(4));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.YEAR, matcher.group(5));</b>
+<b class="nc">&nbsp;                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) { // may be missing the issue</b>
+<b class="nc">&nbsp;                        h.put(StandardField.JOURNAL, matcher.group(1));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.VOLUME, matcher.group(2));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.PAGES, matcher.group(3));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.YEAR, matcher.group(4));</b>
+<b class="nc">&nbsp;                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_2.matcher(content)).find()) {</b>
+<b class="nc">&nbsp;                        h.put(StandardField.JOURNAL, matcher.group(1));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.VOLUME, matcher.group(2));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.ISSUE, matcher.group(3));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.MONTH, matcher.group(4));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.YEAR, matcher.group(5));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.PAGES, matcher.group(6));</b>
+<b class="nc">&nbsp;                    } else if ((matcher = OvidImporter.INCOLLECTION_PATTERN.matcher(content)).find()) {</b>
+<b class="nc">&nbsp;                        h.put(StandardField.EDITOR, matcher.group(1).replace(&quot; (Ed)&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.YEAR, matcher.group(2));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.BOOKTITLE, matcher.group(3));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.PAGES, matcher.group(4));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.ADDRESS, matcher.group(5));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.PUBLISHER, matcher.group(6));</b>
+<b class="nc">&nbsp;                    } else if ((matcher = OvidImporter.BOOK_PATTERN.matcher(content)).find()) {</b>
+<b class="nc">&nbsp;                        h.put(StandardField.YEAR, matcher.group(1));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.PAGES, matcher.group(2));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.ADDRESS, matcher.group(3));</b>
+<b class="nc">&nbsp;                        h.put(StandardField.PUBLISHER, matcher.group(4));</b>
+&nbsp;                    }
+&nbsp;                    // Add double hyphens to page ranges:
+<b class="nc">&nbsp;                    if (h.get(StandardField.PAGES) != null) {</b>
+<b class="nc">&nbsp;                        h.put(StandardField.PAGES, h.get(StandardField.PAGES).replace(&quot;-&quot;, &quot;--&quot;));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } else if (&quot;Abstract&quot;.equals(fieldName)) {</b>
+<b class="nc">&nbsp;                    h.put(StandardField.ABSTRACT, content);</b>
+<b class="nc">&nbsp;                } else if (&quot;Publication Type&quot;.equals(fieldName)) {</b>
+<b class="nc">&nbsp;                    if (content.contains(&quot;Book&quot;)) {</b>
+<b class="nc">&nbsp;                        h.put(InternalField.TYPE_HEADER, &quot;book&quot;);</b>
+<b class="nc">&nbsp;                    } else if (content.contains(&quot;Journal&quot;)) {</b>
+<b class="nc">&nbsp;                        h.put(InternalField.TYPE_HEADER, &quot;article&quot;);</b>
+<b class="nc">&nbsp;                    } else if (content.contains(&quot;Conference Paper&quot;)) {</b>
+<b class="nc">&nbsp;                        h.put(InternalField.TYPE_HEADER, &quot;inproceedings&quot;);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } else if (fieldName.startsWith(&quot;Language&quot;)) {</b>
+<b class="nc">&nbsp;                    h.put(StandardField.LANGUAGE, content);</b>
+<b class="nc">&nbsp;                } else if (fieldName.startsWith(&quot;Author Keywords&quot;)) {</b>
+<b class="nc">&nbsp;                    content = content.replace(&quot;;&quot;, &quot;,&quot;).replace(&quot;  &quot;, &quot; &quot;);</b>
+<b class="nc">&nbsp;                    h.put(StandardField.KEYWORDS, content);</b>
+<b class="nc">&nbsp;                } else if (fieldName.startsWith(&quot;ISSN&quot;)) {</b>
+<b class="nc">&nbsp;                    h.put(StandardField.ISSN, content);</b>
+<b class="nc">&nbsp;                } else if (fieldName.startsWith(&quot;DOI Number&quot;)) {</b>
+<b class="nc">&nbsp;                    h.put(StandardField.DOI, content);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // Now we need to check if a book entry has given editors in the author field;
+&nbsp;            // if so, rearrange:
+<b class="nc">&nbsp;            String auth = h.get(StandardField.AUTHOR);</b>
+<b class="nc">&nbsp;            if ((auth != null) &amp;&amp; auth.contains(&quot; [Ed]&quot;)) {</b>
+<b class="nc">&nbsp;                h.remove(StandardField.AUTHOR);</b>
+<b class="nc">&nbsp;                h.put(StandardField.EDITOR, auth.replace(&quot; [Ed]&quot;, &quot;&quot;));</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Rearrange names properly:
+<b class="nc">&nbsp;            auth = h.get(StandardField.AUTHOR);</b>
+<b class="nc">&nbsp;            if (auth != null) {</b>
+<b class="nc">&nbsp;                h.put(StandardField.AUTHOR, fixNames(auth));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            auth = h.get(StandardField.EDITOR);</b>
+<b class="nc">&nbsp;            if (auth != null) {</b>
+<b class="nc">&nbsp;                h.put(StandardField.EDITOR, fixNames(auth));</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Set the entrytype properly:
+<b class="nc">&nbsp;            EntryType entryType = h.containsKey(InternalField.TYPE_HEADER) ? EntryTypeFactory.parse(h.get(InternalField.TYPE_HEADER)) : BibEntry.DEFAULT_TYPE;</b>
+<b class="nc">&nbsp;            h.remove(InternalField.TYPE_HEADER);</b>
+<b class="nc">&nbsp;            if (entryType.equals(StandardEntryType.Book) &amp;&amp; h.containsKey(new UnknownField(&quot;chaptertitle&quot;))) {</b>
+&nbsp;                // This means we have an &quot;incollection&quot; entry.
+<b class="nc">&nbsp;                entryType = StandardEntryType.InCollection;</b>
+&nbsp;                // Move the &quot;chaptertitle&quot; to just &quot;title&quot;:
+<b class="nc">&nbsp;                h.put(StandardField.TITLE, h.remove(new UnknownField(&quot;chaptertitle&quot;)));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            BibEntry b = new BibEntry(entryType);</b>
+<b class="nc">&nbsp;            b.setField(h);</b>
+&nbsp;
+<b class="nc">&nbsp;            bibitems.add(b);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new ParserResult(bibitems);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert a string of author names into a BibTeX-compatible format.
+&nbsp;     *
+&nbsp;     * @param content The name string.
+&nbsp;     * @return The formatted names.
+&nbsp;     */
+&nbsp;    private static String fixNames(String content) {
+&nbsp;        String names;
+<b class="nc">&nbsp;        if (content.indexOf(&#39;;&#39;) &gt; 0) { // LN FN; [LN FN;]*</b>
+<b class="nc">&nbsp;            names = content.replaceAll(&quot;[^\\.A-Za-z,;\\- ]&quot;, &quot;&quot;).replace(&quot;;&quot;, &quot; and&quot;);</b>
+<b class="nc">&nbsp;        } else if (content.indexOf(&quot;  &quot;) &gt; 0) {</b>
+<b class="nc">&nbsp;            String[] sNames = content.split(&quot; {2}&quot;);</b>
+<b class="nc">&nbsp;            StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; sNames.length; i++) {</b>
+<b class="nc">&nbsp;                if (i &gt; 0) {</b>
+<b class="nc">&nbsp;                    sb.append(&quot; and &quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                sb.append(sNames[i].replaceFirst(&quot; &quot;, &quot;, &quot;));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            names = sb.toString();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            names = content;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return AuthorList.fixAuthorLastNameFirst(names);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

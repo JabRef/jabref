@@ -1,0 +1,178 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Crawler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.crawler</a>
+</div>
+
+<h1>Coverage Summary for Class: Crawler (org.jabref.logic.crawler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Crawler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.crawler;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.exporter.SaveException;
+&nbsp;import org.jabref.logic.git.SlrGitHandler;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.study.QueryResult;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import org.eclipse.jgit.api.errors.GitAPIException;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class provides a service for SLR support by conducting an automated search and persistance
+&nbsp; * of studies using the queries and E-Libraries specified in the provided study definition file.
+&nbsp; * &lt;p&gt;
+&nbsp; * It composes a StudyRepository for repository management,
+&nbsp; * and a StudyFetcher that manages the crawling over the selected E-Libraries.
+&nbsp; */
+&nbsp;public class Crawler {
+&nbsp;    public static final String FILENAME_STUDY_RESULT_BIB = &quot;studyResult.bib&quot;;
+&nbsp;
+&nbsp;    private final StudyRepository studyRepository;
+&nbsp;    private final StudyFetcher studyFetcher;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a crawler for retrieving studies from E-Libraries
+&nbsp;     *
+&nbsp;     * @param studyRepositoryRoot The path to the study repository
+&nbsp;     */
+&nbsp;    public Crawler(Path studyRepositoryRoot,
+&nbsp;                   SlrGitHandler gitHandler,
+&nbsp;                   CliPreferences preferences,
+&nbsp;                   BibEntryTypesManager bibEntryTypesManager,
+<b class="nc">&nbsp;                   FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException, JabRefException {</b>
+<b class="nc">&nbsp;        this.studyRepository = new StudyRepository(</b>
+&nbsp;                studyRepositoryRoot,
+&nbsp;                gitHandler,
+&nbsp;                preferences,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                bibEntryTypesManager);
+<b class="nc">&nbsp;        StudyCatalogToFetcherConverter studyCatalogToFetcherConverter = new StudyCatalogToFetcherConverter(</b>
+<b class="nc">&nbsp;                studyRepository.getActiveLibraryEntries(),</b>
+<b class="nc">&nbsp;                preferences.getImportFormatPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getImporterPreferences());</b>
+<b class="nc">&nbsp;        this.studyFetcher = new StudyFetcher(</b>
+<b class="nc">&nbsp;                studyCatalogToFetcherConverter.getActiveFetchers(),</b>
+<b class="nc">&nbsp;                studyRepository.getSearchQueryStrings());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This methods performs the crawling of the active libraries defined in the study definition file.
+&nbsp;     * This method also persists the results in the same folder the study definition file is stored in.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The whole process works as follows:
+&nbsp;     * &lt;ol&gt;
+&nbsp;     *     &lt;li&gt;Then the search is executed&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;The repository changes to the search branch&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Afterwards, the results are persisted on the search branch.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Finally, the changes are merged into the work branch&lt;/li&gt;
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     *
+&nbsp;     * @throws IOException Thrown if a problem occurred during the persistence of the result.
+&nbsp;     */
+&nbsp;    public void performCrawl() throws IOException, GitAPIException, SaveException, JabRefException {
+<b class="nc">&nbsp;        List&lt;QueryResult&gt; results = studyFetcher.crawl();</b>
+<b class="nc">&nbsp;        studyRepository.persist(results);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,306 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CustomExternalFileType</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiletype</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomExternalFileType (org.jabref.gui.externalfiletype)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CustomExternalFileType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiletype;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class defines a type of external files that can be linked to from JabRef.
+&nbsp; * The class contains enough information to provide an icon, a standard extension
+&nbsp; * and a link to which application handles files of this type.
+&nbsp; * &lt;p&gt;
+&nbsp; * TODO: Move to model (and then adapt {@link org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel#fromFile(java.nio.file.Path, java.util.List, FilePreferences)}).
+&nbsp; */
+&nbsp;public class CustomExternalFileType implements ExternalFileType {
+&nbsp;
+&nbsp;    private String name;
+&nbsp;    private String extension;
+&nbsp;    private String openWith;
+&nbsp;    private String iconName;
+&nbsp;    private String mimeType;
+&nbsp;    private JabRefIcon icon;
+&nbsp;
+&nbsp;    public CustomExternalFileType(String name, String extension, String mimeType,
+<b class="nc">&nbsp;                                  String openWith, String iconName, JabRefIcon icon) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.extension = extension;</b>
+<b class="nc">&nbsp;        this.mimeType = mimeType;</b>
+<b class="nc">&nbsp;        this.openWith = openWith;</b>
+&nbsp;
+<b class="nc">&nbsp;        setIconName(iconName);</b>
+<b class="nc">&nbsp;        setIcon(icon);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CustomExternalFileType(ExternalFileType type) {
+<b class="nc">&nbsp;        this(type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), &quot;&quot;, type.getIcon());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Construct an ExternalFileType from a String array. This is used when
+&nbsp;     * reading file type definitions from Preferences, where the available data types are
+&nbsp;     * limited. We assume that the array contains the same values as the main constructor,
+&nbsp;     * in the same order.
+&nbsp;     *
+&nbsp;     * @param val arguments.
+&nbsp;     */
+&nbsp;    public static ExternalFileType buildFromArgs(String[] val) {
+<b class="nc">&nbsp;        if ((val == null) || (val.length &lt; 4) || (val.length &gt; 5)) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Cannot construct ExternalFileType without four elements in String[] argument.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String name = val[0];</b>
+<b class="nc">&nbsp;        String extension = val[1];</b>
+&nbsp;        String openWith;
+&nbsp;        String mimeType;
+&nbsp;        String iconName;
+&nbsp;
+<b class="nc">&nbsp;        if (val.length == 4) {</b>
+&nbsp;            // Up to version 2.4b the mime type is not included:
+<b class="nc">&nbsp;            mimeType = &quot;&quot;;</b>
+<b class="nc">&nbsp;            openWith = val[2];</b>
+<b class="nc">&nbsp;            iconName = val[3];</b>
+&nbsp;        } else {
+&nbsp;            // When mime type is included, the array length should be 5:
+<b class="nc">&nbsp;            mimeType = val[2];</b>
+<b class="nc">&nbsp;            openWith = val[3];</b>
+<b class="nc">&nbsp;            iconName = val[4];</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // set icon to default first
+<b class="nc">&nbsp;        JabRefIcon icon = IconTheme.JabRefIcons.FILE;</b>
+&nbsp;
+&nbsp;        // check whether there is another icon defined for this file type
+<b class="nc">&nbsp;        for (ExternalFileType fileType : ExternalFileTypes.getDefaultExternalFileTypes()) {</b>
+<b class="nc">&nbsp;            if (fileType.getName().equals(name)) {</b>
+<b class="nc">&nbsp;                icon = fileType.getIcon();</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new CustomExternalFileType(name, extension, mimeType, openWith, iconName, icon);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setName(String name) {
+<b class="nc">&nbsp;        this.name = name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExtension() {
+<b class="nc">&nbsp;        if (extension == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return extension;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setExtension(String extension) {
+<b class="nc">&nbsp;        this.extension = extension;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getMimeType() {
+<b class="nc">&nbsp;        if (mimeType == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return mimeType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMimeType(String mimeType) {
+<b class="nc">&nbsp;        this.mimeType = mimeType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getOpenWithApplication() {
+<b class="nc">&nbsp;        if (openWith == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return openWith;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOpenWith(String openWith) {
+<b class="nc">&nbsp;        this.openWith = openWith;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the string associated with this file type&#39;s icon.
+&nbsp;     *
+&nbsp;     * @return The icon name.
+&nbsp;     */
+&nbsp;    public String getIconName() {
+<b class="nc">&nbsp;        return iconName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the string associated with this file type&#39;s icon.
+&nbsp;     *
+&nbsp;     * @param name The icon name to use.
+&nbsp;     */
+&nbsp;    public void setIconName(String name) {
+<b class="nc">&nbsp;        this.iconName = name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public JabRefIcon getIcon() {
+<b class="nc">&nbsp;        return icon;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setIcon(JabRefIcon icon) {
+<b class="nc">&nbsp;        Objects.requireNonNull(icon);</b>
+<b class="nc">&nbsp;        this.icon = icon;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ExternalFileType copy() {
+<b class="nc">&nbsp;        return new CustomExternalFileType(name, extension, mimeType, openWith, iconName, icon);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(name, extension, mimeType, openWith, iconName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * We define two file type objects as equal if their name, extension, openWith and
+&nbsp;     * iconName are equal.
+&nbsp;     *
+&nbsp;     * @param object The file type to compare with.
+&nbsp;     * @return true if the file types are equal.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object object) {
+<b class="nc">&nbsp;        if (this == object) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (object instanceof CustomExternalFileType other) {</b>
+<b class="nc">&nbsp;            return Objects.equals(name, other.name) &amp;&amp; Objects.equals(extension, other.extension) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(mimeType, other.mimeType) &amp;&amp; Objects.equals(openWith, other.openWith) &amp;&amp; Objects.equals(iconName, other.iconName);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

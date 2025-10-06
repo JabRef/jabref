@@ -1,0 +1,241 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SearchFlagsToExpressionVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.search.query</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchFlagsToExpressionVisitor (org.jabref.logic.search.query)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SearchFlagsToExpressionVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.search.query;
+&nbsp;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.search.SearchFlags;
+&nbsp;import org.jabref.search.SearchBaseVisitor;
+&nbsp;import org.jabref.search.SearchParser;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import static org.jabref.model.search.SearchFlags.CASE_INSENSITIVE;
+&nbsp;import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
+&nbsp;import static org.jabref.model.search.SearchFlags.EXACT_MATCH;
+&nbsp;import static org.jabref.model.search.SearchFlags.INEXACT_MATCH;
+&nbsp;import static org.jabref.model.search.SearchFlags.NEGATION;
+&nbsp;import static org.jabref.model.search.SearchFlags.REGULAR_EXPRESSION;
+&nbsp;
+&nbsp;/// Tests are located in `org.jabref.logic.search.query.SearchQueryFlagsConversionTest`
+&nbsp;public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor&lt;String&gt; {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SearchFlagsToExpressionVisitor.class);</b>
+&nbsp;
+&nbsp;    private final boolean isCaseSensitive;
+&nbsp;    private final boolean isRegularExpression;
+&nbsp;
+<b class="nc">&nbsp;    public SearchFlagsToExpressionVisitor(EnumSet&lt;SearchFlags&gt; searchFlags) {</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Converting search flags to search expression: {}&quot;, searchFlags);</b>
+<b class="nc">&nbsp;        this.isCaseSensitive = searchFlags.contains(SearchFlags.CASE_SENSITIVE);</b>
+<b class="nc">&nbsp;        this.isRegularExpression = searchFlags.contains(SearchFlags.REGULAR_EXPRESSION);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitStart(SearchParser.StartContext ctx) {
+<b class="nc">&nbsp;        return visit(ctx.andExpression());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
+<b class="nc">&nbsp;        List&lt;String&gt; children = ctx.expression().stream().map(this::visit).toList();</b>
+<b class="nc">&nbsp;        if (children.size() == 1) {</b>
+<b class="nc">&nbsp;            return children.getFirst();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return String.join(&quot; &quot;, children);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitParenExpression(SearchParser.ParenExpressionContext ctx) {
+<b class="nc">&nbsp;        return &quot;(&quot; + visit(ctx.andExpression()) + &quot;)&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitNegatedExpression(SearchParser.NegatedExpressionContext ctx) {
+<b class="nc">&nbsp;        return &quot;NOT &quot; + visit(ctx.expression());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
+<b class="nc">&nbsp;        return visit(ctx.left) + &quot; &quot; + ctx.bin_op.getText() + &quot; &quot; + visit(ctx.right);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitComparisonExpression(SearchParser.ComparisonExpressionContext ctx) {
+<b class="nc">&nbsp;        return visit(ctx.comparison());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitComparison(SearchParser.ComparisonContext ctx) {
+<b class="nc">&nbsp;        String term = ctx.searchValue().getText();</b>
+&nbsp;
+&nbsp;        // unfielded expression
+<b class="nc">&nbsp;        if (ctx.FIELD() == null) {</b>
+<b class="nc">&nbsp;            return term;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // fielded expression
+<b class="nc">&nbsp;        EnumSet&lt;SearchFlags&gt; searchFlags = EnumSet.noneOf(SearchFlags.class);</b>
+<b class="nc">&nbsp;        String field = ctx.FIELD().getText();</b>
+<b class="nc">&nbsp;        int operator = ctx.operator().getStart().getType();</b>
+&nbsp;
+<b class="nc">&nbsp;        searchFlags.add(isCaseSensitive ? CASE_SENSITIVE : CASE_INSENSITIVE);</b>
+<b class="nc">&nbsp;        if (operator == SearchParser.NEQUAL) {</b>
+<b class="nc">&nbsp;            searchFlags.add(NEGATION);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isRegularExpression) {</b>
+<b class="nc">&nbsp;            searchFlags.add(REGULAR_EXPRESSION);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (operator == SearchParser.EQUAL || operator == SearchParser.CONTAINS || operator == SearchParser.NEQUAL) {</b>
+<b class="nc">&nbsp;                searchFlags.add(INEXACT_MATCH);</b>
+<b class="nc">&nbsp;            } else if (operator == SearchParser.EEQUAL || operator == SearchParser.MATCHES) {</b>
+<b class="nc">&nbsp;                searchFlags.add(EXACT_MATCH);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return getFieldQueryNode(field, term, searchFlags);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getFieldQueryNode(String field, String term, EnumSet&lt;SearchFlags&gt; searchFlags) {
+<b class="nc">&nbsp;        String operator = getOperator(searchFlags);</b>
+<b class="nc">&nbsp;        return field + &quot; &quot; + operator + &quot; &quot; + term;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getOperator(EnumSet&lt;SearchFlags&gt; searchFlags) {
+<b class="nc">&nbsp;        StringBuilder operator = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (searchFlags.contains(NEGATION)) {</b>
+<b class="nc">&nbsp;            operator.append(&quot;!&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (searchFlags.contains(INEXACT_MATCH)) {</b>
+<b class="nc">&nbsp;            operator.append(&quot;=&quot;);</b>
+<b class="nc">&nbsp;        } else if (searchFlags.contains(EXACT_MATCH)) {</b>
+<b class="nc">&nbsp;            operator.append(&quot;==&quot;);</b>
+<b class="nc">&nbsp;        } else if (searchFlags.contains(REGULAR_EXPRESSION)) {</b>
+<b class="nc">&nbsp;            operator.append(&quot;=~&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (searchFlags.contains(CASE_SENSITIVE)) {</b>
+<b class="nc">&nbsp;            operator.append(&quot;!&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return operator.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

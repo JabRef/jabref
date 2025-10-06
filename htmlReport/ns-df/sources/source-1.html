@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SSLCertificate</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.net.ssl</a>
+</div>
+
+<h1>Coverage Summary for Class: SSLCertificate (org.jabref.logic.net.ssl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SSLCertificate</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.net.ssl;
+&nbsp;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.security.cert.CertificateEncodingException;
+&nbsp;import java.security.cert.CertificateException;
+&nbsp;import java.security.cert.CertificateFactory;
+&nbsp;import java.security.cert.X509Certificate;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.ZoneId;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import com.google.common.hash.Hashing;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class SSLCertificate {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SSLCertificate.class);</b>
+&nbsp;
+&nbsp;    private final String sha256Thumbprint;
+&nbsp;    private final String serialNumber;
+&nbsp;    private final String issuer;
+&nbsp;    private final LocalDate validFrom;
+&nbsp;    private final LocalDate validTo;
+&nbsp;    private final String signatureAlgorithm;
+&nbsp;    private final Integer version;
+&nbsp;
+<b class="nc">&nbsp;    public SSLCertificate(byte[] encoded, String serialNumber, String issuer, LocalDate validFrom, LocalDate validTo, String signatureAlgorithm, Integer version) {</b>
+<b class="nc">&nbsp;        this.serialNumber = serialNumber;</b>
+<b class="nc">&nbsp;        this.issuer = issuer;</b>
+<b class="nc">&nbsp;        this.validFrom = validFrom;</b>
+<b class="nc">&nbsp;        this.validTo = validTo;</b>
+<b class="nc">&nbsp;        this.signatureAlgorithm = signatureAlgorithm;</b>
+<b class="nc">&nbsp;        this.version = version;</b>
+<b class="nc">&nbsp;        this.sha256Thumbprint = Hashing.sha256().hashBytes(encoded).toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSerialNumber() {
+<b class="nc">&nbsp;        return serialNumber;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getIssuer() {
+<b class="nc">&nbsp;        return issuer;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LocalDate getValidFrom() {
+<b class="nc">&nbsp;        return validFrom;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LocalDate getValidTo() {
+<b class="nc">&nbsp;        return validTo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSignatureAlgorithm() {
+<b class="nc">&nbsp;        return signatureAlgorithm;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getVersion() {
+<b class="nc">&nbsp;        return version;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return the SHA-256 of the &lt;a href=&quot;https://en.wikipedia.org/wiki/X.690#DER_encoding&quot;&gt;DER encoding&lt;/a&gt;
+&nbsp;     */
+&nbsp;    public String getSHA256Thumbprint() {
+<b class="nc">&nbsp;        return sha256Thumbprint;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;SSLCertificate&gt; fromX509(X509Certificate x509Certificate) {
+<b class="nc">&nbsp;        Objects.requireNonNull(x509Certificate);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return Optional.of(new SSLCertificate(x509Certificate.getEncoded(), x509Certificate.getSerialNumber().toString(),</b>
+<b class="nc">&nbsp;                    x509Certificate.getIssuerX500Principal().getName(),</b>
+<b class="nc">&nbsp;                    LocalDate.ofInstant(x509Certificate.getNotBefore().toInstant(), ZoneId.systemDefault()),</b>
+<b class="nc">&nbsp;                    LocalDate.ofInstant(x509Certificate.getNotAfter().toInstant(), ZoneId.systemDefault()),</b>
+<b class="nc">&nbsp;                    x509Certificate.getSigAlgName(),</b>
+<b class="nc">&nbsp;                    x509Certificate.getVersion()));</b>
+&nbsp;        } catch (CertificateEncodingException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error while encoding certificate&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;SSLCertificate&gt; fromPath(Path certPath) {
+<b class="nc">&nbsp;        Objects.requireNonNull(certPath);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            CertificateFactory certificateFactory = CertificateFactory.getInstance(&quot;X509&quot;);</b>
+<b class="nc">&nbsp;            return fromX509((X509Certificate) certificateFactory.generateCertificate(Files.newInputStream(certPath)));</b>
+&nbsp;        } catch (CertificateException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Certificate doesn&#39;t follow X.509 format&quot;, e);</b>
+&nbsp;        } catch (FileNotFoundException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Bad Certificate path: {}&quot;, certPath, e);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error reading certificate:&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,788 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NewEntryView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.newentry</a>
+</div>
+
+<h1>Coverage Summary for Class: NewEntryView (org.jabref.gui.newentry)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NewEntryView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/138)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/271)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NewEntryView$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/138)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/273)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.newentry;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.Hyperlink;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.RadioButton;
+&nbsp;import javafx.scene.control.Tab;
+&nbsp;import javafx.scene.control.TabPane;
+&nbsp;import javafx.scene.control.TextArea;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.TextInputControl;
+&nbsp;import javafx.scene.control.TitledPane;
+&nbsp;import javafx.scene.control.ToggleGroup;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.TilePane;
+&nbsp;import javafx.stage.Screen;
+&nbsp;import javafx.stage.Stage;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.fieldeditors.EditorValidator;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.search.SearchType;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.ControlHelper;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.importer.IdBasedFetcher;
+&nbsp;import org.jabref.logic.importer.WebFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.ArXivFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.DoiFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.RfcFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
+&nbsp;import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.identifier.ArXivIdentifier;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;import org.jabref.model.entry.identifier.ISBN;
+&nbsp;import org.jabref.model.entry.identifier.Identifier;
+&nbsp;import org.jabref.model.entry.identifier.RFC;
+&nbsp;import org.jabref.model.entry.identifier.SSRN;
+&nbsp;import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
+&nbsp;import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+&nbsp;import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
+&nbsp;import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class NewEntryView extends BaseDialog&lt;BibEntry&gt; {
+&nbsp;    private static final String BIBTEX_REGEX = &quot;^@([A-Za-z]+)\\{,&quot;;
+&nbsp;    private static final String LINE_BREAK = &quot;\n&quot;;
+&nbsp;
+&nbsp;    private NewEntryViewModel viewModel;
+&nbsp;
+&nbsp;    private final NewEntryDialogTab initialApproach;
+&nbsp;    private NewEntryDialogTab currentApproach;
+&nbsp;
+&nbsp;    private final GuiPreferences guiPreferences;
+&nbsp;    private final NewEntryPreferences preferences;
+&nbsp;    private final LibraryTab libraryTab;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;    @Inject private TaskExecutor taskExecutor;
+&nbsp;    @Inject private AiService aiService;
+&nbsp;    @Inject private FileUpdateMonitor fileUpdateMonitor;
+&nbsp;
+&nbsp;    private final ControlsFxVisualizer visualizer;
+&nbsp;
+&nbsp;    @FXML private ButtonType generateButtonType;
+&nbsp;    private Button generateButton;
+&nbsp;
+&nbsp;    @FXML private TabPane tabs;
+&nbsp;    @FXML private Tab tabAddEntry;
+&nbsp;    @FXML private Tab tabLookupIdentifier;
+&nbsp;    @FXML private Tab tabInterpretCitations;
+&nbsp;    @FXML private Tab tabSpecifyBibtex;
+&nbsp;
+&nbsp;    @FXML private TitledPane entryRecommendedTitle;
+&nbsp;    @FXML private TilePane entryRecommended;
+&nbsp;    @FXML private TitledPane entryOtherTitle;
+&nbsp;    @FXML private TilePane entryOther;
+&nbsp;    @FXML private TitledPane entryCustomTitle;
+&nbsp;    @FXML private TilePane entryCustom;
+&nbsp;
+&nbsp;    @FXML private TextField idText;
+&nbsp;    @FXML private Tooltip idTextTooltip;
+&nbsp;    @FXML private Hyperlink idJumpLink;
+&nbsp;    @FXML private RadioButton idLookupGuess;
+&nbsp;    @FXML private RadioButton idLookupSpecify;
+&nbsp;    @FXML private ComboBox&lt;IdBasedFetcher&gt; idFetcher;
+&nbsp;    @FXML private Label idErrorInvalidText;
+&nbsp;    @FXML private Label idErrorInvalidFetcher;
+&nbsp;
+&nbsp;    @FXML private TextArea interpretText;
+&nbsp;    @FXML private ComboBox&lt;PlainCitationParserChoice&gt; interpretParser;
+&nbsp;
+&nbsp;    @FXML private TextArea bibtexText;
+&nbsp;
+&nbsp;    private BibEntry result;
+&nbsp;
+<b class="nc">&nbsp;    public NewEntryView(NewEntryDialogTab initialApproach, GuiPreferences preferences, LibraryTab libraryTab, DialogService dialogService) {</b>
+<b class="nc">&nbsp;        this.initialApproach = initialApproach;</b>
+<b class="nc">&nbsp;        this.currentApproach = initialApproach;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.guiPreferences = preferences;</b>
+<b class="nc">&nbsp;        this.preferences = preferences.getNewEntryPreferences();</b>
+<b class="nc">&nbsp;        this.libraryTab = libraryTab;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+&nbsp;
+<b class="nc">&nbsp;        visualizer = new ControlsFxVisualizer();</b>
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;New Entry&quot;));</b>
+<b class="nc">&nbsp;        ViewLoader.view(this).load().setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);</b>
+<b class="nc">&nbsp;        generateButton.getStyleClass().add(&quot;customGenerateButton&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        final Stage stage = (Stage) getDialogPane().getScene().getWindow();</b>
+<b class="nc">&nbsp;        stage.setHeight(650);</b>
+<b class="nc">&nbsp;        stage.setWidth(931);</b>
+<b class="nc">&nbsp;        stage.setMinHeight(300);</b>
+<b class="nc">&nbsp;        stage.setMinWidth(400);</b>
+&nbsp;
+<b class="nc">&nbsp;        ControlHelper.setAction(generateButtonType, getDialogPane(), _ -&gt; execute());</b>
+<b class="nc">&nbsp;        setOnCloseRequest(_ -&gt; cancel());</b>
+<b class="nc">&nbsp;        setResultConverter(_ -&gt; result);</b>
+&nbsp;
+<b class="nc">&nbsp;        getDialogPane().disableProperty().bind(viewModel.executingProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        finalizeTabs();</b>
+<b class="nc">&nbsp;        tabs.requestFocus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void finalizeTabs() {
+<b class="nc">&nbsp;        NewEntryDialogTab approach = initialApproach;</b>
+<b class="nc">&nbsp;        if (approach == null) {</b>
+<b class="nc">&nbsp;            final String clipboardText = ClipBoardManager.getContents().trim();</b>
+<b class="nc">&nbsp;            if (!StringUtil.isBlank(clipboardText)) {</b>
+<b class="nc">&nbsp;                Optional&lt;Identifier&gt; identifier = Identifier.from(clipboardText);</b>
+<b class="nc">&nbsp;                if (identifier.isPresent()) {</b>
+<b class="nc">&nbsp;                    approach = NewEntryDialogTab.ENTER_IDENTIFIER;</b>
+<b class="nc">&nbsp;                    interpretText.setText(clipboardText);</b>
+<b class="nc">&nbsp;                    interpretText.selectAll();</b>
+<b class="nc">&nbsp;                } else if (clipboardText.split(LINE_BREAK)[0].matches(BIBTEX_REGEX)) {</b>
+<b class="nc">&nbsp;                    approach = NewEntryDialogTab.SPECIFY_BIBTEX;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    approach = preferences.getLatestApproach();</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                approach = preferences.getLatestApproach();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        switch (approach) {</b>
+&nbsp;            case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
+<b class="nc">&nbsp;                tabs.getSelectionModel().select(tabAddEntry);</b>
+<b class="nc">&nbsp;                switchAddEntry();</b>
+&nbsp;                break;
+&nbsp;            case NewEntryDialogTab.ENTER_IDENTIFIER:
+<b class="nc">&nbsp;                tabs.getSelectionModel().select(tabLookupIdentifier);</b>
+<b class="nc">&nbsp;                switchLookupIdentifier();</b>
+&nbsp;                break;
+&nbsp;            case NewEntryDialogTab.INTERPRET_CITATIONS:
+<b class="nc">&nbsp;                tabs.getSelectionModel().select(tabInterpretCitations);</b>
+<b class="nc">&nbsp;                switchInterpretCitations();</b>
+&nbsp;                break;
+&nbsp;            case NewEntryDialogTab.SPECIFY_BIBTEX:
+<b class="nc">&nbsp;                tabs.getSelectionModel().select(tabSpecifyBibtex);</b>
+<b class="nc">&nbsp;                switchSpecifyBibtex();</b>
+&nbsp;                break;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        tabAddEntry.setOnSelectionChanged(_ -&gt; switchAddEntry());</b>
+<b class="nc">&nbsp;        tabLookupIdentifier.setOnSelectionChanged(_ -&gt; switchLookupIdentifier());</b>
+<b class="nc">&nbsp;        tabInterpretCitations.setOnSelectionChanged(_ -&gt; switchInterpretCitations());</b>
+<b class="nc">&nbsp;        tabSpecifyBibtex.setOnSelectionChanged(_ -&gt; switchSpecifyBibtex());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        viewModel = new NewEntryViewModel(guiPreferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);</b>
+&nbsp;
+<b class="nc">&nbsp;        visualizer.setDecoration(new IconValidationDecorator());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(</b>
+<b class="nc">&nbsp;                viewModel.executedSuccessfullyProperty(),</b>
+&nbsp;                succeeded -&gt; {
+<b class="nc">&nbsp;                    if (succeeded) {</b>
+<b class="nc">&nbsp;                        onSuccessfulExecution();</b>
+&nbsp;                    }
+&nbsp;                });
+&nbsp;
+<b class="nc">&nbsp;        initializeAddEntry();</b>
+<b class="nc">&nbsp;        initializeLookupIdentifier();</b>
+<b class="nc">&nbsp;        initializeInterpretCitations();</b>
+<b class="nc">&nbsp;        initializeSpecifyBibTeX();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeAddEntry() {
+<b class="nc">&nbsp;        entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());</b>
+<b class="nc">&nbsp;        entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());</b>
+<b class="nc">&nbsp;        entryRecommended.managedProperty().bind(entryRecommended.visibleProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        entryOtherTitle.managedProperty().bind(entryOtherTitle.visibleProperty());</b>
+<b class="nc">&nbsp;        entryOtherTitle.expandedProperty().bindBidirectional(preferences.typesOtherExpandedProperty());</b>
+<b class="nc">&nbsp;        entryOther.managedProperty().bind(entryOther.visibleProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        entryCustomTitle.managedProperty().bind(entryCustomTitle.visibleProperty());</b>
+<b class="nc">&nbsp;        entryCustomTitle.expandedProperty().bindBidirectional(preferences.typesCustomExpandedProperty());</b>
+<b class="nc">&nbsp;        entryCustom.managedProperty().bind(entryCustom.visibleProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        final boolean isBiblatexMode = libraryTab.getBibDatabaseContext().isBiblatexMode();</b>
+&nbsp;
+&nbsp;        List&lt;BibEntryType&gt; recommendedEntries;
+&nbsp;        List&lt;BibEntryType&gt; otherEntries;
+<b class="nc">&nbsp;        if (isBiblatexMode) {</b>
+<b class="nc">&nbsp;            recommendedEntries = BiblatexEntryTypeDefinitions.RECOMMENDED;</b>
+<b class="nc">&nbsp;            otherEntries = new ArrayList&lt;&gt;(BiblatexEntryTypeDefinitions.ALL);</b>
+<b class="nc">&nbsp;            otherEntries.removeAll(recommendedEntries);</b>
+<b class="nc">&nbsp;            otherEntries.addAll(BiblatexSoftwareEntryTypeDefinitions.ALL);</b>
+<b class="nc">&nbsp;            otherEntries.addAll(BiblatexAPAEntryTypeDefinitions.ALL);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            recommendedEntries = BibtexEntryTypeDefinitions.RECOMMENDED;</b>
+<b class="nc">&nbsp;            otherEntries = new ArrayList&lt;&gt;(BiblatexEntryTypeDefinitions.ALL);</b>
+<b class="nc">&nbsp;            otherEntries.removeAll(recommendedEntries);</b>
+<b class="nc">&nbsp;            otherEntries.addAll(IEEETranEntryTypeDefinitions.ALL);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        addEntriesToPane(entryRecommended, recommendedEntries);</b>
+<b class="nc">&nbsp;        addEntriesToPane(entryOther, otherEntries);</b>
+&nbsp;
+<b class="nc">&nbsp;        final BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);</b>
+<b class="nc">&nbsp;        final BibDatabaseMode customTypesDatabaseMode = isBiblatexMode ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX;</b>
+<b class="nc">&nbsp;        final List&lt;BibEntryType&gt; customEntries = entryTypesManager.getAllCustomTypes(customTypesDatabaseMode);</b>
+<b class="nc">&nbsp;        if (customEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;            entryCustomTitle.setVisible(false);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            addEntriesToPane(entryCustom, customEntries);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeLookupIdentifier() {
+&nbsp;        // TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
+&nbsp;        //       model would then iterate through all non-blank lines, passing each of them through the specified lookup
+&nbsp;        //       method (each automatically independently, or all through the same fetcher).
+<b class="nc">&nbsp;        idText.setPromptText(Localization.lang(&quot;Enter the reference identifier to search for.&quot;));</b>
+<b class="nc">&nbsp;        idText.textProperty().bindBidirectional(viewModel.idTextProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        ToggleGroup toggleGroup = new ToggleGroup();</b>
+<b class="nc">&nbsp;        idLookupGuess.setToggleGroup(toggleGroup);</b>
+<b class="nc">&nbsp;        idLookupSpecify.setToggleGroup(toggleGroup);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (preferences.getIdLookupGuessing()) {</b>
+<b class="nc">&nbsp;            idLookupGuess.selectedProperty().set(true);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            idLookupSpecify.selectedProperty().set(true);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        viewModel.populateDOICache();</b>
+&nbsp;
+&nbsp;        // [impl-&gt;req~newentry.clipboard.autofocus~1]
+<b class="nc">&nbsp;        Optional&lt;Identifier&gt; validClipboardId = extractValidIdentifierFromClipboard();</b>
+<b class="nc">&nbsp;        if (validClipboardId.isPresent()) {</b>
+<b class="nc">&nbsp;            viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -&gt; {</b>
+<b class="nc">&nbsp;                if (isValid) {</b>
+<b class="nc">&nbsp;                    Tooltip.install(idText, idTextTooltip);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    Tooltip.uninstall(idText, idTextTooltip);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            idText.setText(ClipBoardManager.getContents().trim());</b>
+<b class="nc">&nbsp;            idText.selectAll();</b>
+&nbsp;
+<b class="nc">&nbsp;            Identifier id = validClipboardId.get();</b>
+<b class="nc">&nbsp;            Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;                idLookupSpecify.setSelected(true);</b>
+<b class="nc">&nbsp;                fetcherForIdentifier(id).ifPresent(idFetcher::setValue);</b>
+&nbsp;            });
+&nbsp;        } else {
+<b class="nc">&nbsp;            Platform.runLater(() -&gt; idLookupGuess.setSelected(true));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        idLookupGuess.selectedProperty().addListener((_, _, newValue) -&gt; preferences.setIdLookupGuessing(newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;IdBasedFetcher&gt;().withText(WebFetcher::getName).install(idFetcher);</b>
+<b class="nc">&nbsp;        idFetcher.disableProperty().bind(idLookupSpecify.selectedProperty().not());</b>
+<b class="nc">&nbsp;        idFetcher.valueProperty().bindBidirectional(viewModel.idFetcherProperty());</b>
+<b class="nc">&nbsp;        IdBasedFetcher initialFetcher = fetcherFromName(preferences.getLatestIdFetcher(), idFetcher.getItems());</b>
+<b class="nc">&nbsp;        if (initialFetcher == null) {</b>
+<b class="nc">&nbsp;            final IdBasedFetcher defaultFetcher = new DoiFetcher(guiPreferences.getImportFormatPreferences());</b>
+<b class="nc">&nbsp;            initialFetcher = fetcherFromName(defaultFetcher.getName(), idFetcher.getItems());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        idFetcher.setValue(initialFetcher);</b>
+<b class="nc">&nbsp;        idFetcher.setOnAction(_ -&gt; preferences.setLatestIdFetcher(idFetcher.getValue().getName()));</b>
+&nbsp;
+<b class="nc">&nbsp;        idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());</b>
+<b class="nc">&nbsp;        idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());</b>
+<b class="nc">&nbsp;        idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());</b>
+<b class="nc">&nbsp;        idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));</b>
+&nbsp;
+<b class="nc">&nbsp;        idJumpLink.setOnAction(_ -&gt; libraryTab.showAndEdit(viewModel.getDuplicateEntry()));</b>
+&nbsp;
+<b class="nc">&nbsp;        TextInputControl textInput = idText;</b>
+<b class="nc">&nbsp;        EditorValidator validator = new EditorValidator(this.guiPreferences);</b>
+<b class="nc">&nbsp;        validator.configureValidation(viewModel.duplicateDoiValidatorStatus(), textInput);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeInterpretCitations() {
+<b class="nc">&nbsp;        interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());</b>
+<b class="nc">&nbsp;        final String clipboardText = ClipBoardManager.getContents().trim();</b>
+<b class="nc">&nbsp;        if (!StringUtil.isBlank(clipboardText)) {</b>
+<b class="nc">&nbsp;            interpretText.setText(clipboardText);</b>
+<b class="nc">&nbsp;            interpretText.selectAll();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        interpretParser.itemsProperty().bind(viewModel.interpretParsersProperty());</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;PlainCitationParserChoice&gt;().withText(PlainCitationParserChoice::getLocalizedName).install(interpretParser);</b>
+<b class="nc">&nbsp;        interpretParser.valueProperty().bindBidirectional(viewModel.interpretParserProperty());</b>
+<b class="nc">&nbsp;        PlainCitationParserChoice initialParser = parserFromName(preferences.getLatestInterpretParser(), interpretParser.getItems());</b>
+<b class="nc">&nbsp;        if (initialParser == null) {</b>
+<b class="nc">&nbsp;            final PlainCitationParserChoice defaultParser = PlainCitationParserChoice.RULE_BASED;</b>
+<b class="nc">&nbsp;            initialParser = parserFromName(defaultParser.getLocalizedName(), interpretParser.getItems());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        interpretParser.setValue(initialParser);</b>
+<b class="nc">&nbsp;        interpretParser.setOnAction(_ -&gt; preferences.setLatestInterpretParser(interpretParser.getValue().getLocalizedName()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeSpecifyBibTeX() {
+<b class="nc">&nbsp;        bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());</b>
+<b class="nc">&nbsp;        final String clipboardText = ClipBoardManager.getContents().trim();</b>
+<b class="nc">&nbsp;        if (!StringUtil.isBlank(clipboardText)) {</b>
+&nbsp;            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
+&nbsp;            // supported Bib(La)Tex source format.
+<b class="nc">&nbsp;            bibtexText.setText(clipboardText);</b>
+<b class="nc">&nbsp;            bibtexText.selectAll();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void switchAddEntry() {
+<b class="nc">&nbsp;        if (!tabAddEntry.isSelected()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        currentApproach = NewEntryDialogTab.CHOOSE_ENTRY_TYPE;</b>
+<b class="nc">&nbsp;        preferences.setLatestApproach(NewEntryDialogTab.CHOOSE_ENTRY_TYPE);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (generateButton != null) {</b>
+<b class="nc">&nbsp;            generateButton.disableProperty().unbind();</b>
+<b class="nc">&nbsp;            generateButton.setDisable(true);</b>
+<b class="nc">&nbsp;            generateButton.setText(&quot;Select&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void switchLookupIdentifier() {
+<b class="nc">&nbsp;        if (!tabLookupIdentifier.isSelected()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        currentApproach = NewEntryDialogTab.ENTER_IDENTIFIER;</b>
+<b class="nc">&nbsp;        preferences.setLatestApproach(NewEntryDialogTab.ENTER_IDENTIFIER);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (idText != null) {</b>
+<b class="nc">&nbsp;            Platform.runLater(() -&gt; idText.requestFocus());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (generateButton != null) {</b>
+<b class="nc">&nbsp;            generateButton.disableProperty().bind(idErrorInvalidText.visibleProperty().or(idErrorInvalidFetcher.visibleProperty()));</b>
+<b class="nc">&nbsp;            generateButton.setText(&quot;Search&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void switchInterpretCitations() {
+<b class="nc">&nbsp;        if (!tabInterpretCitations.isSelected()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        currentApproach = NewEntryDialogTab.INTERPRET_CITATIONS;</b>
+<b class="nc">&nbsp;        preferences.setLatestApproach(NewEntryDialogTab.INTERPRET_CITATIONS);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (interpretText != null) {</b>
+<b class="nc">&nbsp;            Platform.runLater(() -&gt; interpretText.requestFocus());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (generateButton != null) {</b>
+<b class="nc">&nbsp;            generateButton.disableProperty().bind(viewModel.interpretTextValidatorProperty().not());</b>
+<b class="nc">&nbsp;            generateButton.setText(&quot;Parse&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void switchSpecifyBibtex() {
+<b class="nc">&nbsp;        if (!tabSpecifyBibtex.isSelected()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        currentApproach = NewEntryDialogTab.SPECIFY_BIBTEX;</b>
+<b class="nc">&nbsp;        preferences.setLatestApproach(NewEntryDialogTab.SPECIFY_BIBTEX);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bibtexText != null) {</b>
+<b class="nc">&nbsp;            Platform.runLater(() -&gt; bibtexText.requestFocus());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (generateButton != null) {</b>
+<b class="nc">&nbsp;            generateButton.disableProperty().bind(viewModel.bibtexTextValidatorProperty().not());</b>
+<b class="nc">&nbsp;            generateButton.setText(&quot;Create&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onEntryTypeSelected(EntryType type) {
+<b class="nc">&nbsp;        preferences.setLatestImmediateType(type);</b>
+<b class="nc">&nbsp;        result = new BibEntry(type);</b>
+&nbsp;        this.close();
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onSuccessfulExecution() {
+<b class="nc">&nbsp;        viewModel.cancel();</b>
+<b class="nc">&nbsp;        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(Optional.empty());</b>
+&nbsp;        this.close();
+&nbsp;    }
+&nbsp;
+&nbsp;    private void execute() {
+&nbsp;        // :TODO: These button text changes aren&#39;t actually visible, due to the UI thread not being able to perform the
+&nbsp;        // update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
+&nbsp;        // a `Platform.runLater(...)` which would probably fix this.
+<b class="nc">&nbsp;        switch (currentApproach) {</b>
+&nbsp;            case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
+&nbsp;                // We do nothing here.
+&nbsp;                break;
+&nbsp;            case NewEntryDialogTab.ENTER_IDENTIFIER:
+<b class="nc">&nbsp;                generateButton.setText(&quot;Searching...&quot;);</b>
+<b class="nc">&nbsp;                viewModel.executeLookupIdentifier(idLookupGuess.isSelected());</b>
+<b class="nc">&nbsp;                switchLookupIdentifier();</b>
+&nbsp;                break;
+&nbsp;            case NewEntryDialogTab.INTERPRET_CITATIONS:
+<b class="nc">&nbsp;                generateButton.setText(&quot;Parsing...&quot;);</b>
+<b class="nc">&nbsp;                viewModel.executeInterpretCitations();</b>
+<b class="nc">&nbsp;                switchInterpretCitations();</b>
+&nbsp;                break;
+&nbsp;            case NewEntryDialogTab.SPECIFY_BIBTEX:
+<b class="nc">&nbsp;                generateButton.setText(&quot;Parsing...&quot;);</b>
+<b class="nc">&nbsp;                viewModel.executeSpecifyBibtex();</b>
+<b class="nc">&nbsp;                switchSpecifyBibtex();</b>
+&nbsp;                break;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void cancel() {
+<b class="nc">&nbsp;        viewModel.cancel();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addEntriesToPane(TilePane pane, Collection&lt;? extends BibEntryType&gt; entries) {
+<b class="nc">&nbsp;        final double maxTooltipWidth = (2.0 / 3.0) * Screen.getPrimary().getBounds().getWidth();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntryType entry : entries) {</b>
+<b class="nc">&nbsp;            final EntryType type = entry.getType();</b>
+&nbsp;
+<b class="nc">&nbsp;            final Button button = new Button(type.getDisplayName());</b>
+<b class="nc">&nbsp;            button.setMinWidth(Button.USE_PREF_SIZE);</b>
+<b class="nc">&nbsp;            button.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;            button.setUserData(entry);</b>
+<b class="nc">&nbsp;            button.setOnAction(_ -&gt; onEntryTypeSelected(type));</b>
+&nbsp;
+<b class="nc">&nbsp;            final String description = descriptionOfEntryType(type);</b>
+<b class="nc">&nbsp;            if (description != null) {</b>
+<b class="nc">&nbsp;                final Tooltip tooltip = new Tooltip(description);</b>
+<b class="nc">&nbsp;                tooltip.setMaxWidth(maxTooltipWidth);</b>
+<b class="nc">&nbsp;                tooltip.setWrapText(true);</b>
+<b class="nc">&nbsp;                button.setTooltip(tooltip);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            pane.getChildren().add(button);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String descriptionOfEntryType(EntryType type) {
+<b class="nc">&nbsp;        if (type instanceof StandardEntryType entryType) {</b>
+<b class="nc">&nbsp;            return descriptionOfStandardEntryType(entryType);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String descriptionOfStandardEntryType(StandardEntryType type) {
+&nbsp;        // These descriptions are taken from subsection 2.1 of the biblatex package documentation.
+&nbsp;        // Biblatex is a superset of bibtex, with more elaborate descriptions, so its documentation is preferred.
+&nbsp;        // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
+<b class="nc">&nbsp;        return switch (type) {</b>
+&nbsp;            case Article -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;An article in a journal, magazine, newspaper, or other periodical which forms a self-contained unit with its own title.&quot;);</b>
+&nbsp;            case Book -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A single-volume book with one or more authors where the authors share credit for the work as a whole.&quot;);</b>
+&nbsp;            case Booklet -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A book-like work without a formal publisher or sponsoring institution.&quot;);</b>
+&nbsp;            case Collection -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A single-volume collection with multiple, self-contained contributions by distinct authors which have their own title. The work as a whole has no overall author but it will usually have an editor.&quot;);</b>
+&nbsp;            case Conference -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A legacy alias for \&quot;InProceedings\&quot;.&quot;);</b>
+&nbsp;            case InBook -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A part of a book which forms a self-contained unit with its own title.&quot;);</b>
+&nbsp;            case InCollection -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A contribution to a collection which forms a self-contained unit with a distinct author and title.&quot;);</b>
+&nbsp;            case InProceedings -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;An article in a conference proceedings.&quot;);</b>
+&nbsp;            case Manual -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Technical or other documentation, not necessarily in printed form.&quot;);</b>
+&nbsp;            case MastersThesis -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Similar to \&quot;Thesis\&quot; except that the type field is optional and defaults to the localised term  Master&#39;s thesis.&quot;);</b>
+&nbsp;            case Misc -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A fallback type for entries which do not fit into any other category.&quot;);</b>
+&nbsp;            case PhdThesis -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Similar to \&quot;Thesis\&quot; except that the type field is optional and defaults to the localised term PhD thesis.&quot;);</b>
+&nbsp;            case Proceedings -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A single-volume conference proceedings. This type is very similar to \&quot;Collection\&quot;.&quot;);</b>
+&nbsp;            case TechReport -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Similar to \&quot;Report\&quot; except that the type field is optional and defaults to the localised term technical report.&quot;);</b>
+&nbsp;            case Unpublished -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A work with an author and a title which has not been formally published, such as a manuscript or the script of a talk.&quot;);</b>
+&nbsp;            case BookInBook -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;This type is similar to \&quot;InBook\&quot; but intended for works originally published as a stand-alone book.&quot;);</b>
+&nbsp;            case InReference -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;An article in a work of reference. This is a more specific variant of the generic \&quot;InCollection\&quot; entry type.&quot;);</b>
+&nbsp;            case MvBook -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A multi-volume \&quot;Book\&quot;.&quot;);</b>
+&nbsp;            case MvCollection -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A multi-volume \&quot;Collection\&quot;.&quot;);</b>
+&nbsp;            case MvProceedings -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A multi-volume \&quot;Proceedings\&quot; entry.&quot;);</b>
+&nbsp;            case MvReference -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A multi-volume \&quot;Reference\&quot; entry. The standard styles will treat this entry type as an alias for \&quot;MvCollection\&quot;.&quot;);</b>
+&nbsp;            case Online -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;This entry type is intended for sources such as web sites which are intrinsically online resources.&quot;);</b>
+&nbsp;            case Reference -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A single-volume work of reference such as an encyclopedia or a dictionary.&quot;);</b>
+&nbsp;            case Report -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A technical report, research report, or white paper published by a university or some other institution.&quot;);</b>
+&nbsp;            case Set -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;An entry set is a group of entries which are cited as a single reference and listed as a single item in the bibliography.&quot;);</b>
+&nbsp;            case SuppBook -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Supplemental material in a \&quot;Book\&quot;. This type is provided for elements such as prefaces, introductions, forewords, afterwords, etc. which often have a generic title only.&quot;);</b>
+&nbsp;            case SuppCollection -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Supplemental material in a \&quot;Collection\&quot;.&quot;);</b>
+&nbsp;            case SuppPeriodical -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Supplemental material in a \&quot;Periodical\&quot;. This type may be useful when referring to items such as regular columns, obituaries, letters to the editor, etc. which only have a generic title.&quot;);</b>
+&nbsp;            case Thesis -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A thesis written for an educational institution to satisfy the requirements for a degree.&quot;);</b>
+&nbsp;            case WWW -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;An alias for \&quot;Online\&quot;, provided for jurabib compatibility.&quot;);</b>
+&nbsp;            case Software -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Computer software. The standard styles will treat this entry type as an alias for \&quot;Misc\&quot;.&quot;);</b>
+&nbsp;            case Dataset -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;A data set or a similar collection of (mostly) raw data.&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static IdBasedFetcher fetcherFromName(String fetcherName, List&lt;IdBasedFetcher&gt; fetchers) {
+<b class="nc">&nbsp;        for (IdBasedFetcher fetcher : fetchers) {</b>
+<b class="nc">&nbsp;            if (fetcher.getName().equals(fetcherName)) {</b>
+<b class="nc">&nbsp;                return fetcher;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static PlainCitationParserChoice parserFromName(String parserName, List&lt;PlainCitationParserChoice&gt; parsers) {
+<b class="nc">&nbsp;        for (PlainCitationParserChoice parser : parsers) {</b>
+<b class="nc">&nbsp;            if (parser.getLocalizedName().equals(parserName)) {</b>
+<b class="nc">&nbsp;                return parser;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;Identifier&gt; extractValidIdentifierFromClipboard() {
+<b class="nc">&nbsp;        String clipboardText = ClipBoardManager.getContents().trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!StringUtil.isBlank(clipboardText) &amp;&amp; !clipboardText.contains(&quot;\n&quot;)) {</b>
+<b class="nc">&nbsp;            Optional&lt;Identifier&gt; identifier = Identifier.from(clipboardText);</b>
+<b class="nc">&nbsp;            if (identifier.isPresent()) {</b>
+<b class="nc">&nbsp;                Identifier id = identifier.get();</b>
+<b class="nc">&nbsp;                boolean isValid = switch (id) {</b>
+<b class="nc">&nbsp;                    case DOI doi -&gt;</b>
+<b class="nc">&nbsp;                            DOI.isValid(doi.asString());</b>
+<b class="nc">&nbsp;                    case ISBN isbn -&gt;</b>
+<b class="nc">&nbsp;                            isbn.isValid();</b>
+&nbsp;                    default -&gt;
+<b class="nc">&nbsp;                            true;</b>
+<b class="nc">&nbsp;                };</b>
+<b class="nc">&nbsp;                if (isValid) {</b>
+<b class="nc">&nbsp;                    return Optional.of(id);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;IdBasedFetcher&gt; fetcherForIdentifier(Identifier id) {
+<b class="nc">&nbsp;        for (IdBasedFetcher fetcher : idFetcher.getItems()) {</b>
+<b class="nc">&nbsp;            if ((id instanceof DOI &amp;&amp; fetcher instanceof DoiFetcher) ||</b>
+&nbsp;                    (id instanceof ISBN &amp;&amp; (fetcher instanceof IsbnFetcher) ||
+&nbsp;                            (id instanceof ArXivIdentifier &amp;&amp; fetcher instanceof ArXivFetcher) ||
+&nbsp;                            (id instanceof RFC &amp;&amp; fetcher instanceof RfcFetcher) ||
+&nbsp;                            (id instanceof SSRN &amp;&amp; fetcher instanceof DoiFetcher))) {
+<b class="nc">&nbsp;                return Optional.of(fetcher);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

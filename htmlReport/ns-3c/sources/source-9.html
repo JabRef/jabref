@@ -1,0 +1,322 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitShareToGitHubDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.git</a>
+</div>
+
+<h1>Coverage Summary for Class: GitShareToGitHubDialogViewModel (org.jabref.gui.git)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitShareToGitHubDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.git;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.git.GitHandler;
+&nbsp;import org.jabref.logic.git.preferences.GitPreferences;
+&nbsp;import org.jabref.logic.git.status.GitStatusChecker;
+&nbsp;import org.jabref.logic.git.status.GitStatusSnapshot;
+&nbsp;import org.jabref.logic.git.status.SyncStatus;
+&nbsp;import org.jabref.logic.git.util.GitHandlerRegistry;
+&nbsp;import org.jabref.logic.git.util.GitInitService;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;import org.eclipse.jgit.api.errors.GitAPIException;
+&nbsp;
+&nbsp;/// &quot;Preferences&quot; dialog for sharing library to GitHub.
+&nbsp;/// We do not put it into the JabRef preferences dialog because we want these settings to be close to the user.
+&nbsp;public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    // The preferences stored in JabRef
+&nbsp;    private final GitPreferences gitPreferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final GitHandlerRegistry gitHandlerRegistry;
+&nbsp;
+&nbsp;    // The preferences of this dialog
+<b class="nc">&nbsp;    private final StringProperty usernameProperty = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty patProperty = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+&nbsp;    // TODO: This should be a library preference -&gt; the library is connected to repository; not all JabRef libraries to the same one
+&nbsp;    //       Reason: One could have https://github.com/JabRef/JabRef-exmple-libraries as one repo and https://github.com/myexampleuser/demolibs as onther repository
+&nbsp;    //               Both share the same secrets, but are different URLs.
+&nbsp;    //       Also think of having two .bib files in the same folder - they will have the same repository URL -- should make no issues, but let&#39;s see...
+<b class="nc">&nbsp;    private final StringProperty repositoryUrlProperty = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty rememberPatProperty = new SimpleBooleanProperty();</b>
+&nbsp;
+&nbsp;    private final Validator repositoryUrlValidator;
+&nbsp;    private final Validator githubUsernameValidator;
+&nbsp;    private final Validator githubPatValidator;
+&nbsp;
+&nbsp;    public GitShareToGitHubDialogViewModel(
+&nbsp;            GitPreferences gitPreferences,
+&nbsp;            StateManager stateManager,
+&nbsp;            DialogService dialogService,
+&nbsp;            TaskExecutor taskExecutor,
+<b class="nc">&nbsp;            GitHandlerRegistry gitHandlerRegistry) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.gitPreferences = gitPreferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.gitHandlerRegistry = gitHandlerRegistry;</b>
+&nbsp;
+<b class="nc">&nbsp;        repositoryUrlValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                repositoryUrlProperty,
+<b class="nc">&nbsp;                githubHttpsUrlValidator(),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Please enter a valid HTTPS GitHub repository URL&quot;))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        githubUsernameValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                usernameProperty,
+<b class="nc">&nbsp;                notEmptyValidator(),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;GitHub username is required&quot;))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        githubPatValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                patProperty,
+<b class="nc">&nbsp;                notEmptyValidator(),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Personal Access Token is required&quot;))</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /// @implNote `close` Is a runnable to make testing easier
+&nbsp;    public void shareToGitHub(Runnable close) {
+&nbsp;        // We store the settings because &quot;Share&quot; implies that the settings should be used as typed
+&nbsp;        // We also have the option to not store the settings permanently: This is implemented in JabRefCliPreferences at the listeners.
+<b class="nc">&nbsp;        this.storeSettings();</b>
+<b class="nc">&nbsp;        BackgroundTask</b>
+<b class="nc">&nbsp;                .wrap(() -&gt; {</b>
+<b class="nc">&nbsp;                    this.doShareToGitHub();</b>
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onSuccess(_ -&gt; {</b>
+<b class="nc">&nbsp;                    dialogService.notify(Localization.lang(&quot;Successfully pushed to GitHub.&quot;));</b>
+<b class="nc">&nbsp;                    close.run();</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onFailure(e -&gt;</b>
+<b class="nc">&nbsp;                        dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                                Localization.lang(&quot;GitHub share failed&quot;),</b>
+<b class="nc">&nbsp;                                e.getMessage(),</b>
+&nbsp;                                e
+&nbsp;                        )
+&nbsp;                )
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Method assumes that settings are stored before.
+&nbsp;    private void doShareToGitHub() throws JabRefException, IOException, GitAPIException {
+<b class="nc">&nbsp;        Optional&lt;BibDatabaseContext&gt; activeDatabaseOpt = stateManager.getActiveDatabase();</b>
+<b class="nc">&nbsp;        if (activeDatabaseOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(Localization.lang(&quot;No library open&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BibDatabaseContext activeDatabase = activeDatabaseOpt.get();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; bibFilePathOpt = activeDatabase.getDatabasePath();</b>
+<b class="nc">&nbsp;        if (bibFilePathOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(Localization.lang(&quot;No library file path. Please save the library to a file first.&quot;));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // We don&#39;t get a new preference object (and re-use the existing one instead), because of ADR-0016
+&nbsp;
+&nbsp;        // TODO: Read remove from the git configuration - and only prompt for a repository if there is none
+<b class="nc">&nbsp;        String url = gitPreferences.getRepositoryUrl();</b>
+<b class="nc">&nbsp;        String user = gitPreferences.getUsername();</b>
+<b class="nc">&nbsp;        String pat = gitPreferences.getPat();</b>
+&nbsp;
+<b class="nc">&nbsp;        Path bibPath = bibFilePathOpt.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        GitInitService.initRepoAndSetRemote(bibPath, url, gitHandlerRegistry);</b>
+<b class="nc">&nbsp;        GitHandler handler = gitHandlerRegistry.get(bibPath.getParent());</b>
+<b class="nc">&nbsp;        handler.setCredentials(user, pat);</b>
+&nbsp;
+<b class="nc">&nbsp;        GitStatusSnapshot status = GitStatusChecker.checkStatusAndFetch(handler);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (status.syncStatus() == SyncStatus.BEHIND) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(Localization.lang(&quot;Remote repository is not empty. Please pull changes before pushing.&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        handler.createCommitOnCurrentBranch(Localization.lang(&quot;Share library to GitHub&quot;), false);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (status.syncStatus() == SyncStatus.REMOTE_EMPTY) {</b>
+<b class="nc">&nbsp;            handler.pushCurrentBranchCreatingUpstream();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            handler.pushCommitsToRemoteRepository();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        repositoryUrlProperty.set(gitPreferences.getRepositoryUrl());</b>
+<b class="nc">&nbsp;        usernameProperty.set(gitPreferences.getUsername());</b>
+<b class="nc">&nbsp;        patProperty.set(gitPreferences.getPat());</b>
+<b class="nc">&nbsp;        rememberPatProperty.set(gitPreferences.getRememberPat());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        gitPreferences.setRepositoryUrl(repositoryUrlProperty.get().trim());</b>
+<b class="nc">&nbsp;        gitPreferences.setUsername(usernameProperty.get().trim());</b>
+<b class="nc">&nbsp;        gitPreferences.setRememberPat(rememberPatProperty.get());</b>
+<b class="nc">&nbsp;        gitPreferences.setPat(patProperty.get().trim());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus repositoryUrlValidation() {
+<b class="nc">&nbsp;        return repositoryUrlValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus githubUsernameValidation() {
+<b class="nc">&nbsp;        return githubUsernameValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus githubPatValidation() {
+<b class="nc">&nbsp;        return githubPatValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Predicate&lt;String&gt; notEmptyValidator() {
+<b class="nc">&nbsp;        return StringUtil::isNotBlank;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Predicate&lt;String&gt; githubHttpsUrlValidator() {
+<b class="nc">&nbsp;        return input -&gt; StringUtil.isNotBlank(input) &amp;&amp; URLUtil.isURL(input.trim());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty usernameProperty() {
+<b class="nc">&nbsp;        return usernameProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty patProperty() {
+<b class="nc">&nbsp;        return patProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty repositoryUrlProperty() {
+<b class="nc">&nbsp;        return repositoryUrlProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty rememberPatProperty() {
+<b class="nc">&nbsp;        return rememberPatProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

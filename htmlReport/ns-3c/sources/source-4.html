@@ -1,0 +1,148 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitConflictResolverDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.git</a>
+</div>
+
+<h1>Coverage Summary for Class: GitConflictResolverDialog (org.jabref.gui.git)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitConflictResolverDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.git;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.ShowDiffConfig;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.toolbar.ThreeWayMergeToolbar;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;/// A wrapper around {@link MergeEntriesDialog} for Git feature
+&nbsp;///
+&nbsp;/// Receives a semantic conflict (ThreeWayEntryConflict), pops up an interactive GUI (belonging to mergeentries), and returns a user-confirmed BibEntry merge result.
+&nbsp;public class GitConflictResolverDialog {
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public GitConflictResolverDialog(DialogService dialogService, GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;BibEntry&gt; resolveConflict(ThreeWayEntryConflict conflict) {
+<b class="nc">&nbsp;        BibEntry base = conflict.base();</b>
+<b class="nc">&nbsp;        BibEntry local = conflict.local();</b>
+<b class="nc">&nbsp;        BibEntry remote = conflict.remote();</b>
+&nbsp;
+<b class="nc">&nbsp;        MergeEntriesDialog dialog = new MergeEntriesDialog(local, remote, preferences);</b>
+<b class="nc">&nbsp;        dialog.setLeftHeaderText(Localization.lang(&quot;Local&quot;));</b>
+<b class="nc">&nbsp;        dialog.setRightHeaderText(Localization.lang(&quot;Remote&quot;));</b>
+<b class="nc">&nbsp;        ShowDiffConfig diffConfig = new ShowDiffConfig(</b>
+&nbsp;                ThreeWayMergeToolbar.DiffView.SPLIT,
+&nbsp;                DiffHighlighter.BasicDiffMethod.WORDS
+&nbsp;        );
+<b class="nc">&nbsp;        dialog.configureDiff(diffConfig);</b>
+&nbsp;
+<b class="nc">&nbsp;        return dialogService.showCustomDialogAndWait(dialog)</b>
+<b class="nc">&nbsp;                            .map(result -&gt; result.mergedEntry());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,449 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > KeywordsEditor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: KeywordsEditor (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">KeywordsEditor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/105)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">KeywordsEditor$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">KeywordsEditor$TagContextAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/119)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.ContentDisplay;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.JabRefDialogService;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.shared.exception.MscCodeLoadingException;
+&nbsp;import org.jabref.logic.util.MscCodeUtils;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Keyword;
+&nbsp;import org.jabref.model.entry.KeywordList;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.dlsc.gemsfx.TagsField;
+&nbsp;import com.google.common.collect.Comparators;
+&nbsp;import com.google.common.collect.HashBiMap;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class KeywordsEditor extends HBox implements FieldEditorFX {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);</b>
+<b class="nc">&nbsp;    private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass(&quot;focused&quot;);</b>
+&nbsp;    private static HashBiMap&lt;String, String&gt; mscmap;
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource(&quot;msc_codes.json&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (resourceUrl == null) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Resource not found: msc_codes.json&quot;);</b>
+<b class="nc">&nbsp;            mscmap = HashBiMap.create();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            Optional&lt;HashBiMap&lt;String, String&gt;&gt; optionalMscCodes = MscCodeUtils.loadMscCodesFromJson(resourceUrl);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (optionalMscCodes.isPresent()) {</b>
+<b class="nc">&nbsp;                mscmap = optionalMscCodes.get();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Resource not found msc_codes.json&quot;);</b>
+<b class="nc">&nbsp;                mscmap = HashBiMap.create();</b>
+&nbsp;            }
+&nbsp;        } catch (MscCodeLoadingException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error loading MSC codes&quot;, e);</b>
+<b class="nc">&nbsp;            mscmap = HashBiMap.create();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML private KeywordsEditorViewModel viewModel;
+&nbsp;    @FXML private TagsField&lt;Keyword&gt; keywordTagsField;
+&nbsp;
+&nbsp;    @Inject private CliPreferences preferences;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;    @Inject private ClipBoardManager clipBoardManager;
+&nbsp;
+<b class="nc">&nbsp;    private boolean isSortedTagsField = false;</b>
+<b class="nc">&nbsp;    private Optional&lt;Keyword&gt; draggedKeyword = Optional.empty();</b>
+&nbsp;
+&nbsp;    public KeywordsEditor(Field field,
+&nbsp;                          SuggestionProvider&lt;?&gt; suggestionProvider,
+<b class="nc">&nbsp;                          FieldCheckers fieldCheckers) {</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.viewModel = new KeywordsEditorViewModel(</b>
+&nbsp;                field,
+&nbsp;                suggestionProvider,
+&nbsp;                fieldCheckers,
+&nbsp;                preferences,
+&nbsp;                undoManager);
+&nbsp;
+<b class="nc">&nbsp;        keywordTagsField.setCellFactory(new ViewModelListCellFactory&lt;Keyword&gt;().withText(Keyword::get));</b>
+<b class="nc">&nbsp;        keywordTagsField.setTagViewFactory(this::createTag);</b>
+&nbsp;
+<b class="nc">&nbsp;        keywordTagsField.setSuggestionProvider(request -&gt; viewModel.getSuggestions(request.getUserText()));</b>
+<b class="nc">&nbsp;        keywordTagsField.setConverter(KeywordsEditorViewModel.getStringConverter());</b>
+<b class="nc">&nbsp;        keywordTagsField.setMatcher((keyword, searchText) -&gt; keyword.get().toLowerCase().startsWith(searchText.toLowerCase()));</b>
+<b class="nc">&nbsp;        keywordTagsField.setComparator(Comparator.comparing(Keyword::get));</b>
+&nbsp;
+<b class="nc">&nbsp;        keywordTagsField.setNewItemProducer(searchText -&gt; KeywordsEditorViewModel.getStringConverter().fromString(searchText));</b>
+&nbsp;
+<b class="nc">&nbsp;        keywordTagsField.setShowSearchIcon(false);</b>
+<b class="nc">&nbsp;        keywordTagsField.setOnMouseClicked(_ -&gt; keywordTagsField.getEditor().requestFocus());</b>
+<b class="nc">&nbsp;        keywordTagsField.getEditor().getStyleClass().clear();</b>
+<b class="nc">&nbsp;        keywordTagsField.getEditor().getStyleClass().add(&quot;tags-field-editor&quot;);</b>
+<b class="nc">&nbsp;        keywordTagsField.getEditor().focusedProperty().addListener((_, _, newValue) -&gt; keywordTagsField.pseudoClassStateChanged(FOCUSED, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        String keywordSeparator = String.valueOf(viewModel.getKeywordSeparator());</b>
+<b class="nc">&nbsp;        keywordTagsField.getEditor().setOnKeyReleased(event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getText().equals(keywordSeparator)) {</b>
+<b class="nc">&nbsp;                keywordTagsField.commit();</b>
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        this.viewModel.keywordListProperty().addListener((_, _, _) -&gt; {</b>
+<b class="nc">&nbsp;            if (keywordTagsField.getTags().size() &lt; 2) {</b>
+<b class="nc">&nbsp;                isSortedTagsField = false;</b>
+<b class="nc">&nbsp;            } else if ((Comparators.isInOrder(keywordTagsField.getTags(), Comparator.comparing(Keyword::get))) || isSortedTagsField) {</b>
+<b class="nc">&nbsp;                isSortedTagsField = true;</b>
+<b class="nc">&nbsp;                keywordTagsField.getTags().sort(Comparator.comparing(Keyword::get));</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        keywordTagsField.getEditor().setOnKeyPressed(event -&gt; {</b>
+<b class="nc">&nbsp;            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, event)) {</b>
+<b class="nc">&nbsp;                String clipboardText = ClipBoardManager.getContents();</b>
+<b class="nc">&nbsp;                if (!clipboardText.isEmpty()) {</b>
+<b class="nc">&nbsp;                    KeywordList keywordsList = KeywordList.parse(clipboardText, viewModel.getKeywordSeparator());</b>
+<b class="nc">&nbsp;                    keywordsList.stream().forEach(keyword -&gt; keywordTagsField.addTags(keyword));</b>
+<b class="nc">&nbsp;                    keywordTagsField.getEditor().clear();</b>
+<b class="nc">&nbsp;                    event.consume();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node createTag(Keyword keyword) {
+<b class="nc">&nbsp;        Label tagLabel = new Label();</b>
+<b class="nc">&nbsp;        tagLabel.setText(keywordTagsField.getConverter().toString(keyword));</b>
+<b class="nc">&nbsp;        tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());</b>
+<b class="nc">&nbsp;        tagLabel.getGraphic().setOnMouseClicked(_ -&gt; keywordTagsField.removeTags(keyword));</b>
+<b class="nc">&nbsp;        tagLabel.setContentDisplay(ContentDisplay.RIGHT);</b>
+<b class="nc">&nbsp;        ContextMenu contextMenu = new ContextMenu();</b>
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+<b class="nc">&nbsp;        contextMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY, new KeywordsEditor.TagContextAction(StandardActions.COPY, keyword)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CUT, new KeywordsEditor.TagContextAction(StandardActions.CUT, keyword)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.DELETE, new KeywordsEditor.TagContextAction(StandardActions.DELETE, keyword))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        tagLabel.setContextMenu(contextMenu);</b>
+<b class="nc">&nbsp;        tagLabel.setOnMouseClicked(event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getClickCount() == 2) {</b>
+<b class="nc">&nbsp;                keywordTagsField.removeTags(keyword);</b>
+<b class="nc">&nbsp;                keywordTagsField.getEditor().setText(keyword.get());</b>
+<b class="nc">&nbsp;                keywordTagsField.getEditor().positionCaret(keyword.get().length());</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        tagLabel.setOnDragOver(event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getGestureSource() != tagLabel &amp;&amp; event.getDragboard().hasString()) {</b>
+<b class="nc">&nbsp;                event.acceptTransferModes(TransferMode.MOVE);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        });
+&nbsp;
+&nbsp;        // Checks Keyword for MSC code and displays tooltip with corresponding description
+<b class="nc">&nbsp;        if (mscmap.containsKey(tagLabel.getText())) {</b>
+<b class="nc">&nbsp;            String mscClassification = mscmap.get(tagLabel.getText());</b>
+<b class="nc">&nbsp;            Tooltip tooltip = new Tooltip(mscClassification);</b>
+<b class="nc">&nbsp;            tagLabel.setTooltip(tooltip);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        tagLabel.setOnDragDetected(event -&gt; {</b>
+<b class="nc">&nbsp;            Dragboard db = tagLabel.startDragAndDrop(TransferMode.MOVE);</b>
+<b class="nc">&nbsp;            ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;            content.putString(keyword.get());</b>
+<b class="nc">&nbsp;            db.setContent(content);</b>
+<b class="nc">&nbsp;            draggedKeyword = Optional.of(keyword);</b>
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        tagLabel.setOnDragEntered(_ -&gt; tagLabel.setStyle(&quot;-fx-background-color: lightgrey;&quot;));</b>
+<b class="nc">&nbsp;        tagLabel.setOnDragExited(_ -&gt; tagLabel.setStyle(&quot;&quot;));</b>
+<b class="nc">&nbsp;        tagLabel.setOnDragDropped(event -&gt; {</b>
+<b class="nc">&nbsp;            Dragboard db = event.getDragboard();</b>
+<b class="nc">&nbsp;            if (db.hasString() &amp;&amp; draggedKeyword.isPresent()) {</b>
+<b class="nc">&nbsp;                int oldIndex = keywordTagsField.getTags().indexOf(draggedKeyword.get());</b>
+<b class="nc">&nbsp;                int dropIndex = keywordTagsField.getTags().indexOf(keyword);</b>
+<b class="nc">&nbsp;                if (oldIndex != dropIndex) {</b>
+<b class="nc">&nbsp;                    keywordTagsField.removeTags(draggedKeyword.get());</b>
+<b class="nc">&nbsp;                    keywordTagsField.getTags().add(dropIndex, draggedKeyword.get());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                event.setDropCompleted(true);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                event.setDropCompleted(false);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            draggedKeyword = Optional.empty();</b>
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        tagLabel.setOnDragDone(DragEvent::consume);</b>
+<b class="nc">&nbsp;        return tagLabel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeywordsEditorViewModel getViewModel() {
+<b class="nc">&nbsp;        return viewModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        viewModel.bindToEntry(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parent getNode() {
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public double getWeight() {
+<b class="nc">&nbsp;        return 2;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private class TagContextAction extends SimpleCommand {
+&nbsp;        private final StandardActions command;
+&nbsp;        private final Keyword keyword;
+&nbsp;
+<b class="nc">&nbsp;        public TagContextAction(StandardActions command, Keyword keyword) {</b>
+<b class="nc">&nbsp;            this.command = command;</b>
+<b class="nc">&nbsp;            this.keyword = keyword;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void execute() {
+<b class="nc">&nbsp;            switch (command) {</b>
+&nbsp;                case COPY -&gt; {
+<b class="nc">&nbsp;                    clipBoardManager.setContent(keyword.get());</b>
+<b class="nc">&nbsp;                    dialogService.notify(Localization.lang(&quot;Copied &#39;%0&#39; to clipboard.&quot;,</b>
+<b class="nc">&nbsp;                            JabRefDialogService.shortenDialogMessage(keyword.get())));</b>
+&nbsp;                }
+&nbsp;                case CUT -&gt; {
+<b class="nc">&nbsp;                    clipBoardManager.setContent(keyword.get());</b>
+<b class="nc">&nbsp;                    dialogService.notify(Localization.lang(&quot;Copied &#39;%0&#39; to clipboard.&quot;,</b>
+<b class="nc">&nbsp;                            JabRefDialogService.shortenDialogMessage(keyword.get())));</b>
+<b class="nc">&nbsp;                    keywordTagsField.removeTags(keyword);</b>
+&nbsp;                }
+&nbsp;                case DELETE -&gt;
+<b class="nc">&nbsp;                        keywordTagsField.removeTags(keyword);</b>
+&nbsp;                default -&gt;
+<b class="nc">&nbsp;                        LOGGER.info(&quot;Action {} not defined&quot;, command.getText());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

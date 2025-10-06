@@ -1,0 +1,386 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SaveOrder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.metadata</a>
+</div>
+
+<h1>Coverage Summary for Class: SaveOrder (org.jabref.model.metadata)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SaveOrder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SaveOrder$OrderType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SaveOrder$SortCriterion</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.metadata;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Stores the save order config for a library
+&nbsp; * &lt;p&gt;
+&nbsp; * Format: &amp;lt;choice&gt; ({@link OrderType}, a pair of {@link Field} + descending (boolean)
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Note that {@link OrderType#TABLE} can only be used as &quot;intermediate&quot; setting. When passing &lt;code&gt;SaveOrder&lt;/code&gt;
+&nbsp; * to {@link org.jabref.logic.exporter.BibDatabaseWriter}, the orderType must be different. Reason: The writer
+&nbsp; * does not have access to the UI.
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+&nbsp;public class SaveOrder {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrder.class);</b>
+&nbsp;
+&nbsp;    private final OrderType orderType;
+&nbsp;    private final List&lt;SortCriterion&gt; sortCriteria;
+&nbsp;
+<b class="nc">&nbsp;    public SaveOrder(OrderType orderType, List&lt;SortCriterion&gt; sortCriteria) {</b>
+<b class="nc">&nbsp;        this.orderType = orderType;</b>
+<b class="nc">&nbsp;        this.sortCriteria = sortCriteria;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private SaveOrder(List&lt;String&gt; data) {</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (data.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        OrderType orderType;
+&nbsp;        try {
+<b class="nc">&nbsp;            orderType = OrderType.valueOf(data.getFirst().toUpperCase());</b>
+&nbsp;        } catch (IllegalArgumentException ex) {
+<b class="nc">&nbsp;            if (data.size() &gt; 1 &amp;&amp; data.size() % 2 == 1) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not parse sort order: {} - trying to parse the sort criteria&quot;, data.getFirst());</b>
+<b class="nc">&nbsp;                orderType = OrderType.SPECIFIED;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not parse sort order: {}&quot;, data.getFirst());</b>
+<b class="nc">&nbsp;                this.sortCriteria = List.of();</b>
+<b class="nc">&nbsp;                this.orderType = OrderType.ORIGINAL;</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        this.orderType = orderType;</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;SortCriterion&gt; sortCriteria = new ArrayList&lt;&gt;(data.size() / 2);</b>
+<b class="nc">&nbsp;        for (int index = 1; index &lt; data.size(); index = index + 2) {</b>
+<b class="nc">&nbsp;            sortCriteria.add(new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1)));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.sortCriteria = sortCriteria;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SaveOrder parse(List&lt;String&gt; orderedData) {
+<b class="nc">&nbsp;        return new SaveOrder(orderedData);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SelfContainedSaveOrder getDefaultSaveOrder() {
+<b class="nc">&nbsp;        return new SelfContainedSaveOrder(OrderType.ORIGINAL, List.of());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OrderType getOrderType() {
+<b class="nc">&nbsp;        return orderType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;SortCriterion&gt; getSortCriteria() {
+<b class="nc">&nbsp;        return sortCriteria;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o instanceof SaveOrder that) {</b>
+<b class="nc">&nbsp;            return Objects.equals(sortCriteria, that.sortCriteria) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(orderType, that.orderType);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(orderType, sortCriteria);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;SaveOrderConfig{&quot; + &quot;orderType=&quot; + orderType.toString() +</b>
+&nbsp;                &quot;, sortCriteria=&quot; + sortCriteria +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Outputs the current configuration to be consumed later by the constructor
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; getAsStringList() {
+<b class="nc">&nbsp;        List&lt;String&gt; res = new ArrayList&lt;&gt;(7);</b>
+<b class="nc">&nbsp;        res.add(orderType.toString());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (SortCriterion sortCriterion : sortCriteria) {</b>
+<b class="nc">&nbsp;            res.add(sortCriterion.field.getName());</b>
+<b class="nc">&nbsp;            res.add(Boolean.toString(sortCriterion.descending));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return res;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class SortCriterion {
+&nbsp;
+&nbsp;        public final Field field;
+&nbsp;
+&nbsp;        public final boolean descending;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Given field sorted ascending
+&nbsp;         */
+&nbsp;        public SortCriterion(Field field) {
+<b class="nc">&nbsp;            this(field, false);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @param field      The field
+&nbsp;         * @param descending Must be a boolean value as string, e.g. &quot;true&quot;, &quot;false&quot;
+&nbsp;         */
+<b class="nc">&nbsp;        public SortCriterion(Field field, String descending) {</b>
+<b class="nc">&nbsp;            this.field = field;</b>
+<b class="nc">&nbsp;            this.descending = Boolean.parseBoolean(descending);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public SortCriterion(Field field, boolean descending) {</b>
+<b class="nc">&nbsp;            this.field = field;</b>
+<b class="nc">&nbsp;            this.descending = descending;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return &quot;SortCriterion{&quot; + &quot;field=&#39;&quot; + field + &#39;\&#39;&#39; +</b>
+&nbsp;                    &quot;, descending=&quot; + descending +
+&nbsp;                    &#39;}&#39;;
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            if (this == o) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            SortCriterion that = (SortCriterion) o;</b>
+<b class="nc">&nbsp;            return Objects.equals(descending, that.descending) &amp;&amp;</b>
+<b class="nc">&nbsp;                    Objects.equals(field, that.field);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return Objects.hash(field, descending);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum OrderType {</b>
+<b class="nc">&nbsp;        SPECIFIED(&quot;specified&quot;),</b>
+<b class="nc">&nbsp;        ORIGINAL(&quot;original&quot;),</b>
+<b class="nc">&nbsp;        TABLE(&quot;table&quot;);</b>
+&nbsp;
+&nbsp;        private final String name;
+&nbsp;
+<b class="nc">&nbsp;        OrderType(String name) {</b>
+<b class="nc">&nbsp;            this.name = name;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return name;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static SaveOrder.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
+<b class="nc">&nbsp;            SaveOrder.OrderType orderType = SaveOrder.OrderType.TABLE;</b>
+<b class="nc">&nbsp;            if (saveInSpecifiedOrder) {</b>
+<b class="nc">&nbsp;                orderType = SaveOrder.OrderType.SPECIFIED;</b>
+<b class="nc">&nbsp;            } else if (saveInOriginalOrder) {</b>
+<b class="nc">&nbsp;                orderType = SaveOrder.OrderType.ORIGINAL;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return orderType;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

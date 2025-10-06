@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BackupUIManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.dialogs</a>
+</div>
+
+<h1>Coverage Summary for Class: BackupUIManager (org.jabref.gui.dialogs)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BackupUIManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.dialogs;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.autosaveandbackup.BackupManager;
+&nbsp;import org.jabref.gui.backup.BackupResolverDialog;
+&nbsp;import org.jabref.gui.collab.DatabaseChange;
+&nbsp;import org.jabref.gui.collab.DatabaseChangeList;
+&nbsp;import org.jabref.gui.collab.DatabaseChangeResolverFactory;
+&nbsp;import org.jabref.gui.collab.DatabaseChangesResolverDialog;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.OpenDatabase;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackupFileType;
+&nbsp;import org.jabref.logic.util.io.BackupFileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.util.DummyFileUpdateMonitor;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Stores all user dialogs related to {@link BackupManager}.
+&nbsp; */
+&nbsp;public class BackupUIManager {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);</b>
+&nbsp;
+&nbsp;    private BackupUIManager() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;ParserResult&gt; showRestoreBackupDialog(DialogService dialogService,
+&nbsp;                                                                 Path originalPath,
+&nbsp;                                                                 GuiPreferences preferences,
+&nbsp;                                                                 FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                                                                 UndoManager undoManager,
+&nbsp;                                                                 StateManager stateManager) {
+<b class="nc">&nbsp;        Optional&lt;ButtonType&gt; actionOpt = showBackupResolverDialog(</b>
+&nbsp;                dialogService,
+<b class="nc">&nbsp;                preferences.getExternalApplicationsPreferences(),</b>
+&nbsp;                originalPath,
+<b class="nc">&nbsp;                preferences.getFilePreferences().getBackupDirectory());</b>
+<b class="nc">&nbsp;        return actionOpt.flatMap(action -&gt; {</b>
+<b class="nc">&nbsp;            if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {</b>
+<b class="nc">&nbsp;                BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+<b class="nc">&nbsp;            } else if (action == BackupResolverDialog.REVIEW_BACKUP) {</b>
+<b class="nc">&nbsp;                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;ButtonType&gt; showBackupResolverDialog(DialogService dialogService,
+&nbsp;                                                                 ExternalApplicationsPreferences externalApplicationsPreferences,
+&nbsp;                                                                 Path originalPath,
+&nbsp;                                                                 Path backupDir) {
+<b class="nc">&nbsp;        return UiTaskExecutor.runInJavaFXThread(</b>
+<b class="nc">&nbsp;                () -&gt; dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;ParserResult&gt; showReviewBackupDialog(
+&nbsp;            DialogService dialogService,
+&nbsp;            Path originalPath,
+&nbsp;            GuiPreferences preferences,
+&nbsp;            FileUpdateMonitor fileUpdateMonitor,
+&nbsp;            UndoManager undoManager,
+&nbsp;            StateManager stateManager) {
+&nbsp;        try {
+<b class="nc">&nbsp;            ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();</b>
+&nbsp;
+&nbsp;            // The database of the originalParserResult will be modified
+<b class="nc">&nbsp;            ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, fileUpdateMonitor);</b>
+&nbsp;            // This will be modified by using the `DatabaseChangesResolverDialog`.
+<b class="nc">&nbsp;            BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();</b>
+&nbsp;
+<b class="nc">&nbsp;            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();</b>
+<b class="nc">&nbsp;            BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();</b>
+&nbsp;
+<b class="nc">&nbsp;            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;            return UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;                List&lt;DatabaseChange&gt; changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);</b>
+<b class="nc">&nbsp;                DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(</b>
+&nbsp;                        changes,
+&nbsp;                        originalDatabase, &quot;Review Backup&quot;
+&nbsp;                );
+<b class="nc">&nbsp;                Optional&lt;Boolean&gt; allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);</b>
+<b class="nc">&nbsp;                LibraryTab saveState = stateManager.activeTabProperty().get().get();</b>
+<b class="nc">&nbsp;                final NamedCompoundEdit CE = new NamedCompoundEdit(Localization.lang(&quot;Merged external changes&quot;));</b>
+<b class="nc">&nbsp;                changes.stream().filter(DatabaseChange::isAccepted).forEach(change -&gt; change.applyChange(CE));</b>
+<b class="nc">&nbsp;                CE.end();</b>
+<b class="nc">&nbsp;                undoManager.addEdit(CE);</b>
+<b class="nc">&nbsp;                if (allChangesResolved.get()) {</b>
+<b class="nc">&nbsp;                    if (reviewBackupDialog.areAllChangesDenied()) {</b>
+&nbsp;                        // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
+<b class="nc">&nbsp;                        saveState.resetChangeMonitor();</b>
+&nbsp;                    } else {
+&nbsp;                        // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
+<b class="nc">&nbsp;                        saveState.markBaseChanged();</b>
+&nbsp;                    }
+&nbsp;                    // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
+<b class="nc">&nbsp;                    return Optional.of(originalParserResult);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // In case not all changes are resolved, start from scratch
+<b class="nc">&nbsp;                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);</b>
+&nbsp;            });
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error while loading backup or current database&quot;, e);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

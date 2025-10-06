@@ -1,0 +1,566 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LtwaRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.journals.ltwa</a>
+</div>
+
+<h1>Coverage Summary for Class: LtwaRepository (org.jabref.logic.journals.ltwa)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LtwaRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.4%
+  </span>
+  <span class="absValue">
+    (2/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.7%
+  </span>
+  <span class="absValue">
+    (6/90)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LtwaRepository$AbbreviationListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/76)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    6.5%
+  </span>
+  <span class="absValue">
+    (2/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.6%
+  </span>
+  <span class="absValue">
+    (6/166)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.journals.ltwa;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.IntStream;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.CharStream;
+&nbsp;import org.antlr.v4.runtime.CharStreams;
+&nbsp;import org.antlr.v4.runtime.CommonTokenStream;
+&nbsp;import org.antlr.v4.runtime.ParserRuleContext;
+&nbsp;import org.antlr.v4.runtime.tree.ParseTreeWalker;
+&nbsp;import org.h2.mvstore.MVMap;
+&nbsp;import org.h2.mvstore.MVStore;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A repository for LTWA (List of Title Word Abbreviations) entries.
+&nbsp; * Provides methods for retrieving and applying abbreviations based on LTWA rules.
+&nbsp; */
+&nbsp;public class LtwaRepository {
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LtwaRepository.class);</b>
+<b class="fc">&nbsp;    private static final Pattern INFLECTION = Pattern.compile(&quot;[ieasn&#39;’]{1,3}&quot;);</b>
+<b class="fc">&nbsp;    private static final Pattern BOUNDARY = Pattern.compile(&quot;[\\s\\u2013\\u2014_.,:;!|=+*\\\\/\&quot;()&amp;#%@$?]&quot;);</b>
+&nbsp;    private static final String PREFIX_MAP_NAME = &quot;Prefixes&quot;;
+&nbsp;    private static final String SUFFIX_MAP_NAME = &quot;Suffixes&quot;;
+&nbsp;
+&nbsp;    private final PrefixTree&lt;LtwaEntry&gt; prefix;
+&nbsp;    private final PrefixTree&lt;LtwaEntry&gt; suffix;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an empty LtwaRepository.
+&nbsp;     */
+<b class="fc">&nbsp;    public LtwaRepository() {</b>
+<b class="fc">&nbsp;        this.prefix = new PrefixTree&lt;&gt;();</b>
+<b class="fc">&nbsp;        this.suffix = new PrefixTree&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new LtwaRepository from an MV store file.
+&nbsp;     *
+&nbsp;     * @param ltwaListFile Path to the LTWA MVStore file
+&nbsp;     */
+&nbsp;    public LtwaRepository(Path ltwaListFile) {
+<b class="nc">&nbsp;        this();</b>
+&nbsp;
+<b class="nc">&nbsp;        try (MVStore store = new MVStore.Builder().readOnly().fileName(ltwaListFile.toAbsolutePath().toString()).open()) {</b>
+<b class="nc">&nbsp;            MVMap&lt;String, List&lt;LtwaEntry&gt;&gt; prefixMap = store.openMap(PREFIX_MAP_NAME);</b>
+<b class="nc">&nbsp;            MVMap&lt;String, List&lt;LtwaEntry&gt;&gt; suffixMap = store.openMap(SUFFIX_MAP_NAME);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (String key : prefixMap.keySet()) {</b>
+<b class="nc">&nbsp;                List&lt;LtwaEntry&gt; value = prefixMap.get(key);</b>
+<b class="nc">&nbsp;                if (value != null) {</b>
+<b class="nc">&nbsp;                    prefix.insert(key, value);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            for (String key : suffixMap.keySet()) {</b>
+<b class="nc">&nbsp;                List&lt;LtwaEntry&gt; value = suffixMap.get(key);</b>
+<b class="nc">&nbsp;                if (value != null) {</b>
+<b class="nc">&nbsp;                    suffix.insert(key, value);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Loaded LTWA repository with {} prefixes and {} suffixes&quot;, prefixMap.size(), suffixMap.size());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Abbreviates a given title using the ISO4 rules.
+&nbsp;     *
+&nbsp;     * @param title The title to be abbreviated
+&nbsp;     * @return The abbreviated title
+&nbsp;     */
+&nbsp;    public Optional&lt;String&gt; abbreviate(String title) {
+<b class="nc">&nbsp;        if (title == null || title.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.of(title)</b>
+<b class="nc">&nbsp;                       .flatMap(NormalizeUtils::toNFKC)</b>
+<b class="nc">&nbsp;                       .flatMap(normalizedTitle -&gt; {</b>
+<b class="nc">&nbsp;                           CharStream charStream = CharStreams.fromString(normalizedTitle);</b>
+<b class="nc">&nbsp;                           LtwaLexer lexer = new LtwaLexer(charStream);</b>
+<b class="nc">&nbsp;                           CommonTokenStream tokens = new CommonTokenStream(lexer);</b>
+<b class="nc">&nbsp;                           LtwaParser parser = new LtwaParser(tokens);</b>
+<b class="nc">&nbsp;                           LtwaParser.TitleContext titleContext = parser.title();</b>
+<b class="nc">&nbsp;                           AbbreviationListener listener = new AbbreviationListener(normalizedTitle, prefix, suffix);</b>
+<b class="nc">&nbsp;                           ParseTreeWalker walker = new ParseTreeWalker();</b>
+<b class="nc">&nbsp;                           walker.walk(listener, titleContext);</b>
+<b class="nc">&nbsp;                           return listener.getResult();</b>
+&nbsp;                       });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Listener to apply abbreviation rules to the parsed title
+&nbsp;     */
+&nbsp;    private static class AbbreviationListener extends LtwaBaseListener {
+<b class="nc">&nbsp;        private final StringBuilder result = new StringBuilder();</b>
+&nbsp;        private final String originalTitle;
+&nbsp;        private final PrefixTree&lt;LtwaEntry&gt; prefix;
+&nbsp;        private final PrefixTree&lt;LtwaEntry&gt; suffix;
+<b class="nc">&nbsp;        private boolean isFirstElement = true;</b>
+<b class="nc">&nbsp;        private boolean addSpace = false;</b>
+<b class="nc">&nbsp;        private int lastPartPosition = -1;</b>
+<b class="nc">&nbsp;        private int abbreviatedTitlePosition = 0;</b>
+<b class="nc">&nbsp;        private boolean error = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        public AbbreviationListener(String originalTitle, PrefixTree&lt;LtwaEntry&gt; prefix, PrefixTree&lt;LtwaEntry&gt; suffix) {</b>
+<b class="nc">&nbsp;            this.originalTitle = originalTitle;</b>
+<b class="nc">&nbsp;            this.prefix = prefix;</b>
+<b class="nc">&nbsp;            this.suffix = suffix;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitArticleElement(LtwaParser.ArticleElementContext ctx) {
+&nbsp;            // Skip articles
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitStopwordElement(LtwaParser.StopwordElementContext ctx) {
+<b class="nc">&nbsp;            if (isFirstElement) {</b>
+<b class="nc">&nbsp;                appendWithSpace(ctx.getText());</b>
+<b class="nc">&nbsp;                isFirstElement = false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitSymbolsElement(LtwaParser.SymbolsElementContext ctx) {
+<b class="nc">&nbsp;            String val = ctx.getText().replace(&quot;...&quot;, &quot;&quot;).replace(&quot;,&quot;, &quot;&quot;).replace(&quot;.&quot;, &quot;,&quot;);</b>
+<b class="nc">&nbsp;            if (&quot;&amp;&quot;.equals(val) || &quot;+&quot;.equals(val)) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            result.append(val);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitOrdinalElement(LtwaParser.OrdinalElementContext ctx) {
+<b class="nc">&nbsp;            addSpace = true;</b>
+<b class="nc">&nbsp;            if (lastPartPosition != -1) {</b>
+<b class="nc">&nbsp;                result.delete(lastPartPosition, result.length());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            appendWithSpace(ctx.getText());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitHyphenElement(LtwaParser.HyphenElementContext ctx) {
+<b class="nc">&nbsp;            result.append(ctx.getText());</b>
+<b class="nc">&nbsp;            addSpace = false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitPartElement(LtwaParser.PartElementContext ctx) {
+<b class="nc">&nbsp;            lastPartPosition = result.length();</b>
+<b class="nc">&nbsp;            addAbbreviation(ctx.getStart().getStartIndex(), ctx.getText());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitAbbreviationElement(LtwaParser.AbbreviationElementContext ctx) {
+<b class="nc">&nbsp;            appendWithSpace(ctx.getText());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitWordElement(LtwaParser.WordElementContext ctx) {
+<b class="nc">&nbsp;            addAbbreviation(ctx.getStart().getStartIndex(), ctx.getText());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void addAbbreviation(int position, String initialText) {
+<b class="nc">&nbsp;            if (position &lt; abbreviatedTitlePosition) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String remainingTitle = originalTitle.substring(position);</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; normalizedOpt = NormalizeUtils.normalize(remainingTitle)</b>
+<b class="nc">&nbsp;                                                           .map(String::toLowerCase);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (normalizedOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;                error = true;</b>
+<b class="nc">&nbsp;                appendWithSpace(initialText);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String normalizedRemaining = normalizedOpt.get();</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;LtwaEntry&gt; matchingEntries = findMatchingEntries(normalizedRemaining);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (matchingEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;                appendWithSpace(initialText);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LtwaEntry bestEntry = findBestEntry(matchingEntries).get();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (bestEntry.abbreviation() == null) {</b>
+<b class="nc">&nbsp;                appendWithSpace(initialText);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            abbreviatedTitlePosition += bestEntry.word().length();</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; matchedOpt = restoreCapitalizationAndDiacritics(bestEntry.abbreviation(), remainingTitle);</b>
+<b class="nc">&nbsp;            if (matchedOpt.isPresent()) {</b>
+<b class="nc">&nbsp;                appendWithSpace(matchedOpt.get());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                error = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Find matching entries from prefix and suffix trees
+&nbsp;         */
+&nbsp;        private List&lt;LtwaEntry&gt; findMatchingEntries(String normalizedText) {
+<b class="nc">&nbsp;            return Stream.concat(</b>
+<b class="nc">&nbsp;                                 prefix.search(normalizedText).stream(),</b>
+<b class="nc">&nbsp;                                 suffix.search(reverse(normalizedText)).stream())</b>
+<b class="nc">&nbsp;                         .filter(e -&gt; matches(normalizedText, e))</b>
+<b class="nc">&nbsp;                         .toList();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Find the best entry based on prioritization criteria
+&nbsp;         */
+&nbsp;        private Optional&lt;LtwaEntry&gt; findBestEntry(List&lt;LtwaEntry&gt; entries) {
+<b class="nc">&nbsp;            return entries.stream()</b>
+<b class="nc">&nbsp;                          .max(Comparator</b>
+<b class="nc">&nbsp;                                  .&lt;LtwaEntry&gt;comparingInt(e -&gt; e.word().endsWith(&quot;-&quot;) ? 1 : 0)</b>
+<b class="nc">&nbsp;                                  .thenComparingInt(e -&gt; e.word().length())</b>
+<b class="nc">&nbsp;                                  .thenComparingInt(e -&gt; e.abbreviation() != null ? 1 : 0)</b>
+<b class="nc">&nbsp;                                  .thenComparingInt(e -&gt; e.languages().contains(&quot;eng&quot;) ? 1 : 0));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitSingleWordTitleFull(LtwaParser.SingleWordTitleFullContext ctx) {
+<b class="nc">&nbsp;            result.append(ctx.singleWordTitle().getText());</b>
+<b class="nc">&nbsp;            addSpace = false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitStopwordPlusTitleFull(LtwaParser.StopwordPlusTitleFullContext ctx) {
+<b class="nc">&nbsp;            String stopword = ctx.stopwordPlusAny().STOPWORD().getText();</b>
+<b class="nc">&nbsp;            String second = ctx.stopwordPlusAny().getChild(1).getText();</b>
+<b class="nc">&nbsp;            result.append(stopword).append(&quot; &quot;).append(second);</b>
+<b class="nc">&nbsp;            addSpace = false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitAnyPlusSymbolsFull(LtwaParser.AnyPlusSymbolsFullContext ctx) {
+<b class="nc">&nbsp;            String first = ctx.anyPlusSymbols().getChild(0).getText();</b>
+<b class="nc">&nbsp;            String symbol = ctx.anyPlusSymbols().SYMBOLS().getText();</b>
+<b class="nc">&nbsp;            result.append(first).append(symbol);</b>
+<b class="nc">&nbsp;            addSpace = false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void exitEveryRule(ParserRuleContext ctx) {
+<b class="nc">&nbsp;            isFirstElement = ctx.getParent() instanceof LtwaParser.TitleElementContext &amp;&amp; isFirstElement;</b>
+<b class="nc">&nbsp;            if (!(ctx instanceof LtwaParser.PartContext ||</b>
+&nbsp;                    ctx instanceof LtwaParser.PartElementContext ||
+&nbsp;                    ctx instanceof LtwaParser.OrdinalContext)) {
+<b class="nc">&nbsp;                lastPartPosition = -1;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            abbreviatedTitlePosition = Math.max(abbreviatedTitlePosition, ctx.getStart().getStartIndex());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void appendWithSpace(String text) {
+<b class="nc">&nbsp;            if (addSpace &amp;&amp; !result.isEmpty() &amp;&amp; result.charAt(result.length() - 1) != &#39; &#39;) {</b>
+<b class="nc">&nbsp;                result.append(&quot; &quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            result.append(text);</b>
+<b class="nc">&nbsp;            addSpace = true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Optional&lt;String&gt; getResult() {
+<b class="nc">&nbsp;            return error ? Optional.empty() : Optional.of(result.toString());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Restore capitalization and diacritics from the original text to the abbreviation
+&nbsp;     */
+&nbsp;    private static Optional&lt;String&gt; restoreCapitalizationAndDiacritics(String abbreviation, String original) {
+<b class="nc">&nbsp;        if (abbreviation == null || original == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int abbrCodePointCount = abbreviation.codePointCount(0, abbreviation.length());</b>
+<b class="nc">&nbsp;        int origCodePointCount = original.codePointCount(0, original.length());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (abbrCodePointCount &gt; origCodePointCount) {</b>
+<b class="nc">&nbsp;            abbreviation = abbreviation.substring(0, abbreviation.offsetByCodePoints(0, origCodePointCount));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return NormalizeUtils.toNFKC(abbreviation)</b>
+<b class="nc">&nbsp;                             .map(normalized -&gt; {</b>
+<b class="nc">&nbsp;                                 int[] normalizedAbbrCodePoints = normalized.codePoints().toArray();</b>
+<b class="nc">&nbsp;                                 int[] origCodePoints = original.codePoints().toArray();</b>
+<b class="nc">&nbsp;                                 int[] resultCodePoints = Arrays.copyOf(normalizedAbbrCodePoints,</b>
+<b class="nc">&nbsp;                                         Math.min(normalizedAbbrCodePoints.length, origCodePoints.length));</b>
+<b class="nc">&nbsp;                                 IntStream.range(0, resultCodePoints.length)</b>
+<b class="nc">&nbsp;                                          .forEach(i -&gt; preserveOriginalCharacterProperties(</b>
+&nbsp;                                                  normalizedAbbrCodePoints[i],
+&nbsp;                                                  origCodePoints[i],
+&nbsp;                                                  resultCodePoints,
+&nbsp;                                                  i));
+&nbsp;
+<b class="nc">&nbsp;                                 return new String(resultCodePoints, 0, resultCodePoints.length);</b>
+&nbsp;                             });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Helper method to preserve original character properties (case, diacritics)
+&nbsp;     */
+&nbsp;    private static void preserveOriginalCharacterProperties(
+&nbsp;            int normalizedChar, int originalChar, int[] resultCodePoints, int index) {
+&nbsp;
+<b class="nc">&nbsp;        String normalizedCharStr = new String(Character.toChars(normalizedChar));</b>
+<b class="nc">&nbsp;        String origCharStr = new String(Character.toChars(originalChar));</b>
+&nbsp;
+<b class="nc">&nbsp;        NormalizeUtils.toNFKC(origCharStr)</b>
+<b class="nc">&nbsp;                      .filter(normalizedOrigChar -&gt; !normalizedOrigChar.isEmpty() &amp;&amp;</b>
+<b class="nc">&nbsp;                              normalizedCharStr.equalsIgnoreCase(normalizedOrigChar))</b>
+<b class="nc">&nbsp;                      .ifPresent(_ -&gt; resultCodePoints[index] = originalChar);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines if a title matches an LTWA entry
+&nbsp;     */
+&nbsp;    private static boolean matches(String title, LtwaEntry entry) {
+<b class="nc">&nbsp;        String word = entry.word();</b>
+<b class="nc">&nbsp;        int margin = (word.startsWith(&quot;-&quot;) ? 1 : 0) + (word.endsWith(&quot;-&quot;) ? 1 : 0);</b>
+<b class="nc">&nbsp;        if (title.length() &lt; word.length() - margin) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (word.startsWith(&quot;-&quot;)) {</b>
+<b class="nc">&nbsp;            word = reverse(word);</b>
+<b class="nc">&nbsp;            title = reverse(title);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return matchesInternal(title, word);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Internal matching logic after handling special cases
+&nbsp;     */
+&nbsp;    private static boolean matchesInternal(String title, String word) {
+<b class="nc">&nbsp;        int wordPosition = 0;</b>
+<b class="nc">&nbsp;        int titlePosition = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (wordPosition &lt; word.length() &amp;&amp; titlePosition &lt; title.length()) {</b>
+<b class="nc">&nbsp;            int wordCp = word.codePointAt(wordPosition);</b>
+<b class="nc">&nbsp;            int titleCp = title.codePointAt(titlePosition);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (wordCp == &#39;-&#39; &amp;&amp; wordPosition == word.length() - 1) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (Character.toLowerCase(wordCp) != Character.toLowerCase(titleCp)) {</b>
+<b class="nc">&nbsp;                Matcher match = INFLECTION.matcher(title.substring(titlePosition));</b>
+<b class="nc">&nbsp;                if (!match.lookingAt()) {</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                titlePosition += match.end();</b>
+<b class="nc">&nbsp;                match = BOUNDARY.matcher(title.substring(titlePosition));</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!match.lookingAt()) {</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                int boundaryLength = match.end();</b>
+<b class="nc">&nbsp;                titlePosition += boundaryLength;</b>
+<b class="nc">&nbsp;                wordPosition += boundaryLength;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            wordPosition += Character.charCount(wordCp);</b>
+<b class="nc">&nbsp;            titlePosition += Character.charCount(titleCp);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return handleRemainingText(title, titlePosition);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handle remaining text after initial match
+&nbsp;     */
+&nbsp;    private static boolean handleRemainingText(String title, int titlePosition) {
+<b class="nc">&nbsp;        Matcher match = INFLECTION.matcher(title.substring(titlePosition));</b>
+<b class="nc">&nbsp;        if (match.lookingAt()) {</b>
+<b class="nc">&nbsp;            titlePosition += match.end();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (titlePosition &gt;= title.length()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return BOUNDARY.matcher(title.substring(titlePosition)).lookingAt();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String reverse(String str) {
+<b class="nc">&nbsp;        return new StringBuilder(str).reverse().toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

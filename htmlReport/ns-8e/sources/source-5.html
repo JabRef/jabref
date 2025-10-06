@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Walkthroughs</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.welcome.components</a>
+</div>
+
+<h1>Coverage Summary for Class: Walkthroughs (org.jabref.gui.welcome.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Walkthroughs</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.welcome.components;
+&nbsp;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.stage.Stage;
+&nbsp;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.walkthrough.WalkthroughAction;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;public class Walkthroughs extends VBox {
+&nbsp;    private final Stage stage;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;
+&nbsp;    private final Label header;
+<b class="nc">&nbsp;    private boolean isScrollEnabled = true;</b>
+&nbsp;
+<b class="nc">&nbsp;    public Walkthroughs(Stage stage, LibraryTabContainer tabContainer, StateManager stateManager, GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.stage = stage;</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        getStyleClass().add(&quot;welcome-section&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        header = new Label(Localization.lang(&quot;Walkthroughs&quot;));</b>
+<b class="nc">&nbsp;        header.getStyleClass().add(&quot;welcome-header-label&quot;);</b>
+<b class="nc">&nbsp;        enableScroll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void enableScroll() {
+<b class="nc">&nbsp;        if (isScrollEnabled) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        isScrollEnabled = true;</b>
+<b class="nc">&nbsp;        getChildren().clear();</b>
+<b class="nc">&nbsp;        getChildren().addAll(header, createScrollPane(createWalkthroughContent()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void disableScroll() {
+<b class="nc">&nbsp;        if (!isScrollEnabled) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        isScrollEnabled = false;</b>
+<b class="nc">&nbsp;        getChildren().clear();</b>
+<b class="nc">&nbsp;        getChildren().addAll(header, createWalkthroughContent());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createWalkthroughContent() {
+<b class="nc">&nbsp;        VBox content = new VBox();</b>
+<b class="nc">&nbsp;        content.getStyleClass().add(&quot;walkthroughs-container&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Button mainFileDirWalkthroughButton = createWalkthroughButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Set main file directory&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.FOLDER,
+&nbsp;                WalkthroughAction.MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME);
+<b class="nc">&nbsp;        Button entryTableWalkthroughButton = createWalkthroughButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Customize entry table&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.TOGGLE_GROUPS,
+&nbsp;                WalkthroughAction.CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME);
+<b class="nc">&nbsp;        Button linkPdfWalkthroughButton = createWalkthroughButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Link PDF to entries&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.PDF_FILE,
+&nbsp;                WalkthroughAction.PDF_LINK_WALKTHROUGH_NAME);
+<b class="nc">&nbsp;        Button groupButton = createWalkthroughButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Add group&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.NEW_GROUP,
+&nbsp;                WalkthroughAction.GROUP_WALKTHROUGH_NAME);
+<b class="nc">&nbsp;        Button searchButton = createWalkthroughButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Search your library&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.SEARCH,
+&nbsp;                WalkthroughAction.SEARCH_WALKTHROUGH_NAME);
+&nbsp;
+<b class="nc">&nbsp;        content.getChildren().addAll(</b>
+&nbsp;                mainFileDirWalkthroughButton,
+&nbsp;                entryTableWalkthroughButton,
+&nbsp;                linkPdfWalkthroughButton,
+&nbsp;                groupButton,
+&nbsp;                searchButton);
+<b class="nc">&nbsp;        return content;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ScrollPane createScrollPane(VBox content) {
+<b class="nc">&nbsp;        ScrollPane scrollPane = new ScrollPane(content);</b>
+<b class="nc">&nbsp;        scrollPane.setFitToWidth(true);</b>
+<b class="nc">&nbsp;        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);</b>
+<b class="nc">&nbsp;        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);</b>
+<b class="nc">&nbsp;        scrollPane.getStyleClass().add(&quot;walkthroughs-scroll-pane&quot;);</b>
+<b class="nc">&nbsp;        scrollPane.setMaxHeight(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        VBox.setVgrow(scrollPane, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        return scrollPane;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Button createWalkthroughButton(String text, IconTheme.JabRefIcons icon, String walkthroughId) {
+<b class="nc">&nbsp;        Button button = new Button(text);</b>
+<b class="nc">&nbsp;        button.setGraphic(icon.getGraphicNode());</b>
+<b class="nc">&nbsp;        button.getStyleClass().add(&quot;quick-settings-button&quot;);</b>
+<b class="nc">&nbsp;        button.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        button.setOnAction(_ -&gt; new WalkthroughAction(stage, tabContainer, stateManager, preferences, walkthroughId).execute());</b>
+<b class="nc">&nbsp;        return button;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

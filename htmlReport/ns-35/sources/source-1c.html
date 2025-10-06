@@ -1,0 +1,376 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedFilesEditorViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedFilesEditorViewModel (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedFilesEditorViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
+&nbsp;import org.jabref.gui.externalfiletype.CustomExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.linkedfile.AttachFileFromURLAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.logic.bibtex.FileFieldWriter;
+&nbsp;import org.jabref.logic.importer.FulltextFetchers;
+&nbsp;import org.jabref.logic.importer.util.FileFieldParser;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesEditorViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;LinkedFileViewModel&gt; files = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));</b>
+<b class="nc">&nbsp;    private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);</b>
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;
+&nbsp;    public LinkedFilesEditorViewModel(Field field, SuggestionProvider&lt;?&gt; suggestionProvider,
+&nbsp;                                      DialogService dialogService,
+&nbsp;                                      BibDatabaseContext databaseContext,
+&nbsp;                                      TaskExecutor taskExecutor,
+&nbsp;                                      FieldCheckers fieldCheckers,
+&nbsp;                                      GuiPreferences preferences,
+&nbsp;                                      UndoManager undoManager) {
+&nbsp;
+<b class="nc">&nbsp;        super(field, suggestionProvider, fieldCheckers, undoManager);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        BindingsHelper.bindContentBidirectional(</b>
+&nbsp;                files,
+&nbsp;                text,
+&nbsp;                LinkedFilesEditorViewModel::getStringRepresentation,
+&nbsp;                this::parseToFileViewModel);
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getStringRepresentation(List&lt;LinkedFileViewModel&gt; files) {
+&nbsp;        // Only serialize linked files, not the ones that are automatically found
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; filesToSerialize = files.stream()</b>
+<b class="nc">&nbsp;                                                 .filter(file -&gt; !file.isAutomaticallyFound())</b>
+<b class="nc">&nbsp;                                                 .map(LinkedFileViewModel::getFile)</b>
+<b class="nc">&nbsp;                                                 .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        return FileFieldWriter.getStringRepresentation(filesToSerialize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an instance of {@link LinkedFile} based on the given file.
+&nbsp;     * We try to guess the file type and relativize the path against the given file directories.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
+&nbsp;     */
+&nbsp;    public static LinkedFile fromFile(Path file, List&lt;Path&gt; fileDirectories, ExternalApplicationsPreferences externalApplicationsPreferences) {
+<b class="nc">&nbsp;        String fileExtension = FileUtil.getFileExtension(file).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, externalApplicationsPreferences)</b>
+<b class="nc">&nbsp;                                                              .orElse(new UnknownExternalFileType(fileExtension));</b>
+<b class="nc">&nbsp;        Path relativePath = FileUtil.relativize(file, fileDirectories);</b>
+<b class="nc">&nbsp;        return new LinkedFile(&quot;&quot;, relativePath, suggestedFileType.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;LinkedFileViewModel&gt; parseToFileViewModel(String stringValue) {
+<b class="nc">&nbsp;        return FileFieldParser.parse(stringValue).stream()</b>
+<b class="nc">&nbsp;                              .map(linkedFile -&gt; new LinkedFileViewModel(</b>
+&nbsp;                                      linkedFile,
+&nbsp;                                      entry,
+&nbsp;                                      databaseContext,
+&nbsp;                                      taskExecutor,
+&nbsp;                                      dialogService,
+&nbsp;                                      preferences))
+<b class="nc">&nbsp;                              .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;LinkedFileViewModel&gt; getFiles() {
+<b class="nc">&nbsp;        return files.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;LinkedFileViewModel&gt; filesProperty() {
+<b class="nc">&nbsp;        return files;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addNewLinkedFile(LinkedFile linkedFile) {
+<b class="nc">&nbsp;        files.add(new LinkedFileViewModel(</b>
+&nbsp;                linkedFile,
+&nbsp;                entry,
+&nbsp;                databaseContext,
+&nbsp;                taskExecutor,
+&nbsp;                dialogService,
+&nbsp;                preferences));
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        super.bindToEntry(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Auto-linking files for entry {}&quot;, entry);</b>
+<b class="nc">&nbsp;            BackgroundTask&lt;List&lt;LinkedFileViewModel&gt;&gt; findAssociatedNotLinkedFiles = BackgroundTask</b>
+<b class="nc">&nbsp;                    .wrap(() -&gt; findAssociatedNotLinkedFiles(entry))</b>
+<b class="nc">&nbsp;                    .onSuccess(list -&gt; {</b>
+<b class="nc">&nbsp;                        if (!list.isEmpty()) {</b>
+<b class="nc">&nbsp;                            LOGGER.debug(&quot;Found non-associated files: {}&quot;, list);</b>
+<b class="nc">&nbsp;                            files.addAll(list);</b>
+&nbsp;                        }
+&nbsp;                    });
+<b class="nc">&nbsp;            taskExecutor.execute(findAssociatedNotLinkedFiles);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find files that are probably associated  to the given entry but not yet linked.
+&nbsp;     */
+&nbsp;    private List&lt;LinkedFileViewModel&gt; findAssociatedNotLinkedFiles(BibEntry entry) {
+<b class="nc">&nbsp;        List&lt;LinkedFileViewModel&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(</b>
+&nbsp;                databaseContext,
+<b class="nc">&nbsp;                preferences.getExternalApplicationsPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getFilePreferences(),</b>
+<b class="nc">&nbsp;                preferences.getAutoLinkPreferences());</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;LinkedFile&gt; linkedFiles = util.findAssociatedNotLinkedFiles(entry);</b>
+<b class="nc">&nbsp;            for (LinkedFile linkedFile : linkedFiles) {</b>
+<b class="nc">&nbsp;                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(</b>
+&nbsp;                        linkedFile,
+&nbsp;                        entry,
+&nbsp;                        databaseContext,
+&nbsp;                        taskExecutor,
+&nbsp;                        dialogService,
+&nbsp;                        preferences);
+<b class="nc">&nbsp;                newLinkedFile.markAsAutomaticallyFound();</b>
+<b class="nc">&nbsp;                result.add(newLinkedFile);</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(&quot;Error accessing the file system&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Found {} associated files for entry {}&quot;, result.size(), entry.getCitationKey());</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean downloadFile(String urlText) {
+&nbsp;        try {
+<b class="nc">&nbsp;            URL url = URLUtil.create(urlText);</b>
+<b class="nc">&nbsp;            addFromURLAndDownload(url);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } catch (MalformedURLException exception) {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Invalid URL&quot;),</b>
+&nbsp;                    exception);
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void fetchFulltext() {
+<b class="nc">&nbsp;        FulltextFetchers fetcher = new FulltextFetchers(</b>
+<b class="nc">&nbsp;                preferences.getImportFormatPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getImporterPreferences());</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; urlField = entry.getField(StandardField.URL);</b>
+<b class="nc">&nbsp;        boolean download_success = false;</b>
+<b class="nc">&nbsp;        if (urlField.isPresent()) {</b>
+<b class="nc">&nbsp;            download_success = downloadFile(urlField.get());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (urlField.isEmpty() || !download_success) {</b>
+<b class="nc">&nbsp;            BackgroundTask</b>
+<b class="nc">&nbsp;                    .wrap(() -&gt; fetcher.findFullTextPDF(entry))</b>
+<b class="nc">&nbsp;                    .onRunning(() -&gt; fulltextLookupInProgress.setValue(true))</b>
+<b class="nc">&nbsp;                    .onFinished(() -&gt; fulltextLookupInProgress.setValue(false))</b>
+<b class="nc">&nbsp;                    .onSuccess(url -&gt; {</b>
+<b class="nc">&nbsp;                        if (url.isPresent()) {</b>
+<b class="nc">&nbsp;                            addFromURLAndDownload(url.get());</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            dialogService.notify(Localization.lang(&quot;No full text document found&quot;));</b>
+&nbsp;                        }
+&nbsp;                    })
+<b class="nc">&nbsp;                    .executeWith(taskExecutor);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addFromURL() {
+<b class="nc">&nbsp;        AttachFileFromURLAction.getUrlForDownloadFromClipBoardOrEntry(dialogService, entry)</b>
+<b class="nc">&nbsp;                               .ifPresent(this::downloadFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addFromURLAndDownload(URL url) {
+<b class="nc">&nbsp;        LinkedFileViewModel onlineFile = new LinkedFileViewModel(</b>
+&nbsp;                new LinkedFile(url, &quot;&quot;),
+&nbsp;                entry,
+&nbsp;                databaseContext,
+&nbsp;                taskExecutor,
+&nbsp;                dialogService,
+&nbsp;                preferences);
+<b class="nc">&nbsp;        files.add(onlineFile);</b>
+<b class="nc">&nbsp;        onlineFile.download(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void deleteFile(LinkedFileViewModel file) {
+<b class="nc">&nbsp;        if (file.getFile().isOnlineLink()) {</b>
+<b class="nc">&nbsp;            removeFileLink(file);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            boolean deleteSuccessful = file.delete();</b>
+<b class="nc">&nbsp;            if (deleteSuccessful) {</b>
+<b class="nc">&nbsp;                files.remove(file);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeFileLink(LinkedFileViewModel file) {
+<b class="nc">&nbsp;        files.remove(file);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty fulltextLookupInProgressProperty() {
+<b class="nc">&nbsp;        return fulltextLookupInProgress;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

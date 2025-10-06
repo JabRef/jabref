@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MVStoreChatHistoryStorage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.chatting.chathistory.storages</a>
+</div>
+
+<h1>Coverage Summary for Class: MVStoreChatHistoryStorage (org.jabref.logic.ai.chatting.chathistory.storages)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MVStoreChatHistoryStorage</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.7%
+  </span>
+  <span class="absValue">
+    (1/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.3%
+  </span>
+  <span class="absValue">
+    (1/19)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MVStoreChatHistoryStorage$ChatHistoryRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    5.6%
+  </span>
+  <span class="absValue">
+    (1/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.4%
+  </span>
+  <span class="absValue">
+    (1/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.chatting.chathistory.storages;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage;
+&nbsp;import org.jabref.logic.ai.util.ErrorMessage;
+&nbsp;import org.jabref.logic.ai.util.MVStoreBase;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.NotificationService;
+&nbsp;
+&nbsp;import dev.langchain4j.data.message.AiMessage;
+&nbsp;import dev.langchain4j.data.message.ChatMessage;
+&nbsp;import dev.langchain4j.data.message.UserMessage;
+&nbsp;import kotlin.ranges.IntRange;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class MVStoreChatHistoryStorage extends MVStoreBase implements ChatHistoryStorage {
+&nbsp;    private static final String ENTRY_CHAT_HISTORY_PREFIX = &quot;entry&quot;;
+&nbsp;    private static final String GROUP_CHAT_HISTORY_PREFIX = &quot;group&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private record ChatHistoryRecord(String className, String content) implements Serializable {</b>
+<b class="nc">&nbsp;        private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryRecord.class);</b>
+&nbsp;
+&nbsp;        public static ChatHistoryRecord fromLangchainMessage(ChatMessage chatMessage) {
+<b class="nc">&nbsp;            String className = chatMessage.getClass().getName();</b>
+<b class="nc">&nbsp;            String content = getContentFromLangchainMessage(chatMessage);</b>
+<b class="nc">&nbsp;            return new ChatHistoryRecord(className, content);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static String getContentFromLangchainMessage(ChatMessage chatMessage) {
+&nbsp;            String content;
+&nbsp;
+<b class="nc">&nbsp;            switch (chatMessage) {</b>
+<b class="nc">&nbsp;                case AiMessage aiMessage -&gt;</b>
+<b class="nc">&nbsp;                        content = aiMessage.text();</b>
+<b class="nc">&nbsp;                case UserMessage userMessage -&gt;</b>
+<b class="nc">&nbsp;                        content = userMessage.singleText();</b>
+<b class="nc">&nbsp;                case ErrorMessage errorMessage -&gt;</b>
+<b class="nc">&nbsp;                        content = errorMessage.getText();</b>
+&nbsp;                default -&gt; {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;ChatHistoryRecord supports only AI, user. and error messages, but added message has other type: {}&quot;, chatMessage.type().name());</b>
+<b class="nc">&nbsp;                    return &quot;&quot;;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return content;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ChatMessage toLangchainMessage() {
+<b class="nc">&nbsp;            if (className.equals(AiMessage.class.getName())) {</b>
+<b class="nc">&nbsp;                return new AiMessage(content);</b>
+<b class="nc">&nbsp;            } else if (className.equals(UserMessage.class.getName())) {</b>
+<b class="nc">&nbsp;                return new UserMessage(content);</b>
+<b class="nc">&nbsp;            } else if (className.equals(ErrorMessage.class.getName())) {</b>
+<b class="nc">&nbsp;                return new ErrorMessage(content);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;ChatHistoryRecord supports only AI and user messages, but retrieved message has other type: {}. Will treat as an AI message.&quot;, className);</b>
+<b class="nc">&nbsp;                return new AiMessage(content);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public MVStoreChatHistoryStorage(Path path, NotificationService dialogService) {
+<b class="fc">&nbsp;        super(path, dialogService);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;ChatMessage&gt; loadMessagesForEntry(Path bibDatabasePath, String citationKey) {
+<b class="nc">&nbsp;        return loadMessagesFromMap(getMapForEntry(bibDatabasePath, citationKey));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeMessagesForEntry(Path bibDatabasePath, String citationKey, List&lt;ChatMessage&gt; messages) {
+<b class="nc">&nbsp;        storeMessagesForMap(getMapForEntry(bibDatabasePath, citationKey), messages);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;ChatMessage&gt; loadMessagesForGroup(Path bibDatabasePath, String name) {
+<b class="nc">&nbsp;        return loadMessagesFromMap(getMapForGroup(bibDatabasePath, name));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeMessagesForGroup(Path bibDatabasePath, String name, List&lt;ChatMessage&gt; messages) {
+<b class="nc">&nbsp;        storeMessagesForMap(getMapForGroup(bibDatabasePath, name), messages);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;ChatMessage&gt; loadMessagesFromMap(Map&lt;Integer, ChatHistoryRecord&gt; map) {
+<b class="nc">&nbsp;        return map</b>
+<b class="nc">&nbsp;                .entrySet()</b>
+&nbsp;                // We need to check all keys, because upon deletion, there can be &quot;holes&quot; in the integer.
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .sorted(Comparator.comparingInt(Map.Entry::getKey))</b>
+<b class="nc">&nbsp;                .map(entry -&gt; entry.getValue().toLangchainMessage())</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storeMessagesForMap(Map&lt;Integer, ChatHistoryRecord&gt; map, List&lt;ChatMessage&gt; messages) {
+<b class="nc">&nbsp;        map.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        new IntRange(0, messages.size() - 1).forEach(i -&gt;</b>
+<b class="nc">&nbsp;                map.put(i, ChatHistoryRecord.fromLangchainMessage(messages.get(i)))</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;Integer, ChatHistoryRecord&gt; getMapForEntry(Path bibDatabasePath, String citationKey) {
+<b class="nc">&nbsp;        return getMap(bibDatabasePath, ENTRY_CHAT_HISTORY_PREFIX, citationKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;Integer, ChatHistoryRecord&gt; getMapForGroup(Path bibDatabasePath, String name) {
+<b class="nc">&nbsp;        return getMap(bibDatabasePath, GROUP_CHAT_HISTORY_PREFIX, name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;Integer, ChatHistoryRecord&gt; getMap(Path bibDatabasePath, String type, String name) {
+<b class="nc">&nbsp;        return mvStore.openMap(bibDatabasePath + &quot;-&quot; + type + &quot;-&quot; + name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String errorMessageForOpening() {
+<b class="nc">&nbsp;        return &quot;An error occurred while opening chat history storage. Chat history of entries and groups will not be stored in the next session.&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String errorMessageForOpeningLocalized() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;An error occurred while opening chat history storage. Chat history of entries and groups will not be stored in the next session.&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

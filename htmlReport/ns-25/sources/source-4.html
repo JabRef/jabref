@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OSX</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.desktop.os</a>
+</div>
+
+<h1>Coverage Summary for Class: OSX (org.jabref.gui.desktop.os)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OSX</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.desktop.os;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseAwt;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class contains macOS (OSX) specific implementations for file directories and file/application open handling methods.
+&nbsp; * &lt;p&gt;
+&nbsp; * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
+&nbsp; * The configuration of tinylog will become immutable as soon as the first log entry is issued.
+&nbsp; * https://tinylog.org/v2/configuration/
+&nbsp; */
+&nbsp;@AllowedToUseAwt(&quot;Requires AWT to open a file&quot;)
+<b class="nc">&nbsp;public class OSX extends NativeDesktop {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+<b class="nc">&nbsp;        Optional&lt;ExternalFileType&gt; type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);</b>
+<b class="nc">&nbsp;        if (type.isPresent() &amp;&amp; !type.get().getOpenWithApplication().isEmpty()) {</b>
+<b class="nc">&nbsp;            openFileWithApplication(filePath, type.get().getOpenWithApplication());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            String[] cmd = {&quot;/usr/bin/open&quot;, filePath};</b>
+<b class="nc">&nbsp;            Runtime.getRuntime().exec(cmd);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void openFileWithApplication(String filePath, String application) throws IOException {
+&nbsp;        // Use &quot;-a &lt;application&gt;&quot; if the app is specified, and just &quot;open &lt;filename&gt;&quot; otherwise:
+<b class="nc">&nbsp;        String[] cmd = (application != null) &amp;&amp; !application.isEmpty() ? new String[] {&quot;/usr/bin/open&quot;, &quot;-a&quot;,</b>
+<b class="nc">&nbsp;                application, filePath} : new String[] {&quot;/usr/bin/open&quot;, filePath};</b>
+<b class="nc">&nbsp;        new ProcessBuilder(cmd).start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void openFolderAndSelectFile(Path file) throws IOException {
+<b class="nc">&nbsp;        String[] cmd = {&quot;/usr/bin/open&quot;, &quot;-R&quot;, file.toString()};</b>
+<b class="nc">&nbsp;        Runtime.getRuntime().exec(cmd);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
+<b class="nc">&nbsp;        new ProcessBuilder(&quot;open&quot;, &quot;-a&quot;, &quot;Terminal&quot;, absolutePath).start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Path getApplicationDirectory() {
+<b class="nc">&nbsp;        return Path.of(&quot;/Applications&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

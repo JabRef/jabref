@@ -1,0 +1,313 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationKeyPatternPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citationkeypattern</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationKeyPatternPreferences (org.jabref.logic.citationkeypattern)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationKeyPatternPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    32.1%
+  </span>
+  <span class="absValue">
+    (9/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.7%
+  </span>
+  <span class="absValue">
+    (27/46)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CitationKeyPatternPreferences$KeySuffix</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    36.7%
+  </span>
+  <span class="absValue">
+    (11/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62%
+  </span>
+  <span class="absValue">
+    (31/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citationkeypattern;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.ReadOnlyObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;
+&nbsp;public class CitationKeyPatternPreferences {
+&nbsp;
+<b class="fc">&nbsp;    public enum KeySuffix {</b>
+<b class="fc">&nbsp;        ALWAYS,         // CiteKeyA, CiteKeyB, CiteKeyC ...</b>
+<b class="fc">&nbsp;        SECOND_WITH_A,  // CiteKey, CiteKeyA, CiteKeyB ...</b>
+<b class="fc">&nbsp;        SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private final BooleanProperty shouldAvoidOverwriteCiteKey = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty shouldWarnBeforeOverwriteCiteKey = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty shouldGenerateCiteKeysBeforeSaving = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final ObjectProperty&lt;KeySuffix&gt; keySuffix = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final StringProperty keyPatternRegex = new SimpleStringProperty();</b>
+<b class="fc">&nbsp;    private final StringProperty keyPatternReplacement = new SimpleStringProperty();</b>
+<b class="fc">&nbsp;    private final StringProperty unwantedCharacters = new SimpleStringProperty();</b>
+<b class="fc">&nbsp;    private final ObjectProperty&lt;GlobalCitationKeyPatterns&gt; keyPatterns = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;    private final String defaultPattern;
+&nbsp;    private final ReadOnlyObjectProperty&lt;Character&gt; keywordDelimiter;
+&nbsp;
+&nbsp;    public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
+&nbsp;                                         boolean shouldWarnBeforeOverwriteCiteKey,
+&nbsp;                                         boolean shouldGenerateCiteKeysBeforeSaving,
+&nbsp;                                         KeySuffix keySuffix,
+&nbsp;                                         String keyPatternRegex,
+&nbsp;                                         String keyPatternReplacement,
+&nbsp;                                         String unwantedCharacters,
+&nbsp;                                         GlobalCitationKeyPatterns keyPatterns,
+&nbsp;                                         String defaultPattern,
+<b class="fc">&nbsp;                                         ReadOnlyObjectProperty&lt;Character&gt; keywordDelimiter) {</b>
+&nbsp;
+<b class="fc">&nbsp;        this.shouldAvoidOverwriteCiteKey.set(shouldAvoidOverwriteCiteKey);</b>
+<b class="fc">&nbsp;        this.shouldWarnBeforeOverwriteCiteKey.set(shouldWarnBeforeOverwriteCiteKey);</b>
+<b class="fc">&nbsp;        this.shouldGenerateCiteKeysBeforeSaving.set(shouldGenerateCiteKeysBeforeSaving);</b>
+<b class="fc">&nbsp;        this.keySuffix.set(keySuffix);</b>
+<b class="fc">&nbsp;        this.keyPatternRegex.set(keyPatternRegex);</b>
+<b class="fc">&nbsp;        this.keyPatternReplacement.set(keyPatternReplacement);</b>
+<b class="fc">&nbsp;        this.unwantedCharacters.set(unwantedCharacters);</b>
+<b class="fc">&nbsp;        this.keyPatterns.set(keyPatterns);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.defaultPattern = defaultPattern;</b>
+<b class="fc">&nbsp;        this.keywordDelimiter = keywordDelimiter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
+&nbsp;                                         boolean shouldWarnBeforeOverwriteCiteKey,
+&nbsp;                                         boolean shouldGenerateCiteKeysBeforeSaving,
+&nbsp;                                         KeySuffix keySuffix,
+&nbsp;                                         String keyPatternRegex,
+&nbsp;                                         String keyPatternReplacement,
+&nbsp;                                         String unwantedCharacters,
+&nbsp;                                         GlobalCitationKeyPatterns keyPatterns,
+&nbsp;                                         String defaultPattern,
+&nbsp;                                         Character keywordDelimiter) {
+&nbsp;
+<b class="nc">&nbsp;        this(shouldAvoidOverwriteCiteKey,</b>
+&nbsp;                shouldWarnBeforeOverwriteCiteKey,
+&nbsp;                shouldGenerateCiteKeysBeforeSaving,
+&nbsp;                keySuffix,
+&nbsp;                keyPatternRegex,
+&nbsp;                keyPatternReplacement,
+&nbsp;                unwantedCharacters,
+&nbsp;                keyPatterns,
+&nbsp;                defaultPattern,
+&nbsp;                new SimpleObjectProperty&lt;&gt;(keywordDelimiter));
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldAvoidOverwriteCiteKey() {
+<b class="nc">&nbsp;        return shouldAvoidOverwriteCiteKey.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldAvoidOverwriteCiteKeyProperty() {
+<b class="fc">&nbsp;        return shouldAvoidOverwriteCiteKey;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAvoidOverwriteCiteKey(boolean shouldAvoidOverwriteCiteKey) {
+<b class="nc">&nbsp;        this.shouldAvoidOverwriteCiteKey.set(shouldAvoidOverwriteCiteKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldWarnBeforeOverwriteCiteKey() {
+<b class="nc">&nbsp;        return shouldWarnBeforeOverwriteCiteKey.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldWarnBeforeOverwriteCiteKeyProperty() {
+<b class="fc">&nbsp;        return shouldWarnBeforeOverwriteCiteKey;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setWarnBeforeOverwriteCiteKey(boolean shouldWarnBeforeOverwriteCiteKey) {
+<b class="nc">&nbsp;        this.shouldWarnBeforeOverwriteCiteKey.set(shouldWarnBeforeOverwriteCiteKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldGenerateCiteKeysBeforeSaving() {
+<b class="nc">&nbsp;        return shouldGenerateCiteKeysBeforeSaving.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldGenerateCiteKeysBeforeSavingProperty() {
+<b class="fc">&nbsp;        return shouldGenerateCiteKeysBeforeSaving;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setGenerateCiteKeysBeforeSaving(boolean shouldGenerateCiteKeysBeforeSaving) {
+<b class="nc">&nbsp;        this.shouldGenerateCiteKeysBeforeSaving.set(shouldGenerateCiteKeysBeforeSaving);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeySuffix getKeySuffix() {
+<b class="nc">&nbsp;        return keySuffix.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;KeySuffix&gt; keySuffixProperty() {
+<b class="fc">&nbsp;        return keySuffix;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setKeySuffix(KeySuffix keySuffix) {
+<b class="nc">&nbsp;        this.keySuffix.set(keySuffix);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getKeyPatternRegex() {
+<b class="nc">&nbsp;        return keyPatternRegex.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty keyPatternRegexProperty() {
+<b class="fc">&nbsp;        return keyPatternRegex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setKeyPatternRegex(String keyPatternRegex) {
+<b class="nc">&nbsp;        this.keyPatternRegex.set(keyPatternRegex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getKeyPatternReplacement() {
+<b class="nc">&nbsp;        return keyPatternReplacement.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty keyPatternReplacementProperty() {
+<b class="fc">&nbsp;        return keyPatternReplacement;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setKeyPatternReplacement(String keyPatternReplacement) {
+<b class="nc">&nbsp;        this.keyPatternReplacement.set(keyPatternReplacement);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getUnwantedCharacters() {
+<b class="nc">&nbsp;        return unwantedCharacters.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty unwantedCharactersProperty() {
+<b class="fc">&nbsp;        return unwantedCharacters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUnwantedCharacters(String unwantedCharacters) {
+<b class="nc">&nbsp;        this.unwantedCharacters.set(unwantedCharacters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public GlobalCitationKeyPatterns getKeyPatterns() {
+<b class="nc">&nbsp;        return keyPatterns.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;GlobalCitationKeyPatterns&gt; keyPatternsProperty() {
+<b class="fc">&nbsp;        return keyPatterns;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setKeyPatterns(GlobalCitationKeyPatterns keyPatterns) {
+<b class="nc">&nbsp;        this.keyPatterns.set(keyPatterns);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDefaultPattern() {
+<b class="nc">&nbsp;        return defaultPattern;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Character getKeywordDelimiter() {
+<b class="nc">&nbsp;        return keywordDelimiter.get();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

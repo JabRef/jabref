@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CellFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: CellFactory (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CellFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.specialfields.SpecialFieldViewModel;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.SpecialField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;
+&nbsp;public class CellFactory {
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;Field, JabRefIcon&gt; TABLE_ICONS = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    public CellFactory(GuiPreferences preferences, UndoManager undoManager) {</b>
+&nbsp;        JabRefIcon icon;
+<b class="nc">&nbsp;        icon = IconTheme.JabRefIcons.PDF_FILE;</b>
+&nbsp;        // icon.setToo(Localization.lang(&quot;Open&quot;) + &quot; PDF&quot;);
+<b class="nc">&nbsp;        TABLE_ICONS.put(StandardField.PDF, icon);</b>
+&nbsp;
+<b class="nc">&nbsp;        icon = IconTheme.JabRefIcons.WWW;</b>
+&nbsp;        // icon.setToolTipText(Localization.lang(&quot;Open&quot;) + &quot; URL&quot;);
+<b class="nc">&nbsp;        TABLE_ICONS.put(StandardField.URL, icon);</b>
+&nbsp;
+<b class="nc">&nbsp;        icon = IconTheme.JabRefIcons.WWW;</b>
+&nbsp;        // icon.setToolTipText(Localization.lang(&quot;Open&quot;) + &quot; CiteSeer URL&quot;);
+<b class="nc">&nbsp;        TABLE_ICONS.put(new UnknownField(&quot;citeseerurl&quot;), icon);</b>
+&nbsp;
+<b class="nc">&nbsp;        icon = IconTheme.JabRefIcons.WWW;</b>
+&nbsp;        // icon.setToolTipText(Localization.lang(&quot;Open&quot;) + &quot; ArXivFetcher URL&quot;);
+<b class="nc">&nbsp;        TABLE_ICONS.put(StandardField.EPRINT, icon);</b>
+&nbsp;
+<b class="nc">&nbsp;        icon = IconTheme.JabRefIcons.DOI;</b>
+&nbsp;        // icon.setToolTipText(Localization.lang(&quot;Open&quot;) + &quot; DOI &quot; + Localization.lang(&quot;web link&quot;));
+<b class="nc">&nbsp;        TABLE_ICONS.put(StandardField.DOI, icon);</b>
+&nbsp;
+<b class="nc">&nbsp;        icon = IconTheme.JabRefIcons.FILE;</b>
+&nbsp;        // icon.setToolTipText(Localization.lang(&quot;Open&quot;) + &quot; PS&quot;);
+<b class="nc">&nbsp;        TABLE_ICONS.put(StandardField.PS, icon);</b>
+&nbsp;
+<b class="nc">&nbsp;        icon = IconTheme.JabRefIcons.FOLDER;</b>
+&nbsp;        // icon.setToolTipText(Localization.lang(&quot;Open folder&quot;));
+<b class="nc">&nbsp;        TABLE_ICONS.put(StandardField.FOLDER, icon);</b>
+&nbsp;
+<b class="nc">&nbsp;        icon = IconTheme.JabRefIcons.FILE;</b>
+&nbsp;        // icon.setToolTipText(Localization.lang(&quot;Open file&quot;));
+<b class="nc">&nbsp;        TABLE_ICONS.put(StandardField.FILE, icon);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ExternalFileType fileType : preferences.getExternalApplicationsPreferences().getExternalFileTypes()) {</b>
+<b class="nc">&nbsp;            icon = fileType.getIcon();</b>
+&nbsp;            // icon.setToolTipText(Localization.lang(&quot;Open %0 file&quot;, fileType.getName()));
+<b class="nc">&nbsp;            TABLE_ICONS.put(fileType.getField(), icon);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SpecialFieldViewModel relevanceViewModel = new SpecialFieldViewModel(SpecialField.RELEVANCE, preferences, undoManager);</b>
+<b class="nc">&nbsp;        icon = relevanceViewModel.getIcon();</b>
+&nbsp;        // icon.setToolTipText(relevanceViewModel.getLocalization());
+<b class="nc">&nbsp;        TABLE_ICONS.put(SpecialField.RELEVANCE, icon);</b>
+&nbsp;
+<b class="nc">&nbsp;        SpecialFieldViewModel qualityViewModel = new SpecialFieldViewModel(SpecialField.QUALITY, preferences, undoManager);</b>
+<b class="nc">&nbsp;        icon = qualityViewModel.getIcon();</b>
+&nbsp;        // icon.setToolTipText(qualityViewModel.getLocalization());
+<b class="nc">&nbsp;        TABLE_ICONS.put(SpecialField.QUALITY, icon);</b>
+&nbsp;
+&nbsp;        // Ranking item in the menu uses one star
+<b class="nc">&nbsp;        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANKING, preferences, undoManager);</b>
+<b class="nc">&nbsp;        icon = rankViewModel.getIcon();</b>
+&nbsp;        // icon.setToolTipText(rankViewModel.getLocalization());
+<b class="nc">&nbsp;        TABLE_ICONS.put(SpecialField.RANKING, icon);</b>
+&nbsp;
+&nbsp;        // Priority icon used for the menu
+<b class="nc">&nbsp;        SpecialFieldViewModel priorityViewModel = new SpecialFieldViewModel(SpecialField.PRIORITY, preferences, undoManager);</b>
+<b class="nc">&nbsp;        icon = priorityViewModel.getIcon();</b>
+&nbsp;        // icon.setToolTipText(priorityViewModel.getLocalization());
+<b class="nc">&nbsp;        TABLE_ICONS.put(SpecialField.PRIORITY, icon);</b>
+&nbsp;
+&nbsp;        // Read icon used for menu
+<b class="nc">&nbsp;        SpecialFieldViewModel readViewModel = new SpecialFieldViewModel(SpecialField.READ_STATUS, preferences, undoManager);</b>
+<b class="nc">&nbsp;        icon = readViewModel.getIcon();</b>
+&nbsp;        // icon.setToolTipText(readViewModel.getLocalization());
+<b class="nc">&nbsp;        TABLE_ICONS.put(SpecialField.READ_STATUS, icon);</b>
+&nbsp;
+&nbsp;        // Print icon used for menu
+<b class="nc">&nbsp;        SpecialFieldViewModel printedViewModel = new SpecialFieldViewModel(SpecialField.PRINTED, preferences, undoManager);</b>
+<b class="nc">&nbsp;        icon = printedViewModel.getIcon();</b>
+&nbsp;        // icon.setToolTipText(printedViewModel.getLocalization());
+<b class="nc">&nbsp;        TABLE_ICONS.put(SpecialField.PRINTED, icon);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Node getTableIcon(Field field) {
+<b class="nc">&nbsp;        JabRefIcon icon = TABLE_ICONS.get(field);</b>
+<b class="nc">&nbsp;        if (icon == null) {</b>
+&nbsp;            // LOGGER.info(&quot;Error: no table icon defined for type &#39;&quot; + field + &quot;&#39;.&quot;);
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        } else {
+&nbsp;            // node should be generated for each call, as nodes can be added to the scene graph only once
+<b class="nc">&nbsp;            return icon.getGraphicNode();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

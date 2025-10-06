@@ -1,0 +1,423 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MainTableColumnModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: MainTableColumnModel (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MainTableColumnModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.6%
+  </span>
+  <span class="absValue">
+    (1/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.5%
+  </span>
+  <span class="absValue">
+    (2/57)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MainTableColumnModel$Type</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.1%
+  </span>
+  <span class="absValue">
+    (19/26)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    23.1%
+  </span>
+  <span class="absValue">
+    (6/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25.3%
+  </span>
+  <span class="absValue">
+    (21/83)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.property.DoubleProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.ReadOnlyStringWrapper;
+&nbsp;import javafx.beans.property.SimpleDoubleProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;
+&nbsp;import org.jabref.gui.util.FieldsUtil;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.metadata.SaveOrder;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the full internal name of a column in the main table. Consists of two parts: The type of the column and a qualifier, like the
+&nbsp; * field name to be displayed in the column.
+&nbsp; */
+&nbsp;public class MainTableColumnModel {
+&nbsp;
+<b class="fc">&nbsp;    public static final Character COLUMNS_QUALIFIER_DELIMITER = &#39;:&#39;;</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    public enum Type {</b>
+<b class="fc">&nbsp;        MATCH_CATEGORY(&quot;match_category&quot;), // Not localized, because this column is always hidden</b>
+<b class="fc">&nbsp;        INDEX(&quot;index&quot;, Localization.lang(&quot;Index&quot;)),</b>
+<b class="fc">&nbsp;        EXTRAFILE(&quot;extrafile&quot;, Localization.lang(&quot;File type&quot;)),</b>
+<b class="fc">&nbsp;        FILES(&quot;files&quot;, Localization.lang(&quot;Linked files&quot;)),</b>
+&nbsp;
+<b class="fc">&nbsp;        GROUPS(&quot;groups&quot;, Localization.lang(&quot;Groups&quot;)),</b>
+<b class="fc">&nbsp;        GROUP_ICONS(&quot;group_icons&quot;, Localization.lang(&quot;Group icons&quot;)),</b>
+<b class="fc">&nbsp;        LINKED_IDENTIFIER(&quot;linked_id&quot;, Localization.lang(&quot;Linked identifiers&quot;)),</b>
+<b class="fc">&nbsp;        NORMALFIELD(&quot;field&quot;),</b>
+<b class="fc">&nbsp;        SPECIALFIELD(&quot;special&quot;, Localization.lang(&quot;Special&quot;)),</b>
+<b class="fc">&nbsp;        LIBRARY_NAME(&quot;library&quot;, Localization.lang(&quot;Library&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        public static final EnumSet&lt;Type&gt; ICON_COLUMNS = EnumSet.of(EXTRAFILE, FILES, GROUPS, GROUP_ICONS, LINKED_IDENTIFIER);</b>
+&nbsp;
+&nbsp;        private final String name;
+&nbsp;        private final String displayName;
+&nbsp;
+<b class="fc">&nbsp;        Type(String name) {</b>
+<b class="fc">&nbsp;            this.name = name;</b>
+<b class="fc">&nbsp;            this.displayName = name;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Type(String name, String displayName) {</b>
+<b class="fc">&nbsp;            this.name = name;</b>
+<b class="fc">&nbsp;            this.displayName = displayName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getName() {
+<b class="fc">&nbsp;            return name;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return displayName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static Type fromString(String text) {
+<b class="nc">&nbsp;            for (Type type : Type.values()) {</b>
+<b class="nc">&nbsp;                if (type.getName().equals(text)) {</b>
+<b class="nc">&nbsp;                    return type;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Column type &#39;{}&#39; is unknown.&quot;, text);</b>
+<b class="nc">&nbsp;            return NORMALFIELD;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return &quot;Type{&quot; +</b>
+&nbsp;                    &quot;name=&#39;&quot; + name + &#39;\&#39;&#39; +
+&nbsp;                    &quot;, displayName=&#39;&quot; + displayName + &#39;\&#39;&#39; +
+&nbsp;                    &#39;}&#39;;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Type&gt; typeProperty = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final StringProperty qualifierProperty = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final DoubleProperty widthProperty = new SimpleDoubleProperty();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;TableColumn.SortType&gt; sortTypeProperty = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is used by the preferences dialog, to initialize available columns the user can add to the table.
+&nbsp;     *
+&nbsp;     * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. &quot;NORMALFIELD&quot; or &quot;EXTRAFILE&quot;
+&nbsp;     * @param qualifier the stored qualifier of the column, e.g. &quot;author/editor&quot;
+&nbsp;     */
+<b class="nc">&nbsp;    public MainTableColumnModel(Type type, String qualifier) {</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(type);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(qualifier);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.typeProperty.setValue(type);</b>
+<b class="nc">&nbsp;        this.qualifierProperty.setValue(qualifier);</b>
+<b class="nc">&nbsp;        this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);</b>
+<b class="nc">&nbsp;        this.preferences = Injector.instantiateModelOrService(CliPreferences.class);</b>
+<b class="nc">&nbsp;        this.undoManager = Injector.instantiateModelOrService(UndoManager.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Type.ICON_COLUMNS.contains(type)) {</b>
+<b class="nc">&nbsp;            this.widthProperty.setValue(ColumnPreferences.ICON_COLUMN_WIDTH);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.widthProperty.setValue(ColumnPreferences.DEFAULT_COLUMN_WIDTH);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is used by the preferences dialog, to initialize available basic icon columns, the user can add to the table.
+&nbsp;     *
+&nbsp;     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. &quot;GROUPS&quot; or &quot;LINKED_IDENTIFIER&quot;
+&nbsp;     */
+&nbsp;    public MainTableColumnModel(Type type) {
+<b class="nc">&nbsp;        this(type, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is used by the preference migrations.
+&nbsp;     *
+&nbsp;     * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. &quot;NORMALFIELD&quot; or &quot;GROUPS&quot;
+&nbsp;     * @param qualifier the stored qualifier of the column, e.g. &quot;author/editor&quot;
+&nbsp;     * @param width     the stored width of the column
+&nbsp;     */
+&nbsp;    public MainTableColumnModel(Type type, String qualifier, double width) {
+<b class="nc">&nbsp;        this(type, qualifier);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.widthProperty.setValue(width);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Type getType() {
+<b class="nc">&nbsp;        return typeProperty.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getQualifier() {
+<b class="nc">&nbsp;        return qualifierProperty.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        if (qualifierProperty.getValue().isBlank()) {</b>
+<b class="nc">&nbsp;            return typeProperty.getValue().getName();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return typeProperty.getValue().getName() + COLUMNS_QUALIFIER_DELIMITER + qualifierProperty.getValue();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        if ((Type.ICON_COLUMNS.contains(typeProperty.getValue()) &amp;&amp; qualifierProperty.getValue().isBlank())</b>
+<b class="nc">&nbsp;                || (typeProperty.getValue() == Type.INDEX)) {</b>
+<b class="nc">&nbsp;            return typeProperty.getValue().getDisplayName();</b>
+&nbsp;        } else {
+&nbsp;            // In case an OrField is used, `FieldFactory.parseField` returns UnknownField, which leads to
+&nbsp;            // &quot;author/editor(Custom)&quot; instead of &quot;author/editor&quot; in the output
+&nbsp;
+<b class="nc">&nbsp;            return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()), preferences, undoManager);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty nameProperty() {
+<b class="nc">&nbsp;        return new ReadOnlyStringWrapper(getDisplayName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getWidth() {
+<b class="nc">&nbsp;        return widthProperty.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty widthProperty() {
+<b class="nc">&nbsp;        return widthProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public TableColumn.SortType getSortType() {
+<b class="nc">&nbsp;        return sortTypeProperty.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;TableColumn.SortType&gt; sortTypeProperty() {
+<b class="nc">&nbsp;        return sortTypeProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a list of sort cirteria based on the fields the current column displays.
+&nbsp;     * In case it is single field, a single SortCriterion is returned.
+&nbsp;     * In case of multiple fields, for each field, there is a SortCriterion contained in the list.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Implementation reason: We want to have SortCriterion handle a single field, because the UI allows for handling
+&nbsp;     * &quot;plain&quot; fields only.
+&nbsp;     */
+&nbsp;    public List&lt;SaveOrder.SortCriterion&gt; getSortCriteria() {
+<b class="nc">&nbsp;        boolean descending = getSortType() == TableColumn.SortType.DESCENDING;</b>
+<b class="nc">&nbsp;        return FieldFactory.parseOrFields(getQualifier()).getFields().stream()</b>
+<b class="nc">&nbsp;                           .map(field -&gt; new SaveOrder.SortCriterion(field, descending))</b>
+<b class="nc">&nbsp;                           .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MainTableColumnModel that = (MainTableColumnModel) o;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (typeProperty.getValue() != that.typeProperty.getValue()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Objects.equals(qualifierProperty.getValue(), that.qualifierProperty.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(typeProperty.getValue(), qualifierProperty.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;MainTableColumnModel{&quot; +</b>
+&nbsp;                &quot;qualifierProperty=&quot; + qualifierProperty +
+&nbsp;                &quot;, typeProperty=&quot; + typeProperty +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This creates a new {@code MainTableColumnModel} out of a given string
+&nbsp;     *
+&nbsp;     * @param rawColumnName the name of the column, e.g. &quot;field:author&quot;, or &quot;author&quot;
+&nbsp;     * @return A new {@code MainTableColumnModel}
+&nbsp;     */
+&nbsp;    public static MainTableColumnModel parse(String rawColumnName) {
+<b class="nc">&nbsp;        Objects.requireNonNull(rawColumnName);</b>
+<b class="nc">&nbsp;        String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());</b>
+&nbsp;
+<b class="nc">&nbsp;        Type type = Type.fromString(splittedName[0]);</b>
+<b class="nc">&nbsp;        String qualifier = &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((type == Type.NORMALFIELD)</b>
+&nbsp;                || (type == Type.SPECIALFIELD)
+&nbsp;                || (type == Type.EXTRAFILE)) {
+<b class="nc">&nbsp;            if (splittedName.length == 1) {</b>
+<b class="nc">&nbsp;                qualifier = splittedName[0]; // By default the rawColumnName is parsed as NORMALFIELD</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                qualifier = splittedName[1];</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new MainTableColumnModel(type, qualifier);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,228 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NewEntryAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: NewEntryAction (org.jabref.gui.importer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NewEntryAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.importer;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.newentry.NewEntryDialogTab;
+&nbsp;import org.jabref.gui.newentry.NewEntryView;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class NewEntryAction extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);</b>
+&nbsp;
+&nbsp;    private final Supplier&lt;LibraryTab&gt; tabSupplier;
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;
+&nbsp;    private NewEntryDialogTab initialApproach;
+&nbsp;    private boolean isImmediate;
+&nbsp;    private Optional&lt;EntryType&gt; immediateType;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Launches a tool for creating new entries.
+&nbsp;     * If `createImmediately` is `true`, a new entry will be immediately be created (using the last-selected entry type
+&nbsp;     * from the tool dialog was last run with).
+&nbsp;     * If `createImmediately` is `false`, a dialog will appear asking the user to specify inputs for the new entry.
+&nbsp;     */
+<b class="nc">&nbsp;    public NewEntryAction(boolean createImmediately, Supplier&lt;LibraryTab&gt; tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.tabSupplier = tabSupplier;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.initialApproach = null;</b>
+<b class="nc">&nbsp;        this.isImmediate = createImmediately;</b>
+<b class="nc">&nbsp;        this.immediateType = Optional.empty();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(ActionHelper.needsDatabase(stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Launches a dialog asking the user for inputs for the new entry to create.
+&nbsp;     * This dialog initially opens to the tab specified by `approach`. If `approach` is `null`, then the last-used tab
+&nbsp;     * from previous use of the tool is restored.
+&nbsp;     */
+&nbsp;    public NewEntryAction(NewEntryDialogTab approach, Supplier&lt;LibraryTab&gt; tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
+<b class="nc">&nbsp;        this(false, tabSupplier, dialogService, preferences, stateManager);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.initialApproach = approach;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Directly creates a new empty entry of the type `immediateType`, without opening a dialog for the user to provide
+&nbsp;     * inputs.
+&nbsp;     * If `immediateType` is `null`, the last-selected immediate type from the previous use of the tool to create an empty
+&nbsp;     * instance of a particular type is used (the `Article` standard entry type by default).
+&nbsp;     */
+&nbsp;    public NewEntryAction(EntryType immediateType, Supplier&lt;LibraryTab&gt; tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
+<b class="nc">&nbsp;        this(true, tabSupplier, dialogService, preferences, stateManager);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.immediateType = Optional.ofNullable(immediateType);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+&nbsp;        // Without a tab supplier, we can only log an error message and abort.
+<b class="nc">&nbsp;        if (tabSupplier.get() == null) {</b>
+&nbsp;            // We skip logging the error if we were launched due to a keyboard shortcut though, since this isn&#39;t
+&nbsp;            // something that can be disabled anyway.
+<b class="nc">&nbsp;            if (this.initialApproach == null &amp;&amp; !this.isImmediate) {</b>
+<b class="nc">&nbsp;                LOGGER.error(&quot;Action &#39;New Entry&#39; must be disabled when no database is open.&quot;);</b>
+&nbsp;            }
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        BibEntry newEntry;
+<b class="nc">&nbsp;        if (isImmediate) {</b>
+&nbsp;            // If we&#39;re an immediate action...
+&nbsp;            final EntryType type;
+<b class="nc">&nbsp;            if (immediateType.isPresent()) {</b>
+&nbsp;                // And we were created with an immediate type, then we use that type.
+<b class="nc">&nbsp;                type = immediateType.get();</b>
+&nbsp;            } else {
+&nbsp;                // Otherwise, we query the last-selected entry type from the NewEntry dialogue.
+<b class="nc">&nbsp;                type = preferences.getNewEntryPreferences().getLatestImmediateType();</b>
+&nbsp;            }
+&nbsp;            // ...and create a new entry using this type.
+<b class="nc">&nbsp;            newEntry = new BibEntry(type);</b>
+&nbsp;        } else {
+&nbsp;            // Otherwise, we launch a panel asking the user to specify details of the new entry.
+<b class="nc">&nbsp;            NewEntryView newEntryDialog = new NewEntryView(initialApproach, preferences, tabSupplier.get(), dialogService);</b>
+<b class="nc">&nbsp;            newEntry = dialogService.showCustomDialogAndWait(newEntryDialog).orElse(null);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // This dialogue might handle inserting the new entry directly, so we don&#39;t do anything if the dialogue returns
+&nbsp;        // `null`.
+<b class="nc">&nbsp;        if (newEntry != null) {</b>
+<b class="nc">&nbsp;            tabSupplier.get().insertEntry(newEntry);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

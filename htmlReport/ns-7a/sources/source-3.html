@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SharedDatabaseLoginDialogView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.shared</a>
+</div>
+
+<h1>Coverage Summary for Class: SharedDatabaseLoginDialogView (org.jabref.gui.shared)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SharedDatabaseLoginDialogView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.shared;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.event.ActionEvent;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.PasswordField;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.ControlHelper;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.shared.DBMSType;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;/**
+&nbsp; * This offers the user to connect to a remove SQL database.
+&nbsp; * Moreover, it directly opens the shared database after successful connection.
+&nbsp; */
+&nbsp;public class SharedDatabaseLoginDialogView extends BaseDialog&lt;Void&gt; {
+&nbsp;    @FXML private ComboBox&lt;DBMSType&gt; databaseType;
+&nbsp;    @FXML private TextField host;
+&nbsp;    @FXML private TextField database;
+&nbsp;    @FXML private TextField port;
+&nbsp;    @FXML private TextField user;
+&nbsp;    @FXML private PasswordField password;
+&nbsp;    @FXML private CheckBox rememberPassword;
+&nbsp;    @FXML private TextField folder;
+&nbsp;    @FXML private Button browseButton;
+&nbsp;    @FXML private CheckBox autosave;
+&nbsp;    @FXML private ButtonType connectButton;
+&nbsp;    @FXML private CheckBox useSSL;
+&nbsp;    @FXML private TextField fileKeystore;
+&nbsp;    @FXML private PasswordField passwordKeystore;
+&nbsp;    @FXML private Button browseKeystore;
+&nbsp;    @FXML private TextField serverTimezone;
+&nbsp;    @FXML private TextField jdbcUrl;
+&nbsp;    @FXML private CheckBox expertMode;
+&nbsp;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private GuiPreferences preferences;
+&nbsp;    @Inject private AiService aiService;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;    @Inject private BibEntryTypesManager entryTypesManager;
+&nbsp;    @Inject private FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;    @Inject private ClipBoardManager clipBoardManager;
+&nbsp;    @Inject private TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private SharedDatabaseLoginDialogViewModel viewModel;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;    public SharedDatabaseLoginDialogView(LibraryTabContainer tabContainer) {</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;Connect to shared database&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        ControlHelper.setAction(connectButton, this.getDialogPane(), event -&gt; openDatabase());</b>
+<b class="nc">&nbsp;        Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);</b>
+&nbsp;        // must be set here, because in initialize the button is still null
+<b class="nc">&nbsp;        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());</b>
+<b class="nc">&nbsp;        btnConnect.textProperty().bind(EasyBind.map(viewModel.loadingProperty(), loading -&gt; loading ? Localization.lang(&quot;Connecting...&quot;) : Localization.lang(&quot;Connect&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void openDatabase() {
+<b class="nc">&nbsp;        boolean connected = viewModel.openDatabase();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (connected) {</b>
+&nbsp;            this.close();
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        visualizer.setDecoration(new IconValidationDecorator());</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel = new SharedDatabaseLoginDialogViewModel(</b>
+&nbsp;                tabContainer,
+&nbsp;                dialogService,
+&nbsp;                preferences,
+&nbsp;                aiService,
+&nbsp;                stateManager,
+&nbsp;                entryTypesManager,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                undoManager,
+&nbsp;                clipBoardManager,
+&nbsp;                taskExecutor);
+<b class="nc">&nbsp;        databaseType.getItems().addAll(DBMSType.values());</b>
+<b class="nc">&nbsp;        databaseType.getSelectionModel().select(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        database.textProperty().bindBidirectional(viewModel.databaseproperty());</b>
+<b class="nc">&nbsp;        host.textProperty().bindBidirectional(viewModel.hostProperty());</b>
+<b class="nc">&nbsp;        user.textProperty().bindBidirectional(viewModel.userProperty());</b>
+<b class="nc">&nbsp;        password.textProperty().bindBidirectional(viewModel.passwordProperty());</b>
+<b class="nc">&nbsp;        port.textProperty().bindBidirectional(viewModel.portProperty());</b>
+<b class="nc">&nbsp;        serverTimezone.textProperty().bindBidirectional(viewModel.serverTimezoneProperty());</b>
+<b class="nc">&nbsp;        databaseType.valueProperty().bindBidirectional(viewModel.selectedDbmstypeProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        folder.textProperty().bindBidirectional(viewModel.folderProperty());</b>
+<b class="nc">&nbsp;        browseButton.disableProperty().bind(viewModel.autosaveProperty().not());</b>
+<b class="nc">&nbsp;        folder.disableProperty().bind(viewModel.autosaveProperty().not());</b>
+<b class="nc">&nbsp;        autosave.selectedProperty().bindBidirectional(viewModel.autosaveProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        useSSL.selectedProperty().bindBidirectional(viewModel.useSSLProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        fileKeystore.textProperty().bindBidirectional(viewModel.keyStoreProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        expertMode.selectedProperty().bindBidirectional(viewModel.expertModeProperty());</b>
+<b class="nc">&nbsp;        jdbcUrl.textProperty().bindBidirectional(viewModel.jdbcUrlProperty());</b>
+<b class="nc">&nbsp;        jdbcUrl.disableProperty().bind(viewModel.expertModeProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        browseKeystore.disableProperty().bind(viewModel.useSSLProperty().not());</b>
+<b class="nc">&nbsp;        passwordKeystore.disableProperty().bind(viewModel.useSSLProperty().not());</b>
+<b class="nc">&nbsp;        passwordKeystore.textProperty().bindBidirectional(viewModel.keyStorePasswordProperty());</b>
+<b class="nc">&nbsp;        rememberPassword.selectedProperty().bindBidirectional(viewModel.rememberPasswordProperty());</b>
+&nbsp;
+&nbsp;        // Must be executed after the initialization of the view, otherwise it doesn&#39;t work
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.dbValidation(), database, true);</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.hostValidation(), host, true);</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.portValidation(), port, true);</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.userValidation(), user, true);</b>
+&nbsp;
+<b class="nc">&nbsp;            EasyBind.subscribe(autosave.selectedProperty(), selected -&gt;</b>
+<b class="nc">&nbsp;                    visualizer.initVisualization(viewModel.folderValidation(), folder, true));</b>
+&nbsp;
+<b class="nc">&nbsp;            EasyBind.subscribe(useSSL.selectedProperty(), selected -&gt;</b>
+<b class="nc">&nbsp;                    visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true));</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void showSaveDbToFileDialog(ActionEvent event) {
+<b class="nc">&nbsp;        viewModel.showSaveDbToFileDialog();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void showOpenKeystoreFileDialog(ActionEvent event) {
+<b class="nc">&nbsp;        viewModel.showOpenKeystoreFileDialog();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

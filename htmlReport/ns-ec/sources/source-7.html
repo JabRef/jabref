@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PushToEmacs</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.push</a>
+</div>
+
+<h1>Coverage Summary for Class: PushToEmacs (org.jabref.logic.push)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PushToEmacs</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.push;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.HeadlessExecutorService;
+&nbsp;import org.jabref.logic.util.NotificationService;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class PushToEmacs extends AbstractPushToApplication {
+&nbsp;
+<b class="nc">&nbsp;    public static final PushApplications APPLICATION = PushApplications.EMACS;</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param preferences getPushToApplicationPreferences(), getExternalApplicationsPreferences(), and getFilePreferences() are used
+&nbsp;     */
+&nbsp;    public PushToEmacs(NotificationService notificationService, PushToApplicationPreferences preferences) {
+<b class="nc">&nbsp;        super(notificationService, preferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return APPLICATION.getDisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void pushEntries(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        couldNotPush = false;</b>
+<b class="nc">&nbsp;        couldNotCall = false;</b>
+<b class="nc">&nbsp;        notDefined = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        commandPath = preferences.getCommandPaths().get(this.getDisplayName());</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((commandPath == null) || commandPath.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            notDefined = true;</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        commandPath = preferences.getCommandPaths().get(this.getDisplayName());</b>
+&nbsp;
+<b class="nc">&nbsp;        String keyString = getKeyString(entries, getDelimiter());</b>
+&nbsp;
+<b class="nc">&nbsp;        String[] addParams = preferences.getEmacsArguments().split(&quot; &quot;);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            String[] com = new String[addParams.length + 2];</b>
+<b class="nc">&nbsp;            com[0] = commandPath;</b>
+<b class="nc">&nbsp;            System.arraycopy(addParams, 0, com, 1, addParams.length);</b>
+&nbsp;
+&nbsp;            // Surrounding with is handled below
+<b class="nc">&nbsp;            String prefix = &quot;(with-current-buffer (window-buffer (selected-window)) (insert &quot;;</b>
+<b class="nc">&nbsp;            String suffix = &quot;))&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (OS.WINDOWS) {</b>
+&nbsp;                // Windows gnuclient/emacsclient escaping:
+&nbsp;                // java string: &quot;(insert \\\&quot;\\\\cite{Blah2001}\\\&quot;)&quot;;
+&nbsp;                // so cmd receives: (insert \&quot;\\cite{Blah2001}\&quot;)
+&nbsp;                // so emacs receives: (insert &quot;\cite{Blah2001}&quot;)
+&nbsp;
+<b class="nc">&nbsp;                com[com.length - 1] = prefix.concat(&quot;\&quot;&quot;</b>
+<b class="nc">&nbsp;                                                    + getCitePrefix().replace(&quot;\\&quot;, &quot;\\\\&quot;)</b>
+&nbsp;                                                    + keyString
+<b class="nc">&nbsp;                                                    + getCiteSuffix().replace(&quot;\\&quot;, &quot;\\\\&quot;)</b>
+<b class="nc">&nbsp;                                                    + &quot;\&quot;&quot;).concat(suffix)</b>
+<b class="nc">&nbsp;                                            .replace(&quot;\&quot;&quot;, &quot;\\\&quot;&quot;);</b>
+&nbsp;            } else {
+&nbsp;                // Linux gnuclient/emacslient escaping:
+&nbsp;                // java string: &quot;(insert \&quot;\\\\cite{Blah2001}\&quot;)&quot;
+&nbsp;                // so sh receives: (insert &quot;\\cite{Blah2001}&quot;)
+&nbsp;                // so emacs receives: (insert &quot;\cite{Blah2001}&quot;)
+<b class="nc">&nbsp;                com[com.length - 1] = prefix.concat(&quot;\&quot;&quot;</b>
+<b class="nc">&nbsp;                        + getCitePrefix().replace(&quot;\\&quot;, &quot;\\\\&quot;)</b>
+&nbsp;                        + keyString
+<b class="nc">&nbsp;                        + getCiteSuffix().replace(&quot;\\&quot;, &quot;\\\\&quot;)</b>
+<b class="nc">&nbsp;                        + &quot;\&quot;&quot;).concat(suffix);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.atDebug()</b>
+<b class="nc">&nbsp;                  .setMessage(&quot;Executing command {}&quot;)</b>
+<b class="nc">&nbsp;                  .addArgument(() -&gt; Arrays.toString(com))</b>
+<b class="nc">&nbsp;                  .log();</b>
+&nbsp;
+<b class="nc">&nbsp;            final Process p = Runtime.getRuntime().exec(com);</b>
+&nbsp;
+<b class="nc">&nbsp;            HeadlessExecutorService.INSTANCE.executeAndWait(() -&gt; {</b>
+<b class="nc">&nbsp;                try (InputStream out = p.getErrorStream()) {</b>
+&nbsp;                    int c;
+<b class="nc">&nbsp;                    StringBuilder sb = new StringBuilder();</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        while ((c = out.read()) != -1) {</b>
+<b class="nc">&nbsp;                            sb.append((char) c);</b>
+&nbsp;                        }
+&nbsp;                    } catch (IOException e) {
+<b class="nc">&nbsp;                        LOGGER.warn(&quot;Could not read from stderr.&quot;, e);</b>
+&nbsp;                    }
+&nbsp;                    // Error stream has been closed. See if there were any errors:
+<b class="nc">&nbsp;                    if (!sb.toString().trim().isEmpty()) {</b>
+<b class="nc">&nbsp;                        LOGGER.warn(&quot;Push to Emacs error: {}&quot;, sb);</b>
+<b class="nc">&nbsp;                        couldNotPush = true;</b>
+&nbsp;                    }
+&nbsp;                } catch (IOException e) {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Error handling std streams&quot;, e);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;        } catch (IOException excep) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Problem pushing to Emacs.&quot;, excep);</b>
+<b class="nc">&nbsp;            couldNotCall = true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onOperationCompleted() {
+<b class="nc">&nbsp;        if (couldNotPush) {</b>
+<b class="nc">&nbsp;            this.sendErrorNotification(Localization.lang(&quot;Error pushing entries&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Could not push to a running emacs daemon.&quot;));</b>
+<b class="nc">&nbsp;        } else if (couldNotCall) {</b>
+<b class="nc">&nbsp;            this.sendErrorNotification(Localization.lang(&quot;Error pushing entries&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Could not run the emacs client.&quot;));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            super.onOperationCompleted();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getCommandName() {
+<b class="nc">&nbsp;        return &quot;gnuclient &quot; + Localization.lang(&quot;or&quot;) + &quot; emacsclient&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+<b class="nc">&nbsp;        return new String[] {commandPath, &quot;+%s&quot;.formatted(line), fileName.toString()};</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

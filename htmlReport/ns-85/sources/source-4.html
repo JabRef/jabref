@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WalkthroughOverlay</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough</a>
+</div>
+
+<h1>Coverage Summary for Class: WalkthroughOverlay (org.jabref.gui.walkthrough)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WalkthroughOverlay</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.stage.Stage;
+&nbsp;import javafx.stage.Window;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.walkthrough.declarative.WindowResolver;
+&nbsp;import org.jabref.gui.walkthrough.declarative.sideeffect.SideEffectExecutor;
+&nbsp;import org.jabref.gui.walkthrough.declarative.sideeffect.WalkthroughSideEffect;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.PanelStep;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.SideEffect;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughResolver;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughResolver.WalkthroughResult;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughReverter;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughScroller;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class WalkthroughOverlay {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughOverlay.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;Window, WindowOverlay&gt; overlays = new HashMap&lt;&gt;();</b>
+&nbsp;    private final Stage stage;
+&nbsp;    private final Walkthrough walkthrough;
+&nbsp;    private final WalkthroughHighlighter highlighter;
+&nbsp;    private final WalkthroughReverter reverter;
+&nbsp;    private final SideEffectExecutor sideEffectExecutor;
+&nbsp;
+&nbsp;    private @Nullable WalkthroughScroller scroller;
+&nbsp;    private @Nullable WalkthroughResolver resolver;
+&nbsp;
+&nbsp;    private Window resolvedWindow;
+&nbsp;    private Node resolvedNode;
+&nbsp;
+<b class="nc">&nbsp;    public WalkthroughOverlay(Stage stage, Walkthrough walkthrough) {</b>
+<b class="nc">&nbsp;        this.stage = stage;</b>
+<b class="nc">&nbsp;        this.walkthrough = walkthrough;</b>
+<b class="nc">&nbsp;        this.highlighter = new WalkthroughHighlighter();</b>
+<b class="nc">&nbsp;        this.highlighter.setOnBackgroundClick(this::showQuitConfirmationAndQuit);</b>
+<b class="nc">&nbsp;        this.sideEffectExecutor = new SideEffectExecutor();</b>
+<b class="nc">&nbsp;        this.reverter = new WalkthroughReverter(walkthrough, stage, sideEffectExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void show(@NonNull WalkthroughStep step) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Showing step: {}&quot;, step.title());</b>
+<b class="nc">&nbsp;        cleanUp();</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (step) {</b>
+<b class="nc">&nbsp;            case SideEffect(</b>
+<b class="nc">&nbsp;                    String title,</b>
+<b class="nc">&nbsp;                    WalkthroughSideEffect sideEffect</b>
+&nbsp;            ) -&gt; {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Executing side effect for step: {}&quot;, title);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (sideEffectExecutor.executeForward(sideEffect, walkthrough)) {</b>
+<b class="nc">&nbsp;                    walkthrough.nextStep();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Failed to execute side effect: {}&quot;, sideEffect.description());</b>
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Side effect failed for step: {}&quot;, title);</b>
+<b class="nc">&nbsp;                    reverter.findAndUndo();</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            case VisibleComponent component -&gt; {</b>
+<b class="nc">&nbsp;                WindowResolver windowResolver = component.windowResolver().orElse(() -&gt; Optional.of(stage));</b>
+<b class="nc">&nbsp;                resolver = new WalkthroughResolver(</b>
+&nbsp;                        windowResolver,
+<b class="nc">&nbsp;                        component.nodeResolver().orElse(null),</b>
+&nbsp;                        this::handleResolutionResult);
+<b class="nc">&nbsp;                resolver.startResolution();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void detachAll() {
+<b class="nc">&nbsp;        cleanUp();</b>
+<b class="nc">&nbsp;        reverter.revertAll();</b>
+<b class="nc">&nbsp;        highlighter.detachAll();</b>
+<b class="nc">&nbsp;        overlays.values().forEach(WindowOverlay::detach);</b>
+<b class="nc">&nbsp;        overlays.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void showQuitConfirmationAndQuit() {
+<b class="nc">&nbsp;        hide();</b>
+<b class="nc">&nbsp;        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);</b>
+<b class="nc">&nbsp;        boolean shouldQuit = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Quit walkthrough&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Are you sure you want to quit the walkthrough?&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Quit walkthrough&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Continue walkthrough&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (shouldQuit) {</b>
+<b class="nc">&nbsp;            walkthrough.quit();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            show(walkthrough.getCurrentStep());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void hide() {
+<b class="nc">&nbsp;        overlays.values().forEach(WindowOverlay::hide);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleResolutionResult(WalkthroughResult result) {
+<b class="nc">&nbsp;        if (result.wasSuccessful()) {</b>
+<b class="nc">&nbsp;            displayWalkthroughStep(result);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Failed to resolve node for step &#39;{}&#39;. Reverting.&quot;, walkthrough.getCurrentStep().title());</b>
+<b class="nc">&nbsp;            reverter.findAndUndo();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        resolver = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void displayWalkthroughStep(WalkthroughResult result) {
+<b class="nc">&nbsp;        Optional&lt;Window&gt; window = result.window();</b>
+<b class="nc">&nbsp;        if (window.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Resolution should not be successful without Window being resolved.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.resolvedWindow = window.get();</b>
+<b class="nc">&nbsp;        this.resolvedNode = result.node().orElse(null);</b>
+<b class="nc">&nbsp;        VisibleComponent component = (VisibleComponent) walkthrough.getCurrentStep();</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Displaying overlay for component &#39;{}&#39;&quot;, component.title());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (resolvedNode != null) {</b>
+<b class="nc">&nbsp;            this.scroller = new WalkthroughScroller(resolvedNode);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        highlighter.applyHighlight(</b>
+<b class="nc">&nbsp;                component.highlight().orElse(null),</b>
+<b class="nc">&nbsp;                resolvedWindow.getScene(),</b>
+&nbsp;                resolvedNode);
+<b class="nc">&nbsp;        WindowOverlay overlay = overlays.computeIfAbsent(resolvedWindow,</b>
+<b class="nc">&nbsp;                w -&gt; new WindowOverlay(w, WalkthroughPane.getInstance(w), walkthrough));</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (component) {</b>
+<b class="nc">&nbsp;            case TooltipStep tooltip -&gt;</b>
+<b class="nc">&nbsp;                    overlay.showTooltip(tooltip, resolvedNode, this::prepareForNavigation);</b>
+<b class="nc">&nbsp;            case PanelStep panel -&gt;</b>
+<b class="nc">&nbsp;                    overlay.showPanel(panel, resolvedNode, this::prepareForNavigation);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        reverter.attach(resolvedWindow, resolvedNode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void cleanUp() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Cleaning up listeners and state for the previous step&quot;);</b>
+<b class="nc">&nbsp;        if (resolver != null) {</b>
+<b class="nc">&nbsp;            resolver.cancel();</b>
+<b class="nc">&nbsp;            resolver = null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        reverter.detach();</b>
+<b class="nc">&nbsp;        if (scroller != null) {</b>
+<b class="nc">&nbsp;            scroller.cleanup();</b>
+<b class="nc">&nbsp;            scroller = null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        resolvedWindow = null;</b>
+<b class="nc">&nbsp;        resolvedNode = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        hide();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Called before the Navigation to next step occur.
+&nbsp;    ///
+&nbsp;    /// 1. Note sometimes node disappear when you click on it (even it&#39;s window), consider a menu button on a context
+&nbsp;    /// menu. This lead to moving to next step results in revert to previous step.
+&nbsp;    /// 2. Hide is necessary because [WindowOverlay] have a hack---automatically recover PopOver throughout the course
+&nbsp;    /// when it&#39;s supposed to be displayed. That seems harmless, but since we used
+&nbsp;    /// [org.jabref.gui.walkthrough.utils.WalkthroughUtils#debounced(Runnable, long)], the following &quot;race condition&quot;
+&nbsp;    /// can occur:
+&nbsp;    ///     - [#prepareForNavigation()] ran
+&nbsp;    ///     - node hid (original event dispatcher ran)
+&nbsp;    ///     - popover hid
+&nbsp;    ///     - popover restoration scheduled in next 50ms
+&nbsp;    ///     - timeout/delayed execution of walkthrough logic started and finished in 50ms, set popover to hide
+&nbsp;    ///     - new popover show, ALONG WITH the 50ms delayed one -&gt; two popover at once.
+&nbsp;    ///
+&nbsp;    /// So the current hack is we will hide [WindowOverlay] so that they won&#39;t get hacked restored.
+&nbsp;    private void prepareForNavigation() {
+<b class="nc">&nbsp;        reverter.detach();</b>
+<b class="nc">&nbsp;        hide();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,351 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationKeyPatternSuggestionCell</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.commonfxcontrols</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationKeyPatternSuggestionCell (org.jabref.gui.commonfxcontrols)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationKeyPatternSuggestionCell</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CitationKeyPatternSuggestionCell$CitationKeyPatternSuggestionTextField</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.commonfxcontrols;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.geometry.Bounds;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.CustomMenuItem;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.Menu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.cell.TextFieldTableCell;
+&nbsp;import javafx.stage.Window;
+&nbsp;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;public class CitationKeyPatternSuggestionCell extends TextFieldTableCell&lt;CitationKeyPatternsPanelItemModel, String&gt; {
+&nbsp;    private final CitationKeyPatternSuggestionTextField searchField;
+&nbsp;
+<b class="nc">&nbsp;    public CitationKeyPatternSuggestionCell(List&lt;String&gt; citationKeyPatterns) {</b>
+<b class="nc">&nbsp;        this.searchField = new CitationKeyPatternSuggestionTextField(citationKeyPatterns);</b>
+<b class="nc">&nbsp;        searchField.setOnAction(event -&gt; commitEdit(searchField.getText()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void startEdit() {
+<b class="nc">&nbsp;        super.startEdit();</b>
+<b class="nc">&nbsp;        searchField.setText(getItem());</b>
+<b class="nc">&nbsp;        setGraphic(searchField);</b>
+<b class="nc">&nbsp;        searchField.requestFocus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancelEdit() {
+<b class="nc">&nbsp;        super.cancelEdit();</b>
+<b class="nc">&nbsp;        setGraphic(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void commitEdit(String newValue) {
+<b class="nc">&nbsp;        super.commitEdit(newValue);</b>
+<b class="nc">&nbsp;        getTableView().getItems().get(getIndex()).setPattern(newValue);</b>
+<b class="nc">&nbsp;        setGraphic(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void updateItem(String item, boolean empty) {
+<b class="nc">&nbsp;        super.updateItem(item, empty);</b>
+<b class="nc">&nbsp;        if (empty || item == null) {</b>
+<b class="nc">&nbsp;            setGraphic(null);</b>
+<b class="nc">&nbsp;            setText(null);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            setText(item);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    static class CitationKeyPatternSuggestionTextField extends TextField {
+&nbsp;        private final List&lt;String&gt; citationKeyPatterns;
+&nbsp;        private final ContextMenu suggestionsList;
+&nbsp;        private int heightOfMenuItem;
+&nbsp;
+<b class="nc">&nbsp;        public CitationKeyPatternSuggestionTextField(List&lt;String&gt; citationKeyPatterns) {</b>
+<b class="nc">&nbsp;            this.citationKeyPatterns = new ArrayList&lt;&gt;(citationKeyPatterns);</b>
+<b class="nc">&nbsp;            this.suggestionsList = new ContextMenu();</b>
+&nbsp;            // Initial reasonable estimate before the menu items are populated. We overwrite this dynamically
+<b class="nc">&nbsp;            this.heightOfMenuItem = 30;</b>
+&nbsp;
+<b class="nc">&nbsp;            setListener();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void setListener() {
+<b class="nc">&nbsp;            textProperty().addListener((_, _, _) -&gt; {</b>
+<b class="nc">&nbsp;                String enteredText = getText();</b>
+<b class="nc">&nbsp;                if (enteredText == null || enteredText.isEmpty()) {</b>
+<b class="nc">&nbsp;                    suggestionsList.hide();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    List&lt;String&gt; filteredEntries = citationKeyPatterns.stream()</b>
+<b class="nc">&nbsp;                                                                      .filter(e -&gt; e.toLowerCase().contains(enteredText.toLowerCase()))</b>
+<b class="nc">&nbsp;                                                                      .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (!filteredEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;                        populatePopup(filteredEntries);</b>
+<b class="nc">&nbsp;                        if (!suggestionsList.isShowing() &amp;&amp; getScene() != null) {</b>
+<b class="nc">&nbsp;                            double screenX = localToScreen(0, 0).getX();</b>
+<b class="nc">&nbsp;                            double screenY = localToScreen(0, 0).getY() + getHeight();</b>
+<b class="nc">&nbsp;                            suggestionsList.show(this, screenX, screenY);</b>
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        suggestionsList.hide();</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            focusedProperty().addListener((_, _, _) -&gt; suggestionsList.hide());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void populatePopup(List&lt;String&gt; searchResult) {
+<b class="nc">&nbsp;            List&lt;CustomMenuItem&gt; menuItems = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            double space = getAvailableSpaceBelow(this);</b>
+<b class="nc">&nbsp;            int maxItems = (int) (space / heightOfMenuItem) - 1;</b>
+&nbsp;
+<b class="nc">&nbsp;            int count = Math.min(searchResult.size(), maxItems);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (int i = 0; i &lt; count; i++) {</b>
+<b class="nc">&nbsp;                final String result = searchResult.get(i);</b>
+<b class="nc">&nbsp;                Label entryLabel = new Label(result);</b>
+<b class="nc">&nbsp;                entryLabel.setPrefWidth(getWidth());</b>
+&nbsp;
+<b class="nc">&nbsp;                CustomMenuItem item = new CustomMenuItem(entryLabel, true);</b>
+<b class="nc">&nbsp;                item.setHideOnClick(false);</b>
+&nbsp;
+<b class="nc">&nbsp;                menuItems.add(item);</b>
+&nbsp;
+<b class="nc">&nbsp;                item.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;                    setText(result);</b>
+<b class="nc">&nbsp;                    positionCaret(result.length());</b>
+<b class="nc">&nbsp;                    suggestionsList.hide();</b>
+&nbsp;                });
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!menuItems.isEmpty()) {</b>
+<b class="nc">&nbsp;                Platform.runLater(() -&gt; heightOfMenuItem = (int) menuItems.getFirst().getContent().getBoundsInLocal().getHeight());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            suggestionsList.getItems().clear();</b>
+<b class="nc">&nbsp;            suggestionsList.getItems().add(createPatternsSubMenu());</b>
+<b class="nc">&nbsp;            suggestionsList.getItems().addAll(menuItems);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!menuItems.isEmpty()) {</b>
+<b class="nc">&nbsp;                menuItems.getFirst().getContent().requestFocus();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        public static double getAvailableSpaceBelow(TextField textField) {
+<b class="nc">&nbsp;            if (textField.getScene() == null || textField.getScene().getWindow() == null) {</b>
+<b class="nc">&nbsp;                return 0;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Window window = textField.getScene().getWindow();</b>
+<b class="nc">&nbsp;            if (window == null) {</b>
+<b class="nc">&nbsp;                return 0;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Bounds bounds = textField.localToScreen(textField.getBoundsInLocal());</b>
+<b class="nc">&nbsp;            double screenHeight = window.getHeight();</b>
+<b class="nc">&nbsp;            double textFieldBottom = bounds.getMinY() + textField.getHeight();</b>
+&nbsp;
+<b class="nc">&nbsp;            return screenHeight - (textFieldBottom - window.getY());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Menu createPatternsSubMenu() {
+<b class="nc">&nbsp;            Menu patternsSubMenu = new Menu(Localization.lang(&quot;All patterns&quot;));</b>
+&nbsp;
+&nbsp;            Map&lt;CitationKeyPattern.Category, List&lt;CitationKeyPattern&gt;&gt; categorizedPatterns =
+<b class="nc">&nbsp;                    CitationKeyPattern.getAllPatterns().stream()</b>
+<b class="nc">&nbsp;                                      .collect(Collectors.groupingBy(CitationKeyPattern::getCategory));</b>
+&nbsp;
+<b class="nc">&nbsp;            Map&lt;CitationKeyPattern.Category, String&gt; categoryNames = Map.of(</b>
+<b class="nc">&nbsp;                    CitationKeyPattern.Category.AUTHOR_RELATED, Localization.lang(&quot;Author related&quot;),</b>
+<b class="nc">&nbsp;                    CitationKeyPattern.Category.EDITOR_RELATED, Localization.lang(&quot;Editor related&quot;),</b>
+<b class="nc">&nbsp;                    CitationKeyPattern.Category.TITLE_RELATED, Localization.lang(&quot;Title related&quot;),</b>
+<b class="nc">&nbsp;                    CitationKeyPattern.Category.OTHER_FIELDS, Localization.lang(&quot;Other fields&quot;),</b>
+<b class="nc">&nbsp;                    CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang(&quot;Entry fields&quot;)</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            for (Map.Entry&lt;CitationKeyPattern.Category, String&gt; entry : categoryNames.entrySet()) {</b>
+<b class="nc">&nbsp;                CitationKeyPattern.Category category = entry.getKey();</b>
+<b class="nc">&nbsp;                String categoryName = entry.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;                Menu categoryMenu = new Menu(categoryName);</b>
+<b class="nc">&nbsp;                List&lt;CitationKeyPattern&gt; patterns = categorizedPatterns.getOrDefault(category, List.of());</b>
+&nbsp;
+<b class="nc">&nbsp;                for (CitationKeyPattern pattern : patterns) {</b>
+<b class="nc">&nbsp;                    MenuItem menuItem = new MenuItem(pattern.stringRepresentation());</b>
+<b class="nc">&nbsp;                    menuItem.setOnAction(event -&gt; {</b>
+<b class="nc">&nbsp;                        setText(pattern.stringRepresentation());</b>
+<b class="nc">&nbsp;                        positionCaret(pattern.stringRepresentation().length());</b>
+<b class="nc">&nbsp;                        suggestionsList.hide();</b>
+&nbsp;                    });
+<b class="nc">&nbsp;                    categoryMenu.getItems().add(menuItem);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                patternsSubMenu.getItems().add(categoryMenu);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return patternsSubMenu;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IdentifierEditor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors.identifier</a>
+</div>
+
+<h1>Coverage Summary for Class: IdentifierEditor (org.jabref.gui.fieldeditors.identifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IdentifierEditor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors.identifier;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.fieldeditors.EditorTextField;
+&nbsp;import org.jabref.gui.fieldeditors.EditorValidator;
+&nbsp;import org.jabref.gui.fieldeditors.FieldEditorFX;
+&nbsp;import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;import static org.jabref.model.entry.field.StandardField.DOI;
+&nbsp;import static org.jabref.model.entry.field.StandardField.EPRINT;
+&nbsp;import static org.jabref.model.entry.field.StandardField.ISBN;
+&nbsp;
+<b class="nc">&nbsp;public class IdentifierEditor extends HBox implements FieldEditorFX {</b>
+&nbsp;
+&nbsp;    @FXML private BaseIdentifierEditorViewModel&lt;?&gt; viewModel;
+&nbsp;    @FXML private EditorTextField textField;
+&nbsp;    @FXML private Button shortenDOIButton;
+&nbsp;    @FXML private Button fetchInformationByIdentifierButton;
+&nbsp;    @FXML private Button lookupIdentifierButton;
+&nbsp;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private TaskExecutor taskExecutor;
+&nbsp;    @Inject private GuiPreferences preferences;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;    @Inject private StateManager stateManager;
+<b class="nc">&nbsp;    private Optional&lt;BibEntry&gt; entry = Optional.empty();</b>
+&nbsp;
+&nbsp;    public IdentifierEditor(Field field,
+&nbsp;                            SuggestionProvider&lt;?&gt; suggestionProvider,
+<b class="nc">&nbsp;                            FieldCheckers fieldCheckers) {</b>
+&nbsp;
+&nbsp;        // Viewloader must be called after the viewmodel is loaded,
+&nbsp;        // but we need the injected vars to create the viewmodels.
+<b class="nc">&nbsp;        Injector.registerExistingAndInject(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (field) {</b>
+&nbsp;            case DOI -&gt;
+<b class="nc">&nbsp;                    this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);</b>
+&nbsp;            case ISBN -&gt;
+<b class="nc">&nbsp;                    this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);</b>
+&nbsp;            case EPRINT -&gt;
+<b class="nc">&nbsp;                    this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);</b>
+&nbsp;
+&nbsp;            // TODO: Add support for PMID
+&nbsp;            case null,
+&nbsp;                 default -&gt; {
+<b class="nc">&nbsp;                assert field != null;</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;Unable to instantiate a view model for identifier field editor &#39;%s&#39;&quot;.formatted(FieldTextMapper.getDisplayName(field)));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;
+<b class="nc">&nbsp;        textField.textProperty().bindBidirectional(viewModel.textProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        fetchInformationByIdentifierButton.setTooltip(</b>
+<b class="nc">&nbsp;                new Tooltip(Localization.lang(&quot;Get bibliographic data from %0&quot;, FieldTextMapper.getDisplayName(field))));</b>
+<b class="nc">&nbsp;        lookupIdentifierButton.setTooltip(</b>
+<b class="nc">&nbsp;                new Tooltip(Localization.lang(&quot;Look up %0&quot;, FieldTextMapper.getDisplayName(field))));</b>
+<b class="nc">&nbsp;        shortenDOIButton.setTooltip(</b>
+<b class="nc">&nbsp;                new Tooltip(Localization.lang(&quot;Shorten %0&quot;, FieldTextMapper.getDisplayName(field))));</b>
+&nbsp;
+<b class="nc">&nbsp;        textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());</b>
+&nbsp;
+<b class="nc">&nbsp;        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BaseIdentifierEditorViewModel&lt;?&gt; getViewModel() {
+<b class="nc">&nbsp;        return viewModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        this.entry = Optional.of(entry);</b>
+<b class="nc">&nbsp;        viewModel.bindToEntry(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parent getNode() {
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void fetchInformationByIdentifier() {
+<b class="nc">&nbsp;        entry.ifPresent(viewModel::fetchBibliographyInformation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void lookupIdentifier() {
+<b class="nc">&nbsp;        entry.ifPresent(viewModel::lookupIdentifier);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void openExternalLink() {
+<b class="nc">&nbsp;        viewModel.openExternalLink();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void shortenID() {
+<b class="nc">&nbsp;        viewModel.shortenID();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

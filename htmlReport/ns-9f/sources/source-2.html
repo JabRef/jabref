@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InternalPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic</a>
+</div>
+
+<h1>Coverage Summary for Class: InternalPreferences (org.jabref.logic)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InternalPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35.3%
+  </span>
+  <span class="absValue">
+    (6/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (11/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.logic.util.Version;
+&nbsp;import org.jabref.model.metadata.UserHostInfo;
+&nbsp;
+&nbsp;public class InternalPreferences {
+&nbsp;
+&nbsp;    private final ObjectProperty&lt;Version&gt; ignoredVersion;
+&nbsp;    private final BooleanProperty versionCheckEnabled;
+&nbsp;    private final ObjectProperty&lt;Path&gt; lastPreferencesExportPath;
+&nbsp;    private final StringProperty userAndHost;
+&nbsp;    private final BooleanProperty memoryStickMode;
+&nbsp;
+&nbsp;    public InternalPreferences(Version ignoredVersion,
+&nbsp;                               boolean versionCheck,
+&nbsp;                               Path exportPath,
+&nbsp;                               String userAndHost,
+<b class="fc">&nbsp;                               boolean memoryStickMode) {</b>
+<b class="fc">&nbsp;        this.ignoredVersion = new SimpleObjectProperty&lt;&gt;(ignoredVersion);</b>
+<b class="fc">&nbsp;        this.versionCheckEnabled = new SimpleBooleanProperty(versionCheck);</b>
+<b class="fc">&nbsp;        this.lastPreferencesExportPath = new SimpleObjectProperty&lt;&gt;(exportPath);</b>
+<b class="fc">&nbsp;        this.userAndHost = new SimpleStringProperty(userAndHost);</b>
+<b class="fc">&nbsp;        this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Version getIgnoredVersion() {
+<b class="nc">&nbsp;        return ignoredVersion.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Version&gt; ignoredVersionProperty() {
+<b class="fc">&nbsp;        return ignoredVersion;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setIgnoredVersion(Version ignoredVersion) {
+<b class="nc">&nbsp;        this.ignoredVersion.set(ignoredVersion);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isVersionCheckEnabled() {
+<b class="nc">&nbsp;        return versionCheckEnabled.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty versionCheckEnabledProperty() {
+<b class="fc">&nbsp;        return versionCheckEnabled;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setVersionCheckEnabled(boolean versionCheckEnabled) {
+<b class="nc">&nbsp;        this.versionCheckEnabled.set(versionCheckEnabled);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Path getLastPreferencesExportPath() {
+<b class="nc">&nbsp;        return lastPreferencesExportPath.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Path&gt; lastPreferencesExportPathProperty() {
+<b class="fc">&nbsp;        return lastPreferencesExportPath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLastPreferencesExportPath(Path lastPreferencesExportPath) {
+<b class="nc">&nbsp;        this.lastPreferencesExportPath.set(lastPreferencesExportPath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getUserAndHost() {
+<b class="nc">&nbsp;        return userAndHost.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty getUserAndHostProperty() {
+<b class="fc">&nbsp;        return userAndHost;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the user and host information as a UserHostInfo object.
+&nbsp;     *
+&nbsp;     * @return the user and host information
+&nbsp;     */
+&nbsp;    public UserHostInfo getUserHostInfo() {
+<b class="nc">&nbsp;        return UserHostInfo.parse(getUserAndHost());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the user and host information from a UserHostInfo object.
+&nbsp;     *
+&nbsp;     * @param userHostInfo the user and host information
+&nbsp;     */
+&nbsp;    public void setUserHostInfo(UserHostInfo userHostInfo) {
+<b class="nc">&nbsp;        userAndHost.set(userHostInfo.getUserHostString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isMemoryStickMode() {
+<b class="nc">&nbsp;        return memoryStickMode.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty memoryStickModeProperty() {
+<b class="fc">&nbsp;        return memoryStickMode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMemoryStickMode(boolean memoryStickMode) {
+<b class="nc">&nbsp;        this.memoryStickMode.set(memoryStickMode);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

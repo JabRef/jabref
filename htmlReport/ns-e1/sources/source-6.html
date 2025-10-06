@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Update</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.action</a>
+</div>
+
+<h1>Coverage Summary for Class: Update (org.jabref.logic.openoffice.action)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Update</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Update$SyncOptions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.action;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.openoffice.frontend.OOFrontend;
+&nbsp;import org.jabref.logic.openoffice.frontend.UpdateBibliography;
+&nbsp;import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
+&nbsp;import org.jabref.logic.openoffice.style.JStyle;
+&nbsp;import org.jabref.logic.openoffice.style.OOProcess;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
+&nbsp;import org.jabref.model.openoffice.uno.CreationException;
+&nbsp;import org.jabref.model.openoffice.uno.NoDocumentException;
+&nbsp;import org.jabref.model.openoffice.uno.UnoScreenRefresh;
+&nbsp;
+&nbsp;import com.sun.star.lang.IllegalArgumentException;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Update document: citation marks and bibliography
+&nbsp; */
+&nbsp;public class Update {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(Update.class);</b>
+&nbsp;
+&nbsp;    private Update() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return the list of unresolved citation keys
+&nbsp;     */
+&nbsp;    private static List&lt;String&gt; updateDocument(XTextDocument doc,
+&nbsp;                                               OOFrontend frontend,
+&nbsp;                                               List&lt;BibDatabase&gt; databases,
+&nbsp;                                               JStyle style,
+&nbsp;                                               FunctionalTextViewCursor fcursor,
+&nbsp;                                               boolean doUpdateBibliography,
+&nbsp;                                               boolean alwaysAddCitedOnPages)
+&nbsp;            throws
+&nbsp;            CreationException,
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException,
+&nbsp;            IllegalArgumentException {
+&nbsp;
+<b class="nc">&nbsp;        final boolean useLockControllers = true;</b>
+&nbsp;
+<b class="nc">&nbsp;        frontend.imposeGlobalOrder(doc, fcursor);</b>
+<b class="nc">&nbsp;        OOProcess.produceCitationMarkers(frontend.citationGroups, databases, style);</b>
+&nbsp;
+&nbsp;        try {
+&nbsp;            if (useLockControllers) {
+<b class="nc">&nbsp;                UnoScreenRefresh.lockControllers(doc);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            UpdateCitationMarkers.applyNewCitationMarkers(doc, frontend, style);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (doUpdateBibliography) {</b>
+<b class="nc">&nbsp;                UpdateBibliography.rebuildBibTextSection(doc,</b>
+&nbsp;                        frontend,
+<b class="nc">&nbsp;                        frontend.citationGroups.getBibliography().get(),</b>
+&nbsp;                        style,
+&nbsp;                        alwaysAddCitedOnPages);
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return frontend.citationGroups.getUnresolvedKeys();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error while updating document&quot;, e);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            if (useLockControllers &amp;&amp; UnoScreenRefresh.hasControllersLocked(doc)) {</b>
+<b class="nc">&nbsp;                UnoScreenRefresh.unlockControllers(doc);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return frontend.citationGroups.getUnresolvedKeys();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class SyncOptions {
+&nbsp;
+&nbsp;        public final List&lt;BibDatabase&gt; databases;
+&nbsp;        boolean updateBibliography;
+&nbsp;        boolean alwaysAddCitedOnPages;
+&nbsp;
+<b class="nc">&nbsp;        public SyncOptions(List&lt;BibDatabase&gt; databases) {</b>
+<b class="nc">&nbsp;            this.databases = databases;</b>
+<b class="nc">&nbsp;            this.updateBibliography = false;</b>
+<b class="nc">&nbsp;            this.alwaysAddCitedOnPages = false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SyncOptions setUpdateBibliography(boolean value) {
+<b class="nc">&nbsp;            this.updateBibliography = value;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public SyncOptions setAlwaysAddCitedOnPages(boolean value) {
+<b class="nc">&nbsp;            this.alwaysAddCitedOnPages = value;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;String&gt; synchronizeDocument(XTextDocument doc,
+&nbsp;                                                   OOFrontend frontend,
+&nbsp;                                                   JStyle style,
+&nbsp;                                                   FunctionalTextViewCursor fcursor,
+&nbsp;                                                   SyncOptions syncOptions)
+&nbsp;            throws
+&nbsp;            CreationException,
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException,
+&nbsp;            IllegalArgumentException {
+&nbsp;
+<b class="nc">&nbsp;        return Update.updateDocument(doc,</b>
+&nbsp;                frontend,
+&nbsp;                syncOptions.databases,
+&nbsp;                style,
+&nbsp;                fcursor,
+&nbsp;                syncOptions.updateBibliography,
+&nbsp;                syncOptions.alwaysAddCitedOnPages);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reread document before sync
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; resyncDocument(XTextDocument doc,
+&nbsp;                                              JStyle style,
+&nbsp;                                              FunctionalTextViewCursor fcursor,
+&nbsp;                                              SyncOptions syncOptions)
+&nbsp;            throws
+&nbsp;            CreationException,
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException,
+&nbsp;            IllegalArgumentException {
+&nbsp;
+<b class="nc">&nbsp;        OOFrontend frontend = new OOFrontend(doc);</b>
+&nbsp;
+<b class="nc">&nbsp;        return Update.synchronizeDocument(doc, frontend, style, fcursor, syncOptions);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

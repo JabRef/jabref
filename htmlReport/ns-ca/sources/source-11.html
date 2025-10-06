@@ -1,0 +1,392 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImportFormatReader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: ImportFormatReader (org.jabref.logic.importer)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImportFormatReader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/71)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ImportFormatReader$CheckedFunction</td>
+  </tr>
+  <tr>
+    <td class="name">ImportFormatReader$UnknownFormatImport</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.CffImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.CopacImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.EndnoteImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.InspecImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.IsiImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.MedlineImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.ModsImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.MsBibImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.OvidImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.ReferImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.RepecNepImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.RisImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabases;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;public class ImportFormatReader {
+&nbsp;
+&nbsp;    public static final String BIBTEX_FORMAT = &quot;BibTeX&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All import formats.
+&nbsp;     * Sorted accordingly to {@link Importer#compareTo}, which defaults to alphabetically by the name
+&nbsp;     */
+<b class="nc">&nbsp;    private final List&lt;Importer&gt; formats = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final ImporterPreferences importerPreferences;
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+&nbsp;
+&nbsp;    public ImportFormatReader(ImporterPreferences importerPreferences,
+&nbsp;                              ImportFormatPreferences importFormatPreferences,
+&nbsp;                              CitationKeyPatternPreferences citationKeyPatternPreferences,
+<b class="nc">&nbsp;                              FileUpdateMonitor fileUpdateMonitor) {</b>
+<b class="nc">&nbsp;        this.importerPreferences = importerPreferences;</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = importFormatPreferences;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.citationKeyPatternPreferences = citationKeyPatternPreferences;</b>
+<b class="nc">&nbsp;        reset();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void reset() {
+<b class="nc">&nbsp;        formats.add(new CopacImporter());</b>
+<b class="nc">&nbsp;        formats.add(new EndnoteImporter());</b>
+<b class="nc">&nbsp;        formats.add(new EndnoteXmlImporter(importFormatPreferences));</b>
+<b class="nc">&nbsp;        formats.add(new InspecImporter());</b>
+<b class="nc">&nbsp;        formats.add(new IsiImporter());</b>
+<b class="nc">&nbsp;        formats.add(new MedlineImporter());</b>
+<b class="nc">&nbsp;        formats.add(new MedlinePlainImporter(importFormatPreferences));</b>
+<b class="nc">&nbsp;        formats.add(new ModsImporter(importFormatPreferences));</b>
+<b class="nc">&nbsp;        formats.add(new MsBibImporter());</b>
+<b class="nc">&nbsp;        formats.add(new OvidImporter());</b>
+<b class="nc">&nbsp;        formats.add(new PdfMergeMetadataImporter(importFormatPreferences));</b>
+<b class="nc">&nbsp;        formats.add(new PdfVerbatimBibtexImporter(importFormatPreferences));</b>
+<b class="nc">&nbsp;        formats.add(new PdfContentImporter());</b>
+<b class="nc">&nbsp;        formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));</b>
+<b class="nc">&nbsp;        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {</b>
+<b class="nc">&nbsp;            formats.add(new PdfGrobidImporter(importFormatPreferences));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));</b>
+<b class="nc">&nbsp;        formats.add(new RepecNepImporter(importFormatPreferences));</b>
+<b class="nc">&nbsp;        formats.add(new ReferImporter());</b>
+<b class="nc">&nbsp;        formats.add(new RisImporter());</b>
+<b class="nc">&nbsp;        formats.add(new CffImporter(citationKeyPatternPreferences));</b>
+<b class="nc">&nbsp;        formats.add(new BiblioscapeImporter());</b>
+<b class="nc">&nbsp;        formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));</b>
+<b class="nc">&nbsp;        formats.add(new CitaviXmlImporter());</b>
+&nbsp;
+&nbsp;        // Get custom import formats
+<b class="nc">&nbsp;        formats.addAll(importerPreferences.getCustomImporters());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Format for a given CLI-ID.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;p&gt;Will return the first format according to the default-order of
+&nbsp;     * format that matches the given ID.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param cliId CLI-Id
+&nbsp;     * @return Import Format or &lt;code&gt;null&lt;/code&gt; if none matches
+&nbsp;     */
+&nbsp;    private Optional&lt;Importer&gt; getByCliId(String cliId) {
+<b class="nc">&nbsp;        for (Importer format : formats) {</b>
+<b class="nc">&nbsp;            if (format.getId().equals(cliId)) {</b>
+<b class="nc">&nbsp;                return Optional.of(format);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ParserResult importFromFile(String format, Path file) throws ImportException {
+<b class="nc">&nbsp;        Optional&lt;Importer&gt; importer = getByCliId(format);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (importer.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new ImportException(Localization.lang(&quot;Unknown import format&quot;) + &quot;: &quot; + format);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return importer.get().importDatabase(file);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            throw new ImportException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// All importers.
+&nbsp;    ///
+&nbsp;    /// Elements are sorted by name.
+&nbsp;    ///
+&nbsp;    /// @return all custom importers, elements are of type InputFormat
+&nbsp;    public SortedSet&lt;Importer&gt; getImportFormats() {
+<b class="nc">&nbsp;        return new TreeSet&lt;&gt;(this.formats);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record UnknownFormatImport(String format, ParserResult parserResult) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Tries to import a file by iterating through the available import filters,
+&nbsp;    /// and keeping the import that seems most promising.
+&nbsp;    ///
+&nbsp;    /// This method first attempts to read this file as bibtex.
+&nbsp;    ///
+&nbsp;    /// @throws ImportException if the import fails (for example, if no suitable importer is found)
+&nbsp;    public UnknownFormatImport importUnknownFormat(Path filePath, FileUpdateMonitor fileMonitor) throws ImportException {
+<b class="nc">&nbsp;        Objects.requireNonNull(filePath);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -&gt; importer.importDatabase(filePath), importer -&gt; importer.isRecognizedFormat(filePath));</b>
+<b class="nc">&nbsp;            unknownFormatImport.parserResult.setPath(filePath);</b>
+<b class="nc">&nbsp;            return unknownFormatImport;</b>
+&nbsp;        } catch (ImportException e) {
+&nbsp;            // If all importers fail, try to read the file as BibTeX
+&nbsp;            try {
+<b class="nc">&nbsp;                ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor);</b>
+<b class="nc">&nbsp;                if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {</b>
+<b class="nc">&nbsp;                    parserResult.setPath(filePath);</b>
+<b class="nc">&nbsp;                    return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new ImportException(parserResult.getErrorMessage());</b>
+&nbsp;                }
+&nbsp;            } catch (IOException ignore) {
+&nbsp;                // Ignored
+<b class="nc">&nbsp;                throw new ImportException(Localization.lang(&quot;Could not find a suitable import format.&quot;));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tries to import entries by iterating through the available import filters,
+&nbsp;     * and keeping the import that seems the most promising
+&nbsp;     *
+&nbsp;     * @param importDatabase     the function to import the entries with a formatter
+&nbsp;     * @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
+&nbsp;     * @return an UnknownFormatImport with the imported entries and metadata
+&nbsp;     * @throws ImportException if the import fails (for example, if no suitable importer is found)
+&nbsp;     */
+&nbsp;    private UnknownFormatImport importUnknownFormat(CheckedFunction&lt;Importer, ParserResult&gt; importDatabase, CheckedFunction&lt;Importer, Boolean&gt; isRecognizedFormat) throws ImportException {
+&nbsp;        // stores ref to best result, gets updated at the next loop
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; bestResult = null;</b>
+<b class="nc">&nbsp;        int bestResultCount = 0;</b>
+<b class="nc">&nbsp;        String bestFormatName = null;</b>
+&nbsp;
+&nbsp;        // Cycle through all importers:
+<b class="nc">&nbsp;        for (Importer imFo : formats) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                if (!isRecognizedFormat.apply(imFo) || imFo.equals(new ReferImporter())) {</b>
+&nbsp;                    // Refer/BibIX should be explicitly chosen by user
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                ParserResult parserResult = importDatabase.apply(imFo);</b>
+<b class="nc">&nbsp;                List&lt;BibEntry&gt; entries = parserResult.getDatabase().getEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;                BibDatabases.purgeEmptyEntries(entries);</b>
+<b class="nc">&nbsp;                int entryCount = entries.size();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (entryCount &gt; bestResultCount) {</b>
+<b class="nc">&nbsp;                    bestResult = entries;</b>
+<b class="nc">&nbsp;                    bestResultCount = entryCount;</b>
+<b class="nc">&nbsp;                    bestFormatName = imFo.getName();</b>
+&nbsp;                }
+&nbsp;            } catch (IOException ex) {
+&nbsp;                // The import did not succeed. Go on.
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (bestResult != null) {</b>
+&nbsp;            // we found something
+<b class="nc">&nbsp;            ParserResult parserResult = new ParserResult(bestResult);</b>
+<b class="nc">&nbsp;            return new UnknownFormatImport(bestFormatName, parserResult);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        throw new ImportException(Localization.lang(&quot;Could not find a suitable import format.&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FunctionalInterface
+&nbsp;    public interface CheckedFunction&lt;T, R&gt; {
+&nbsp;
+&nbsp;        R apply(T t) throws IOException;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tries to import a String by iterating through the available import filters,
+&nbsp;     * and keeping the import that seems the most promising
+&nbsp;     *
+&nbsp;     * @param data the string to import
+&nbsp;     * @return an UnknownFormatImport with the imported entries and metadata
+&nbsp;     * @throws ImportException if the import fails (for example, if no suitable importer is found)
+&nbsp;     */
+&nbsp;    public UnknownFormatImport importUnknownFormat(String data) throws ImportException {
+<b class="nc">&nbsp;        Objects.requireNonNull(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        return importUnknownFormat(importer -&gt; importer.importDatabase(data), importer -&gt; importer.isRecognizedFormat(data));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

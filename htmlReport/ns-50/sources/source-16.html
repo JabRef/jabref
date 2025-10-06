@@ -1,0 +1,356 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RightClickMenu</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: RightClickMenu (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RightClickMenu</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.Menu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.SeparatorMenuItem;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.edit.CopyMoreAction;
+&nbsp;import org.jabref.gui.edit.CopyTo;
+&nbsp;import org.jabref.gui.edit.EditAction;
+&nbsp;import org.jabref.gui.exporter.ExportToClipboardAction;
+&nbsp;import org.jabref.gui.externalfiles.ImportHandler;
+&nbsp;import org.jabref.gui.frame.SendAsKindleEmailAction;
+&nbsp;import org.jabref.gui.frame.SendAsStandardEmailAction;
+&nbsp;import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.linkedfile.AttachFileAction;
+&nbsp;import org.jabref.gui.linkedfile.AttachFileFromURLAction;
+&nbsp;import org.jabref.gui.menus.ChangeEntryTypeMenu;
+&nbsp;import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.CopyCitationAction;
+&nbsp;import org.jabref.gui.preview.PreviewPreferences;
+&nbsp;import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+&nbsp;import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+&nbsp;import org.jabref.logic.importer.WebFetchers;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.shared.DatabaseLocation;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.SpecialField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+<b class="nc">&nbsp;public class RightClickMenu {</b>
+&nbsp;
+&nbsp;    public static ContextMenu create(BibEntryTableViewModel entry,
+&nbsp;                                     KeyBindingRepository keyBindingRepository,
+&nbsp;                                     LibraryTab libraryTab,
+&nbsp;                                     DialogService dialogService,
+&nbsp;                                     StateManager stateManager,
+&nbsp;                                     GuiPreferences preferences,
+&nbsp;                                     UndoManager undoManager,
+&nbsp;                                     ClipBoardManager clipBoardManager,
+&nbsp;                                     TaskExecutor taskExecutor,
+&nbsp;                                     JournalAbbreviationRepository abbreviationRepository,
+&nbsp;                                     BibEntryTypesManager entryTypesManager,
+&nbsp;                                     ImportHandler importHandler) {
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+<b class="nc">&nbsp;        ContextMenu contextMenu = new ContextMenu();</b>
+&nbsp;
+<b class="nc">&nbsp;        ExtractReferencesAction extractReferencesAction = new ExtractReferencesAction(dialogService, stateManager, preferences);</b>
+&nbsp;        // Two menu items required, because of menu item display. Action checks preference internal what to do
+<b class="nc">&nbsp;        MenuItem extractFileReferencesOnline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_ONLINE, extractReferencesAction);</b>
+<b class="nc">&nbsp;        MenuItem extractFileReferencesOffline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_OFFLINE, extractReferencesAction);</b>
+&nbsp;
+<b class="nc">&nbsp;        contextMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -&gt; libraryTab, stateManager, undoManager)),</b>
+<b class="nc">&nbsp;                createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),</b>
+<b class="nc">&nbsp;                createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -&gt; libraryTab, stateManager, undoManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -&gt; libraryTab, stateManager, undoManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -&gt; libraryTab, stateManager, undoManager)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                createSendSubMenu(factory, dialogService, stateManager, preferences, entryTypesManager, taskExecutor),</b>
+&nbsp;
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, () -&gt; libraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, () -&gt; libraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, () -&gt; libraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, () -&gt; libraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, () -&gt; libraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, () -&gt; libraryTab, dialogService, preferences, undoManager, stateManager),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(libraryTab, dialogService, stateManager, preferences.getFilePreferences(), preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferences)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, taskExecutor)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor)),</b>
+&nbsp;                extractFileReferencesOnline,
+&nbsp;                extractFileReferencesOffline,
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction&lt;&gt;(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(preferences.getGrobidPreferences().grobidEnabledProperty(), enabled -&gt; {</b>
+<b class="nc">&nbsp;            extractFileReferencesOnline.setVisible(enabled);</b>
+<b class="nc">&nbsp;            extractFileReferencesOffline.setVisible(!enabled);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        return contextMenu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Menu createCopyToMenu(ActionFactory factory,
+&nbsp;                                         DialogService dialogService,
+&nbsp;                                         StateManager stateManager,
+&nbsp;                                         GuiPreferences preferences,
+&nbsp;                                         LibraryTab libraryTab,
+&nbsp;                                         ImportHandler importHandler) {
+<b class="nc">&nbsp;        Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);</b>
+<b class="nc">&nbsp;        copyToMenu.disableProperty().bind(</b>
+<b class="nc">&nbsp;                ActionHelper.needsMultipleDatabases(stateManager).not()</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        // Menu is created on each right-click, thus we can always assume that the list of open databases is up-to-date
+&nbsp;
+<b class="nc">&nbsp;        BibDatabaseContext sourceDatabaseContext = libraryTab.getBibDatabaseContext();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibDatabaseContext targetDatabaseContext : stateManager.getOpenDatabases()) {</b>
+<b class="nc">&nbsp;            if (targetDatabaseContext == sourceDatabaseContext) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;            String targetDatabaseName;
+&nbsp;
+<b class="nc">&nbsp;            if (targetDatabaseContext.getDatabasePath().isPresent()) {</b>
+<b class="nc">&nbsp;                targetDatabaseName = FileUtil.getUniquePathFragment(</b>
+<b class="nc">&nbsp;                        stateManager.getAllDatabasePaths(),</b>
+<b class="nc">&nbsp;                        targetDatabaseContext.getDatabasePath().get()</b>
+<b class="nc">&nbsp;                ).orElse(Localization.lang(&quot;untitled&quot;));</b>
+<b class="nc">&nbsp;            } else if (targetDatabaseContext.getLocation() == DatabaseLocation.SHARED) {</b>
+<b class="nc">&nbsp;                targetDatabaseName = targetDatabaseContext.getDBMSSynchronizer().getDBName() + &quot; [&quot; + Localization.lang(&quot;shared&quot;) + &quot;]&quot;;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                targetDatabaseName = Localization.lang(&quot;untitled&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            copyToMenu.getItems().add(</b>
+<b class="nc">&nbsp;                    factory.createCustomMenuItem(</b>
+&nbsp;                            StandardActions.COPY_TO,
+<b class="nc">&nbsp;                            new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),</b>
+&nbsp;                                    importHandler, sourceDatabaseContext, targetDatabaseContext),
+&nbsp;                            targetDatabaseName
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return copyToMenu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Menu createCopySubMenu(ActionFactory factory,
+&nbsp;                                         DialogService dialogService,
+&nbsp;                                         StateManager stateManager,
+&nbsp;                                         GuiPreferences preferences,
+&nbsp;                                         ClipBoardManager clipBoardManager,
+&nbsp;                                         JournalAbbreviationRepository abbreviationRepository,
+&nbsp;                                         TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);</b>
+&nbsp;
+<b class="nc">&nbsp;        copySpecialMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                createCopyFieldContentSubMenu(factory, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository),</b>
+&nbsp;                new SeparatorMenuItem(),
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_CITATION_KEY, new CopyMoreAction(StandardActions.COPY_CITATION_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_AS_CITE_COMMAND, new CopyMoreAction(StandardActions.COPY_AS_CITE_COMMAND, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_CITATION_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_CITATION_KEY_AND_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_CITATION_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_CITATION_KEY_AND_LINK, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+&nbsp;                new SeparatorMenuItem(),
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_DOI, new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_DOI_URL, new CopyMoreAction(StandardActions.COPY_DOI_URL, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+&nbsp;                new SeparatorMenuItem(),
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences))</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        // the submenu will behave dependent on what style is currently selected (citation/preview)
+<b class="nc">&nbsp;        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();</b>
+<b class="nc">&nbsp;        if (previewPreferences.getSelectedPreviewLayout() instanceof CitationStylePreviewLayout) {</b>
+<b class="nc">&nbsp;            copySpecialMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                    factory.createMenuItem(StandardActions.COPY_CITATION_HTML, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                    factory.createMenuItem(StandardActions.COPY_CITATION_TEXT, new CopyCitationAction(CitationStyleOutputFormat.TEXT, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                    factory.createMenuItem(StandardActions.COPY_CITATION_MARKDOWN, new CopyCitationAction(CitationStyleOutputFormat.MARKDOWN, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        copySpecialMenu.getItems().addAll(</b>
+&nbsp;                new SeparatorMenuItem(),
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences)));</b>
+&nbsp;
+<b class="nc">&nbsp;        return copySpecialMenu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Menu createCopyFieldContentSubMenu(ActionFactory factory,
+&nbsp;                                              DialogService dialogService,
+&nbsp;                                              StateManager stateManager,
+&nbsp;                                              ClipBoardManager clipBoardManager,
+&nbsp;                                              GuiPreferences preferences,
+&nbsp;                                              JournalAbbreviationRepository abbreviationRepository) {
+<b class="nc">&nbsp;        Menu copyFieldContentMenu = factory.createMenu(StandardActions.COPY_FIELD_CONTENT);</b>
+&nbsp;
+<b class="nc">&nbsp;        copyFieldContentMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_FIELD_AUTHOR, new CopyMoreAction(StandardActions.COPY_FIELD_AUTHOR, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_FIELD_TITLE, new CopyMoreAction(StandardActions.COPY_FIELD_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_FIELD_JOURNAL, new CopyMoreAction(StandardActions.COPY_FIELD_JOURNAL, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_FIELD_DATE, new CopyMoreAction(StandardActions.COPY_FIELD_DATE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_FIELD_KEYWORDS, new CopyMoreAction(StandardActions.COPY_FIELD_KEYWORDS, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_FIELD_ABSTRACT, new CopyMoreAction(StandardActions.COPY_FIELD_ABSTRACT, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return copyFieldContentMenu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Menu createSendSubMenu(ActionFactory factory,
+&nbsp;                                          DialogService dialogService,
+&nbsp;                                          StateManager stateManager,
+&nbsp;                                          GuiPreferences preferences,
+&nbsp;                                          BibEntryTypesManager entryTypesManager,
+&nbsp;                                          TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        Menu sendMenu = factory.createMenu(StandardActions.SEND);</b>
+<b class="nc">&nbsp;        sendMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor)),</b>
+&nbsp;                new SeparatorMenuItem()
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return sendMenu;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

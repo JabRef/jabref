@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FilteredListProxy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: FilteredListProxy (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FilteredListProxy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.ListIterator;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import javafx.collections.ObservableListBase;
+&nbsp;import javafx.collections.transformation.FilteredList;
+&nbsp;
+&nbsp;import org.jabref.gui.maintable.BibEntryTableViewModel;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class FilteredListProxy {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FilteredListProxy.class);</b>
+<b class="nc">&nbsp;    private static boolean initialized = false;</b>
+&nbsp;    private static Method BEGIN_CHANGE_METHOD;
+&nbsp;    private static Method END_CHANGE_METHOD;
+&nbsp;    private static Method NEXT_ADD_METHOD;
+&nbsp;    private static Method NEXT_UPDATE_METHOD;
+&nbsp;    private static Method NEXT_REMOVE_METHOD;
+&nbsp;    private static Method REFILTER_METHOD;
+&nbsp;    private static Method ENSURE_SIZE_METHOD;
+&nbsp;    private static Method GET_PREDICATE_IMPL_METHOD;
+&nbsp;    private static Field FILTERED_FIELD;
+&nbsp;    private static Field SIZE_FIELD;
+&nbsp;
+&nbsp;    public static void refilterListReflection(FilteredList&lt;BibEntryTableViewModel&gt; filteredList) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (!initialized) {</b>
+<b class="nc">&nbsp;                initReflection();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            REFILTER_METHOD.invoke(filteredList);</b>
+&nbsp;        } catch (IllegalAccessException
+&nbsp;                 | InvocationTargetException
+&nbsp;                 | NoSuchMethodException
+&nbsp;                 | NoSuchFieldException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not refilter list&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void refilterListReflection(FilteredList&lt;BibEntryTableViewModel&gt; filteredList, int sourceFrom, int sourceTo) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (!initialized) {</b>
+<b class="nc">&nbsp;                initReflection();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (sourceFrom &lt; 0 || sourceTo &gt; filteredList.getSource().size() || sourceFrom &gt; sourceTo) {</b>
+<b class="nc">&nbsp;                throw new IndexOutOfBoundsException();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            BEGIN_CHANGE_METHOD.invoke(filteredList);</b>
+<b class="nc">&nbsp;            ENSURE_SIZE_METHOD.invoke(filteredList, filteredList.getSource().size());</b>
+&nbsp;
+&nbsp;            @SuppressWarnings(&quot;unchecked&quot;)
+<b class="nc">&nbsp;            Predicate&lt;BibEntryTableViewModel&gt; predicateImpl = (Predicate&lt;BibEntryTableViewModel&gt;) GET_PREDICATE_IMPL_METHOD.invoke(filteredList);</b>
+<b class="nc">&nbsp;            ListIterator&lt;? extends BibEntryTableViewModel&gt; it = filteredList.getSource().listIterator(sourceFrom);</b>
+&nbsp;
+<b class="nc">&nbsp;            int[] filtered = (int[]) FILTERED_FIELD.get(filteredList);</b>
+<b class="nc">&nbsp;            int size = (int) SIZE_FIELD.get(filteredList);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (int i = sourceFrom; i &lt; sourceTo; ++i) {</b>
+<b class="nc">&nbsp;                BibEntryTableViewModel el = it.next();</b>
+<b class="nc">&nbsp;                int pos = Arrays.binarySearch(filtered, 0, size, i);</b>
+<b class="nc">&nbsp;                boolean passedBefore = pos &gt;= 0;</b>
+<b class="nc">&nbsp;                boolean passedNow = predicateImpl.test(el);</b>
+&nbsp;                /* 1. passed before and now -&gt; nextUpdate
+&nbsp;                 * 2. passed before and not now -&gt; nextRemove
+&nbsp;                 * 3. not passed before and now -&gt; nextAdd
+&nbsp;                 * 4. not passed before and not now -&gt; do nothing */
+<b class="nc">&nbsp;                if (passedBefore &amp;&amp; passedNow) {</b>
+<b class="nc">&nbsp;                    NEXT_UPDATE_METHOD.invoke(filteredList, pos);</b>
+<b class="nc">&nbsp;                } else if (passedBefore) {</b>
+<b class="nc">&nbsp;                    NEXT_REMOVE_METHOD.invoke(filteredList, pos, el);</b>
+<b class="nc">&nbsp;                    System.arraycopy(filtered, pos + 1, filtered, pos, size - pos - 1);</b>
+<b class="nc">&nbsp;                    size--;</b>
+<b class="nc">&nbsp;                } else if (passedNow) {</b>
+<b class="nc">&nbsp;                    int insertionPoint = ~pos;</b>
+<b class="nc">&nbsp;                    System.arraycopy(filtered, insertionPoint, filtered, insertionPoint + 1, size - insertionPoint);</b>
+<b class="nc">&nbsp;                    filtered[insertionPoint] = i;</b>
+<b class="nc">&nbsp;                    NEXT_ADD_METHOD.invoke(filteredList, insertionPoint, insertionPoint + 1);</b>
+<b class="nc">&nbsp;                    size++;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // Write back
+<b class="nc">&nbsp;            FILTERED_FIELD.set(filteredList, filtered);</b>
+<b class="nc">&nbsp;            SIZE_FIELD.set(filteredList, size);</b>
+&nbsp;
+<b class="nc">&nbsp;            END_CHANGE_METHOD.invoke(filteredList);</b>
+&nbsp;        } catch (ReflectiveOperationException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not refilter list&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void initReflection() throws NoSuchMethodException, NoSuchFieldException {
+<b class="nc">&nbsp;        BEGIN_CHANGE_METHOD = ObservableListBase.class.getDeclaredMethod(&quot;beginChange&quot;);</b>
+<b class="nc">&nbsp;        END_CHANGE_METHOD = ObservableListBase.class.getDeclaredMethod(&quot;endChange&quot;);</b>
+<b class="nc">&nbsp;        NEXT_ADD_METHOD = ObservableListBase.class.getDeclaredMethod(&quot;nextAdd&quot;, int.class, int.class);</b>
+<b class="nc">&nbsp;        NEXT_UPDATE_METHOD = ObservableListBase.class.getDeclaredMethod(&quot;nextUpdate&quot;, int.class);</b>
+<b class="nc">&nbsp;        NEXT_REMOVE_METHOD = ObservableListBase.class.getDeclaredMethod(&quot;nextRemove&quot;, int.class, Object.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        REFILTER_METHOD = FilteredList.class.getDeclaredMethod(&quot;refilter&quot;);</b>
+<b class="nc">&nbsp;        ENSURE_SIZE_METHOD = FilteredList.class.getDeclaredMethod(&quot;ensureSize&quot;, int.class);</b>
+<b class="nc">&nbsp;        GET_PREDICATE_IMPL_METHOD = FilteredList.class.getDeclaredMethod(&quot;getPredicateImpl&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        FILTERED_FIELD = FilteredList.class.getDeclaredField(&quot;filtered&quot;);</b>
+<b class="nc">&nbsp;        SIZE_FIELD = FilteredList.class.getDeclaredField(&quot;size&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        BEGIN_CHANGE_METHOD.setAccessible(true);</b>
+<b class="nc">&nbsp;        END_CHANGE_METHOD.setAccessible(true);</b>
+<b class="nc">&nbsp;        NEXT_ADD_METHOD.setAccessible(true);</b>
+<b class="nc">&nbsp;        NEXT_UPDATE_METHOD.setAccessible(true);</b>
+<b class="nc">&nbsp;        NEXT_REMOVE_METHOD.setAccessible(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        REFILTER_METHOD.setAccessible(true);</b>
+<b class="nc">&nbsp;        ENSURE_SIZE_METHOD.setAccessible(true);</b>
+<b class="nc">&nbsp;        GET_PREDICATE_IMPL_METHOD.setAccessible(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        FILTERED_FIELD.setAccessible(true);</b>
+<b class="nc">&nbsp;        SIZE_FIELD.setAccessible(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        initialized = true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

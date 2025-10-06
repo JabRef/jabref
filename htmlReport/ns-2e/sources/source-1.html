@@ -1,0 +1,265 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AiChatTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: AiChatTab (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AiChatTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
+&nbsp;import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
+&nbsp;import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.ai.util.CitationKeyCheck;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;public class AiChatTab extends EntryEditorTab {
+&nbsp;    private final AiService aiService;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+&nbsp;    private final EntryEditorPreferences entryEditorPreferences;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final AdaptVisibleTabs adaptVisibleTabs;
+&nbsp;    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+&nbsp;
+<b class="nc">&nbsp;    private Optional&lt;BibEntry&gt; previousBibEntry = Optional.empty();</b>
+&nbsp;
+&nbsp;    public AiChatTab(AiService aiService,
+&nbsp;                     DialogService dialogService,
+&nbsp;                     GuiPreferences preferences,
+&nbsp;                     StateManager stateManager,
+&nbsp;                     AdaptVisibleTabs adaptVisibleTabs,
+<b class="nc">&nbsp;                     TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.aiPreferences = preferences.getAiPreferences();</b>
+<b class="nc">&nbsp;        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();</b>
+<b class="nc">&nbsp;        this.entryEditorPreferences = preferences.getEntryEditorPreferences();</b>
+<b class="nc">&nbsp;        this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.adaptVisibleTabs = adaptVisibleTabs;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        setText(Localization.lang(&quot;AI chat&quot;));</b>
+<b class="nc">&nbsp;        setTooltip(new Tooltip(Localization.lang(&quot;Chat with AI about content of attached file(s)&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean shouldShow(BibEntry entry) {
+<b class="nc">&nbsp;        return entryEditorPreferences.shouldShowAiChatTab();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @implNote Method similar to {@link AiSummaryTab#bindToEntry(BibEntry)}
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    protected void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        previousBibEntry.ifPresent(previousBibEntry -&gt; aiService.getChatHistoryService().closeChatHistoryForEntry(previousBibEntry));</b>
+<b class="nc">&nbsp;        previousBibEntry = Optional.of(entry);</b>
+<b class="nc">&nbsp;        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!aiPreferences.getEnableAi()) {</b>
+<b class="nc">&nbsp;            showPrivacyNotice(entry);</b>
+<b class="nc">&nbsp;        } else if (entry.getFiles().isEmpty()) {</b>
+<b class="nc">&nbsp;            showErrorNoFiles();</b>
+<b class="nc">&nbsp;        } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {</b>
+<b class="nc">&nbsp;            showErrorNotPdfs();</b>
+<b class="nc">&nbsp;        } else if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {</b>
+<b class="nc">&nbsp;            tryToGenerateCitationKeyThenBind(bibDatabaseContext, entry);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            showChatPanel(bibDatabaseContext, entry);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showPrivacyNotice(BibEntry entry) {
+<b class="nc">&nbsp;        setContent(new PrivacyNoticeComponent(aiPreferences, () -&gt; bindToEntry(entry), externalApplicationsPreferences, dialogService, adaptVisibleTabs));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showErrorNotPdfs() {
+<b class="nc">&nbsp;        setContent(</b>
+&nbsp;                new ErrorStateComponent(
+<b class="nc">&nbsp;                        Localization.lang(&quot;Unable to chat&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Only PDF files are supported.&quot;)</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showErrorNoFiles() {
+<b class="nc">&nbsp;        setContent(</b>
+&nbsp;                new ErrorStateComponent(
+<b class="nc">&nbsp;                        Localization.lang(&quot;Unable to chat&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Please attach at least one PDF file to enable chatting with PDF file(s).&quot;)</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void tryToGenerateCitationKeyThenBind(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+<b class="nc">&nbsp;        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);</b>
+<b class="nc">&nbsp;        if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {</b>
+<b class="nc">&nbsp;            setContent(</b>
+&nbsp;                    new ErrorStateComponent(
+<b class="nc">&nbsp;                            Localization.lang(&quot;Unable to chat&quot;),</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Please provide a non-empty and unique citation key for this entry.&quot;)</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            bindToEntry(entry);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showChatPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+&nbsp;        // We omit the localization here, because it is only a chat with one entry in the {@link EntryEditor}.
+&nbsp;        // See documentation for {@link AiChatGuardedComponent#name}.
+<b class="nc">&nbsp;        StringProperty chatName = new SimpleStringProperty(&quot;entry &quot; + entry.getCitationKey().orElse(&quot;&lt;no citation key&gt;&quot;));</b>
+<b class="nc">&nbsp;        entry.getCiteKeyBinding().addListener((observable, oldValue, newValue) -&gt; chatName.setValue(&quot;entry &quot; + newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        setContent(new AiChatGuardedComponent(</b>
+&nbsp;                chatName,
+<b class="nc">&nbsp;                aiService.getChatHistoryService().getChatHistoryForEntry(bibDatabaseContext, entry),</b>
+&nbsp;                bibDatabaseContext,
+<b class="nc">&nbsp;                FXCollections.observableArrayList(new ArrayList&lt;&gt;(List.of(entry))),</b>
+&nbsp;                aiService,
+&nbsp;                dialogService,
+&nbsp;                aiPreferences,
+&nbsp;                externalApplicationsPreferences,
+&nbsp;                adaptVisibleTabs,
+&nbsp;                taskExecutor
+&nbsp;        ));
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

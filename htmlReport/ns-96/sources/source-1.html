@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CAYWQueryParams</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.server.cayw</a>
+</div>
+
+<h1>Coverage Summary for Class: CAYWQueryParams (org.jabref.http.server.cayw)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CAYWQueryParams</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.server.cayw;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.push.PushApplications;
+&nbsp;
+&nbsp;import jakarta.ws.rs.DefaultValue;
+&nbsp;import jakarta.ws.rs.QueryParam;
+&nbsp;
+<b class="nc">&nbsp;public class CAYWQueryParams {</b>
+&nbsp;
+&nbsp;    /// See documentation here https://retorque.re/zotero-better-bibtex/citing/cayw/index.html#diy
+&nbsp;
+&nbsp;    @QueryParam(&quot;probe&quot;)
+&nbsp;    private String probe;
+&nbsp;
+&nbsp;    @QueryParam(&quot;format&quot;)
+&nbsp;    @DefaultValue(&quot;biblatex&quot;)
+&nbsp;    private String format;
+&nbsp;
+&nbsp;    @QueryParam(&quot;clipboard&quot;)
+&nbsp;    private String clipboard;
+&nbsp;
+&nbsp;    @QueryParam(&quot;command&quot;)
+&nbsp;    private String command;
+&nbsp;
+&nbsp;    @QueryParam(&quot;minimize&quot;)
+&nbsp;    private String minimize;
+&nbsp;
+&nbsp;    @QueryParam(&quot;texstudio&quot;)
+&nbsp;    private String texstudio;
+&nbsp;
+&nbsp;    @QueryParam(&quot;selected&quot;)
+&nbsp;    private String selected;
+&nbsp;
+&nbsp;    @QueryParam(&quot;select&quot;)
+&nbsp;    private String select;
+&nbsp;
+&nbsp;    @QueryParam(&quot;librarypath&quot;)
+&nbsp;    private String libraryPath;
+&nbsp;
+&nbsp;    @QueryParam(&quot;libraryid&quot;)
+&nbsp;    private String libraryId;
+&nbsp;
+&nbsp;    @QueryParam(&quot;application&quot;)
+&nbsp;    private String application;
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getCommand() {
+<b class="nc">&nbsp;        return Optional.ofNullable(command);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isClipboard() {
+<b class="nc">&nbsp;        return clipboard != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isTexstudio() {
+<b class="nc">&nbsp;        return texstudio != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isSelected() {
+<b class="nc">&nbsp;        return selected != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isSelect() {
+<b class="nc">&nbsp;        return &quot;true&quot;.equalsIgnoreCase(select);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isProbe() {
+<b class="nc">&nbsp;        return probe != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isMinimize() {
+<b class="nc">&nbsp;        return minimize != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFormat() {
+<b class="nc">&nbsp;        return format;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getLibraryPath() {
+<b class="nc">&nbsp;        return Optional.ofNullable(libraryPath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getLibraryId() {
+<b class="nc">&nbsp;        return Optional.ofNullable(libraryId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;PushApplications&gt; getApplication() {
+<b class="nc">&nbsp;        if (isTexstudio()) {</b>
+<b class="nc">&nbsp;            return Optional.of(PushApplications.TEXSTUDIO);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return PushApplications.getApplicationById(application);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

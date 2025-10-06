@@ -1,0 +1,270 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RangeSort</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.rangesort</a>
+</div>
+
+<h1>Coverage Summary for Class: RangeSort (org.jabref.model.openoffice.rangesort)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RangeSort</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RangeSort$HolderComparatorWithinPartition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RangeSort$RangePartitions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.rangesort;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.model.openoffice.uno.UnoCast;
+&nbsp;import org.jabref.model.openoffice.uno.UnoTextRange;
+&nbsp;
+&nbsp;import com.sun.star.text.XText;
+&nbsp;import com.sun.star.text.XTextRangeCompare;
+&nbsp;
+&nbsp;/**
+&nbsp; * RangeSort provides sorting based on XTextRangeCompare, which only provides comparison between XTextRange values within the same XText.
+&nbsp; */
+&nbsp;public class RangeSort {
+&nbsp;
+&nbsp;    private RangeSort() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compare two RangeHolders (using RangeHolder.getRange()) within an XText.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note: since we only look at the ranges, this comparison is generally not consistent with `equals` on the RangeHolders. Probably should not be used for key comparison in {@code TreeMap&lt;RangeHolder&gt;} or {@code Set&lt;RangeHolder&gt;}
+&nbsp;     */
+&nbsp;    private static class HolderComparatorWithinPartition implements Comparator&lt;RangeHolder&gt; {
+&nbsp;
+&nbsp;        private final XTextRangeCompare cmp;
+&nbsp;
+<b class="nc">&nbsp;        HolderComparatorWithinPartition(XText text) {</b>
+<b class="nc">&nbsp;            cmp = UnoCast.cast(XTextRangeCompare.class, text)</b>
+<b class="nc">&nbsp;                         .orElseThrow(java.lang.IllegalArgumentException::new);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Assumes a and b belong to the same XText as cmp.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public int compare(RangeHolder a, RangeHolder b) {
+<b class="nc">&nbsp;            return UnoTextRange.compareStartsThenEndsUnsafe(cmp, a.getRange(), b.getRange());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sort a list of RangeHolder values known to share the same getText().
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note: RangeHolder.getRange() is called many times.
+&nbsp;     */
+&nbsp;    public static &lt;V extends RangeHolder&gt; void sortWithinPartition(List&lt;V&gt; rangeHolders) {
+<b class="nc">&nbsp;        if (rangeHolders.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        XText text = rangeHolders.getFirst().getRange().getText();</b>
+<b class="nc">&nbsp;        rangeHolders.sort(new HolderComparatorWithinPartition(text));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represent a partitioning of RangeHolders by XText
+&nbsp;     */
+&nbsp;    public static class RangePartitions&lt;V extends RangeHolder&gt; {
+&nbsp;        private final Map&lt;XText, List&lt;V&gt;&gt; partitions;
+&nbsp;
+<b class="nc">&nbsp;        public RangePartitions() {</b>
+<b class="nc">&nbsp;            this.partitions = new HashMap&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void add(V holder) {
+<b class="nc">&nbsp;            XText partitionKey = holder.getRange().getText();</b>
+<b class="nc">&nbsp;            List&lt;V&gt; partition = partitions.computeIfAbsent(partitionKey, unused -&gt; new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;            partition.add(holder);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public List&lt;List&lt;V&gt;&gt; getPartitions() {
+<b class="nc">&nbsp;            return new ArrayList&lt;&gt;(partitions.values());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Partition RangeHolders by the corresponding XText.
+&nbsp;     */
+&nbsp;    public static &lt;V extends RangeHolder&gt; RangePartitions&lt;V&gt; partitionRanges(List&lt;V&gt; holders) {
+<b class="nc">&nbsp;        RangePartitions&lt;V&gt; result = new RangePartitions&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (V holder : holders) {</b>
+<b class="nc">&nbsp;            result.add(holder);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Note: RangeHolder.getRange() is called many times.
+&nbsp;     */
+&nbsp;    public static &lt;V extends RangeHolder&gt; RangePartitions&lt;V&gt; partitionAndSortRanges(List&lt;V&gt; holders) {
+<b class="nc">&nbsp;        RangePartitions&lt;V&gt; result = partitionRanges(holders);</b>
+<b class="nc">&nbsp;        for (List&lt;V&gt; partition : result.getPartitions()) {</b>
+<b class="nc">&nbsp;            sortWithinPartition(partition);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

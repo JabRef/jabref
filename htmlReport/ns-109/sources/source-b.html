@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SSRN</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.identifier</a>
+</div>
+
+<h1>Coverage Summary for Class: SSRN (org.jabref.model.entry.identifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SSRN</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.identifier;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseLogic;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents an SSRN article, identified by its abstract ID.
+&nbsp; */
+&nbsp;@AllowedToUseLogic(&quot;Because URL utility is needed&quot;)
+&nbsp;public class SSRN extends EprintIdentifier {
+&nbsp;
+&nbsp;    private static final String SSRN_URL_REGEX = &quot;(https?://)?(papers\\.)?ssrn\\.com/(sol3/papers.cfm\\?)?abstract(_id)?=(?&lt;id&gt;\\d+)&quot;;
+<b class="nc">&nbsp;    private static final Pattern SSRN_URL_FULL_MATCH = Pattern.compile(&quot;^&quot; + SSRN_URL_REGEX + &quot;$&quot;, Pattern.CASE_INSENSITIVE);</b>
+<b class="nc">&nbsp;    private static final Pattern SSRN_URL_MATCH = Pattern.compile(SSRN_URL_REGEX, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+&nbsp;    private final Integer abstractId;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tries to parse an SSRN identifier
+&nbsp;     *
+&nbsp;     * @param string Either a number or a SSRN url that has the abstract ID in it
+&nbsp;     * @throws NullPointerException     If you pass a null to the constructor
+&nbsp;     * @throws IllegalArgumentException Invalid string passed to the constructor
+&nbsp;     */
+<b class="nc">&nbsp;    public SSRN(String string) {</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(string);</b>
+<b class="nc">&nbsp;        string = string.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (string.chars().allMatch(Character::isDigit)) {</b>
+<b class="nc">&nbsp;            abstractId = Integer.parseInt(string);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Matcher matcher = SSRN_URL_FULL_MATCH.matcher(string);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            abstractId = Integer.parseInt(matcher.group(&quot;id&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        throw new IllegalArgumentException(string + &quot; is not a valid SSRN identifier&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public SSRN(Integer abstractId) {</b>
+<b class="nc">&nbsp;        this.abstractId = abstractId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;SSRN&gt; parse(String data) {
+<b class="nc">&nbsp;        Matcher matcher = SSRN_URL_MATCH.matcher(data);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            int abstractId = Integer.parseInt(matcher.group(&quot;id&quot;));</b>
+<b class="nc">&nbsp;            return Optional.of(new SSRN(abstractId));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String asString() {
+<b class="nc">&nbsp;        return String.valueOf(abstractId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URI&gt; getExternalURI() {
+<b class="nc">&nbsp;        URI uri = URLUtil.createUri(&quot;https://ssrn.com/abstract=&quot; + abstractId);</b>
+<b class="nc">&nbsp;        return Optional.of(uri);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generate the DOI based on the SSRN
+&nbsp;     *
+&nbsp;     * @return a DOI formatted as &lt;code&gt;10.2139/ssrn.[article]&lt;/code&gt;
+&nbsp;     */
+&nbsp;    public DOI toDoi() {
+<b class="nc">&nbsp;        return new DOI(&quot;10.2139/ssrn.&quot; + abstractId);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

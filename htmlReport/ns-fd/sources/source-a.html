@@ -1,0 +1,340 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RegExpBasedFileFinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: RegExpBasedFileFinder (org.jabref.logic.util.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RegExpBasedFileFinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.io;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.file.FileVisitOption;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.attribute.BasicFileAttributes;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.BiPredicate;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.regex.PatternSyntaxException;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.citationkeypattern.BracketedPattern;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;class RegExpBasedFileFinder implements FileFinder {
+&nbsp;
+&nbsp;    private static final String EXT_MARKER = &quot;__EXTENSION__&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern ESCAPE_PATTERN = Pattern.compile(&quot;([^\\\\])\\\\([^\\\\])&quot;);</b>
+&nbsp;
+&nbsp;    private final String regExp;
+&nbsp;    private final Character keywordDelimiter;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param regExp The expression deciding which names are acceptable.
+&nbsp;     */
+<b class="nc">&nbsp;    RegExpBasedFileFinder(String regExp, Character keywordDelimiter) {</b>
+<b class="nc">&nbsp;        this.regExp = regExp;</b>
+<b class="nc">&nbsp;        this.keywordDelimiter = keywordDelimiter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a Pattern that matches the file name corresponding to the last element of {@code fileParts} with any bracketed patterns expanded.
+&nbsp;     *
+&nbsp;     * @throws IOException throws an IOException if a PatternSyntaxException occurs
+&nbsp;     */
+&nbsp;    private Pattern createFileNamePattern(String[] fileParts, String extensionRegExp, BibEntry entry) throws IOException {
+&nbsp;        // Protect the extension marker so that it isn&#39;t treated as a bracketed pattern
+<b class="nc">&nbsp;        String filePart = fileParts[fileParts.length - 1].replace(&quot;[extension]&quot;, EXT_MARKER);</b>
+&nbsp;
+&nbsp;        // We need to supply a custom function to deal with the content of a bracketed expression and expandBracketContent is the default function
+<b class="nc">&nbsp;        Function&lt;String, String&gt; expandBracket = BracketedPattern.expandBracketContent(keywordDelimiter, entry, null);</b>
+&nbsp;        // but, we want to post-process the expanded content so that it can be used as a regex for finding a file name
+<b class="nc">&nbsp;        Function&lt;String, String&gt; bracketToFileNameRegex = expandBracket.andThen(RegExpBasedFileFinder::toFileNameRegex);</b>
+&nbsp;
+<b class="nc">&nbsp;        String expandedBracketAsFileNameRegex = BracketedPattern.expandBrackets(filePart, bracketToFileNameRegex);</b>
+&nbsp;
+<b class="nc">&nbsp;        String fileNamePattern = expandedBracketAsFileNameRegex</b>
+<b class="nc">&nbsp;                .replaceAll(EXT_MARKER, extensionRegExp) // Replace the extension marker</b>
+<b class="nc">&nbsp;                .replaceAll(&quot;\\\\\\\\&quot;, &quot;\\\\&quot;);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return Pattern.compile(&#39;^&#39; + fileNamePattern + &#39;$&#39;, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;        } catch (PatternSyntaxException e) {
+<b class="nc">&nbsp;            throw new IOException(&quot;There is a syntax error in the regular expression %s used to search for files&quot;.formatted(fileNamePattern), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Helper method for both exact matching (if the file name were not created by JabRef) and cleaned file name matching.
+&nbsp;     *
+&nbsp;     * @param expandedContent the expanded content of a bracketed expression
+&nbsp;     * @return a String representation of a regex matching the expanded content and the expanded content cleaned for file name use
+&nbsp;     */
+&nbsp;    private static String toFileNameRegex(String expandedContent) {
+<b class="nc">&nbsp;        String cleanedContent = FileNameCleaner.cleanFileName(expandedContent);</b>
+<b class="nc">&nbsp;        return expandedContent.equals(cleanedContent) ? Pattern.quote(expandedContent) :</b>
+<b class="nc">&nbsp;               &quot;(&quot; + Pattern.quote(expandedContent) + &quot;)|(&quot; + Pattern.quote(cleanedContent) + &quot;)&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Method for searching for files using regexp. A list of extensions and directories can be
+&nbsp;     * given.
+&nbsp;     *
+&nbsp;     * @param entry       The entry to search for.
+&nbsp;     * @param extensions  The extensions that are acceptable.
+&nbsp;     * @param directories The root directories to search.
+&nbsp;     * @return A list of files paths matching the given criteria.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;Path&gt; findAssociatedFiles(BibEntry entry, List&lt;Path&gt; directories, List&lt;String&gt; extensions) throws IOException {
+<b class="nc">&nbsp;        String extensionRegExp = &#39;(&#39; + String.join(&quot;|&quot;, extensions) + &#39;)&#39;;</b>
+<b class="nc">&nbsp;        return findFile(entry, directories, extensionRegExp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Searches the given directory and filename pattern for a file for the
+&nbsp;     * BibTeX entry.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Used to fix:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * http://sourceforge.net/tracker/index.php?func=detail&amp;aid=1503410&amp;group_id=92314&amp;atid=600309
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Requirements:
+&nbsp;     * - Be able to find the associated PDF in a set of given directories.
+&nbsp;     * - Be able to return a relative path or absolute path.
+&nbsp;     * - Be fast.
+&nbsp;     * - Allow for flexible naming schemes in the PDFs.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Syntax scheme for file:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;* Any subDir&lt;/li&gt;
+&nbsp;     * &lt;li&gt;** Any subDir (recursive)&lt;/li&gt;
+&nbsp;     * &lt;li&gt;[key] Key from BibTeX file and database&lt;/li&gt;
+&nbsp;     * &lt;li&gt;.* Anything else is taken to be a Regular expression.&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param entry non-null
+&nbsp;     * @param dirs  A set of root directories to start the search from. Paths are
+&nbsp;     *              returned relative to these directories if relative is set to
+&nbsp;     *              true. These directories will not be expanded or anything. Use
+&nbsp;     *              the file attribute for this.
+&nbsp;     * @return Will return the first file found to match the given criteria or
+&nbsp;     * null if none was found.
+&nbsp;     */
+&nbsp;    private List&lt;Path&gt; findFile(BibEntry entry, List&lt;Path&gt; dirs, String extensionRegExp) throws IOException {
+<b class="nc">&nbsp;        List&lt;Path&gt; res = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Path directory : dirs) {</b>
+<b class="nc">&nbsp;            res.addAll(findFile(entry, directory, regExp, extensionRegExp));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return res;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The actual work-horse. Will find absolute filepaths starting from the
+&nbsp;     * given directory using the given regular expression string for search.
+&nbsp;     */
+&nbsp;    private List&lt;Path&gt; findFile(final BibEntry entry, final Path directory, final String file, final String extensionRegExp) throws IOException {
+<b class="nc">&nbsp;        List&lt;Path&gt; resultFiles = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        String fileName = file;</b>
+&nbsp;        Path currentDirectory;
+<b class="nc">&nbsp;        if (fileName.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;            currentDirectory = Path.of(&quot;.&quot;);</b>
+<b class="nc">&nbsp;            fileName = fileName.substring(1);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            currentDirectory = directory;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Escape handling...
+<b class="nc">&nbsp;        Matcher m = ESCAPE_PATTERN.matcher(fileName);</b>
+<b class="nc">&nbsp;        StringBuilder s = new StringBuilder();</b>
+<b class="nc">&nbsp;        while (m.find()) {</b>
+<b class="nc">&nbsp;            m.appendReplacement(s, m.group(1) + &#39;/&#39; + m.group(2));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        m.appendTail(s);</b>
+<b class="nc">&nbsp;        fileName = s.toString();</b>
+<b class="nc">&nbsp;        String[] fileParts = fileName.split(&quot;/&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fileParts.length == 0) {</b>
+<b class="nc">&nbsp;            return resultFiles;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; (fileParts.length - 1); index++) {</b>
+<b class="nc">&nbsp;            String dirToProcess = fileParts[index];</b>
+&nbsp;
+<b class="nc">&nbsp;            if (dirToProcess.matches(&quot;^.:$&quot;)) { // Windows Drive Letter</b>
+<b class="nc">&nbsp;                currentDirectory = Path.of(dirToProcess + &#39;/&#39;);</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            switch (dirToProcess) {</b>
+&nbsp;                case &quot;.&quot; -&gt; {
+&nbsp;                    // Stay in current directory
+&nbsp;                }
+&nbsp;                case &quot;..&quot; -&gt; {
+<b class="nc">&nbsp;                    currentDirectory = currentDirectory.getParent();</b>
+&nbsp;                }
+&nbsp;                case &quot;*&quot; -&gt; { // for all direct subdirs
+<b class="nc">&nbsp;                    String restOfFileString = StringUtil.join(fileParts, &quot;/&quot;, index + 1, fileParts.length);</b>
+&nbsp;
+<b class="nc">&nbsp;                    final Path rootDirectory = currentDirectory;</b>
+<b class="nc">&nbsp;                    try (Stream&lt;Path&gt; pathStream = Files.walk(currentDirectory, 1)) {</b>
+<b class="nc">&nbsp;                        List&lt;Path&gt; subDirs = pathStream</b>
+<b class="nc">&nbsp;                                .filter(path -&gt; isSubDirectory(rootDirectory, path))  // We only want to transverse directories (and not the current one; this is already done below)</b>
+<b class="nc">&nbsp;                                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;                        for (Path subDir : subDirs) {</b>
+<b class="nc">&nbsp;                            resultFiles.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));</b>
+&nbsp;                        }
+&nbsp;                    } catch (UncheckedIOException ioe) {
+<b class="nc">&nbsp;                        throw ioe.getCause();</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case &quot;**&quot; -&gt; { // for all direct and indirect subdirs
+<b class="nc">&nbsp;                    String restOfFileString = StringUtil.join(fileParts, &quot;/&quot;, index + 1, fileParts.length);</b>
+&nbsp;
+<b class="nc">&nbsp;                    final Path rootDirectory = currentDirectory;</b>
+<b class="nc">&nbsp;                    try (Stream&lt;Path&gt; pathStream = Files.walk(currentDirectory)) {</b>
+<b class="nc">&nbsp;                        List&lt;Path&gt; subDirs = pathStream</b>
+<b class="nc">&nbsp;                                .filter(path -&gt; isSubDirectory(rootDirectory, path))  // We only want to transverse directories (and not the current one; this is already done below)</b>
+<b class="nc">&nbsp;                                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;                        for (Path subDir : subDirs) {</b>
+<b class="nc">&nbsp;                            resultFiles.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));</b>
+&nbsp;                        }
+&nbsp;                    } catch (UncheckedIOException ioe) {
+<b class="nc">&nbsp;                        throw ioe.getCause();</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } // End process directory information
+&nbsp;        }
+&nbsp;
+&nbsp;        // Last step: check if the given file can be found in this directory
+<b class="nc">&nbsp;        Pattern toMatch = createFileNamePattern(fileParts, extensionRegExp, entry);</b>
+<b class="nc">&nbsp;        BiPredicate&lt;Path, BasicFileAttributes&gt; matcher = (path, _) -&gt; toMatch.matcher(path.getFileName().toString()).matches();</b>
+<b class="nc">&nbsp;        try (Stream&lt;Path&gt; pathStream = Files.find(currentDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {</b>
+<b class="nc">&nbsp;            resultFiles.addAll(pathStream.toList());</b>
+&nbsp;        } catch (UncheckedIOException uncheckedIOException) {
+&nbsp;            // Previously, an empty list were returned here on both IOException and UncheckedIOException
+<b class="nc">&nbsp;            throw uncheckedIOException.getCause();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return resultFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isSubDirectory(Path rootDirectory, Path path) {
+<b class="nc">&nbsp;        return !rootDirectory.equals(path) &amp;&amp; Files.isDirectory(path);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

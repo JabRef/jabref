@@ -1,0 +1,146 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RangeForOverlapCheck</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.frontend</a>
+</div>
+
+<h1>Coverage Summary for Class: RangeForOverlapCheck (org.jabref.logic.openoffice.frontend)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RangeForOverlapCheck</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.frontend;
+&nbsp;
+&nbsp;import org.jabref.model.openoffice.rangesort.RangeHolder;
+&nbsp;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;
+&nbsp;/**
+&nbsp; * Describe a protected range for overlap checking and reporting.
+&nbsp; * &lt;p&gt;
+&nbsp; * To check that our protected ranges do not overlap, we collect these ranges. To check for overlaps between these, we need the {@code range} itself. To report the results of overlap checking, we need a {@code description} that can be understood by the user.
+&nbsp; * &lt;p&gt;
+&nbsp; * To be able to refer back to more extended data, we might need to identify its {@code kind}, and its index in the corresponding tables or other identifier within its kind ({@code idWithinKind})
+&nbsp; */
+&nbsp;public class RangeForOverlapCheck&lt;T&gt; implements RangeHolder {
+&nbsp;
+&nbsp;    public final static int REFERENCE_MARK_KIND = 0;
+&nbsp;    public final static int FOOTNOTE_MARK_KIND = 1;
+&nbsp;    public final static int CURSOR_MARK_KIND = 2;
+&nbsp;    public final static int BIBLIOGRAPHY_MARK_KIND = 3;
+&nbsp;
+&nbsp;    public final XTextRange range;
+&nbsp;
+&nbsp;    public final int kind;
+&nbsp;    public final T idWithinKind;
+&nbsp;    private final String description;
+&nbsp;
+<b class="nc">&nbsp;    public RangeForOverlapCheck(XTextRange range, T idWithinKind, int kind, String description) {</b>
+<b class="nc">&nbsp;        this.range = range;</b>
+<b class="nc">&nbsp;        this.kind = kind;</b>
+<b class="nc">&nbsp;        this.idWithinKind = idWithinKind;</b>
+<b class="nc">&nbsp;        this.description = description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String format() {
+<b class="nc">&nbsp;        return description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public XTextRange getRange() {
+<b class="nc">&nbsp;        return range;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

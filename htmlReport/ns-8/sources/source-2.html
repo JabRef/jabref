@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AiChatGuardedComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.ai.components.aichat</a>
+</div>
+
+<h1>Coverage Summary for Class: AiChatGuardedComponent (org.jabref.gui.ai.components.aichat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AiChatGuardedComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.ai.components.aichat;
+&nbsp;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.Node;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.ai.components.util.EmbeddingModelGuardedComponent;
+&nbsp;import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import dev.langchain4j.data.message.ChatMessage;
+&nbsp;
+&nbsp;/**
+&nbsp; * Main class for AI chatting. It checks if the AI features are enabled and if the embedding model is properly set up.
+&nbsp; */
+&nbsp;public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
+&nbsp;    /// This field is used for two purposes:
+&nbsp;    /// 1. Logging
+&nbsp;    /// 2. Title of group chat window
+&nbsp;    /// Thus, if you use {@link AiChatGuardedComponent} for one entry in {@link org.jabref.gui.entryeditor.EntryEditor}, then you may not localize
+&nbsp;    /// this parameter. However, for group chat window, you should.
+&nbsp;    private final StringProperty name;
+&nbsp;
+&nbsp;    private final ObservableList&lt;ChatMessage&gt; chatHistory;
+&nbsp;    private final BibDatabaseContext bibDatabaseContext;
+&nbsp;    private final ObservableList&lt;BibEntry&gt; entries;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public AiChatGuardedComponent(StringProperty name,
+&nbsp;                                  ObservableList&lt;ChatMessage&gt; chatHistory,
+&nbsp;                                  BibDatabaseContext bibDatabaseContext,
+&nbsp;                                  ObservableList&lt;BibEntry&gt; entries,
+&nbsp;                                  AiService aiService,
+&nbsp;                                  DialogService dialogService,
+&nbsp;                                  AiPreferences aiPreferences,
+&nbsp;                                  ExternalApplicationsPreferences externalApplicationsPreferences,
+&nbsp;                                  AdaptVisibleTabs adaptVisibleTabs,
+&nbsp;                                  TaskExecutor taskExecutor
+&nbsp;    ) {
+<b class="nc">&nbsp;        super(aiService, aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.chatHistory = chatHistory;</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+<b class="nc">&nbsp;        this.entries = entries;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        rebuildUi();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Node showEmbeddingModelGuardedContent() {
+<b class="nc">&nbsp;        return new AiChatComponent(</b>
+&nbsp;                aiService,
+&nbsp;                name,
+&nbsp;                chatHistory,
+&nbsp;                entries,
+&nbsp;                bibDatabaseContext,
+&nbsp;                aiPreferences,
+&nbsp;                dialogService,
+&nbsp;                taskExecutor
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

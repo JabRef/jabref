@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RangeSortVisual</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.rangesort</a>
+</div>
+
+<h1>Coverage Summary for Class: RangeSortVisual (org.jabref.model.openoffice.rangesort)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RangeSortVisual</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RangeSortVisual$ComparableMark</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.rangesort;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.openoffice.uno.UnoScreenRefresh;
+&nbsp;
+&nbsp;import com.sun.star.awt.Point;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;import com.sun.star.text.XTextViewCursor;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Sort XTextRange values visually (top-down,left-to-right).
+&nbsp; * &lt;p&gt;
+&nbsp; * Requires functional XTextViewCursor.
+&nbsp; * &lt;p&gt;
+&nbsp; * Problem: for multicolumn layout and when viewing pages side-by-side in LO, the (top-down,left-to-right) order interpreted as-on-the-screen: an XTextRange at the top of the second column or second page is sorted before an XTextRange at the bottom of the first column of the first page.
+&nbsp; */
+&nbsp;public class RangeSortVisual {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(RangeSortVisual.class);</b>
+&nbsp;
+&nbsp;    private RangeSortVisual() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sort the input {@code inputs} visually.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Requires a functional {@code XTextViewCursor}.
+&nbsp;     *
+&nbsp;     * @return The input, sorted by the elements XTextRange and getIndexInPosition.
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; List&lt;RangeSortable&lt;T&gt;&gt; visualSort(List&lt;RangeSortable&lt;T&gt;&gt; inputs,
+&nbsp;                                                        XTextDocument doc,
+&nbsp;                                                        FunctionalTextViewCursor fcursor) {
+&nbsp;
+<b class="nc">&nbsp;        if (UnoScreenRefresh.hasControllersLocked(doc)) {</b>
+<b class="nc">&nbsp;            final String msg = &quot;visualSort: with ControllersLocked, viewCursor.gotoRange is probably useless&quot;;</b>
+<b class="nc">&nbsp;            LOGGER.warn(msg);</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(msg);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        XTextViewCursor viewCursor = fcursor.getViewCursor();</b>
+&nbsp;
+<b class="nc">&nbsp;        final int inputSize = inputs.size();</b>
+&nbsp;
+&nbsp;        // find coordinates
+<b class="nc">&nbsp;        List&lt;Point&gt; positions = new ArrayList&lt;&gt;(inputSize);</b>
+<b class="nc">&nbsp;        for (RangeSortable&lt;T&gt; v : inputs) {</b>
+<b class="nc">&nbsp;            positions.add(findPositionOfTextRange(v.getRange(), viewCursor));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        fcursor.restore(doc);</b>
+&nbsp;
+&nbsp;        // order by position
+<b class="nc">&nbsp;        ArrayList&lt;ComparableMark&lt;RangeSortable&lt;T&gt;&gt;&gt; comparableMarks = new ArrayList&lt;&gt;(inputSize);</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; inputSize; i++) {</b>
+<b class="nc">&nbsp;            RangeSortable&lt;T&gt; input = inputs.get(i);</b>
+<b class="nc">&nbsp;            comparableMarks.add(new ComparableMark&lt;&gt;(positions.get(i),</b>
+<b class="nc">&nbsp;                    input.getIndexInPosition(),</b>
+&nbsp;                    input));
+&nbsp;        }
+<b class="nc">&nbsp;        comparableMarks.sort(RangeSortVisual::compareTopToBottomLeftToRight);</b>
+&nbsp;
+&nbsp;        // collect ordered result
+<b class="nc">&nbsp;        List&lt;RangeSortable&lt;T&gt;&gt; result = new ArrayList&lt;&gt;(comparableMarks.size());</b>
+<b class="nc">&nbsp;        for (ComparableMark&lt;RangeSortable&lt;T&gt;&gt; mark : comparableMarks) {</b>
+<b class="nc">&nbsp;            result.add(mark.content());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (result.size() != inputSize) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;visualSort: result.size() != inputSize&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Given a location, return its position: coordinates relative to the top left position of the first page of the document.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note: for text layouts with two or more columns, this gives the wrong order: top-down/left-to-right does not match reading order.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note: The &quot;relative to the top left position of the first page&quot; is meant &quot;as it appears on the screen&quot;.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In particular: when viewing pages side-by-side, the top half of the right page is higher than the lower half of the left page. Again, top-down/left-to-right does not match reading order.
+&nbsp;     *
+&nbsp;     * @param range  Location.
+&nbsp;     * @param cursor To get the position, we need az XTextViewCursor. It will be moved to the range.
+&nbsp;     */
+&nbsp;    private static Point findPositionOfTextRange(XTextRange range, XTextViewCursor cursor) {
+<b class="nc">&nbsp;        cursor.gotoRange(range, false);</b>
+<b class="nc">&nbsp;        return cursor.getPosition();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static &lt;T&gt; int compareTopToBottomLeftToRight(ComparableMark&lt;T&gt; a, ComparableMark&lt;T&gt; b) {
+<b class="nc">&nbsp;        if (a.position.Y != b.position.Y) {</b>
+<b class="nc">&nbsp;            return a.position.Y - b.position.Y;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (a.position.X != b.position.X) {</b>
+<b class="nc">&nbsp;            return a.position.X - b.position.X;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return a.indexInPosition - b.indexInPosition;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A reference mark name paired with its visual position.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Comparison is based on (Y,X,indexInPosition): vertical compared first, horizontal second, indexInPosition third.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Used for sorting reference marks by their visual positions.
+&nbsp;     */
+<b class="nc">&nbsp;    private record ComparableMark&lt;T&gt;(Point position, int indexInPosition, T content) {</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

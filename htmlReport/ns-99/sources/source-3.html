@@ -1,0 +1,223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SelectEntriesCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.server.command</a>
+</div>
+
+<h1>Coverage Summary for Class: SelectEntriesCommand (org.jabref.http.server.command)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SelectEntriesCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.server.command;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.http.JabRefSrvStateManager;
+&nbsp;import org.jabref.logic.command.CommandSelectionTab;
+&nbsp;import org.jabref.logic.util.io.BackupFileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonIgnore;
+&nbsp;import com.fasterxml.jackson.annotation.JsonProperty;
+&nbsp;import com.fasterxml.jackson.annotation.JsonTypeName;
+&nbsp;import jakarta.ws.rs.core.Response;
+&nbsp;import org.glassfish.hk2.api.ServiceLocator;
+&nbsp;
+&nbsp;@JsonTypeName(&quot;selectentries&quot;)
+&nbsp;public class SelectEntriesCommand implements Command {
+&nbsp;
+&nbsp;    @JsonIgnore
+&nbsp;    private ServiceLocator serviceLocator;
+&nbsp;
+<b class="nc">&nbsp;    @JsonProperty</b>
+&nbsp;    private String libraryId = &quot;&quot;;
+<b class="nc">&nbsp;    @JsonProperty</b>
+&nbsp;    private List&lt;String&gt; citationKeys = new ArrayList&lt;&gt;();
+<b class="nc">&nbsp;    @JsonProperty</b>
+&nbsp;    private List&lt;String&gt; entryIds = new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;    public SelectEntriesCommand() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Response execute() {
+<b class="nc">&nbsp;        if (getSrvStateManager() instanceof JabRefSrvStateManager) {</b>
+<b class="nc">&nbsp;            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)</b>
+<b class="nc">&nbsp;                           .entity(&quot;This command is not supported in CLI mode.&quot;)</b>
+<b class="nc">&nbsp;                           .build();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;CommandSelectionTab&gt; activeTab = getSrvStateManager().getActiveSelectionTabProperty().getValue();</b>
+<b class="nc">&nbsp;        if (activeTab.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Response.status(Response.Status.BAD_REQUEST)</b>
+<b class="nc">&nbsp;                           .entity(&quot;This command cannot be executed because no library is opened.&quot;)</b>
+<b class="nc">&nbsp;                           .build();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CommandSelectionTab commandSelectionTab = activeTab.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!getLibraryIdFromContext(commandSelectionTab.getBibDatabaseContext()).equals(libraryId)) {</b>
+<b class="nc">&nbsp;            return Response.status(Response.Status.BAD_REQUEST)</b>
+<b class="nc">&nbsp;                           .entity(&quot;This command cannot be executed because the libraryId does not match the active selection tab.&quot;)</b>
+<b class="nc">&nbsp;                           .build();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = commandSelectionTab.getBibDatabaseContext().getEntries().stream()</b>
+<b class="nc">&nbsp;                                                    .filter(entry -&gt; citationKeys.contains(entry.getCitationKey().orElse(null)) || entryIds.contains(entry.getId()))</b>
+<b class="nc">&nbsp;                                                    .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        commandSelectionTab.clearAndSelect(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        return Response.ok().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getLibraryIdFromContext(BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        return bibDatabaseContext.getDatabasePath()</b>
+<b class="nc">&nbsp;                                 .map(path -&gt; path.getFileName() + &quot;-&quot; + BackupFileUtil.getUniqueFilePrefix(path))</b>
+<b class="nc">&nbsp;                                 .orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setServiceLocator(ServiceLocator serviceLocator) {
+<b class="nc">&nbsp;        this.serviceLocator = serviceLocator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ServiceLocator getServiceLocator() {
+<b class="nc">&nbsp;        return this.serviceLocator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLibraryId() {
+<b class="nc">&nbsp;        return libraryId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getCitationKeys() {
+<b class="nc">&nbsp;        return citationKeys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getEntryIds() {
+<b class="nc">&nbsp;        return entryIds;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLibraryId(String libraryId) {
+<b class="nc">&nbsp;        this.libraryId = libraryId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCitationKeys(List&lt;String&gt; citationKeys) {
+<b class="nc">&nbsp;        this.citationKeys = citationKeys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEntryIds(List&lt;String&gt; entryIds) {
+<b class="nc">&nbsp;        this.entryIds = entryIds;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

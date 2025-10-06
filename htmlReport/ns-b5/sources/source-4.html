@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationStyle</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citationstyle</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationStyle (org.jabref.logic.citationstyle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationStyle</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    18.8%
+  </span>
+  <span class="absValue">
+    (3/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.9%
+  </span>
+  <span class="absValue">
+    (11/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citationstyle;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.openoffice.style.OOStyle;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+&nbsp;/**
+&nbsp; * Representation of a CitationStyle. Stores its name, the file path and the style itself.
+&nbsp; * This is a pure model class. For loading/parsing functionality, see {@link CSLStyleUtils} and {@link CSLStyleLoader}.
+&nbsp; */
+&nbsp;public class CitationStyle implements OOStyle {
+&nbsp;
+&nbsp;    // Currently, we have support for only one alphanumeric style, so we hardcode it
+&nbsp;    private static final String ALPHANUMERIC_STYLE = &quot;DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690&quot;;
+&nbsp;
+&nbsp;    private final String filePath;
+&nbsp;    private final String title;
+&nbsp;    private final String shortTitle;
+&nbsp;    private final boolean isNumericStyle;
+&nbsp;    private final boolean hasBibliography;
+&nbsp;    private final boolean usesHangingIndent;
+&nbsp;    private final String source;
+&nbsp;    private final boolean isInternalStyle;
+&nbsp;
+<b class="fc">&nbsp;    public CitationStyle(@NonNull String filePath, @NonNull String title, @NonNull String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, @NonNull String source, boolean isInternalStyle) {</b>
+<b class="fc">&nbsp;        this.filePath = Path.of(filePath).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)</b>
+<b class="fc">&nbsp;        this.title = title;</b>
+<b class="fc">&nbsp;        this.shortTitle = shortTitle;</b>
+<b class="fc">&nbsp;        this.isNumericStyle = isNumericStyle;</b>
+<b class="fc">&nbsp;        this.hasBibliography = hasBibliography;</b>
+<b class="pc">&nbsp;        this.usesHangingIndent = hasBibliography &amp;&amp; usesHangingIndent;</b>
+<b class="fc">&nbsp;        this.source = source;</b>
+<b class="fc">&nbsp;        this.isInternalStyle = isInternalStyle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new citation style with an auto-determined internal/external state.
+&nbsp;     */
+&nbsp;    public CitationStyle(@NonNull String filePath, @NonNull String title, @NonNull String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, @NonNull String source) {
+<b class="nc">&nbsp;        this(filePath, title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTitle() {
+<b class="nc">&nbsp;        return title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getShortTitle() {
+<b class="nc">&nbsp;        return shortTitle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isNumericStyle() {
+<b class="nc">&nbsp;        return isNumericStyle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasBibliography() {
+<b class="nc">&nbsp;        return hasBibliography;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean usesHangingIndent() {
+<b class="nc">&nbsp;        return usesHangingIndent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Currently, we have support for one alphanumeric CSL style.
+&nbsp;     * There is no tag or field in .csl style files that can be parsed to determine if it is an alphanumeric style.
+&nbsp;     * Thus, to determine alphanumeric nature, we currently manually check for equality with &quot;DIN 1505-2&quot;.
+&nbsp;     */
+&nbsp;    public boolean isAlphanumericStyle() {
+<b class="nc">&nbsp;        return ALPHANUMERIC_STYLE.equals(this.title);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSource() {
+<b class="nc">&nbsp;        return source;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFilePath() {
+<b class="fc">&nbsp;        return filePath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CitationStyle other = (CitationStyle) o;</b>
+<b class="nc">&nbsp;        return Objects.equals(source, other.source);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(source);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return getTitle();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isInternalStyle() {
+<b class="nc">&nbsp;        return isInternalStyle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getPath() {
+<b class="fc">&nbsp;        return getFilePath();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

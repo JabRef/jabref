@@ -1,0 +1,314 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NodeResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.declarative</a>
+</div>
+
+<h1>Coverage Summary for Class: NodeResolver (org.jabref.gui.walkthrough.declarative)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NodeResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.declarative;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.control.ButtonBase;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.DialogPane;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIconView;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.google.common.collect.Streams;
+&nbsp;import com.sun.javafx.scene.NodeHelper;
+&nbsp;import com.sun.javafx.scene.control.LabeledText;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.kordamp.ikonli.javafx.FontIcon;
+&nbsp;
+&nbsp;/// Resolves nodes from a Scene
+&nbsp;@FunctionalInterface
+&nbsp;public interface NodeResolver {
+&nbsp;    /// Resolves a node from the given scene.
+&nbsp;    ///
+&nbsp;    /// @param scene the scene to search in
+&nbsp;    /// @return an optional containing the found node, or empty if not found
+&nbsp;    Optional&lt;Node&gt; resolve(@NonNull Scene scene);
+&nbsp;
+&nbsp;    /// Creates a resolver that finds a node by CSS selector. The returned node is
+&nbsp;    /// guaranteed to be visible.
+&nbsp;    ///
+&nbsp;    /// @param selector the CSS selector to find the node
+&nbsp;    /// @return a resolver that finds the node by selector
+&nbsp;    static NodeResolver selector(@NonNull String selector) {
+<b class="nc">&nbsp;        return scene -&gt; scene.getRoot().lookupAll(selector).stream().filter(NodeResolver::isVisible).findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Creates a resolver that finds a node by its fx:id. The returned node is
+&nbsp;    /// guaranteed to be visible.
+&nbsp;    ///
+&nbsp;    /// @param fxId the fx:id of the node
+&nbsp;    /// @return a resolver that finds the node by fx:id
+&nbsp;    static NodeResolver fxId(@NonNull String fxId) {
+<b class="nc">&nbsp;        return selector(&quot;#&quot; + fxId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Creates a resolver that finds a button by its graphic. The returned button is
+&nbsp;    /// guaranteed to be visible.
+&nbsp;    ///
+&nbsp;    /// @param glyph the graphic of the button
+&nbsp;    /// @return a resolver that finds the button by graphic
+&nbsp;    static NodeResolver buttonWithGraphic(IconTheme.JabRefIcons glyph) {
+<b class="nc">&nbsp;        return scene -&gt; Streams</b>
+&nbsp;                // .icon-button, .button selector is not used, because lookupAll doesn&#39;t support multiple selectors
+<b class="nc">&nbsp;                .concat(scene.getRoot().lookupAll(&quot;.button&quot;).stream(),</b>
+<b class="nc">&nbsp;                        scene.getRoot().lookupAll(&quot;.icon-button&quot;).stream())</b>
+<b class="nc">&nbsp;                .filter(node -&gt; {</b>
+<b class="nc">&nbsp;                    if (!(node instanceof ButtonBase button) || !NodeResolver.isVisible(button)) {</b>
+<b class="nc">&nbsp;                        return false;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    Node graphic = button.getGraphic();</b>
+<b class="nc">&nbsp;                    return (graphic instanceof JabRefIconView jabRefIconView) &amp;&amp; jabRefIconView.getGlyph() == glyph ||</b>
+<b class="nc">&nbsp;                            (graphic instanceof FontIcon fontIcon) &amp;&amp; fontIcon.getIconCode() == glyph.getIkon();</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Creates a resolver that finds a node by a predicate. The returned node is
+&nbsp;    /// guaranteed to be visible.
+&nbsp;    ///
+&nbsp;    /// @param predicate the predicate to match the node
+&nbsp;    /// @return a resolver that finds the node matching the predicate
+&nbsp;    static NodeResolver predicate(@NonNull Predicate&lt;Node&gt; predicate) {
+<b class="nc">&nbsp;        return scene -&gt; Optional.ofNullable(findNode(scene.getRoot(),</b>
+<b class="nc">&nbsp;                node -&gt; NodeResolver.isVisible(node) &amp;&amp; predicate.test(node)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Creates a resolver that finds a button by its StandardAction. The button is
+&nbsp;    /// matched by its tooltip text or button text. The returned button is guaranteed to
+&nbsp;    /// be visible.
+&nbsp;    ///
+&nbsp;    /// @param action the StandardAction associated with the button
+&nbsp;    /// @return a resolver that finds the button by action
+&nbsp;    static NodeResolver action(@NonNull StandardActions action) {
+<b class="nc">&nbsp;        return scene -&gt; Optional.ofNullable(findNode(scene.getRoot(), node -&gt; {</b>
+<b class="nc">&nbsp;            if (!(node instanceof ButtonBase button) || !NodeResolver.isVisible(button)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (button.getTooltip() != null) {</b>
+<b class="nc">&nbsp;                String tooltipText = button.getTooltip().getText();</b>
+<b class="nc">&nbsp;                if (tooltipText != null &amp;&amp; tooltipText.equals(action.getText())) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (button.getStyleClass().contains(&quot;icon-button&quot;)) {</b>
+<b class="nc">&nbsp;                String actionText = action.getText();</b>
+<b class="nc">&nbsp;                if (button.getTooltip() != null &amp;&amp; button.getTooltip().getText() != null) {</b>
+<b class="nc">&nbsp;                    String tooltipText = button.getTooltip().getText();</b>
+<b class="nc">&nbsp;                    if (tooltipText.startsWith(actionText) || tooltipText.contains(actionText)) {</b>
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                return button.getText() != null &amp;&amp; button.getText().equals(actionText);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }));
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Creates a resolver that finds a button by its button type, assuming the node
+&nbsp;    /// resolved is a [javafx.scene.control.DialogPane].
+&nbsp;    ///
+&nbsp;    /// @param buttonType the button type to find
+&nbsp;    /// @return a resolver that finds the button by button type
+&nbsp;    static NodeResolver buttonType(@NonNull ButtonType buttonType) {
+<b class="nc">&nbsp;        return scene -&gt; predicate(DialogPane.class::isInstance)</b>
+<b class="nc">&nbsp;                .resolve(scene)</b>
+<b class="nc">&nbsp;                .map(node -&gt; node instanceof DialogPane pane ? pane.lookupButton(buttonType) : null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Creates a resolver that finds a node by selector first, then matches text
+&nbsp;    /// content in the node and the node&#39;s LabeledText children. The returned node is
+&nbsp;    /// guaranteed to be visible.
+&nbsp;    ///
+&nbsp;    /// @param selector    the style class to match
+&nbsp;    /// @param textMatcher predicate to match text content in LabeledText children
+&nbsp;    /// @return a resolver that finds the node by style class and text content
+&nbsp;    static NodeResolver selectorWithText(@NonNull String selector, @NonNull Predicate&lt;String&gt; textMatcher) {
+<b class="nc">&nbsp;        return scene -&gt; scene</b>
+<b class="nc">&nbsp;                .getRoot()</b>
+<b class="nc">&nbsp;                .lookupAll(selector)</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .filter(NodeHelper::isTreeVisible)</b>
+<b class="nc">&nbsp;                .filter(node -&gt; textMatcher.test(node.toString()) || node.lookupAll(&quot;.text&quot;).stream().anyMatch(child -&gt; {</b>
+<b class="nc">&nbsp;                            if (child instanceof LabeledText text) {</b>
+<b class="nc">&nbsp;                                String textContent = text.getText();</b>
+<b class="nc">&nbsp;                                return textContent != null &amp;&amp; textMatcher.test(textContent);</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                            return false;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                )).findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Creates a resolver that finds a menu item by its language key.
+&nbsp;    ///
+&nbsp;    /// @param key the language key of the menu item
+&nbsp;    /// @return a resolver that finds the menu item by language key
+&nbsp;    static NodeResolver menuItem(@NonNull String key) {
+<b class="nc">&nbsp;        return scene -&gt; {</b>
+<b class="nc">&nbsp;            if (!(scene.getWindow() instanceof ContextMenu menu)) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!menu.isShowing()) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return menu.getItems().stream()</b>
+<b class="nc">&nbsp;                       .filter(item -&gt; NodeResolver.isVisible(item.getStyleableNode()))</b>
+<b class="nc">&nbsp;                       .filter(item -&gt; Optional</b>
+<b class="nc">&nbsp;                               .ofNullable(item.getText())</b>
+<b class="nc">&nbsp;                               .map(str -&gt; str.contains(Localization.lang(key)))</b>
+<b class="nc">&nbsp;                               .orElse(false))</b>
+<b class="nc">&nbsp;                       .map(MenuItem::getStyleableNode).findFirst();</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Nullable
+&nbsp;    private static Node findNode(@NonNull Node root, @NonNull Predicate&lt;Node&gt; predicate) {
+<b class="nc">&nbsp;        if (predicate.test(root)) {</b>
+<b class="nc">&nbsp;            return root;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (root instanceof Parent parent) {</b>
+<b class="nc">&nbsp;            for (Node child : parent.getChildrenUnmodifiable()) {</b>
+<b class="nc">&nbsp;                Node result = findNode(child, predicate);</b>
+<b class="nc">&nbsp;                if (result != null) {</b>
+<b class="nc">&nbsp;                    return result;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isVisible(@Nullable Node node) {
+<b class="nc">&nbsp;        return node != null &amp;&amp; NodeHelper.isTreeVisible(node);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

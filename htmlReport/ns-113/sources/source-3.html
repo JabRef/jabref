@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RangeOverlapBetween</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.rangesort</a>
+</div>
+
+<h1>Coverage Summary for Class: RangeOverlapBetween (org.jabref.model.openoffice.rangesort)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RangeOverlapBetween</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.rangesort;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.openoffice.uno.UnoCast;
+&nbsp;import org.jabref.model.openoffice.uno.UnoTextRange;
+&nbsp;import org.jabref.model.openoffice.util.OOTuple3;
+&nbsp;
+&nbsp;import com.sun.star.text.XText;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;import com.sun.star.text.XTextRangeCompare;
+&nbsp;
+&nbsp;public class RangeOverlapBetween {
+&nbsp;
+&nbsp;    private RangeOverlapBetween() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check for any overlap between two sets of XTextRange values.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Assume fewHolders is small (usually a single element, for checking the cursor)
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Returns on first problem found.
+&nbsp;     */
+&nbsp;    public static &lt;V extends RangeHolder&gt;
+&nbsp;    List&lt;RangeOverlap&lt;V&gt;&gt; findFirst(XTextDocument doc,
+&nbsp;                                    List&lt;V&gt; fewHolders,
+&nbsp;                                    List&lt;V&gt; manyHolders,
+&nbsp;                                    boolean includeTouching) {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeOverlap&lt;V&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fewHolders.isEmpty()) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Cache all we need to know about fewHolders. We are trying to minimize the number of calls
+&nbsp;         * to LO.
+&nbsp;         */
+<b class="nc">&nbsp;        List&lt;OOTuple3&lt;XText, XTextRangeCompare, V&gt;&gt; fewTuples = new ArrayList&lt;&gt;(fewHolders.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (V aHolder : fewHolders) {</b>
+<b class="nc">&nbsp;            XText aText = aHolder.getRange().getText();</b>
+<b class="nc">&nbsp;            fewTuples.add(new OOTuple3&lt;&gt;(aText,</b>
+<b class="nc">&nbsp;                    UnoCast.cast(XTextRangeCompare.class, aText).get(),</b>
+&nbsp;                    aHolder));
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * We only go through manyHolders once: fewTuples is in the inner loop.
+&nbsp;         */
+<b class="nc">&nbsp;        for (V bHolder : manyHolders) {</b>
+<b class="nc">&nbsp;            XTextRange bRange = bHolder.getRange();</b>
+<b class="nc">&nbsp;            XText bText = bRange.getText();</b>
+<b class="nc">&nbsp;            XTextRange bRangeStart = bRange.getStart();</b>
+<b class="nc">&nbsp;            XTextRange bRangeEnd = bRange.getEnd();</b>
+&nbsp;
+<b class="nc">&nbsp;            for (OOTuple3&lt;XText, XTextRangeCompare, V&gt; tup : fewTuples) {</b>
+<b class="nc">&nbsp;                XText aText = tup.a;</b>
+<b class="nc">&nbsp;                XTextRangeCompare cmp = tup.b;</b>
+<b class="nc">&nbsp;                V aHolder = tup.c;</b>
+<b class="nc">&nbsp;                XTextRange aRange = aHolder.getRange();</b>
+<b class="nc">&nbsp;                if (aText != bText) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;                int abEndToStart = UnoTextRange.compareStartsUnsafe(cmp, aRange.getEnd(), bRangeStart);</b>
+<b class="nc">&nbsp;                if (abEndToStart &lt; 0 || (!includeTouching &amp;&amp; (abEndToStart == 0))) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;                int baEndToStart = UnoTextRange.compareStartsUnsafe(cmp, bRangeEnd, aRange.getStart());</b>
+<b class="nc">&nbsp;                if (baEndToStart &lt; 0 || (!includeTouching &amp;&amp; (baEndToStart == 0))) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                boolean equal = UnoTextRange.compareStartsThenEndsUnsafe(cmp, aRange, bRange) == 0;</b>
+<b class="nc">&nbsp;                boolean touching = abEndToStart == 0 || baEndToStart == 0;</b>
+&nbsp;
+&nbsp;                // In case of two equal collapsed ranges there is an ambiguity : TOUCH or EQUAL_RANGE ?
+&nbsp;                //
+&nbsp;                // We return EQUAL_RANGE
+<b class="nc">&nbsp;                RangeOverlapKind kind = equal ? RangeOverlapKind.EQUAL_RANGE</b>
+<b class="nc">&nbsp;                                              : (touching ? RangeOverlapKind.TOUCH</b>
+<b class="nc">&nbsp;                                                          : RangeOverlapKind.OVERLAP);</b>
+&nbsp;
+<b class="nc">&nbsp;                List&lt;V&gt; valuesForOverlappingRanges = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                valuesForOverlappingRanges.add(aHolder);</b>
+<b class="nc">&nbsp;                valuesForOverlappingRanges.add(bHolder);</b>
+&nbsp;
+<b class="nc">&nbsp;                result.add(new RangeOverlap&lt;&gt;(kind, valuesForOverlappingRanges));</b>
+<b class="nc">&nbsp;                return result;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

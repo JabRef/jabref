@@ -1,0 +1,135 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NotificationsComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.ai.components.util.notifications</a>
+</div>
+
+<h1>Coverage Summary for Class: NotificationsComponent (org.jabref.gui.ai.components.util.notifications)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NotificationsComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.ai.components.util.notifications;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link ScrollPane} for displaying AI chat {@link Notification}s. See the documentation of {@link Notification} for
+&nbsp; * more details.
+&nbsp; */
+&nbsp;public class NotificationsComponent extends ScrollPane {
+&nbsp;    private static final double SCROLL_PANE_MAX_HEIGHT = 300;
+&nbsp;
+<b class="nc">&nbsp;    private final VBox vBox = new VBox(10);</b>
+&nbsp;
+<b class="nc">&nbsp;    public NotificationsComponent(ObservableList&lt;Notification&gt; notifications) {</b>
+<b class="nc">&nbsp;        setContent(vBox);</b>
+<b class="nc">&nbsp;        setMaxHeight(SCROLL_PANE_MAX_HEIGHT);</b>
+&nbsp;
+<b class="nc">&nbsp;        fill(notifications);</b>
+<b class="nc">&nbsp;        notifications.addListener((ListChangeListener&lt;? super Notification&gt;) change -&gt; fill(notifications));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void fill(List&lt;Notification&gt; notifications) {
+<b class="nc">&nbsp;        vBox.getChildren().clear();</b>
+<b class="nc">&nbsp;        notifications.stream().map(NotificationComponent::new).forEach(vBox.getChildren()::add);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

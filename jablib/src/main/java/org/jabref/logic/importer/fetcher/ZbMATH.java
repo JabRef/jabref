@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,6 +30,7 @@ import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
@@ -39,8 +39,8 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     private final ImportFormatPreferences preferences;
 
-    public ZbMATH(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public ZbMATH(@NonNull ImportFormatPreferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override

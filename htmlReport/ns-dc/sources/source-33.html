@@ -1,0 +1,137 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MarkdownFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: MarkdownFormatter (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MarkdownFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;
+&nbsp;import com.vladsch.flexmark.html.HtmlRenderer;
+&nbsp;import com.vladsch.flexmark.parser.Parser;
+&nbsp;import com.vladsch.flexmark.util.ast.Node;
+&nbsp;import com.vladsch.flexmark.util.data.MutableDataSet;
+&nbsp;
+&nbsp;public class MarkdownFormatter implements LayoutFormatter {
+&nbsp;
+&nbsp;    private final Parser parser;
+&nbsp;    private final HtmlRenderer renderer;
+&nbsp;
+<b class="nc">&nbsp;    public MarkdownFormatter() {</b>
+<b class="nc">&nbsp;        MutableDataSet options = new MutableDataSet();</b>
+<b class="nc">&nbsp;        parser = Parser.builder(options).build();</b>
+<b class="nc">&nbsp;        renderer = HtmlRenderer.builder(options).build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(final String fieldText) {
+<b class="nc">&nbsp;        Objects.requireNonNull(fieldText, &quot;Field Text should not be null, when handed to formatter&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Node document = parser.parse(fieldText);</b>
+<b class="nc">&nbsp;        String html = renderer.render(document);</b>
+&nbsp;
+&nbsp;        // workaround HTMLChars transforming &quot;\n&quot; into &lt;br&gt; by returning a one liner
+<b class="nc">&nbsp;        return html.replaceAll(&quot;\\r\\n|\\r|\\n&quot;, &quot; &quot;).trim();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

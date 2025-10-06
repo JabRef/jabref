@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibEntryView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor.citationrelationtab</a>
+</div>
+
+<h1>Coverage Summary for Class: BibEntryView (org.jabref.gui.entryeditor.citationrelationtab)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibEntryView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor.citationrelationtab;
+&nbsp;
+&nbsp;import java.util.EnumSet;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.util.TextFlowLimited;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class to unify the display method of BibEntries in ListViews.
+&nbsp; */
+<b class="nc">&nbsp;public class BibEntryView {</b>
+&nbsp;
+<b class="nc">&nbsp;    public static final EnumSet&lt;StandardEntryType&gt; CROSS_REF_TYPES = EnumSet.of(StandardEntryType.InBook,</b>
+&nbsp;            StandardEntryType.InProceedings, StandardEntryType.InCollection);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a layout for a given {@link BibEntry} to be displayed in a List
+&nbsp;     *
+&nbsp;     * @param entry {@link BibEntry} to display
+&nbsp;     * @return layout container displaying the entry
+&nbsp;     */
+&nbsp;    public static Node getEntryNode(BibEntry entry) {
+<b class="nc">&nbsp;        Node entryType = getIcon(entry.getType()).getGraphicNode();</b>
+<b class="nc">&nbsp;        entryType.getStyleClass().add(&quot;type&quot;);</b>
+<b class="nc">&nbsp;        String authorsText = entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        Node authors = createLabel(authorsText);</b>
+<b class="nc">&nbsp;        authors.getStyleClass().add(&quot;authors&quot;);</b>
+<b class="nc">&nbsp;        String titleText = entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        Node title = createLabel(titleText);</b>
+<b class="nc">&nbsp;        title.getStyleClass().add(&quot;title&quot;);</b>
+<b class="nc">&nbsp;        Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;        year.getStyleClass().add(&quot;year&quot;);</b>
+<b class="nc">&nbsp;        String journalText = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        Node journal = createLabel(journalText);</b>
+<b class="nc">&nbsp;        journal.getStyleClass().add(&quot;journal&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox entryContainer = new VBox(</b>
+&nbsp;                new HBox(10, entryType, title),
+&nbsp;                new HBox(5, year, journal),
+&nbsp;                authors
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -&gt; {</b>
+<b class="nc">&nbsp;            Node summary = createSummary(summaryText);</b>
+<b class="nc">&nbsp;            summary.getStyleClass().add(&quot;summary&quot;);</b>
+<b class="nc">&nbsp;            entryContainer.getChildren().add(summary);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        entryContainer.getStyleClass().add(&quot;bibEntry&quot;);</b>
+<b class="nc">&nbsp;        return entryContainer;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the correct Icon for a given {@link EntryType}
+&nbsp;     *
+&nbsp;     * @param type {@link EntryType} to get Icon for
+&nbsp;     * @return Icon corresponding to {@link EntryType}
+&nbsp;     */
+&nbsp;    private static IconTheme.JabRefIcons getIcon(EntryType type) {
+<b class="nc">&nbsp;        if (type instanceof StandardEntryType standardEntry) {</b>
+<b class="nc">&nbsp;            if (standardEntry == StandardEntryType.Book) {</b>
+<b class="nc">&nbsp;                return IconTheme.JabRefIcons.BOOK;</b>
+<b class="nc">&nbsp;            } else if (CROSS_REF_TYPES.contains(standardEntry)) {</b>
+<b class="nc">&nbsp;                return IconTheme.JabRefIcons.OPEN_LINK;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return IconTheme.JabRefIcons.ARTICLE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if text contains right-to-left characters
+&nbsp;     *
+&nbsp;     * @param text Text to check
+&nbsp;     * @return true if text contains RTL characters
+&nbsp;     */
+&nbsp;    private static boolean isRTL(String text) {
+<b class="nc">&nbsp;        for (char c : text.toCharArray()) {</b>
+<b class="nc">&nbsp;            if (Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT ||</b>
+<b class="nc">&nbsp;                    Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a text node for the summary with horizontal scrolling for RTL text,
+&nbsp;     * avoiding JavaFX bug related to RTL text wrapping
+&nbsp;     *
+&nbsp;     * @param text The summary text content
+&nbsp;     * @return Node with either:
+&nbsp;     * - ScrollPane (for RTL text)
+&nbsp;     * - TextFlowLimited (for LTR text)
+&nbsp;     */
+&nbsp;    private static Node createSummary(String text) {
+<b class="nc">&nbsp;        if (isRTL(text)) {</b>
+<b class="nc">&nbsp;            Text textNode = new Text(text);</b>
+<b class="nc">&nbsp;            ScrollPane scrollPane = new ScrollPane(textNode);</b>
+<b class="nc">&nbsp;            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);</b>
+<b class="nc">&nbsp;            scrollPane.setFitToHeight(true);</b>
+<b class="nc">&nbsp;            return scrollPane;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return new TextFlowLimited(new Text(text));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a label with horizontal scrolling for RTL text,
+&nbsp;     * avoiding JavaFX bug related to RTL text wrapping
+&nbsp;     *
+&nbsp;     * @param text The label text content
+&nbsp;     * @return Node with either:
+&nbsp;     * - ScrollPane (for RTL text)
+&nbsp;     * - Wrapped Label (for LTR text)
+&nbsp;     */
+&nbsp;    private static Node createLabel(String text) {
+<b class="nc">&nbsp;        if (isRTL(text)) {</b>
+<b class="nc">&nbsp;            Label label = new Label(text);</b>
+<b class="nc">&nbsp;            ScrollPane scrollPane = new ScrollPane(label);</b>
+<b class="nc">&nbsp;            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);</b>
+<b class="nc">&nbsp;            scrollPane.setFitToHeight(true);</b>
+<b class="nc">&nbsp;            return scrollPane;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Label label = new Label(text);</b>
+<b class="nc">&nbsp;            label.setWrapText(true);</b>
+<b class="nc">&nbsp;            return label;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

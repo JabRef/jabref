@@ -221,7 +221,10 @@ extraJavaModuleInfo {
         overrideModuleName()
         exportAllPackages()
     }
-    module("io.github.adr:e-adr", "io.github.adr")
+    module("io.github.adr:e-adr", "io.github.adr") {
+        patchRealModule()
+        exportAllPackages()
+    }
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "embedded.postgres.binaries.darwin.amd64")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8", "embedded.postgres.binaries.darwin.arm64v8")
@@ -461,10 +464,6 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.logging")
-    }
-
-    module("org.hisp.dhis:json-tree", "org.hisp.dhis.jsontree") {
-        preserveExisting()
     }
 
     module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {

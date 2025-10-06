@@ -1,0 +1,273 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WalkthroughScroller</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: WalkthroughScroller (org.jabref.gui.walkthrough.utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WalkthroughScroller</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.utils;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.geometry.Bounds;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;import javafx.scene.control.TreeView;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.Subscription;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class WalkthroughScroller {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughScroller.class);</b>
+&nbsp;
+&nbsp;    /// Mutable list of all [Subscription] of parent bounds and node position
+<b class="nc">&nbsp;    private final List&lt;Subscription&gt; subscriptions = new ArrayList&lt;&gt;();</b>
+&nbsp;    private final WalkthroughUtils.DebouncedInvalidationListener debouncedScroller;
+&nbsp;
+<b class="nc">&nbsp;    public WalkthroughScroller(@NonNull Node node) {</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Setting up scrollable parent monitoring for node: {}&quot;, node.getClass().getSimpleName());</b>
+<b class="nc">&nbsp;        List&lt;Node&gt; scrollableParents = findScrollableParents(node);</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Found {} scrollable parents&quot;, scrollableParents.size());</b>
+<b class="nc">&nbsp;        debouncedScroller = WalkthroughUtils.debounced((_) -&gt; scrollNodeIntoView(node, scrollableParents));</b>
+&nbsp;
+<b class="nc">&nbsp;        scrollableParents</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(parent -&gt; EasyBind.listen(parent.boundsInParentProperty(), debouncedScroller))</b>
+<b class="nc">&nbsp;                .forEach(subscriptions::add);</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(node.localToSceneTransformProperty(), debouncedScroller));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cleanup() {
+<b class="nc">&nbsp;        subscriptions.forEach(Subscription::unsubscribe);</b>
+<b class="nc">&nbsp;        subscriptions.clear();</b>
+<b class="nc">&nbsp;        debouncedScroller.cancel();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Node&gt; findScrollableParents(@NonNull Node node) {
+<b class="nc">&nbsp;        List&lt;Node&gt; scrollableParents = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Parent parent = node.getParent();</b>
+<b class="nc">&nbsp;        while (parent != null) {</b>
+<b class="nc">&nbsp;            if (isScrollable(parent)) {</b>
+<b class="nc">&nbsp;                scrollableParents.add(parent);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            parent = parent.getParent();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return scrollableParents;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isScrollable(@NonNull Node node) {
+<b class="nc">&nbsp;        return node instanceof ScrollPane || node instanceof ListView&lt;?&gt; || node instanceof TableView&lt;?&gt; || node instanceof TreeView&lt;?&gt;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void scrollNodeIntoView(@NonNull Node targetNode, @NonNull List&lt;Node&gt; scrollableParents) {
+<b class="nc">&nbsp;        for (Node scrollableParent : scrollableParents) {</b>
+<b class="nc">&nbsp;            scrollNodeIntoViewForParent(targetNode, scrollableParent);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void scrollNodeIntoViewForParent(@NonNull Node targetNode, @NonNull Node scrollableParent) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (targetNode.getScene() == null || scrollableParent.getScene() == null) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            switch (scrollableParent) {</b>
+<b class="nc">&nbsp;                case ScrollPane scrollPane -&gt; {</b>
+<b class="nc">&nbsp;                    Bounds targetBounds = targetNode.localToScene(targetNode.getBoundsInLocal());</b>
+<b class="nc">&nbsp;                    scrollIntoScrollPane(scrollPane, targetBounds);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                case ListView&lt;?&gt; listView -&gt;</b>
+<b class="nc">&nbsp;                        scrollIntoListView(targetNode, listView);</b>
+<b class="nc">&nbsp;                case TableView&lt;?&gt; tableView -&gt;</b>
+<b class="nc">&nbsp;                        scrollIntoTableView(targetNode, tableView);</b>
+<b class="nc">&nbsp;                case TreeView&lt;?&gt; treeView -&gt;</b>
+<b class="nc">&nbsp;                        scrollIntoTreeView(targetNode, treeView);</b>
+&nbsp;                default -&gt;
+<b class="nc">&nbsp;                        LOGGER.warn(&quot;Unsupported scrollable type: {}&quot;, scrollableParent.getClass().getSimpleName());</b>
+&nbsp;            }
+&nbsp;        } catch (RuntimeException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Failed to scroll node into view for parent {}&quot;, scrollableParent.getClass().getSimpleName(), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void scrollIntoScrollPane(@NonNull ScrollPane scrollPane, @NonNull Bounds targetBounds) {
+<b class="nc">&nbsp;        Node content = scrollPane.getContent();</b>
+<b class="nc">&nbsp;        if (content == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Bounds contentBounds = content.getBoundsInLocal();</b>
+<b class="nc">&nbsp;        double viewportHeight = scrollPane.getViewportBounds().getHeight();</b>
+<b class="nc">&nbsp;        if (contentBounds.getHeight() &lt;= viewportHeight) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Bounds targetInContent = content.sceneToLocal(targetBounds);</b>
+<b class="nc">&nbsp;        double targetCenterY = targetInContent.getCenterY();</b>
+<b class="nc">&nbsp;        double maxScrollY = contentBounds.getHeight() - viewportHeight;</b>
+<b class="nc">&nbsp;        double desiredScrollY = targetCenterY - (viewportHeight / 2);</b>
+&nbsp;
+<b class="nc">&nbsp;        double vValue = Math.max(0, Math.min(1, desiredScrollY / maxScrollY));</b>
+<b class="nc">&nbsp;        scrollPane.setVvalue(vValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void scrollIntoListView(@NonNull Node targetNode, @NonNull ListView&lt;?&gt; listView) {
+<b class="nc">&nbsp;        int index = findItemIndex(targetNode, listView, listView.getItems().size(), listView.getFixedCellSize());</b>
+<b class="nc">&nbsp;        if (index != -1) {</b>
+<b class="nc">&nbsp;            listView.scrollTo(index);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Scrolled ListView to index: {}&quot;, index);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void scrollIntoTableView(@NonNull Node targetNode, @NonNull TableView&lt;?&gt; tableView) {
+<b class="nc">&nbsp;        int index = findItemIndex(targetNode, tableView, tableView.getItems().size(), tableView.getFixedCellSize());</b>
+<b class="nc">&nbsp;        if (index != -1) {</b>
+<b class="nc">&nbsp;            tableView.scrollTo(index);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Scrolled TableView to index: {}&quot;, index);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void scrollIntoTreeView(@NonNull Node targetNode, @NonNull TreeView&lt;?&gt; treeView) {
+<b class="nc">&nbsp;        int index = findItemIndex(targetNode, treeView, treeView.getExpandedItemCount(), treeView.getFixedCellSize());</b>
+<b class="nc">&nbsp;        if (index != -1) {</b>
+<b class="nc">&nbsp;            treeView.scrollTo(index);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Scrolled TreeView to index: {}&quot;, index);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private int findItemIndex(Node targetNode, Node container, int itemCount, double fixedCellSize) {
+<b class="nc">&nbsp;        Bounds containerBounds = container.getBoundsInLocal();</b>
+<b class="nc">&nbsp;        Bounds targetBounds = container.sceneToLocal(targetNode.localToScene(targetNode.getBoundsInLocal()));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (targetBounds == null || containerBounds.contains(targetBounds)) {</b>
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double itemHeight = fixedCellSize;</b>
+<b class="nc">&nbsp;        if (itemHeight &lt;= 0 &amp;&amp; itemCount &gt; 0) {</b>
+<b class="nc">&nbsp;            itemHeight = containerBounds.getHeight() / Math.min(itemCount, 10);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (itemHeight &gt; 0) {</b>
+<b class="nc">&nbsp;            double targetCenterY = targetBounds.getCenterY();</b>
+<b class="nc">&nbsp;            return (int) Math.max(0, Math.min(itemCount - 1, targetCenterY / itemHeight));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return -1;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PopOverUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: PopOverUtil (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PopOverUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ProgressIndicator;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.fieldeditors.journalinfo.JournalInfoView;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.controlsfx.control.PopOver;
+&nbsp;
+<b class="nc">&nbsp;public class PopOverUtil {</b>
+&nbsp;
+&nbsp;    public static void showJournalInfo(Button button, BibEntry entry, DialogService dialogService, TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; optionalIssn = entry.getField(StandardField.ISSN);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; optionalJournalName = entry.getFieldOrAlias(StandardField.JOURNAL);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (optionalIssn.isPresent() || optionalJournalName.isPresent()) {</b>
+<b class="nc">&nbsp;            PopOver popOver = new PopOver();</b>
+<b class="nc">&nbsp;            ProgressIndicator progressIndicator = new ProgressIndicator();</b>
+<b class="nc">&nbsp;            progressIndicator.setMaxSize(30, 30);</b>
+<b class="nc">&nbsp;            popOver.setContentNode(progressIndicator);</b>
+<b class="nc">&nbsp;            popOver.setDetachable(true);</b>
+<b class="nc">&nbsp;            popOver.setTitle(Localization.lang(&quot;Journal Information&quot;));</b>
+<b class="nc">&nbsp;            popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);</b>
+<b class="nc">&nbsp;            popOver.setArrowSize(0);</b>
+<b class="nc">&nbsp;            popOver.show(button, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;            BackgroundTask</b>
+<b class="nc">&nbsp;                    .wrap(() -&gt; new JournalInfoView().populateJournalInformation(optionalIssn.orElse(&quot;&quot;), optionalJournalName.orElse(&quot;&quot;)))</b>
+<b class="nc">&nbsp;                    .onSuccess(updatedNode -&gt; {</b>
+<b class="nc">&nbsp;                        popOver.setContentNode(updatedNode);</b>
+<b class="nc">&nbsp;                        popOver.show(button, 0);</b>
+&nbsp;                    })
+<b class="nc">&nbsp;                    .onFailure(exception -&gt; {</b>
+<b class="nc">&nbsp;                        popOver.hide();</b>
+<b class="nc">&nbsp;                        String message = Localization.lang(&quot;Error while fetching journal information: %0&quot;,</b>
+<b class="nc">&nbsp;                                exception.getMessage());</b>
+<b class="nc">&nbsp;                        dialogService.notify(message);</b>
+&nbsp;                    })
+<b class="nc">&nbsp;                    .executeWith(taskExecutor);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;ISSN or journal name required for fetching journal information&quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,427 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntryEditorPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: EntryEditorPreferences (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntryEditorPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.2%
+  </span>
+  <span class="absValue">
+    (17/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    52.4%
+  </span>
+  <span class="absValue">
+    (33/63)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EntryEditorPreferences$JournalPopupEnabled</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (20/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.3%
+  </span>
+  <span class="absValue">
+    (40/71)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.DoubleProperty;
+&nbsp;import javafx.beans.property.MapProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleDoubleProperty;
+&nbsp;import javafx.beans.property.SimpleMapProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableMap;
+&nbsp;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;public class EntryEditorPreferences {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies the different possible enablement states for online services
+&nbsp;     */
+<b class="fc">&nbsp;    public enum JournalPopupEnabled {</b>
+<b class="fc">&nbsp;        FIRST_START, // The first time a user uses this service</b>
+<b class="fc">&nbsp;        ENABLED,</b>
+<b class="fc">&nbsp;        DISABLED;</b>
+&nbsp;
+&nbsp;        public static JournalPopupEnabled fromString(String status) {
+<b class="pc">&nbsp;            for (JournalPopupEnabled value : JournalPopupEnabled.values()) {</b>
+<b class="pc">&nbsp;                if (value.toString().equalsIgnoreCase(status)) {</b>
+<b class="fc">&nbsp;                    return value;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;No enum found with value: &quot; + status);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private final MapProperty&lt;String, Set&lt;Field&gt;&gt; entryEditorTabList;
+&nbsp;    private final MapProperty&lt;String, Set&lt;Field&gt;&gt; defaultEntryEditorTabList;
+&nbsp;    private final BooleanProperty shouldOpenOnNewEntry;
+&nbsp;    private final BooleanProperty shouldShowRecommendationsTab;
+&nbsp;    private final BooleanProperty shouldShowAiSummaryTab;
+&nbsp;    private final BooleanProperty shouldShowAiChatTab;
+&nbsp;    private final BooleanProperty shouldShowLatexCitationsTab;
+&nbsp;    private final BooleanProperty shouldShowFileAnnotationsTab;
+&nbsp;    private final BooleanProperty showSourceTabByDefault;
+&nbsp;    private final BooleanProperty enableValidation;
+&nbsp;    private final BooleanProperty allowIntegerEditionBibtex;
+&nbsp;    private final BooleanProperty autoLinkFiles;
+&nbsp;    private final ObjectProperty&lt;JournalPopupEnabled&gt; enablementStatus;
+&nbsp;    private final BooleanProperty shouldShowSciteTab;
+&nbsp;    private final BooleanProperty showUserCommentsFields;
+&nbsp;    private final DoubleProperty previewWidthDividerPosition;
+&nbsp;
+&nbsp;    public EntryEditorPreferences(Map&lt;String, Set&lt;Field&gt;&gt; entryEditorTabList,
+&nbsp;                                  Map&lt;String, Set&lt;Field&gt;&gt; defaultEntryEditorTabList,
+&nbsp;                                  boolean shouldOpenOnNewEntry,
+&nbsp;                                  boolean shouldShowRecommendationsTab,
+&nbsp;                                  boolean shouldShowAiSummaryTab,
+&nbsp;                                  boolean shouldShowAiChatTab,
+&nbsp;                                  boolean shouldShowLatexCitationsTab,
+&nbsp;                                  boolean shouldShowFileAnnotationsTab,
+&nbsp;                                  boolean showSourceTabByDefault,
+&nbsp;                                  boolean enableValidation,
+&nbsp;                                  boolean allowIntegerEditionBibtex,
+&nbsp;                                  boolean autolinkFilesEnabled,
+&nbsp;                                  JournalPopupEnabled journalPopupEnabled,
+&nbsp;                                  boolean showSciteTab,
+&nbsp;                                  boolean showUserCommentsFields,
+<b class="fc">&nbsp;                                  double previewWidthDividerPosition) {</b>
+&nbsp;
+<b class="fc">&nbsp;        this.entryEditorTabList = new SimpleMapProperty&lt;&gt;(FXCollections.observableMap(entryEditorTabList));</b>
+<b class="fc">&nbsp;        this.defaultEntryEditorTabList = new SimpleMapProperty&lt;&gt;(FXCollections.observableMap(defaultEntryEditorTabList));</b>
+<b class="fc">&nbsp;        this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);</b>
+<b class="fc">&nbsp;        this.shouldShowRecommendationsTab = new SimpleBooleanProperty(shouldShowRecommendationsTab);</b>
+<b class="fc">&nbsp;        this.shouldShowAiSummaryTab = new SimpleBooleanProperty(shouldShowAiSummaryTab);</b>
+<b class="fc">&nbsp;        this.shouldShowAiChatTab = new SimpleBooleanProperty(shouldShowAiChatTab);</b>
+<b class="fc">&nbsp;        this.shouldShowLatexCitationsTab = new SimpleBooleanProperty(shouldShowLatexCitationsTab);</b>
+<b class="fc">&nbsp;        this.shouldShowFileAnnotationsTab = new SimpleBooleanProperty(shouldShowFileAnnotationsTab);</b>
+<b class="fc">&nbsp;        this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);</b>
+<b class="fc">&nbsp;        this.enableValidation = new SimpleBooleanProperty(enableValidation);</b>
+<b class="fc">&nbsp;        this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);</b>
+<b class="fc">&nbsp;        this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);</b>
+<b class="fc">&nbsp;        this.enablementStatus = new SimpleObjectProperty&lt;&gt;(journalPopupEnabled);</b>
+<b class="fc">&nbsp;        this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);</b>
+<b class="fc">&nbsp;        this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);</b>
+<b class="fc">&nbsp;        this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableMap&lt;String, Set&lt;Field&gt;&gt; getEntryEditorTabs() {
+<b class="fc">&nbsp;        return entryEditorTabList.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MapProperty&lt;String, Set&lt;Field&gt;&gt; entryEditorTabs() {
+<b class="fc">&nbsp;        return entryEditorTabList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEntryEditorTabList(Map&lt;String, Set&lt;Field&gt;&gt; entryEditorTabList) {
+<b class="nc">&nbsp;        this.entryEditorTabList.set(FXCollections.observableMap(entryEditorTabList));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableMap&lt;String, Set&lt;Field&gt;&gt; getDefaultEntryEditorTabs() {
+<b class="nc">&nbsp;        return defaultEntryEditorTabList.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldOpenOnNewEntry() {
+<b class="nc">&nbsp;        return shouldOpenOnNewEntry.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldOpenOnNewEntryProperty() {
+<b class="fc">&nbsp;        return shouldOpenOnNewEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShouldOpenOnNewEntry(boolean shouldOpenOnNewEntry) {
+<b class="nc">&nbsp;        this.shouldOpenOnNewEntry.set(shouldOpenOnNewEntry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowRecommendationsTab() {
+<b class="nc">&nbsp;        return shouldShowRecommendationsTab.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldShowRecommendationsTabProperty() {
+<b class="fc">&nbsp;        return shouldShowRecommendationsTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShouldShowRecommendationsTab(boolean shouldShowRecommendationsTab) {
+<b class="nc">&nbsp;        this.shouldShowRecommendationsTab.set(shouldShowRecommendationsTab);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowAiSummaryTab() {
+<b class="nc">&nbsp;        return shouldShowAiSummaryTab.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldShowAiSummaryTabProperty() {
+<b class="fc">&nbsp;        return shouldShowAiSummaryTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShouldShowAiSummaryTab(boolean shouldShowAiSummaryTab) {
+<b class="nc">&nbsp;        this.shouldShowAiSummaryTab.set(shouldShowAiSummaryTab);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowAiChatTab() {
+<b class="nc">&nbsp;        return shouldShowAiChatTab.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldShowAiChatTabProperty() {
+<b class="fc">&nbsp;        return shouldShowAiChatTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShouldShowAiChatTab(boolean shouldShowAiChatTab) {
+<b class="nc">&nbsp;        this.shouldShowAiChatTab.set(shouldShowAiChatTab);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowLatexCitationsTab() {
+<b class="nc">&nbsp;        return shouldShowLatexCitationsTab.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldShowLatexCitationsTabProperty() {
+<b class="fc">&nbsp;        return shouldShowLatexCitationsTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShouldShowLatexCitationsTab(boolean shouldShowLatexCitationsTab) {
+<b class="nc">&nbsp;        this.shouldShowLatexCitationsTab.set(shouldShowLatexCitationsTab);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowFileAnnotationsTab() {
+<b class="nc">&nbsp;        return shouldShowFileAnnotationsTab.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldShowFileAnnotationsTabProperty() {
+<b class="fc">&nbsp;        return shouldShowFileAnnotationsTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShouldShowFileAnnotationsTab(boolean shouldShowFileAnnotationsTab) {
+<b class="nc">&nbsp;        this.shouldShowFileAnnotationsTab.set(shouldShowFileAnnotationsTab);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean showSourceTabByDefault() {
+<b class="nc">&nbsp;        return showSourceTabByDefault.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty showSourceTabByDefaultProperty() {
+<b class="fc">&nbsp;        return showSourceTabByDefault;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShowSourceTabByDefault(boolean showSourceTabByDefault) {
+<b class="nc">&nbsp;        this.showSourceTabByDefault.set(showSourceTabByDefault);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldEnableValidation() {
+<b class="nc">&nbsp;        return enableValidation.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty enableValidationProperty() {
+<b class="fc">&nbsp;        return enableValidation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEnableValidation(boolean enableValidation) {
+<b class="nc">&nbsp;        this.enableValidation.set(enableValidation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldAllowIntegerEditionBibtex() {
+<b class="nc">&nbsp;        return allowIntegerEditionBibtex.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty allowIntegerEditionBibtexProperty() {
+<b class="fc">&nbsp;        return allowIntegerEditionBibtex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAllowIntegerEditionBibtex(boolean allowIntegerEditionBibtex) {
+<b class="nc">&nbsp;        this.allowIntegerEditionBibtex.set(allowIntegerEditionBibtex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean autoLinkFilesEnabled() {
+<b class="nc">&nbsp;        return this.autoLinkFiles.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty autoLinkEnabledProperty() {
+<b class="fc">&nbsp;        return this.autoLinkFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutoLinkFilesEnabled(boolean enabled) {
+<b class="nc">&nbsp;        this.autoLinkFiles.setValue(enabled);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JournalPopupEnabled shouldEnableJournalPopup() {
+<b class="nc">&nbsp;        return enablementStatus.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;JournalPopupEnabled&gt; enableJournalPopupProperty() {
+<b class="fc">&nbsp;        return enablementStatus;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEnableJournalPopup(JournalPopupEnabled journalPopupEnabled) {
+<b class="nc">&nbsp;        this.enablementStatus.set(journalPopupEnabled);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowSciteTab() {
+<b class="nc">&nbsp;        return this.shouldShowSciteTab.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldShowLSciteTabProperty() {
+<b class="fc">&nbsp;        return this.shouldShowSciteTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShouldShowSciteTab(boolean shouldShowSciteTab) {
+<b class="nc">&nbsp;        this.shouldShowSciteTab.set(shouldShowSciteTab);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowUserCommentsFields() {
+<b class="nc">&nbsp;        return showUserCommentsFields.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty showUserCommentsFieldsProperty() {
+<b class="fc">&nbsp;        return showUserCommentsFields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShowUserCommentsFields(boolean showUserCommentsFields) {
+<b class="nc">&nbsp;        this.showUserCommentsFields.set(showUserCommentsFields);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPreviewWidthDividerPosition(double previewWidthDividerPosition) {
+<b class="nc">&nbsp;        this.previewWidthDividerPosition.set(previewWidthDividerPosition);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Holds the horizontal divider position when the Preview is shown in the entry editor
+&nbsp;     */
+&nbsp;    public DoubleProperty previewWidthDividerPositionProperty() {
+<b class="fc">&nbsp;        return previewWidthDividerPosition;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Double getPreviewWidthDividerPosition() {
+<b class="nc">&nbsp;        return previewWidthDividerPosition.get();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

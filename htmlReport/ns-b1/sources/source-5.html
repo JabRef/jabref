@@ -1,0 +1,357 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstWidthCalculator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst.util</a>
+</div>
+
+<h1>Coverage Summary for Class: BstWidthCalculator (org.jabref.logic.bst.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BstWidthCalculator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/152)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bst.util;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; *
+&nbsp; * The |built_in| function {\.{purify\$}} pops the top (string) literal, removes
+&nbsp; * nonalphanumeric characters except for |white_space| and |sep_char| characters
+&nbsp; * (these get converted to a |space|) and removes certain alphabetic characters
+&nbsp; * contained in the control sequences associated with a special character, and
+&nbsp; * pushes the resulting string. If the literal isn&#39;t a string, it complains and
+&nbsp; * pushes the null string.
+&nbsp; *
+&nbsp; */
+&nbsp;public class BstWidthCalculator {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BstWidthCalculator.class);</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Quoted from Bibtex:
+&nbsp;     *
+&nbsp;     * Now we initialize the system-dependent |char_width| array, for which
+&nbsp;     * |space| is the only |white_space| character given a nonzero printing
+&nbsp;     * width. The widths here are taken from Stanford&#39;s June~&#39;87 $cmr10$~font
+&nbsp;     * and represent hundredths of a point (rounded), but since they&#39;re used
+&nbsp;     * only for relative comparisons, the units have no meaning.
+&nbsp;     */
+&nbsp;
+&nbsp;    private static int[] widths;
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        if (BstWidthCalculator.widths == null) {</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths = new int[128];</b>
+&nbsp;
+<b class="nc">&nbsp;            for (int i = 0; i &lt; 128; i++) {</b>
+<b class="nc">&nbsp;                BstWidthCalculator.widths[i] = 0;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            BstWidthCalculator.widths[32] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[33] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[34] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[35] = 833;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[36] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[37] = 833;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[38] = 778;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[39] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[40] = 389;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[41] = 389;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[42] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[43] = 778;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[44] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[45] = 333;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[46] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[47] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[48] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[49] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[50] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[51] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[52] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[53] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[54] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[55] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[56] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[57] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[58] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[59] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[60] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[61] = 778;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[62] = 472;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[63] = 472;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[64] = 778;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[65] = 750;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[66] = 708;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[67] = 722;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[68] = 764;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[69] = 681;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[70] = 653;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[71] = 785;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[72] = 750;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[73] = 361;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[74] = 514;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[75] = 778;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[76] = 625;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[77] = 917;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[78] = 750;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[79] = 778;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[80] = 681;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[81] = 778;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[82] = 736;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[83] = 556;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[84] = 722;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[85] = 750;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[86] = 750;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[87] = 1028;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[88] = 750;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[89] = 750;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[90] = 611;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[91] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[92] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[93] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[94] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[95] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[96] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[97] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[98] = 556;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[99] = 444;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[100] = 556;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[101] = 444;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[102] = 306;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[103] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[104] = 556;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[105] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[106] = 306;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[107] = 528;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[108] = 278;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[109] = 833;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[110] = 556;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[111] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[112] = 556;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[113] = 528;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[114] = 392;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[115] = 394;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[116] = 389;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[117] = 556;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[118] = 528;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[119] = 722;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[120] = 528;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[121] = 528;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[122] = 444;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[123] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[124] = 1000;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[125] = 500;</b>
+<b class="nc">&nbsp;            BstWidthCalculator.widths[126] = 500;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private BstWidthCalculator() {
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int getSpecialCharWidth(char[] c, int pos) {
+<b class="nc">&nbsp;        if ((pos + 1) &lt; c.length) {</b>
+<b class="nc">&nbsp;            if ((c[pos] == &#39;o&#39;) &amp;&amp; (c[pos + 1] == &#39;e&#39;)) {</b>
+<b class="nc">&nbsp;                return 778;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;O&#39;) &amp;&amp; (c[pos + 1] == &#39;E&#39;)) {</b>
+<b class="nc">&nbsp;                return 1014;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;a&#39;) &amp;&amp; (c[pos + 1] == &#39;e&#39;)) {</b>
+<b class="nc">&nbsp;                return 722;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;A&#39;) &amp;&amp; (c[pos + 1] == &#39;E&#39;)) {</b>
+<b class="nc">&nbsp;                return 903;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[pos] == &#39;s&#39;) &amp;&amp; (c[pos + 1] == &#39;s&#39;)) {</b>
+<b class="nc">&nbsp;                return 500;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return BstWidthCalculator.getCharWidth(c[pos]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int getCharWidth(char c) {
+<b class="nc">&nbsp;        if ((c &gt;= 0) &amp;&amp; (c &lt; 128)) {</b>
+<b class="nc">&nbsp;            return BstWidthCalculator.widths[c];</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int width(String toMeasure) {
+&nbsp;        /*
+&nbsp;         * From Bibtex: We use the natural width for all but special characters,
+&nbsp;         * and we complain if the string isn&#39;t brace-balanced.
+&nbsp;         */
+&nbsp;
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        int n = toMeasure.length();</b>
+<b class="nc">&nbsp;        int braceLevel = 0;</b>
+<b class="nc">&nbsp;        char[] c = toMeasure.toCharArray();</b>
+<b class="nc">&nbsp;        int result = 0;</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * From Bibtex:
+&nbsp;         *
+&nbsp;         * We use the natural widths of all characters except that some
+&nbsp;         * characters have no width: braces, control sequences (except for the
+&nbsp;         * usual 13 accented and foreign characters, whose widths are given in
+&nbsp;         * the next module), and |white_space| following control sequences (even
+&nbsp;         * a null control sequence).
+&nbsp;         *
+&nbsp;         */
+<b class="nc">&nbsp;        while (i &lt; n) {</b>
+<b class="nc">&nbsp;            if (c[i] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                braceLevel++;</b>
+<b class="nc">&nbsp;                if ((braceLevel == 1) &amp;&amp; ((i + 1) &lt; n) &amp;&amp; (c[i + 1] == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                    i++; // skip brace</b>
+<b class="nc">&nbsp;                    while ((i &lt; n) &amp;&amp; (braceLevel &gt; 0)) {</b>
+<b class="nc">&nbsp;                        i++; // skip backslash</b>
+&nbsp;
+<b class="nc">&nbsp;                        int afterBackslash = i;</b>
+<b class="nc">&nbsp;                        while ((i &lt; n) &amp;&amp; Character.isLetter(c[i])) {</b>
+<b class="nc">&nbsp;                            i++;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        if ((i &lt; n) &amp;&amp; (i == afterBackslash)) {</b>
+<b class="nc">&nbsp;                            i++; // Skip non-alpha control seq</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            if (BstCaseChanger.findSpecialChar(c, afterBackslash).isPresent()) {</b>
+<b class="nc">&nbsp;                                result += BstWidthCalculator.getSpecialCharWidth(c, afterBackslash);</b>
+&nbsp;                            }
+&nbsp;                        }
+<b class="nc">&nbsp;                        while ((i &lt; n) &amp;&amp; Character.isWhitespace(c[i])) {</b>
+<b class="nc">&nbsp;                            i++;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        while ((i &lt; n) &amp;&amp; (braceLevel &gt; 0) &amp;&amp; (c[i] != &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                            if (c[i] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                                braceLevel--;</b>
+<b class="nc">&nbsp;                            } else if (c[i] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                                braceLevel++;</b>
+&nbsp;                            } else {
+<b class="nc">&nbsp;                                result += BstWidthCalculator.getCharWidth(c[i]);</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                            i++;</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (c[i] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                if (braceLevel &gt; 0) {</b>
+<b class="nc">&nbsp;                    braceLevel--;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Too many closing braces in string: {}&quot;, toMeasure);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            result += BstWidthCalculator.getCharWidth(c[i]);</b>
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (braceLevel &gt; 0) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;No enough closing braces in string: {}&quot;, toMeasure);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

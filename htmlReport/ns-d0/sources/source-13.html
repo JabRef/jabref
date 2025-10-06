@@ -1,0 +1,758 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ModsImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: ModsImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ModsImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/266)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/266)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javax.xml.stream.XMLInputFactory;
+&nbsp;import javax.xml.stream.XMLStreamException;
+&nbsp;import javax.xml.stream.XMLStreamReader;
+&nbsp;import javax.xml.stream.events.XMLEvent;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.mods.Identifier;
+&nbsp;import org.jabref.logic.importer.fileformat.mods.Name;
+&nbsp;import org.jabref.logic.importer.fileformat.mods.RecordInfo;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Date;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.EntryTypeFactory;
+&nbsp;
+&nbsp;import com.google.common.base.Joiner;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Importer for the MODS format.&lt;br&gt;
+&nbsp; * More details about the format can be found here &lt;a href=&quot;http://www.loc.gov/standards/mods/&quot;&gt;http://www.loc.gov/standards/mods/&lt;/a&gt;. &lt;br&gt;
+&nbsp; * The newest xml schema can also be found here &lt;a href=&quot;www.loc.gov/standards/mods/mods-schemas.html.&quot;&gt;www.loc.gov/standards/mods/mods-schemas.html.&lt;/a&gt;.
+&nbsp; */
+&nbsp;public class ModsImporter extends Importer implements Parser {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ModsImporter.class);</b>
+<b class="nc">&nbsp;    private static final Pattern MODS_PATTERN = Pattern.compile(&quot;&lt;mods .*&gt;&quot;);</b>
+&nbsp;
+&nbsp;    private final String keywordSeparator;
+&nbsp;    private final XMLInputFactory xmlInputFactory;
+&nbsp;
+<b class="nc">&nbsp;    public ModsImporter(ImportFormatPreferences importFormatPreferences) {</b>
+<b class="nc">&nbsp;        keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + &quot; &quot;;</b>
+<b class="nc">&nbsp;        xmlInputFactory = XMLInputFactory.newInstance();</b>
+&nbsp;        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
+&nbsp;        // Not supported by aalto-xml
+&nbsp;        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, &quot;&quot;);
+&nbsp;        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, &quot;&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+<b class="nc">&nbsp;        return input.lines().anyMatch(line -&gt; MODS_PATTERN.matcher(line).find());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader input) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(input);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; bibItems = new ArrayList&lt;&gt;();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);</b>
+<b class="nc">&nbsp;            parseModsCollection(bibItems, reader);</b>
+&nbsp;        } catch (XMLStreamException e) {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;could not parse document&quot;, e);</b>
+<b class="nc">&nbsp;            return ParserResult.fromError(e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new ParserResult(bibItems);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseModsCollection(List&lt;BibEntry&gt; bibItems, XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader) &amp;&amp; &quot;mods&quot;.equals(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                BibEntry entry = new BibEntry();</b>
+<b class="nc">&nbsp;                Map&lt;Field, String&gt; fields = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;                String id = reader.getAttributeValue(null, &quot;ID&quot;);</b>
+<b class="nc">&nbsp;                if (id != null) {</b>
+<b class="nc">&nbsp;                    entry.setCitationKey(id);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                parseModsGroup(fields, reader, entry);</b>
+&nbsp;
+<b class="nc">&nbsp;                entry.setField(fields);</b>
+<b class="nc">&nbsp;                bibItems.add(entry);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseModsGroup(Map&lt;Field, String&gt; fields, XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
+&nbsp;        // These elements (subject, keywords and authors) can appear more than once,
+&nbsp;        // so they are collected in lists
+<b class="nc">&nbsp;        List&lt;String&gt; notes = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; keywords = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; authors = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                String elementName = reader.getName().getLocalPart();</b>
+&nbsp;                // check which MODS group has started
+<b class="nc">&nbsp;                switch (elementName) {</b>
+&nbsp;                    case &quot;abstract&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            putIfValueNotNull(fields, StandardField.ABSTRACT, reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;genre&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            entry.setType(EntryTypeFactory.parse(mapGenre(reader.getText())));</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;language&quot; -&gt;
+<b class="nc">&nbsp;                            parseLanguage(reader, fields);</b>
+&nbsp;                    case &quot;location&quot; -&gt;
+<b class="nc">&nbsp;                            parseLocationAndUrl(reader, fields);</b>
+&nbsp;                    case &quot;identifier&quot; -&gt; {
+<b class="nc">&nbsp;                        String type = reader.getAttributeValue(null, &quot;type&quot;);</b>
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            parseIdentifier(fields, new Identifier(type, reader.getText()), entry);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;note&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            notes.add(reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;recordInfo&quot; -&gt;
+<b class="nc">&nbsp;                            parseRecordInfo(reader, fields);</b>
+&nbsp;                    case &quot;titleInfo&quot; -&gt;
+<b class="nc">&nbsp;                            parseTitle(reader, fields);</b>
+&nbsp;                    case &quot;subject&quot; -&gt;
+<b class="nc">&nbsp;                            parseSubject(reader, fields, keywords);</b>
+&nbsp;                    case &quot;originInfo&quot; -&gt;
+<b class="nc">&nbsp;                            parseOriginInfo(reader, fields);</b>
+&nbsp;                    case &quot;name&quot; -&gt;
+<b class="nc">&nbsp;                            parseName(reader, fields, authors);</b>
+&nbsp;                    case &quot;relatedItem&quot; -&gt;
+<b class="nc">&nbsp;                            parseRelatedItem(reader, fields);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;mods&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        putIfListIsNotEmpty(fields, notes, StandardField.NOTE, &quot;, &quot;);</b>
+<b class="nc">&nbsp;        putIfListIsNotEmpty(fields, keywords, StandardField.KEYWORDS, this.keywordSeparator);</b>
+<b class="nc">&nbsp;        putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, &quot; and &quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses information from the RelatedModsGroup. It has the same elements as ModsGroup.
+&nbsp;     * But information like volume, issue and the pages appear here instead of in the ModsGroup.
+&nbsp;     * Also, if there appears a title field, then this indicates that is the name of the journal
+&nbsp;     * which the article belongs to.
+&nbsp;     */
+&nbsp;    private void parseRelatedItem(XMLStreamReader reader, Map&lt;Field, String&gt; fields) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                switch (reader.getName().getLocalPart()) {</b>
+&nbsp;                    case &quot;title&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            putIfValueNotNull(fields, StandardField.JOURNAL, reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;detail&quot; -&gt;
+<b class="nc">&nbsp;                            handleDetail(reader, fields);</b>
+&nbsp;                    case &quot;extent&quot; -&gt;
+<b class="nc">&nbsp;                            handleExtent(reader, fields);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;relatedItem&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleExtent(XMLStreamReader reader, Map&lt;Field, String&gt; fields) throws XMLStreamException {
+<b class="nc">&nbsp;        String total = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String startPage = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String endPage = &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                String elementName = reader.getName().getLocalPart();</b>
+<b class="nc">&nbsp;                reader.next();</b>
+<b class="nc">&nbsp;                switch (elementName) {</b>
+&nbsp;                    case &quot;total&quot; -&gt; {
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            total = reader.getText();</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;start&quot; -&gt; {
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            startPage = reader.getText();</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;end&quot; -&gt; {
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            endPage = reader.getText();</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;extent&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!total.isBlank()) {</b>
+<b class="nc">&nbsp;            putIfValueNotNull(fields, StandardField.PAGES, total);</b>
+<b class="nc">&nbsp;        } else if (!startPage.isBlank()) {</b>
+<b class="nc">&nbsp;            putIfValueNotNull(fields, StandardField.PAGES, startPage);</b>
+<b class="nc">&nbsp;            if (!endPage.isBlank()) {</b>
+&nbsp;                // if end appears, then there has to be a start page appeared, so get it and put it together with
+&nbsp;                // the end page
+<b class="nc">&nbsp;                fields.put(StandardField.PAGES, startPage + &quot;-&quot; + endPage);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleDetail(XMLStreamReader reader, Map&lt;Field, String&gt; fields) throws XMLStreamException {
+<b class="nc">&nbsp;        String type = reader.getAttributeValue(null, &quot;type&quot;);</b>
+<b class="nc">&nbsp;        Set&lt;String&gt; detailElementSet = Set.of(&quot;number&quot;, &quot;caption&quot;, &quot;title&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                if (detailElementSet.contains(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                    reader.next();</b>
+<b class="nc">&nbsp;                    if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                        putIfValueNotNull(fields, FieldFactory.parseField(type), reader.getText());</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;detail&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseName(XMLStreamReader reader, Map&lt;Field, String&gt; fields, List&lt;String&gt; authors) throws XMLStreamException {
+<b class="nc">&nbsp;        List&lt;Name&gt; names = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                if (&quot;affiliation&quot;.equals(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                    reader.next();</b>
+<b class="nc">&nbsp;                    if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                        putIfValueNotNull(fields, new UnknownField(&quot;affiliation&quot;), reader.getText());</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } else if (&quot;namePart&quot;.equals(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                    String type = reader.getAttributeValue(null, &quot;type&quot;);</b>
+<b class="nc">&nbsp;                    reader.next();</b>
+<b class="nc">&nbsp;                    if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                        names.add(new Name(reader.getText(), type));</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;name&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        handleAuthorsInNamePart(names, authors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseOriginInfo(XMLStreamReader reader, Map&lt;Field, String&gt; fields) throws XMLStreamException {
+<b class="nc">&nbsp;        List&lt;String&gt; places = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                String elementName = reader.getName().getLocalPart();</b>
+<b class="nc">&nbsp;                switch (elementName) {</b>
+&nbsp;                    case &quot;issuance&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            putIfValueNotNull(fields, new UnknownField(&quot;issuance&quot;), reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;placeTerm&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            appendIfValueNotNullOrBlank(places, reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;publisher&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            putIfValueNotNull(fields, StandardField.PUBLISHER, reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;edition&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            putIfValueNotNull(fields, StandardField.EDITION, reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;dateIssued&quot;,
+&nbsp;                         &quot;dateCreated&quot;,
+&nbsp;                         &quot;dateCaptured&quot;,
+&nbsp;                         &quot;dateModified&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            putDate(fields, elementName, reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;originInfo&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, &quot;, &quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseSubject(XMLStreamReader reader, Map&lt;Field, String&gt; fields, List&lt;String&gt; keywords) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                switch (reader.getName().getLocalPart()) {</b>
+&nbsp;                    case &quot;topic&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            keywords.add(reader.getText().trim());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;city&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            putIfValueNotNull(fields, new UnknownField(&quot;city&quot;), reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case &quot;country&quot; -&gt; {
+<b class="nc">&nbsp;                        reader.next();</b>
+<b class="nc">&nbsp;                        if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                            putIfValueNotNull(fields, new UnknownField(&quot;country&quot;), reader.getText());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;subject&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseRecordInfo(XMLStreamReader reader, Map&lt;Field, String&gt; fields) throws XMLStreamException {
+<b class="nc">&nbsp;        RecordInfo recordInfoDefinition = new RecordInfo();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; recordContents = recordInfoDefinition.recordContents();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; languages = recordInfoDefinition.languages();</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                if (RecordInfo.elementNameSet.contains(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                    reader.next();</b>
+<b class="nc">&nbsp;                    if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                        recordContents.addFirst(reader.getText());</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } else if (&quot;languageTerm&quot;.equals(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                    reader.next();</b>
+<b class="nc">&nbsp;                    if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                        languages.add(reader.getText());</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;recordInfo&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (String recordContent : recordContents) {</b>
+<b class="nc">&nbsp;            putIfValueNotNull(fields, new UnknownField(&quot;source&quot;), recordContent);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        putIfListIsNotEmpty(fields, languages, StandardField.LANGUAGE, &quot;, &quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseLanguage(XMLStreamReader reader, Map&lt;Field, String&gt; fields) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader) &amp;&amp; &quot;languageTerm&quot;.equals(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                reader.next();</b>
+<b class="nc">&nbsp;                if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                    putIfValueNotNull(fields, StandardField.LANGUAGE, reader.getText());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;language&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseTitle(XMLStreamReader reader, Map&lt;Field, String&gt; fields) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader) &amp;&amp; &quot;title&quot;.equals(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                reader.next();</b>
+<b class="nc">&nbsp;                if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                    putIfValueNotNull(fields, StandardField.TITLE, reader.getText());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;titleInfo&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseLocationAndUrl(XMLStreamReader reader, Map&lt;Field, String&gt; fields) throws XMLStreamException {
+<b class="nc">&nbsp;        List&lt;String&gt; locations = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; urls = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            reader.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isStartXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                if (&quot;physicalLocation&quot;.equals(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                    reader.next();</b>
+<b class="nc">&nbsp;                    if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                        locations.add(reader.getText());</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } else if (&quot;url&quot;.equals(reader.getName().getLocalPart())) {</b>
+<b class="nc">&nbsp;                    reader.next();</b>
+<b class="nc">&nbsp;                    if (isCharacterXMLEvent(reader)) {</b>
+<b class="nc">&nbsp;                        urls.add(reader.getText());</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isEndXMLEvent(reader) &amp;&amp; &quot;location&quot;.equals(reader.getName().getLocalPart())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        putIfListIsNotEmpty(fields, locations, StandardField.LOCATION, &quot;, &quot;);</b>
+<b class="nc">&nbsp;        putIfListIsNotEmpty(fields, urls, StandardField.URL, &quot;, &quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String mapGenre(String genre) {
+<b class="nc">&nbsp;        return switch (genre.toLowerCase(Locale.ROOT)) {</b>
+&nbsp;            case &quot;conference publication&quot; -&gt;
+<b class="nc">&nbsp;                    &quot;proceedings&quot;;</b>
+&nbsp;            case &quot;database&quot; -&gt;
+<b class="nc">&nbsp;                    &quot;dataset&quot;;</b>
+&nbsp;            case &quot;yearbook&quot;,
+&nbsp;                 &quot;handbook&quot; -&gt;
+<b class="nc">&nbsp;                    &quot;book&quot;;</b>
+&nbsp;            case &quot;law report or digest&quot;,
+&nbsp;                 &quot;technical report&quot;,
+&nbsp;                 &quot;reporting&quot; -&gt;
+<b class="nc">&nbsp;                    &quot;report&quot;;</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    genre;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseIdentifier(Map&lt;Field, String&gt; fields, Identifier identifier, BibEntry entry) {
+<b class="nc">&nbsp;        String type = identifier.type();</b>
+<b class="nc">&nbsp;        if (&quot;citekey&quot;.equals(type) &amp;&amp; entry.getCitationKey().isEmpty()) {</b>
+<b class="nc">&nbsp;            entry.setCitationKey(identifier.value());</b>
+<b class="nc">&nbsp;        } else if (!&quot;local&quot;.equals(type) &amp;&amp; !&quot;citekey&quot;.equals(type)) {</b>
+&nbsp;            // put all identifiers (doi, issn, isbn,...) except of local and citekey
+<b class="nc">&nbsp;            putIfValueNotNull(fields, FieldFactory.parseField(identifier.type()), identifier.value());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putDate(Map&lt;Field, String&gt; fields, String elementName, String date) {
+<b class="nc">&nbsp;        if (date != null) {</b>
+<b class="nc">&nbsp;            Optional&lt;Date&gt; optionalParsedDate = Date.parse(date);</b>
+<b class="nc">&nbsp;            switch (elementName) {</b>
+&nbsp;                case &quot;dateIssued&quot; -&gt; {
+<b class="nc">&nbsp;                    optionalParsedDate</b>
+<b class="nc">&nbsp;                            .ifPresent(parsedDate -&gt; fields.put(StandardField.DATE, parsedDate.getNormalized()));</b>
+&nbsp;
+<b class="nc">&nbsp;                    optionalParsedDate.flatMap(Date::getYear)</b>
+<b class="nc">&nbsp;                                      .ifPresent(year -&gt; fields.put(StandardField.YEAR, year.toString()));</b>
+&nbsp;
+<b class="nc">&nbsp;                    optionalParsedDate.flatMap(Date::getMonth)</b>
+<b class="nc">&nbsp;                                      .ifPresent(month -&gt; fields.put(StandardField.MONTH, month.getJabRefFormat()));</b>
+&nbsp;                }
+&nbsp;                case &quot;dateCreated&quot; -&gt; {
+&nbsp;                    // If there was no year in date issued, then take the year from date created
+<b class="nc">&nbsp;                    fields.computeIfAbsent(StandardField.YEAR, k -&gt; date.substring(0, 4));</b>
+<b class="nc">&nbsp;                    fields.put(new UnknownField(&quot;created&quot;), date);</b>
+&nbsp;                }
+&nbsp;                case &quot;dateCaptured&quot; -&gt;
+<b class="nc">&nbsp;                        optionalParsedDate</b>
+<b class="nc">&nbsp;                                .ifPresent(parsedDate -&gt; fields.put(StandardField.CREATIONDATE, parsedDate.getNormalized()));</b>
+&nbsp;                case &quot;dateModified&quot; -&gt;
+<b class="nc">&nbsp;                        optionalParsedDate</b>
+<b class="nc">&nbsp;                                .ifPresent(parsedDate -&gt; fields.put(StandardField.MODIFICATIONDATE, parsedDate.getNormalized()));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putIfListIsNotEmpty(Map&lt;Field, String&gt; fields, List&lt;String&gt; list, Field key, String separator) {
+<b class="nc">&nbsp;        if (!list.isEmpty()) {</b>
+<b class="nc">&nbsp;            fields.put(key, String.join(separator, list));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleAuthorsInNamePart(List&lt;Name&gt; names, List&lt;String&gt; authors) {
+<b class="nc">&nbsp;        List&lt;String&gt; foreName = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        String familyName = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String author = &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Name name : names) {</b>
+<b class="nc">&nbsp;            String type = name.type(); // date, family, given, termsOfAddress</b>
+&nbsp;
+<b class="nc">&nbsp;            if ((type == null) &amp;&amp; (name.value() != null)) {</b>
+<b class="nc">&nbsp;                String namePartValue = name.value();</b>
+<b class="nc">&nbsp;                namePartValue = namePartValue.replaceAll(&quot;,$&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                authors.add(namePartValue);</b>
+<b class="nc">&nbsp;            } else if (&quot;family&quot;.equals(type) &amp;&amp; (name.value() != null)) {</b>
+&nbsp;                // family should come first, so if family appears we can set the author then comes before
+&nbsp;                // we have to check if forename and family name are not empty in case it&#39;s the first author
+<b class="nc">&nbsp;                if (!foreName.isEmpty() &amp;&amp; !familyName.isEmpty()) {</b>
+&nbsp;                    // now set and add the old author
+<b class="nc">&nbsp;                    author = familyName + &quot;, &quot; + Joiner.on(&quot; &quot;).join(foreName);</b>
+<b class="nc">&nbsp;                    authors.add(author);</b>
+&nbsp;                    // remove old forenames
+<b class="nc">&nbsp;                    foreName.clear();</b>
+<b class="nc">&nbsp;                } else if (foreName.isEmpty() &amp;&amp; !familyName.isEmpty()) {</b>
+<b class="nc">&nbsp;                    authors.add(familyName);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                familyName = name.value();</b>
+<b class="nc">&nbsp;            } else if (&quot;given&quot;.equals(type) &amp;&amp; (name.value() != null)) {</b>
+<b class="nc">&nbsp;                foreName.add(name.value());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // last author is not added, so do it here
+<b class="nc">&nbsp;        if (!foreName.isEmpty() &amp;&amp; !familyName.isEmpty()) {</b>
+<b class="nc">&nbsp;            author = familyName + &quot;, &quot; + Joiner.on(&quot; &quot;).join(foreName);</b>
+<b class="nc">&nbsp;            authors.add(author.trim());</b>
+<b class="nc">&nbsp;            foreName.clear();</b>
+<b class="nc">&nbsp;        } else if (foreName.isEmpty() &amp;&amp; !familyName.isEmpty()) {</b>
+<b class="nc">&nbsp;            authors.add(familyName.trim());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putIfValueNotNull(Map&lt;Field, String&gt; fields, Field field, String value) {
+<b class="nc">&nbsp;        if (value != null) {</b>
+<b class="nc">&nbsp;            fields.put(field, value);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void appendIfValueNotNullOrBlank(List&lt;String&gt; list, String value) {
+<b class="nc">&nbsp;        if (value != null &amp;&amp; !value.isBlank()) {</b>
+<b class="nc">&nbsp;            list.add(value);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isCharacterXMLEvent(XMLStreamReader reader) {
+<b class="nc">&nbsp;        return reader.getEventType() == XMLEvent.CHARACTERS;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isStartXMLEvent(XMLStreamReader reader) {
+<b class="nc">&nbsp;        return reader.getEventType() == XMLEvent.START_ELEMENT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isEndXMLEvent(XMLStreamReader reader) {
+<b class="nc">&nbsp;        return reader.getEventType() == XMLEvent.END_ELEMENT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;mods&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;MODS&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StandardFileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.XML;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Importer for the MODS format.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; parseEntries(InputStream inputStream) throws ParseException {
+&nbsp;        try {
+<b class="nc">&nbsp;            return importDatabase(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(e.getLocalizedMessage(), e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return List.of();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

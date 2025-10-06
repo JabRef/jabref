@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitedKey</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.style</a>
+</div>
+
+<h1>Coverage Summary for Class: CitedKey (org.jabref.model.openoffice.style)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitedKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.style;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.openoffice.ootext.OOText;
+&nbsp;
+&nbsp;/**
+&nbsp; * Cited keys are collected from the citations in citation groups.
+&nbsp; * &lt;p&gt;
+&nbsp; * They contain backreferences to the corresponding citations in {@code where}. This allows the extra information generated using CitedKeys to be distributed back to the in-text citations.
+&nbsp; */
+&nbsp;public class CitedKey implements
+&nbsp;        ComparableCitedKey,
+&nbsp;        CitationMarkerNormEntry,
+&nbsp;        CitationMarkerNumericBibEntry {
+&nbsp;
+&nbsp;    public final String citationKey;
+&nbsp;    private final List&lt;CitationPath&gt; where;
+&nbsp;
+&nbsp;    private Optional&lt;CitationLookupResult&gt; db;
+&nbsp;    private Optional&lt;Integer&gt; number; // For Numbered citation styles.
+&nbsp;    private Optional&lt;String&gt; uniqueLetter; // For AuthorYear citation styles.
+&nbsp;    private Optional&lt;OOText&gt; normCitMarker;  // For AuthorYear citation styles.
+&nbsp;
+<b class="nc">&nbsp;    CitedKey(String citationKey, CitationPath path, Citation citation) {</b>
+<b class="nc">&nbsp;        this.citationKey = citationKey;</b>
+<b class="nc">&nbsp;        this.where = new ArrayList&lt;&gt;(); // remember order</b>
+<b class="nc">&nbsp;        this.where.add(path);</b>
+&nbsp;
+&nbsp;        // synchronized with Citation
+<b class="nc">&nbsp;        this.db = citation.getLookupResult();</b>
+<b class="nc">&nbsp;        this.number = citation.getNumber();</b>
+<b class="nc">&nbsp;        this.uniqueLetter = citation.getUniqueLetter();</b>
+&nbsp;
+&nbsp;        // CitedKey only
+<b class="nc">&nbsp;        this.normCitMarker = Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Implement ComparableCitedKey
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String getCitationKey() {
+<b class="nc">&nbsp;        return citationKey;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;BibEntry&gt; getBibEntry() {
+<b class="nc">&nbsp;        return db.map(e -&gt; e.entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Implement CitationMarkerNormEntry
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Optional&lt;CitationLookupResult&gt; getLookupResult() {
+<b class="nc">&nbsp;        return db;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Implement CitationMarkerNumericBibEntry
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Optional&lt;Integer&gt; getNumber() {
+<b class="nc">&nbsp;        return number;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setNumber(Optional&lt;Integer&gt; number) {
+<b class="nc">&nbsp;        this.number = number;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;CitationPath&gt; getCitationPaths() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(where);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getUniqueLetter() {
+<b class="nc">&nbsp;        return uniqueLetter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUniqueLetter(Optional&lt;String&gt; uniqueLetter) {
+<b class="nc">&nbsp;        this.uniqueLetter = uniqueLetter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;OOText&gt; getNormalizedCitationMarker() {
+<b class="nc">&nbsp;        return normCitMarker;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setNormalizedCitationMarker(Optional&lt;OOText&gt; normCitMarker) {
+<b class="nc">&nbsp;        this.normCitMarker = normCitMarker;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Appends to end of {@code where}
+&nbsp;     */
+&nbsp;    void addPath(CitationPath path, Citation cit) {
+<b class="nc">&nbsp;        this.where.add(path);</b>
+&nbsp;
+&nbsp;        // Check consistency
+<b class="nc">&nbsp;        if (!cit.getLookupResult().equals(this.db)) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;CitedKey.addPath: mismatch on cit.db&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!cit.getNumber().equals(this.number)) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;CitedKey.addPath: mismatch on cit.number&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!cit.getUniqueLetter().equals(this.uniqueLetter)) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;CitedKey.addPath: mismatch on cit.uniqueLetter&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Lookup
+&nbsp;     */
+&nbsp;    void lookupInDatabases(List&lt;BibDatabase&gt; databases) {
+<b class="nc">&nbsp;        this.db = Citation.lookup(databases, this.citationKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void distributeLookupResult(CitationGroups citationGroups) {
+<b class="nc">&nbsp;        citationGroups.distributeToCitations(where, Citation::setLookupResult, db);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Make unique using a letter or by numbering
+&nbsp;     */
+&nbsp;
+&nbsp;    void distributeNumber(CitationGroups citationGroups) {
+<b class="nc">&nbsp;        citationGroups.distributeToCitations(where, Citation::setNumber, number);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void distributeUniqueLetter(CitationGroups citationGroups) {
+<b class="nc">&nbsp;        citationGroups.distributeToCitations(where, Citation::setUniqueLetter, uniqueLetter);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

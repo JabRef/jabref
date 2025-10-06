@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JsonReader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.util</a>
+</div>
+
+<h1>Coverage Summary for Class: JsonReader (org.jabref.logic.importer.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JsonReader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;
+&nbsp;/**
+&nbsp; * Converts an {@link InputStream} into a {@link JSONObject}.
+&nbsp; */
+<b class="nc">&nbsp;public class JsonReader {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts the given input stream into a {@link JSONObject}.
+&nbsp;     *
+&nbsp;     * @return A {@link JSONObject}. An empty JSON object is returned in the case an empty stream is passed.
+&nbsp;     */
+&nbsp;    public static JSONObject toJsonObject(InputStream inputStream) throws ParseException {
+&nbsp;        try {
+<b class="nc">&nbsp;            String inputStr = new String((inputStream.readAllBytes()), StandardCharsets.UTF_8);</b>
+&nbsp;            // Fallback: in case an empty stream was passed, return an empty JSON object
+<b class="nc">&nbsp;            if (inputStr.isBlank()) {</b>
+<b class="nc">&nbsp;                return new JSONObject();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return new JSONObject(inputStr);</b>
+&nbsp;        } catch (IOException | JSONException e) {
+<b class="nc">&nbsp;            throw new ParseException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static JSONArray toJsonArray(InputStream stream) throws ParseException {
+&nbsp;        try {
+<b class="nc">&nbsp;            String inpStr = new String((stream.readAllBytes()), StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;            if (inpStr.isBlank()) {</b>
+<b class="nc">&nbsp;                return new JSONArray();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return new JSONArray(inpStr);</b>
+&nbsp;        } catch (IOException | JSONException e) {
+<b class="nc">&nbsp;            throw new ParseException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

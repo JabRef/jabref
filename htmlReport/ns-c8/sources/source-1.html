@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HelpFile</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.help</a>
+</div>
+
+<h1>Coverage Summary for Class: HelpFile (org.jabref.logic.help)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HelpFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.help;
+&nbsp;
+&nbsp;/**
+&nbsp; * This enum globally defines all help pages with the name of the markdown file in the help repository at Github.
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://github.com/JabRef/user-documentation&quot;&gt;user-documentation@github&lt;/a&gt;
+&nbsp; */
+<b class="nc">&nbsp;public enum HelpFile {</b>
+&nbsp;    // empty string denotes that it refers to the TOC/index
+<b class="nc">&nbsp;    CONTENTS(&quot;&quot;), // this is always the index</b>
+<b class="nc">&nbsp;    ENTRY_EDITOR(&quot;advanced/entryeditor&quot;),</b>
+<b class="nc">&nbsp;    STRING_EDITOR(&quot;setup/stringeditor&quot;),</b>
+<b class="nc">&nbsp;    GROUPS(&quot;finding-sorting-and-cleaning-entries/groups#groups-structure-creating-and-removing-groups&quot;),</b>
+<b class="nc">&nbsp;    SPECIAL_FIELDS(&quot;finding-sorting-and-cleaning-entries/specialfields&quot;),</b>
+<b class="nc">&nbsp;    CITATION_KEY_PATTERN(&quot;setup/citationkeypatterns&quot;),</b>
+<b class="nc">&nbsp;    OWNER(&quot;advanced/entryeditor/owner&quot;),</b>
+<b class="nc">&nbsp;    TIMESTAMP(&quot;advanced/entryeditor/timestamp&quot;),</b>
+<b class="nc">&nbsp;    CUSTOM_EXPORTS_NAME_FORMATTER(&quot;collaborative-work/export/customexports#using-custom-name-formatters&quot;),</b>
+<b class="nc">&nbsp;    GENERAL_FIELDS(&quot;setup/generalfields&quot;),</b>
+<b class="nc">&nbsp;    REMOTE(&quot;advanced/remote&quot;),</b>
+<b class="nc">&nbsp;    REGEX_SEARCH(&quot;finding-sorting-and-cleaning-entries/filelinks#using-regular-expression-search-for-auto-linking&quot;),</b>
+<b class="nc">&nbsp;    PREVIEW(&quot;setup/preview&quot;),</b>
+<b class="nc">&nbsp;    AUTOSAVE(&quot;advanced/autosave&quot;),</b>
+&nbsp;    // The help page covers both OO and LO.
+<b class="nc">&nbsp;    OPENOFFICE_LIBREOFFICE(&quot;cite/openofficeintegration&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_ACM(&quot;collect/import-using-online-bibliographic-database#acm-portal&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_BIBSONOMY_SCRAPER(&quot;&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_BIODIVERSITY_HERITAGE_LIBRARY(&quot;collect/import-using-online-bibliographic-database#bibliotheksverbund-bayern-bvb&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_CITESEERX(&quot;collect/import-using-online-bibliographic-database#citeseerx&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_COLLECTION_OF_COMPUTER_SCIENCE_BIBLIOGRAPHIES(&quot;collect/import-using-online-bibliographic-database#collection-of-computer-science-bibliographies-ccsb&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_CROSSREF(&quot;collect/import-using-online-bibliographic-database#crossref-unpaywalll&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_DBLP(&quot;collect/import-using-online-bibliographic-database#dblp&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_DOAB(&quot;collect/import-using-online-bibliographic-database#doab&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_DOAJ(&quot;collect/import-using-online-bibliographic-database#doaj&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_DIVA(&quot;collect/add-entry-using-an-id&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_DOI(&quot;collect/add-entry-using-an-id&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_GOOGLE_SCHOLAR(&quot;collect/import-using-online-bibliographic-database#googlescholar&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_GVK(&quot;collect/import-using-online-bibliographic-database#gvk&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_IEEEXPLORE(&quot;collect/import-using-online-bibliographic-database#ieeexplore&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_INSPIRE(&quot;collect/import-using-online-bibliographic-database#inspire&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_ISBN(&quot;collect/add-entry-using-an-id&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_MEDLINE(&quot;collect/import-using-online-bibliographic-database#medline-pubmed&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_OAI2_ARXIV(&quot;collect/import-using-online-bibliographic-database#arxiv&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_RFC(&quot;collect/add-entry-using-an-id&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_SPRINGER(&quot;collect/import-using-online-bibliographic-database#springer&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_ZBMATH(&quot;collect/import-using-online-bibliographic-database#zbmath-open&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_TITLE(&quot;collect/add-entry-using-an-id&quot;),</b>
+<b class="nc">&nbsp;    FETCHER_SCIENCEDIRECT(&quot;&quot;),</b>
+<b class="nc">&nbsp;    DATABASE_PROPERTIES(&quot;setup/databaseproperties&quot;),</b>
+<b class="nc">&nbsp;    FIND_DUPLICATES(&quot;finding-sorting-and-cleaning-entries/findduplicates&quot;),</b>
+<b class="nc">&nbsp;    SQL_DATABASE_MIGRATION(&quot;collaborative-work/sqldatabase/sqldatabasemigration&quot;),</b>
+<b class="nc">&nbsp;    PUSH_TO_APPLICATION(&quot;cite/pushtoapplications&quot;),</b>
+<b class="nc">&nbsp;    AI_GENERAL_SETTINGS(&quot;ai/preferences&quot;),</b>
+<b class="nc">&nbsp;    AI_EXPERT_SETTINGS(&quot;ai/preferences#ai-expert-settings&quot;),</b>
+<b class="nc">&nbsp;    AI_TEMPLATES(&quot;ai/preferences#templates&quot;);</b>
+&nbsp;
+&nbsp;    private final String pageName;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the URL path part of the help page.
+&nbsp;     *
+&nbsp;     * @param pageName the URL path part of the help page
+&nbsp;     */
+<b class="nc">&nbsp;    HelpFile(String pageName) {</b>
+<b class="nc">&nbsp;        this.pageName = pageName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the URL path part of the help page.
+&nbsp;     *
+&nbsp;     * @return the URL path part of the help page
+&nbsp;     */
+&nbsp;    public String getPageName() {
+<b class="nc">&nbsp;        return pageName;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

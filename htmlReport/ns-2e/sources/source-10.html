@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OtherFieldsTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: OtherFieldsTab (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OtherFieldsTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.SequencedSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.PreviewPanel;
+&nbsp;import org.jabref.gui.undo.RedoAction;
+&nbsp;import org.jabref.gui.undo.UndoAction;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UserSpecificCommentField;
+&nbsp;
+&nbsp;public class OtherFieldsTab extends FieldsEditorTab {
+&nbsp;
+&nbsp;    public static final String NAME = &quot;Other fields&quot;;
+&nbsp;    private final List&lt;Field&gt; customTabsFieldNames;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;
+&nbsp;    public OtherFieldsTab(UndoManager undoManager,
+&nbsp;                          UndoAction undoAction,
+&nbsp;                          RedoAction redoAction,
+&nbsp;                          GuiPreferences preferences,
+&nbsp;                          BibEntryTypesManager entryTypesManager,
+&nbsp;                          JournalAbbreviationRepository journalAbbreviationRepository,
+&nbsp;                          StateManager stateManager,
+&nbsp;                          PreviewPanel previewPanel) {
+<b class="nc">&nbsp;        super(</b>
+&nbsp;                false,
+&nbsp;                undoManager,
+&nbsp;                undoAction,
+&nbsp;                redoAction,
+&nbsp;                preferences,
+&nbsp;                journalAbbreviationRepository,
+&nbsp;                stateManager,
+&nbsp;                previewPanel
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.customTabsFieldNames = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        preferences.getEntryEditorPreferences().getEntryEditorTabs().values().forEach(customTabsFieldNames::addAll);</b>
+&nbsp;
+<b class="nc">&nbsp;        setText(Localization.lang(&quot;Other fields&quot;));</b>
+<b class="nc">&nbsp;        setTooltip(new Tooltip(Localization.lang(&quot;Show remaining fields&quot;)));</b>
+<b class="nc">&nbsp;        setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected SequencedSet&lt;Field&gt; determineFieldsToShow(BibEntry entry) {
+<b class="nc">&nbsp;        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)</b>
+<b class="nc">&nbsp;                                           .orElse(BibDatabaseMode.BIBLATEX);</b>
+<b class="nc">&nbsp;        Optional&lt;BibEntryType&gt; entryType = entryTypesManager.enrich(entry.getType(), mode);</b>
+<b class="nc">&nbsp;        if (entryType.isPresent()) {</b>
+&nbsp;            // Get all required and optional fields configured for the entry
+<b class="nc">&nbsp;            Set&lt;Field&gt; allKnownFields = entryType.get().getAllFields();</b>
+&nbsp;            // Remove all fields being required or optional
+<b class="nc">&nbsp;            SequencedSet&lt;Field&gt; otherFields = entry.getFields().stream()</b>
+<b class="nc">&nbsp;                                                   .filter(field -&gt; !allKnownFields.contains(field))</b>
+<b class="nc">&nbsp;                                                   .collect(Collectors.toCollection(LinkedHashSet::new));</b>
+&nbsp;            // The key field is in the required tab, but has a special treatment
+<b class="nc">&nbsp;            otherFields.remove(InternalField.KEY_FIELD);</b>
+&nbsp;            // Remove all fields contained in JabRef&#39;s tab &quot;Deprecated&quot;
+<b class="nc">&nbsp;            otherFields.removeAll(entryType.get().getDeprecatedFields(mode));</b>
+&nbsp;            // Remove all fields contained in the custom tabs
+<b class="nc">&nbsp;            customTabsFieldNames.forEach(otherFields::remove);</b>
+&nbsp;            // Remove all user-comment fields (tab org.jabref.gui.entryeditor.CommentsTab)
+<b class="nc">&nbsp;            otherFields.removeIf(field -&gt; field.equals(StandardField.COMMENT));</b>
+<b class="nc">&nbsp;            otherFields.removeIf(field -&gt; field instanceof UserSpecificCommentField);</b>
+<b class="nc">&nbsp;            return otherFields;</b>
+&nbsp;        } else {
+&nbsp;            // Entry type unknown -&gt; treat all fields as required (thus no other fields)
+<b class="nc">&nbsp;            return new LinkedHashSet&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

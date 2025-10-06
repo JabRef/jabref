@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DiffHighlighting</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.multiwaymerge</a>
+</div>
+
+<h1>Coverage Summary for Class: DiffHighlighting (org.jabref.gui.mergeentries.multiwaymerge)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DiffHighlighting</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DiffHighlighting$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.multiwaymerge;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;import com.github.difflib.DiffUtils;
+&nbsp;import com.github.difflib.patch.AbstractDelta;
+&nbsp;
+&nbsp;public class DiffHighlighting {
+&nbsp;
+&nbsp;    private DiffHighlighting() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Text&gt; generateDiffHighlighting(String baseString, String modifiedString, String separator) {
+<b class="nc">&nbsp;        List&lt;String&gt; baseStringSplit = Arrays.asList(baseString.split(separator));</b>
+<b class="nc">&nbsp;        List&lt;String&gt; modifiedStringSplit = Arrays.asList(modifiedString.split(separator));</b>
+<b class="nc">&nbsp;        List&lt;AbstractDelta&lt;String&gt;&gt; deltaList = DiffUtils.diff(baseStringSplit, modifiedStringSplit).getDeltas();</b>
+<b class="nc">&nbsp;        List&lt;Text&gt; result = baseStringSplit.stream().map(text -&gt; forUnchanged(text + separator)).collect(Collectors.toList());</b>
+<b class="nc">&nbsp;        for (AbstractDelta&lt;String&gt; delta : deltaList.reversed()) {</b>
+<b class="nc">&nbsp;            int startPos = delta.getSource().getPosition();</b>
+<b class="nc">&nbsp;            List&lt;String&gt; lines = delta.getSource().getLines();</b>
+<b class="nc">&nbsp;            int offset = 0;</b>
+<b class="nc">&nbsp;            switch (delta.getType()) {</b>
+&nbsp;                case CHANGE:
+<b class="nc">&nbsp;                    for (String line : lines) {</b>
+<b class="nc">&nbsp;                        result.set(startPos + offset, forRemoved(line + separator));</b>
+<b class="nc">&nbsp;                        offset++;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    result.set(startPos + offset - 1, forRemoved(baseStringSplit.get((startPos + offset) - 1) + separator));</b>
+<b class="nc">&nbsp;                    result.add(startPos + offset, forAdded(String.join(separator, delta.getTarget().getLines())));</b>
+&nbsp;                    break;
+&nbsp;                case DELETE:
+<b class="nc">&nbsp;                    for (String line : lines) {</b>
+<b class="nc">&nbsp;                        result.set(startPos + offset, forRemoved(line + separator));</b>
+<b class="nc">&nbsp;                        offset++;</b>
+&nbsp;                    }
+&nbsp;                    break;
+&nbsp;                case INSERT:
+<b class="nc">&nbsp;                    result.add(delta.getSource().getPosition(), forAdded(String.join(separator, delta.getTarget().getLines())));</b>
+&nbsp;                    break;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Text forChanged(String text) {
+<b class="nc">&nbsp;        Text node = new Text(text);</b>
+<b class="nc">&nbsp;        node.getStyleClass().add(&quot;text-changed&quot;);</b>
+<b class="nc">&nbsp;        return node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Text forUnchanged(String text) {
+<b class="nc">&nbsp;        Text node = new Text(text);</b>
+<b class="nc">&nbsp;        node.getStyleClass().add(&quot;text-unchanged&quot;);</b>
+<b class="nc">&nbsp;        return node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Text forAdded(String text) {
+<b class="nc">&nbsp;        Text node = new Text(text);</b>
+<b class="nc">&nbsp;        node.getStyleClass().add(&quot;text-added&quot;);</b>
+<b class="nc">&nbsp;        return node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Text forRemoved(String text) {
+<b class="nc">&nbsp;        Text node = new Text(text);</b>
+<b class="nc">&nbsp;        node.getStyleClass().add(&quot;text-removed&quot;);</b>
+<b class="nc">&nbsp;        return node;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

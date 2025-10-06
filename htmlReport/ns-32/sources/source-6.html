@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SaveAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: SaveAction (org.jabref.gui.exporter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SaveAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SaveAction$SaveMethod</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.exporter;
+&nbsp;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class is just a simple wrapper for the soon to be refactored SaveDatabaseAction.
+&nbsp; */
+&nbsp;public class SaveAction extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    public enum SaveMethod { SAVE, SAVE_AS, SAVE_SELECTED }</b>
+&nbsp;
+&nbsp;    private final SaveMethod saveMethod;
+&nbsp;    private final Supplier&lt;LibraryTab&gt; tabSupplier;
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    public SaveAction(SaveMethod saveMethod,
+&nbsp;                      Supplier&lt;LibraryTab&gt; tabSupplier,
+&nbsp;                      DialogService dialogService,
+&nbsp;                      GuiPreferences preferences,
+<b class="nc">&nbsp;                      StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.saveMethod = saveMethod;</b>
+<b class="nc">&nbsp;        this.tabSupplier = tabSupplier;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (saveMethod == SaveMethod.SAVE_SELECTED) {</b>
+<b class="nc">&nbsp;            this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.executable.bind(ActionHelper.needsDatabase(stateManager));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(</b>
+<b class="nc">&nbsp;                tabSupplier.get(),</b>
+&nbsp;                dialogService,
+&nbsp;                preferences,
+<b class="nc">&nbsp;                Injector.instantiateModelOrService(BibEntryTypesManager.class),</b>
+&nbsp;                stateManager);
+&nbsp;
+<b class="nc">&nbsp;        switch (saveMethod) {</b>
+&nbsp;            case SAVE -&gt;
+<b class="nc">&nbsp;                    saveDatabaseAction.save();</b>
+&nbsp;            case SAVE_AS -&gt;
+<b class="nc">&nbsp;                    saveDatabaseAction.saveAs();</b>
+&nbsp;            case SAVE_SELECTED -&gt;
+<b class="nc">&nbsp;                    saveDatabaseAction.saveSelectedAsPlain();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,314 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ControlHelper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ControlHelper (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ControlHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ControlHelper$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ControlHelper$EllipsisPosition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.UnaryOperator;
+&nbsp;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.event.ActionEvent;
+&nbsp;import javafx.event.Event;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.Cell;
+&nbsp;import javafx.scene.control.DialogPane;
+&nbsp;import javafx.scene.control.TextFormatter;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;
+<b class="nc">&nbsp;public class ControlHelper {</b>
+&nbsp;
+&nbsp;    // Pseudo-classes for drag and drop
+<b class="nc">&nbsp;    private static PseudoClass dragOverBottom = PseudoClass.getPseudoClass(&quot;dragOver-bottom&quot;);</b>
+<b class="nc">&nbsp;    private static PseudoClass dragOverCenter = PseudoClass.getPseudoClass(&quot;dragOver-center&quot;);</b>
+<b class="nc">&nbsp;    private static PseudoClass dragOverTop = PseudoClass.getPseudoClass(&quot;dragOver-top&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    public enum EllipsisPosition { BEGINNING, CENTER, ENDING }</b>
+&nbsp;
+&nbsp;    public static void setAction(ButtonType buttonType, DialogPane dialogPane, Consumer&lt;Event&gt; consumer) {
+<b class="nc">&nbsp;        Button button = (Button) dialogPane.lookupButton(buttonType);</b>
+<b class="nc">&nbsp;        button.addEventFilter(ActionEvent.ACTION, event -&gt; {</b>
+<b class="nc">&nbsp;            consumer.accept(event);</b>
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean childIsFocused(Parent node) {
+<b class="nc">&nbsp;        return node.isFocused() || node.getChildrenUnmodifiable().stream().anyMatch(child -&gt; {</b>
+<b class="nc">&nbsp;            if (child instanceof Parent parent) {</b>
+<b class="nc">&nbsp;                return childIsFocused(parent);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return child.isFocused();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a text formatter that restricts input to integers
+&nbsp;     */
+&nbsp;    public static TextFormatter&lt;String&gt; getIntegerTextFormatter() {
+<b class="nc">&nbsp;        UnaryOperator&lt;TextFormatter.Change&gt; filter = change -&gt; {</b>
+<b class="nc">&nbsp;            String text = change.getText();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (text.matches(&quot;[0-9]*&quot;)) {</b>
+<b class="nc">&nbsp;                return change;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        };
+<b class="nc">&nbsp;        return new TextFormatter&lt;&gt;(filter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void removePseudoClasses(Cell&lt;?&gt; cell, PseudoClass... pseudoClasses) {
+<b class="nc">&nbsp;        for (PseudoClass pseudoClass : pseudoClasses) {</b>
+<b class="nc">&nbsp;            cell.pseudoClassStateChanged(pseudoClass, false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines where the mouse is in the given cell.
+&nbsp;     */
+&nbsp;    public static DroppingMouseLocation getDroppingMouseLocation(Cell&lt;?&gt; cell, DragEvent event) {
+<b class="nc">&nbsp;        if ((cell.getHeight() * 0.25) &gt; event.getY()) {</b>
+<b class="nc">&nbsp;            return DroppingMouseLocation.TOP;</b>
+<b class="nc">&nbsp;        } else if ((cell.getHeight() * 0.75) &lt; event.getY()) {</b>
+<b class="nc">&nbsp;            return DroppingMouseLocation.BOTTOM;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return DroppingMouseLocation.CENTER;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void setDroppingPseudoClasses(Cell&lt;?&gt; cell, DragEvent event) {
+<b class="nc">&nbsp;        removeDroppingPseudoClasses(cell);</b>
+<b class="nc">&nbsp;        switch (getDroppingMouseLocation(cell, event)) {</b>
+&nbsp;            case BOTTOM:
+<b class="nc">&nbsp;                cell.pseudoClassStateChanged(dragOverBottom, true);</b>
+&nbsp;                break;
+&nbsp;            case CENTER:
+<b class="nc">&nbsp;                cell.pseudoClassStateChanged(dragOverCenter, true);</b>
+&nbsp;                break;
+&nbsp;            case TOP:
+<b class="nc">&nbsp;                cell.pseudoClassStateChanged(dragOverTop, true);</b>
+&nbsp;                break;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void setDroppingPseudoClasses(Cell&lt;?&gt; cell) {
+<b class="nc">&nbsp;        removeDroppingPseudoClasses(cell);</b>
+<b class="nc">&nbsp;        cell.pseudoClassStateChanged(dragOverCenter, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void removeDroppingPseudoClasses(Cell&lt;?&gt; cell) {
+<b class="nc">&nbsp;        removePseudoClasses(cell, dragOverBottom, dragOverCenter, dragOverTop);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If needed, truncates a given string to &lt;code&gt;maxCharacters&lt;/code&gt;, adding &lt;code&gt;ellipsisString&lt;/code&gt; instead.
+&nbsp;     *
+&nbsp;     * @param text             text which should be truncated, if needed
+&nbsp;     * @param maxCharacters    maximum amount of characters which the resulting text should have, including the
+&nbsp;     *                         &lt;code&gt;ellipsisString&lt;/code&gt;; if set to -1, then the default length of 75 characters will be
+&nbsp;     *                         used
+&nbsp;     * @param ellipsisString   string which should be used for indicating the truncation
+&nbsp;     * @param ellipsisPosition location in the given text where the truncation should be performed
+&nbsp;     * @return the new, truncated string
+&nbsp;     */
+&nbsp;    public static String truncateString(String text, int maxCharacters, String ellipsisString, EllipsisPosition ellipsisPosition) {
+<b class="nc">&nbsp;        if (text == null || text.isEmpty()) {</b>
+<b class="nc">&nbsp;            return text; // return original</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (ellipsisString == null) {</b>
+<b class="nc">&nbsp;            ellipsisString = &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (maxCharacters == -1) {</b>
+<b class="nc">&nbsp;            maxCharacters = 75; // default</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        maxCharacters = Math.max(ellipsisString.length(), maxCharacters);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (text.length() &gt; maxCharacters) {</b>
+&nbsp;            // truncation necessary
+<b class="nc">&nbsp;            return switch (ellipsisPosition) {</b>
+&nbsp;                case BEGINNING -&gt;
+<b class="nc">&nbsp;                        ellipsisString + text.substring(text.length() - (maxCharacters - ellipsisString.length()));</b>
+&nbsp;                case CENTER -&gt; {
+<b class="nc">&nbsp;                    int partialLength = (int) Math.floor((maxCharacters - ellipsisString.length()) / 2f);</b>
+<b class="nc">&nbsp;                    yield text.substring(0, partialLength) + ellipsisString + text.substring(text.length() - partialLength);</b>
+&nbsp;                }
+&nbsp;                case ENDING -&gt;
+<b class="nc">&nbsp;                        text.substring(0, maxCharacters - ellipsisString.length()) + ellipsisString;</b>
+&nbsp;            };
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return text;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

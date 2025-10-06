@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CleanupPresetPanel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.cleanup</a>
+</div>
+
+<h1>Coverage Summary for Class: CleanupPresetPanel (org.jabref.gui.cleanup)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CleanupPresetPanel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.cleanup;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.cleanup.CleanupPreferences;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanups;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;
+&nbsp;public class CleanupPresetPanel extends VBox {
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    @FXML private Label cleanupRenamePDFLabel;
+&nbsp;    @FXML private CheckBox cleanUpDOI;
+&nbsp;    @FXML private CheckBox cleanUpEprint;
+&nbsp;    @FXML private CheckBox cleanUpURL;
+&nbsp;    @FXML private CheckBox cleanUpMovePDF;
+&nbsp;    @FXML private CheckBox cleanUpMakePathsRelative;
+&nbsp;    @FXML private CheckBox cleanUpRenamePDF;
+&nbsp;    @FXML private CheckBox cleanUpRenamePDFonlyRelativePaths;
+&nbsp;    @FXML private CheckBox cleanUpDeletedFiles;
+&nbsp;    @FXML private CheckBox cleanUpUpgradeExternalLinks;
+&nbsp;    @FXML private CheckBox cleanUpBiblatex;
+&nbsp;    @FXML private CheckBox cleanUpBibtex;
+&nbsp;    @FXML private CheckBox cleanUpTimestampToCreationDate;
+&nbsp;    @FXML private CheckBox cleanUpTimestampToModificationDate;
+&nbsp;    @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
+&nbsp;
+<b class="nc">&nbsp;    public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {</b>
+<b class="nc">&nbsp;        this.databaseContext = Objects.requireNonNull(databaseContext);</b>
+&nbsp;
+&nbsp;        // Load FXML
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;
+<b class="nc">&nbsp;        init(cleanupPreferences, filePreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void init(CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
+<b class="nc">&nbsp;        Optional&lt;Path&gt; firstExistingDir = databaseContext.getFirstExistingFileDir(filePreferences);</b>
+<b class="nc">&nbsp;        if (firstExistingDir.isPresent()) {</b>
+<b class="nc">&nbsp;            cleanUpMovePDF.setText(Localization.lang(&quot;Move linked files to default file directory %0&quot;, firstExistingDir.get().toString()));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            cleanUpMovePDF.setText(Localization.lang(&quot;Move linked files to default file directory %0&quot;, &quot;...&quot;));</b>
+&nbsp;
+&nbsp;            // Since the directory does not exist, we cannot move it to there. So, this option is not checked - regardless of the presets stored in the preferences.
+<b class="nc">&nbsp;            cleanUpMovePDF.setDisable(true);</b>
+<b class="nc">&nbsp;            cleanUpMovePDF.setSelected(false);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        cleanUpRenamePDFonlyRelativePaths.disableProperty().bind(cleanUpRenamePDF.selectedProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        cleanUpUpgradeExternalLinks.setText(Localization.lang(&quot;Upgrade external PDF/PS links to use the &#39;%0&#39; field.&quot;, FieldTextMapper.getDisplayName(StandardField.FILE)));</b>
+&nbsp;
+<b class="nc">&nbsp;        String currentPattern = Localization.lang(&quot;Filename format pattern (from preferences)&quot;)</b>
+<b class="nc">&nbsp;                                            .concat(filePreferences.getFileNamePattern());</b>
+<b class="nc">&nbsp;        cleanupRenamePDFLabel.setText(currentPattern);</b>
+&nbsp;
+<b class="nc">&nbsp;        cleanUpBibtex.selectedProperty().addListener(</b>
+&nbsp;                (observable, oldValue, newValue) -&gt; {
+<b class="nc">&nbsp;                    if (newValue) {</b>
+<b class="nc">&nbsp;                        cleanUpBiblatex.selectedProperty().setValue(false);</b>
+&nbsp;                    }
+&nbsp;                });
+<b class="nc">&nbsp;        cleanUpBiblatex.selectedProperty().addListener(</b>
+&nbsp;                (observable, oldValue, newValue) -&gt; {
+<b class="nc">&nbsp;                    if (newValue) {</b>
+<b class="nc">&nbsp;                        cleanUpBibtex.selectedProperty().setValue(false);</b>
+&nbsp;                    }
+&nbsp;                });
+&nbsp;
+<b class="nc">&nbsp;        cleanUpTimestampToCreationDate.selectedProperty().addListener(</b>
+&nbsp;                (observable, oldValue, newValue) -&gt; {
+<b class="nc">&nbsp;                    if (newValue) {</b>
+<b class="nc">&nbsp;                        cleanUpTimestampToModificationDate.selectedProperty().setValue(false);</b>
+&nbsp;                    }
+&nbsp;                });
+<b class="nc">&nbsp;        cleanUpTimestampToModificationDate.selectedProperty().addListener(</b>
+&nbsp;                (observable, oldValue, newValue) -&gt; {
+<b class="nc">&nbsp;                    if (newValue) {</b>
+<b class="nc">&nbsp;                        cleanUpTimestampToCreationDate.selectedProperty().setValue(false);</b>
+&nbsp;                    }
+&nbsp;                });
+<b class="nc">&nbsp;        updateDisplay(cleanupPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateDisplay(CleanupPreferences preset) {
+<b class="nc">&nbsp;        cleanUpDOI.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));</b>
+<b class="nc">&nbsp;        cleanUpEprint.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));</b>
+<b class="nc">&nbsp;        cleanUpURL.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL));</b>
+<b class="nc">&nbsp;        if (!cleanUpMovePDF.isDisabled()) {</b>
+<b class="nc">&nbsp;            cleanUpMovePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        cleanUpMakePathsRelative.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE));</b>
+<b class="nc">&nbsp;        cleanUpRenamePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));</b>
+<b class="nc">&nbsp;        cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));</b>
+<b class="nc">&nbsp;        cleanUpUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));</b>
+<b class="nc">&nbsp;        cleanUpDeletedFiles.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));</b>
+<b class="nc">&nbsp;        cleanUpBiblatex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));</b>
+<b class="nc">&nbsp;        cleanUpBibtex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));</b>
+<b class="nc">&nbsp;        cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));</b>
+<b class="nc">&nbsp;        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));</b>
+<b class="nc">&nbsp;        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));</b>
+<b class="nc">&nbsp;        formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFieldFormatterCleanups().isEnabled());</b>
+<b class="nc">&nbsp;        formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFieldFormatterCleanups().getConfiguredActions()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CleanupPreferences getCleanupPreset() {
+<b class="nc">&nbsp;        EnumSet&lt;CleanupPreferences.CleanupStep&gt; activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (cleanUpMovePDF.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.MOVE_PDF);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpDOI.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DOI);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpEprint.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.CLEANUP_EPRINT);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpURL.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_URL);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpMakePathsRelative.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpRenamePDF.isSelected()) {</b>
+<b class="nc">&nbsp;            if (cleanUpRenamePDFonlyRelativePaths.isSelected()) {</b>
+<b class="nc">&nbsp;                activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpUpgradeExternalLinks.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpDeletedFiles.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpBiblatex.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpBibtex.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpTimestampToCreationDate.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cleanUpTimestampToModificationDate.isSelected()) {</b>
+<b class="nc">&nbsp;            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        activeJobs.add(CleanupPreferences.CleanupStep.FIX_FILE_LINKS);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new CleanupPreferences(activeJobs, new FieldFormatterCleanups(</b>
+<b class="nc">&nbsp;                !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),</b>
+<b class="nc">&nbsp;                formatterCleanupsPanel.cleanupsProperty()));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

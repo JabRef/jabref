@@ -1,0 +1,341 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BiodiversityLibrary</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: BiodiversityLibrary (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BiodiversityLibrary</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/93)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.IntStream;
+&nbsp;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.SearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.BiodiversityLibraryTransformer;
+&nbsp;import org.jabref.logic.importer.util.JsonReader;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetches data from the Biodiversity Heritage Library
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://www.biodiversitylibrary.org/docs/api3.html&quot;&gt;API documentation&lt;/a&gt;
+&nbsp; */
+&nbsp;public class BiodiversityLibrary implements SearchBasedParserFetcher, CustomizableKeyFetcher {
+&nbsp;    public static final String FETCHER_NAME = &quot;Biodiversity Heritage&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BiodiversityLibrary.class);</b>
+&nbsp;
+&nbsp;    private static final String BASE_URL = &quot;https://www.biodiversitylibrary.org/api3&quot;;
+&nbsp;    private static final String RESPONSE_FORMAT = &quot;json&quot;;
+&nbsp;    private static final String TEST_URL_WIH_OPTIONAL_KEY = &quot;https://www.biodiversitylibrary.org/api3?apikey=&quot;;
+&nbsp;
+&nbsp;    private final ImporterPreferences importerPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public BiodiversityLibrary(ImporterPreferences importerPreferences) {</b>
+<b class="nc">&nbsp;        this.importerPreferences = importerPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return FETCHER_NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTestUrl() {
+<b class="nc">&nbsp;        return TEST_URL_WIH_OPTIONAL_KEY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_BIODIVERSITY_HERITAGE_LIBRARY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public URL getBaseURL() throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder baseURI = new URIBuilder(BASE_URL);</b>
+<b class="nc">&nbsp;        importerPreferences.getApiKey(getName()).ifPresent(key -&gt; baseURI.addParameter(&quot;apikey&quot;, key));</b>
+<b class="nc">&nbsp;        baseURI.addParameter(&quot;format&quot;, RESPONSE_FORMAT);</b>
+&nbsp;
+<b class="nc">&nbsp;        return baseURI.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public URL getItemMetadataURL(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;op&quot;, &quot;GetItemMetadata&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;pages&quot;, &quot;f&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;ocr&quot;, &quot;f&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;ocr&quot;, &quot;f&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;id&quot;, identifier);</b>
+&nbsp;
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    URL getPartMetadataURL(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;op&quot;, &quot;GetPartMetadata&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;pages&quot;, &quot;f&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;names&quot;, &quot;f&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;id&quot;, identifier);</b>
+&nbsp;
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JSONObject getDetails(URL url) throws FetcherException {
+<b class="nc">&nbsp;        URLDownload download = new URLDownload(url);</b>
+<b class="nc">&nbsp;        String response = download.asString();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Response {}&quot;, response);</b>
+<b class="nc">&nbsp;        return new JSONObject(response).getJSONArray(&quot;Result&quot;).getJSONObject(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry parseBibJSONtoBibtex(JSONObject item, BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;        if (item.has(&quot;BHLType&quot;)) {</b>
+<b class="nc">&nbsp;            if (&quot;Part&quot;.equals(item.getString(&quot;BHLType&quot;))) {</b>
+&nbsp;                URL url;
+&nbsp;                try {
+<b class="nc">&nbsp;                    url = getPartMetadataURL(item.getString(&quot;PartID&quot;));</b>
+&nbsp;                } catch (URISyntaxException | MalformedURLException e) {
+<b class="nc">&nbsp;                    throw new FetcherException(&quot;Malformed URL&quot;, e);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                JSONObject itemsDetails = getDetails(url);</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.LANGUAGE, itemsDetails.optString(&quot;Language&quot;, &quot;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                entry.setField(StandardField.DOI, itemsDetails.optString(&quot;Doi&quot;, &quot;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                entry.setField(StandardField.PUBLISHER, itemsDetails.optString(&quot;PublisherName&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.DATE, itemsDetails.optString(&quot;Date&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.VOLUME, itemsDetails.optString(&quot;Volume&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.URL, itemsDetails.optString(&quot;PartUrl&quot;, &quot;&quot;));</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (&quot;Item&quot;.equals(item.getString(&quot;BHLType&quot;))) {</b>
+&nbsp;                URL url;
+&nbsp;                try {
+<b class="nc">&nbsp;                    url = getItemMetadataURL(item.getString(&quot;ItemID&quot;));</b>
+&nbsp;                } catch (URISyntaxException | MalformedURLException e) {
+<b class="nc">&nbsp;                    throw new FetcherException(&quot;Malformed URL&quot;, e);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                JSONObject itemsDetails = getDetails(url);</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.EDITOR, itemsDetails.optString(&quot;Sponsor&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.PUBLISHER, itemsDetails.optString(&quot;HoldingInstitution&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.LANGUAGE, itemsDetails.optString(&quot;Language&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.URL, itemsDetails.optString(&quot;ItemUrl&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;                if (itemsDetails.has(&quot;Date&quot;) &amp;&amp; !entry.hasField(StandardField.DATE) &amp;&amp; !entry.hasField(StandardField.YEAR)) {</b>
+<b class="nc">&nbsp;                    entry.setField(StandardField.DATE, itemsDetails.getString(&quot;Date&quot;));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry jsonResultToBibEntry(JSONObject item) {
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (&quot;Book&quot;.equals(item.optString(&quot;Genre&quot;))) {</b>
+<b class="nc">&nbsp;            entry.setType(StandardEntryType.Book);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            entry.setType(StandardEntryType.Article);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        entry.setField(StandardField.TITLE, item.optString(&quot;Title&quot;, &quot;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray(&quot;Authors&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        entry.setField(StandardField.PAGES, item.optString(&quot;PageRange&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.LOCATION, item.optString(&quot;PublisherPlace&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.PUBLISHER, item.optString(&quot;PublisherName&quot;, &quot;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        entry.setField(StandardField.DATE, item.optString(&quot;Date&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.YEAR, item.optString(&quot;PublicationDate&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.JOURNALTITLE, item.optString(&quot;ContainerTitle&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.VOLUME, item.optString(&quot;Volume&quot;, &quot;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String toAuthors(JSONArray authors) {
+<b class="nc">&nbsp;        if (authors == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // input: list of { &quot;Name&quot;: &quot;Author name,&quot;}
+<b class="nc">&nbsp;        return IntStream.range(0, authors.length())</b>
+<b class="nc">&nbsp;                        .mapToObj(authors::getJSONObject)</b>
+<b class="nc">&nbsp;                        .map(author -&gt; new Author(</b>
+<b class="nc">&nbsp;                                author.optString(&quot;Name&quot;, &quot;&quot;), &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;))</b>
+<b class="nc">&nbsp;                        .collect(AuthorList.collect())</b>
+<b class="nc">&nbsp;                        .getAsFirstLastNamesWithAnd();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return inputStream -&gt; {</b>
+<b class="nc">&nbsp;            JSONObject response = JsonReader.toJsonObject(inputStream);</b>
+<b class="nc">&nbsp;            if (response.isEmpty()) {</b>
+<b class="nc">&nbsp;                return List.of();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String errorMessage = response.getString(&quot;ErrorMessage&quot;);</b>
+<b class="nc">&nbsp;            if (!errorMessage.isBlank()) {</b>
+<b class="nc">&nbsp;                return List.of();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            JSONArray items = response.getJSONArray(&quot;Result&quot;);</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; entries = new ArrayList&lt;&gt;(items.length());</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; items.length(); i++) {</b>
+<b class="nc">&nbsp;                JSONObject item = items.getJSONObject(i);</b>
+<b class="nc">&nbsp;                BibEntry entry = jsonResultToBibEntry(item);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    entry = parseBibJSONtoBibtex(item, entry);</b>
+&nbsp;                } catch (JSONException | FetcherException exception) {
+<b class="nc">&nbsp;                    throw new ParseException(&quot;Error when parsing entry&quot;, exception);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                entries.add(entry);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return entries;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode query) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());</b>
+<b class="nc">&nbsp;        BiodiversityLibraryTransformer transformer = new BiodiversityLibraryTransformer();</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;op&quot;, &quot;PublicationSearch&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;searchtype&quot;, &quot;C&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;searchterm&quot;, transformer.transformSearchQuery(query).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

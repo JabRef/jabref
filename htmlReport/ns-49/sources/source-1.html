@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ContentSelectorView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.libraryproperties.contentselectors</a>
+</div>
+
+<h1>Coverage Summary for Class: ContentSelectorView (org.jabref.gui.libraryproperties.contentselectors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ContentSelectorView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.libraryproperties.contentselectors;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.SelectionModel;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class ContentSelectorView extends AbstractPropertiesTabView&lt;ContentSelectorViewModel&gt; {
+&nbsp;
+&nbsp;    @FXML private Button removeFieldNameButton;
+&nbsp;    @FXML private Button addKeywordButton;
+&nbsp;    @FXML private Button removeKeywordButton;
+&nbsp;    @FXML private ListView&lt;Field&gt; fieldsListView;
+&nbsp;    @FXML private ListView&lt;String&gt; keywordsListView;
+&nbsp;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;
+<b class="nc">&nbsp;    public ContentSelectorView(BibDatabaseContext databaseContext) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Content selectors&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new ContentSelectorViewModel(databaseContext, dialogService);</b>
+&nbsp;
+<b class="nc">&nbsp;        initFieldNameComponents();</b>
+<b class="nc">&nbsp;        initKeywordsComponents();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initFieldNameComponents() {
+<b class="nc">&nbsp;        initListView(fieldsListView, viewModel::getFieldNamesBackingList);</b>
+<b class="nc">&nbsp;        viewModel.selectedFieldProperty().bind(fieldsListView.getSelectionModel().selectedItemProperty());</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;Field&gt;()</b>
+<b class="nc">&nbsp;                .withText(FieldTextMapper::getDisplayName)</b>
+<b class="nc">&nbsp;                .install(fieldsListView);</b>
+<b class="nc">&nbsp;        removeFieldNameButton.disableProperty().bind(viewModel.isNoFieldNameSelected());</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.selectedFieldProperty(), viewModel::populateKeywords);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initKeywordsComponents() {
+<b class="nc">&nbsp;        initListView(keywordsListView, viewModel::getKeywordsBackingList);</b>
+<b class="nc">&nbsp;        viewModel.selectedKeywordProperty().bind(keywordsListView.getSelectionModel().selectedItemProperty());</b>
+<b class="nc">&nbsp;        addKeywordButton.disableProperty().bind(viewModel.isFieldNameListEmpty());</b>
+<b class="nc">&nbsp;        removeKeywordButton.disableProperty().bind(viewModel.isNoKeywordSelected());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void addNewFieldName() {
+<b class="nc">&nbsp;        viewModel.showInputFieldNameDialog();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void removeFieldName() {
+<b class="nc">&nbsp;        getSelectedField().ifPresent(viewModel::showRemoveFieldNameConfirmationDialog);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void addNewKeyword() {
+<b class="nc">&nbsp;        getSelectedField().ifPresent(viewModel::showInputKeywordDialog);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void removeKeyword() {
+<b class="nc">&nbsp;        Optional&lt;Field&gt; fieldName = getSelectedField();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; keywordToRemove = getSelectedKeyword();</b>
+<b class="nc">&nbsp;        if (fieldName.isPresent() &amp;&amp; keywordToRemove.isPresent()) {</b>
+<b class="nc">&nbsp;            viewModel.showRemoveKeywordConfirmationDialog(fieldName.get(), keywordToRemove.get());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private &lt;T&gt; void initListView(ListView&lt;T&gt; listViewToInit, Supplier&lt;ListProperty&lt;T&gt;&gt; backingList) {
+<b class="nc">&nbsp;        listViewToInit.itemsProperty().bind(backingList.get());</b>
+<b class="nc">&nbsp;        listViewToInit.getSelectionModel().selectFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;Field&gt; getSelectedField() {
+<b class="nc">&nbsp;        return Optional.of(fieldsListView.getSelectionModel()).map(SelectionModel::getSelectedItem);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;String&gt; getSelectedKeyword() {
+<b class="nc">&nbsp;        return Optional.of(keywordsListView.getSelectionModel()).map(SelectionModel::getSelectedItem);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

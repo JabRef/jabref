@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstTextPrefixer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst.util</a>
+</div>
+
+<h1>Coverage Summary for Class: BstTextPrefixer (org.jabref.logic.bst.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BstTextPrefixer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BstTextPrefixer$PrefixState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bst.util;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * The |built_in| function {\.{text.prefix\$}} pops the top two literals (the
+&nbsp; * integer literal |pop_lit1| and a string literal, in that order). It pushes
+&nbsp; * the substring of the (at most) |pop_lit1| consecutive text characters
+&nbsp; * starting from the beginning of the string. This function is similar to
+&nbsp; * {\.{substring\$}}, but this one considers an accented character (or more
+&nbsp; * precisely, a ``special character&#39;&#39;$\!$, even if it&#39;s missing its matching
+&nbsp; * |right_brace|) to be a single text character (rather than however many
+&nbsp; * |ASCII_code| characters it actually comprises), and this function doesn&#39;t
+&nbsp; * consider braces to be text characters; furthermore, this function appends any
+&nbsp; * needed matching |right_brace|s. If any of the types is incorrect, it
+&nbsp; * complains and pushes the null string.
+&nbsp; *
+&nbsp; */
+&nbsp;public class BstTextPrefixer {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BstTextPrefixer.class);</b>
+&nbsp;
+&nbsp;    private BstTextPrefixer() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String textPrefix(int numOfChars, String toPrefix) {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        PrefixState prefixState = new PrefixState(0, 0, numOfChars);</b>
+<b class="nc">&nbsp;        char[] cs = toPrefix.toCharArray();</b>
+<b class="nc">&nbsp;        while (prefixState.index &lt; cs.length &amp;&amp; prefixState.numOfChars &gt; 0) {</b>
+<b class="nc">&nbsp;            char c = cs[prefixState.index++];</b>
+<b class="nc">&nbsp;            handleOpeningBrace(cs, prefixState, c);</b>
+<b class="nc">&nbsp;            handleClosingBrace(prefixState, toPrefix, c);</b>
+<b class="nc">&nbsp;            boolean isNormalCharacter = c != &#39;{&#39; &amp;&amp; c != &#39;}&#39;;</b>
+<b class="nc">&nbsp;            if (isNormalCharacter) {</b>
+<b class="nc">&nbsp;                prefixState.numOfChars--;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        sb.append(toPrefix, 0, prefixState.index);</b>
+&nbsp;        // Append any remaining closing braces if unbalanced
+<b class="nc">&nbsp;        while (prefixState.braceLevel-- &gt; 0) {</b>
+<b class="nc">&nbsp;            sb.append(&#39;}&#39;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void handleOpeningBrace(char[] cs, PrefixState prefixState, char c) {
+<b class="nc">&nbsp;        if (c != &#39;{&#39;) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        prefixState.braceLevel++;</b>
+<b class="nc">&nbsp;        if ((prefixState.braceLevel == 1) &amp;&amp; (prefixState.index &lt; cs.length) &amp;&amp; (cs[prefixState.index] == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;            prefixState.index++; // skip backslash</b>
+<b class="nc">&nbsp;            while ((prefixState.index &lt; cs.length) &amp;&amp; (prefixState.braceLevel &gt; 0)) {</b>
+<b class="nc">&nbsp;                if (cs[prefixState.index] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                    prefixState.braceLevel--;</b>
+<b class="nc">&nbsp;                } else if (cs[prefixState.index] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                    prefixState.braceLevel++;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                prefixState.index++;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            prefixState.numOfChars--;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void handleClosingBrace(PrefixState prefixState, String toPrefix, char c) {
+<b class="nc">&nbsp;        if (c != &#39;}&#39;) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (prefixState.braceLevel &gt; 0) {</b>
+<b class="nc">&nbsp;            prefixState.braceLevel--;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Unbalanced brace in string for purify$: {}&quot;, toPrefix);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class PrefixState {
+&nbsp;        public int index;
+&nbsp;        public int braceLevel;
+&nbsp;        public int numOfChars;
+&nbsp;
+<b class="nc">&nbsp;        public PrefixState(int index, int braceLevel, int numOfChars) {</b>
+<b class="nc">&nbsp;            this.index = index;</b>
+<b class="nc">&nbsp;            this.braceLevel = braceLevel;</b>
+<b class="nc">&nbsp;            this.numOfChars = numOfChars;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CSLUpdateBibliography</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.oocsltext</a>
+</div>
+
+<h1>Coverage Summary for Class: CSLUpdateBibliography (org.jabref.logic.openoffice.oocsltext)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CSLUpdateBibliography</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.oocsltext;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyle;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.openoffice.DocumentAnnotation;
+&nbsp;import org.jabref.model.openoffice.uno.CreationException;
+&nbsp;import org.jabref.model.openoffice.uno.NoDocumentException;
+&nbsp;import org.jabref.model.openoffice.uno.UnoTextSection;
+&nbsp;
+&nbsp;import com.sun.star.beans.PropertyVetoException;
+&nbsp;import com.sun.star.beans.UnknownPropertyException;
+&nbsp;import com.sun.star.container.NoSuchElementException;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.sun.star.text.XTextCursor;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class CSLUpdateBibliography {</b>
+&nbsp;
+&nbsp;    private static final String BIBLIOGRAPHY_SECTION_NAME = &quot;JR_bib&quot;;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CSLUpdateBibliography.class);</b>
+&nbsp;
+&nbsp;    public Optional&lt;XTextRange&gt; getBibliographyRange(XTextDocument doc)
+&nbsp;            throws NoDocumentException, WrappedTargetException {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Attempting to get bibliography range&quot;);</b>
+<b class="nc">&nbsp;        Optional&lt;XTextRange&gt; range = UnoTextSection.getAnchor(doc, BIBLIOGRAPHY_SECTION_NAME);</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Bibliography range found: {}&quot;, range.isPresent());</b>
+<b class="nc">&nbsp;        return range;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Rebuilds the bibliography using CSL.
+&nbsp;     */
+&nbsp;    public void rebuildCSLBibliography(XTextDocument doc,
+&nbsp;                                       CSLCitationOOAdapter cslCitationOOAdapter,
+&nbsp;                                       List&lt;BibEntry&gt; entries,
+&nbsp;                                       CitationStyle citationStyle,
+&nbsp;                                       BibDatabaseContext bibDatabaseContext,
+&nbsp;                                       BibEntryTypesManager bibEntryTypesManager)
+&nbsp;            throws WrappedTargetException, NoDocumentException, CreationException, NoSuchElementException, PropertyVetoException, UnknownPropertyException {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Starting to rebuild CSL bibliography&quot;);</b>
+&nbsp;
+&nbsp;        // Ensure the bibliography section exists
+<b class="nc">&nbsp;        Optional&lt;XTextRange&gt; sectionRange = getBibliographyRange(doc);</b>
+<b class="nc">&nbsp;        if (sectionRange.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Bibliography section not found. Creating new section.&quot;);</b>
+<b class="nc">&nbsp;            createCSLBibTextSection(doc);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Bibliography section found. Clearing content.&quot;);</b>
+<b class="nc">&nbsp;            clearCSLBibTextSectionContent(doc);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Finished rebuilding CSL bibliography&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createCSLBibTextSection(XTextDocument doc)
+&nbsp;            throws CreationException {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Creating new CSL bibliography section&quot;);</b>
+<b class="nc">&nbsp;        XTextCursor textCursor = doc.getText().createTextCursor();</b>
+<b class="nc">&nbsp;        textCursor.gotoEnd(false);</b>
+<b class="nc">&nbsp;        DocumentAnnotation annotation = new DocumentAnnotation(doc, BIBLIOGRAPHY_SECTION_NAME, textCursor, false);</b>
+<b class="nc">&nbsp;        UnoTextSection.create(annotation);</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;CSL bibliography section created&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearCSLBibTextSectionContent(XTextDocument doc)
+&nbsp;            throws NoDocumentException, WrappedTargetException {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Clearing CSL bibliography section content&quot;);</b>
+<b class="nc">&nbsp;        Optional&lt;XTextRange&gt; sectionRange = getBibliographyRange(doc);</b>
+<b class="nc">&nbsp;        if (sectionRange.isPresent()) {</b>
+<b class="nc">&nbsp;            XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange.get());</b>
+<b class="nc">&nbsp;            cursor.setString(&quot;&quot;);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;CSL bibliography section content cleared&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Failed to clear CSL bibliography section: section not found&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void populateCSLBibTextSection(XTextDocument doc,
+&nbsp;                                           CSLCitationOOAdapter cslCitationOOAdapter,
+&nbsp;                                           List&lt;BibEntry&gt; entries,
+&nbsp;                                           CitationStyle citationStyle,
+&nbsp;                                           BibDatabaseContext bibDatabaseContext,
+&nbsp;                                           BibEntryTypesManager bibEntryTypesManager)
+&nbsp;            throws WrappedTargetException, NoDocumentException, CreationException {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Populating CSL bibliography section&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;XTextRange&gt; sectionRange = getBibliographyRange(doc);</b>
+<b class="nc">&nbsp;        if (sectionRange.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Bibliography section not found when trying to populate&quot;);</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Bibliography section not found&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        cslCitationOOAdapter.insertBibliography(cursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;CSL bibliography section population completed&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

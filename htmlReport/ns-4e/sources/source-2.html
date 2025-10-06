@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AttachFileFromURLAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.linkedfile</a>
+</div>
+
+<h1>Coverage Summary for Class: AttachFileFromURLAction (org.jabref.gui.linkedfile)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AttachFileFromURLAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.linkedfile;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;public class AttachFileFromURLAction extends SimpleCommand {
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public AttachFileFromURLAction(DialogService dialogService,
+&nbsp;                                   StateManager stateManager,
+&nbsp;                                   TaskExecutor taskExecutor,
+<b class="nc">&nbsp;                                   GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        if (stateManager.getActiveDatabase().isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;This operation requires an open library.&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (stateManager.getSelectedEntries().size() != 1) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;This operation requires exactly one item to be selected.&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();</b>
+&nbsp;
+<b class="nc">&nbsp;        BibEntry entry = stateManager.getSelectedEntries().getFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; urlforDownload = getUrlForDownloadFromClipBoardOrEntry(dialogService, entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (urlforDownload.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            URL url = URLUtil.create(urlforDownload.get());</b>
+<b class="nc">&nbsp;            LinkedFileViewModel onlineFile = new LinkedFileViewModel(</b>
+&nbsp;                    new LinkedFile(url, &quot;&quot;),
+&nbsp;                    entry,
+&nbsp;                    databaseContext,
+&nbsp;                    taskExecutor,
+&nbsp;                    dialogService,
+&nbsp;                    preferences);
+<b class="nc">&nbsp;            onlineFile.download(true);</b>
+&nbsp;        } catch (MalformedURLException exception) {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Invalid URL&quot;), exception);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;String&gt; getUrlForDownloadFromClipBoardOrEntry(DialogService dialogService, BibEntry entry) {
+<b class="nc">&nbsp;        String clipText = ClipBoardManager.getContents();</b>
+&nbsp;        Optional&lt;String&gt; urlText;
+<b class="nc">&nbsp;        String urlField = entry.getField(StandardField.URL).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        if (clipText.startsWith(&quot;http://&quot;) || clipText.startsWith(&quot;https://&quot;) || clipText.startsWith(&quot;ftp://&quot;)) {</b>
+<b class="nc">&nbsp;            urlText = dialogService.showInputDialogWithDefaultAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Download file&quot;), Localization.lang(&quot;Enter URL to download&quot;), clipText);</b>
+<b class="nc">&nbsp;        } else if (urlField.startsWith(&quot;http://&quot;) || urlField.startsWith(&quot;https://&quot;) || urlField.startsWith(&quot;ftp://&quot;)) {</b>
+<b class="nc">&nbsp;            urlText = dialogService.showInputDialogWithDefaultAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Download file&quot;), Localization.lang(&quot;Enter URL to download&quot;), urlField);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            urlText = dialogService.showInputDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Download file&quot;), Localization.lang(&quot;Enter URL to download&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return urlText;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

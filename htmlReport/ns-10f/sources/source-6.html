@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserHostInfo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.metadata</a>
+</div>
+
+<h1>Coverage Summary for Class: UserHostInfo (org.jabref.model.metadata)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserHostInfo</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    23.1%
+  </span>
+  <span class="absValue">
+    (3/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.metadata;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NullMarked;
+&nbsp;
+&nbsp;/**
+&nbsp; * Record to represent user and host information.
+&nbsp; * This is used to identify the user when retrieving file directories.
+&nbsp; */
+<b class="nc">&nbsp;@NullMarked</b>
+<b class="fc">&nbsp;public record UserHostInfo(</b>
+&nbsp;        String user,
+&nbsp;        String host) {
+&nbsp;    /**
+&nbsp;     * Creates a new UserHostInfo from a user-host string.
+&nbsp;     * The user-host string is expected to be in the format &quot;user-host&quot;.
+&nbsp;     * If the string does not contain a hyphen, the entire string is considered as the user and the host is empty.
+&nbsp;     *
+&nbsp;     * @param userHostString the user-host string
+&nbsp;     * @return a new UserHostInfo
+&nbsp;     */
+&nbsp;    public static UserHostInfo parse(String userHostString) {
+<b class="nc">&nbsp;        if (userHostString.contains(&quot;-&quot;)) {</b>
+<b class="nc">&nbsp;            int index = userHostString.lastIndexOf(&#39;-&#39;);</b>
+<b class="nc">&nbsp;            String host = userHostString.substring(index + 1);</b>
+<b class="nc">&nbsp;            String user = userHostString.substring(0, index);</b>
+<b class="nc">&nbsp;            return new UserHostInfo(user, host);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return new UserHostInfo(userHostString, &quot;&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the user-host string representation.
+&nbsp;     * If the host is empty, only the user is returned.
+&nbsp;     * Otherwise, the format is &quot;user-host&quot;.
+&nbsp;     *
+&nbsp;     * @return the user-host string
+&nbsp;     */
+&nbsp;    public String getUserHostString() {
+<b class="pc">&nbsp;        if (host.isEmpty()) {</b>
+<b class="nc">&nbsp;            return user;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return user + &quot;-&quot; + host;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if this UserHostInfo has the same host as the given UserHostInfo.
+&nbsp;     *
+&nbsp;     * @param other the other UserHostInfo
+&nbsp;     * @return true if the hosts are the same and not empty, false otherwise
+&nbsp;     */
+&nbsp;    public boolean hasSameHost(UserHostInfo other) {
+<b class="nc">&nbsp;        return !host.isEmpty() &amp;&amp; !other.host.isEmpty() &amp;&amp; host.equals(other.host);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return getUserHostString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

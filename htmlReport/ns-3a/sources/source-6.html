@@ -1,0 +1,139 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PatentTypeEditorViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors.optioneditors.mapbased</a>
+</div>
+
+<h1>Coverage Summary for Class: PatentTypeEditorViewModel (org.jabref.gui.fieldeditors.optioneditors.mapbased)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PatentTypeEditorViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors.optioneditors.mapbased;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;public class PatentTypeEditorViewModel extends StringMapBasedEditorViewModel {
+&nbsp;
+&nbsp;    public PatentTypeEditorViewModel(Field field, SuggestionProvider&lt;?&gt; suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
+<b class="nc">&nbsp;        super(field, suggestionProvider, fieldCheckers, undoManager, getMap());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, String&gt; getMap() {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; itemMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patent&quot;, Localization.lang(&quot;Patent&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patentde&quot;, Localization.lang(&quot;German patent&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patenteu&quot;, Localization.lang(&quot;European patent&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patentfr&quot;, Localization.lang(&quot;French patent&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patentuk&quot;, Localization.lang(&quot;British patent&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patentus&quot;, Localization.lang(&quot;U.S. patent&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patreq&quot;, Localization.lang(&quot;Patent request&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patreqde&quot;, Localization.lang(&quot;German patent request&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patreqeu&quot;, Localization.lang(&quot;European patent request&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patreqfr&quot;, Localization.lang(&quot;French patent request&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patrequk&quot;, Localization.lang(&quot;British patent request&quot;));</b>
+<b class="nc">&nbsp;        itemMap.put(&quot;patrequs&quot;, Localization.lang(&quot;U.S. patent request&quot;));</b>
+<b class="nc">&nbsp;        return itemMap;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,178 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CopyCitationAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preview</a>
+</div>
+
+<h1>Coverage Summary for Class: CopyCitationAction (org.jabref.gui.preview)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CopyCitationAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preview;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Copies the selected entries and formats them with the selected citation style (or preview), then it is copied to the clipboard. This worker cannot be reused.
+&nbsp; */
+&nbsp;public class CopyCitationAction extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CopyCitationAction.class);</b>
+&nbsp;
+&nbsp;    private final List&lt;BibEntry&gt; selectedEntries;
+&nbsp;    private final CitationStyleOutputFormat outputFormat;
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final ClipboardContentGenerator clipboardContentGenerator;
+&nbsp;
+&nbsp;    public CopyCitationAction(CitationStyleOutputFormat outputFormat,
+&nbsp;                              DialogService dialogService,
+&nbsp;                              StateManager stateManager,
+&nbsp;                              ClipBoardManager clipBoardManager,
+&nbsp;                              TaskExecutor taskExecutor,
+&nbsp;                              GuiPreferences preferences,
+<b class="nc">&nbsp;                              JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.outputFormat = outputFormat;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.selectedEntries = stateManager.getSelectedEntries();</b>
+<b class="nc">&nbsp;        this.clipBoardManager = clipBoardManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), abbreviationRepository);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        BackgroundTask.wrap(this::generateCitations)</b>
+<b class="nc">&nbsp;                      .onFailure(ex -&gt; LOGGER.error(&quot;Error while copying citations to the clipboard&quot;, ex))</b>
+<b class="nc">&nbsp;                      .onSuccess(this::setClipBoardContent)</b>
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ClipboardContent generateCitations() throws IOException {
+<b class="nc">&nbsp;        return clipboardContentGenerator.generate(selectedEntries, outputFormat, stateManager.getActiveDatabase().get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setClipBoardContent(ClipboardContent clipBoardContent) {
+<b class="nc">&nbsp;        clipBoardManager.setContent(clipBoardContent);</b>
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Copied %0 citations.&quot;, String.valueOf(selectedEntries.size())));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

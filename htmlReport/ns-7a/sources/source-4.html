@@ -1,0 +1,550 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SharedDatabaseLoginDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.shared</a>
+</div>
+
+<h1>Coverage Summary for Class: SharedDatabaseLoginDialogViewModel (org.jabref.gui.shared)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SharedDatabaseLoginDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/178)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.shared;
+&nbsp;
+&nbsp;import java.io.UnsupportedEncodingException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.scene.control.Alert.AlertType;
+&nbsp;import javafx.scene.control.ButtonBar.ButtonData;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.exporter.SaveDatabaseAction;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.gui.util.FileFilterConverter;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.shared.DBMSConnectionProperties;
+&nbsp;import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
+&nbsp;import org.jabref.logic.shared.DBMSType;
+&nbsp;import org.jabref.logic.shared.DatabaseLocation;
+&nbsp;import org.jabref.logic.shared.DatabaseNotSupportedException;
+&nbsp;import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+&nbsp;import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+&nbsp;import org.jabref.logic.shared.security.Password;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SharedDatabaseLoginDialogViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;DBMSType&gt; selectedDBMSType = new SimpleObjectProperty&lt;&gt;(DBMSType.values()[0]);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty database = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty host = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty port = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty user = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty password = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty folder = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty autosave = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty rememberPassword = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty loading = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty keystore = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty useSSL = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty keyStorePasswordProperty = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty serverTimezone = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty expertMode = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty jdbcUrl = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final AiService aiService;
+<b class="nc">&nbsp;    private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();</b>
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    private final Validator databaseValidator;
+&nbsp;    private final Validator hostValidator;
+&nbsp;    private final Validator portValidator;
+&nbsp;    private final Validator userValidator;
+&nbsp;    private final Validator folderValidator;
+&nbsp;    private final Validator keystoreValidator;
+&nbsp;    private final CompositeValidator formValidator;
+&nbsp;
+&nbsp;    public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
+&nbsp;                                              DialogService dialogService,
+&nbsp;                                              GuiPreferences preferences,
+&nbsp;                                              AiService aiService,
+&nbsp;                                              StateManager stateManager,
+&nbsp;                                              BibEntryTypesManager entryTypesManager,
+&nbsp;                                              FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                                              UndoManager undoManager,
+&nbsp;                                              ClipBoardManager clipBoardManager,
+<b class="nc">&nbsp;                                              TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.clipBoardManager = clipBoardManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(selectedDBMSType, selected -&gt; port.setValue(Integer.toString(selected.getDefaultPort())));</b>
+&nbsp;
+<b class="nc">&nbsp;        Predicate&lt;String&gt; notEmpty = input -&gt; (input != null) &amp;&amp; !input.trim().isEmpty();</b>
+<b class="nc">&nbsp;        Predicate&lt;String&gt; fileExists = input -&gt; Files.exists(Path.of(input));</b>
+<b class="nc">&nbsp;        Predicate&lt;String&gt; notEmptyAndfilesExist = notEmpty.and(fileExists);</b>
+&nbsp;
+<b class="nc">&nbsp;        databaseValidator = new FunctionBasedValidator&lt;&gt;(database, notEmpty, ValidationMessage.error(Localization.lang(&quot;Required field \&quot;%0\&quot; is empty.&quot;, Localization.lang(&quot;Library&quot;))));</b>
+<b class="nc">&nbsp;        hostValidator = new FunctionBasedValidator&lt;&gt;(host, notEmpty, ValidationMessage.error(Localization.lang(&quot;Required field \&quot;%0\&quot; is empty.&quot;, Localization.lang(&quot;Port&quot;))));</b>
+<b class="nc">&nbsp;        portValidator = new FunctionBasedValidator&lt;&gt;(port, notEmpty, ValidationMessage.error(Localization.lang(&quot;Required field \&quot;%0\&quot; is empty.&quot;, Localization.lang(&quot;Host&quot;))));</b>
+<b class="nc">&nbsp;        userValidator = new FunctionBasedValidator&lt;&gt;(user, notEmpty, ValidationMessage.error(Localization.lang(&quot;Required field \&quot;%0\&quot; is empty.&quot;, Localization.lang(&quot;User&quot;))));</b>
+<b class="nc">&nbsp;        folderValidator = new FunctionBasedValidator&lt;&gt;(folder, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang(&quot;Please enter a valid file path.&quot;)));</b>
+<b class="nc">&nbsp;        keystoreValidator = new FunctionBasedValidator&lt;&gt;(keystore, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang(&quot;Please enter a valid file path.&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        formValidator = new CompositeValidator();</b>
+<b class="nc">&nbsp;        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator);</b>
+&nbsp;
+<b class="nc">&nbsp;        applyPreferences();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean openDatabase() {
+<b class="nc">&nbsp;        DBMSConnectionProperties connectionProperties = new DBMSConnectionPropertiesBuilder()</b>
+<b class="nc">&nbsp;                .setType(selectedDBMSType.getValue())</b>
+<b class="nc">&nbsp;                .setHost(host.getValue())</b>
+<b class="nc">&nbsp;                .setPort(Integer.parseInt(port.getValue()))</b>
+<b class="nc">&nbsp;                .setDatabase(database.getValue())</b>
+<b class="nc">&nbsp;                .setUser(user.getValue())</b>
+<b class="nc">&nbsp;                .setPassword(password.getValue())</b>
+<b class="nc">&nbsp;                .setUseSSL(useSSL.getValue())</b>
+&nbsp;                // Authorize client to retrieve RSA server public key when serverRsaPublicKeyFile is not set (for sha256_password and caching_sha2_password authentication password)
+<b class="nc">&nbsp;                .setAllowPublicKeyRetrieval(true)</b>
+<b class="nc">&nbsp;                .setKeyStore(keystore.getValue())</b>
+<b class="nc">&nbsp;                .setServerTimezone(serverTimezone.getValue())</b>
+<b class="nc">&nbsp;                .setExpertMode(expertMode.getValue())</b>
+<b class="nc">&nbsp;                .setJdbcUrl(jdbcUrl.getValue())</b>
+<b class="nc">&nbsp;                .createDBMSConnectionProperties();</b>
+&nbsp;
+<b class="nc">&nbsp;        setupKeyStore();</b>
+<b class="nc">&nbsp;        return openSharedDatabase(connectionProperties);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupKeyStore() {
+<b class="nc">&nbsp;        System.setProperty(&quot;javax.net.ssl.trustStore&quot;, keystore.getValue());</b>
+<b class="nc">&nbsp;        System.setProperty(&quot;javax.net.ssl.trustStorePassword&quot;, keyStorePasswordProperty.getValue());</b>
+<b class="nc">&nbsp;        System.setProperty(&quot;javax.net.debug&quot;, &quot;ssl&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean openSharedDatabase(DBMSConnectionProperties connectionProperties) {
+<b class="nc">&nbsp;        if (isSharedDatabaseAlreadyPresent(connectionProperties)) {</b>
+<b class="nc">&nbsp;            dialogService.showWarningDialogAndWait(Localization.lang(&quot;Shared database connection&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;You are already connected to a database using entered connection details.&quot;));</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (autosave.get()) {</b>
+<b class="nc">&nbsp;            Path localFilePath = Path.of(folder.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (Files.exists(localFilePath) &amp;&amp; !Files.isDirectory(localFilePath)) {</b>
+<b class="nc">&nbsp;                boolean overwriteFilePressed = dialogService.showConfirmationDialogAndWait(Localization.lang(&quot;Existing file&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;&#39;%0&#39; exists. Overwrite file?&quot;, localFilePath.getFileName().toString()),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Overwrite file&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Cancel&quot;));</b>
+<b class="nc">&nbsp;                if (!overwriteFilePressed) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        loading.set(true);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(</b>
+&nbsp;                    tabContainer,
+&nbsp;                    dialogService,
+&nbsp;                    preferences,
+&nbsp;                    aiService,
+&nbsp;                    stateManager,
+&nbsp;                    entryTypesManager,
+&nbsp;                    fileUpdateMonitor,
+&nbsp;                    undoManager,
+&nbsp;                    clipBoardManager,
+&nbsp;                    taskExecutor);
+<b class="nc">&nbsp;            LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);</b>
+<b class="nc">&nbsp;            setPreferences();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!folder.getValue().isEmpty() &amp;&amp; autosave.get()) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    new SaveDatabaseAction(</b>
+&nbsp;                            libraryTab,
+&nbsp;                            dialogService,
+&nbsp;                            preferences,
+<b class="nc">&nbsp;                            Injector.instantiateModelOrService(BibEntryTypesManager.class),</b>
+&nbsp;                            stateManager
+<b class="nc">&nbsp;                    ).saveAs(Path.of(folder.getValue()));</b>
+&nbsp;                } catch (Throwable e) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Error while saving the database&quot;, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Connection error&quot;), exception);</b>
+&nbsp;        } catch (DatabaseNotSupportedException exception) {
+<b class="nc">&nbsp;            ButtonType openHelp = new ButtonType(&quot;Open Help&quot;, ButtonData.OTHER);</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;ButtonType&gt; result = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Migration help information&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Entered database has obsolete structure and is no longer supported.&quot;)</b>
+&nbsp;                            + &quot;\n&quot; +
+<b class="nc">&nbsp;                            Localization.lang(&quot;Click help to learn about the migration of pre-3.6 databases.&quot;)</b>
+&nbsp;                            + &quot;\n&quot; +
+<b class="nc">&nbsp;                            Localization.lang(&quot;However, a new database was created alongside the pre-3.6 one.&quot;),</b>
+&nbsp;                    ButtonType.OK, openHelp);
+&nbsp;
+<b class="nc">&nbsp;            result.filter(btn -&gt; btn.equals(openHelp)).ifPresent(btn -&gt; new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());</b>
+<b class="nc">&nbsp;            result.filter(ButtonType.OK::equals).ifPresent(btn -&gt; openSharedDatabase(connectionProperties));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        loading.set(false);</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setPreferences() {
+<b class="nc">&nbsp;        sharedDatabasePreferences.setType(selectedDBMSType.getValue().toString());</b>
+<b class="nc">&nbsp;        sharedDatabasePreferences.setHost(host.getValue());</b>
+<b class="nc">&nbsp;        sharedDatabasePreferences.setPort(port.getValue());</b>
+<b class="nc">&nbsp;        sharedDatabasePreferences.setName(database.getValue());</b>
+<b class="nc">&nbsp;        sharedDatabasePreferences.setUser(user.getValue());</b>
+<b class="nc">&nbsp;        sharedDatabasePreferences.setUseSSL(useSSL.getValue());</b>
+<b class="nc">&nbsp;        sharedDatabasePreferences.setKeystoreFile(keystore.getValue());</b>
+<b class="nc">&nbsp;        sharedDatabasePreferences.setServerTimezone(serverTimezone.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (rememberPassword.get()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                sharedDatabasePreferences.setPassword(new Password(password.getValue(), user.getValue()).encrypt());</b>
+&nbsp;            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Could not store the password due to encryption problems.&quot;, e);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            sharedDatabasePreferences.clearPassword(); // for the case that the password is already set</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sharedDatabasePreferences.setRememberPassword(rememberPassword.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        sharedDatabasePreferences.setFolder(folder.getValue());</b>
+<b class="nc">&nbsp;        sharedDatabasePreferences.setAutosave(autosave.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fetches possibly saved data and configures the control elements respectively.
+&nbsp;     */
+&nbsp;    private void applyPreferences() {
+<b class="nc">&nbsp;        Optional&lt;String&gt; sharedDatabaseType = sharedDatabasePreferences.getType();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; sharedDatabaseHost = sharedDatabasePreferences.getHost();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; sharedDatabasePort = sharedDatabasePreferences.getPort();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; sharedDatabaseName = sharedDatabasePreferences.getName();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; sharedDatabaseUser = sharedDatabasePreferences.getUser();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; sharedDatabasePassword = sharedDatabasePreferences.getPassword();</b>
+<b class="nc">&nbsp;        boolean sharedDatabaseRememberPassword = sharedDatabasePreferences.getRememberPassword();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; sharedDatabaseFolder = sharedDatabasePreferences.getFolder();</b>
+<b class="nc">&nbsp;        boolean sharedDatabaseAutosave = sharedDatabasePreferences.getAutosave();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; sharedDatabaseKeystoreFile = sharedDatabasePreferences.getKeyStoreFile();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (sharedDatabaseType.isPresent()) {</b>
+<b class="nc">&nbsp;            Optional&lt;DBMSType&gt; dbmsType = DBMSType.fromString(sharedDatabaseType.get());</b>
+<b class="nc">&nbsp;            dbmsType.ifPresent(selectedDBMSType::set);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sharedDatabaseHost.ifPresent(host::set);</b>
+<b class="nc">&nbsp;        sharedDatabasePort.ifPresent(port::set);</b>
+<b class="nc">&nbsp;        sharedDatabaseName.ifPresent(database::set);</b>
+<b class="nc">&nbsp;        sharedDatabaseUser.ifPresent(user::set);</b>
+<b class="nc">&nbsp;        sharedDatabaseKeystoreFile.ifPresent(keystore::set);</b>
+<b class="nc">&nbsp;        useSSL.setValue(sharedDatabasePreferences.isUseSSL());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (sharedDatabasePassword.isPresent() &amp;&amp; sharedDatabaseUser.isPresent()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                password.setValue(new Password(sharedDatabasePassword.get().toCharArray(), sharedDatabaseUser.get()).decrypt());</b>
+&nbsp;            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Could not read the password due to decryption problems.&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        rememberPassword.set(sharedDatabaseRememberPassword);</b>
+&nbsp;
+<b class="nc">&nbsp;        sharedDatabaseFolder.ifPresent(folder::set);</b>
+<b class="nc">&nbsp;        autosave.set(sharedDatabaseAutosave);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
+<b class="nc">&nbsp;        List&lt;LibraryTab&gt; libraryTabs = tabContainer.getLibraryTabs();</b>
+<b class="nc">&nbsp;        return libraryTabs.parallelStream().anyMatch(panel -&gt; {</b>
+<b class="nc">&nbsp;            BibDatabaseContext context = panel.getBibDatabaseContext();</b>
+&nbsp;
+<b class="nc">&nbsp;            return (context.getLocation() == DatabaseLocation.SHARED) &amp;&amp;</b>
+<b class="nc">&nbsp;                    connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties());</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void showSaveDbToFileDialog() {
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.BIBTEX_DB)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.BIBTEX_DB)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);</b>
+<b class="nc">&nbsp;        exportPath.ifPresent(path -&gt; folder.setValue(path.toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void showOpenKeystoreFileDialog() {
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(FileFilterConverter.ANY_FILE)</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; keystorePath = dialogService.showFileOpenDialog(fileDialogConfiguration);</b>
+<b class="nc">&nbsp;        keystorePath.ifPresent(path -&gt; keystore.setValue(path.toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty databaseproperty() {
+<b class="nc">&nbsp;        return database;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty hostProperty() {
+<b class="nc">&nbsp;        return host;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty portProperty() {
+<b class="nc">&nbsp;        return port;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty userProperty() {
+<b class="nc">&nbsp;        return user;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty passwordProperty() {
+<b class="nc">&nbsp;        return password;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty autosaveProperty() {
+<b class="nc">&nbsp;        return autosave;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty rememberPasswordProperty() {
+<b class="nc">&nbsp;        return rememberPassword;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty folderProperty() {
+<b class="nc">&nbsp;        return folder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty keyStoreProperty() {
+<b class="nc">&nbsp;        return keystore;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty keyStorePasswordProperty() {
+<b class="nc">&nbsp;        return keyStorePasswordProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty useSSLProperty() {
+<b class="nc">&nbsp;        return useSSL;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;DBMSType&gt; selectedDbmstypeProperty() {
+<b class="nc">&nbsp;        return selectedDBMSType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty loadingProperty() {
+<b class="nc">&nbsp;        return loading;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus dbValidation() {
+<b class="nc">&nbsp;        return databaseValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus hostValidation() {
+<b class="nc">&nbsp;        return hostValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus portValidation() {
+<b class="nc">&nbsp;        return portValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus userValidation() {
+<b class="nc">&nbsp;        return userValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus folderValidation() {
+<b class="nc">&nbsp;        return folderValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus keystoreValidation() {
+<b class="nc">&nbsp;        return keystoreValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus formValidation() {
+<b class="nc">&nbsp;        return formValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty serverTimezoneProperty() {
+<b class="nc">&nbsp;        return serverTimezone;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty expertModeProperty() {
+<b class="nc">&nbsp;        return expertMode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty jdbcUrlProperty() {
+<b class="nc">&nbsp;        return jdbcUrl;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

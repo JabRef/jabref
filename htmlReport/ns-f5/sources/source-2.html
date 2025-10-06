@@ -1,0 +1,329 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DBMSConnectionProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.shared</a>
+</div>
+
+<h1>Coverage Summary for Class: DBMSConnectionProperties (org.jabref.logic.shared)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DBMSConnectionProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/75)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.shared;
+&nbsp;
+&nbsp;import java.io.UnsupportedEncodingException;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Properties;
+&nbsp;
+&nbsp;import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+&nbsp;import org.jabref.logic.shared.security.Password;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Keeps all essential data for establishing a new connection to a DBMS using {@link DBMSConnection}.
+&nbsp; */
+&nbsp;public class DBMSConnectionProperties implements DatabaseConnectionProperties {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DBMSConnectionProperties.class);</b>
+&nbsp;
+&nbsp;    private DBMSType type;
+&nbsp;    private String host;
+&nbsp;    private int port;
+&nbsp;    private String database;
+&nbsp;    private String user;
+&nbsp;    private String password;
+&nbsp;    private boolean allowPublicKeyRetrieval;
+&nbsp;    private final boolean useSSL;
+<b class="nc">&nbsp;    private String serverTimezone = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private String jdbcUrl = &quot;&quot;;</b>
+&nbsp;    private final boolean expertMode;
+&nbsp;
+&nbsp;    // Not needed for connection, but stored for future login
+&nbsp;    private String keyStore;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all required data from {@link SharedDatabasePreferences} and sets them if present.
+&nbsp;     */
+<b class="nc">&nbsp;    public DBMSConnectionProperties(SharedDatabasePreferences prefs) {</b>
+<b class="nc">&nbsp;        if (prefs.getType().isPresent()) {</b>
+<b class="nc">&nbsp;            Optional&lt;DBMSType&gt; dbmsType = DBMSType.fromString(prefs.getType().get());</b>
+<b class="nc">&nbsp;            dbmsType.ifPresent(value -&gt; this.type = value);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        prefs.getHost().ifPresent(theHost -&gt; this.host = theHost);</b>
+<b class="nc">&nbsp;        prefs.getPort().ifPresent(thePort -&gt; this.port = Integer.parseInt(thePort));</b>
+<b class="nc">&nbsp;        prefs.getName().ifPresent(theDatabase -&gt; this.database = theDatabase);</b>
+<b class="nc">&nbsp;        prefs.getKeyStoreFile().ifPresent(theKeystore -&gt; this.keyStore = theKeystore);</b>
+<b class="nc">&nbsp;        prefs.getServerTimezone().ifPresent(theServerTimezone -&gt; this.serverTimezone = theServerTimezone);</b>
+<b class="nc">&nbsp;        prefs.getJdbcUrl().ifPresent(theJdbcUrl -&gt; this.jdbcUrl = theJdbcUrl);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.expertMode = prefs.isUseExpertMode();</b>
+<b class="nc">&nbsp;        this.useSSL = prefs.isUseSSL();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (prefs.getUser().isPresent()) {</b>
+<b class="nc">&nbsp;            this.user = prefs.getUser().get();</b>
+<b class="nc">&nbsp;            if (prefs.getPassword().isPresent()) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();</b>
+&nbsp;                } catch (UnsupportedEncodingException | GeneralSecurityException e) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Could not decrypt password&quot;, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (prefs.getPassword().isEmpty()) {</b>
+&nbsp;            // Some DBMS require a non-null value as a password (in case of using an empty string).
+<b class="nc">&nbsp;            this.password = &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,
+&nbsp;                             String password, boolean useSSL, boolean allowPublicKeyRetrieval,
+<b class="nc">&nbsp;                             String serverTimezone, String keyStore, String jdbcUrl, boolean expertMode) {</b>
+<b class="nc">&nbsp;        this.type = type;</b>
+<b class="nc">&nbsp;        this.host = host;</b>
+<b class="nc">&nbsp;        this.port = port;</b>
+<b class="nc">&nbsp;        this.database = database;</b>
+<b class="nc">&nbsp;        this.user = user;</b>
+<b class="nc">&nbsp;        this.password = password;</b>
+<b class="nc">&nbsp;        this.useSSL = useSSL;</b>
+<b class="nc">&nbsp;        this.allowPublicKeyRetrieval = allowPublicKeyRetrieval;</b>
+<b class="nc">&nbsp;        this.serverTimezone = serverTimezone;</b>
+<b class="nc">&nbsp;        this.keyStore = keyStore;</b>
+<b class="nc">&nbsp;        this.jdbcUrl = jdbcUrl;</b>
+<b class="nc">&nbsp;        this.expertMode = expertMode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DBMSType getType() {
+<b class="nc">&nbsp;        return type;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getHost() {
+<b class="nc">&nbsp;        return host;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getPort() {
+<b class="nc">&nbsp;        return port;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDatabase() {
+<b class="nc">&nbsp;        return database;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUser() {
+<b class="nc">&nbsp;        return user;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getPassword() {
+<b class="nc">&nbsp;        return password;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isUseSSL() {
+<b class="nc">&nbsp;        return useSSL;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isAllowPublicKeyRetrieval() {
+<b class="nc">&nbsp;        return allowPublicKeyRetrieval;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getServerTimezone() {
+<b class="nc">&nbsp;        return serverTimezone;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getJdbcUrl() {
+<b class="nc">&nbsp;        return jdbcUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isUseExpertMode() {
+<b class="nc">&nbsp;        return expertMode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getUrl() {
+<b class="nc">&nbsp;        return type.getUrl(host, port, database);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns username, password and ssl as Properties Object
+&nbsp;     *
+&nbsp;     * @return Properties with values for user, password and ssl
+&nbsp;     */
+&nbsp;    public Properties asProperties() {
+<b class="nc">&nbsp;        Properties props = new Properties();</b>
+<b class="nc">&nbsp;        props.setProperty(&quot;user&quot;, user);</b>
+<b class="nc">&nbsp;        props.setProperty(&quot;password&quot;, password);</b>
+<b class="nc">&nbsp;        props.setProperty(&quot;serverTimezone&quot;, serverTimezone);</b>
+<b class="nc">&nbsp;        if (useSSL) {</b>
+<b class="nc">&nbsp;            props.setProperty(&quot;ssl&quot;, Boolean.toString(true));</b>
+<b class="nc">&nbsp;            props.setProperty(&quot;useSSL&quot;, Boolean.toString(true));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (allowPublicKeyRetrieval) {</b>
+<b class="nc">&nbsp;            props.setProperty(&quot;allowPublicKeyRetrieval&quot;, Boolean.toString(true));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return props;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKeyStore() {
+<b class="nc">&nbsp;        return keyStore;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compares all properties except the password.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object obj) {
+<b class="nc">&nbsp;        if (this == obj) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!(obj instanceof DBMSConnectionProperties properties)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Objects.equals(type, properties.getType())</b>
+<b class="nc">&nbsp;                &amp;&amp; this.host.equalsIgnoreCase(properties.getHost())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(port, properties.getPort())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(database, properties.getDatabase())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(user, properties.getUser())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(useSSL, properties.isUseSSL())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(allowPublicKeyRetrieval, properties.isAllowPublicKeyRetrieval())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(serverTimezone, properties.getServerTimezone())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(keyStore, properties.getKeyStore())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(jdbcUrl, properties.getJdbcUrl())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(expertMode, properties.isUseExpertMode());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, serverTimezone, keyStore, jdbcUrl, expertMode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isValid() {
+<b class="nc">&nbsp;        return type != null</b>
+&nbsp;                &amp;&amp; host != null
+&nbsp;                &amp;&amp; port &gt; 0
+&nbsp;                &amp;&amp; database != null
+&nbsp;                &amp;&amp; user != null
+&nbsp;                &amp;&amp; password != null;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

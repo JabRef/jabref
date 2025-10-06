@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitShareToGitHubDialogView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.git</a>
+</div>
+
+<h1>Coverage Summary for Class: GitShareToGitHubDialogView (org.jabref.gui.git)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitShareToGitHubDialogView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.git;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.PasswordField;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.logic.git.util.GitHandlerRegistry;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class GitShareToGitHubDialogView extends BaseDialog&lt;Void&gt; {
+&nbsp;    private static final String GITHUB_PAT_DOCS_URL =
+&nbsp;            &quot;https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens&quot;;
+&nbsp;
+&nbsp;    private static final String GITHUB_NEW_REPO_URL = &quot;https://github.com/new&quot;;
+&nbsp;
+&nbsp;    @FXML private TextField repositoryUrl;
+&nbsp;    @FXML private TextField username;
+&nbsp;    @FXML private PasswordField personalAccessToken;
+&nbsp;    @FXML private ButtonType shareButton;
+&nbsp;    @FXML private Label patHelpIcon;
+&nbsp;    @FXML private Tooltip patHelpTooltip;
+&nbsp;    @FXML private CheckBox rememberSettingsCheck;
+&nbsp;    @FXML private Label repoHelpIcon;
+&nbsp;    @FXML private Tooltip repoHelpTooltip;
+&nbsp;
+&nbsp;    private GitShareToGitHubDialogViewModel viewModel;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    private DialogService dialogService;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    private StateManager stateManager;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    private TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    private GitHandlerRegistry gitHandlerRegistry;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    private GuiPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;    public GitShareToGitHubDialogView() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new GitShareToGitHubDialogViewModel(preferences.getGitPreferences(), stateManager, dialogService, taskExecutor, gitHandlerRegistry);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;Share this Library to GitHub&quot;));</b>
+&nbsp;
+&nbsp;        // See &quot;javafx.md&quot;
+<b class="nc">&nbsp;        this.setResultConverter(button -&gt; {</b>
+<b class="nc">&nbsp;            if (button != ButtonType.CANCEL) {</b>
+&nbsp;                // We do not want to use &quot;OK&quot;, but we want to use a custom text instead.
+&nbsp;                // JavaFX does not allow to alter the text of the &quot;OK&quot; button.
+&nbsp;                // Therefore, we used another button type.
+&nbsp;                // Since we have only two buttons, we can check for non-cancel here.
+<b class="nc">&nbsp;                shareToGitHub();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        patHelpTooltip.setText(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Click to open GitHub Personal Access Token documentation&quot;)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        username.setPromptText(Localization.lang(&quot;Your GitHub username&quot;));</b>
+<b class="nc">&nbsp;        personalAccessToken.setPromptText(Localization.lang(&quot;PAT with repo access&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        repoHelpTooltip.setText(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Create an empty repository on GitHub, then copy the HTTPS URL (ends with .git). Click to open GitHub.&quot;)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        Tooltip.install(repoHelpIcon, repoHelpTooltip);</b>
+<b class="nc">&nbsp;        repoHelpIcon.setOnMouseClicked(e -&gt;</b>
+<b class="nc">&nbsp;                NativeDesktop.openBrowserShowPopup(</b>
+&nbsp;                        GITHUB_NEW_REPO_URL,
+&nbsp;                        dialogService,
+<b class="nc">&nbsp;                        preferences.getExternalApplicationsPreferences()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Tooltip.install(patHelpIcon, patHelpTooltip);</b>
+<b class="nc">&nbsp;        patHelpIcon.setOnMouseClicked(e -&gt;</b>
+<b class="nc">&nbsp;                NativeDesktop.openBrowserShowPopup(</b>
+&nbsp;                        GITHUB_PAT_DOCS_URL,
+&nbsp;                        dialogService,
+<b class="nc">&nbsp;                        preferences.getExternalApplicationsPreferences()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        repositoryUrl.textProperty().bindBidirectional(viewModel.repositoryUrlProperty());</b>
+<b class="nc">&nbsp;        username.textProperty().bindBidirectional(viewModel.usernameProperty());</b>
+<b class="nc">&nbsp;        personalAccessToken.textProperty().bindBidirectional(viewModel.patProperty());</b>
+<b class="nc">&nbsp;        rememberSettingsCheck.selectedProperty().bindBidirectional(viewModel.rememberPatProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.setValues();</b>
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            visualizer.setDecoration(new IconValidationDecorator());</b>
+&nbsp;
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.repositoryUrlValidation(), repositoryUrl, true);</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.githubUsernameValidation(), username, true);</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.githubPatValidation(), personalAccessToken, true);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void shareToGitHub() {
+<b class="nc">&nbsp;        viewModel.shareToGitHub(() -&gt; this.close());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

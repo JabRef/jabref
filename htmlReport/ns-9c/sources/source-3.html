@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExtensionSettings</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.languageserver</a>
+</div>
+
+<h1>Coverage Summary for Class: ExtensionSettings (org.jabref.languageserver)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExtensionSettings</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.languageserver;
+&nbsp;
+&nbsp;import com.google.gson.JsonObject;
+&nbsp;import org.hisp.dhis.jsontree.JsonMixed;
+&nbsp;import org.slf4j.Logger;
+&nbsp;
+&nbsp;public class ExtensionSettings {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ExtensionSettings.class);</b>
+&nbsp;
+&nbsp;    private boolean consistencyCheck;
+&nbsp;    private boolean consistencyCheckRequired;
+&nbsp;    private boolean consistencyCheckOptional;
+&nbsp;    private boolean consistencyCheckUnknown;
+&nbsp;    private boolean integrityCheck;
+&nbsp;
+<b class="nc">&nbsp;    private ExtensionSettings() {</b>
+<b class="nc">&nbsp;        this.consistencyCheck = true;</b>
+<b class="nc">&nbsp;        this.consistencyCheckRequired = true;</b>
+<b class="nc">&nbsp;        this.consistencyCheckOptional = true;</b>
+<b class="nc">&nbsp;        this.consistencyCheckUnknown = true;</b>
+<b class="nc">&nbsp;        this.integrityCheck = true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ExtensionSettings getDefaultSettings() {
+<b class="nc">&nbsp;        return new ExtensionSettings();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void copyFromJsonObject(JsonObject object) {
+<b class="nc">&nbsp;        org.hisp.dhis.jsontree.JsonObject json = JsonMixed.of(object.toString());</b>
+<b class="nc">&nbsp;        this.consistencyCheck = json.getBoolean(&quot;jabref.consistencyCheck.enabled&quot;).booleanValue(this.consistencyCheck);</b>
+<b class="nc">&nbsp;        this.consistencyCheckRequired = json.getBoolean(&quot;jabref.consistencyCheck.required&quot;).booleanValue(this.consistencyCheckRequired);</b>
+<b class="nc">&nbsp;        this.consistencyCheckOptional = json.getBoolean(&quot;jabref.consistencyCheck.optional&quot;).booleanValue(this.consistencyCheckOptional);</b>
+<b class="nc">&nbsp;        this.consistencyCheckUnknown = json.getBoolean(&quot;jabref.consistencyCheck.unknown&quot;).booleanValue(this.consistencyCheckUnknown);</b>
+<b class="nc">&nbsp;        this.integrityCheck = json.getBoolean(&quot;jabref.integrityCheck.enabled&quot;).booleanValue(this.integrityCheck);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isConsistencyCheck() {
+<b class="nc">&nbsp;        return consistencyCheck;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isIntegrityCheck() {
+<b class="nc">&nbsp;        return integrityCheck;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isConsistencyCheckRequired() {
+<b class="nc">&nbsp;        return consistencyCheckRequired;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isConsistencyCheckOptional() {
+<b class="nc">&nbsp;        return consistencyCheckOptional;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isConsistencyCheckUnknown() {
+<b class="nc">&nbsp;        return consistencyCheckUnknown;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;ExtensionSettings{&quot; +</b>
+&nbsp;                &quot;consistencyCheckRequired=&quot; + consistencyCheckRequired +
+&nbsp;                &quot;, consistencyCheckOptional=&quot; + consistencyCheckOptional +
+&nbsp;                &quot;, consistencyCheckUnknown=&quot; + consistencyCheckUnknown +
+&nbsp;                &quot;, integrityCheck=&quot; + integrityCheck +
+&nbsp;                &quot;, consistencyCheck=&quot; + consistencyCheck +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

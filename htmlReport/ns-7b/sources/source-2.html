@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SidePane</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.sidepane</a>
+</div>
+
+<h1>Coverage Summary for Class: SidePane (org.jabref.gui.sidepane)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SidePane</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.sidepane;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;public class SidePane extends VBox {
+&nbsp;    private final SidePaneViewModel viewModel;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    // These bindings need to be stored, otherwise they are garbage collected
+<b class="nc">&nbsp;    @SuppressWarnings(&quot;MismatchedQueryAndUpdateOfCollection&quot;)</b>
+&nbsp;    private final Map&lt;SidePaneType, BooleanBinding&gt; visibleBindings = new HashMap&lt;&gt;();
+&nbsp;
+&nbsp;    public SidePane(LibraryTabContainer tabContainer,
+&nbsp;                    GuiPreferences preferences,
+&nbsp;                    JournalAbbreviationRepository abbreviationRepository,
+&nbsp;                    TaskExecutor taskExecutor,
+&nbsp;                    DialogService dialogService,
+&nbsp;                    AiService aiService,
+&nbsp;                    StateManager stateManager,
+&nbsp;                    AdaptVisibleTabs adaptVisibleTabs,
+&nbsp;                    FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                    BibEntryTypesManager entryTypesManager,
+&nbsp;                    ClipBoardManager clipBoardManager,
+<b class="nc">&nbsp;                    UndoManager undoManager) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.viewModel = new SidePaneViewModel(</b>
+&nbsp;                tabContainer,
+&nbsp;                preferences,
+&nbsp;                abbreviationRepository,
+&nbsp;                stateManager,
+&nbsp;                taskExecutor,
+&nbsp;                adaptVisibleTabs,
+&nbsp;                dialogService,
+&nbsp;                aiService,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                entryTypesManager,
+&nbsp;                clipBoardManager,
+&nbsp;                undoManager);
+&nbsp;
+<b class="nc">&nbsp;        stateManager.getVisibleSidePaneComponents().addListener((ListChangeListener&lt;SidePaneType&gt;) c -&gt; updateView());</b>
+<b class="nc">&nbsp;        updateView();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateView() {
+<b class="nc">&nbsp;        getChildren().clear();</b>
+<b class="nc">&nbsp;        for (SidePaneType type : stateManager.getVisibleSidePaneComponents()) {</b>
+<b class="nc">&nbsp;            SidePaneComponent view = viewModel.getSidePaneComponent(type);</b>
+<b class="nc">&nbsp;            getChildren().add(view);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding paneVisibleBinding(SidePaneType pane) {
+<b class="nc">&nbsp;        BooleanBinding visibility = Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                () -&gt; stateManager.getVisibleSidePaneComponents().contains(pane),</b>
+<b class="nc">&nbsp;                stateManager.getVisibleSidePaneComponents());</b>
+<b class="nc">&nbsp;        visibleBindings.put(pane, visibility);</b>
+<b class="nc">&nbsp;        return visibility;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SimpleCommand getToggleCommandFor(SidePaneType sidePane) {
+<b class="nc">&nbsp;        return new TogglePaneAction(stateManager, sidePane, preferences.getSidePanePreferences());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SidePaneComponent getSidePaneComponent(SidePaneType type) {
+<b class="nc">&nbsp;        return viewModel.getSidePaneComponent(type);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

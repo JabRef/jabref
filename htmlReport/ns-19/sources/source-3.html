@@ -1,0 +1,152 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntryChangeResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab.entrychange</a>
+</div>
+
+<h1>Coverage Summary for Class: EntryChangeResolver (org.jabref.gui.collab.entrychange)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntryChangeResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab.entrychange;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.collab.DatabaseChange;
+&nbsp;import org.jabref.gui.collab.DatabaseChangeResolver;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.ShowDiffConfig;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter.BasicDiffMethod;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.toolbar.ThreeWayMergeToolbar;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;public final class EntryChangeResolver extends DatabaseChangeResolver {
+&nbsp;    private final EntryChange entryChange;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;
+&nbsp;    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, GuiPreferences preferences) {
+<b class="nc">&nbsp;        super(dialogService);</b>
+<b class="nc">&nbsp;        this.entryChange = entryChange;</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;DatabaseChange&gt; askUserToResolveChange() {
+<b class="nc">&nbsp;        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), preferences);</b>
+<b class="nc">&nbsp;        mergeEntriesDialog.setLeftHeaderText(Localization.lang(&quot;In JabRef&quot;));</b>
+<b class="nc">&nbsp;        mergeEntriesDialog.setRightHeaderText(Localization.lang(&quot;On disk&quot;));</b>
+<b class="nc">&nbsp;        mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, BasicDiffMethod.WORDS));</b>
+&nbsp;
+<b class="nc">&nbsp;        return dialogService.showCustomDialogAndWait(mergeEntriesDialog)</b>
+<b class="nc">&nbsp;                            .map(this::mapMergeResultToExternalChange);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private EntryChange mapMergeResultToExternalChange(EntriesMergeResult entriesMergeResult) {
+<b class="nc">&nbsp;        return new EntryChange(</b>
+<b class="nc">&nbsp;                entryChange.getOldEntry(),</b>
+<b class="nc">&nbsp;                entriesMergeResult.mergedEntry(),</b>
+&nbsp;                databaseContext
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

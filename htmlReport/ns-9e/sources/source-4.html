@@ -1,0 +1,157 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LspIntegrityCheck</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.languageserver.util</a>
+</div>
+
+<h1>Coverage Summary for Class: LspIntegrityCheck (org.jabref.languageserver.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LspIntegrityCheck</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.languageserver.util;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.integrity.IntegrityCheck;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;
+&nbsp;import org.eclipse.lsp4j.Diagnostic;
+&nbsp;
+&nbsp;public class LspIntegrityCheck {
+&nbsp;
+&nbsp;    private static final boolean ALLOW_INTEGER_EDITION = true;
+&nbsp;
+&nbsp;    private final CliPreferences cliPreferences;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;
+<b class="nc">&nbsp;    public LspIntegrityCheck(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.cliPreferences = cliPreferences;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Diagnostic&gt; check(ParserResult parserResult) {
+<b class="nc">&nbsp;        IntegrityCheck integrityCheck = new IntegrityCheck(</b>
+<b class="nc">&nbsp;                parserResult.getDatabaseContext(),</b>
+<b class="nc">&nbsp;                cliPreferences.getFilePreferences(),</b>
+<b class="nc">&nbsp;                cliPreferences.getCitationKeyPatternPreferences(),</b>
+&nbsp;                abbreviationRepository,
+&nbsp;                ALLOW_INTEGER_EDITION
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return parserResult.getDatabaseContext().getEntries().stream().flatMap(entry -&gt; integrityCheck.checkEntry(entry).stream().map(message -&gt; {</b>
+<b class="nc">&nbsp;            if (entry.getFieldOrAlias(message.field()).isPresent()) {</b>
+<b class="nc">&nbsp;                return LspDiagnosticBuilder.create(parserResult, message.message()).setField(message.field()).setEntry(entry).build();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return LspDiagnosticBuilder.create(parserResult, message.message()).setEntry(entry).build();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        })).toList();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Highlighter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.search</a>
+</div>
+
+<h1>Coverage Summary for Class: Highlighter (org.jabref.gui.search)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Highlighter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.search;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.PreparedStatement;
+&nbsp;import java.sql.ResultSet;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.search.PostgreServer;
+&nbsp;import org.jabref.logic.search.query.SearchQueryConversion;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.search.PostgreConstants;
+&nbsp;import org.jabref.model.search.query.SearchQuery;
+&nbsp;import org.jabref.model.search.query.SearchQueryNode;
+&nbsp;import org.jabref.model.util.Range;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.jsoup.Jsoup;
+&nbsp;import org.jsoup.nodes.Document;
+&nbsp;import org.jsoup.nodes.Element;
+&nbsp;import org.jsoup.nodes.Node;
+&nbsp;import org.jsoup.nodes.TextNode;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class Highlighter {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(Highlighter.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Functions defined in {@link PostgreConstants#POSTGRES_FUNCTIONS}
+&nbsp;     */
+&nbsp;    private static final String REGEXP_MARK = &quot;SELECT regexp_mark(?, ?)&quot;;
+&nbsp;    private static final String REGEXP_POSITIONS = &quot;SELECT * FROM regexp_positions(?, ?)&quot;;
+&nbsp;    private static Connection connection;
+&nbsp;
+&nbsp;    private Highlighter() {
+&nbsp;        // prevent instantiation
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String highlightHtml(String htmlText, SearchQuery searchQuery) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; searchTermsPattern = buildSearchPattern(searchQuery);</b>
+<b class="nc">&nbsp;        if (searchTermsPattern.isEmpty()) {</b>
+<b class="nc">&nbsp;            return htmlText;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Document document = Jsoup.parse(htmlText);</b>
+<b class="nc">&nbsp;        highlightTextNodes(document.body(), searchTermsPattern.get());</b>
+<b class="nc">&nbsp;        return document.outerHtml();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void highlightTextNodes(Element element, String searchPattern) {
+<b class="nc">&nbsp;        for (Node node : element.childNodes()) {</b>
+<b class="nc">&nbsp;            if (node instanceof TextNode textNode) {</b>
+<b class="nc">&nbsp;                String highlightedText = highlightNode(textNode.text(), searchPattern);</b>
+<b class="nc">&nbsp;                textNode.text(&quot;&quot;);</b>
+<b class="nc">&nbsp;                textNode.after(highlightedText);</b>
+<b class="nc">&nbsp;            } else if (node instanceof Element element1) {</b>
+<b class="nc">&nbsp;                highlightTextNodes(element1, searchPattern);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String highlightNode(String text, String searchPattern) {
+<b class="nc">&nbsp;        if (connection == null) {</b>
+<b class="nc">&nbsp;            connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        try (PreparedStatement preparedStatement = connection.prepareStatement(REGEXP_MARK)) {</b>
+<b class="nc">&nbsp;            preparedStatement.setString(1, text);</b>
+<b class="nc">&nbsp;            preparedStatement.setString(2, searchPattern);</b>
+&nbsp;
+<b class="nc">&nbsp;            try (ResultSet resultSet = preparedStatement.executeQuery()) {</b>
+<b class="nc">&nbsp;                if (resultSet.next()) {</b>
+<b class="nc">&nbsp;                    return resultSet.getString(1);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error highlighting search terms in text&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return text;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Range&gt; findMatchPositions(String text, String pattern) {
+<b class="nc">&nbsp;        if (connection == null) {</b>
+<b class="nc">&nbsp;            connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        try (PreparedStatement preparedStatement = connection.prepareStatement(REGEXP_POSITIONS)) {</b>
+<b class="nc">&nbsp;            preparedStatement.setString(1, text);</b>
+<b class="nc">&nbsp;            preparedStatement.setString(2, pattern);</b>
+&nbsp;
+<b class="nc">&nbsp;            try (ResultSet resultSet = preparedStatement.executeQuery()) {</b>
+<b class="nc">&nbsp;                List&lt;Range&gt; positions = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                while (resultSet.next()) {</b>
+<b class="nc">&nbsp;                    positions.add(new Range(resultSet.getInt(1), resultSet.getInt(2)));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return positions;</b>
+&nbsp;            }
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error getting match positions in text&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return List.of();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Map&lt;Optional&lt;Field&gt;, List&lt;String&gt;&gt; groupTermsByField(SearchQuery searchQuery) {
+<b class="nc">&nbsp;        if (!searchQuery.isValid()) {</b>
+<b class="nc">&nbsp;            return Map.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;SearchQueryNode&gt; queryNodes = getSearchQueryNodes(searchQuery);</b>
+<b class="nc">&nbsp;        Map&lt;Optional&lt;Field&gt;, List&lt;String&gt;&gt; searchTermsMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (SearchQueryNode searchTerm : queryNodes) {</b>
+<b class="nc">&nbsp;            searchTermsMap.computeIfAbsent(searchTerm.field(), k -&gt; new ArrayList&lt;&gt;()).add(searchTerm.term());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return searchTermsMap;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;String&gt; buildSearchPattern(SearchQuery searchQuery) {
+<b class="nc">&nbsp;        if (!searchQuery.isValid()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; terms = getSearchQueryNodes(searchQuery).stream()</b>
+<b class="nc">&nbsp;                                                             .map(SearchQueryNode::term)</b>
+<b class="nc">&nbsp;                                                             .toList();</b>
+<b class="nc">&nbsp;        return buildSearchPattern(terms);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;SearchQueryNode&gt; getSearchQueryNodes(SearchQuery searchQuery) {
+<b class="nc">&nbsp;        return searchQuery.isValid() ? SearchQueryConversion.extractSearchTerms(searchQuery) : List.of();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;String&gt; buildSearchPattern(List&lt;String&gt; terms) {
+<b class="nc">&nbsp;        return terms.isEmpty() ? Optional.empty() : Optional.of(String.join(&quot;|&quot;, terms));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

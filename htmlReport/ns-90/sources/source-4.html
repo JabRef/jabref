@@ -1,0 +1,241 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OnlineServicesDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.welcome.quicksettings.viewmodel</a>
+</div>
+
+<h1>Coverage Summary for Class: OnlineServicesDialogViewModel (org.jabref.gui.welcome.quicksettings.viewmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OnlineServicesDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.welcome.quicksettings.viewmodel;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.slr.StudyCatalogItem;
+&nbsp;import org.jabref.logic.importer.SearchBasedFetcher;
+&nbsp;import org.jabref.logic.importer.WebFetchers;
+&nbsp;import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+&nbsp;public class OnlineServicesDialogViewModel extends AbstractViewModel {
+<b class="nc">&nbsp;    private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty webSearchProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty dlibEnabledProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty grobidUrlProperty = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;StudyCatalogItem&gt; fetchersProperty =</b>
+<b class="nc">&nbsp;            new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public OnlineServicesDialogViewModel(GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        initializeSettings();</b>
+<b class="nc">&nbsp;        initializeFetchers();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeSettings() {
+<b class="nc">&nbsp;        versionCheckProperty.set(preferences.getInternalPreferences().isVersionCheckEnabled());</b>
+<b class="nc">&nbsp;        webSearchProperty.set(preferences.getImporterPreferences().areImporterEnabled());</b>
+<b class="nc">&nbsp;        dlibEnabledProperty.set(preferences.getMrDlibPreferences().shouldAcceptRecommendations());</b>
+<b class="nc">&nbsp;        grobidEnabledProperty.set(preferences.getGrobidPreferences().isGrobidEnabled());</b>
+<b class="nc">&nbsp;        grobidUrlProperty.set(preferences.getGrobidPreferences().getGrobidURL());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeFetchers() {
+<b class="nc">&nbsp;        List&lt;StudyCatalogItem&gt; availableFetchers = WebFetchers</b>
+<b class="nc">&nbsp;                .getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences())</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(SearchBasedFetcher::getName)</b>
+<b class="nc">&nbsp;                .filter(name -&gt; !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))</b>
+<b class="nc">&nbsp;                .map(name -&gt; {</b>
+<b class="nc">&nbsp;                    boolean enabled = preferences.getImporterPreferences().getCatalogs().contains(name);</b>
+<b class="nc">&nbsp;                    return new StudyCatalogItem(name, enabled);</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        fetchersProperty.setAll(availableFetchers);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty versionCheckProperty() {
+<b class="nc">&nbsp;        return versionCheckProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isVersionCheckEnabled() {
+<b class="nc">&nbsp;        return versionCheckProperty.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty webSearchProperty() {
+<b class="nc">&nbsp;        return webSearchProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isWebSearchEnabled() {
+<b class="nc">&nbsp;        return webSearchProperty.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty dlibEnabledProperty() {
+<b class="nc">&nbsp;        return dlibEnabledProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isDlibEnabled() {
+<b class="nc">&nbsp;        return dlibEnabledProperty.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty grobidEnabledProperty() {
+<b class="nc">&nbsp;        return grobidEnabledProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isGrobidEnabled() {
+<b class="nc">&nbsp;        return grobidEnabledProperty.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty grobidUrlProperty() {
+<b class="nc">&nbsp;        return grobidUrlProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public @NonNull String getGrobidUrl() {
+<b class="nc">&nbsp;        return Objects.requireNonNull(grobidUrlProperty.get()); // In every sensible use case (unless someone intentionally set this property to null), this should not be null.</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;StudyCatalogItem&gt; fetchersProperty() {
+<b class="nc">&nbsp;        return fetchersProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void saveSettings() {
+<b class="nc">&nbsp;        preferences.getInternalPreferences().setVersionCheckEnabled(isVersionCheckEnabled());</b>
+<b class="nc">&nbsp;        preferences.getImporterPreferences().setImporterEnabled(isWebSearchEnabled());</b>
+<b class="nc">&nbsp;        preferences.getGrobidPreferences().setGrobidEnabled(isGrobidEnabled());</b>
+<b class="nc">&nbsp;        preferences.getGrobidPreferences().setGrobidURL(getGrobidUrl());</b>
+<b class="nc">&nbsp;        preferences.getMrDlibPreferences().setAcceptRecommendations(isDlibEnabled());</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; enabledFetchers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (StudyCatalogItem fetcher : fetchersProperty) {</b>
+<b class="nc">&nbsp;            if (fetcher.isEnabled()) {</b>
+<b class="nc">&nbsp;                enabledFetchers.add(fetcher.getName());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        preferences.getImporterPreferences().setCatalogs(enabledFetchers);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

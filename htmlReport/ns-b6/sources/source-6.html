@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EprintCleanup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.cleanup</a>
+</div>
+
+<h1>Coverage Summary for Class: EprintCleanup (org.jabref.logic.cleanup)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EprintCleanup</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.cleanup;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.ArXivIdentifier;
+&nbsp;
+&nbsp;/**
+&nbsp; * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
+&nbsp; * &lt;p&gt;
+&nbsp; * Background information on &lt;a href=&quot;https://tex.stackexchange.com/questions/49757/what-should-an-entry-for-arxiv-entries-look-like-for-biblatex&quot;&gt;tex.stackexchange&lt;/a&gt;.
+&nbsp; */
+<b class="nc">&nbsp;public class EprintCleanup implements CleanupJob {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;FieldChange&gt; cleanup(BibEntry entry) {
+<b class="nc">&nbsp;        List&lt;FieldChange&gt; changes = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; version = entry.getField(StandardField.VERSION);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; institution = entry.getField(StandardField.INSTITUTION);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE, StandardField.EID)) {</b>
+<b class="nc">&nbsp;            Optional&lt;ArXivIdentifier&gt; arXivIdentifier = entry.getField(field).flatMap(ArXivIdentifier::parse);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (arXivIdentifier.isPresent()) {</b>
+<b class="nc">&nbsp;                String normalizedEprint = arXivIdentifier.get().asString();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (version.isPresent() &amp;&amp; !normalizedEprint.contains(&quot;v&quot; + version.get())) {</b>
+<b class="nc">&nbsp;                    normalizedEprint += &quot;v&quot; + version.get();</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (institution.isPresent() &amp;&amp; &quot;arxiv&quot;.equalsIgnoreCase(institution.get())) {</b>
+<b class="nc">&nbsp;                    entry.clearField(StandardField.INSTITUTION)</b>
+<b class="nc">&nbsp;                         .ifPresent(changes::add);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                entry.setField(StandardField.EPRINT, normalizedEprint)</b>
+<b class="nc">&nbsp;                     .ifPresent(changes::add);</b>
+&nbsp;
+<b class="nc">&nbsp;                entry.setField(StandardField.EPRINTTYPE, &quot;arxiv&quot;)</b>
+<b class="nc">&nbsp;                     .ifPresent(changes::add);</b>
+&nbsp;
+<b class="nc">&nbsp;                arXivIdentifier.get().getClassification()</b>
+<b class="nc">&nbsp;                               .flatMap(classification -&gt; entry.setField(StandardField.EPRINTCLASS, classification))</b>
+<b class="nc">&nbsp;                               .ifPresent(changes::add);</b>
+&nbsp;
+<b class="nc">&nbsp;                entry.clearField(field)</b>
+<b class="nc">&nbsp;                     .ifPresent(changes::add);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (field.equals(StandardField.URL)) {</b>
+&nbsp;                    // If we clear the URL field, we should also clear the URL-date field
+<b class="nc">&nbsp;                    entry.clearField(StandardField.URLDATE)</b>
+<b class="nc">&nbsp;                         .ifPresent(changes::add);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        entry.clearField(StandardField.VERSION).ifPresent(changes::add);</b>
+&nbsp;
+<b class="nc">&nbsp;        return changes;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

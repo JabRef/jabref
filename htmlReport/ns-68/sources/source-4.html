@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExternalFileTypesTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.externalfiletypes</a>
+</div>
+
+<h1>Coverage Summary for Class: ExternalFileTypesTab (org.jabref.gui.preferences.externalfiletypes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExternalFileTypesTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.externalfiletypes;
+&nbsp;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.gui.util.ValueTableCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;
+&nbsp;/**
+&nbsp; * Editor for external file types.
+&nbsp; */
+&nbsp;public class ExternalFileTypesTab extends AbstractPreferenceTabView&lt;ExternalFileTypesTabViewModel&gt; implements PreferencesTab {
+&nbsp;
+&nbsp;    @FXML private TableColumn&lt;ExternalFileTypeItemViewModel, JabRefIcon&gt; fileTypesTableIconColumn;
+&nbsp;    @FXML private TableColumn&lt;ExternalFileTypeItemViewModel, String&gt; fileTypesTableNameColumn;
+&nbsp;    @FXML private TableColumn&lt;ExternalFileTypeItemViewModel, String&gt; fileTypesTableExtensionColumn;
+&nbsp;    @FXML private TableColumn&lt;ExternalFileTypeItemViewModel, String&gt; fileTypesTableMimeTypeColumn;
+&nbsp;    @FXML private TableColumn&lt;ExternalFileTypeItemViewModel, String&gt; fileTypesTableApplicationColumn;
+&nbsp;    @FXML private TableColumn&lt;ExternalFileTypeItemViewModel, Boolean&gt; fileTypesTableEditColumn;
+&nbsp;    @FXML private TableColumn&lt;ExternalFileTypeItemViewModel, Boolean&gt; fileTypesTableDeleteColumn;
+&nbsp;    @FXML private TableView&lt;ExternalFileTypeItemViewModel&gt; fileTypesTable;
+&nbsp;
+<b class="nc">&nbsp;    public ExternalFileTypesTab() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;External file types&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        viewModel = new ExternalFileTypesTabViewModel(preferences.getExternalApplicationsPreferences(), dialogService);</b>
+&nbsp;
+<b class="nc">&nbsp;        fileTypesTable.setItems(viewModel.getFileTypes());</b>
+&nbsp;
+<b class="nc">&nbsp;        fileTypesTableIconColumn.setCellValueFactory(cellData -&gt; cellData.getValue().iconProperty());</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ExternalFileTypeItemViewModel, JabRefIcon&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(JabRefIcon::getGraphicNode)</b>
+<b class="nc">&nbsp;                .install(fileTypesTableIconColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        fileTypesTableNameColumn.setCellValueFactory(cellData -&gt; cellData.getValue().nameProperty());</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ExternalFileTypeItemViewModel, String&gt;()</b>
+<b class="nc">&nbsp;                .withText(name -&gt; name)</b>
+<b class="nc">&nbsp;                .install(fileTypesTableNameColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        fileTypesTableExtensionColumn.setCellValueFactory(cellData -&gt; cellData.getValue().extensionProperty());</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ExternalFileTypeItemViewModel, String&gt;()</b>
+<b class="nc">&nbsp;                .withText(extension -&gt; extension)</b>
+<b class="nc">&nbsp;                .install(fileTypesTableExtensionColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        fileTypesTableMimeTypeColumn.setCellValueFactory(cellData -&gt; cellData.getValue().mimetypeProperty());</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ExternalFileTypeItemViewModel, String&gt;()</b>
+<b class="nc">&nbsp;                .withText(mimetype -&gt; mimetype)</b>
+<b class="nc">&nbsp;                .install(fileTypesTableMimeTypeColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        fileTypesTableApplicationColumn.setCellValueFactory(cellData -&gt; cellData.getValue().applicationProperty());</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ExternalFileTypeItemViewModel, String&gt;()</b>
+<b class="nc">&nbsp;                .withText(extension -&gt; extension)</b>
+<b class="nc">&nbsp;                .install(fileTypesTableApplicationColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        fileTypesTableEditColumn.setCellValueFactory(data -&gt; BindingsHelper.constantOf(true));</b>
+<b class="nc">&nbsp;        fileTypesTableDeleteColumn.setCellValueFactory(data -&gt; BindingsHelper.constantOf(true));</b>
+&nbsp;
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ExternalFileTypeItemViewModel, JabRefIcon&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(JabRefIcon::getGraphicNode)</b>
+<b class="nc">&nbsp;                .install(fileTypesTableIconColumn);</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ExternalFileTypeItemViewModel, Boolean&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(none -&gt; IconTheme.JabRefIcons.EDIT.getGraphicNode())</b>
+<b class="nc">&nbsp;                .withOnMouseClickedEvent((type, none) -&gt; event -&gt; editType(type))</b>
+<b class="nc">&nbsp;                .install(fileTypesTableEditColumn);</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ExternalFileTypeItemViewModel, Boolean&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(none -&gt; IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())</b>
+<b class="nc">&nbsp;                .withOnMouseClickedEvent((type, none) -&gt; event -&gt; viewModel.remove(type))</b>
+<b class="nc">&nbsp;                .install(fileTypesTableDeleteColumn);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void editType(ExternalFileTypeItemViewModel type) {
+<b class="nc">&nbsp;        if (viewModel.edit(type)) {</b>
+<b class="nc">&nbsp;            fileTypesTable.getSelectionModel().selectLast();</b>
+<b class="nc">&nbsp;            fileTypesTable.scrollTo(viewModel.getFileTypes().size() - 1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void addNewType() {
+<b class="nc">&nbsp;        if (viewModel.addNewType()) {</b>
+<b class="nc">&nbsp;            fileTypesTable.getSelectionModel().selectLast();</b>
+<b class="nc">&nbsp;            fileTypesTable.scrollTo(viewModel.getFileTypes().size() - 1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void resetToDefault() {
+<b class="nc">&nbsp;        viewModel.resetToDefaults();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

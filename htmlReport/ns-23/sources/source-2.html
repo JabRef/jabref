@@ -1,0 +1,369 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConsistencyCheckDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.consistency</a>
+</div>
+
+<h1>Coverage Summary for Class: ConsistencyCheckDialog (org.jabref.gui.consistency)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConsistencyCheckDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConsistencyCheckDialog$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.consistency;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.property.ReadOnlyStringWrapper;
+&nbsp;import javafx.collections.transformation.FilteredList;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.TableCell;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;import javafx.stage.Modality;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.entryeditor.EntryEditor;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
+&nbsp;import org.jabref.logic.quality.consistency.ConsistencyMessage;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;import org.jabref.model.entry.field.SpecialField;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class ConsistencyCheckDialog extends BaseDialog&lt;Void&gt; {
+&nbsp;
+&nbsp;    @FXML private TableView&lt;ConsistencyMessage&gt; tableView;
+&nbsp;    @FXML private ComboBox&lt;String&gt; entryTypeCombo;
+&nbsp;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;    @Inject private EntryEditor entryEditor;
+&nbsp;
+&nbsp;    private final LibraryTab libraryTab;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final BibliographyConsistencyCheck.Result result;
+&nbsp;
+&nbsp;    private ConsistencyCheckDialogViewModel viewModel;
+&nbsp;
+&nbsp;    public ConsistencyCheckDialog(LibraryTab libraryTab,
+&nbsp;                                  DialogService dialogService,
+&nbsp;                                  GuiPreferences preferences,
+&nbsp;                                  BibEntryTypesManager entryTypesManager,
+<b class="nc">&nbsp;                                  BibliographyConsistencyCheck.Result result) {</b>
+<b class="nc">&nbsp;        this.libraryTab = libraryTab;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.result = result;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;Check consistency&quot;));</b>
+<b class="nc">&nbsp;        this.initModality(Modality.NONE);</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ConsistencyCheckDialogViewModel getViewModel() {
+<b class="nc">&nbsp;        return viewModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, result);</b>
+&nbsp;
+<b class="nc">&nbsp;        entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());</b>
+<b class="nc">&nbsp;        entryTypeCombo.valueProperty().bindBidirectional(viewModel.selectedEntryTypeProperty());</b>
+<b class="nc">&nbsp;        EasyBind.listen(entryTypeCombo.getEditor().textProperty(), observable -&gt; entryTypeCombo.commitValue());</b>
+<b class="nc">&nbsp;        entryTypeCombo.getSelectionModel().selectFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;        FilteredList&lt;ConsistencyMessage&gt; filteredData = new FilteredList&lt;&gt;(viewModel.getTableData(), message -&gt;</b>
+<b class="nc">&nbsp;                message.message().getFirst().equals(viewModel.selectedEntryTypeProperty().get())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        viewModel.selectedEntryTypeProperty().addListener((_, _, newValue) -&gt;</b>
+<b class="nc">&nbsp;                filteredData.setPredicate(message -&gt;</b>
+<b class="nc">&nbsp;                        message.message().getFirst().equals(newValue)</b>
+&nbsp;                ));
+&nbsp;
+<b class="nc">&nbsp;        tableView.setItems(filteredData);</b>
+&nbsp;
+<b class="nc">&nbsp;        int columnIndex = 0;</b>
+<b class="nc">&nbsp;        for (String columnName : viewModel.getColumnNames()) {</b>
+<b class="nc">&nbsp;            final int currentIndex = columnIndex;</b>
+<b class="nc">&nbsp;            TableColumn&lt;ConsistencyMessage, String&gt; tableColumn = new TableColumn&lt;&gt;(columnName);</b>
+&nbsp;
+<b class="nc">&nbsp;            tableColumn.setCellValueFactory(row -&gt; {</b>
+<b class="nc">&nbsp;                List&lt;String&gt; message = row.getValue().message();</b>
+<b class="nc">&nbsp;                if (currentIndex &lt; message.size()) {</b>
+<b class="nc">&nbsp;                    return new ReadOnlyStringWrapper(message.get(currentIndex));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return new ReadOnlyStringWrapper(&quot;&quot;);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            columnIndex++;</b>
+&nbsp;
+<b class="nc">&nbsp;            tableColumn.setCellFactory(_ -&gt; new TableCell&lt;&gt;() {</b>
+&nbsp;                @Override
+&nbsp;                protected void updateItem(String item, boolean empty) {
+<b class="nc">&nbsp;                    super.updateItem(item, empty);</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (empty || item == null) {</b>
+<b class="nc">&nbsp;                        setGraphic(null);</b>
+<b class="nc">&nbsp;                        setText(null);</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    ConsistencySymbol.fromText(item)</b>
+<b class="nc">&nbsp;                                     .ifPresentOrElse(</b>
+<b class="nc">&nbsp;                                             symbol -&gt; setGraphic(symbol.getIcon().getGraphicNode()),</b>
+&nbsp;                                             () -&gt; {
+<b class="nc">&nbsp;                                                 setGraphic(null);</b>
+<b class="nc">&nbsp;                                                 setText(item);</b>
+&nbsp;                                             }
+&nbsp;                                     );
+&nbsp;
+<b class="nc">&nbsp;                    this.setOnMouseClicked(_ -&gt; {</b>
+<b class="nc">&nbsp;                        if (!isEmpty()) {</b>
+<b class="nc">&nbsp;                            TableColumn&lt;ConsistencyMessage, String&gt; clickedColumn = getTableColumn();</b>
+&nbsp;
+<b class="nc">&nbsp;                            ConsistencyMessage message = getTableRow().getItem();</b>
+<b class="nc">&nbsp;                            String cellValue = getTableColumn().getCellObservableValue(getIndex()).getValue();</b>
+<b class="nc">&nbsp;                            Field field = FieldFactory.parseField(clickedColumn.getText());</b>
+<b class="nc">&nbsp;                            boolean isUnsetField = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());</b>
+&nbsp;
+<b class="nc">&nbsp;                            if (field.isStandardField()) {</b>
+<b class="nc">&nbsp;                                stateManager.getEditorShowing().setValue(true);</b>
+<b class="nc">&nbsp;                                Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;                                    libraryTab.clearAndSelect(message.bibEntry());</b>
+<b class="nc">&nbsp;                                    entryEditor.setFocusToField(field);</b>
+&nbsp;                                });
+<b class="nc">&nbsp;                            } else if (!message.bibEntry().hasField(field) &amp;&amp; isUnsetField) {</b>
+<b class="nc">&nbsp;                                libraryTab.showAndEdit(message.bibEntry());</b>
+&nbsp;                            } else {
+<b class="nc">&nbsp;                                stateManager.getEditorShowing().setValue(true);</b>
+<b class="nc">&nbsp;                                Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;                                    libraryTab.clearAndSelect(message.bibEntry());</b>
+<b class="nc">&nbsp;                                    entryEditor.setFocusToField(field);</b>
+&nbsp;                                });
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;                    });
+&nbsp;                }
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            tableView.getColumns().add(tableColumn);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        EnumSet&lt;ConsistencySymbol&gt; targetSymbols = EnumSet.of(</b>
+&nbsp;                ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
+&nbsp;                ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
+&nbsp;                ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
+&nbsp;                ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        targetSymbols.stream()</b>
+<b class="nc">&nbsp;                     .map(ConsistencySymbol::getText)</b>
+<b class="nc">&nbsp;                     .forEach(this::removeColumnWithUniformValue);</b>
+&nbsp;
+<b class="nc">&nbsp;        Arrays.stream(SpecialField.values())</b>
+<b class="nc">&nbsp;              .map(FieldTextMapper::getDisplayName)</b>
+<b class="nc">&nbsp;              .forEach(this::removeColumnByTitle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeColumnWithUniformValue(String symbol) {
+<b class="nc">&nbsp;        List&lt;TableColumn&lt;ConsistencyMessage, ?&gt;&gt; columnToRemove = tableView.getColumns().stream()</b>
+<b class="nc">&nbsp;                                                                           .filter(column -&gt; {</b>
+<b class="nc">&nbsp;                                                                               Set&lt;String&gt; values = tableView.getItems().stream()</b>
+<b class="nc">&nbsp;                                                                                                             .map(item -&gt; Optional.ofNullable(column.getCellObservableValue(item).getValue()).map(Object::toString).orElse(&quot;&quot;))</b>
+<b class="nc">&nbsp;                                                                                                             .collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;                                                                               return values.size() == 1 &amp;&amp; values.contains(symbol);</b>
+&nbsp;                                                                           })
+<b class="nc">&nbsp;                                                                           .toList();</b>
+<b class="nc">&nbsp;        tableView.getColumns().removeAll(columnToRemove);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeColumnByTitle(String columnName) {
+<b class="nc">&nbsp;        tableView.getColumns().removeIf(column -&gt; column.getText().equalsIgnoreCase(columnName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void exportAsCsv() {
+<b class="nc">&nbsp;        viewModel.startExportAsCsv();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void exportAsTxt() {
+<b class="nc">&nbsp;        viewModel.startExportAsTxt();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void showInfo() {
+<b class="nc">&nbsp;        ConsistencySymbolsDialog consistencySymbolsDialog = new ConsistencySymbolsDialog();</b>
+<b class="nc">&nbsp;        dialogService.showCustomDialog(consistencySymbolsDialog);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

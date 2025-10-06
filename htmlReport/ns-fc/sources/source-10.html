@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProgressCounter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ProgressCounter (org.jabref.logic.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProgressCounter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ProgressCounter$ProgressMessage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.animation.KeyFrame;
+&nbsp;import javafx.animation.Timeline;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ReadOnlyStringProperty;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import ai.djl.util.Progress;
+&nbsp;
+&nbsp;/**
+&nbsp; * Convenient class for managing ETA for background tasks.
+&nbsp; * &lt;p&gt;
+&nbsp; * Always call {@link ProgressCounter#stop()} when your task is done, because there is a background timer that
+&nbsp; * periodically updates the ETA.
+&nbsp; */
+&nbsp;public class ProgressCounter implements Progress {
+&nbsp;
+<b class="nc">&nbsp;    private record ProgressMessage(int maxTime, String message) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // The list should be sorted by ProgressMessage.maxTime, smaller first.
+<b class="nc">&nbsp;    private static final List&lt;ProgressMessage&gt; PROGRESS_MESSAGES = List.of(</b>
+<b class="nc">&nbsp;            new ProgressMessage(5, Localization.lang(&quot;Estimated time left: 5 seconds.&quot;)),</b>
+<b class="nc">&nbsp;            new ProgressMessage(15, Localization.lang(&quot;Estimated time left: 15 seconds.&quot;)),</b>
+<b class="nc">&nbsp;            new ProgressMessage(30, Localization.lang(&quot;Estimated time left: 30 seconds.&quot;)),</b>
+<b class="nc">&nbsp;            new ProgressMessage(60, Localization.lang(&quot;Estimated time left: approx. 1 minute.&quot;)),</b>
+<b class="nc">&nbsp;            new ProgressMessage(120, Localization.lang(&quot;Estimated time left: approx. 2 minutes.&quot;)),</b>
+<b class="nc">&nbsp;            new ProgressMessage(Integer.MAX_VALUE, Localization.lang(&quot;Estimated time left: more than 2 minutes.&quot;))</b>
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    private static final Duration PERIODIC_UPDATE_DURATION = Duration.ofSeconds(PROGRESS_MESSAGES.getFirst().maxTime);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final IntegerProperty workDone = new SimpleIntegerProperty(0);</b>
+<b class="nc">&nbsp;    private final IntegerProperty workMax = new SimpleIntegerProperty(0);</b>
+<b class="nc">&nbsp;    private final StringProperty message = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+&nbsp;    // Progress counter is updated on two events:
+&nbsp;    // 1) When workDone or workMax changes: this in normal behavior.
+&nbsp;    // 2) When PERIODIC_UPDATE_DURATION passes: it is used in situations where one piece of work takes too much time
+&nbsp;    //    (and so there are no events 1), and so the message could be &quot;approx. 5 seconds&quot;, while it should be more.
+<b class="nc">&nbsp;    private final Timeline periodicUpdate = new Timeline(new KeyFrame(new javafx.util.Duration(PERIODIC_UPDATE_DURATION.getSeconds() * 1000), e -&gt; update()));</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Instant workStartTime = Instant.now();</b>
+&nbsp;
+<b class="nc">&nbsp;    public ProgressCounter() {</b>
+<b class="nc">&nbsp;        periodicUpdate.setCycleCount(Timeline.INDEFINITE);</b>
+<b class="nc">&nbsp;        periodicUpdate.play();</b>
+&nbsp;
+<b class="nc">&nbsp;        workDone.addListener(obs -&gt; update());</b>
+<b class="nc">&nbsp;        workMax.addListener(obs -&gt; update());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void increaseWorkDone(int incr) {
+<b class="nc">&nbsp;        workDone.set(workDone.get() + incr);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void increaseWorkMax(int incr) {
+<b class="nc">&nbsp;        workMax.set(workMax.get() + incr);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty workDoneProperty() {
+<b class="nc">&nbsp;        return workDone;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getWorkDone() {
+<b class="nc">&nbsp;        return workDone.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty workMaxProperty() {
+<b class="nc">&nbsp;        return workMax;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getWorkMax() {
+<b class="nc">&nbsp;        return workMax.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringProperty messageProperty() {
+<b class="nc">&nbsp;        return message;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getMessage() {
+<b class="nc">&nbsp;        return message.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void listenToAllProperties(Runnable runnable) {
+<b class="nc">&nbsp;        workDoneProperty().addListener(obs -&gt; runnable.run());</b>
+<b class="nc">&nbsp;        workMaxProperty().addListener(obs -&gt; runnable.run());</b>
+<b class="nc">&nbsp;        messageProperty().addListener(obs -&gt; runnable.run());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void update() {
+<b class="nc">&nbsp;        Duration workTime = Duration.between(workStartTime, Instant.now());</b>
+<b class="nc">&nbsp;        Duration oneWorkTime = workTime.dividedBy(workDone.get() == 0 ? 1 : workDone.get());</b>
+<b class="nc">&nbsp;        Duration eta = oneWorkTime.multipliedBy(workMax.get() - workDone.get() &lt;= 0 ? 1 : workMax.get() - workDone.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        updateMessage(eta);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void reset(String message, long max, String trailingMessage) {
+<b class="nc">&nbsp;        workMax.set((int) max);</b>
+<b class="nc">&nbsp;        workDone.set(0);</b>
+&nbsp;        // Ignoring message, because 1) it&#39;s not localized, 2) we supply our own message in updateMessage().
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void start(long initialProgress) {
+<b class="nc">&nbsp;        workDone.set((int) initialProgress);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void end() {
+&nbsp;        // Do nothing.
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void increment(long increment) {
+<b class="nc">&nbsp;        workDone.set(workDone.get() + (int) increment);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void update(long progress, String message) {
+<b class="nc">&nbsp;        workDone.set((int) progress);</b>
+&nbsp;        // Ignoring message, because 1) it&#39;s not localized, 2) we supply our own message in updateMessage().
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateMessage(Duration eta) {
+<b class="nc">&nbsp;        for (ProgressMessage progressMessage : PROGRESS_MESSAGES) {</b>
+<b class="nc">&nbsp;            if (eta.getSeconds() &lt;= progressMessage.maxTime()) {</b>
+<b class="nc">&nbsp;                message.set(progressMessage.message());</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void stop() {
+<b class="nc">&nbsp;        periodicUpdate.stop();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

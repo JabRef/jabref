@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OOProcess</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.style</a>
+</div>
+
+<h1>Coverage Summary for Class: OOProcess (org.jabref.logic.openoffice.style)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OOProcess</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.style;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.comparator.FieldComparator;
+&nbsp;import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.openoffice.style.CitationGroups;
+&nbsp;
+&nbsp;public class OOProcess {
+&nbsp;
+<b class="nc">&nbsp;    static final Comparator&lt;BibEntry&gt; AUTHOR_YEAR_TITLE_COMPARATOR = makeAuthorYearTitleComparator();</b>
+<b class="nc">&nbsp;    static final Comparator&lt;BibEntry&gt; YEAR_AUTHOR_TITLE_COMPARATOR = makeYearAuthorTitleComparator();</b>
+&nbsp;
+&nbsp;    private OOProcess() {
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Comparator&lt;BibEntry&gt; makeAuthorYearTitleComparator() {
+<b class="nc">&nbsp;        List&lt;Comparator&lt;BibEntry&gt;&gt; ayt = List.of(new FieldComparator(StandardField.AUTHOR),</b>
+&nbsp;                new FieldComparator(StandardField.YEAR),
+&nbsp;                new FieldComparator(StandardField.TITLE));
+<b class="nc">&nbsp;        return new FieldComparatorStack&lt;&gt;(ayt);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Comparator&lt;BibEntry&gt; makeYearAuthorTitleComparator() {
+<b class="nc">&nbsp;        List&lt;Comparator&lt;BibEntry&gt;&gt; yat = List.of(new FieldComparator(StandardField.YEAR),</b>
+&nbsp;                new FieldComparator(StandardField.AUTHOR),
+&nbsp;                new FieldComparator(StandardField.TITLE));
+<b class="nc">&nbsp;        return new FieldComparatorStack&lt;&gt;(yat);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The comparator used to sort within a group of merged
+&nbsp;     * citations.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The term used here is &quot;multicite&quot;. The option controlling the
+&nbsp;     * order is &quot;MultiCiteChronological&quot; in style files.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Yes, they are always sorted one way or another.
+&nbsp;     */
+&nbsp;    public static Comparator&lt;BibEntry&gt; comparatorForMulticite(JStyle style) {
+<b class="nc">&nbsp;        if (style.getMultiCiteChronological()) {</b>
+<b class="nc">&nbsp;            return OOProcess.YEAR_AUTHOR_TITLE_COMPARATOR;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fill citationGroups.bibliography and cgs.citationGroupsUnordered//CitationMarker
+&nbsp;     * according to style.
+&nbsp;     */
+&nbsp;    public static void produceCitationMarkers(CitationGroups citationGroups, List&lt;BibDatabase&gt; databases, JStyle style) {
+<b class="nc">&nbsp;        if (!citationGroups.hasGlobalOrder()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;produceCitationMarkers: globalOrder is misssing in citationGroups&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        citationGroups.lookupCitations(databases);</b>
+<b class="nc">&nbsp;        citationGroups.imposeLocalOrder(comparatorForMulticite(style));</b>
+&nbsp;
+&nbsp;        // fill CitationGroup.citationMarker
+<b class="nc">&nbsp;        if (style.isCitationKeyCiteMarkers()) {</b>
+<b class="nc">&nbsp;            OOProcessCitationKeyMarkers.produceCitationMarkers(citationGroups, style);</b>
+<b class="nc">&nbsp;        } else if (style.isNumberEntries()) {</b>
+<b class="nc">&nbsp;            OOProcessNumericMarkers.produceCitationMarkers(citationGroups, style);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            OOProcessAuthorYearMarkers.produceCitationMarkers(citationGroups, style);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FullyIngestedDocumentsTracker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.ingestion</a>
+</div>
+
+<h1>Coverage Summary for Class: FullyIngestedDocumentsTracker (org.jabref.logic.ai.ingestion)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">FullyIngestedDocumentsTracker</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.ingestion;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class is responsible for recording the information about which documents (or documents) have been fully ingested.
+&nbsp; * &lt;p&gt;
+&nbsp; * The class also records the document modification time.
+&nbsp; */
+&nbsp;public interface FullyIngestedDocumentsTracker {
+&nbsp;    void markDocumentAsFullyIngested(String link, long modificationTimeInSeconds);
+&nbsp;
+&nbsp;    Optional&lt;Long&gt; getIngestedDocumentModificationTimeInSeconds(String link);
+&nbsp;
+&nbsp;    void unmarkDocumentAsFullyIngested(String link);
+&nbsp;
+&nbsp;    void commit();
+&nbsp;
+&nbsp;    void close();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

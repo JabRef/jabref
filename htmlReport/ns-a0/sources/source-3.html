@@ -1,0 +1,254 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AiService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai</a>
+</div>
+
+<h1>Coverage Summary for Class: AiService (org.jabref.logic.ai)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AiService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (1/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.1%
+  </span>
+  <span class="absValue">
+    (9/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai;
+&nbsp;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.ai.chatting.AiChatService;
+&nbsp;import org.jabref.logic.ai.chatting.ChatHistoryService;
+&nbsp;import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
+&nbsp;import org.jabref.logic.ai.chatting.model.JabRefChatLanguageModel;
+&nbsp;import org.jabref.logic.ai.ingestion.IngestionService;
+&nbsp;import org.jabref.logic.ai.ingestion.MVStoreEmbeddingStore;
+&nbsp;import org.jabref.logic.ai.ingestion.model.JabRefEmbeddingModel;
+&nbsp;import org.jabref.logic.ai.ingestion.storages.MVStoreFullyIngestedDocumentsTracker;
+&nbsp;import org.jabref.logic.ai.summarization.SummariesService;
+&nbsp;import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
+&nbsp;import org.jabref.logic.ai.templates.AiTemplatesService;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.util.Directories;
+&nbsp;import org.jabref.logic.util.NotificationService;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;import com.google.common.util.concurrent.ThreadFactoryBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * The main class for the AI functionality.
+&nbsp; * &lt;p&gt;
+&nbsp; * Holds all the AI components: LLM and embedding model, chat history and embeddings cache.
+&nbsp; */
+&nbsp;public class AiService implements AutoCloseable {
+&nbsp;    public static final String VERSION = &quot;1&quot;;
+&nbsp;
+&nbsp;    private static final String EMBEDDINGS_FILE_NAME = &quot;embeddings.mv&quot;;
+&nbsp;    private static final String FULLY_INGESTED_FILE_NAME = &quot;fully-ingested.mv&quot;;
+&nbsp;    private static final String SUMMARIES_FILE_NAME = &quot;summaries.mv&quot;;
+&nbsp;    private static final String CHAT_HISTORY_FILE_NAME = &quot;chat-histories.mv&quot;;
+&nbsp;
+&nbsp;    // This field is used to shut down AI-related background tasks.
+&nbsp;    // If a background task processes a big document and has a loop, then the task should check the status
+&nbsp;    // of this property for being true. If it&#39;s true, then it should abort the cycle.
+<b class="fc">&nbsp;    private final BooleanProperty shutdownSignal = new SimpleBooleanProperty(false);</b>
+&nbsp;
+<b class="fc">&nbsp;    private final ExecutorService cachedThreadPool = Executors.newCachedThreadPool(</b>
+<b class="fc">&nbsp;            new ThreadFactoryBuilder().setNameFormat(&quot;ai-retrieval-pool-%d&quot;).build()</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    private final MVStoreChatHistoryStorage mvStoreChatHistoryStorage;
+&nbsp;    private final MVStoreEmbeddingStore mvStoreEmbeddingStore;
+&nbsp;    private final MVStoreFullyIngestedDocumentsTracker mvStoreFullyIngestedDocumentsTracker;
+&nbsp;    private final MVStoreSummariesStorage mvStoreSummariesStorage;
+&nbsp;
+&nbsp;    private final AiTemplatesService templatesService;
+&nbsp;    private final ChatHistoryService chatHistoryService;
+&nbsp;    private final JabRefChatLanguageModel jabRefChatLanguageModel;
+&nbsp;    private final JabRefEmbeddingModel jabRefEmbeddingModel;
+&nbsp;    private final AiChatService aiChatService;
+&nbsp;    private final IngestionService ingestionService;
+&nbsp;    private final SummariesService summariesService;
+&nbsp;
+&nbsp;    public AiService(AiPreferences aiPreferences,
+&nbsp;                     FilePreferences filePreferences,
+&nbsp;                     CitationKeyPatternPreferences citationKeyPatternPreferences,
+&nbsp;                     NotificationService notificationService,
+&nbsp;                     TaskExecutor taskExecutor
+<b class="fc">&nbsp;    ) {</b>
+&nbsp;
+<b class="fc">&nbsp;        this.mvStoreChatHistoryStorage = new MVStoreChatHistoryStorage(Directories.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);</b>
+<b class="fc">&nbsp;        this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(Directories.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), notificationService);</b>
+<b class="fc">&nbsp;        this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(Directories.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), notificationService);</b>
+<b class="fc">&nbsp;        this.mvStoreSummariesStorage = new MVStoreSummariesStorage(Directories.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.templatesService = new AiTemplatesService(aiPreferences);</b>
+<b class="nc">&nbsp;        this.chatHistoryService = new ChatHistoryService(citationKeyPatternPreferences, mvStoreChatHistoryStorage);</b>
+<b class="nc">&nbsp;        this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);</b>
+<b class="nc">&nbsp;        this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, notificationService, taskExecutor);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, templatesService);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.ingestionService = new IngestionService(</b>
+&nbsp;                aiPreferences,
+&nbsp;                shutdownSignal,
+&nbsp;                jabRefEmbeddingModel,
+&nbsp;                mvStoreEmbeddingStore,
+&nbsp;                mvStoreFullyIngestedDocumentsTracker,
+&nbsp;                filePreferences,
+&nbsp;                taskExecutor
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        this.summariesService = new SummariesService(</b>
+&nbsp;                aiPreferences,
+&nbsp;                mvStoreSummariesStorage,
+&nbsp;                jabRefChatLanguageModel,
+&nbsp;                templatesService,
+&nbsp;                shutdownSignal,
+&nbsp;                filePreferences,
+&nbsp;                taskExecutor
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public JabRefChatLanguageModel getChatLanguageModel() {
+<b class="nc">&nbsp;        return jabRefChatLanguageModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JabRefEmbeddingModel getEmbeddingModel() {
+<b class="nc">&nbsp;        return jabRefEmbeddingModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ChatHistoryService getChatHistoryService() {
+<b class="nc">&nbsp;        return chatHistoryService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AiChatService getAiChatService() {
+<b class="nc">&nbsp;        return aiChatService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IngestionService getIngestionService() {
+<b class="nc">&nbsp;        return ingestionService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SummariesService getSummariesService() {
+<b class="nc">&nbsp;        return summariesService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AiTemplatesService getTemplatesService() {
+<b class="nc">&nbsp;        return templatesService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setupDatabase(BibDatabaseContext context) {
+<b class="nc">&nbsp;        chatHistoryService.setupDatabase(context);</b>
+<b class="nc">&nbsp;        ingestionService.setupDatabase(context);</b>
+<b class="nc">&nbsp;        summariesService.setupDatabase(context);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        shutdownSignal.set(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        cachedThreadPool.shutdownNow();</b>
+<b class="nc">&nbsp;        jabRefChatLanguageModel.close();</b>
+<b class="nc">&nbsp;        jabRefEmbeddingModel.close();</b>
+&nbsp;
+<b class="nc">&nbsp;        mvStoreFullyIngestedDocumentsTracker.close();</b>
+<b class="nc">&nbsp;        mvStoreEmbeddingStore.close();</b>
+<b class="nc">&nbsp;        mvStoreSummariesStorage.close();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

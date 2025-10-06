@@ -1,0 +1,160 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DocBookAuthorFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: DocBookAuthorFormatter (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DocBookAuthorFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;
+&nbsp;/**
+&nbsp; * DocBook author formatter for both version 4 and 5
+&nbsp; */
+<b class="nc">&nbsp;public class DocBookAuthorFormatter {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final XMLChars XML_CHARS = new XMLChars();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param tagName Editor or author field/tag
+&nbsp;     */
+&nbsp;    public void addBody(StringBuilder sb, AuthorList al, String tagName, DocBookVersion version) {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; al.getNumberOfAuthors(); i++) {</b>
+<b class="nc">&nbsp;            sb.append(&#39;&lt;&#39;).append(tagName).append(&#39;&gt;&#39;);</b>
+<b class="nc">&nbsp;            if (version == DocBookVersion.DOCBOOK_5) {</b>
+<b class="nc">&nbsp;                sb.append(&quot;&lt;personname&gt;&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Author a = al.getAuthor(i);</b>
+<b class="nc">&nbsp;            a.getGivenName().filter(first -&gt; !first.isEmpty()).ifPresent(first -&gt; sb.append(&quot;&lt;firstname&gt;&quot;)</b>
+<b class="nc">&nbsp;                                                                                    .append(XML_CHARS.format(first)).append(&quot;&lt;/firstname&gt;&quot;));</b>
+<b class="nc">&nbsp;            a.getNamePrefix().filter(von -&gt; !von.isEmpty()).ifPresent(von -&gt; sb.append(&quot;&lt;othername&gt;&quot;)</b>
+<b class="nc">&nbsp;                                                                               .append(XML_CHARS.format(von)).append(&quot;&lt;/othername&gt;&quot;));</b>
+<b class="nc">&nbsp;            a.getFamilyName().filter(last -&gt; !last.isEmpty()).ifPresent(last -&gt; {</b>
+<b class="nc">&nbsp;                sb.append(&quot;&lt;surname&gt;&quot;).append(XML_CHARS.format(last));</b>
+<b class="nc">&nbsp;                a.getNameSuffix().filter(jr -&gt; !jr.isEmpty())</b>
+<b class="nc">&nbsp;                 .ifPresent(jr -&gt; sb.append(&#39; &#39;).append(XML_CHARS.format(jr)));</b>
+<b class="nc">&nbsp;                sb.append(&quot;&lt;/surname&gt;&quot;);</b>
+<b class="nc">&nbsp;                if (version == DocBookVersion.DOCBOOK_5) {</b>
+<b class="nc">&nbsp;                    sb.append(&quot;&lt;/personname&gt;&quot;);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            if (i &lt; (al.getNumberOfAuthors() - 1)) {</b>
+<b class="nc">&nbsp;                sb.append(&quot;&lt;/&quot;).append(tagName).append(&quot;&gt;\n       &quot;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                sb.append(&quot;&lt;/&quot;).append(tagName).append(&#39;&gt;&#39;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

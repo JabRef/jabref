@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SmartConstrainedResizePolicy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: SmartConstrainedResizePolicy (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SmartConstrainedResizePolicy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.scene.control.ResizeFeaturesBase;
+&nbsp;import javafx.scene.control.TableColumnBase;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;import javafx.util.Callback;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This resize policy is almost the same as {@link TableView#CONSTRAINED_RESIZE_POLICY}
+&nbsp; * We make sure that the width of all columns sums up to the total width of the table.
+&nbsp; * However, in contrast to {@link TableView#CONSTRAINED_RESIZE_POLICY} we size the columns initially by their preferred width.
+&nbsp; * Although {@link TableView#CONSTRAINED_RESIZE_POLICY} is deprecated, this policy maintains a similar resizing behavior.
+&nbsp; */
+<b class="nc">&nbsp;public class SmartConstrainedResizePolicy implements Callback&lt;TableView.ResizeFeatures, Boolean&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SmartConstrainedResizePolicy.class);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Boolean call(TableView.ResizeFeatures prop) {
+<b class="nc">&nbsp;        if (prop.getColumn() == null) {</b>
+<b class="nc">&nbsp;            return initColumnSize(prop.getTable());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return constrainedResize(prop);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Boolean initColumnSize(TableView&lt;?&gt; table) {
+<b class="nc">&nbsp;        double tableWidth = getContentWidth(table);</b>
+<b class="nc">&nbsp;        List&lt;? extends TableColumnBase&lt;?, ?&gt;&gt; visibleLeafColumns = table.getVisibleLeafColumns();</b>
+<b class="nc">&nbsp;        double totalWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getWidth).sum();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Math.abs(totalWidth - tableWidth) &gt; 1) {</b>
+<b class="nc">&nbsp;            double totalPrefWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getPrefWidth).sum();</b>
+<b class="nc">&nbsp;            double currPrefWidth = 0;</b>
+<b class="nc">&nbsp;            if (totalPrefWidth &gt; 0) {</b>
+<b class="nc">&nbsp;                for (TableColumnBase&lt;?, ?&gt; col : visibleLeafColumns) {</b>
+<b class="nc">&nbsp;                    double share = col.getPrefWidth() / totalPrefWidth;</b>
+<b class="nc">&nbsp;                    double newSize = tableWidth * share;</b>
+&nbsp;
+&nbsp;                    // Just to make sure that we are staying under the total table width (due to rounding errors)
+<b class="nc">&nbsp;                    currPrefWidth += newSize;</b>
+<b class="nc">&nbsp;                    if (currPrefWidth &gt; tableWidth) {</b>
+<b class="nc">&nbsp;                        newSize -= currPrefWidth - tableWidth;</b>
+<b class="nc">&nbsp;                        currPrefWidth -= tableWidth;</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    resize(col, newSize - col.getWidth());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void resize(TableColumnBase&lt;?, ?&gt; column, double delta) {
+&nbsp;        // We have to use reflection since TableUtil is not visible to us
+&nbsp;        try {
+&nbsp;            // TODO: reflective access, should be removed
+<b class="nc">&nbsp;            Class&lt;?&gt; clazz = Class.forName(&quot;javafx.scene.control.TableUtil&quot;);</b>
+<b class="nc">&nbsp;            Method constrainedResize = clazz.getDeclaredMethod(&quot;resize&quot;, TableColumnBase.class, double.class);</b>
+<b class="nc">&nbsp;            constrainedResize.setAccessible(true);</b>
+<b class="nc">&nbsp;            constrainedResize.invoke(null, column, delta);</b>
+&nbsp;        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not invoke resize in TableUtil&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Boolean constrainedResize(TableView.ResizeFeatures&lt;?&gt; prop) {
+<b class="nc">&nbsp;        TableView&lt;?&gt; table = prop.getTable();</b>
+<b class="nc">&nbsp;        List&lt;? extends TableColumnBase&lt;?, ?&gt;&gt; visibleLeafColumns = table.getVisibleLeafColumns();</b>
+<b class="nc">&nbsp;        return constrainedResize(prop,</b>
+<b class="nc">&nbsp;                false,</b>
+<b class="nc">&nbsp;                getContentWidth(table) - 2,</b>
+&nbsp;                visibleLeafColumns);
+&nbsp;    }
+&nbsp;
+&nbsp;    private Boolean constrainedResize(TableView.ResizeFeatures&lt;?&gt; prop, Boolean isFirstRun, Double contentWidth, List&lt;? extends TableColumnBase&lt;?, ?&gt;&gt; visibleLeafColumns) {
+&nbsp;        // We have to use reflection since TableUtil is not visible to us
+&nbsp;        try {
+&nbsp;            // TODO: reflective access, should be removed
+<b class="nc">&nbsp;            Class&lt;?&gt; clazz = Class.forName(&quot;javafx.scene.control.TableUtil&quot;);</b>
+<b class="nc">&nbsp;            Method constrainedResize = clazz.getDeclaredMethod(&quot;constrainedResize&quot;, ResizeFeaturesBase.class, Boolean.TYPE, Double.TYPE, List.class);</b>
+<b class="nc">&nbsp;            constrainedResize.setAccessible(true);</b>
+<b class="nc">&nbsp;            Object returnValue = constrainedResize.invoke(null, prop, isFirstRun, contentWidth, visibleLeafColumns);</b>
+<b class="nc">&nbsp;            return (Boolean) returnValue;</b>
+&nbsp;        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not invoke constrainedResize in TableUtil&quot;, e);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Double getContentWidth(TableView&lt;?&gt; table) {
+&nbsp;        try {
+&nbsp;            // TODO: reflective access, should be removed
+<b class="nc">&nbsp;            Field privateStringField = TableView.class.getDeclaredField(&quot;contentWidth&quot;);</b>
+<b class="nc">&nbsp;            privateStringField.setAccessible(true);</b>
+<b class="nc">&nbsp;            return (Double) privateStringField.get(table);</b>
+&nbsp;        } catch (IllegalAccessException | NoSuchFieldException e) {
+<b class="nc">&nbsp;            return 0d;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

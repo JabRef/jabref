@@ -1,0 +1,381 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CffExporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: CffExporter (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CffExporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/137)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.io.BufferedWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Date;
+&nbsp;import org.jabref.model.entry.ParsedEntryLink;
+&nbsp;import org.jabref.model.entry.field.BiblatexSoftwareField;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import org.yaml.snakeyaml.DumperOptions;
+&nbsp;import org.yaml.snakeyaml.Yaml;
+&nbsp;
+&nbsp;public class CffExporter extends Exporter {
+&nbsp;    // Fields that are taken 1:1 from BibTeX to CFF
+<b class="nc">&nbsp;    public static final List&lt;String&gt; UNMAPPED_FIELDS = List.of(</b>
+&nbsp;            &quot;abbreviation&quot;, &quot;collection-doi&quot;, &quot;collection-title&quot;, &quot;collection-type&quot;, &quot;commit&quot;, &quot;copyright&quot;,
+&nbsp;            &quot;data-type&quot;, &quot;database&quot;, &quot;date-accessed&quot;, &quot;date-downloaded&quot;, &quot;date-published&quot;, &quot;department&quot;, &quot;end&quot;,
+&nbsp;            &quot;entry&quot;, &quot;filename&quot;, &quot;format&quot;, &quot;issue-date&quot;, &quot;issue-title&quot;, &quot;license-url&quot;, &quot;loc-end&quot;, &quot;loc-start&quot;,
+&nbsp;            &quot;medium&quot;, &quot;nihmsid&quot;, &quot;number-volumes&quot;, &quot;patent-states&quot;, &quot;pmcid&quot;, &quot;repository-artifact&quot;, &quot;repository-code&quot;,
+&nbsp;            &quot;scope&quot;, &quot;section&quot;, &quot;start&quot;, &quot;term&quot;, &quot;thesis-type&quot;, &quot;volume-title&quot;, &quot;year-original&quot;
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    public static final Map&lt;Field, String&gt; FIELDS_MAP = Map.ofEntries(</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.ABSTRACT, &quot;abstract&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.DATE, &quot;date-released&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.DOI, &quot;doi&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.KEYWORDS, &quot;keywords&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(BiblatexSoftwareField.LICENSE, &quot;license&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.COMMENT, &quot;message&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(BiblatexSoftwareField.REPOSITORY, &quot;repository&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.TITLE, &quot;title&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.URL, &quot;url&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.VERSION, &quot;version&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.EDITION, &quot;edition&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.ISBN, &quot;isbn&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.ISSN, &quot;issn&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.ISSUE, &quot;issue&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.JOURNAL, &quot;journal&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.MONTH, &quot;month&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.NOTE, &quot;notes&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.NUMBER, &quot;number&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.PAGES, &quot;pages&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.PUBSTATE, &quot;status&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.VOLUME, &quot;volume&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardField.YEAR, &quot;year&quot;)</b>
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    public static final Map&lt;EntryType, String&gt; TYPES_MAP = Map.ofEntries(</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Article, &quot;article&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Book, &quot;book&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Booklet, &quot;pamphlet&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Proceedings, &quot;conference&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.InProceedings, &quot;conference-paper&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Misc, &quot;misc&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Manual, &quot;manual&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Software, &quot;software&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Dataset, &quot;dataset&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Report, &quot;report&quot;),</b>
+<b class="nc">&nbsp;            Map.entry(StandardEntryType.Unpublished, &quot;unpublished&quot;)</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    public CffExporter() {
+<b class="nc">&nbsp;        super(&quot;cff&quot;, &quot;CFF&quot;, StandardFileType.CFF);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void export(BibDatabaseContext databaseContext, Path file, List&lt;BibEntry&gt; entries) throws SaveException {
+<b class="nc">&nbsp;        Objects.requireNonNull(databaseContext);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(file);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(entries);</b>
+&nbsp;
+&nbsp;        // Do not export if no entries to export -- avoids exports with only template text
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Make a copy of the list to avoid modifying the original list
+<b class="nc">&nbsp;        final List&lt;BibEntry&gt; entriesToTransform = new ArrayList&lt;&gt;(entries);</b>
+&nbsp;
+&nbsp;        // Set up YAML options
+<b class="nc">&nbsp;        DumperOptions options = new DumperOptions();</b>
+<b class="nc">&nbsp;        options.setWidth(Integer.MAX_VALUE);</b>
+<b class="nc">&nbsp;        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);</b>
+<b class="nc">&nbsp;        options.setPrettyFlow(true);</b>
+<b class="nc">&nbsp;        options.setIndentWithIndicator(true);</b>
+<b class="nc">&nbsp;        options.setIndicatorIndent(2);</b>
+<b class="nc">&nbsp;        Yaml yaml = new Yaml(options);</b>
+&nbsp;
+<b class="nc">&nbsp;        BibEntry main = null;</b>
+<b class="nc">&nbsp;        boolean mainIsDummy = false;</b>
+<b class="nc">&nbsp;        int countOfSoftwareAndDataSetEntries = 0;</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entriesToTransform) {</b>
+<b class="nc">&nbsp;            if (entry.getType() == StandardEntryType.Software || entry.getType() == StandardEntryType.Dataset) {</b>
+<b class="nc">&nbsp;                main = entry;</b>
+<b class="nc">&nbsp;                countOfSoftwareAndDataSetEntries++;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (countOfSoftwareAndDataSetEntries == 1) {</b>
+&nbsp;            // If there is only one software or dataset entry, use it as the main entry
+<b class="nc">&nbsp;            entriesToTransform.remove(main);</b>
+&nbsp;        } else {
+&nbsp;            // If there are no software or dataset entries, create a dummy main entry holding the given entries
+<b class="nc">&nbsp;            main = new BibEntry(StandardEntryType.Software);</b>
+<b class="nc">&nbsp;            mainIsDummy = true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Transform main entry to CFF format
+<b class="nc">&nbsp;        Map&lt;String, Object&gt; cffData = transformEntry(main, true, mainIsDummy);</b>
+&nbsp;
+&nbsp;        // Preferred citation
+<b class="nc">&nbsp;        if (main.hasField(StandardField.CITES)) {</b>
+<b class="nc">&nbsp;            String citeKey = main.getField(StandardField.CITES).orElse(&quot;&quot;).split(&quot;,&quot;)[0];</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; citedEntries = databaseContext.getDatabase().getEntriesByCitationKey(citeKey);</b>
+<b class="nc">&nbsp;            entriesToTransform.removeAll(citedEntries);</b>
+<b class="nc">&nbsp;            if (!citedEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;                BibEntry citedEntry = citedEntries.getFirst();</b>
+<b class="nc">&nbsp;                cffData.put(&quot;preferred-citation&quot;, transformEntry(citedEntry, false, false));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // References
+<b class="nc">&nbsp;        List&lt;Map&lt;String, Object&gt;&gt; related = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        if (main.hasField(StandardField.RELATED)) {</b>
+<b class="nc">&nbsp;            main.getEntryLinkList(StandardField.RELATED, databaseContext.getDatabase())</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(ParsedEntryLink::getLinkedEntry)</b>
+<b class="nc">&nbsp;                .filter(Optional::isPresent)</b>
+<b class="nc">&nbsp;                .map(Optional::get)</b>
+<b class="nc">&nbsp;                .forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;                    related.add(transformEntry(entry, false, false));</b>
+<b class="nc">&nbsp;                    entriesToTransform.remove(entry);</b>
+&nbsp;                });
+&nbsp;        }
+&nbsp;
+&nbsp;        // Add remaining entries as references
+<b class="nc">&nbsp;        for (BibEntry entry : entriesToTransform) {</b>
+<b class="nc">&nbsp;            related.add(transformEntry(entry, false, false));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!related.isEmpty()) {</b>
+<b class="nc">&nbsp;            cffData.put(&quot;references&quot;, related);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {</b>
+<b class="nc">&nbsp;            yaml.dump(cffData, writer);</b>
+&nbsp;        } catch (IOException ex) {
+<b class="nc">&nbsp;            throw new SaveException(ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, Object&gt; transformEntry(BibEntry entry, boolean main, boolean dummy) {
+<b class="nc">&nbsp;        Map&lt;String, Object&gt; cffData = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        Map&lt;Field, String&gt; fields = new HashMap&lt;&gt;(entry.getFieldMap());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (main) {</b>
+&nbsp;            // Mandatory CFF version field
+<b class="nc">&nbsp;            cffData.put(&quot;cff-version&quot;, &quot;1.2.0&quot;);</b>
+&nbsp;
+&nbsp;            // Mandatory message field
+<b class="nc">&nbsp;            String message = fields.getOrDefault(StandardField.COMMENT,</b>
+&nbsp;                    &quot;If you use this software, please cite it using the metadata from this file.&quot;);
+<b class="nc">&nbsp;            cffData.put(&quot;message&quot;, message);</b>
+<b class="nc">&nbsp;            fields.remove(StandardField.COMMENT);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Mandatory title field
+<b class="nc">&nbsp;        String title = fields.getOrDefault(StandardField.TITLE, &quot;No title specified.&quot;);</b>
+<b class="nc">&nbsp;        cffData.put(&quot;title&quot;, title);</b>
+<b class="nc">&nbsp;        fields.remove(StandardField.TITLE);</b>
+&nbsp;
+&nbsp;        // Mandatory authors field
+<b class="nc">&nbsp;        List&lt;Author&gt; authors = AuthorList.parse(fields.getOrDefault(StandardField.AUTHOR, &quot;&quot;))</b>
+<b class="nc">&nbsp;                                         .getAuthors();</b>
+<b class="nc">&nbsp;        parseAuthors(cffData, authors);</b>
+<b class="nc">&nbsp;        fields.remove(StandardField.AUTHOR);</b>
+&nbsp;
+&nbsp;        // Type
+<b class="nc">&nbsp;        if (!dummy) {</b>
+<b class="nc">&nbsp;            cffData.put(&quot;type&quot;, TYPES_MAP.getOrDefault(entry.getType(), &quot;misc&quot;));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Keywords
+<b class="nc">&nbsp;        String keywords = fields.getOrDefault(StandardField.KEYWORDS, null);</b>
+<b class="nc">&nbsp;        if (keywords != null) {</b>
+<b class="nc">&nbsp;            cffData.put(&quot;keywords&quot;, keywords.split(&quot;,\\s*&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        fields.remove(StandardField.KEYWORDS);</b>
+&nbsp;
+&nbsp;        // Date
+<b class="nc">&nbsp;        String date = fields.getOrDefault(StandardField.DATE, null);</b>
+<b class="nc">&nbsp;        if (date != null) {</b>
+<b class="nc">&nbsp;            parseDate(cffData, date);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        fields.remove(StandardField.DATE);</b>
+&nbsp;
+&nbsp;        // Remaining fields not handled above
+<b class="nc">&nbsp;        for (Field field : fields.keySet()) {</b>
+<b class="nc">&nbsp;            if (FIELDS_MAP.containsKey(field)) {</b>
+<b class="nc">&nbsp;                cffData.put(FIELDS_MAP.get(field), fields.get(field));</b>
+<b class="nc">&nbsp;            } else if (field instanceof UnknownField) {</b>
+&nbsp;                // Check that field is accepted by CFF format specification
+<b class="nc">&nbsp;                if (UNMAPPED_FIELDS.contains(field.getName())) {</b>
+<b class="nc">&nbsp;                    cffData.put(field.getName(), fields.get(field));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return cffData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseAuthors(Map&lt;String, Object&gt; data, List&lt;Author&gt; authors) {
+<b class="nc">&nbsp;        List&lt;Map&lt;String, String&gt;&gt; authorsList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        authors.forEach(author -&gt; {</b>
+<b class="nc">&nbsp;            Map&lt;String, String&gt; authorMap = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;            if (author.getFamilyName().isPresent()) {</b>
+<b class="nc">&nbsp;                authorMap.put(&quot;family-names&quot;, author.getFamilyName().get());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (author.getGivenName().isPresent()) {</b>
+<b class="nc">&nbsp;                authorMap.put(&quot;given-names&quot;, author.getGivenName().get());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (author.getNamePrefix().isPresent()) {</b>
+<b class="nc">&nbsp;                authorMap.put(&quot;name-particle&quot;, author.getNamePrefix().get());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (author.getNameSuffix().isPresent()) {</b>
+<b class="nc">&nbsp;                authorMap.put(&quot;name-suffix&quot;, author.getNameSuffix().get());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            authorsList.add(authorMap);</b>
+&nbsp;        });
+<b class="nc">&nbsp;        data.put(&quot;authors&quot;, authorsList.isEmpty() ? List.of(Map.of(&quot;name&quot;, &quot;/&quot;)) : authorsList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseDate(Map&lt;String, Object&gt; data, String date) {
+<b class="nc">&nbsp;        Optional&lt;Date&gt; parsedDateOpt = Date.parse(date);</b>
+<b class="nc">&nbsp;        if (parsedDateOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;            data.put(&quot;issue-date&quot;, date);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        Date parsedDate = parsedDateOpt.get();</b>
+<b class="nc">&nbsp;        if (parsedDate.getYear().isPresent() &amp;&amp; parsedDate.getMonth().isPresent() &amp;&amp; parsedDate.getDay().isPresent()) {</b>
+<b class="nc">&nbsp;            data.put(&quot;date-released&quot;, parsedDate.getNormalized());</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        parsedDate.getMonth().ifPresent(month -&gt; data.put(&quot;month&quot;, month.getNumber()));</b>
+<b class="nc">&nbsp;        parsedDate.getYear().ifPresent(year -&gt; data.put(&quot;year&quot;, year));</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

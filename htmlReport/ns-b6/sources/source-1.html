@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CleanupPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.cleanup</a>
+</div>
+
+<h1>Coverage Summary for Class: CleanupPreferences (org.jabref.logic.cleanup)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CleanupPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CleanupPreferences$CleanupStep</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (2/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    47.4%
+  </span>
+  <span class="absValue">
+    (18/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.cleanup;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableSet;
+&nbsp;
+&nbsp;public class CleanupPreferences {
+&nbsp;
+&nbsp;    private final ObservableSet&lt;CleanupStep&gt; activeJobs;
+&nbsp;    private final ObjectProperty&lt;FieldFormatterCleanups&gt; fieldFormatterCleanups;
+&nbsp;
+&nbsp;    public CleanupPreferences(EnumSet&lt;CleanupStep&gt; activeJobs) {
+<b class="nc">&nbsp;        this(activeJobs, new FieldFormatterCleanups(false, new ArrayList&lt;&gt;()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CleanupPreferences(CleanupStep activeJob) {
+<b class="nc">&nbsp;        this(EnumSet.of(activeJob));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CleanupPreferences(FieldFormatterCleanups formatterCleanups) {
+<b class="nc">&nbsp;        this(EnumSet.noneOf(CleanupStep.class), formatterCleanups);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public CleanupPreferences(EnumSet&lt;CleanupStep&gt; activeJobs, FieldFormatterCleanups formatterCleanups) {</b>
+<b class="nc">&nbsp;        this.activeJobs = FXCollections.observableSet(activeJobs);</b>
+<b class="nc">&nbsp;        this.fieldFormatterCleanups = new SimpleObjectProperty&lt;&gt;(formatterCleanups);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public EnumSet&lt;CleanupStep&gt; getActiveJobs() {
+<b class="nc">&nbsp;        if (activeJobs.isEmpty()) {</b>
+<b class="nc">&nbsp;            return EnumSet.noneOf(CleanupStep.class);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return EnumSet.copyOf(activeJobs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setActive(CleanupStep job, boolean value) {
+<b class="nc">&nbsp;        if (activeJobs.contains(job) &amp;&amp; !value) {</b>
+<b class="nc">&nbsp;            activeJobs.remove(job);</b>
+<b class="nc">&nbsp;        } else if (!activeJobs.contains(job) &amp;&amp; value) {</b>
+<b class="nc">&nbsp;            activeJobs.add(job);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableSet&lt;CleanupStep&gt; getObservableActiveJobs() {
+<b class="nc">&nbsp;        return activeJobs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setActiveJobs(Set&lt;CleanupStep&gt; jobs) {
+<b class="nc">&nbsp;        activeJobs.clear();</b>
+<b class="nc">&nbsp;        activeJobs.addAll(jobs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean isActive(CleanupStep step) {
+<b class="nc">&nbsp;        return activeJobs.contains(step);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FieldFormatterCleanups getFieldFormatterCleanups() {
+<b class="nc">&nbsp;        return fieldFormatterCleanups.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;FieldFormatterCleanups&gt; fieldFormatterCleanupsProperty() {
+<b class="nc">&nbsp;        return fieldFormatterCleanups;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFieldFormatterCleanups(FieldFormatterCleanups fieldFormatters) {
+<b class="nc">&nbsp;        fieldFormatterCleanups.setValue(fieldFormatters);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum CleanupStep {</b>
+&nbsp;        /**
+&nbsp;         * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
+&nbsp;         */
+<b class="fc">&nbsp;        CLEAN_UP_DOI,</b>
+<b class="fc">&nbsp;        CLEANUP_EPRINT,</b>
+<b class="fc">&nbsp;        CLEAN_UP_URL,</b>
+<b class="fc">&nbsp;        MAKE_PATHS_RELATIVE,</b>
+<b class="fc">&nbsp;        RENAME_PDF,</b>
+<b class="fc">&nbsp;        RENAME_PDF_ONLY_RELATIVE_PATHS,</b>
+&nbsp;        /**
+&nbsp;         * Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
+&nbsp;         */
+<b class="fc">&nbsp;        CLEAN_UP_UPGRADE_EXTERNAL_LINKS,</b>
+<b class="fc">&nbsp;        CLEAN_UP_DELETED_LINKED_FILES,</b>
+&nbsp;        /**
+&nbsp;         * Converts to biblatex format
+&nbsp;         */
+<b class="fc">&nbsp;        CONVERT_TO_BIBLATEX,</b>
+&nbsp;        /**
+&nbsp;         * Converts to bibtex format
+&nbsp;         */
+<b class="fc">&nbsp;        CONVERT_TO_BIBTEX,</b>
+<b class="fc">&nbsp;        CONVERT_TIMESTAMP_TO_CREATIONDATE,</b>
+<b class="fc">&nbsp;        CONVERT_TIMESTAMP_TO_MODIFICATIONDATE,</b>
+<b class="fc">&nbsp;        DO_NOT_CONVERT_TIMESTAMP,</b>
+<b class="fc">&nbsp;        MOVE_PDF,</b>
+<b class="fc">&nbsp;        FIX_FILE_LINKS,</b>
+<b class="fc">&nbsp;        CLEAN_UP_ISSN,</b>
+&nbsp;        /*
+&nbsp;         * Converts Math Subject Classification Codes presented in Keywords into their Descriptions
+&nbsp;         */
+<b class="fc">&nbsp;        CONVERT_MSC_CODES</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

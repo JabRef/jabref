@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CreateModifyExporterDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: CreateModifyExporterDialogViewModel (org.jabref.gui.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CreateModifyExporterDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.exporter;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.exporter.TemplateExporter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This view model can be used both for &quot;add exporter&quot; and &quot;modify exporter&quot; functionalities.
+&nbsp; * It takes an optional exporter which is empty for &quot;add exporter,&quot; and takes the selected exporter
+&nbsp; * for &quot;modify exporter.&quot;  It returns an optional exporter which empty if an invalid or no exporter is
+&nbsp; * created, and otherwise contains the exporter to be added or that is modified.
+&nbsp; */
+&nbsp;
+&nbsp;public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CreateModifyExporterDialogViewModel.class);</b>
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty name = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty layoutFile = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty extension = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+&nbsp;    public CreateModifyExporterDialogViewModel(ExporterViewModel exporter,
+&nbsp;                                               DialogService dialogService,
+<b class="nc">&nbsp;                                               CliPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;
+&nbsp;        // Set text of each of the boxes
+<b class="nc">&nbsp;        if (exporter != null) {</b>
+<b class="nc">&nbsp;            name.setValue(exporter.name().get());</b>
+<b class="nc">&nbsp;            layoutFile.setValue(exporter.layoutFileName().get());</b>
+<b class="nc">&nbsp;            extension.setValue(exporter.extension().get());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public ExporterViewModel saveExporter() {
+<b class="nc">&nbsp;        Path layoutFileDir = Path.of(layoutFile.get()).getParent();</b>
+<b class="nc">&nbsp;        if (layoutFileDir != null) {</b>
+<b class="nc">&nbsp;            preferences.getExportPreferences().setExportWorkingDirectory(layoutFileDir);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Check that there are no empty strings.
+<b class="nc">&nbsp;        if (layoutFile.get().isEmpty() || name.get().isEmpty() || extension.get().isEmpty()</b>
+<b class="nc">&nbsp;                || !layoutFile.get().endsWith(&quot;.layout&quot;)) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;One of the fields is empty or invalid.&quot;);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
+<b class="nc">&nbsp;        TemplateExporter format = new TemplateExporter(</b>
+<b class="nc">&nbsp;                name.get(),</b>
+<b class="nc">&nbsp;                layoutFile.get(),</b>
+<b class="nc">&nbsp;                extension.get(),</b>
+<b class="nc">&nbsp;                preferences.getLayoutFormatterPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getSelfContainedExportConfiguration().getSelfContainedSaveOrder());</b>
+<b class="nc">&nbsp;        format.setCustomExport(true);</b>
+<b class="nc">&nbsp;        return new ExporterViewModel(format);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void browse() {
+<b class="nc">&nbsp;        String fileDir = layoutFile.getValue().isEmpty()</b>
+<b class="nc">&nbsp;                         ? preferences.getExportPreferences().getExportWorkingDirectory().toString()</b>
+<b class="nc">&nbsp;                         : layoutFile.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(Localization.lang(&quot;Custom layout file&quot;), StandardFileType.LAYOUT)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(Localization.lang(&quot;Custom layout file&quot;), StandardFileType.LAYOUT)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(fileDir).build();</b>
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -&gt; layoutFile.set(f.toAbsolutePath().toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty getLayoutFileName() {
+<b class="nc">&nbsp;        return layoutFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty getExtension() {
+<b class="nc">&nbsp;        return extension;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

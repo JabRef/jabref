@@ -1,0 +1,181 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CopySingleFileAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.copyfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: CopySingleFileAction (org.jabref.gui.copyfiles)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CopySingleFileAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.copyfiles;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.util.DirectoryDialogConfiguration;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.util.OptionalUtil;
+&nbsp;
+&nbsp;public class CopySingleFileAction extends SimpleCommand {
+&nbsp;
+&nbsp;    private final LinkedFile linkedFile;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;
+<b class="nc">&nbsp;    private final BiFunction&lt;Path, Path, Path&gt; resolvePathFilename = (path, file) -&gt; path.resolve(file.getFileName());</b>
+&nbsp;
+<b class="nc">&nbsp;    public CopySingleFileAction(LinkedFile linkedFile, DialogService dialogService, BibDatabaseContext databaseContext, FilePreferences filePreferences) {</b>
+<b class="nc">&nbsp;        this.linkedFile = linkedFile;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                () -&gt; !linkedFile.isOnlineLink()</b>
+<b class="nc">&nbsp;                        &amp;&amp; linkedFile.findIn(databaseContext, this.filePreferences).isPresent(),</b>
+<b class="nc">&nbsp;                linkedFile.linkProperty()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .withInitialDirectory(filePreferences.getWorkingDirectory())</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);</b>
+<b class="nc">&nbsp;        exportPath.ifPresent(this::copyFileToDestination);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void copyFileToDestination(Path exportPath) {
+<b class="nc">&nbsp;        Optional&lt;Path&gt; fileToExport = linkedFile.findIn(databaseContext, filePreferences);</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; newPath = OptionalUtil.combine(Optional.of(exportPath), fileToExport, resolvePathFilename);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (newPath.isPresent()) {</b>
+<b class="nc">&nbsp;            Path newFile = newPath.get();</b>
+<b class="nc">&nbsp;            boolean success = fileToExport.isPresent() &amp;&amp; FileUtil.copyFile(fileToExport.get(), newFile, false);</b>
+<b class="nc">&nbsp;            if (success) {</b>
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(Localization.lang(&quot;Copy linked file&quot;), Localization.lang(&quot;Successfully copied file to %0.&quot;, newPath.map(Path::getParent).map(Path::toString).orElse(&quot;&quot;)));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.showErrorDialogAndWait(Localization.lang(&quot;Copy linked file&quot;), Localization.lang(&quot;Could not copy file to %0, maybe the file is already existing?&quot;, newPath.map(Path::getParent).map(Path::toString).orElse(&quot;&quot;)));</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Could not resolve the file %0&quot;, fileToExport.map(Path::getParent).map(Path::toString).orElse(&quot;&quot;)));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,331 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedEntriesEditor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedEntriesEditor (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedEntriesEditor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LinkedEntriesEditor$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LinkedEntriesEditor$TagContextAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.ContentDisplay;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.input.MouseButton;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.JabRefDialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.EntryLinkList;
+&nbsp;import org.jabref.model.entry.ParsedEntryLink;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.dlsc.gemsfx.TagsField;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedEntriesEditor.class);</b>
+<b class="nc">&nbsp;    private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass(&quot;focused&quot;);</b>
+&nbsp;
+&nbsp;    @FXML private LinkedEntriesEditorViewModel viewModel;
+&nbsp;    @FXML private TagsField&lt;ParsedEntryLink&gt; entryLinkField;
+&nbsp;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private ClipBoardManager clipBoardManager;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;
+<b class="nc">&nbsp;    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider&lt;?&gt; suggestionProvider, FieldCheckers fieldCheckers) {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers, undoManager, stateManager);</b>
+&nbsp;
+<b class="nc">&nbsp;        entryLinkField.setCellFactory(new ViewModelListCellFactory&lt;ParsedEntryLink&gt;().withText(ParsedEntryLink::getKey));</b>
+<b class="nc">&nbsp;        entryLinkField.setSuggestionProvider(request -&gt; viewModel.getSuggestions(request.getUserText()));</b>
+&nbsp;
+<b class="nc">&nbsp;        entryLinkField.setTagViewFactory(this::createTag);</b>
+<b class="nc">&nbsp;        entryLinkField.setConverter(viewModel.getStringConverter());</b>
+<b class="nc">&nbsp;        entryLinkField.setNewItemProducer(searchText -&gt; viewModel.getStringConverter().fromString(searchText));</b>
+<b class="nc">&nbsp;        entryLinkField.setMatcher((entryLink, searchText) -&gt; entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));</b>
+<b class="nc">&nbsp;        entryLinkField.setComparator(Comparator.comparing(ParsedEntryLink::getKey));</b>
+&nbsp;
+<b class="nc">&nbsp;        entryLinkField.setShowSearchIcon(false);</b>
+<b class="nc">&nbsp;        entryLinkField.setOnMouseClicked(event -&gt; entryLinkField.getEditor().requestFocus());</b>
+<b class="nc">&nbsp;        entryLinkField.getEditor().getStyleClass().clear();</b>
+<b class="nc">&nbsp;        entryLinkField.getEditor().getStyleClass().add(&quot;tags-field-editor&quot;);</b>
+<b class="nc">&nbsp;        entryLinkField.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -&gt; entryLinkField.pseudoClassStateChanged(FOCUSED, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        String separator = EntryLinkList.SEPARATOR;</b>
+<b class="nc">&nbsp;        entryLinkField.getEditor().setOnKeyReleased(event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getText().equals(separator)) {</b>
+<b class="nc">&nbsp;                entryLinkField.commit();</b>
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        Bindings.bindContentBidirectional(entryLinkField.getTags(), viewModel.linkedEntriesProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node createTag(ParsedEntryLink entryLink) {
+<b class="nc">&nbsp;        Label tagLabel = new Label();</b>
+<b class="nc">&nbsp;        tagLabel.setText(entryLinkField.getConverter().toString(entryLink));</b>
+<b class="nc">&nbsp;        tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());</b>
+<b class="nc">&nbsp;        tagLabel.getGraphic().setOnMouseClicked(event -&gt; entryLinkField.removeTags(entryLink));</b>
+<b class="nc">&nbsp;        tagLabel.setContentDisplay(ContentDisplay.RIGHT);</b>
+<b class="nc">&nbsp;        tagLabel.setOnMouseClicked(event -&gt; {</b>
+<b class="nc">&nbsp;            if ((event.getClickCount() == 2 || event.isControlDown()) &amp;&amp; event.getButton() == MouseButton.PRIMARY) {</b>
+<b class="nc">&nbsp;                viewModel.jumpToEntry(entryLink);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        ContextMenu contextMenu = new ContextMenu();</b>
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+<b class="nc">&nbsp;        contextMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY, new TagContextAction(StandardActions.COPY, entryLink)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CUT, new TagContextAction(StandardActions.CUT, entryLink)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.DELETE, new TagContextAction(StandardActions.DELETE, entryLink))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        tagLabel.setContextMenu(contextMenu);</b>
+<b class="nc">&nbsp;        return tagLabel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedEntriesEditorViewModel getViewModel() {
+<b class="nc">&nbsp;        return viewModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        viewModel.bindToEntry(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parent getNode() {
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private class TagContextAction extends SimpleCommand {
+&nbsp;        private final StandardActions command;
+&nbsp;        private final ParsedEntryLink entryLink;
+&nbsp;
+<b class="nc">&nbsp;        public TagContextAction(StandardActions command, ParsedEntryLink entryLink) {</b>
+<b class="nc">&nbsp;            this.command = command;</b>
+<b class="nc">&nbsp;            this.entryLink = entryLink;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void execute() {
+<b class="nc">&nbsp;            switch (command) {</b>
+&nbsp;                case COPY -&gt; {
+<b class="nc">&nbsp;                    clipBoardManager.setContent(entryLink.getKey());</b>
+<b class="nc">&nbsp;                    dialogService.notify(Localization.lang(&quot;Copied &#39;%0&#39; to clipboard.&quot;,</b>
+<b class="nc">&nbsp;                            JabRefDialogService.shortenDialogMessage(entryLink.getKey())));</b>
+&nbsp;                }
+&nbsp;                case CUT -&gt; {
+<b class="nc">&nbsp;                    clipBoardManager.setContent(entryLink.getKey());</b>
+<b class="nc">&nbsp;                    dialogService.notify(Localization.lang(&quot;Copied &#39;%0&#39; to clipboard.&quot;,</b>
+<b class="nc">&nbsp;                            JabRefDialogService.shortenDialogMessage(entryLink.getKey())));</b>
+<b class="nc">&nbsp;                    entryLinkField.removeTags(entryLink);</b>
+&nbsp;                }
+&nbsp;                case DELETE -&gt;
+<b class="nc">&nbsp;                        entryLinkField.removeTags(entryLink);</b>
+&nbsp;                default -&gt;
+<b class="nc">&nbsp;                        LOGGER.info(&quot;Action {} not defined&quot;, command.getText());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

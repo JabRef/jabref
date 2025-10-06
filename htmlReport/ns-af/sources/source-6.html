@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibStringDiff</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bibtex.comparator</a>
+</div>
+
+<h1>Coverage Summary for Class: BibStringDiff (org.jabref.logic.bibtex.comparator)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibStringDiff</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bibtex.comparator;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;
+&nbsp;public class BibStringDiff {
+&nbsp;
+&nbsp;    private final BibtexString originalString;
+&nbsp;    private final BibtexString newString;
+&nbsp;
+<b class="nc">&nbsp;    BibStringDiff(BibtexString originalString, BibtexString newString) {</b>
+<b class="nc">&nbsp;        this.originalString = originalString;</b>
+<b class="nc">&nbsp;        this.newString = newString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;BibStringDiff&gt; compare(BibDatabase originalDatabase, BibDatabase newDatabase) {
+<b class="nc">&nbsp;        if (originalDatabase.hasNoStrings() &amp;&amp; newDatabase.hasNoStrings()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibStringDiff&gt; differences = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;BibtexString&gt; used = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        Set&lt;BibtexString&gt; notMatched = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // First try to match by string names.
+<b class="nc">&nbsp;        for (BibtexString original : originalDatabase.getStringValues()) {</b>
+<b class="nc">&nbsp;            Optional&lt;BibtexString&gt; match = newDatabase</b>
+<b class="nc">&nbsp;                    .getStringValues().stream()</b>
+<b class="nc">&nbsp;                    .filter(test -&gt; test.getName().equals(original.getName()))</b>
+<b class="nc">&nbsp;                    .findAny();</b>
+<b class="nc">&nbsp;            if (match.isPresent()) {</b>
+&nbsp;                // We have found a string with a matching name.
+<b class="nc">&nbsp;                if (!Objects.equals(original.getContent(), match.get().getContent())) {</b>
+&nbsp;                    // But they have non-matching contents, so we&#39;ve found a change.
+<b class="nc">&nbsp;                    differences.add(new BibStringDiff(original, match.get()));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                used.add(match.get());</b>
+&nbsp;            } else {
+&nbsp;                // No match for this string.
+<b class="nc">&nbsp;                notMatched.add(original);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // See if we can detect a name change for those entries that we couldn&#39;t match, based on their content
+<b class="nc">&nbsp;        for (Iterator&lt;BibtexString&gt; iterator = notMatched.iterator(); iterator.hasNext(); ) {</b>
+<b class="nc">&nbsp;            BibtexString original = iterator.next();</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;BibtexString&gt; match = newDatabase</b>
+<b class="nc">&nbsp;                    .getStringValues().stream()</b>
+<b class="nc">&nbsp;                    .filter(test -&gt; test.getContent().equals(original.getContent()))</b>
+<b class="nc">&nbsp;                    .findAny();</b>
+<b class="nc">&nbsp;            if (match.isPresent()) {</b>
+&nbsp;                // We have found a string with the same content. It cannot have the same
+&nbsp;                // name, or we would have found it above.
+<b class="nc">&nbsp;                differences.add(new BibStringDiff(original, match.get()));</b>
+<b class="nc">&nbsp;                iterator.remove();</b>
+<b class="nc">&nbsp;                used.add(match.get());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Strings that are still not found must have been removed.
+<b class="nc">&nbsp;        for (BibtexString original : notMatched) {</b>
+<b class="nc">&nbsp;            differences.add(new BibStringDiff(original, null));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Finally, see if there are remaining strings in the new database. They must have been added.
+<b class="nc">&nbsp;        newDatabase.getStringValues().stream()</b>
+<b class="nc">&nbsp;                   .filter(test -&gt; !used.contains(test))</b>
+<b class="nc">&nbsp;                   .forEach(newString -&gt; differences.add(new BibStringDiff(null, newString)));</b>
+&nbsp;
+<b class="nc">&nbsp;        return differences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibtexString getOriginalString() {
+<b class="nc">&nbsp;        return originalString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibtexString getNewString() {
+<b class="nc">&nbsp;        return newString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object other) {
+<b class="nc">&nbsp;        if (this == other) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((other == null) || (getClass() != other.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BibStringDiff that = (BibStringDiff) other;</b>
+<b class="nc">&nbsp;        return Objects.equals(newString, that.newString) &amp;&amp; Objects.equals(originalString, that.originalString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(originalString, newString);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

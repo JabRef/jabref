@@ -1,0 +1,328 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Linux</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.desktop.os</a>
+</div>
+
+<h1>Coverage Summary for Class: Linux (org.jabref.gui.desktop.os)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Linux</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/95)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.desktop.os;
+&nbsp;
+&nbsp;import java.awt.Desktop;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseAwt;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.Directories;
+&nbsp;import org.jabref.logic.util.HeadlessExecutorService;
+&nbsp;import org.jabref.logic.util.StreamGobbler;
+&nbsp;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class contains Linux specific implementations for file directories and file/application open handling methods.
+&nbsp; * &lt;p&gt;
+&nbsp; * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
+&nbsp; * The configuration of tinylog will become immutable as soon as the first log entry is issued.
+&nbsp; * https://tinylog.org/v2/configuration
+&nbsp; */
+&nbsp;@AllowedToUseAwt(&quot;Requires AWT to open a file with the native method&quot;)
+<b class="nc">&nbsp;public class Linux extends NativeDesktop {</b>
+&nbsp;
+&nbsp;    private static final String ETC_ALTERNATIVES_X_TERMINAL_EMULATOR = &quot;/etc/alternatives/x-terminal-emulator&quot;;
+&nbsp;
+&nbsp;    private void nativeOpenFile(String filePath) {
+<b class="nc">&nbsp;        HeadlessExecutorService.INSTANCE.execute(() -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                Desktop.getDesktop().open(Path.of(filePath).toFile());</b>
+<b class="nc">&nbsp;                LoggerFactory.getLogger(Linux.class).debug(&quot;Open file in default application with Desktop integration&quot;);</b>
+&nbsp;            } catch (IllegalArgumentException e) {
+<b class="nc">&nbsp;                LoggerFactory.getLogger(Linux.class).debug(&quot;Fail back to xdg-open&quot;);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    String[] cmd = {&quot;xdg-open&quot;, filePath};</b>
+<b class="nc">&nbsp;                    Runtime.getRuntime().exec(cmd);</b>
+&nbsp;                } catch (Exception e2) {
+<b class="nc">&nbsp;                    LoggerFactory.getLogger(Linux.class).warn(&quot;Open operation not successful: &quot;, e2);</b>
+&nbsp;                }
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LoggerFactory.getLogger(Linux.class).warn(&quot;Native open operation not successful: &quot;, e);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+<b class="nc">&nbsp;        Optional&lt;ExternalFileType&gt; type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);</b>
+&nbsp;        String viewer;
+&nbsp;
+<b class="nc">&nbsp;        if (type.isPresent() &amp;&amp; !type.get().getOpenWithApplication().isEmpty()) {</b>
+<b class="nc">&nbsp;            viewer = type.get().getOpenWithApplication();</b>
+<b class="nc">&nbsp;            ProcessBuilder processBuilder = new ProcessBuilder(viewer, filePath);</b>
+<b class="nc">&nbsp;            Process process = processBuilder.start();</b>
+<b class="nc">&nbsp;            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);</b>
+<b class="nc">&nbsp;            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);</b>
+&nbsp;
+<b class="nc">&nbsp;            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);</b>
+<b class="nc">&nbsp;            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            nativeOpenFile(filePath);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void openFileWithApplication(String filePath, String application) throws IOException {
+&nbsp;        // Use the given app if specified, and the universal &quot;xdg-open&quot; otherwise:
+&nbsp;        String[] openWith;
+<b class="nc">&nbsp;        if ((application != null) &amp;&amp; !application.isEmpty()) {</b>
+<b class="nc">&nbsp;            openWith = application.split(&quot; &quot;);</b>
+<b class="nc">&nbsp;            String[] cmdArray = new String[openWith.length + 1];</b>
+<b class="nc">&nbsp;            System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);</b>
+<b class="nc">&nbsp;            cmdArray[cmdArray.length - 1] = filePath;</b>
+&nbsp;
+<b class="nc">&nbsp;            ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);</b>
+<b class="nc">&nbsp;            Process process = processBuilder.start();</b>
+&nbsp;
+<b class="nc">&nbsp;            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);</b>
+<b class="nc">&nbsp;            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);</b>
+&nbsp;
+<b class="nc">&nbsp;            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);</b>
+<b class="nc">&nbsp;            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            nativeOpenFile(filePath);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void openFolderAndSelectFile(Path filePath) throws IOException {
+<b class="nc">&nbsp;        String desktopSession = System.getenv(&quot;DESKTOP_SESSION&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        String absoluteFilePath = filePath.toAbsolutePath().toString();</b>
+<b class="nc">&nbsp;        String[] cmd = {&quot;xdg-open&quot;, filePath.getParent().toString()}; // default is the folder of the file</b>
+&nbsp;
+<b class="nc">&nbsp;        if (desktopSession != null) {</b>
+<b class="nc">&nbsp;            desktopSession = desktopSession.toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;            if (desktopSession.contains(&quot;gnome&quot;)) {</b>
+<b class="nc">&nbsp;                cmd = new String[] {&quot;nautilus&quot;, &quot;--select&quot;, absoluteFilePath};</b>
+<b class="nc">&nbsp;            } else if (desktopSession.contains(&quot;kde&quot;) || desktopSession.contains(&quot;plasma&quot;)) {</b>
+<b class="nc">&nbsp;                cmd = new String[] {&quot;dolphin&quot;, &quot;--select&quot;, absoluteFilePath};</b>
+<b class="nc">&nbsp;            } else if (desktopSession.contains(&quot;mate&quot;)) {</b>
+<b class="nc">&nbsp;                cmd = new String[] {&quot;caja&quot;, &quot;--select&quot;, absoluteFilePath};</b>
+<b class="nc">&nbsp;            } else if (desktopSession.contains(&quot;cinnamon&quot;)) {</b>
+<b class="nc">&nbsp;                cmd = new String[] {&quot;nemo&quot;, absoluteFilePath}; // Although nemo is based on nautilus it does not support --select, it directly highlights the file</b>
+<b class="nc">&nbsp;            } else if (desktopSession.contains(&quot;xfce&quot;)) {</b>
+<b class="nc">&nbsp;                cmd = new String[] {&quot;thunar&quot;, absoluteFilePath};</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        LoggerFactory.getLogger(Linux.class).debug(&quot;Opening folder and selecting file using {}&quot;, String.join(&quot; &quot;, cmd));</b>
+<b class="nc">&nbsp;        ProcessBuilder processBuilder = new ProcessBuilder(cmd);</b>
+<b class="nc">&nbsp;        Process process = processBuilder.start();</b>
+&nbsp;
+<b class="nc">&nbsp;        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);</b>
+<b class="nc">&nbsp;        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);</b>
+&nbsp;
+<b class="nc">&nbsp;        HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);</b>
+<b class="nc">&nbsp;        HeadlessExecutorService.INSTANCE.execute(streamGobblerError);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        if (!Files.exists(Path.of(ETC_ALTERNATIVES_X_TERMINAL_EMULATOR))) {</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Could not detect terminal automatically using &#39;%0&#39;. Please define a custom terminal in the preferences.&quot;, ETC_ALTERNATIVES_X_TERMINAL_EMULATOR));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ProcessBuilder processBuilder = new ProcessBuilder(&quot;readlink&quot;, ETC_ALTERNATIVES_X_TERMINAL_EMULATOR);</b>
+<b class="nc">&nbsp;        Process process = processBuilder.start();</b>
+&nbsp;
+<b class="nc">&nbsp;        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {</b>
+<b class="nc">&nbsp;            String emulatorName = reader.readLine();</b>
+<b class="nc">&nbsp;            if (emulatorName != null) {</b>
+<b class="nc">&nbsp;                emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);</b>
+&nbsp;
+&nbsp;                String[] cmd;
+<b class="nc">&nbsp;                if (emulatorName.contains(&quot;gnome&quot;)) {</b>
+<b class="nc">&nbsp;                    cmd = new String[] {&quot;gnome-terminal&quot;, &quot;--working-directory&quot;, absolutePath};</b>
+<b class="nc">&nbsp;                } else if (emulatorName.contains(&quot;xfce4&quot;)) {</b>
+&nbsp;                    // xfce4-terminal requires &quot;--working-directory=&lt;directory&gt;&quot; format (one arg)
+<b class="nc">&nbsp;                    cmd = new String[] {&quot;xfce4-terminal&quot;, &quot;--working-directory=&quot; + absolutePath};</b>
+<b class="nc">&nbsp;                } else if (emulatorName.contains(&quot;konsole&quot;)) {</b>
+<b class="nc">&nbsp;                    cmd = new String[] {&quot;konsole&quot;, &quot;--workdir&quot;, absolutePath};</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    cmd = new String[] {emulatorName, absolutePath};</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                LoggerFactory.getLogger(Linux.class).debug(&quot;Opening terminal using {}&quot;, String.join(&quot; &quot;, cmd));</b>
+&nbsp;
+<b class="nc">&nbsp;                ProcessBuilder builder = new ProcessBuilder(cmd);</b>
+<b class="nc">&nbsp;                builder.directory(Path.of(absolutePath).toFile());</b>
+<b class="nc">&nbsp;                Process processTerminal = builder.start();</b>
+&nbsp;
+<b class="nc">&nbsp;                StreamGobbler streamGobblerInput = new StreamGobbler(processTerminal.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);</b>
+<b class="nc">&nbsp;                StreamGobbler streamGobblerError = new StreamGobbler(processTerminal.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);</b>
+&nbsp;
+<b class="nc">&nbsp;                HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);</b>
+<b class="nc">&nbsp;                HeadlessExecutorService.INSTANCE.execute(streamGobblerError);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Path getApplicationDirectory() {
+<b class="nc">&nbsp;        return Path.of(&quot;/usr/lib/&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Path getDefaultFileChooserDirectory() {
+<b class="nc">&nbsp;        String xdgDocumentsDir = System.getenv(&quot;XDG_DOCUMENTS_DIR&quot;);</b>
+<b class="nc">&nbsp;        if (xdgDocumentsDir != null) {</b>
+<b class="nc">&nbsp;            return Path.of(xdgDocumentsDir);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Make use of xdg-user-dirs
+&nbsp;        // See https://www.freedesktop.org/wiki/Software/xdg-user-dirs/ for details
+&nbsp;        try {
+<b class="nc">&nbsp;            Process process = new ProcessBuilder(&quot;xdg-user-dir&quot;, &quot;DOCUMENTS&quot;).start(); // Package name with &#39;s&#39;, command without</b>
+<b class="nc">&nbsp;            List&lt;String&gt; strings = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))</b>
+<b class="nc">&nbsp;                    .lines().toList();</b>
+<b class="nc">&nbsp;            if (strings.isEmpty()) {</b>
+<b class="nc">&nbsp;                LoggerFactory.getLogger(Linux.class).error(&quot;xdg-user-dir returned nothing&quot;);</b>
+<b class="nc">&nbsp;                return Directories.getUserDirectory();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String documentsDirectory = strings.getFirst();</b>
+<b class="nc">&nbsp;            Path documentsPath = Path.of(documentsDirectory);</b>
+<b class="nc">&nbsp;            if (!Files.exists(documentsPath)) {</b>
+<b class="nc">&nbsp;                LoggerFactory.getLogger(Linux.class).error(&quot;xdg-user-dir returned non-existant directory {}&quot;, documentsDirectory);</b>
+<b class="nc">&nbsp;                return Directories.getUserDirectory();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            LoggerFactory.getLogger(Linux.class).debug(&quot;Got documents path {}&quot;, documentsPath);</b>
+<b class="nc">&nbsp;            return documentsPath;</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LoggerFactory.getLogger(Linux.class).error(&quot;Error while executing xdg-user-dir&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Fallback
+<b class="nc">&nbsp;        return Directories.getUserDirectory();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

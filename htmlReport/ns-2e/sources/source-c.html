@@ -1,0 +1,438 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LatexCitationsTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: LatexCitationsTabViewModel (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LatexCitationsTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LatexCitationsTabViewModel$CitationsAlterationListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LatexCitationsTabViewModel$Status</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/99)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.ReadOnlyListWrapper;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.input.MouseButton;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.push.GuiPushToApplication;
+&nbsp;import org.jabref.gui.push.GuiPushToApplications;
+&nbsp;import org.jabref.gui.push.GuiPushToTeXstudio;
+&nbsp;import org.jabref.gui.texparser.CitationsDisplay;
+&nbsp;import org.jabref.gui.util.DirectoryDialogConfiguration;
+&nbsp;import org.jabref.gui.util.DirectoryMonitor;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.texparser.DefaultLatexParser;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.texparser.Citation;
+&nbsp;import org.jabref.model.texparser.LatexParserResult;
+&nbsp;import org.jabref.model.texparser.LatexParserResults;
+&nbsp;
+&nbsp;import org.apache.commons.io.filefilter.FileFilterUtils;
+&nbsp;import org.apache.commons.io.filefilter.IOFileFilter;
+&nbsp;import org.apache.commons.io.monitor.FileAlterationListener;
+&nbsp;import org.apache.commons.io.monitor.FileAlterationObserver;
+&nbsp;import org.apache.commons.io.monitor.FileEntry;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class LatexCitationsTabViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    public enum Status {</b>
+<b class="nc">&nbsp;        IN_PROGRESS,</b>
+<b class="nc">&nbsp;        CITATIONS_FOUND,</b>
+<b class="nc">&nbsp;        NO_RESULTS,</b>
+<b class="nc">&nbsp;        ERROR</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);</b>
+&nbsp;    private static final String TEX_EXT = &quot;.tex&quot;;
+<b class="nc">&nbsp;    private static final IOFileFilter FILE_FILTER = FileFilterUtils.or(FileFilterUtils.suffixFileFilter(TEX_EXT), FileFilterUtils.directoryFileFilter());</b>
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Path&gt; directory = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;Citation&gt; citationList = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Status&gt; status = new SimpleObjectProperty&lt;&gt;(Status.IN_PROGRESS);</b>
+<b class="nc">&nbsp;    private final StringProperty searchError = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty updateStatusOnCreate = new SimpleBooleanProperty(false);</b>
+&nbsp;
+&nbsp;    private final DefaultLatexParser latexParser;
+&nbsp;    private final LatexParserResults latexFiles;
+&nbsp;    private final DirectoryMonitor directoryMonitor;
+&nbsp;    private final FileAlterationListener listener;
+&nbsp;
+&nbsp;    private FileAlterationObserver observer;
+&nbsp;    private BibEntry currentEntry;
+&nbsp;    private BibDatabaseContext currentDatabaseContext;
+&nbsp;
+&nbsp;    public LatexCitationsTabViewModel(GuiPreferences preferences,
+&nbsp;                                      DialogService dialogService,
+<b class="nc">&nbsp;                                      DirectoryMonitor directoryMonitor) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.directoryMonitor = directoryMonitor;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.latexParser = new DefaultLatexParser();</b>
+<b class="nc">&nbsp;        this.latexFiles = new LatexParserResults();</b>
+<b class="nc">&nbsp;        this.listener = new CitationsAlterationListener();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.currentDatabaseContext = new BibDatabaseContext();</b>
+<b class="nc">&nbsp;        this.directory.set(FileUtil.getInitialDirectory(currentDatabaseContext, preferences.getFilePreferences().getWorkingDirectory()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void handleMouseClick(MouseEvent event, CitationsDisplay citationsDisplay) {
+<b class="nc">&nbsp;        Citation selectedItem = citationsDisplay.getSelectionModel().getSelectedItem();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (event.getButton() == MouseButton.PRIMARY &amp;&amp; event.getClickCount() == 2 &amp;&amp; selectedItem != null) {</b>
+<b class="nc">&nbsp;            String applicationName = preferences.getPushToApplicationPreferences()</b>
+<b class="nc">&nbsp;                                                .getActiveApplicationName();</b>
+<b class="nc">&nbsp;            GuiPushToApplication application = GuiPushToApplications.getGUIApplicationByName(</b>
+&nbsp;                                                                            applicationName,
+&nbsp;                                                                            dialogService,
+<b class="nc">&nbsp;                                                                            preferences.getPushToApplicationPreferences())</b>
+<b class="nc">&nbsp;                                                                    .orElseGet(() -&gt; new GuiPushToTeXstudio(dialogService, preferences.getPushToApplicationPreferences()));</b>
+<b class="nc">&nbsp;            preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());</b>
+<b class="nc">&nbsp;            application.jumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void bindToEntry(LibraryTab libraryTab, BibEntry entry) {
+<b class="nc">&nbsp;        currentDatabaseContext = libraryTab.getBibDatabaseContext();</b>
+&nbsp;
+<b class="nc">&nbsp;        checkAndUpdateDirectory();</b>
+&nbsp;
+<b class="nc">&nbsp;        currentEntry = entry;</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; citationKey = entry.getCitationKey();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (citationKey.isPresent()) {</b>
+<b class="nc">&nbsp;            citationList.setAll(latexFiles.getCitationsByKey(citationKey.get()));</b>
+<b class="nc">&nbsp;            if (status.get() != Status.IN_PROGRESS) {</b>
+<b class="nc">&nbsp;                updateStatus();</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            searchError.set(Localization.lang(&quot;Selected entry does not have an associated citation key.&quot;));</b>
+<b class="nc">&nbsp;            status.set(Status.ERROR);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLatexDirectory() {
+<b class="nc">&nbsp;        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .withInitialDirectory(directory.get()).build();</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -&gt;</b>
+<b class="nc">&nbsp;                currentDatabaseContext.getMetaData().setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath().toString()));</b>
+&nbsp;
+<b class="nc">&nbsp;        checkAndUpdateDirectory();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void checkAndUpdateDirectory() {
+<b class="nc">&nbsp;        Path newDirectory = currentDatabaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())</b>
+<b class="nc">&nbsp;                                                  .orElse(FileUtil.getInitialDirectory(currentDatabaseContext, preferences.getFilePreferences().getWorkingDirectory()));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!newDirectory.equals(directory.get()) || observer == null) {</b>
+<b class="nc">&nbsp;            status.set(Status.IN_PROGRESS);</b>
+<b class="nc">&nbsp;            updateStatusOnCreate.set(false);</b>
+<b class="nc">&nbsp;            citationList.clear();</b>
+<b class="nc">&nbsp;            latexFiles.clear();</b>
+<b class="nc">&nbsp;            directoryMonitor.removeObserver(observer);</b>
+&nbsp;
+<b class="nc">&nbsp;            directory.set(newDirectory);</b>
+<b class="nc">&nbsp;            setAlterationObserver();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setAlterationObserver() {
+<b class="nc">&nbsp;        observer = FileAlterationObserver.builder()</b>
+<b class="nc">&nbsp;                                         .setRootEntry(new FileEntry(directory.get().toFile()))</b>
+<b class="nc">&nbsp;                                         .setFileFilter(FILE_FILTER)</b>
+<b class="nc">&nbsp;                                         .getUnchecked();</b>
+<b class="nc">&nbsp;        directoryMonitor.addObserver(observer, listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateStatus() {
+<b class="nc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;            if (!Files.exists(directory.get())) {</b>
+<b class="nc">&nbsp;                searchError.set(Localization.lang(&quot;Current search directory does not exist: %0&quot;, directory.get()));</b>
+<b class="nc">&nbsp;                status.set(Status.ERROR);</b>
+<b class="nc">&nbsp;            } else if (citationList.isEmpty()) {</b>
+<b class="nc">&nbsp;                status.set(Status.NO_RESULTS);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                status.set(Status.CITATIONS_FOUND);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Path&gt; directoryProperty() {
+<b class="nc">&nbsp;        return directory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;Citation&gt; getCitationList() {
+<b class="nc">&nbsp;        return new ReadOnlyListWrapper&lt;&gt;(citationList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Status&gt; statusProperty() {
+<b class="nc">&nbsp;        return status;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty searchErrorProperty() {
+<b class="nc">&nbsp;        return searchError;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShow() {
+<b class="nc">&nbsp;        return preferences.getEntryEditorPreferences().shouldShowLatexCitationsTab();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private class CitationsAlterationListener implements FileAlterationListener {</b>
+&nbsp;        @Override
+&nbsp;        public void onStart(FileAlterationObserver observer) {
+<b class="nc">&nbsp;            if (!updateStatusOnCreate.get()) {</b>
+<b class="nc">&nbsp;                UiTaskExecutor.runInJavaFXThread(() -&gt; status.set(Status.IN_PROGRESS));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onStop(FileAlterationObserver observer) {
+<b class="nc">&nbsp;            if (!updateStatusOnCreate.get()) {</b>
+<b class="nc">&nbsp;                updateStatusOnCreate.set(true);</b>
+<b class="nc">&nbsp;                updateStatus();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onFileCreate(File file) {
+<b class="nc">&nbsp;            Path path = file.toPath();</b>
+<b class="nc">&nbsp;            LatexParserResult result = latexParser.parse(path).get();</b>
+<b class="nc">&nbsp;            latexFiles.add(path, result);</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;String&gt; citationKey = currentEntry.getCitationKey();</b>
+<b class="nc">&nbsp;            if (citationKey.isPresent()) {</b>
+<b class="nc">&nbsp;                Collection&lt;Citation&gt; citations = result.getCitationsByKey(citationKey.get());</b>
+<b class="nc">&nbsp;                UiTaskExecutor.runInJavaFXThread(() -&gt; citationList.addAll(citations));</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (updateStatusOnCreate.get()) {</b>
+<b class="nc">&nbsp;                updateStatus();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onFileDelete(File file) {
+<b class="nc">&nbsp;            LatexParserResult result = latexFiles.remove(file.toPath());</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;String&gt; citationKey = currentEntry.getCitationKey();</b>
+<b class="nc">&nbsp;            if (citationKey.isPresent()) {</b>
+<b class="nc">&nbsp;                Collection&lt;Citation&gt; citations = result.getCitationsByKey(citationKey.get());</b>
+<b class="nc">&nbsp;                UiTaskExecutor.runInJavaFXThread(() -&gt; citationList.removeAll(citations));</b>
+<b class="nc">&nbsp;                updateStatus();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onFileChange(File file) {
+<b class="nc">&nbsp;            onFileDelete(file);</b>
+<b class="nc">&nbsp;            onFileCreate(file);</b>
+<b class="nc">&nbsp;            updateStatus();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onDirectoryChange(File directory) {
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onDirectoryCreate(File directory) {
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onDirectoryDelete(File directory) {
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

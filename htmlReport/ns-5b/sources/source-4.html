@@ -1,0 +1,798 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NewEntryViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.newentry</a>
+</div>
+
+<h1>Coverage Summary for Class: NewEntryViewModel (org.jabref.gui.newentry)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NewEntryViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/165)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NewEntryViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NewEntryViewModel$WorkerInterpretCitations</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NewEntryViewModel$WorkerLookupId</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NewEntryViewModel$WorkerLookupTypedId</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NewEntryViewModel$WorkerSpecifyBibtex</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/204)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.newentry;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.concurrent.Task;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.externalfiles.ImportHandler;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.importer.CompositeIdFetcher;
+&nbsp;import org.jabref.logic.importer.FetcherClientException;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.FetcherServerException;
+&nbsp;import org.jabref.logic.importer.IdBasedFetcher;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.WebFetchers;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
+&nbsp;import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
+&nbsp;import org.jabref.logic.importer.plaincitation.PlainCitationParser;
+&nbsp;import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
+&nbsp;import org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser;
+&nbsp;import org.jabref.logic.importer.plaincitation.SeveralPlainCitationParser;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.logic.layout.format.DOIStrip;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class NewEntryViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryViewModel.class);</b>
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final LibraryTab libraryTab;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final UiTaskExecutor taskExecutor;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;
+&nbsp;    private final BooleanProperty executing;
+&nbsp;    private final BooleanProperty executedSuccessfully;
+&nbsp;
+&nbsp;    private final StringProperty idText;
+&nbsp;    private final Validator idTextValidator;
+&nbsp;    private final Validator duplicateDoiValidator;
+&nbsp;    private final ListProperty&lt;IdBasedFetcher&gt; idFetchers;
+&nbsp;    private final ObjectProperty&lt;IdBasedFetcher&gt; idFetcher;
+&nbsp;    private final Validator idFetcherValidator;
+&nbsp;    private Task&lt;Optional&lt;BibEntry&gt;&gt; idLookupWorker;
+&nbsp;
+&nbsp;    private final StringProperty interpretText;
+&nbsp;    private final Validator interpretTextValidator;
+&nbsp;    private final ListProperty&lt;PlainCitationParserChoice&gt; interpretParsers;
+&nbsp;    private final ObjectProperty&lt;PlainCitationParserChoice&gt; interpretParser;
+&nbsp;    private Task&lt;Optional&lt;List&lt;BibEntry&gt;&gt;&gt; interpretWorker;
+&nbsp;
+&nbsp;    private final StringProperty bibtexText;
+&nbsp;    private final Validator bibtexTextValidator;
+&nbsp;    private Task&lt;Optional&lt;List&lt;BibEntry&gt;&gt;&gt; bibtexWorker;
+&nbsp;    private final Map&lt;String, BibEntry&gt; doiCache;
+&nbsp;    private BibEntry duplicateEntry;
+&nbsp;
+&nbsp;    public NewEntryViewModel(GuiPreferences preferences,
+&nbsp;                             LibraryTab libraryTab,
+&nbsp;                             DialogService dialogService,
+&nbsp;                             StateManager stateManager,
+&nbsp;                             UiTaskExecutor taskExecutor,
+&nbsp;                             AiService aiService,
+<b class="nc">&nbsp;                             FileUpdateMonitor fileUpdateMonitor) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.libraryTab = libraryTab;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+&nbsp;
+<b class="nc">&nbsp;        executing = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;        executedSuccessfully = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;        doiCache = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        idText = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;        idTextValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                idText,
+&nbsp;                StringUtil::isNotBlank,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;You must specify an identifier.&quot;)));</b>
+<b class="nc">&nbsp;        duplicateDoiValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                idText,
+<b class="nc">&nbsp;                input -&gt; checkDOI(input).orElse(null));</b>
+<b class="nc">&nbsp;        idFetchers = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;        idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));</b>
+<b class="nc">&nbsp;        idFetcher = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;        idFetcherValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                idFetcher,
+&nbsp;                Objects::nonNull,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;You must select an identifier type.&quot;)));</b>
+<b class="nc">&nbsp;        idLookupWorker = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        interpretText = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;        interpretTextValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                interpretText,
+&nbsp;                StringUtil::isNotBlank,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;You must specify one (or more) citations.&quot;)));</b>
+<b class="nc">&nbsp;        interpretParsers = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;        interpretParsers.addAll(PlainCitationParserChoice.values());</b>
+<b class="nc">&nbsp;        interpretParser = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;        interpretWorker = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        bibtexText = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;        bibtexTextValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                bibtexText,
+&nbsp;                StringUtil::isNotBlank,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;You must specify a Bib(La)TeX source.&quot;)));</b>
+<b class="nc">&nbsp;        bibtexWorker = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void populateDOICache() {
+<b class="nc">&nbsp;        doiCache.clear();</b>
+<b class="nc">&nbsp;        Optional&lt;BibDatabaseContext&gt; activeDatabase = stateManager.getActiveDatabase();</b>
+&nbsp;
+<b class="nc">&nbsp;        activeDatabase.map(BibDatabaseContext::getEntries)</b>
+<b class="nc">&nbsp;                      .ifPresent(entries -&gt; {</b>
+<b class="nc">&nbsp;                          entries.forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;                              entry.getField(StandardField.DOI)</b>
+<b class="nc">&nbsp;                                   .ifPresent(doi -&gt; {</b>
+<b class="nc">&nbsp;                                       doiCache.put(doi, entry);</b>
+&nbsp;                                   });
+&nbsp;                          });
+&nbsp;                      });
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;ValidationMessage&gt; checkDOI(String doiInput) {
+<b class="nc">&nbsp;        if (doiInput == null || doiInput.isBlank()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LayoutFormatter doiStrip = new DOIStrip();</b>
+<b class="nc">&nbsp;        String normalized = doiStrip.format(doiInput.toLowerCase());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (doiCache.containsKey(normalized)) {</b>
+<b class="nc">&nbsp;            duplicateEntry = doiCache.get(normalized);</b>
+<b class="nc">&nbsp;            return Optional.of(ValidationMessage.warning(Localization.lang(&quot;Entry already exists in a library&quot;)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry getDuplicateEntry() {
+<b class="nc">&nbsp;        return duplicateEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty executingProperty() {
+<b class="nc">&nbsp;        return executing;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty executedSuccessfullyProperty() {
+<b class="nc">&nbsp;        return executedSuccessfully;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty idTextProperty() {
+<b class="nc">&nbsp;        return idText;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty idTextValidatorProperty() {
+<b class="nc">&nbsp;        return idTextValidator.getValidationStatus().validProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus duplicateDoiValidatorStatus() {
+<b class="nc">&nbsp;        return duplicateDoiValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;IdBasedFetcher&gt; idFetchersProperty() {
+<b class="nc">&nbsp;        return idFetchers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;IdBasedFetcher&gt; idFetcherProperty() {
+<b class="nc">&nbsp;        return idFetcher;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty idFetcherValidatorProperty() {
+<b class="nc">&nbsp;        return idFetcherValidator.getValidationStatus().validProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty interpretTextProperty() {
+<b class="nc">&nbsp;        return interpretText;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty interpretTextValidatorProperty() {
+<b class="nc">&nbsp;        return interpretTextValidator.getValidationStatus().validProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;PlainCitationParserChoice&gt; interpretParsersProperty() {
+<b class="nc">&nbsp;        return interpretParsers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;PlainCitationParserChoice&gt; interpretParserProperty() {
+<b class="nc">&nbsp;        return interpretParser;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty bibtexTextProperty() {
+<b class="nc">&nbsp;        return bibtexText;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty bibtexTextValidatorProperty() {
+<b class="nc">&nbsp;        return bibtexTextValidator.getValidationStatus().validProperty();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private class WorkerLookupId extends Task&lt;Optional&lt;BibEntry&gt;&gt; {</b>
+&nbsp;        @Override
+&nbsp;        protected Optional&lt;BibEntry&gt; call() throws FetcherException {
+<b class="nc">&nbsp;            final String text = idText.getValue();</b>
+<b class="nc">&nbsp;            final CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (text == null || text.isEmpty()) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return fetcher.performSearchById(text);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private class WorkerLookupTypedId extends Task&lt;Optional&lt;BibEntry&gt;&gt; {</b>
+&nbsp;        @Override
+&nbsp;        protected Optional&lt;BibEntry&gt; call() throws FetcherException {
+<b class="nc">&nbsp;            final String text = idText.getValue();</b>
+<b class="nc">&nbsp;            final boolean textValid = idTextValidator.getValidationStatus().isValid();</b>
+<b class="nc">&nbsp;            final IdBasedFetcher fetcher = idFetcher.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (text == null || !textValid || fetcher == null) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return fetcher.performSearchById(text);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void executeLookupIdentifier(boolean searchComposite) {
+<b class="nc">&nbsp;        executing.setValue(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        cancel();</b>
+<b class="nc">&nbsp;        if (searchComposite) {</b>
+<b class="nc">&nbsp;            idLookupWorker = new WorkerLookupId();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            idLookupWorker = new WorkerLookupTypedId();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        idLookupWorker.setOnFailed(_ -&gt; {</b>
+<b class="nc">&nbsp;            final Throwable exception = idLookupWorker.getException();</b>
+<b class="nc">&nbsp;            final String exceptionMessage = exception.getMessage();</b>
+<b class="nc">&nbsp;            final String textString = idText.getValue();</b>
+<b class="nc">&nbsp;            final String fetcherName = idFetcher.getValue().getName();</b>
+&nbsp;
+<b class="nc">&nbsp;            final String dialogTitle = Localization.lang(&quot;Failed to lookup identifier&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (exception instanceof FetcherClientException) {</b>
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(</b>
+&nbsp;                        dialogTitle,
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;Bibliographic data could not be retrieved.\n&quot; +
+&nbsp;                                        &quot;This is likely due to an issue with your input, or your network connection.\n&quot; +
+&nbsp;                                        &quot;Check your provided identifier (and identifier type), and try again.\n&quot; +
+&nbsp;                                        &quot;%0&quot;,
+&nbsp;                                exceptionMessage));
+<b class="nc">&nbsp;            } else if (exception instanceof FetcherServerException) {</b>
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(</b>
+&nbsp;                        dialogTitle,
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;Bibliographic data could not be retrieved.\n&quot; +
+&nbsp;                                        &quot;This is likely due to an issue being experienced by the server.\n&quot; +
+&nbsp;                                        &quot;Try again later.\n&quot; +
+&nbsp;                                        &quot;%0&quot;,
+&nbsp;                                exceptionMessage));
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(</b>
+&nbsp;                        dialogTitle,
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;Bibliographic data could not be retrieved.\n&quot; +
+&nbsp;                                        &quot;The following error was encountered:\n&quot; +
+&nbsp;                                        &quot;%0&quot;,
+&nbsp;                                exceptionMessage));
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.error(&quot;An exception occurred with the &#39;{}&#39; fetcher when resolving &#39;{}&#39;.&quot;, fetcherName, textString, exception);</b>
+&nbsp;
+<b class="nc">&nbsp;            executing.set(false);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        idLookupWorker.setOnSucceeded(event -&gt; {</b>
+<b class="nc">&nbsp;            final Optional&lt;BibEntry&gt; result = idLookupWorker.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (result.isEmpty()) {</b>
+<b class="nc">&nbsp;                dialogService.showWarningDialogAndWait(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Invalid result returned&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;An unknown error has occurred.\n&quot; +
+&nbsp;                                        &quot;This entry may need to be added manually.&quot;));
+<b class="nc">&nbsp;                executing.set(false);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            final ImportHandler handler = new ImportHandler(</b>
+<b class="nc">&nbsp;                    libraryTab.getBibDatabaseContext(),</b>
+&nbsp;                    preferences,
+&nbsp;                    fileUpdateMonitor,
+<b class="nc">&nbsp;                    libraryTab.getUndoManager(),</b>
+&nbsp;                    stateManager,
+&nbsp;                    dialogService,
+&nbsp;                    taskExecutor);
+<b class="nc">&nbsp;            handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());</b>
+&nbsp;
+<b class="nc">&nbsp;            executedSuccessfully.set(true);</b>
+<b class="nc">&nbsp;            executing.set(false);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        taskExecutor.execute(idLookupWorker);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private class WorkerInterpretCitations extends Task&lt;Optional&lt;List&lt;BibEntry&gt;&gt;&gt; {</b>
+&nbsp;        @Override
+&nbsp;        protected Optional&lt;List&lt;BibEntry&gt;&gt; call() throws FetcherException {
+<b class="nc">&nbsp;            final String text = interpretText.getValue();</b>
+<b class="nc">&nbsp;            final boolean textValid = interpretTextValidator.getValidationStatus().isValid();</b>
+<b class="nc">&nbsp;            final PlainCitationParserChoice parserChoice = interpretParser.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (text == null || !textValid || parserChoice == null) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            final PlainCitationParser parser = switch (parserChoice) {</b>
+&nbsp;                case PlainCitationParserChoice.RULE_BASED -&gt;
+<b class="nc">&nbsp;                        new RuleBasedPlainCitationParser();</b>
+&nbsp;                case PlainCitationParserChoice.GROBID -&gt;
+<b class="nc">&nbsp;                        new GrobidPlainCitationParser(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());</b>
+&nbsp;                case PlainCitationParserChoice.LLM -&gt;
+<b class="nc">&nbsp;                        new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());</b>
+&nbsp;            };
+&nbsp;
+<b class="nc">&nbsp;            final SeveralPlainCitationParser setParser = new SeveralPlainCitationParser(parser);</b>
+<b class="nc">&nbsp;            final List&lt;BibEntry&gt; entries = setParser.parseSeveralPlainCitations(text);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Optional.of(entries);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void executeInterpretCitations() {
+<b class="nc">&nbsp;        executing.setValue(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        cancel();</b>
+<b class="nc">&nbsp;        interpretWorker = new WorkerInterpretCitations();</b>
+&nbsp;
+<b class="nc">&nbsp;        interpretWorker.setOnFailed(event -&gt; {</b>
+<b class="nc">&nbsp;            final Throwable exception = interpretWorker.getException();</b>
+<b class="nc">&nbsp;            final String exceptionMessage = exception.getMessage();</b>
+<b class="nc">&nbsp;            final String parserName = interpretParser.getValue().getLocalizedName();</b>
+&nbsp;
+<b class="nc">&nbsp;            final String dialogTitle = Localization.lang(&quot;Failed to interpret citations&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (exception instanceof FetcherException) {</b>
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(</b>
+&nbsp;                        dialogTitle,
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;Failed to interpret citations.\n&quot; +
+&nbsp;                                        &quot;The following error was encountered:\n&quot; +
+&nbsp;                                        &quot;%0&quot;,
+&nbsp;                                exceptionMessage));
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(</b>
+&nbsp;                        dialogTitle,
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;The following error occurred:\n&quot; +
+&nbsp;                                        &quot;%0&quot;,
+&nbsp;                                exceptionMessage));
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.error(&quot;An exception occurred with the &#39;{}&#39; parser.&quot;, parserName, exception);</b>
+&nbsp;
+<b class="nc">&nbsp;            executing.set(false);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        interpretWorker.setOnSucceeded(_ -&gt; {</b>
+<b class="nc">&nbsp;            final Optional&lt;List&lt;BibEntry&gt;&gt; result = interpretWorker.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (result.isEmpty()) {</b>
+<b class="nc">&nbsp;                dialogService.showWarningDialogAndWait(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Invalid result&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;An unknown error has occurred.\n&quot; +
+&nbsp;                                        &quot;Entries may need to be added manually.&quot;));
+<b class="nc">&nbsp;                LOGGER.error(&quot;An invalid result was returned when parsing citations.&quot;);</b>
+<b class="nc">&nbsp;                executing.set(false);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            final ImportHandler handler = new ImportHandler(</b>
+<b class="nc">&nbsp;                    libraryTab.getBibDatabaseContext(),</b>
+&nbsp;                    preferences,
+&nbsp;                    fileUpdateMonitor,
+<b class="nc">&nbsp;                    libraryTab.getUndoManager(),</b>
+&nbsp;                    stateManager,
+&nbsp;                    dialogService,
+&nbsp;                    taskExecutor);
+<b class="nc">&nbsp;            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());</b>
+&nbsp;
+<b class="nc">&nbsp;            executedSuccessfully.set(true);</b>
+<b class="nc">&nbsp;            executing.set(false);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        taskExecutor.execute(interpretWorker);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private class WorkerSpecifyBibtex extends Task&lt;Optional&lt;List&lt;BibEntry&gt;&gt;&gt; {</b>
+&nbsp;        @Override
+&nbsp;        protected Optional&lt;List&lt;BibEntry&gt;&gt; call() throws ParseException {
+<b class="nc">&nbsp;            final String text = bibtexText.getValue();</b>
+<b class="nc">&nbsp;            final boolean textValid = bibtexTextValidator.getValidationStatus().isValid();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (text == null || !textValid) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            final BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());</b>
+<b class="nc">&nbsp;            final List&lt;BibEntry&gt; entries = parser.parseEntries(text);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Optional.of(entries);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void executeSpecifyBibtex() {
+<b class="nc">&nbsp;        executing.setValue(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        cancel();</b>
+<b class="nc">&nbsp;        bibtexWorker = new WorkerSpecifyBibtex();</b>
+&nbsp;
+<b class="nc">&nbsp;        bibtexWorker.setOnFailed(_ -&gt; {</b>
+<b class="nc">&nbsp;            final Throwable exception = interpretWorker.getException();</b>
+<b class="nc">&nbsp;            final String exceptionMessage = exception.getMessage();</b>
+&nbsp;
+<b class="nc">&nbsp;            final String dialogTitle = Localization.lang(&quot;Failed to parse Bib(La)Tex&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (exception instanceof ParseException) {</b>
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(</b>
+&nbsp;                        dialogTitle,
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;Failed to parse entries.\n&quot; +
+&nbsp;                                        &quot;The following error was encountered:\n&quot; +
+&nbsp;                                        &quot;%0&quot;,
+&nbsp;                                exceptionMessage));
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(</b>
+&nbsp;                        dialogTitle,
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;The following error occurred:\n&quot; +
+&nbsp;                                        &quot;%0&quot;,
+&nbsp;                                exceptionMessage));
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.error(&quot;An exception occurred when parsing Bib(La)Tex entries.&quot;, exception);</b>
+&nbsp;
+<b class="nc">&nbsp;            executing.set(false);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        bibtexWorker.setOnSucceeded(_ -&gt; {</b>
+<b class="nc">&nbsp;            final Optional&lt;List&lt;BibEntry&gt;&gt; result = bibtexWorker.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (result.isEmpty()) {</b>
+<b class="nc">&nbsp;                dialogService.showWarningDialogAndWait(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Invalid result&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(</b>
+&nbsp;                                &quot;An unknown error has occurred.\n&quot; +
+&nbsp;                                        &quot;Entries may need to be added manually.&quot;));
+<b class="nc">&nbsp;                LOGGER.error(&quot;An invalid result was returned when parsing Bib(La)Tex entries.&quot;);</b>
+<b class="nc">&nbsp;                executing.set(false);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            final ImportHandler handler = new ImportHandler(</b>
+<b class="nc">&nbsp;                    libraryTab.getBibDatabaseContext(),</b>
+&nbsp;                    preferences,
+&nbsp;                    fileUpdateMonitor,
+<b class="nc">&nbsp;                    libraryTab.getUndoManager(),</b>
+&nbsp;                    stateManager,
+&nbsp;                    dialogService,
+&nbsp;                    taskExecutor);
+<b class="nc">&nbsp;            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());</b>
+&nbsp;
+<b class="nc">&nbsp;            executedSuccessfully.set(true);</b>
+<b class="nc">&nbsp;            executing.set(false);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        taskExecutor.execute(bibtexWorker);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cancel() {
+<b class="nc">&nbsp;        if (idLookupWorker != null) {</b>
+<b class="nc">&nbsp;            idLookupWorker.cancel();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (interpretWorker != null) {</b>
+<b class="nc">&nbsp;            interpretWorker.cancel();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (bibtexWorker != null) {</b>
+<b class="nc">&nbsp;            bibtexWorker.cancel();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

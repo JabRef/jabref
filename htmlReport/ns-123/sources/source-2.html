@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CommonArchitectureTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.support</a>
+</div>
+
+<h1>Coverage Summary for Class: CommonArchitectureTest (org.jabref.support)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CommonArchitectureTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.support;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
+&nbsp;import org.jabref.architecture.AllowedToUseAwt;
+&nbsp;import org.jabref.architecture.AllowedToUseClassGetResource;
+&nbsp;import org.jabref.architecture.AllowedToUseLogic;
+&nbsp;import org.jabref.architecture.AllowedToUseStandardStreams;
+&nbsp;import org.jabref.architecture.AllowedToUseSwing;
+&nbsp;
+&nbsp;import com.tngtech.archunit.core.domain.JavaClasses;
+&nbsp;import com.tngtech.archunit.core.importer.ImportOption;
+&nbsp;import com.tngtech.archunit.junit.AnalyzeClasses;
+&nbsp;import com.tngtech.archunit.junit.ArchTest;
+&nbsp;import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
+&nbsp;import com.tngtech.archunit.library.GeneralCodingRules;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class checks JabRef&#39;s shipped classes for architecture quality.
+&nbsp; * Does not analyze test classes. Hint from &lt;a href=&quot;https://stackoverflow.com/a/44681895/873282&quot;&gt;StackOverflow&lt;/a&gt;
+&nbsp; */
+&nbsp;@AnalyzeClasses(packages = &quot;org.jabref&quot;, importOptions = ImportOption.DoNotIncludeTests.class)
+<b class="nc">&nbsp;public class CommonArchitectureTest {</b>
+&nbsp;
+&nbsp;    private static final String PACKAGE_JAVAX_SWING = &quot;javax.swing..&quot;;
+&nbsp;    private static final String PACKAGE_JAVA_AWT = &quot;java.awt..&quot;;
+&nbsp;    private static final String PACKAGE_ORG_JABREF_GUI = &quot;org.jabref.gui..&quot;;
+&nbsp;    private static final String PACKAGE_ORG_JABREF_LOGIC = &quot;org.jabref.logic..&quot;;
+&nbsp;    private static final String PACKAGE_ORG_JABREF_MODEL = &quot;org.jabref.model..&quot;;
+&nbsp;    private static final String PACKAGE_ORG_JABREF_CLI = &quot;org.jabref.cli..&quot;;
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void doNotUseApacheCommonsLang3(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseApacheCommonsLang3.class)</b>
+<b class="nc">&nbsp;                          .should().accessClassesThat().resideInAPackage(&quot;org.apache.commons.lang3&quot;)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void doNotUseSwing(JavaClasses classes) {
+&nbsp;        // This checks for all Swing packages, but not the UndoManager
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseSwing.class)</b>
+<b class="nc">&nbsp;                          .should().accessClassesThat()</b>
+<b class="nc">&nbsp;                          .resideInAnyPackage(&quot;javax.swing&quot;,</b>
+&nbsp;                                  &quot;javax.swing.border..&quot;,
+&nbsp;                                  &quot;javax.swing.colorchooser..&quot;,
+&nbsp;                                  &quot;javax.swing.event..&quot;,
+&nbsp;                                  &quot;javax.swing.filechooser..&quot;,
+&nbsp;                                  &quot;javax.swing.plaf..&quot;,
+&nbsp;                                  &quot;javax.swing.table..&quot;,
+&nbsp;                                  &quot;javax.swing.text..&quot;,
+&nbsp;                                  &quot;javax.swing.tree..&quot;)
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void doNotUseAssertJ(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().should().accessClassesThat().resideInAPackage(&quot;org.assertj..&quot;)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void doNotUseJavaAWT(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseAwt.class)</b>
+<b class="nc">&nbsp;                          .should().accessClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void doNotUsePaths(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().should()</b>
+<b class="nc">&nbsp;                          .accessClassesThat()</b>
+<b class="nc">&nbsp;                          .belongToAnyOf(Paths.class)</b>
+<b class="nc">&nbsp;                          .because(&quot;Path.of(...) should be used instead&quot;)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void useStreamsOfResources(JavaClasses classes) {
+&nbsp;        // Reason: https://github.com/oracle/graal/issues/7682#issuecomment-1786704111
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().that().haveNameNotMatching(&quot;.*Test&quot;)</b>
+<b class="nc">&nbsp;                          .and().areNotAnnotatedWith(AllowedToUseClassGetResource.class)</b>
+<b class="nc">&nbsp;                          .and().areNotAssignableFrom(&quot;org.jabref.logic.importer.fileformat.ImporterTestEngine&quot;)</b>
+<b class="nc">&nbsp;                          .should()</b>
+<b class="nc">&nbsp;                          .callMethod(Class.class, &quot;getResource&quot;, String.class)</b>
+<b class="nc">&nbsp;                          .because(&quot;getResourceAsStream(...) should be used instead&quot;)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void doNotUseLogicInModel(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)</b>
+<b class="nc">&nbsp;                          .and().areNotAnnotatedWith(AllowedToUseLogic.class)</b>
+<b class="nc">&nbsp;                          .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void doNotUseGuiInLogic(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)</b>
+<b class="nc">&nbsp;                          .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_GUI)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void restrictUsagesInModel(JavaClasses classes) {
+&nbsp;        // Until we switch to Lucene, we need to access Globals.stateManager().getActiveDatabase() from the search classes,
+&nbsp;        // because the PDFSearch needs to access the index of the corresponding database
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().that().areNotAssignableFrom(&quot;org.jabref.model.search.rules.ContainBasedSearchRule&quot;)</b>
+<b class="nc">&nbsp;                          .and().areNotAssignableFrom(&quot;org.jabref.model.search.rules.RegexBasedSearchRule&quot;)</b>
+<b class="nc">&nbsp;                          .and().areNotAssignableFrom(&quot;org.jabref.model.search.rules.GrammarBasedSearchRule&quot;)</b>
+<b class="nc">&nbsp;                          .and().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)</b>
+<b class="nc">&nbsp;                          .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void restrictUsagesInLogic(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)</b>
+<b class="nc">&nbsp;                          .and().areNotAnnotatedWith(AllowedToUseSwing.class)</b>
+<b class="nc">&nbsp;                          .and().areNotAssignableFrom(&quot;org.jabref.logic.search.DatabaseSearcherWithBibFilesTest&quot;)</b>
+<b class="nc">&nbsp;                          .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void restrictToSlf4jLogger(JavaClasses classes) {
+<b class="nc">&nbsp;        List&lt;String&gt; restrictedLoggingPackages = List.of(</b>
+&nbsp;                &quot;java.util.logging..&quot;,                  // Java&#39;s built-in logging
+&nbsp;                &quot;org.apache.log4j..&quot;,                   // Log4j 1.x
+&nbsp;                &quot;org.apache.logging.log4j..&quot;,           // Log4j 2.x
+&nbsp;                &quot;org.slf4j.impl..&quot;,                     // Concrete SLF4J bindings
+&nbsp;                &quot;ch.qos.logback..&quot;,                     // Logback
+&nbsp;                &quot;org.apache.commons.logging..&quot;,         // Apache Commons logging
+&nbsp;                &quot;org.tinylog..&quot;,                        // Tinylog
+&nbsp;                &quot;org.mariadb.jdbc.internal.logging..&quot;   // Mariadb logging
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses()</b>
+<b class="nc">&nbsp;                          .that().resideOutsideOfPackages(&quot;org.jabref.gui.errorconsole&quot;, &quot;org.jabref.gui.logging&quot;, &quot;org.jabref&quot;)</b>
+<b class="nc">&nbsp;                          .should().accessClassesThat()</b>
+<b class="nc">&nbsp;                          .resideInAnyPackage(restrictedLoggingPackages.toArray(String[]::new))</b>
+<b class="nc">&nbsp;                          .because(&quot;slf4j should be used for logging&quot;)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void restrictStandardStreams(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses().that().resideOutsideOfPackages(PACKAGE_ORG_JABREF_CLI)</b>
+<b class="nc">&nbsp;                          .and().resideOutsideOfPackages(&quot;org.jabref.gui.openoffice..&quot;) // Uses LibreOffice SDK</b>
+<b class="nc">&nbsp;                          .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)</b>
+<b class="nc">&nbsp;                          .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)</b>
+<b class="nc">&nbsp;                          .because(&quot;logging framework should be used instead or the class be marked explicitly as @AllowedToUseStandardStreams&quot;)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Use constructor new URI(...) instead
+&nbsp;    @ArchTest
+&nbsp;    public void shouldNotCallUriCreateMethod(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses()</b>
+<b class="nc">&nbsp;                          .that()</b>
+<b class="nc">&nbsp;                          .resideInAPackage(&quot;org.jabref..&quot;)</b>
+<b class="nc">&nbsp;                          .should().callMethod(URI.class, &quot;create&quot;, String.class)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ArchTest
+&nbsp;    public void shouldUseJSpecifyAnnotations(JavaClasses classes) {
+<b class="nc">&nbsp;        ArchRuleDefinition.noClasses()</b>
+<b class="nc">&nbsp;                          .should().dependOnClassesThat().resideInAPackage(&quot;org.jetbrains.annotations..&quot;)</b>
+<b class="nc">&nbsp;                          .because(&quot;JSpecify annotations should be used&quot;)</b>
+<b class="nc">&nbsp;                          .check(classes);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

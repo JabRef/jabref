@@ -1,0 +1,331 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MrDLibImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: MrDLibImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MrDLibImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MrDLibImporter$RankedBibEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import kong.unirest.core.json.JSONException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Handles importing of recommended articles to be displayed in the Related Articles tab.
+&nbsp; */
+<b class="nc">&nbsp;public class MrDLibImporter extends Importer {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);</b>
+&nbsp;    public ParserResult parserResult;
+&nbsp;    private String recommendationsHeading;
+&nbsp;    private String recommendationsDescription;
+&nbsp;    private String recommendationSetId;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+<b class="nc">&nbsp;        String recommendationsAsString = convertToString(input);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            JSONObject jsonObject = new JSONObject(recommendationsAsString);</b>
+<b class="nc">&nbsp;            if (!jsonObject.has(&quot;recommendations&quot;)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        } catch (JSONException ex) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader input) throws IOException {
+<b class="nc">&nbsp;        parse(input);</b>
+<b class="nc">&nbsp;        return parserResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;mrDlib&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;MrDLibImporter&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StandardFileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.JSON;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return &quot;Takes valid JSON documents from the Mr. DLib API and parses them into a BibEntry.&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert Buffered Reader response to string for JSON parsing.
+&nbsp;     *
+&nbsp;     * @param input Takes a BufferedReader with a reference to the JSON document delivered by mdl server.
+&nbsp;     * @return Returns an String containing the JSON document.
+&nbsp;     */
+&nbsp;    private String convertToString(BufferedReader input) {
+&nbsp;        String line;
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            while ((line = input.readLine()) != null) {</b>
+<b class="nc">&nbsp;                stringBuilder.append(line);</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return stringBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Small pair-class to ensure the right order of the recommendations.
+&nbsp;     */
+<b class="nc">&nbsp;    private record RankedBibEntry(BibEntry entry, Integer rank) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the input from the server to a ParserResult
+&nbsp;     *
+&nbsp;     * @param input A BufferedReader with a reference to a string with the server&#39;s response
+&nbsp;     */
+&nbsp;    private void parse(BufferedReader input) {
+&nbsp;        // The Bibdatabase that gets returned in the ParserResult.
+<b class="nc">&nbsp;        BibDatabase bibDatabase = new BibDatabase();</b>
+&nbsp;        // The document to parse
+<b class="nc">&nbsp;        String recommendationSet = convertToString(input);</b>
+<b class="nc">&nbsp;        JSONObject recommendationSetJson = new JSONObject(recommendationSet);</b>
+&nbsp;        // The sorted BibEntries gets stored here later
+<b class="nc">&nbsp;        List&lt;RankedBibEntry&gt; rankedBibEntries = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Get recommendations from response and populate bib entries
+<b class="nc">&nbsp;        JSONObject recommendationsJson = recommendationSetJson.getJSONObject(&quot;recommendations&quot;);</b>
+<b class="nc">&nbsp;        Iterator&lt;String&gt; keys = recommendationsJson.keys();</b>
+<b class="nc">&nbsp;        while (keys.hasNext()) {</b>
+<b class="nc">&nbsp;            String key = keys.next();</b>
+<b class="nc">&nbsp;            JSONObject value = recommendationsJson.getJSONObject(key);</b>
+<b class="nc">&nbsp;            rankedBibEntries.add(populateBibEntry(value));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Sort bib entries according to rank
+<b class="nc">&nbsp;        rankedBibEntries.sort(Comparator.comparing((RankedBibEntry rankedBibEntry) -&gt; rankedBibEntry.rank));</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; bibEntries = rankedBibEntries.stream().map(e -&gt; e.entry).collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        bibDatabase.insertEntries(bibEntries);</b>
+<b class="nc">&nbsp;        parserResult = new ParserResult(bibDatabase);</b>
+&nbsp;
+<b class="nc">&nbsp;        JSONObject label = recommendationSetJson.getJSONObject(&quot;label&quot;);</b>
+<b class="nc">&nbsp;        recommendationsHeading = label.getString(&quot;label-text&quot;);</b>
+<b class="nc">&nbsp;        recommendationsDescription = label.getString(&quot;label-description&quot;);</b>
+<b class="nc">&nbsp;        recommendationSetId = recommendationSetJson.getBigInteger(&quot;recommendation_set_id&quot;).toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the JSON recommendations into bib entries
+&nbsp;     *
+&nbsp;     * @param recommendation JSON object of a single recommendation returned by Mr. DLib
+&nbsp;     * @return A ranked bib entry created from the recommendation input
+&nbsp;     */
+&nbsp;    private RankedBibEntry populateBibEntry(JSONObject recommendation) {
+<b class="nc">&nbsp;        BibEntry current = new BibEntry();</b>
+&nbsp;
+&nbsp;        // parse each of the relevant fields into variables
+<b class="nc">&nbsp;        String authors = isRecommendationFieldPresent(recommendation, &quot;authors&quot;) ? recommendation.getString(&quot;authors&quot;) : &quot;&quot;;</b>
+<b class="nc">&nbsp;        String title = isRecommendationFieldPresent(recommendation, &quot;title&quot;) ? recommendation.getString(&quot;title&quot;) : &quot;&quot;;</b>
+<b class="nc">&nbsp;        String year = isRecommendationFieldPresent(recommendation, &quot;published_year&quot;) ? Integer.toString(recommendation.getInt(&quot;published_year&quot;)) : &quot;&quot;;</b>
+<b class="nc">&nbsp;        String journal = isRecommendationFieldPresent(recommendation, &quot;published_in&quot;) ? recommendation.getString(&quot;published_in&quot;) : &quot;&quot;;</b>
+<b class="nc">&nbsp;        String url = isRecommendationFieldPresent(recommendation, &quot;url&quot;) ? recommendation.getString(&quot;url&quot;) : &quot;&quot;;</b>
+<b class="nc">&nbsp;        Integer rank = isRecommendationFieldPresent(recommendation, &quot;recommendation_id&quot;) ? recommendation.getInt(&quot;recommendation_id&quot;) : 100;</b>
+&nbsp;
+&nbsp;        // Populate bib entry with relevant data
+<b class="nc">&nbsp;        current.setField(StandardField.AUTHOR, authors);</b>
+<b class="nc">&nbsp;        current.setField(StandardField.TITLE, title);</b>
+<b class="nc">&nbsp;        current.setField(StandardField.YEAR, year);</b>
+<b class="nc">&nbsp;        current.setField(StandardField.JOURNAL, journal);</b>
+<b class="nc">&nbsp;        current.setField(StandardField.URL, url);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new RankedBibEntry(current, rank);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Boolean isRecommendationFieldPresent(JSONObject recommendation, String field) {
+<b class="nc">&nbsp;        return recommendation.has(field) &amp;&amp; !recommendation.isNull(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ParserResult getParserResult() {
+<b class="nc">&nbsp;        return parserResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRecommendationsHeading() {
+<b class="nc">&nbsp;        return recommendationsHeading;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRecommendationsDescription() {
+<b class="nc">&nbsp;        return recommendationsDescription;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRecommendationSetId() {
+<b class="nc">&nbsp;        return recommendationSetId;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,619 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AuthorList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: AuthorList (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuthorList</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.stream.Collector;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseLogic;
+&nbsp;import org.jabref.logic.importer.AuthorListParser;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+&nbsp;/**
+&nbsp; * This is an immutable class representing information of either &lt;CODE&gt;author&lt;/CODE&gt; or &lt;CODE&gt;editor&lt;/CODE&gt; field in bibtex record.
+&nbsp; * &lt;p&gt;
+&nbsp; * Constructor performs parsing of raw field text and stores preformatted data. Various accessor methods return author/editor field in different formats.
+&nbsp; * &lt;p&gt;
+&nbsp; * Parsing algorithm is designed to satisfy two requirements: (a) when author&#39;s name is typed correctly, the result should coincide with the one of BiBTeX; (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output). The following rules are used:
+&nbsp; * &lt;ol&gt;
+&nbsp; * &lt;li&gt; &#39;author field&#39; is a sequence of tokens;
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt; tokens are separated by sequences of whitespaces (&lt;CODE&gt;Character.isWhitespace(c)==true&lt;/CODE&gt;),
+&nbsp; * commas (,), dashes (-), and tildas (~);
+&nbsp; * &lt;li&gt; every comma separates tokens, while sequences of other separators are
+&nbsp; * equivalent to a single separator; for example: &quot;a - b&quot; consists of 2 tokens
+&nbsp; * (&quot;a&quot; and &quot;b&quot;), while &quot;a,-,b&quot; consists of 3 tokens (&quot;a&quot;, &quot;&quot;, and &quot;b&quot;)
+&nbsp; * &lt;li&gt; anything enclosed in braces belongs to a single token; for example:
+&nbsp; * &quot;abc x{a,b,-~ c}x&quot; consists of 2 tokens, while &quot;abc xa,b,-~ cx&quot; consists of 4
+&nbsp; * tokens (&quot;abc&quot;, &quot;xa&quot;,&quot;b&quot;, and &quot;cx&quot;);
+&nbsp; * &lt;li&gt; a token followed immediately by a dash is &quot;dash-terminated&quot; token, and
+&nbsp; * all other tokens are &quot;space-terminated&quot; tokens; for example: in &quot;a-b- c - d&quot;
+&nbsp; * tokens &quot;a&quot; and &quot;b&quot; are dash-terminated and &quot;c&quot; and &quot;d&quot; are space-terminated;
+&nbsp; * &lt;li&gt; for the purposes of splitting of &#39;author name&#39; into parts and
+&nbsp; * construction of abbreviation of first name, one needs definitions of first
+&nbsp; * letter of a token, case of a token, and abbreviation of a token:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt; &#39;first letter&#39; of a token is the first letter character (&lt;CODE&gt;Character.isLetter(c)==true&lt;/CODE&gt;)
+&nbsp; * that does not belong to a sequence of letters that immediately follows &quot;\&quot;
+&nbsp; * character, with one exception: if &quot;\&quot; is followed by &quot;aa&quot;, &quot;AA&quot;, &quot;ae&quot;, &quot;AE&quot;,
+&nbsp; * &quot;l&quot;, &quot;L&quot;, &quot;o&quot;, &quot;O&quot;, &quot;oe&quot;, &quot;OE&quot;, &quot;i&quot;, or &quot;j&quot; followed by non-letter, the
+&nbsp; * &#39;first letter&#39; of a token is a letter that follows &quot;\&quot;; for example: in
+&nbsp; * &quot;a{x}b&quot; &#39;first letter&#39; is &quot;a&quot;, in &quot;{\&quot;{U}}bel&quot; &#39;first letter&#39; is &quot;U&quot;, in
+&nbsp; * &quot;{\noopsort{\&quot;o}}xyz&quot; &#39;first letter&#39; is &quot;o&quot;, in &quot;{\AE}x&quot; &#39;first letter&#39; is
+&nbsp; * &quot;A&quot;, in &quot;\aex\ijk\Oe\j&quot; &#39;first letter&#39; is &quot;j&quot;; if there is no letter
+&nbsp; * satisfying the above rule, &#39;first letter&#39; is undefined;
+&nbsp; * &lt;li&gt; token is &quot;lower-case&quot; token if its first letter is defined and is
+&nbsp; * lower-case (&lt;CODE&gt;Character.isLowerCase(c)==true&lt;/CODE&gt;), and token is
+&nbsp; * &quot;upper-case&quot; token otherwise;
+&nbsp; * &lt;li&gt; &#39;abbreviation&#39; of a token is the shortest prefix of the token that (a)
+&nbsp; * contains &#39;first letter&#39; and (b) is braces-balanced; if &#39;first letter&#39; is
+&nbsp; * undefined, &#39;abbreviation&#39; is the token itself; in the above examples,
+&nbsp; * &#39;abbreviation&#39;s are &quot;a&quot;, &quot;{\&quot;{U}}&quot;, &quot;{\noopsort{\&quot;o}}&quot;, &quot;{\AE}&quot;,
+&nbsp; * &quot;\aex\ijk\Oe\j&quot;;
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;li&gt; the behavior based on the above definitions will be erroneous only in
+&nbsp; * one case: if the first-name-token is &quot;{\noopsort{A}}john&quot;, we abbreviate it
+&nbsp; * as &quot;{\noopsort{A}}.&quot;, while BiBTeX produces &quot;j.&quot;; fixing this problem,
+&nbsp; * however, requires processing of the preabmle;
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;li&gt; &#39;author names&#39; in &#39;author field&#39; are subsequences of tokens separated by
+&nbsp; * token &quot;and&quot; (&quot;and&quot; is case-insensitive); if &#39;author name&#39; is an empty
+&nbsp; * sequence of tokens, it is ignored; for examle, both &quot;John Smith and Peter
+&nbsp; * Black&quot; and &quot;and and John Smith and and Peter Black&quot; consists of 2 &#39;author
+&nbsp; * name&#39;s &quot;Johm Smith&quot; and &quot;Peter Black&quot; (in erroneous situations, this is a bit
+&nbsp; * different from BiBTeX behavior);
+&nbsp; * &lt;li&gt; &#39;author name&#39; consists of &#39;first-part&#39;, &#39;von-part&#39;, &#39;last-part&#39;, and
+&nbsp; * &#39;junior-part&#39;, each of which is a sequence of tokens; how a sequence of
+&nbsp; * tokens has to be split into these parts, depends the number of commas:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt; no commas, all tokens are upper-case: &#39;junior-part&#39; and &#39;von-part&#39; are
+&nbsp; * empty, &#39;last-part&#39; consist of the last token, &#39;first-part&#39; consists of all
+&nbsp; * other tokens (&#39;first-part&#39; is empty if &#39;author name&#39; consists of a single
+&nbsp; * token); for example, in &quot;John James Smith&quot;, &#39;last-part&#39;=&quot;Smith&quot; and
+&nbsp; * &#39;first-part&#39;=&quot;John James&quot;;
+&nbsp; * &lt;li&gt; no commas, there exists lower-case token: &#39;junior-part&#39; is empty,
+&nbsp; * &#39;first-part&#39; consists of all upper-case tokens before the first lower-case
+&nbsp; * token, &#39;von-part&#39; consists of lower-case tokens starting the first lower-case
+&nbsp; * token and ending the lower-case token that is followed by upper-case token,
+&nbsp; * &#39;last-part&#39; consists of the rest of tokens; note that both &#39;first-part&#39; and
+&nbsp; * &#39;latst-part&#39; may be empty and &#39;last-part&#39; may contain lower-case tokens; for
+&nbsp; * example: in &quot;von der&quot;, &#39;first-part&#39;=&#39;last-part&#39;=&quot;&quot;, &#39;von-part&#39;=&quot;von der&quot;; in
+&nbsp; * &quot;Charles Louis Xavier Joseph de la Vall{\&#39;e}e la Poussin&quot;,
+&nbsp; * &#39;first-part&#39;=&quot;Charles Louis Xavier Joseph&quot;, &#39;von-part&#39;=&quot;de la&quot;,
+&nbsp; * &#39;last-part&#39;=&quot;Vall{\&#39;e}e la Poussin&quot;;
+&nbsp; * &lt;li&gt; one comma: &#39;junior-part&#39; is empty, &#39;first-part&#39; consists of all tokens
+&nbsp; * after comma, &#39;von-part&#39; consists of the longest sequence of lower-case tokens
+&nbsp; * in the very beginning, &#39;last-part&#39; consists of all tokens after &#39;von-part&#39;
+&nbsp; * and before comma; note that any part can be empty; for example: in &quot;de la
+&nbsp; * Vall{\&#39;e}e la Poussin, Charles Louis Xavier Joseph&quot;, &#39;first-part&#39;=&quot;Charles
+&nbsp; * Louis Xavier Joseph&quot;, &#39;von-part&#39;=&quot;de la&quot;, &#39;last-part&#39;=&quot;Vall{\&#39;e}e la
+&nbsp; * Poussin&quot;; in &quot;Joseph de la Vall{\&#39;e}e la Poussin, Charles Louis Xavier&quot;,
+&nbsp; * &#39;first-part&#39;=&quot;Charles Louis Xavier&quot;, &#39;von-part&#39;=&quot;&quot;, &#39;last-part&#39;=&quot;Joseph de la
+&nbsp; * Vall{\&#39;e}e la Poussin&quot;;
+&nbsp; * &lt;li&gt; two or more commas (any comma after the second one is ignored; it merely
+&nbsp; * separates tokens): &#39;junior-part&#39; consists of all tokens between first and
+&nbsp; * second commas, &#39;first-part&#39; consists of all tokens after the second comma,
+&nbsp; * tokens before the first comma are split into &#39;von-part&#39; and &#39;last-part&#39;
+&nbsp; * similarly to the case of one comma; for example: in &quot;de la Vall{\&#39;e}e
+&nbsp; * Poussin, Jr., Charles Louis Xavier Joseph&quot;, &#39;first-part&#39;=&quot;Charles Louis
+&nbsp; * Xavier Joseph&quot;, &#39;von-part&#39;=&quot;de la&quot;, &#39;last-part&#39;=&quot;Vall{\&#39;e}e la Poussin&quot;, and
+&nbsp; * &#39;junior-part&#39;=&quot;Jr.&quot;;
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;li&gt; when &#39;first-part&#39;, &#39;last-part&#39;, &#39;von-part&#39;, or &#39;junior-part&#39; is
+&nbsp; * reconstructed from tokens, tokens in a part are separated either by space or
+&nbsp; * by dash, depending on whether the token before the separator was
+&nbsp; * space-terminated or dash-terminated; for the last token in a part it does not
+&nbsp; * matter whether it was dash- or space-terminated;
+&nbsp; * &lt;li&gt; when &#39;first-part&#39; is abbreviated, each token is replaced by its
+&nbsp; * abbreviation followed by a period; separators are the same as in the case of
+&nbsp; * non-abbreviated name; for example: in &quot;Heinrich-{\&quot;{U}}bel Kurt von Minich&quot;,
+&nbsp; * &#39;first-part&#39;=&quot;Heinrich-{\&quot;{U}}bel Kurt&quot;, and its abbreviation is &quot;H.-{\&quot;{U}}.
+&nbsp; * K.&quot;
+&nbsp; * &lt;/ol&gt;
+&nbsp; */
+&nbsp;@AllowedToUseLogic(&quot;because it needs access to AuthorList parser&quot;)
+&nbsp;public class AuthorList implements Iterable&lt;Author&gt; {
+&nbsp;
+<b class="nc">&nbsp;    private static final Map&lt;String, AuthorList&gt; AUTHOR_CACHE = Collections.synchronizedMap(new WeakHashMap&lt;&gt;());</b>
+&nbsp;    private final List&lt;Author&gt; authors;
+&nbsp;    private AuthorList latexFreeAuthors;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new list of authors.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Don&#39;t call this constructor directly but rather use the getAuthorList()
+&nbsp;     * method which caches its results.
+&nbsp;     *
+&nbsp;     * @param authors the list of authors which should underlie this instance
+&nbsp;     */
+<b class="nc">&nbsp;    private AuthorList(List&lt;Author&gt; authors) {</b>
+<b class="nc">&nbsp;        this.authors = Objects.requireNonNull(authors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static AuthorList of(List&lt;Author&gt; authors) {
+<b class="nc">&nbsp;        return new AuthorList(List.copyOf(authors));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static AuthorList of(Author... authors) {
+<b class="nc">&nbsp;        return new AuthorList(List.of(authors));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Collector&lt;Author, ?, AuthorList&gt; collect() {
+<b class="nc">&nbsp;        return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), AuthorList::new);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String andCoordinatedConjunction(List&lt;Author&gt; authors, Function&lt;Author, String&gt; style, boolean oxfordComma) {
+<b class="nc">&nbsp;        List&lt;String&gt; formattedAuthors = authors.stream().map(style).toList();</b>
+<b class="nc">&nbsp;        return andCoordinatedConjunction(formattedAuthors, oxfordComma);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String andCoordinatedConjunction(List&lt;String&gt; authors, boolean oxfordComma) {
+<b class="nc">&nbsp;        String lastDelimiter = oxfordComma ? &quot;, and &quot; : &quot; and &quot;;</b>
+<b class="nc">&nbsp;        int lastIndex = authors.size() - 1;</b>
+<b class="nc">&nbsp;        return switch (authors.size()) {</b>
+&nbsp;            case 0 -&gt;
+<b class="nc">&nbsp;                    &quot;&quot;;</b>
+&nbsp;            case 1 -&gt;
+<b class="nc">&nbsp;                    authors.getFirst();</b>
+&nbsp;            case 2 -&gt;
+<b class="nc">&nbsp;                    authors.getFirst() + &quot; and &quot; + authors.get(1);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    String.join(&quot;, &quot;, authors.subList(0, lastIndex)) + lastDelimiter + authors.get(lastIndex);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieve an AuthorList for the given string of authors or editors.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This function tries to cache the parsed AuthorLists by the string passed in.
+&nbsp;     *
+&nbsp;     * @param authors The string of authors or editors in bibtex format to parse.
+&nbsp;     * @return An AuthorList object representing the given authors.
+&nbsp;     */
+&nbsp;    public static AuthorList parse(@NonNull final String authors) {
+<b class="nc">&nbsp;        return AUTHOR_CACHE.computeIfAbsent(authors, string -&gt; {</b>
+<b class="nc">&nbsp;            AuthorListParser parser = new AuthorListParser();</b>
+<b class="nc">&nbsp;            return parser.parse(string);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a convenience method for getAuthorsFirstFirst()
+&nbsp;     *
+&nbsp;     * @see AuthorList#getAsFirstLastNames
+&nbsp;     */
+&nbsp;    public static String fixAuthorFirstNameFirstCommas(String authors, boolean abbreviate, boolean oxfordComma) {
+<b class="nc">&nbsp;        return AuthorList.parse(authors).getAsFirstLastNames(abbreviate, oxfordComma);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a convenience method for getAuthorsFirstFirstAnds()
+&nbsp;     *
+&nbsp;     * @see AuthorList#getAsFirstLastNamesWithAnd
+&nbsp;     */
+&nbsp;    public static String fixAuthorFirstNameFirst(String authors) {
+<b class="nc">&nbsp;        return AuthorList.parse(authors).getAsFirstLastNamesWithAnd();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a convenience method for getAuthorsLastFirst()
+&nbsp;     *
+&nbsp;     * @see AuthorList#getAsLastFirstNames
+&nbsp;     */
+&nbsp;    public static String fixAuthorLastNameFirstCommas(String authors, boolean abbreviate, boolean oxfordComma) {
+<b class="nc">&nbsp;        return AuthorList.parse(authors).getAsLastFirstNames(abbreviate, oxfordComma);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a convenience method for getAuthorsLastFirstAnds(true)
+&nbsp;     *
+&nbsp;     * @see AuthorList#getAsLastFirstNamesWithAnd
+&nbsp;     */
+&nbsp;    public static String fixAuthorLastNameFirst(String authors) {
+<b class="nc">&nbsp;        return AuthorList.parse(authors).getAsLastFirstNamesWithAnd(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a convenience method for getAuthorsLastFirstAnds()
+&nbsp;     *
+&nbsp;     * @see AuthorList#getAsLastFirstNamesWithAnd
+&nbsp;     */
+&nbsp;    public static String fixAuthorLastNameFirst(String authors, boolean abbreviate) {
+<b class="nc">&nbsp;        return AuthorList.parse(authors).getAsLastFirstNamesWithAnd(abbreviate);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a convenience method for getAuthorsLastOnly()
+&nbsp;     *
+&nbsp;     * @see AuthorList#getAsLastNames
+&nbsp;     */
+&nbsp;    public static String fixAuthorLastNameOnlyCommas(String authors, boolean oxfordComma) {
+<b class="nc">&nbsp;        return AuthorList.parse(authors).getAsLastNames(oxfordComma);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a convenience method for getAuthorsForAlphabetization()
+&nbsp;     *
+&nbsp;     * @see AuthorList#getForAlphabetization
+&nbsp;     */
+&nbsp;    public static String fixAuthorForAlphabetization(String authors) {
+<b class="nc">&nbsp;        return AuthorList.parse(authors).getForAlphabetization();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a convenience method for getAuthorsNatbib()
+&nbsp;     *
+&nbsp;     * @see AuthorList#getAsNatbib
+&nbsp;     */
+&nbsp;    public static String fixAuthorNatbib(String authors) {
+<b class="nc">&nbsp;        return AuthorList.parse(authors).getAsNatbib();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of author names in this object.
+&nbsp;     *
+&nbsp;     * @return the number of author names in this object.
+&nbsp;     */
+&nbsp;    public int getNumberOfAuthors() {
+<b class="nc">&nbsp;        return authors.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if there are no authors in the list.
+&nbsp;     *
+&nbsp;     * @return true if there are no authors in the list.
+&nbsp;     */
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        return authors.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the &lt;CODE&gt;Author&lt;/CODE&gt; object for the i-th author.
+&nbsp;     *
+&nbsp;     * @param i Index of the author (from 0 to &lt;CODE&gt;size()-1&lt;/CODE&gt;).
+&nbsp;     * @return the &lt;CODE&gt;Author&lt;/CODE&gt; object.
+&nbsp;     */
+&nbsp;    public Author getAuthor(int i) {
+<b class="nc">&nbsp;        return authors.get(i);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of &lt;CODE&gt;Author&lt;/CODE&gt; objects.
+&nbsp;     *
+&nbsp;     * @return the &lt;CODE&gt;List&amp;lt;Author&gt;&lt;/CODE&gt; object.
+&nbsp;     */
+&nbsp;    public List&lt;Author&gt; getAuthors() {
+<b class="nc">&nbsp;        return authors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a LaTeX-free version of this `AuthorList`.
+&nbsp;     */
+&nbsp;    public AuthorList latexFree() {
+<b class="nc">&nbsp;        if (latexFreeAuthors == null) {</b>
+<b class="nc">&nbsp;            latexFreeAuthors = new AuthorList(authors.stream()</b>
+<b class="nc">&nbsp;                                                     .map(Author::latexFree)</b>
+<b class="nc">&nbsp;                                                     .toList());</b>
+<b class="nc">&nbsp;            latexFreeAuthors.latexFreeAuthors = latexFreeAuthors;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return latexFreeAuthors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of authors in &quot;natbib&quot; format.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;&quot;John Smith&quot; -&gt; &quot;Smith&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt;&quot;John Smith and Black Brown, Peter&quot; ==&gt; &quot;Smith and Black Brown&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt;&quot;John von Neumann and John Smith and Black Brown, Peter&quot; ==&gt; &quot;von
+&nbsp;     * Neumann et al.&quot; &lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @return formatted list of authors.
+&nbsp;     */
+&nbsp;    public String getAsNatbib() {
+<b class="nc">&nbsp;        List&lt;Author&gt; authors = getAuthors();</b>
+<b class="nc">&nbsp;        return switch (authors.size()) {</b>
+&nbsp;            case 0 -&gt;
+<b class="nc">&nbsp;                    &quot;&quot;;</b>
+&nbsp;            case 1 -&gt;
+<b class="nc">&nbsp;                    authors.getFirst().getNamePrefixAndFamilyName();</b>
+&nbsp;            case 2 -&gt;
+<b class="nc">&nbsp;                    authors.getFirst().getNamePrefixAndFamilyName() + &quot; and &quot; + authors.get(1).getNamePrefixAndFamilyName();</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    authors.getFirst().getNamePrefixAndFamilyName() + &quot; et al.&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of authors separated by commas with last name only; If the list consists of two or more authors, &quot;and&quot; is inserted before the last author&#39;s name.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt; &quot;John Smith&quot; ==&gt; &quot;Smith&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt; &quot;John Smith and Black Brown, Peter&quot; ==&gt; &quot;Smith and Black Brown&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt; &quot;John von Neumann and John Smith and Black Brown, Peter&quot; ==&gt; &quot;von
+&nbsp;     * Neumann, Smith and Black Brown&quot;.&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param oxfordComma Whether to put a comma before the and at the end.
+&nbsp;     * @return formatted list of authors.
+&nbsp;     * @see &lt;a href=&quot;http://en.wikipedia.org/wiki/Serial_comma&quot;&gt;serial comma for an detailed explaination about the
+&nbsp;     * Oxford comma.&lt;/a&gt;
+&nbsp;     */
+&nbsp;    public String getAsLastNames(boolean oxfordComma) {
+<b class="nc">&nbsp;        return andCoordinatedConjunction(getAuthors(), Author::getNamePrefixAndFamilyName, oxfordComma);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of authors separated by commas with first names after last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, &quot;and&quot; is inserted before the last author&#39;s name.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt; &quot;John Smith&quot; ==&gt; &quot;Smith, John&quot; or &quot;Smith, J.&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt; &quot;John Smith and Black Brown, Peter&quot; ==&gt; &quot;Smith, John and Black
+&nbsp;     * Brown, Peter&quot; or &quot;Smith, J. and Black Brown, P.&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt; &quot;John von Neumann and John Smith and Black Brown, Peter&quot; ==&gt; &quot;von
+&nbsp;     * Neumann, John, Smith, John and Black Brown, Peter&quot; or &quot;von Neumann, J.,
+&nbsp;     * Smith, J. and Black Brown, P.&quot;.&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param abbreviate  whether to abbreivate first names.
+&nbsp;     * @param oxfordComma Whether to put a comma before the and at the end.
+&nbsp;     * @return formatted list of authors.
+&nbsp;     * @see &lt;a href=&quot;http://en.wikipedia.org/wiki/Serial_comma&quot;&gt;serial comma for an detailed explaination about the
+&nbsp;     * Oxford comma.&lt;/a&gt;
+&nbsp;     */
+&nbsp;    public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
+<b class="nc">&nbsp;        return andCoordinatedConjunction(getAuthors(), auth -&gt; auth.getFamilyGiven(abbreviate), oxfordComma);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return authors.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of authors separated by &quot;and&quot;s with first names after last name; first names are not abbreviated.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;&quot;John Smith&quot; ==&gt; &quot;Smith, John&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt;&quot;John Smith and Black Brown, Peter&quot; ==&gt; &quot;Smith, John and Black
+&nbsp;     * Brown, Peter&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt;&quot;John von Neumann and John Smith and Black Brown, Peter&quot; ==&gt; &quot;von
+&nbsp;     * Neumann, John and Smith, John and Black Brown, Peter&quot;.&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @return formatted list of authors.
+&nbsp;     */
+&nbsp;    public String getAsLastFirstNamesWithAnd(boolean abbreviate) {
+<b class="nc">&nbsp;        return getAuthors().stream()</b>
+<b class="nc">&nbsp;                           .map(author -&gt; author.getFamilyGiven(abbreviate))</b>
+<b class="nc">&nbsp;                           .collect(Collectors.joining(&quot; and &quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a list of authors separated with &quot;and&quot;. The first author is formatted with {@link Author#getFamilyGiven(boolean)} and each subsequent author is formatted with {@link Author#getGivenFamily(boolean)}.
+&nbsp;     *
+&nbsp;     * @param abbreviate first names.
+&nbsp;     */
+&nbsp;    public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
+<b class="nc">&nbsp;        return switch (authors.size()) {</b>
+&nbsp;            case 0 -&gt;
+<b class="nc">&nbsp;                    &quot;&quot;;</b>
+&nbsp;            case 1 -&gt;
+<b class="nc">&nbsp;                    authors.getFirst().getFamilyGiven(abbreviate);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    authors.stream()</b>
+<b class="nc">&nbsp;                           .skip(1)</b>
+<b class="nc">&nbsp;                           .map(author -&gt; author.getGivenFamily(abbreviate))</b>
+<b class="nc">&nbsp;                           .collect(Collectors.joining(</b>
+&nbsp;                                   &quot; and &quot;,
+<b class="nc">&nbsp;                                   authors.getFirst().getFamilyGiven(abbreviate) + &quot; and &quot;,</b>
+&nbsp;                                   &quot;&quot;));
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of authors separated by commas with first names before last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, &quot;and&quot; is inserted before the last author&#39;s name.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;&quot;John Smith&quot; ==&gt; &quot;John Smith&quot; or &quot;J. Smith&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt;&quot;John Smith and Black Brown, Peter&quot; ==&gt; &quot;John Smith and Peter Black
+&nbsp;     * Brown&quot; or &quot;J. Smith and P. Black Brown&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt; &quot;John von Neumann and John Smith and Black Brown, Peter&quot; ==&gt; &quot;John
+&nbsp;     * von Neumann, John Smith and Peter Black Brown&quot; or &quot;J. von Neumann, J.
+&nbsp;     * Smith and P. Black Brown&quot; &lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param abbreviate  whether to abbreivate first names.
+&nbsp;     * @param oxfordComma Whether to put a comma before the and at the end.
+&nbsp;     * @return formatted list of authors.
+&nbsp;     * @see &lt;a href=&quot;http://en.wikipedia.org/wiki/Serial_comma&quot;&gt;serial comma for an detailed explaination about the
+&nbsp;     * Oxford comma.&lt;/a&gt;
+&nbsp;     */
+&nbsp;    public String getAsFirstLastNames(boolean abbreviate, boolean oxfordComma) {
+<b class="nc">&nbsp;        return andCoordinatedConjunction(getAuthors(), author -&gt; author.getGivenFamily(abbreviate), oxfordComma);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compare this object with the given one.
+&nbsp;     *
+&nbsp;     * @return `true` iff the other object is an AuthorList, all contained authors are in the same order (and these authors&#39; fields are `Objects.equals`)
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!(o instanceof AuthorList a)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return this.authors.equals(a.authors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(authors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of authors separated by &quot;and&quot;s with first names before last name; first names are not abbreviated.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;&quot;John Smith&quot; ==&gt; &quot;John Smith&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt;&quot;John Smith and Black Brown, Peter&quot; ==&gt; &quot;John Smith and Peter Black
+&nbsp;     * Brown&quot;&lt;/li&gt;
+&nbsp;     * &lt;li&gt;&quot;John von Neumann and John Smith and Black Brown, Peter&quot; ==&gt; &quot;John
+&nbsp;     * von Neumann and John Smith and Peter Black Brown&quot; &lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @return formatted list of authors.
+&nbsp;     */
+&nbsp;    public String getAsFirstLastNamesWithAnd() {
+<b class="nc">&nbsp;        return getAuthors().stream()</b>
+<b class="nc">&nbsp;                           .map(author -&gt; author.getGivenFamily(false))</b>
+<b class="nc">&nbsp;                           .collect(Collectors.joining(&quot; and &quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of authors in a form suitable for alphabetization. This means that last names come first, never preceded by &quot;von&quot; particles, and that any braces are removed. First names are abbreviated so the same name is treated similarly if abbreviated in one case and not in another. This form is not intended to be suitable for presentation, only for sorting.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;&quot;John Smith&quot; ==&gt; &quot;Smith, J.&quot;;&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @return formatted list of authors
+&nbsp;     */
+&nbsp;    public String getForAlphabetization() {
+<b class="nc">&nbsp;        return getAuthors().stream()</b>
+<b class="nc">&nbsp;                           .map(Author::getNameForAlphabetization)</b>
+<b class="nc">&nbsp;                           .collect(Collectors.joining(&quot; and &quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Iterator&lt;Author&gt; iterator() {
+<b class="nc">&nbsp;        return authors.iterator();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

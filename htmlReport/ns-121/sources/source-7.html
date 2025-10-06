@@ -1,0 +1,220 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TreeCollector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.util</a>
+</div>
+
+<h1>Coverage Summary for Class: TreeCollector (org.jabref.model.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeCollector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.util;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;import java.util.function.BiPredicate;
+&nbsp;import java.util.function.BinaryOperator;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Collector;
+&nbsp;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.model.TreeNode;
+&nbsp;
+&nbsp;/// Merges a list of nodes into a tree.
+&nbsp;/// Nodes with a common parent are added as direct children.
+&nbsp;/// For example, the list { A &gt; A1, A &gt; A2, B } is transformed into the forest { A &gt; A1, A2, B}.
+&nbsp;public class TreeCollector&lt;T&gt; implements Collector&lt;T, ObservableList&lt;T&gt;, ObservableList&lt;T&gt;&gt; {
+&nbsp;
+&nbsp;    private Function&lt;T, List&lt;T&gt;&gt; getChildren;
+&nbsp;    private BiConsumer&lt;T, T&gt; addChild;
+&nbsp;    private BiPredicate&lt;T, T&gt; equivalence;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param getChildren a function that returns a list of children of the specified node
+&nbsp;     * @param addChild    a function that adds the second argument as a child to the first-specified node
+&nbsp;     * @param equivalence a function that tells us whether two nodes are equivalent
+&nbsp;     */
+<b class="nc">&nbsp;    private TreeCollector(Function&lt;T, List&lt;T&gt;&gt; getChildren, BiConsumer&lt;T, T&gt; addChild, BiPredicate&lt;T, T&gt; equivalence) {</b>
+<b class="nc">&nbsp;        this.getChildren = getChildren;</b>
+<b class="nc">&nbsp;        this.addChild = addChild;</b>
+<b class="nc">&nbsp;        this.equivalence = equivalence;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T extends TreeNode&lt;T&gt;&gt; TreeCollector&lt;T&gt; mergeIntoTree(BiPredicate&lt;T, T&gt; equivalence) {
+<b class="nc">&nbsp;        return new TreeCollector&lt;&gt;(</b>
+&nbsp;                TreeNode::getChildren,
+<b class="nc">&nbsp;                (parent, child) -&gt; child.moveTo(parent),</b>
+&nbsp;                equivalence);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Supplier&lt;ObservableList&lt;T&gt;&gt; supplier() {
+<b class="nc">&nbsp;        return FXCollections::observableArrayList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BiConsumer&lt;ObservableList&lt;T&gt;, T&gt; accumulator() {
+<b class="nc">&nbsp;        return (alreadyProcessed, newItem) -&gt; {</b>
+&nbsp;            // Check if the node is already in the tree
+<b class="nc">&nbsp;            Optional&lt;T&gt; sameItemInTree = alreadyProcessed</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .filter(item -&gt; equivalence.test(item, newItem))</b>
+<b class="nc">&nbsp;                    .findFirst();</b>
+<b class="nc">&nbsp;            if (sameItemInTree.isPresent()) {</b>
+<b class="nc">&nbsp;                for (T child : new ArrayList&lt;&gt;(getChildren.apply(newItem))) {</b>
+<b class="nc">&nbsp;                    merge(sameItemInTree.get(), child);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                alreadyProcessed.add(newItem);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private void merge(T target, T node) {
+<b class="nc">&nbsp;        Optional&lt;T&gt; sameItemInTree = getChildren</b>
+<b class="nc">&nbsp;                .apply(target).stream()</b>
+<b class="nc">&nbsp;                .filter(item -&gt; equivalence.test(item, node))</b>
+<b class="nc">&nbsp;                .findFirst();</b>
+<b class="nc">&nbsp;        if (sameItemInTree.isPresent()) {</b>
+&nbsp;            // We need to copy the list because the #addChild method might remove the child from its own parent
+<b class="nc">&nbsp;            for (T child : new ArrayList&lt;&gt;(getChildren.apply(node))) {</b>
+<b class="nc">&nbsp;                merge(sameItemInTree.get(), child);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            addChild.accept(target, node);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BinaryOperator&lt;ObservableList&lt;T&gt;&gt; combiner() {
+<b class="nc">&nbsp;        return (list1, list2) -&gt; {</b>
+<b class="nc">&nbsp;            for (T item : list2) {</b>
+<b class="nc">&nbsp;                accumulator().accept(list1, item);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return list1;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Function&lt;ObservableList&lt;T&gt;, ObservableList&lt;T&gt;&gt; finisher() {
+<b class="nc">&nbsp;        return i -&gt; i;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;Characteristics&gt; characteristics() {
+<b class="nc">&nbsp;        return EnumSet.of(Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

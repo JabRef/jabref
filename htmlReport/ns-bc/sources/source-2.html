@@ -1,0 +1,190 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CleanupUrlFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.bibtexfields</a>
+</div>
+
+<h1>Coverage Summary for Class: CleanupUrlFormatter (org.jabref.logic.formatter.bibtexfields)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CleanupUrlFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.bibtexfields;
+&nbsp;
+&nbsp;import java.net.URLDecoder;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;/**
+&nbsp; * Cleanup URL link.
+&nbsp; * &lt;p&gt;
+&nbsp; * Expose string representations URL links clean up logic.
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+<b class="nc">&nbsp;public class CleanupUrlFormatter extends Formatter {</b>
+&nbsp;
+&nbsp;    // This regexp find &quot;url=&quot; or &quot;to=&quot; parameter in full link and get text after them
+<b class="nc">&nbsp;    private static final Pattern PATTERN_URL = Pattern.compile(&quot;(?:url|to)=([^&amp;]*)&quot;);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Cleanup URL link&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKey() {
+<b class="nc">&nbsp;        return &quot;cleanup_url&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escape and decodes a String from the application/x-www-form-urlencoded MIME format.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Method will also try to find a URL placed after &quot;url=&quot; or &quot;to=&quot;.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The conversion process is the same as executed by {@link URLDecoder} to try to
+&nbsp;     * take guarantees against code injections.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The plus sign is replaced by its correspondent code (%2b) to avoid the character
+&nbsp;     * to be replaced by a space during the decoding execution.
+&nbsp;     *
+&nbsp;     * @param url should not be null
+&nbsp;     * @return the decoded URL as a String representation
+&nbsp;     * @see URLDecoder#decode(String, Charset)
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String format(String url) {
+<b class="nc">&nbsp;        String toDecode = Objects</b>
+<b class="nc">&nbsp;                .requireNonNull(url, &quot;Null url&quot;)</b>
+<b class="nc">&nbsp;                .replaceAll(&quot;\\+&quot;, &quot;%2b&quot;);</b>
+<b class="nc">&nbsp;        Matcher matcher = PATTERN_URL.matcher(toDecode);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            return URLDecoder.decode(matcher.group(1), StandardCharsets.UTF_8);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return URLDecoder.decode(toDecode, StandardCharsets.UTF_8);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Cleanup URL link by removing special symbols and extracting simple link&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExampleInput() {
+<b class="nc">&nbsp;        return &quot;https://www.google.de/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=11&amp;cad=&quot; +</b>
+&nbsp;                &quot;rja&amp;uact=8&amp;ved=0ahUKEwjg3ZrB_ZPXAhVGuhoKHYdOBOg4ChAWCCYwAA&amp;url=&quot; +
+&nbsp;                &quot;http%3A%2F%2Fwww.focus.de%2Fgesundheit%2Fratgeber%2Fherz%2Ftest%2&quot; +
+&nbsp;                &quot;Flebenserwartung-werden-sie-100-jahre-alt_aid_363828.html&quot; +
+&nbsp;                &quot;&amp;usg=AOvVaw1G6m2jf-pTHYkXceii4hXU&quot;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,371 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MetadataChangeDetailsView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab.metedatachange</a>
+</div>
+
+<h1>Coverage Summary for Class: MetadataChangeDetailsView (org.jabref.gui.collab.metedatachange)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MetadataChangeDetailsView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MetadataChangeDetailsView$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab.metedatachange;
+&nbsp;
+&nbsp;import javafx.geometry.Orientation;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.control.SplitPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.collab.DatabaseChangeDetailsView;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighlighter;
+&nbsp;import org.jabref.logic.bibtex.comparator.MetaDataDiff;
+&nbsp;import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;
+&nbsp;import org.fxmisc.richtext.StyleClassedTextArea;
+&nbsp;
+&nbsp;public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
+&nbsp;
+<b class="nc">&nbsp;    public MetadataChangeDetailsView(MetadataChange metadataChange, GlobalCitationKeyPatterns globalCitationKeyPatterns) {</b>
+<b class="nc">&nbsp;        VBox container = new VBox(15);</b>
+&nbsp;
+<b class="nc">&nbsp;        Label header = new Label(Localization.lang(&quot;The following metadata changed:&quot;));</b>
+<b class="nc">&nbsp;        header.getStyleClass().add(&quot;sectionHeader&quot;);</b>
+<b class="nc">&nbsp;        container.getChildren().add(header);</b>
+&nbsp;
+&nbsp;        // Add views for each detected difference
+<b class="nc">&nbsp;        for (MetaDataDiff.Difference diff : metadataChange.getMetaDataDiff().getDifferences(globalCitationKeyPatterns)) {</b>
+<b class="nc">&nbsp;            addDifferenceView(container, diff, metadataChange);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.setAllAnchorsAndAttachChild(container);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a view for a specific metadata difference to the container.
+&nbsp;     * Default view if not a group diff.
+&nbsp;     *
+&nbsp;     * @param container      The parent container to add the difference view to
+&nbsp;     * @param diff           The metadata difference to display
+&nbsp;     * @param metadataChange The metadata change object containing all changes
+&nbsp;     */
+&nbsp;    private void addDifferenceView(VBox container, MetaDataDiff.Difference diff, MetadataChange metadataChange) {
+<b class="nc">&nbsp;        Label typeLabel = new Label(getDifferenceString(diff.differenceType()));</b>
+<b class="nc">&nbsp;        typeLabel.getStyleClass().add(&quot;diff-type-label&quot;);</b>
+<b class="nc">&nbsp;        container.getChildren().add(typeLabel);</b>
+&nbsp;
+&nbsp;        // Show appropriate view based on difference type
+<b class="nc">&nbsp;        if (diff.differenceType() == MetaDataDiff.DifferenceType.GROUPS) {</b>
+<b class="nc">&nbsp;            container.getChildren().add(createGroupDiffSplitPane(metadataChange));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            container.getChildren().add(createDefaultDiffScrollPane(diff));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a scroll pane showing simple text differences.
+&nbsp;     *
+&nbsp;     * @param diff The difference to display
+&nbsp;     * @return Configured ScrollPane showing the difference
+&nbsp;     */
+&nbsp;    private ScrollPane createDefaultDiffScrollPane(MetaDataDiff.Difference diff) {
+<b class="nc">&nbsp;        VBox diffContainer = new VBox(15);</b>
+&nbsp;
+&nbsp;        // Show both original and new values
+<b class="nc">&nbsp;        diffContainer.getChildren().add(new Label(diff.originalObject().toString()));</b>
+<b class="nc">&nbsp;        diffContainer.getChildren().add(new Label(diff.newObject().toString()));</b>
+&nbsp;
+<b class="nc">&nbsp;        ScrollPane scrollPane = new ScrollPane(diffContainer);</b>
+<b class="nc">&nbsp;        scrollPane.setFitToWidth(true);</b>
+<b class="nc">&nbsp;        return scrollPane;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a split pane showing differences in groups tree structure.
+&nbsp;     *
+&nbsp;     * @param metadataChange The metadata change containing groups differences
+&nbsp;     * @return Configured SplitPane showing groups differences
+&nbsp;     */
+&nbsp;    private SplitPane createGroupDiffSplitPane(MetadataChange metadataChange) {
+<b class="nc">&nbsp;        StyleClassedTextArea jabrefTextArea = createConfiguredTextArea();</b>
+<b class="nc">&nbsp;        StyleClassedTextArea diskTextArea = createConfiguredTextArea();</b>
+&nbsp;
+<b class="nc">&nbsp;        String jabRefContent = getMetadataGroupsContent(metadataChange.getMetaDataDiff().getOriginalMetaData());</b>
+<b class="nc">&nbsp;        String diskContent = getMetadataGroupsContent(metadataChange.getMetaDataDiff().getNewMetaData());</b>
+&nbsp;
+<b class="nc">&nbsp;        jabrefTextArea.replaceText(jabRefContent);</b>
+<b class="nc">&nbsp;        diskTextArea.replaceText(diskContent);</b>
+&nbsp;
+<b class="nc">&nbsp;        SplitDiffHighlighter highlighter = new SplitDiffHighlighter(</b>
+&nbsp;                jabrefTextArea,
+&nbsp;                diskTextArea,
+&nbsp;                DiffHighlighter.BasicDiffMethod.CHARS
+&nbsp;        );
+<b class="nc">&nbsp;        highlighter.highlight();</b>
+&nbsp;
+<b class="nc">&nbsp;        ScrollPane leftScrollPane = createScrollPane(jabrefTextArea);</b>
+<b class="nc">&nbsp;        ScrollPane rightScrollPane = createScrollPane(diskTextArea);</b>
+&nbsp;
+<b class="nc">&nbsp;        Label inJabRef = new Label(Localization.lang(&quot;In JabRef&quot;));</b>
+<b class="nc">&nbsp;        inJabRef.getStyleClass().add(&quot;lib-change-header&quot;);</b>
+<b class="nc">&nbsp;        Label onDisk = new Label(Localization.lang(&quot;On disk&quot;));</b>
+<b class="nc">&nbsp;        onDisk.getStyleClass().add(&quot;lib-change-header&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox leftContainer = new VBox(5, inJabRef, leftScrollPane);</b>
+<b class="nc">&nbsp;        VBox rightContainer = new VBox(5, onDisk, rightScrollPane);</b>
+&nbsp;
+<b class="nc">&nbsp;        SplitPane splitPane = new SplitPane(leftContainer, rightContainer);</b>
+<b class="nc">&nbsp;        splitPane.setOrientation(Orientation.HORIZONTAL);</b>
+<b class="nc">&nbsp;        splitPane.setDividerPositions(0.5);</b>
+&nbsp;
+<b class="nc">&nbsp;        Label legendLabel = new Label(Localization.lang(&quot;Red: Removed, Blue: Changed, Green: Added&quot;));</b>
+<b class="nc">&nbsp;        legendLabel.getStyleClass().add(&quot;lib-change-legend&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox resultContainer = new VBox(splitPane, legendLabel);</b>
+<b class="nc">&nbsp;        resultContainer.setSpacing(5);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new SplitPane(resultContainer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a configured scroll pane for a text area.
+&nbsp;     *
+&nbsp;     * @param textArea The text area to wrap in a scroll pane
+&nbsp;     * @return Configured ScrollPane
+&nbsp;     */
+&nbsp;    private ScrollPane createScrollPane(StyleClassedTextArea textArea) {
+<b class="nc">&nbsp;        ScrollPane scrollPane = new ScrollPane(textArea);</b>
+<b class="nc">&nbsp;        scrollPane.setFitToWidth(true);</b>
+<b class="nc">&nbsp;        scrollPane.setFitToHeight(true);</b>
+<b class="nc">&nbsp;        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);</b>
+<b class="nc">&nbsp;        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);</b>
+<b class="nc">&nbsp;        setAllAnchorsAndAttachChild(scrollPane);</b>
+<b class="nc">&nbsp;        return scrollPane;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a configured text area for displaying diff content.
+&nbsp;     *
+&nbsp;     * @return Configured StyleClassedTextArea
+&nbsp;     */
+&nbsp;    private StyleClassedTextArea createConfiguredTextArea() {
+<b class="nc">&nbsp;        StyleClassedTextArea textArea = new StyleClassedTextArea();</b>
+<b class="nc">&nbsp;        textArea.setEditable(false);</b>
+<b class="nc">&nbsp;        textArea.setWrapText(false);</b>
+<b class="nc">&nbsp;        textArea.setAutoHeight(true);</b>
+<b class="nc">&nbsp;        return textArea;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extracts the groups tree content from metadata as a string.
+&nbsp;     *
+&nbsp;     * @param metadata The metadata containing groups
+&nbsp;     * @return String representation of groups tree, or empty string if no groups
+&nbsp;     */
+&nbsp;    private String getMetadataGroupsContent(MetaData metadata) {
+<b class="nc">&nbsp;        return metadata.getGroups()</b>
+<b class="nc">&nbsp;                       .map(this::convertGroupTreeToString)</b>
+<b class="nc">&nbsp;                       .orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a group tree to a string representation with indentation.
+&nbsp;     *
+&nbsp;     * @param node The root node of the group tree
+&nbsp;     * @return String representation of the group tree
+&nbsp;     */
+&nbsp;    private String convertGroupTreeToString(GroupTreeNode node) {
+<b class="nc">&nbsp;        StringBuilder builder = new StringBuilder();</b>
+<b class="nc">&nbsp;        appendGroupTreeNode(node, builder, 0);</b>
+<b class="nc">&nbsp;        return builder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Recursively appends a group tree node to the string builder.
+&nbsp;     *
+&nbsp;     * @param node    The current node to append
+&nbsp;     * @param builder The string builder to append to
+&nbsp;     * @param level   The current depth level in the tree (for indentation)
+&nbsp;     */
+&nbsp;    private void appendGroupTreeNode(GroupTreeNode node, StringBuilder builder, int level) {
+<b class="nc">&nbsp;        builder.append(&quot;|  &quot;.repeat(level))</b>
+<b class="nc">&nbsp;               .append(node.getName())</b>
+<b class="nc">&nbsp;               .append(&quot;\n&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (GroupTreeNode child : node.getChildren()) {</b>
+<b class="nc">&nbsp;            appendGroupTreeNode(child, builder, level + 1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getDifferenceString(MetaDataDiff.DifferenceType changeType) {
+<b class="nc">&nbsp;        return switch (changeType) {</b>
+&nbsp;            case PROTECTED -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Library protection&quot;);</b>
+&nbsp;            case GROUPS -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Modified groups tree&quot;);</b>
+&nbsp;            case ENCODING -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Library encoding&quot;);</b>
+&nbsp;            case SAVE_SORT_ORDER -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Save sort order&quot;);</b>
+&nbsp;            case KEY_PATTERNS -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Key patterns&quot;);</b>
+&nbsp;            case USER_FILE_DIRECTORY -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;User-specific file directory&quot;);</b>
+&nbsp;            case LATEX_FILE_DIRECTORY -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;LaTeX file directory&quot;);</b>
+&nbsp;            case DEFAULT_KEY_PATTERN -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Default pattern&quot;);</b>
+&nbsp;            case SAVE_ACTIONS -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Save actions&quot;);</b>
+&nbsp;            case MODE -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Library mode&quot;);</b>
+&nbsp;            case LIBRARY_SPECIFIC_FILE_DIRECTORY -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Library-specific file directory&quot;);</b>
+&nbsp;            case CONTENT_SELECTOR -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Content selectors&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

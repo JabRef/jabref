@@ -1,0 +1,361 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractQueryTransformer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher.transformers</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractQueryTransformer (org.jabref.logic.importer.fetcher.transformers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractQueryTransformer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher.transformers;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.StringJoiner;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;import org.jabref.model.search.query.NotNode;
+&nbsp;import org.jabref.model.search.query.OperatorNode;
+&nbsp;import org.jabref.model.search.query.SearchQueryNode;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * In case the transformer contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
+&nbsp; * Otherwise, a single instance QueryTransformer can be used.
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AbstractQueryTransformer {</b>
+&nbsp;    public static final String NO_EXPLICIT_FIELD = &quot;default&quot;;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);</b>
+&nbsp;
+&nbsp;    // These can be used for filtering in post processing
+<b class="nc">&nbsp;    protected int startYear = Integer.MAX_VALUE;</b>
+<b class="nc">&nbsp;    protected int endYear = Integer.MIN_VALUE;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Transforms a and b and c to (a AND b AND c), where
+&nbsp;     * a, b, and c can be complex expressions.
+&nbsp;     */
+&nbsp;    protected Optional&lt;String&gt; transform(OperatorNode query) {
+&nbsp;        String delimiter;
+<b class="nc">&nbsp;        if (query.op() == OperatorNode.Operator.OR) {</b>
+<b class="nc">&nbsp;            delimiter = getLogicalOrOperator();</b>
+&nbsp;        } else {
+&nbsp;            // We define the logical AND operator as the default implementation
+<b class="nc">&nbsp;            delimiter = getLogicalAndOperator();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String result = query.children().stream()</b>
+<b class="nc">&nbsp;                             .map(this::transform)</b>
+<b class="nc">&nbsp;                             .flatMap(Optional::stream)</b>
+<b class="nc">&nbsp;                             .collect(Collectors.joining(delimiter, &quot;(&quot;, &quot;)&quot;));</b>
+<b class="nc">&nbsp;        if (&quot;()&quot;.equals(result)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the logical AND operator used by the library
+&nbsp;     * Note: whitespaces have to be included around the operator
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Example: &lt;code&gt;&quot; AND &quot;&lt;/code&gt;
+&nbsp;     */
+&nbsp;    protected abstract String getLogicalAndOperator();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the logical OR operator used by the library
+&nbsp;     * Note: whitespaces have to be included around the operator
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Example: &lt;code&gt;&quot; OR &quot;&lt;/code&gt;
+&nbsp;     */
+&nbsp;    protected abstract String getLogicalOrOperator();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the logical NOT operator used by the library
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Example: &lt;code&gt;&quot;!&quot;&lt;/code&gt;
+&nbsp;     */
+&nbsp;    protected abstract String getLogicalNotOperator();
+&nbsp;
+&nbsp;    private Optional&lt;String&gt; transform(SearchQueryNode query) {
+<b class="nc">&nbsp;        String term = query.term();</b>
+<b class="nc">&nbsp;        String field = NO_EXPLICIT_FIELD;</b>
+<b class="nc">&nbsp;        if (query.field().isPresent()) {</b>
+<b class="nc">&nbsp;            field = String.valueOf(query.field().get().getName()).toLowerCase();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        switch (field) {</b>
+&nbsp;            case &quot;author&quot; -&gt; {
+<b class="nc">&nbsp;                return Optional.of(handleAuthor(term));</b>
+&nbsp;            }
+&nbsp;            case &quot;title&quot; -&gt; {
+<b class="nc">&nbsp;                return Optional.of(handleTitle(term));</b>
+&nbsp;            }
+&nbsp;            case &quot;journal&quot; -&gt; {
+<b class="nc">&nbsp;                return Optional.of(handleJournal(term));</b>
+&nbsp;            }
+&nbsp;            case &quot;year&quot; -&gt; {
+<b class="nc">&nbsp;                String s = handleYear(term);</b>
+<b class="nc">&nbsp;                return s.isEmpty() ? Optional.empty() : Optional.of(s);</b>
+&nbsp;            }
+&nbsp;            case &quot;year-range&quot; -&gt; {
+<b class="nc">&nbsp;                String s = handleYearRange(term);</b>
+<b class="nc">&nbsp;                return s.isEmpty() ? Optional.empty() : Optional.of(s);</b>
+&nbsp;            }
+&nbsp;            case &quot;doi&quot; -&gt; {
+<b class="nc">&nbsp;                String s = handleDoi(term);</b>
+<b class="nc">&nbsp;                return s.isEmpty() ? Optional.empty() : Optional.of(s);</b>
+&nbsp;            }
+&nbsp;            case NO_EXPLICIT_FIELD -&gt; {
+<b class="nc">&nbsp;                return handleUnFieldedTerm(term);</b>
+&nbsp;            }
+&nbsp;            default -&gt; {
+&nbsp;                // Just add unknown fields as default
+<b class="nc">&nbsp;                return handleOtherField(field, term);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String handleDoi(String term) {
+<b class="nc">&nbsp;        return &quot;doi:&quot; + term;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles the not modifier, all other cases are silently ignored
+&nbsp;     */
+&nbsp;    private Optional&lt;String&gt; transform(NotNode query) {
+<b class="nc">&nbsp;        return transform(query.negatedNode()).map(s -&gt; getLogicalNotOperator() + s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a string representation of the author fielded term
+&nbsp;     */
+&nbsp;    protected abstract String handleAuthor(String author);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a string representation of the title fielded term
+&nbsp;     */
+&nbsp;    protected abstract String handleTitle(String title);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a string representation of the journal fielded term
+&nbsp;     */
+&nbsp;    protected abstract String handleJournal(String journalTitle);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a string representation of the year fielded term
+&nbsp;     */
+&nbsp;    protected abstract String handleYear(String year);
+&nbsp;
+&nbsp;    /// Parses the year range and fills startYear and endYear.
+&nbsp;    /// Ensures that startYear &lt;= endYear
+&nbsp;    protected void parseYearRange(String yearRange) {
+<b class="nc">&nbsp;        String[] split = yearRange.split(&quot;-&quot;);</b>
+<b class="nc">&nbsp;        int parsedStartYear = Integer.parseInt(split[0]);</b>
+<b class="nc">&nbsp;        startYear = parsedStartYear;</b>
+<b class="nc">&nbsp;        int parsedEndYear = Integer.parseInt(split[1]);</b>
+<b class="nc">&nbsp;        if (parsedEndYear &gt;= parsedStartYear) {</b>
+<b class="nc">&nbsp;            endYear = parsedEndYear;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            startYear = parsedEndYear;</b>
+<b class="nc">&nbsp;            endYear = parsedStartYear;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a string representation of the year-range fielded term
+&nbsp;     * Should follow the structure yyyy-yyyy
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Example: &lt;code&gt;2015-2021&lt;/code&gt;
+&nbsp;     */
+&nbsp;    protected String handleYearRange(String yearRange) {
+<b class="nc">&nbsp;        parseYearRange(yearRange);</b>
+<b class="nc">&nbsp;        if (endYear == Integer.MAX_VALUE) {</b>
+&nbsp;            // invalid year range
+<b class="nc">&nbsp;            return yearRange;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        StringJoiner resultBuilder = new StringJoiner(getLogicalOrOperator());</b>
+<b class="nc">&nbsp;        for (int i = startYear; i &lt;= endYear; i++) {</b>
+<b class="nc">&nbsp;            resultBuilder.add(handleYear(String.valueOf(i)));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return resultBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a string representation of the un-fielded (default fielded) term
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Default implementation: just return the term (in quotes if a space is contained)
+&nbsp;     */
+&nbsp;    protected Optional&lt;String&gt; handleUnFieldedTerm(String term) {
+<b class="nc">&nbsp;        return Optional.of(StringUtil.quoteStringIfSpaceIsContained(term));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String createKeyValuePair(String fieldAsString, String term) {
+<b class="nc">&nbsp;        return createKeyValuePair(fieldAsString, term, &quot;:&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String createKeyValuePair(String fieldAsString, String term, String separator) {
+<b class="nc">&nbsp;        return &quot;%s%s%s&quot;.formatted(fieldAsString, separator, StringUtil.quoteStringIfSpaceIsContained(term));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a string representation of the provided field
+&nbsp;     * If it is not supported return an empty optional.
+&nbsp;     */
+&nbsp;    protected Optional&lt;String&gt; handleOtherField(String fieldAsString, String term) {
+<b class="nc">&nbsp;        return Optional.of(createKeyValuePair(fieldAsString, term));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Optional&lt;String&gt; transform(BaseQueryNode query) {
+<b class="nc">&nbsp;        switch (query) {</b>
+<b class="nc">&nbsp;            case OperatorNode operatorQueryNode -&gt; {</b>
+<b class="nc">&nbsp;                return transform(operatorQueryNode);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            case SearchQueryNode searchQueryNode -&gt; {</b>
+<b class="nc">&nbsp;                return transform(searchQueryNode);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            case NotNode notQueryNode -&gt; {</b>
+<b class="nc">&nbsp;                return transform(notQueryNode);</b>
+&nbsp;            }
+&nbsp;            case null,
+&nbsp;                 default -&gt; {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Unsupported case when transforming the query:\n {}&quot;, query);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the given query string into a complex query using lucene.
+&nbsp;     * Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
+&nbsp;     *
+&nbsp;     * @param queryNode The first search node
+&nbsp;     * @return A query string containing all fields that are contained in the original lucene query and
+&nbsp;     * that are expressible in the library specific query language, other information either is discarded or
+&nbsp;     * stored as part of the state of the transformer if it can be used e.g. as a URL parameter for the query.
+&nbsp;     */
+&nbsp;    public Optional&lt;String&gt; transformSearchQuery(BaseQueryNode queryNode) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; transformedQuery = transform(queryNode);</b>
+<b class="nc">&nbsp;        transformedQuery = transformedQuery.map(this::removeOuterBraces);</b>
+<b class="nc">&nbsp;        return transformedQuery;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the outer braces as they are unnecessary
+&nbsp;     */
+&nbsp;    private String removeOuterBraces(String query) {
+<b class="nc">&nbsp;        if (query.startsWith(&quot;(&quot;) &amp;&amp; query.endsWith(&quot;)&quot;)) {</b>
+<b class="nc">&nbsp;            return query.substring(1, query.length() - 1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return query;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

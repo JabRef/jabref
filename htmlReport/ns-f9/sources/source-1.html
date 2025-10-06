@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SharedDatabasePreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.shared.prefs</a>
+</div>
+
+<h1>Coverage Summary for Class: SharedDatabasePreferences (org.jabref.logic.shared.prefs)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SharedDatabasePreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.shared.prefs;
+&nbsp;
+&nbsp;import java.io.UnsupportedEncodingException;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.prefs.BackingStoreException;
+&nbsp;import java.util.prefs.Preferences;
+&nbsp;
+&nbsp;import org.jabref.logic.shared.DatabaseConnectionProperties;
+&nbsp;import org.jabref.logic.shared.security.Password;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class SharedDatabasePreferences {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SharedDatabasePreferences.class);</b>
+&nbsp;
+&nbsp;    private static final String DEFAULT_NODE = &quot;default&quot;;
+&nbsp;    private static final String PREFERENCES_PATH_NAME = &quot;/org/jabref-shared&quot;;
+&nbsp;
+&nbsp;    private static final String SHARED_DATABASE_TYPE = &quot;sharedDatabaseType&quot;;
+&nbsp;    private static final String SHARED_DATABASE_HOST = &quot;sharedDatabaseHost&quot;;
+&nbsp;    private static final String SHARED_DATABASE_PORT = &quot;sharedDatabasePort&quot;;
+&nbsp;    private static final String SHARED_DATABASE_NAME = &quot;sharedDatabaseName&quot;;
+&nbsp;    private static final String SHARED_DATABASE_USER = &quot;sharedDatabaseUser&quot;;
+&nbsp;    private static final String SHARED_DATABASE_PASSWORD = &quot;sharedDatabasePassword&quot;;
+&nbsp;    private static final String SHARED_DATABASE_FOLDER = &quot;sharedDatabaseFolder&quot;;
+&nbsp;    private static final String SHARED_DATABASE_AUTOSAVE = &quot;sharedDatabaseAutosave&quot;;
+&nbsp;    private static final String SHARED_DATABASE_REMEMBER_PASSWORD = &quot;sharedDatabaseRememberPassword&quot;;
+&nbsp;    private static final String SHARED_DATABASE_USE_SSL = &quot;sharedDatabaseUseSSL&quot;;
+&nbsp;    private static final String SHARED_DATABASE_KEYSTORE_FILE = &quot;sharedDatabaseKeyStoreFile&quot;;
+&nbsp;    private static final String SHARED_DATABASE_SERVER_TIMEZONE = &quot;sharedDatabaseServerTimezone&quot;;
+&nbsp;    private static final String SHARED_DATABASE_EXPERT_MODE = &quot;sharedDatabaseExpertMode&quot;;
+&nbsp;    private static final String SHARED_DATABASE_JDBC_URL = &quot;sharedDatabaseJdbcUrl&quot;;
+&nbsp;
+&nbsp;    // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
+&nbsp;    private final Preferences internalPrefs;
+&nbsp;
+&nbsp;    public SharedDatabasePreferences() {
+<b class="nc">&nbsp;        this(DEFAULT_NODE);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public SharedDatabasePreferences(String sharedDatabaseID) {</b>
+<b class="nc">&nbsp;        internalPrefs = Preferences.userRoot().node(PREFERENCES_PATH_NAME).node(sharedDatabaseID);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getType() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_TYPE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getHost() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_HOST);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getPort() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_PORT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getName() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_NAME);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getUser() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_USER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getPassword() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_PASSWORD);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getKeyStoreFile() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_KEYSTORE_FILE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getServerTimezone() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_SERVER_TIMEZONE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getRememberPassword() {
+<b class="nc">&nbsp;        return internalPrefs.getBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getFolder() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_FOLDER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getAutosave() {
+<b class="nc">&nbsp;        return internalPrefs.getBoolean(SHARED_DATABASE_AUTOSAVE, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isUseSSL() {
+<b class="nc">&nbsp;        return internalPrefs.getBoolean(SHARED_DATABASE_USE_SSL, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setType(String type) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_TYPE, type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHost(String host) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_HOST, host);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPort(String port) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_PORT, port);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setName(String name) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_NAME, name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUser(String user) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_USER, user);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPassword(String password) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_PASSWORD, password);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setRememberPassword(boolean rememberPassword) {
+<b class="nc">&nbsp;        internalPrefs.putBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, rememberPassword);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFolder(String folder) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_FOLDER, folder);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutosave(boolean autosave) {
+<b class="nc">&nbsp;        internalPrefs.putBoolean(SHARED_DATABASE_AUTOSAVE, autosave);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUseSSL(boolean useSSL) {
+<b class="nc">&nbsp;        internalPrefs.putBoolean(SHARED_DATABASE_USE_SSL, useSSL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setKeystoreFile(String keystoreFile) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_KEYSTORE_FILE, keystoreFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setServerTimezone(String serverTimezone) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_SERVER_TIMEZONE, serverTimezone);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearPassword() {
+<b class="nc">&nbsp;        internalPrefs.remove(SHARED_DATABASE_PASSWORD);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setExpertMode(boolean expertMode) {
+<b class="nc">&nbsp;        internalPrefs.putBoolean(SHARED_DATABASE_EXPERT_MODE, expertMode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setJdbcUrl(String jdbcUrl) {
+<b class="nc">&nbsp;        internalPrefs.put(SHARED_DATABASE_JDBC_URL, jdbcUrl);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isUseExpertMode() {
+<b class="nc">&nbsp;        return internalPrefs.getBoolean(SHARED_DATABASE_EXPERT_MODE, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getJdbcUrl() {
+<b class="nc">&nbsp;        return getOptionalValue(SHARED_DATABASE_JDBC_URL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clear() throws BackingStoreException {
+<b class="nc">&nbsp;        internalPrefs.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;String&gt; getOptionalValue(String key) {
+<b class="nc">&nbsp;        return Optional.ofNullable(internalPrefs.get(key, null));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clearAll() throws BackingStoreException {
+<b class="nc">&nbsp;        Preferences.userRoot().node(PREFERENCES_PATH_NAME).clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void putAllDBMSConnectionProperties(DatabaseConnectionProperties properties) {
+<b class="nc">&nbsp;        assert (properties.isValid());</b>
+&nbsp;
+<b class="nc">&nbsp;        setType(properties.getType().toString());</b>
+<b class="nc">&nbsp;        setHost(properties.getHost());</b>
+<b class="nc">&nbsp;        setPort(String.valueOf(properties.getPort()));</b>
+<b class="nc">&nbsp;        setName(properties.getDatabase());</b>
+<b class="nc">&nbsp;        setUser(properties.getUser());</b>
+<b class="nc">&nbsp;        setUseSSL(properties.isUseSSL());</b>
+<b class="nc">&nbsp;        setKeystoreFile(properties.getKeyStore());</b>
+<b class="nc">&nbsp;        setServerTimezone(properties.getServerTimezone());</b>
+<b class="nc">&nbsp;        setExpertMode(properties.isUseExpertMode());</b>
+<b class="nc">&nbsp;        setJdbcUrl(properties.getJdbcUrl());</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());</b>
+&nbsp;        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not store the password due to encryption problems.&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

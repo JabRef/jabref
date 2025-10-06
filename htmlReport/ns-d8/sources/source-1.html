@@ -1,0 +1,233 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Abbreviation</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.journals</a>
+</div>
+
+<h1>Coverage Summary for Class: Abbreviation (org.jabref.logic.journals)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Abbreviation</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.4%
+  </span>
+  <span class="absValue">
+    (2/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20.5%
+  </span>
+  <span class="absValue">
+    (8/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.journals;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;/**
+&nbsp; * The class provides functionality for managing journal abbreviations.
+&nbsp; * &lt;a href=&quot;https://docs.jabref.org/advanced/journalabbreviations&quot;&gt;JabRef Journal Abbreviations Documentation&lt;/a&gt;
+&nbsp; */
+&nbsp;public class Abbreviation implements Comparable&lt;Abbreviation&gt;, Serializable {
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1;
+&nbsp;
+&nbsp;    private transient String name;
+&nbsp;    private final String abbreviation;
+&nbsp;    private transient String dotlessAbbreviation;
+&nbsp;
+&nbsp;    // Is the empty string if not available
+&nbsp;    private String shortestUniqueAbbreviation;
+&nbsp;
+&nbsp;    public Abbreviation(String name, String abbreviation) {
+<b class="nc">&nbsp;        this(name, abbreviation, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
+<b class="fc">&nbsp;        this(name,</b>
+&nbsp;                abbreviation,
+&nbsp;                // &quot;L. N.&quot; becomes &quot;L  N &quot;, we need to remove the double spaces inbetween
+<b class="fc">&nbsp;                abbreviation.replace(&quot;.&quot;, &quot; &quot;).replace(&quot;  &quot;, &quot; &quot;).trim(),</b>
+<b class="fc">&nbsp;                shortestUniqueAbbreviation.trim());</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private Abbreviation(String name, String abbreviation, String dotlessAbbreviation, String shortestUniqueAbbreviation) {</b>
+<b class="fc">&nbsp;        this.name = name.intern();</b>
+<b class="fc">&nbsp;        this.abbreviation = abbreviation.intern();</b>
+<b class="fc">&nbsp;        this.dotlessAbbreviation = dotlessAbbreviation.intern();</b>
+<b class="fc">&nbsp;        this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim().intern();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAbbreviation() {
+<b class="nc">&nbsp;        return abbreviation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getShortestUniqueAbbreviation() {
+<b class="nc">&nbsp;        if (shortestUniqueAbbreviation.isEmpty()) {</b>
+<b class="nc">&nbsp;            shortestUniqueAbbreviation = getAbbreviation();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return shortestUniqueAbbreviation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isDefaultShortestUniqueAbbreviation() {
+<b class="nc">&nbsp;        return (shortestUniqueAbbreviation.isEmpty()) || this.shortestUniqueAbbreviation.equals(this.abbreviation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDotlessAbbreviation() {
+<b class="nc">&nbsp;        return this.dotlessAbbreviation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int compareTo(Abbreviation toCompare) {
+<b class="nc">&nbsp;        int nameComparison = getName().compareTo(toCompare.getName());</b>
+<b class="nc">&nbsp;        if (nameComparison != 0) {</b>
+<b class="nc">&nbsp;            return nameComparison;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int abbreviationComparison = getAbbreviation().compareTo(toCompare.getAbbreviation());</b>
+<b class="nc">&nbsp;        if (abbreviationComparison != 0) {</b>
+<b class="nc">&nbsp;            return abbreviationComparison;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return getShortestUniqueAbbreviation().compareTo(toCompare.getShortestUniqueAbbreviation());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getNext(String current) {
+<b class="nc">&nbsp;        String currentTrimmed = current.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (getDotlessAbbreviation().equals(currentTrimmed)) {</b>
+<b class="nc">&nbsp;            return getShortestUniqueAbbreviation().equals(getAbbreviation()) ? getName() : getShortestUniqueAbbreviation();</b>
+<b class="nc">&nbsp;        } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) &amp;&amp; !getShortestUniqueAbbreviation().equals(getAbbreviation())) {</b>
+<b class="nc">&nbsp;            return getName();</b>
+<b class="nc">&nbsp;        } else if (getName().equals(currentTrimmed)) {</b>
+<b class="nc">&nbsp;            return getAbbreviation();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return getDotlessAbbreviation();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}&quot;.formatted(</b>
+&nbsp;                this.name,
+&nbsp;                this.abbreviation,
+&nbsp;                this.dotlessAbbreviation,
+&nbsp;                this.shortestUniqueAbbreviation);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Abbreviation that = (Abbreviation) o;</b>
+<b class="nc">&nbsp;        return getName().equals(that.getName()) &amp;&amp; getAbbreviation().equals(that.getAbbreviation()) &amp;&amp; getShortestUniqueAbbreviation().equals(that.getShortestUniqueAbbreviation());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(getName(), getAbbreviation(), getShortestUniqueAbbreviation());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

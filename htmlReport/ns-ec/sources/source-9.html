@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PushToSublimeText</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.push</a>
+</div>
+
+<h1>Coverage Summary for Class: PushToSublimeText (org.jabref.logic.push)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PushToSublimeText</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.push;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.HeadlessExecutorService;
+&nbsp;import org.jabref.logic.util.NotificationService;
+&nbsp;import org.jabref.logic.util.StreamGobbler;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class PushToSublimeText extends AbstractPushToApplication {
+&nbsp;
+<b class="nc">&nbsp;    public static final PushApplications APPLICATION = PushApplications.SUBLIME_TEXT;</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);</b>
+&nbsp;
+&nbsp;    public PushToSublimeText(NotificationService notificationService, PushToApplicationPreferences preferences) {
+<b class="nc">&nbsp;        super(notificationService, preferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return APPLICATION.getDisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void pushEntries(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        couldNotPush = false;</b>
+<b class="nc">&nbsp;        couldNotCall = false;</b>
+<b class="nc">&nbsp;        notDefined = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        commandPath = preferences.getCommandPaths().get(this.getDisplayName());</b>
+&nbsp;
+&nbsp;        // Check if a path to the command has been specified
+<b class="nc">&nbsp;        if (StringUtil.isNullOrEmpty(commandPath)) {</b>
+<b class="nc">&nbsp;            notDefined = true;</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            String keyString = this.getKeyString(entries, getDelimiter());</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Sublime string: {}&quot;, String.join(&quot; &quot;, getCommandLine(keyString)));</b>
+<b class="nc">&nbsp;            ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));</b>
+<b class="nc">&nbsp;            processBuilder.inheritIO();</b>
+<b class="nc">&nbsp;            Map&lt;String, String&gt; envs = processBuilder.environment();</b>
+<b class="nc">&nbsp;            envs.put(&quot;PATH&quot;, Path.of(commandPath).getParent().toString());</b>
+&nbsp;
+<b class="nc">&nbsp;            Process process = processBuilder.start();</b>
+<b class="nc">&nbsp;            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::info);</b>
+<b class="nc">&nbsp;            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::info);</b>
+&nbsp;
+<b class="nc">&nbsp;            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);</b>
+<b class="nc">&nbsp;            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);</b>
+&nbsp;        } catch (IOException excep) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error: Could not call executable &#39;{}&#39;&quot;, commandPath, excep);</b>
+<b class="nc">&nbsp;            couldNotCall = true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String[] getCommandLine(String keyString) {
+<b class="nc">&nbsp;        String citeCommand = getCitePrefix();</b>
+&nbsp;        // we need to escape the extra slashses
+<b class="nc">&nbsp;        if (getCitePrefix().contains(&quot;\\&quot;)) {</b>
+<b class="nc">&nbsp;            citeCommand = &quot;\&quot;\\&quot; + getCitePrefix();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (OS.WINDOWS) {</b>
+&nbsp;            // TODO we might need to escape the inner double quotes with &quot;&quot;&quot; &quot;&quot;&quot;
+<b class="nc">&nbsp;            return new String[] {&quot;cmd.exe&quot;, &quot;/c&quot;, &quot;\&quot;&quot; + commandPath + &quot;\&quot;&quot; + &quot;--command \&quot;insert {\\\&quot;characters\\\&quot;: \&quot;\\&quot; + getCitePrefix() + keyString + getCiteSuffix() + &quot;\&quot;}\&quot;&quot;};</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return new String[] {&quot;sh&quot;, &quot;-c&quot;, &quot;\&quot;&quot; + commandPath + &quot;\&quot;&quot; + &quot; --command &#39;insert {\&quot;characters\&quot;: \&quot;&quot; + citeCommand + keyString + getCiteSuffix() + &quot;\&quot;}&#39;&quot;};</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+<b class="nc">&nbsp;        return new String[] {commandPath, &quot;%s:%s:%s&quot;.formatted(fileName.toString(), line, column)};</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChatHistoryComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.ai.components.aichat.chathistory</a>
+</div>
+
+<h1>Coverage Summary for Class: ChatHistoryComponent (org.jabref.gui.ai.components.aichat.chathistory)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChatHistoryComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.ai.components.aichat.chathistory;
+&nbsp;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.ai.components.aichat.chatmessage.ChatMessageComponent;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import dev.langchain4j.data.message.ChatMessage;
+&nbsp;
+&nbsp;public class ChatHistoryComponent extends ScrollPane {
+&nbsp;    @FXML private VBox vBox;
+&nbsp;
+<b class="nc">&nbsp;    public ChatHistoryComponent() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.needsLayoutProperty().addListener((obs, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (newValue) {</b>
+<b class="nc">&nbsp;                scrollDown();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @implNote You must call this method only once.
+&nbsp;     */
+&nbsp;    public void setItems(ObservableList&lt;ChatMessage&gt; items) {
+<b class="nc">&nbsp;        fill(items);</b>
+<b class="nc">&nbsp;        items.addListener((ListChangeListener&lt;? super ChatMessage&gt;) obs -&gt; fill(items));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void fill(ObservableList&lt;ChatMessage&gt; items) {
+<b class="nc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;            vBox.getChildren().clear();</b>
+<b class="nc">&nbsp;            items.forEach(chatMessage -&gt;</b>
+<b class="nc">&nbsp;                    vBox.getChildren().add(new ChatMessageComponent(chatMessage, chatMessageComponent -&gt; {</b>
+<b class="nc">&nbsp;                        int index = vBox.getChildren().indexOf(chatMessageComponent);</b>
+<b class="nc">&nbsp;                        items.remove(index);</b>
+&nbsp;                    })));
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void scrollDown() {
+<b class="nc">&nbsp;        this.layout();</b>
+<b class="nc">&nbsp;        this.setVvalue(this.getVmax());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

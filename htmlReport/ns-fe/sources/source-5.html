@@ -1,0 +1,341 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StringManipulator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.strings</a>
+</div>
+
+<h1>Coverage Summary for Class: StringManipulator (org.jabref.logic.util.strings)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StringManipulator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StringManipulator$Direction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StringManipulator$LetterCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.strings;
+&nbsp;
+&nbsp;import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
+&nbsp;import org.jabref.model.util.ResultingStringState;
+&nbsp;
+<b class="nc">&nbsp;public class StringManipulator {</b>
+<b class="nc">&nbsp;    private enum LetterCase {</b>
+<b class="nc">&nbsp;        UPPER,</b>
+<b class="nc">&nbsp;        LOWER,</b>
+<b class="nc">&nbsp;        CAPITALIZED</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    enum Direction {</b>
+<b class="nc">&nbsp;        NEXT(1),</b>
+<b class="nc">&nbsp;        PREVIOUS(-1);</b>
+&nbsp;
+&nbsp;        public final int OFFSET;
+&nbsp;
+<b class="nc">&nbsp;        Direction(int offset) {</b>
+<b class="nc">&nbsp;            this.OFFSET = offset;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Change word casing in a string from the given position to the next word boundary.
+&nbsp;     *
+&nbsp;     * @param text          The text to manipulate.
+&nbsp;     * @param caretPosition The index to start from.
+&nbsp;     * @param targetCase    The case mode the string should be changed to.
+&nbsp;     * @return The resulting text and caret position.
+&nbsp;     */
+&nbsp;    private static ResultingStringState setWordCase(String text, int caretPosition, LetterCase targetCase) {
+<b class="nc">&nbsp;        int nextWordBoundary = getNextWordBoundary(caretPosition, text, Direction.NEXT);</b>
+&nbsp;
+&nbsp;        // Preserve whitespaces
+<b class="nc">&nbsp;        int wordStartPosition = caretPosition;</b>
+<b class="nc">&nbsp;        while (wordStartPosition &lt; nextWordBoundary &amp;&amp; Character.isWhitespace(text.charAt(wordStartPosition))) {</b>
+<b class="nc">&nbsp;            wordStartPosition++;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String result = switch (targetCase) {</b>
+&nbsp;            case UPPER -&gt;
+<b class="nc">&nbsp;                    new UpperCaseFormatter().format(text.substring(wordStartPosition, nextWordBoundary));</b>
+&nbsp;            case LOWER -&gt;
+<b class="nc">&nbsp;                    new LowerCaseFormatter().format(text.substring(wordStartPosition, nextWordBoundary));</b>
+&nbsp;            case CAPITALIZED -&gt;
+<b class="nc">&nbsp;                    new CapitalizeFormatter().format(text.substring(wordStartPosition, nextWordBoundary));</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        return new ResultingStringState(</b>
+&nbsp;                nextWordBoundary,
+<b class="nc">&nbsp;                text.substring(0, wordStartPosition) + result + text.substring(nextWordBoundary));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Delete all characters in a string from the given position to the next word boundary.
+&nbsp;     *
+&nbsp;     * @param caretPosition The index to start from.
+&nbsp;     * @param text          The text to manipulate.
+&nbsp;     * @param direction     The direction to search.
+&nbsp;     * @return The resulting text and caret position.
+&nbsp;     */
+&nbsp;    static ResultingStringState deleteUntilWordBoundary(int caretPosition, String text, Direction direction) {
+&nbsp;        // Define cutout range
+<b class="nc">&nbsp;        int nextWordBoundary = getNextWordBoundary(caretPosition, text, direction);</b>
+&nbsp;
+&nbsp;        // Construct new string without cutout
+<b class="nc">&nbsp;        return switch (direction) {</b>
+&nbsp;            case NEXT -&gt;
+<b class="nc">&nbsp;                    new ResultingStringState(</b>
+&nbsp;                            caretPosition,
+<b class="nc">&nbsp;                            text.substring(0, caretPosition) + text.substring(nextWordBoundary));</b>
+&nbsp;            case PREVIOUS -&gt;
+<b class="nc">&nbsp;                    new ResultingStringState(</b>
+&nbsp;                            nextWordBoundary,
+<b class="nc">&nbsp;                            text.substring(0, nextWordBoundary) + text.substring(caretPosition));</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Utility method to find the next whitespace position in string after text
+&nbsp;     *
+&nbsp;     * @param caretPosition The current caret position
+&nbsp;     * @param text          The string to search in
+&nbsp;     * @param direction     The direction to move through string
+&nbsp;     * @return The position of the next whitespace after a word
+&nbsp;     */
+&nbsp;    static int getNextWordBoundary(int caretPosition, String text, Direction direction) {
+<b class="nc">&nbsp;        int i = caretPosition;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (direction == Direction.PREVIOUS) {</b>
+&nbsp;            // Swallow whitespaces
+<b class="nc">&nbsp;            while (i &gt; 0 &amp;&amp; Character.isWhitespace(text.charAt(i + direction.OFFSET))) {</b>
+<b class="nc">&nbsp;                i += direction.OFFSET;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Read next word
+<b class="nc">&nbsp;            while (i &gt; 0 &amp;&amp; !Character.isWhitespace(text.charAt(i + direction.OFFSET))) {</b>
+<b class="nc">&nbsp;                i += direction.OFFSET;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (direction == Direction.NEXT) {</b>
+&nbsp;            // Swallow whitespaces
+<b class="nc">&nbsp;            while (i &lt; text.length() &amp;&amp; Character.isWhitespace(text.charAt(i))) {</b>
+<b class="nc">&nbsp;                i += direction.OFFSET;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Read next word
+<b class="nc">&nbsp;            while (i &lt; text.length() &amp;&amp; !Character.isWhitespace(text.charAt(i))) {</b>
+<b class="nc">&nbsp;                i += direction.OFFSET;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return i;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Capitalize the word on the right side of the cursor.
+&nbsp;     *
+&nbsp;     * @param caretPosition The position of the cursor
+&nbsp;     * @param text          The string to manipulate
+&nbsp;     * @return String       The resulting text and caret position.
+&nbsp;     */
+&nbsp;    public static ResultingStringState capitalize(int caretPosition, String text) {
+<b class="nc">&nbsp;        return setWordCase(text, caretPosition, LetterCase.CAPITALIZED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Make all characters in the word uppercase.
+&nbsp;     *
+&nbsp;     * @param caretPosition The position of the cursor
+&nbsp;     * @param text          The string to manipulate
+&nbsp;     * @return String       The resulting text and caret position.
+&nbsp;     */
+&nbsp;    public static ResultingStringState uppercase(int caretPosition, String text) {
+<b class="nc">&nbsp;        return setWordCase(text, caretPosition, LetterCase.UPPER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Make all characters in the word lowercase.
+&nbsp;     *
+&nbsp;     * @param caretPosition The position of the cursor
+&nbsp;     * @param text          The string to manipulate
+&nbsp;     * @return String       The resulting text and caret position.
+&nbsp;     */
+&nbsp;    public static ResultingStringState lowercase(int caretPosition, String text) {
+<b class="nc">&nbsp;        return setWordCase(text, caretPosition, LetterCase.LOWER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remove the next word on the right side of the cursor.
+&nbsp;     *
+&nbsp;     * @param caretPosition The position of the cursor
+&nbsp;     * @param text          The string to manipulate
+&nbsp;     * @return String       The resulting text and caret position.
+&nbsp;     */
+&nbsp;    public static ResultingStringState killWord(int caretPosition, String text) {
+<b class="nc">&nbsp;        return deleteUntilWordBoundary(caretPosition, text, Direction.NEXT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remove the previous word on the left side of the cursor.
+&nbsp;     *
+&nbsp;     * @param caretPosition The position of the cursor
+&nbsp;     * @param text          The string to manipulate
+&nbsp;     * @return String       The resulting text and caret position.
+&nbsp;     */
+&nbsp;    public static ResultingStringState backwardKillWord(int caretPosition, String text) {
+<b class="nc">&nbsp;        return deleteUntilWordBoundary(caretPosition, text, Direction.PREVIOUS);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

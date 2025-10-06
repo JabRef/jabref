@@ -1,0 +1,582 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StudyRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.crawler</a>
+</div>
+
+<h1>Coverage Summary for Class: StudyRepository (org.jabref.logic.crawler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StudyRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/146)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.crawler;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.charset.UnsupportedCharsetException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.time.LocalDateTime;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+&nbsp;import org.jabref.logic.database.DatabaseMerger;
+&nbsp;import org.jabref.logic.exporter.AtomicFileWriter;
+&nbsp;import org.jabref.logic.exporter.BibDatabaseWriter;
+&nbsp;import org.jabref.logic.exporter.BibWriter;
+&nbsp;import org.jabref.logic.exporter.SaveException;
+&nbsp;import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+&nbsp;import org.jabref.logic.git.SlrGitHandler;
+&nbsp;import org.jabref.logic.importer.OpenDatabase;
+&nbsp;import org.jabref.logic.importer.SearchBasedFetcher;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.io.FileNameCleaner;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.metadata.SaveOrder;
+&nbsp;import org.jabref.model.metadata.SelfContainedSaveOrder;
+&nbsp;import org.jabref.model.study.FetchResult;
+&nbsp;import org.jabref.model.study.QueryResult;
+&nbsp;import org.jabref.model.study.Study;
+&nbsp;import org.jabref.model.study.StudyDatabase;
+&nbsp;import org.jabref.model.study.StudyQuery;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import org.eclipse.jgit.api.errors.GitAPIException;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class manages all aspects of the study process related to the repository.
+&nbsp; * &lt;p&gt;
+&nbsp; * It includes the parsing of the study definition file (study.bib) into a Study instance,
+&nbsp; * the structured persistence of the crawling results for the study within the file based repository,
+&nbsp; * as well as the sharing, and versioning of results using git.
+&nbsp; */
+&nbsp;public class StudyRepository {
+&nbsp;    // Tests work with study.yml
+&nbsp;    public static final String STUDY_DEFINITION_FILE_NAME = &quot;study.yml&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(StudyRepository.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern MATCH_COLON = Pattern.compile(&quot;:&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern MATCH_ILLEGAL_CHARACTERS = Pattern.compile(&quot;[^A-Za-z0-9_.\\s=-]&quot;);</b>
+&nbsp;
+&nbsp;    // Currently we make assumptions about the configuration: the remotes, work and search branch names
+&nbsp;    private static final String REMOTE = &quot;origin&quot;;
+&nbsp;    private static final String WORK_BRANCH = &quot;work&quot;;
+&nbsp;    private static final String SEARCH_BRANCH = &quot;search&quot;;
+&nbsp;
+&nbsp;    private final Path repositoryPath;
+&nbsp;    private final Path studyDefinitionFile;
+&nbsp;    private final SlrGitHandler gitHandler;
+&nbsp;    private final Study study;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final BibEntryTypesManager bibEntryTypesManager;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a study repository.
+&nbsp;     *
+&nbsp;     * @param pathToRepository Where the repository root is located.
+&nbsp;     * @param gitHandler       The git handler that manages any interaction with the remote repository
+&nbsp;     * @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not
+&nbsp;     *                                  contain the study definition file.
+&nbsp;     * @throws IOException              Thrown if the given repository does not exist, or the study definition file
+&nbsp;     *                                  does not exist
+&nbsp;     */
+&nbsp;    public StudyRepository(Path pathToRepository,
+&nbsp;                           SlrGitHandler gitHandler,
+&nbsp;                           CliPreferences preferences,
+&nbsp;                           FileUpdateMonitor fileUpdateMonitor,
+<b class="nc">&nbsp;                           BibEntryTypesManager bibEntryTypesManager) throws IOException {</b>
+<b class="nc">&nbsp;        this.repositoryPath = pathToRepository;</b>
+<b class="nc">&nbsp;        this.gitHandler = gitHandler;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.studyDefinitionFile = Path.of(repositoryPath.toString(), STUDY_DEFINITION_FILE_NAME);</b>
+<b class="nc">&nbsp;        this.bibEntryTypesManager = bibEntryTypesManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Files.notExists(repositoryPath)) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;The given repository does not exists.&quot;);</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            gitHandler.createCommitOnCurrentBranch(&quot;Save changes before searching.&quot;, false);</b>
+<b class="nc">&nbsp;            gitHandler.checkoutBranch(WORK_BRANCH);</b>
+<b class="nc">&nbsp;            updateWorkAndSearchBranch();</b>
+&nbsp;        } catch (GitAPIException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not checkout work branch&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (Files.notExists(studyDefinitionFile)) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;The study definition file does not exist in the given repository.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        study = parseStudyFile();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            final String updateRepositoryStructureMessage = &quot;Update repository structure&quot;;</b>
+&nbsp;
+&nbsp;            // Update repository structure on work branch in case of changes
+<b class="nc">&nbsp;            setUpRepositoryStructureForQueriesAndFetchers();</b>
+<b class="nc">&nbsp;            gitHandler.createCommitOnCurrentBranch(updateRepositoryStructureMessage, false);</b>
+&nbsp;
+<b class="nc">&nbsp;            gitHandler.checkoutBranch(SEARCH_BRANCH);</b>
+&nbsp;            // If study definition does not exist on this branch or was changed on work branch, copy it from work
+<b class="nc">&nbsp;            boolean studyDefinitionDoesNotExistOrChanged = !(Files.exists(studyDefinitionFile) &amp;&amp; new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile).equals(study));</b>
+<b class="nc">&nbsp;            if (studyDefinitionDoesNotExistOrChanged) {</b>
+<b class="nc">&nbsp;                new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            setUpRepositoryStructureForQueriesAndFetchers();</b>
+<b class="nc">&nbsp;            gitHandler.createCommitOnCurrentBranch(updateRepositoryStructureMessage, false);</b>
+&nbsp;        } catch (GitAPIException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not checkout search branch.&quot;);</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            gitHandler.checkoutBranch(WORK_BRANCH);</b>
+&nbsp;        } catch (GitAPIException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not checkout work branch&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns entries stored in the repository for a certain query and fetcher
+&nbsp;     */
+&nbsp;    public BibDatabaseContext getFetcherResultEntries(String query, String fetcherName) throws IOException {
+<b class="nc">&nbsp;        if (Files.exists(getPathToFetcherResultFile(query, fetcherName))) {</b>
+<b class="nc">&nbsp;            return OpenDatabase.loadDatabase(getPathToFetcherResultFile(query, fetcherName),</b>
+<b class="nc">&nbsp;                    preferences.getImportFormatPreferences(),</b>
+<b class="nc">&nbsp;                    fileUpdateMonitor).getDatabaseContext();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new BibDatabaseContext();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the merged entries stored in the repository for a certain query
+&nbsp;     */
+&nbsp;    public BibDatabaseContext getQueryResultEntries(String query) throws IOException {
+<b class="nc">&nbsp;        if (Files.exists(getPathToQueryResultFile(query))) {</b>
+<b class="nc">&nbsp;            return OpenDatabase.loadDatabase(getPathToQueryResultFile(query),</b>
+<b class="nc">&nbsp;                    preferences.getImportFormatPreferences(),</b>
+<b class="nc">&nbsp;                    fileUpdateMonitor).getDatabaseContext();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new BibDatabaseContext();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the merged entries stored in the repository for all queries
+&nbsp;     */
+&nbsp;    public BibDatabaseContext getStudyResultEntries() throws IOException {
+<b class="nc">&nbsp;        if (Files.exists(getPathToStudyResultFile())) {</b>
+<b class="nc">&nbsp;            return OpenDatabase.loadDatabase(getPathToStudyResultFile(),</b>
+<b class="nc">&nbsp;                    preferences.getImportFormatPreferences(),</b>
+<b class="nc">&nbsp;                    fileUpdateMonitor).getDatabaseContext();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new BibDatabaseContext();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The study definition file contains all the definitions of a study. This method extracts this study from the yaml study definition file
+&nbsp;     *
+&nbsp;     * @return Returns the BibEntries parsed from the study definition file.
+&nbsp;     * @throws IOException Problem opening the input stream.
+&nbsp;     */
+&nbsp;    private Study parseStudyFile() throws IOException {
+<b class="nc">&nbsp;        return new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all query strings of the study definition
+&nbsp;     *
+&nbsp;     * @return List of all queries as Strings.
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; getSearchQueryStrings() {
+<b class="nc">&nbsp;        return study.getQueries()</b>
+<b class="nc">&nbsp;                    .parallelStream()</b>
+<b class="nc">&nbsp;                    .map(StudyQuery::getQuery)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extracts all active fetchers from the library entries.
+&nbsp;     *
+&nbsp;     * @return List of BibEntries of type Library
+&nbsp;     * @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
+&nbsp;     */
+&nbsp;    public List&lt;StudyDatabase&gt; getActiveLibraryEntries() throws IllegalArgumentException {
+<b class="nc">&nbsp;        return study.getDatabases()</b>
+<b class="nc">&nbsp;                    .parallelStream()</b>
+<b class="nc">&nbsp;                    .filter(StudyDatabase::isEnabled)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Study getStudy() {
+<b class="nc">&nbsp;        return study;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Persists the result locally and remotely by following the steps:
+&nbsp;     * Precondition: Currently checking out work branch
+&nbsp;     * &lt;ol&gt;
+&nbsp;     *     &lt;li&gt;Update the work and search branch&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Persist the results on the search branch&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Manually patch the diff of the search branch onto the work branch (as the merging will not work in
+&nbsp;     *     certain cases without a conflict as it is context sensitive. But for this use case we do not need it to be
+&nbsp;     *     context sensitive. So we can just prepend the patch without checking the &quot;context&quot; lines.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Update the remote tracking branches of the work and search branch&lt;/li&gt;
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     */
+&nbsp;    public void persist(List&lt;QueryResult&gt; crawlResults) throws IOException, GitAPIException, SaveException, JabRefException {
+<b class="nc">&nbsp;        updateWorkAndSearchBranch();</b>
+&nbsp;
+<b class="nc">&nbsp;        gitHandler.checkoutBranch(SEARCH_BRANCH);</b>
+<b class="nc">&nbsp;        persistResults(crawlResults);</b>
+&nbsp;        try {
+&nbsp;            // First commit changes to search branch and update remote
+<b class="nc">&nbsp;            String commitMessage = &quot;Conducted search: &quot; + LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);</b>
+<b class="nc">&nbsp;            boolean newSearchResults = gitHandler.createCommitOnCurrentBranch(commitMessage, false);</b>
+<b class="nc">&nbsp;            gitHandler.checkoutBranch(WORK_BRANCH);</b>
+<b class="nc">&nbsp;            if (!newSearchResults) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;            // Patch new results into work branch
+<b class="nc">&nbsp;            gitHandler.appendLatestSearchResultsOntoCurrentBranch(commitMessage + &quot; - Patch&quot;, SEARCH_BRANCH);</b>
+&nbsp;            // Update both remote tracked branches
+<b class="nc">&nbsp;            updateRemoteSearchAndWorkBranch();</b>
+&nbsp;        } catch (GitAPIException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Updating remote repository failed&quot;, e);</b>
+&nbsp;        } catch (JabRefException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Missing Git credentials&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update the remote tracking branches of the work and search branches
+&nbsp;     * The currently checked out branch is not changed if the method is executed successfully
+&nbsp;     */
+&nbsp;    private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException, JabRefException {
+<b class="nc">&nbsp;        String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();</b>
+&nbsp;
+&nbsp;        // update remote search branch
+<b class="nc">&nbsp;        gitHandler.checkoutBranch(SEARCH_BRANCH);</b>
+<b class="nc">&nbsp;        gitHandler.pushCommitsToRemoteRepository();</b>
+&nbsp;
+&nbsp;        // update remote work branch
+<b class="nc">&nbsp;        gitHandler.checkoutBranch(WORK_BRANCH);</b>
+<b class="nc">&nbsp;        gitHandler.pushCommitsToRemoteRepository();</b>
+&nbsp;
+<b class="nc">&nbsp;        gitHandler.checkoutBranch(currentBranch);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates the local work and search branches with changes from their tracking remote branches
+&nbsp;     * The currently checked out branch is not changed if the method is executed successfully
+&nbsp;     */
+&nbsp;    private void updateWorkAndSearchBranch() throws IOException, GitAPIException {
+<b class="nc">&nbsp;        String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();</b>
+&nbsp;
+&nbsp;        // update search branch
+<b class="nc">&nbsp;        gitHandler.checkoutBranch(SEARCH_BRANCH);</b>
+<b class="nc">&nbsp;        gitHandler.pullOnCurrentBranch();</b>
+&nbsp;
+&nbsp;        // update work branch
+<b class="nc">&nbsp;        gitHandler.checkoutBranch(WORK_BRANCH);</b>
+<b class="nc">&nbsp;        gitHandler.pullOnCurrentBranch();</b>
+&nbsp;
+<b class="nc">&nbsp;        gitHandler.checkoutBranch(currentBranch);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create for each query a folder, and for each fetcher a bib file in the query folder to store its results.
+&nbsp;     */
+&nbsp;    private void setUpRepositoryStructureForQueriesAndFetchers() throws IOException {
+&nbsp;        // Cannot use stream here since IOException has to be thrown
+<b class="nc">&nbsp;        StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(</b>
+<b class="nc">&nbsp;                this.getActiveLibraryEntries(),</b>
+<b class="nc">&nbsp;                preferences.getImportFormatPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getImporterPreferences());</b>
+<b class="nc">&nbsp;        for (String query : this.getSearchQueryStrings()) {</b>
+<b class="nc">&nbsp;            createQueryResultFolder(query);</b>
+<b class="nc">&nbsp;            converter.getActiveFetchers()</b>
+<b class="nc">&nbsp;                     .forEach(searchBasedFetcher -&gt; createFetcherResultFile(query, searchBasedFetcher));</b>
+<b class="nc">&nbsp;            createQueryResultFile(query);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        createStudyResultFile();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a folder using the query and its corresponding query id.
+&nbsp;     * This folder name is unique for each query, as long as the query id in the study definition is unique for each query.
+&nbsp;     *
+&nbsp;     * @param query The query the folder is created for
+&nbsp;     */
+&nbsp;    private void createQueryResultFolder(String query) throws IOException {
+<b class="nc">&nbsp;        Path queryResultFolder = getPathToQueryDirectory(query);</b>
+<b class="nc">&nbsp;        createFolder(queryResultFolder);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createFolder(Path folder) throws IOException {
+<b class="nc">&nbsp;        if (Files.notExists(folder)) {</b>
+<b class="nc">&nbsp;            Files.createDirectory(folder);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createFetcherResultFile(String query, SearchBasedFetcher searchBasedFetcher) {
+<b class="nc">&nbsp;        String fetcherName = searchBasedFetcher.getName();</b>
+<b class="nc">&nbsp;        Path fetcherResultFile = getPathToFetcherResultFile(query, fetcherName);</b>
+<b class="nc">&nbsp;        createBibFile(fetcherResultFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createQueryResultFile(String query) {
+<b class="nc">&nbsp;        Path queryResultFile = getPathToFetcherResultFile(query, &quot;result&quot;);</b>
+<b class="nc">&nbsp;        createBibFile(queryResultFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createStudyResultFile() {
+<b class="nc">&nbsp;        createBibFile(getPathToStudyResultFile());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createBibFile(Path file) {
+<b class="nc">&nbsp;        if (Files.notExists(file)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                Files.createFile(file);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;Error during creation of repository structure.&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a string that can be used as a folder name.
+&nbsp;     * This removes all characters from the query that are illegal for directory names.
+&nbsp;     * Structure: ID-trimmed query
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Examples:
+&nbsp;     * Input: &#39;(title: test-title AND abstract: Test)&#39; as a query entry with id 12345678
+&nbsp;     * Output: &#39;12345678 - title= test-title AND abstract= Test&#39;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Input: &#39;abstract: Test*&#39; as a query entry with id 87654321
+&nbsp;     * Output: &#39;87654321 - abstract= Test&#39;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Input: &#39;&quot;test driven&quot;&#39; as a query entry with id 12348765
+&nbsp;     * Output: &#39;12348765 - test driven&#39;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that this method might be similar to {@link org.jabref.logic.util.io.FileUtil#getValidFileName(String)} or {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName(String)}
+&nbsp;     *
+&nbsp;     * @param query that is trimmed and combined with its query id
+&nbsp;     * @return a unique folder name for any query.
+&nbsp;     */
+&nbsp;    private String trimNameAndAddID(String query) {
+&nbsp;        // Replace all field: with field= for folder name
+<b class="nc">&nbsp;        String trimmedNamed = MATCH_COLON.matcher(query).replaceAll(&quot;=&quot;);</b>
+<b class="nc">&nbsp;        trimmedNamed = MATCH_ILLEGAL_CHARACTERS.matcher(trimmedNamed).replaceAll(&quot;&quot;);</b>
+<b class="nc">&nbsp;        String id = computeIDForQuery(query);</b>
+&nbsp;        // Whole path has to be shorter than 260
+<b class="nc">&nbsp;        int remainingPathLength = 220 - studyDefinitionFile.toString().length() - id.length();</b>
+<b class="nc">&nbsp;        if (query.length() &gt; remainingPathLength) {</b>
+<b class="nc">&nbsp;            trimmedNamed = query.substring(0, remainingPathLength);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return id + &quot; - &quot; + trimmedNamed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Helper to compute the query id for folder name creation.
+&nbsp;     */
+&nbsp;    private String computeIDForQuery(String query) {
+<b class="nc">&nbsp;        return String.valueOf(query.hashCode());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Persists the crawling results in the local file based repository.
+&nbsp;     *
+&nbsp;     * @param crawlResults The results that shall be persisted.
+&nbsp;     */
+&nbsp;    private void persistResults(List&lt;QueryResult&gt; crawlResults) throws IOException, SaveException {
+<b class="nc">&nbsp;        DatabaseMerger merger = new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator());</b>
+<b class="nc">&nbsp;        BibDatabase newStudyResultEntries = new BibDatabase();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (QueryResult result : crawlResults) {</b>
+<b class="nc">&nbsp;            BibDatabase queryResultEntries = new BibDatabase();</b>
+<b class="nc">&nbsp;            for (FetchResult fetcherResult : result.getResultsPerFetcher()) {</b>
+<b class="nc">&nbsp;                BibDatabase fetcherEntries = fetcherResult.getFetchResult();</b>
+<b class="nc">&nbsp;                BibDatabaseContext existingFetcherResult = getFetcherResultEntries(result.getQuery(), fetcherResult.getFetcherName());</b>
+&nbsp;
+&nbsp;                // Merge new entries into fetcher result file
+<b class="nc">&nbsp;                merger.merge(existingFetcherResult.getDatabase(), fetcherEntries);</b>
+&nbsp;
+&nbsp;                // Create citation keys for all entries that do not have one
+<b class="nc">&nbsp;                generateCiteKeys(existingFetcherResult, fetcherEntries);</b>
+&nbsp;
+&nbsp;                // Aggregate each fetcher result into the query result
+<b class="nc">&nbsp;                merger.merge(queryResultEntries, fetcherEntries);</b>
+&nbsp;
+<b class="nc">&nbsp;                writeResultToFile(getPathToFetcherResultFile(result.getQuery(), fetcherResult.getFetcherName()), existingFetcherResult);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            BibDatabaseContext existingQueryEntries = getQueryResultEntries(result.getQuery());</b>
+&nbsp;
+&nbsp;            // Merge new entries into query result file
+<b class="nc">&nbsp;            merger.merge(existingQueryEntries.getDatabase(), queryResultEntries);</b>
+&nbsp;            // Aggregate all new entries for every query into the study result
+<b class="nc">&nbsp;            merger.merge(newStudyResultEntries, queryResultEntries);</b>
+&nbsp;
+<b class="nc">&nbsp;            writeResultToFile(getPathToQueryResultFile(result.getQuery()), existingQueryEntries);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        BibDatabaseContext existingStudyResultEntries = getStudyResultEntries();</b>
+&nbsp;
+&nbsp;        // Merge new entries into study result file
+<b class="nc">&nbsp;        merger.merge(existingStudyResultEntries.getDatabase(), newStudyResultEntries);</b>
+&nbsp;
+<b class="nc">&nbsp;        writeResultToFile(getPathToStudyResultFile(), existingStudyResultEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void generateCiteKeys(BibDatabaseContext existingEntries, BibDatabase targetEntries) {
+<b class="nc">&nbsp;        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(existingEntries,</b>
+<b class="nc">&nbsp;                preferences.getCitationKeyPatternPreferences());</b>
+<b class="nc">&nbsp;        targetEntries.getEntries().stream().filter(bibEntry -&gt; !bibEntry.hasCitationKey()).forEach(citationKeyGenerator::generateAndSetKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void writeResultToFile(Path pathToFile, BibDatabaseContext context) throws SaveException {
+<b class="nc">&nbsp;        try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {</b>
+<b class="nc">&nbsp;            SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()</b>
+<b class="nc">&nbsp;                    .withSaveOrder(context.getMetaData().getSaveOrder().map(SelfContainedSaveOrder::of).orElse(SaveOrder.getDefaultSaveOrder()))</b>
+<b class="nc">&nbsp;                    .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());</b>
+<b class="nc">&nbsp;            BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);</b>
+<b class="nc">&nbsp;            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(</b>
+&nbsp;                    bibWriter,
+&nbsp;                    saveConfiguration,
+<b class="nc">&nbsp;                    preferences.getFieldPreferences(),</b>
+<b class="nc">&nbsp;                    preferences.getCitationKeyPatternPreferences(),</b>
+&nbsp;                    bibEntryTypesManager);
+<b class="nc">&nbsp;            databaseWriter.saveDatabase(context);</b>
+&nbsp;        } catch (UnsupportedCharsetException ex) {
+<b class="nc">&nbsp;            throw new SaveException(Localization.lang(&quot;Character encoding UTF-8 is not supported.&quot;, ex));</b>
+&nbsp;        } catch (IOException ex) {
+<b class="nc">&nbsp;            throw new SaveException(&quot;Problems saving&quot;, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Path getPathToFetcherResultFile(String query, String fetcherName) {
+<b class="nc">&nbsp;        return repositoryPath.resolve(trimNameAndAddID(query)).resolve(FileNameCleaner.cleanFileName(fetcherName) + &quot;.bib&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Path getPathToQueryResultFile(String query) {
+<b class="nc">&nbsp;        return repositoryPath.resolve(trimNameAndAddID(query)).resolve(&quot;result.bib&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Path getPathToStudyResultFile() {
+<b class="nc">&nbsp;        return repositoryPath.resolve(Crawler.FILENAME_STUDY_RESULT_BIB);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Path getPathToQueryDirectory(String query) {
+<b class="nc">&nbsp;        return repositoryPath.resolve(trimNameAndAddID(query));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

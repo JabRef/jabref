@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OnlyIntegerFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: OnlyIntegerFormatter (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OnlyIntegerFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OnlyIntegerFormatter$IntegerFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.function.UnaryOperator;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.scene.control.TextFormatter;
+&nbsp;import javafx.util.converter.IntegerStringConverter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Formatter that only accepts integer.
+&nbsp; * &lt;p&gt;
+&nbsp; * More or less taken from http://stackoverflow.com/a/36749659/873661
+&nbsp; */
+&nbsp;public class OnlyIntegerFormatter extends TextFormatter&lt;Integer&gt; {
+&nbsp;
+&nbsp;    public OnlyIntegerFormatter() {
+<b class="nc">&nbsp;        this(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OnlyIntegerFormatter(Integer defaultValue) {
+<b class="nc">&nbsp;        super(new IntegerStringConverter(), defaultValue, new IntegerFilter());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class IntegerFilter implements UnaryOperator&lt;Change&gt; {</b>
+<b class="nc">&nbsp;        private final static Pattern DIGIT_PATTERN = Pattern.compile(&quot;\\d*&quot;);</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Change apply(TextFormatter.Change aT) {
+<b class="nc">&nbsp;            return DIGIT_PATTERN.matcher(aT.getText()).matches() ? aT : null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

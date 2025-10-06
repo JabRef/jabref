@@ -1,0 +1,529 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RepecNepImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: RepecNepImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RepecNepImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/96)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/120)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Date;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// Imports a New Economics Papers-Message from the REPEC-NEP Service.
+&nbsp;///
+&nbsp;/// [RePEc (Research Papers in Economics)](http://www.repec.org)
+&nbsp;/// is a collaborative effort of over 100 volunteers in 49 countries
+&nbsp;/// to enhance the dissemination of research in economics. The heart of
+&nbsp;/// the project is a decentralized database of working papers, journal
+&nbsp;/// articles and software components. All RePEc material is freely available.
+&nbsp;/// At the time of writing RePEc holds over 300.000 items.
+&nbsp;///
+&nbsp;///
+&nbsp;/// [NEP (New Economic Papers](http://nep.repec.org) is an announcement
+&nbsp;/// service which filters information on new additions to RePEc into edited
+&nbsp;/// reports. The goal is to provide subscribers with up-to-date information
+&nbsp;/// to the research literature.
+&nbsp;///
+&nbsp;/// This importer is capable of importing NEP messages into JabRef.
+&nbsp;///
+&nbsp;/// There is no officially defined message format for NEP. NEP messages are assumed to have
+&nbsp;/// (and almost always have) the form given by the following semi-formal grammar:
+&nbsp;///
+&nbsp;/// ```
+&nbsp;/// NEPMessage:
+&nbsp;///       MessageSection NEPMessage
+&nbsp;///       MessageSection
+&nbsp;///
+&nbsp;/// MessageSection:
+&nbsp;///       OverviewMessageSection
+&nbsp;///       OtherMessageSection
+&nbsp;///
+&nbsp;///# we skip the overview
+&nbsp;/// OverviewMessageSection:
+&nbsp;///       &#39;In this issue we have: &#39; SectionSeparator OtherStuff
+&nbsp;///
+&nbsp;/// OtherMessageSection:
+&nbsp;///       SectionSeparator  OtherMessageSectionContent
+&nbsp;///
+&nbsp;///# we skip other stuff and read only full working paper references
+&nbsp;/// OtherMessageSectionContent:
+&nbsp;///       WorkingPaper EmptyLine OtherMessageSectionContent
+&nbsp;///       OtherStuff EmptyLine OtherMessageSectionContent
+&nbsp;///       &#39;&#39;
+&nbsp;///
+&nbsp;/// OtherStuff:
+&nbsp;///       NonEmptyLine OtherStuff
+&nbsp;///       NonEmptyLine
+&nbsp;///
+&nbsp;/// NonEmptyLine:
+&nbsp;///       a non-empty String that does not start with a number followed by a &#39;.&#39;
+&nbsp;///
+&nbsp;///# working papers are recognized by a number followed by a &#39;.&#39;
+&nbsp;///# in a non-overview section
+&nbsp;/// WorkingPaper:
+&nbsp;///       Number&#39;.&#39; WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract AdditionalFields
+&nbsp;///       Number&#39;.&#39; WhiteSpace TitleString AdditionalFields Abstract AdditionalFields
+&nbsp;///
+&nbsp;/// TitleString:
+&nbsp;///       a String that may span several lines and should be joined
+&nbsp;///
+&nbsp;///# there must be at least one author
+&nbsp;/// Authors:
+&nbsp;///       Author &#39;\n&#39; Authors
+&nbsp;///       Author &#39;\n&#39;
+&nbsp;///
+&nbsp;///# optionally, an institution is given for an author
+&nbsp;/// Author:
+&nbsp;///       AuthorName
+&nbsp;///       AuthorName &#39;(&#39; Institution &#39;)&#39;
+&nbsp;///
+&nbsp;///# there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
+&nbsp;/// AuthorName:
+&nbsp;///       a non-empty String without &#39;(&#39; or &#39;)&#39; characters, not spanning more that one line
+&nbsp;///
+&nbsp;/// Institution:
+&nbsp;///       a non-empty String that may span several lines
+&nbsp;///
+&nbsp;/// Abstract:
+&nbsp;///       a (possibly empty) String that may span several lines
+&nbsp;///
+&nbsp;/// AdditionalFields:
+&nbsp;///       AdditionalField &#39;\n&#39; AdditionalFields
+&nbsp;///       EmptyLine AdditionalFields
+&nbsp;///       &#39;&#39;
+&nbsp;///
+&nbsp;/// AdditionalField:
+&nbsp;///       &#39;Keywords:&#39; KeywordList
+&nbsp;///       &#39;URL:&#39; non-empty String
+&nbsp;///       &#39;Date:&#39; DateString
+&nbsp;///       &#39;JEL:&#39; JelClassificationList
+&nbsp;///       &#39;By&#39;: Authors
+&nbsp;///
+&nbsp;/// KeywordList:
+&nbsp;///        Keyword &#39;,&#39; KeywordList
+&nbsp;///        Keyword &#39;;&#39; KeywordList
+&nbsp;///        Keyword
+&nbsp;///
+&nbsp;/// Keyword:
+&nbsp;///        non-empty String that does not contain &#39;,&#39; (may contain whitespace)
+&nbsp;///
+&nbsp;///# if no date is given, the current year as given by the system clock is assumed
+&nbsp;/// DateString:
+&nbsp;///        &#39;yyyy-MM-dd&#39;
+&nbsp;///        &#39;yyyy-MM&#39;
+&nbsp;///        &#39;yyyy&#39;
+&nbsp;///
+&nbsp;/// JelClassificationList:
+&nbsp;///        JelClassification JelClassificationList
+&nbsp;///        JelClassification
+&nbsp;///
+&nbsp;///# the JEL Classifications are set into a new BIBTEX-field &#39;jel&#39;
+&nbsp;///# they will appear if you add it as a field to one of the BIBTex Entry sections
+&nbsp;/// JelClassification:
+&nbsp;///        one of the allowed classes, see http://ideas.repec.org/j/
+&nbsp;///
+&nbsp;/// SectionSeparator:
+&nbsp;///       &#39;\n-----------------------------&#39;
+&nbsp;///```
+&nbsp;public class RepecNepImporter extends Importer {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(RepecNepImporter.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Collection&lt;String&gt; RECOGNIZED_FIELDS = Arrays.asList(&quot;Keywords&quot;, &quot;JEL&quot;, &quot;Date&quot;, &quot;URL&quot;, &quot;By&quot;);</b>
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;    private int line;
+<b class="nc">&nbsp;    private String lastLine = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private String preLine = &quot;&quot;;</b>
+&nbsp;    private boolean inOverviewSection;
+&nbsp;
+<b class="nc">&nbsp;    public RepecNepImporter(ImportFormatPreferences importFormatPreferences) {</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = importFormatPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;REPEC New Economic Papers (NEP)&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;repecnep&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StandardFileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.TXT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Imports a New Economics Papers-Message from the REPEC-NEP Service.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+&nbsp;        // read the first couple of lines
+&nbsp;        // NEP message usually contain the String &#39;NEP: New Economics Papers&#39;
+&nbsp;        // or, they are from nep.repec.org
+<b class="nc">&nbsp;        StringBuilder startOfMessage = new StringBuilder();</b>
+<b class="nc">&nbsp;        String tmpLine = reader.readLine();</b>
+<b class="nc">&nbsp;        for (int i = 0; (i &lt; 25) &amp;&amp; (tmpLine != null); i++) {</b>
+<b class="nc">&nbsp;            startOfMessage.append(tmpLine);</b>
+<b class="nc">&nbsp;            tmpLine = reader.readLine();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return startOfMessage.toString().contains(&quot;NEP: New Economics Papers&quot;) || startOfMessage.toString().contains(</b>
+&nbsp;                &quot;nep.repec.org&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean startsWithKeyword(Collection&lt;String&gt; keywords) {
+<b class="nc">&nbsp;        boolean result = this.lastLine.indexOf(&#39;:&#39;) &gt;= 1;</b>
+<b class="nc">&nbsp;        if (result) {</b>
+<b class="nc">&nbsp;            String possibleKeyword = this.lastLine.substring(0, this.lastLine.indexOf(&#39;:&#39;));</b>
+<b class="nc">&nbsp;            result = keywords.contains(possibleKeyword);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void readLine(BufferedReader in) throws IOException {
+<b class="nc">&nbsp;        this.line++;</b>
+<b class="nc">&nbsp;        this.preLine = this.lastLine;</b>
+<b class="nc">&nbsp;        this.lastLine = in.readLine();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read multiple lines.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;p&gt;Reads multiple lines until either
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;an empty line&lt;/li&gt;
+&nbsp;     * &lt;li&gt;the end of file&lt;/li&gt;
+&nbsp;     * &lt;li&gt;the next working paper or&lt;/li&gt;
+&nbsp;     * &lt;li&gt;a keyword&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * is found. Whitespace at start or end of lines is trimmed except for one blank character.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @return result
+&nbsp;     */
+&nbsp;    private String readMultipleLines(BufferedReader in) throws IOException {
+<b class="nc">&nbsp;        StringBuilder result = new StringBuilder(this.lastLine.trim());</b>
+<b class="nc">&nbsp;        readLine(in);</b>
+<b class="nc">&nbsp;        while ((this.lastLine != null) &amp;&amp; !this.lastLine.trim().isEmpty() &amp;&amp; !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) &amp;&amp; !isStartOfWorkingPaper()) {</b>
+<b class="nc">&nbsp;            result.append(this.lastLine.isEmpty() ? this.lastLine.trim() : &quot; &quot; + this.lastLine.trim());</b>
+<b class="nc">&nbsp;            readLine(in);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Implements grammar rule &quot;TitleString&quot;.
+&nbsp;     *
+&nbsp;     * @throws IOException in case of error
+&nbsp;     */
+&nbsp;    private void parseTitleString(BibEntry be, BufferedReader in) throws IOException {
+&nbsp;        // skip article number
+<b class="nc">&nbsp;        this.lastLine = this.lastLine.substring(this.lastLine.indexOf(&#39;.&#39;) + 1);</b>
+<b class="nc">&nbsp;        be.setField(StandardField.TITLE, readMultipleLines(in));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Implements grammar rule &quot;Authors&quot;
+&nbsp;     *
+&nbsp;     * @throws IOException in case of error
+&nbsp;     */
+&nbsp;    private void parseAuthors(BibEntry be, BufferedReader in) throws IOException {
+&nbsp;        // read authors and institutions
+<b class="nc">&nbsp;        List&lt;String&gt; authors = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        StringBuilder institutions = new StringBuilder();</b>
+<b class="nc">&nbsp;        while ((this.lastLine != null) &amp;&amp; !this.lastLine.isEmpty() &amp;&amp; !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {</b>
+&nbsp;            // read single author
+&nbsp;            String author;
+<b class="nc">&nbsp;            StringBuilder institution = new StringBuilder();</b>
+&nbsp;            boolean institutionDone;
+<b class="nc">&nbsp;            if (this.lastLine.indexOf(&#39;(&#39;) &gt;= 0) {</b>
+<b class="nc">&nbsp;                author = this.lastLine.substring(0, this.lastLine.indexOf(&#39;(&#39;)).trim();</b>
+<b class="nc">&nbsp;                institutionDone = this.lastLine.indexOf(&#39;)&#39;) &gt;= 1;</b>
+<b class="nc">&nbsp;                institution</b>
+<b class="nc">&nbsp;                        .append(this.lastLine.substring(this.lastLine.indexOf(&#39;(&#39;) + 1,</b>
+<b class="nc">&nbsp;                                            institutionDone &amp;&amp; (this.lastLine</b>
+<b class="nc">&nbsp;                                                    .indexOf(&#39;)&#39;) &gt; (this.lastLine.indexOf(&#39;(&#39;) + 1)) ? this.lastLine</b>
+<b class="nc">&nbsp;                                                    .indexOf(&#39;)&#39;) : this.lastLine.length())</b>
+<b class="nc">&nbsp;                                             .trim());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                author = this.lastLine.trim();</b>
+<b class="nc">&nbsp;                institutionDone = true;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            readLine(in);</b>
+<b class="nc">&nbsp;            while (!institutionDone &amp;&amp; (this.lastLine != null)) {</b>
+<b class="nc">&nbsp;                institutionDone = this.lastLine.indexOf(&#39;)&#39;) &gt;= 1;</b>
+<b class="nc">&nbsp;                institution.append(this.lastLine</b>
+<b class="nc">&nbsp;                        .substring(0, institutionDone ? this.lastLine.indexOf(&#39;)&#39;) : this.lastLine.length()).trim());</b>
+<b class="nc">&nbsp;                readLine(in);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            authors.add(author);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!institution.isEmpty()) {</b>
+<b class="nc">&nbsp;                institutions.append(</b>
+<b class="nc">&nbsp;                        institutions.isEmpty() ? institution.toString() : &quot; and &quot; + institution);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!authors.isEmpty()) {</b>
+<b class="nc">&nbsp;            be.setField(StandardField.AUTHOR, String.join(&quot; and &quot;, authors));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!institutions.isEmpty()) {</b>
+<b class="nc">&nbsp;            be.setField(StandardField.INSTITUTION, institutions.toString());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Implements grammar rule &quot;Abstract&quot;.
+&nbsp;     *
+&nbsp;     * @throws IOException in case of error
+&nbsp;     */
+&nbsp;    private void parseAbstract(BibEntry be, BufferedReader in) throws IOException {
+<b class="nc">&nbsp;        String theabstract = readMultipleLines(in);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!theabstract.isEmpty()) {</b>
+<b class="nc">&nbsp;            be.setField(StandardField.ABSTRACT, theabstract);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Implements grammar rule &quot;AdditionalFields&quot;.
+&nbsp;     *
+&nbsp;     */
+&nbsp;    private void parseAdditionalFields(BibEntry be, boolean multilineUrlFieldAllowed, BufferedReader in)
+&nbsp;            throws IOException {
+&nbsp;
+&nbsp;        // one empty line is possible before fields start
+<b class="nc">&nbsp;        if ((this.lastLine != null) &amp;&amp; this.lastLine.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            readLine(in);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // read other fields
+<b class="nc">&nbsp;        while ((this.lastLine != null) &amp;&amp; !isStartOfWorkingPaper() &amp;&amp; (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) || &quot;&quot;.equals(this.lastLine))) {</b>
+&nbsp;            // if multiple lines for a field are allowed and field consists of multiple lines, join them
+<b class="nc">&nbsp;            String keyword = &quot;&quot;.equals(this.lastLine) ? &quot;&quot; : this.lastLine.substring(0, this.lastLine.indexOf(&#39;:&#39;)).trim();</b>
+&nbsp;            // skip keyword
+<b class="nc">&nbsp;            this.lastLine = &quot;&quot;.equals(this.lastLine) ? &quot;&quot; : this.lastLine.substring(this.lastLine.indexOf(&#39;:&#39;) + 1).trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (&quot;Keywords&quot;.equals(keyword)) {</b>
+&nbsp;                // parse keywords field
+<b class="nc">&nbsp;                String content = readMultipleLines(in);</b>
+<b class="nc">&nbsp;                String[] keywords = content.split(&quot;[,;]&quot;);</b>
+<b class="nc">&nbsp;                be.addKeywords(Arrays.asList(keywords),</b>
+<b class="nc">&nbsp;                        importFormatPreferences.bibEntryPreferences().getKeywordSeparator());</b>
+<b class="nc">&nbsp;            } else if (&quot;JEL&quot;.equals(keyword)) {</b>
+&nbsp;                // parse JEL field
+<b class="nc">&nbsp;                be.setField(new UnknownField(&quot;jel&quot;), readMultipleLines(in));</b>
+<b class="nc">&nbsp;            } else if (keyword.startsWith(&quot;Date&quot;)) {</b>
+&nbsp;                // parse date field
+<b class="nc">&nbsp;                String content = readMultipleLines(in);</b>
+<b class="nc">&nbsp;                Date.parse(content).ifPresent(be::setDate);</b>
+<b class="nc">&nbsp;            } else if (keyword.startsWith(&quot;URL&quot;)) {</b>
+&nbsp;                // parse URL field
+&nbsp;                String content;
+<b class="nc">&nbsp;                if (multilineUrlFieldAllowed) {</b>
+<b class="nc">&nbsp;                    content = readMultipleLines(in);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    content = this.lastLine;</b>
+<b class="nc">&nbsp;                    readLine(in);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                be.setField(StandardField.URL, content);</b>
+<b class="nc">&nbsp;            } else if (keyword.startsWith(&quot;By&quot;)) {</b>
+&nbsp;                // parse authors field
+<b class="nc">&nbsp;                parseAuthors(be, in);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                readLine(in);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * if line starts with a string of the form &#39;x. &#39; and we are not in the overview
+&nbsp;     * section, we have a working paper entry we are interested in
+&nbsp;     */
+&nbsp;    private boolean isStartOfWorkingPaper() {
+<b class="nc">&nbsp;        return this.lastLine.matches(&quot;\\d+\\.\\s.*&quot;) &amp;&amp; !this.inOverviewSection &amp;&amp; this.preLine.trim().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(reader);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; bibitems = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        String paperNoStr = null;</b>
+<b class="nc">&nbsp;        this.line = 0;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            readLine(reader); // skip header and editor information</b>
+<b class="nc">&nbsp;            while (this.lastLine != null) {</b>
+<b class="nc">&nbsp;                if (this.lastLine.startsWith(&quot;-----------------------------&quot;)) {</b>
+<b class="nc">&nbsp;                    this.inOverviewSection = this.preLine.startsWith(&quot;In this issue we have&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (isStartOfWorkingPaper()) {</b>
+<b class="nc">&nbsp;                    BibEntry be = new BibEntry(StandardEntryType.TechReport);</b>
+<b class="nc">&nbsp;                    paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf(&#39;.&#39;));</b>
+<b class="nc">&nbsp;                    parseTitleString(be, reader);</b>
+<b class="nc">&nbsp;                    if (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {</b>
+<b class="nc">&nbsp;                        parseAdditionalFields(be, false, reader);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        readLine(reader); // skip empty line</b>
+<b class="nc">&nbsp;                        parseAuthors(be, reader);</b>
+<b class="nc">&nbsp;                        readLine(reader); // skip empty line</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (!startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {</b>
+<b class="nc">&nbsp;                        parseAbstract(be, reader);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    parseAdditionalFields(be, true, reader);</b>
+&nbsp;
+<b class="nc">&nbsp;                    bibitems.add(be);</b>
+<b class="nc">&nbsp;                    paperNoStr = null;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    this.preLine = this.lastLine;</b>
+<b class="nc">&nbsp;                    readLine(reader);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            String message = &quot;Error in REPEC-NEP import on line &quot; + this.line;</b>
+<b class="nc">&nbsp;            if (paperNoStr != null) {</b>
+<b class="nc">&nbsp;                message += &quot;, paper no. &quot; + paperNoStr + &quot;: &quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            message += e.getLocalizedMessage();</b>
+<b class="nc">&nbsp;            LOGGER.error(message, e);</b>
+<b class="nc">&nbsp;            return ParserResult.fromErrorMessage(message);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new ParserResult(bibitems);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

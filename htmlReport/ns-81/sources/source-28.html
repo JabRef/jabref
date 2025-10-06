@@ -1,0 +1,241 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ViewModelTreeCellFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ViewModelTreeCellFactory (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ViewModelTreeCellFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ViewModelTreeCellFactory$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import javafx.beans.value.ObservableValue;
+&nbsp;import javafx.event.EventHandler;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.CheckBoxTreeItem;
+&nbsp;import javafx.scene.control.TreeCell;
+&nbsp;import javafx.scene.control.TreeItem;
+&nbsp;import javafx.scene.control.TreeTableCell;
+&nbsp;import javafx.scene.control.TreeView;
+&nbsp;import javafx.scene.control.cell.CheckBoxTreeCell;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.util.Callback;
+&nbsp;import javafx.util.StringConverter;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;
+&nbsp;/**
+&nbsp; * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; cell value
+&nbsp; */
+<b class="nc">&nbsp;public class ViewModelTreeCellFactory&lt;T&gt; implements Callback&lt;TreeView&lt;T&gt;, TreeCell&lt;T&gt;&gt; {</b>
+&nbsp;
+&nbsp;    private Callback&lt;T, String&gt; toText;
+&nbsp;    private Callback&lt;T, Node&gt; toGraphic;
+&nbsp;    private Callback&lt;T, EventHandler&lt;? super MouseEvent&gt;&gt; toOnMouseClickedEvent;
+&nbsp;    private Callback&lt;T, String&gt; toTooltip;
+&nbsp;
+&nbsp;    public ViewModelTreeCellFactory&lt;T&gt; withText(Callback&lt;T, String&gt; toText) {
+<b class="nc">&nbsp;        this.toText = toText;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeCellFactory&lt;T&gt; withGraphic(Callback&lt;T, Node&gt; toGraphic) {
+<b class="nc">&nbsp;        this.toGraphic = toGraphic;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeCellFactory&lt;T&gt; withIcon(Callback&lt;T, JabRefIcon&gt; toIcon) {
+<b class="nc">&nbsp;        this.toGraphic = viewModel -&gt; toIcon.call(viewModel).getGraphicNode();</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeCellFactory&lt;T&gt; withTooltip(Callback&lt;T, String&gt; toTooltip) {
+<b class="nc">&nbsp;        this.toTooltip = toTooltip;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeCellFactory&lt;T&gt; withOnMouseClickedEvent(Callback&lt;T, EventHandler&lt;? super MouseEvent&gt;&gt; toOnMouseClickedEvent) {
+<b class="nc">&nbsp;        this.toOnMouseClickedEvent = toOnMouseClickedEvent;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void install(TreeView&lt;T&gt; treeView) {
+<b class="nc">&nbsp;        treeView.setCellFactory(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TreeCell&lt;T&gt; call(TreeView&lt;T&gt; tree) {
+<b class="nc">&nbsp;        Callback&lt;TreeItem&lt;T&gt;, ObservableValue&lt;Boolean&gt;&gt; getSelectedProperty =</b>
+&nbsp;                item -&gt; {
+<b class="nc">&nbsp;                    if (item instanceof CheckBoxTreeItem&lt;?&gt; treeItem) {</b>
+<b class="nc">&nbsp;                        return treeItem.selectedProperty();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;                };
+&nbsp;
+<b class="nc">&nbsp;        StringConverter&lt;TreeItem&lt;T&gt;&gt; converter = new StringConverter&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public String toString(TreeItem&lt;T&gt; treeItem) {
+<b class="nc">&nbsp;                return treeItem == null || treeItem.getValue() == null || toText == null ?</b>
+<b class="nc">&nbsp;                       &quot;&quot; : toText.call(treeItem.getValue());</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public TreeItem&lt;T&gt; fromString(String string) {
+<b class="nc">&nbsp;                throw new UnsupportedOperationException(&quot;Not supported.&quot;);</b>
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        return new CheckBoxTreeCell&lt;&gt;(getSelectedProperty, converter);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

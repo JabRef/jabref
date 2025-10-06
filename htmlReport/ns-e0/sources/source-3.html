@@ -1,0 +1,348 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OpenOfficePreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenOfficePreferences (org.jabref.logic.openoffice)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenOfficePreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyle;
+&nbsp;import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
+&nbsp;import org.jabref.logic.openoffice.style.OOStyle;
+&nbsp;
+&nbsp;public class OpenOfficePreferences {
+&nbsp;
+&nbsp;    public static final String DEFAULT_WIN_EXEC_PATH = &quot;C:\\Program Files\\LibreOffice\\program&quot;;
+&nbsp;    public static final String WINDOWS_EXECUTABLE = &quot;soffice.exe&quot;;
+&nbsp;
+&nbsp;    public static final String DEFAULT_OSX_EXEC_PATH = &quot;/Applications/LibreOffice.app/Contents/MacOS/soffice&quot;;
+&nbsp;    public static final String OSX_EXECUTABLE = &quot;soffice&quot;;
+&nbsp;
+&nbsp;    public static final String DEFAULT_LINUX_EXEC_PATH = &quot;/usr/lib/libreoffice/program/soffice&quot;;
+&nbsp;    public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH = &quot;/app/bin/soffice&quot;;
+&nbsp;    public static final String LINUX_EXECUTABLE = &quot;soffice&quot;;
+&nbsp;
+&nbsp;    private final StringProperty executablePath;
+&nbsp;    private final BooleanProperty useAllDatabases;
+&nbsp;    private final BooleanProperty syncWhenCiting;
+&nbsp;    private final ObservableList&lt;String&gt; externalJStyles;
+&nbsp;    private final StringProperty currentJStyle;
+&nbsp;    private final ObjectProperty&lt;OOStyle&gt; currentStyle;
+&nbsp;    private final BooleanProperty alwaysAddCitedOnPages;
+&nbsp;    private final StringProperty cslBibliographyTitle;
+&nbsp;    private final StringProperty cslBibliographyHeaderFormat;
+&nbsp;    private final StringProperty cslBibliographyBodyFormat;
+&nbsp;    private final ObservableList&lt;String&gt; externalCslStyles;
+&nbsp;    private final BooleanProperty addSpaceAfter;
+&nbsp;
+&nbsp;    public OpenOfficePreferences(String executablePath,
+&nbsp;                                 boolean useAllDatabases,
+&nbsp;                                 boolean syncWhenCiting,
+&nbsp;                                 List&lt;String&gt; externalJStyles,
+&nbsp;                                 String currentJStyle,
+&nbsp;                                 OOStyle currentStyle,
+&nbsp;                                 boolean alwaysAddCitedOnPages,
+&nbsp;                                 String cslBibliographyTitle,
+&nbsp;                                 String cslBibliographyHeaderFormat,
+&nbsp;                                 String cslBibliographyBodyFormat,
+&nbsp;                                 List&lt;String&gt; externalCslStyles,
+<b class="nc">&nbsp;                                 boolean addSpaceAfter) {</b>
+<b class="nc">&nbsp;        this.executablePath = new SimpleStringProperty(executablePath);</b>
+<b class="nc">&nbsp;        this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);</b>
+<b class="nc">&nbsp;        this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);</b>
+<b class="nc">&nbsp;        this.externalJStyles = FXCollections.observableArrayList(externalJStyles);</b>
+<b class="nc">&nbsp;        this.currentJStyle = new SimpleStringProperty(currentJStyle);</b>
+<b class="nc">&nbsp;        this.currentStyle = new SimpleObjectProperty&lt;&gt;(currentStyle);</b>
+<b class="nc">&nbsp;        this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);</b>
+<b class="nc">&nbsp;        this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);</b>
+<b class="nc">&nbsp;        this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);</b>
+<b class="nc">&nbsp;        this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);</b>
+<b class="nc">&nbsp;        this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);</b>
+<b class="nc">&nbsp;        this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearConnectionSettings() {
+<b class="nc">&nbsp;        this.executablePath.set(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearCurrentJStyle() {
+<b class="nc">&nbsp;        this.currentJStyle.set(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * path to soffice-file
+&nbsp;     */
+&nbsp;    public String getExecutablePath() {
+<b class="nc">&nbsp;        return executablePath.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty executablePathProperty() {
+<b class="nc">&nbsp;        return executablePath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setExecutablePath(String executablePath) {
+<b class="nc">&nbsp;        this.executablePath.setValue(executablePath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * true if all databases should be used when citing
+&nbsp;     */
+&nbsp;    public boolean getUseAllDatabases() {
+<b class="nc">&nbsp;        return useAllDatabases.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty useAllDatabasesProperty() {
+<b class="nc">&nbsp;        return useAllDatabases;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUseAllDatabases(boolean useAllDatabases) {
+<b class="nc">&nbsp;        this.useAllDatabases.set(useAllDatabases);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * true if the reference list is updated when adding a new citation
+&nbsp;     */
+&nbsp;    public boolean getSyncWhenCiting() {
+<b class="nc">&nbsp;        return syncWhenCiting.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty syncWhenCitingProperty() {
+<b class="nc">&nbsp;        return syncWhenCiting;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSyncWhenCiting(boolean syncWhenCiting) {
+<b class="nc">&nbsp;        this.syncWhenCiting.setValue(syncWhenCiting);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * list with paths to external style files
+&nbsp;     */
+&nbsp;    public ObservableList&lt;String&gt; getExternalJStyles() {
+<b class="nc">&nbsp;        return externalJStyles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setExternalJStyles(List&lt;String&gt; list) {
+<b class="nc">&nbsp;        externalJStyles.clear();</b>
+<b class="nc">&nbsp;        externalJStyles.addAll(list);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * path to the used style file
+&nbsp;     */
+&nbsp;    public String getCurrentJStyle() {
+<b class="nc">&nbsp;        return currentJStyle.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty currentJStyleProperty() {
+<b class="nc">&nbsp;        return currentJStyle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCurrentJStyle(String currentJStyle) {
+<b class="nc">&nbsp;        this.currentJStyle.set(currentJStyle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OOStyle getCurrentStyle() {
+<b class="nc">&nbsp;        return currentStyle.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;OOStyle&gt; currentStyleProperty() {
+<b class="nc">&nbsp;        return currentStyle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCurrentStyle(OOStyle style) {
+<b class="nc">&nbsp;        this.currentStyle.set(style);</b>
+<b class="nc">&nbsp;        if (style instanceof CitationStyle citationStyle) {</b>
+<b class="nc">&nbsp;            this.cslBibliographyBodyFormat.set(CSLFormatUtils.getDefaultBodyFormatForStyle(citationStyle));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getAlwaysAddCitedOnPages() {
+<b class="nc">&nbsp;        return this.alwaysAddCitedOnPages.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty alwaysAddCitedOnPagesProperty() {
+<b class="nc">&nbsp;        return this.alwaysAddCitedOnPages;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAlwaysAddCitedOnPages(boolean alwaysAddCitedOnPages) {
+<b class="nc">&nbsp;        this.alwaysAddCitedOnPages.set(alwaysAddCitedOnPages);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty cslBibliographyTitleProperty() {
+<b class="nc">&nbsp;        return cslBibliographyTitle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCslBibliographyTitle() {
+<b class="nc">&nbsp;        return cslBibliographyTitle.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCslBibliographyTitle(String title) {
+<b class="nc">&nbsp;        this.cslBibliographyTitle.set(title);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty cslBibliographyHeaderFormatProperty() {
+<b class="nc">&nbsp;        return cslBibliographyHeaderFormat;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCslBibliographyHeaderFormat() {
+<b class="nc">&nbsp;        return cslBibliographyHeaderFormat.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCslBibliographyHeaderFormat(String headerFormat) {
+<b class="nc">&nbsp;        this.cslBibliographyHeaderFormat.set(headerFormat);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty cslBibliographyBodyFormatProperty() {
+<b class="nc">&nbsp;        return cslBibliographyBodyFormat;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCslBibliographyBodyFormat() {
+<b class="nc">&nbsp;        return cslBibliographyBodyFormat.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCslBibliographyBodyFormat(String format) {
+<b class="nc">&nbsp;        this.cslBibliographyBodyFormat.set(format);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;String&gt; getExternalCslStyles() {
+<b class="nc">&nbsp;        return externalCslStyles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setExternalCslStyles(List&lt;String&gt; paths) {
+<b class="nc">&nbsp;        externalCslStyles.clear();</b>
+<b class="nc">&nbsp;        externalCslStyles.addAll(paths);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getAddSpaceAfter() {
+<b class="nc">&nbsp;        return addSpaceAfter.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty addSpaceAfterProperty() {
+<b class="nc">&nbsp;        return addSpaceAfter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAddSpaceAfter(boolean addSpaceAfter) {
+<b class="nc">&nbsp;        this.addSpaceAfter.setValue(addSpaceAfter);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

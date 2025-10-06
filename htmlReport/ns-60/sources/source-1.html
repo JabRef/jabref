@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationKeyPatternTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.citationkeypattern</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationKeyPatternTab (org.jabref.gui.preferences.citationkeypattern)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationKeyPatternTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.citationkeypattern;
+&nbsp;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.RadioButton;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;
+&nbsp;public class CitationKeyPatternTab extends AbstractPreferenceTabView&lt;CitationKeyPatternTabViewModel&gt; implements PreferencesTab {
+&nbsp;
+&nbsp;    @FXML private CheckBox overwriteAllow;
+&nbsp;    @FXML private CheckBox overwriteWarning;
+&nbsp;    @FXML private CheckBox generateOnSave;
+&nbsp;    @FXML private CheckBox generateNewKeyOnImport;
+&nbsp;    @FXML private RadioButton letterStartA;
+&nbsp;    @FXML private RadioButton letterStartB;
+&nbsp;    @FXML private RadioButton letterAlwaysAdd;
+&nbsp;    @FXML private TextField keyPatternRegex;
+&nbsp;    @FXML private TextField keyPatternReplacement;
+&nbsp;    @FXML private TextField unwantedCharacters;
+&nbsp;    @FXML private Button keyPatternHelp;
+&nbsp;    @FXML private CitationKeyPatternsPanel bibtexKeyPatternTable;
+&nbsp;
+<b class="nc">&nbsp;    public CitationKeyPatternTab() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Citation key generator&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new CitationKeyPatternTabViewModel(preferences.getCitationKeyPatternPreferences(), preferences.getImporterPreferences());</b>
+&nbsp;
+<b class="nc">&nbsp;        overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());</b>
+<b class="nc">&nbsp;        overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());</b>
+<b class="nc">&nbsp;        generateOnSave.selectedProperty().bindBidirectional(viewModel.generateOnSaveProperty());</b>
+<b class="nc">&nbsp;        generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());</b>
+<b class="nc">&nbsp;        letterStartA.selectedProperty().bindBidirectional(viewModel.letterStartAProperty());</b>
+<b class="nc">&nbsp;        letterStartB.selectedProperty().bindBidirectional(viewModel.letterStartBProperty());</b>
+<b class="nc">&nbsp;        letterAlwaysAdd.selectedProperty().bindBidirectional(viewModel.letterAlwaysAddProperty());</b>
+<b class="nc">&nbsp;        keyPatternRegex.textProperty().bindBidirectional(viewModel.keyPatternRegexProperty());</b>
+<b class="nc">&nbsp;        keyPatternReplacement.textProperty().bindBidirectional(viewModel.keyPatternReplacementProperty());</b>
+<b class="nc">&nbsp;        unwantedCharacters.textProperty().bindBidirectional(viewModel.unwantedCharactersProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());</b>
+<b class="nc">&nbsp;        bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        ActionFactory actionFactory = new ActionFactory();</b>
+<b class="nc">&nbsp;        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferences.getExternalApplicationsPreferences()), keyPatternHelp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        viewModel.setValues();</b>
+<b class="nc">&nbsp;        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);</b>
+<b class="nc">&nbsp;        bibtexKeyPatternTable.setValues(</b>
+<b class="nc">&nbsp;                entryTypesManager.getAllTypes(preferences.getLibraryPreferences().getDefaultBibDatabaseMode()),</b>
+<b class="nc">&nbsp;                preferences.getCitationKeyPatternPreferences().getKeyPatterns());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        viewModel.storeSettings();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void resetAllKeyPatterns() {
+<b class="nc">&nbsp;        bibtexKeyPatternTable.resetAll();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

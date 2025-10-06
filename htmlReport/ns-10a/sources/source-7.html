@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntryTypeFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.types</a>
+</div>
+
+<h1>Coverage Summary for Class: EntryTypeFactory (org.jabref.model.entry.types)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntryTypeFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.types;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;
+&nbsp;public class EntryTypeFactory {
+&nbsp;
+&nbsp;    private EntryTypeFactory() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks whether two EntryTypeFactory are equal
+&nbsp;     * based on the equality of the type names and on the equality of the required and optional field lists
+&nbsp;     *
+&nbsp;     * @return returns true if the two compared entry types have the same name and equal required and optional fields
+&nbsp;     */
+&nbsp;    public static boolean nameAndFieldsAreEqual(BibEntryType type1, BibEntryType type2) {
+<b class="nc">&nbsp;        if ((type1 == null) &amp;&amp; (type2 == null)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } else if ((type1 == null) || (type2 == null)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Objects.equals(type1.getType(), type2.getType())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(type1.getRequiredFields(), type2.getRequiredFields())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(type1.getOptionalFields(), type2.getOptionalFields())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(type1.getDetailOptionalFields(), type2.getDetailOptionalFields());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isExclusiveBiblatex(EntryType type) {
+<b class="nc">&nbsp;        return isBiblatex(type) &amp;&amp; !isBibtex(type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isBibtex(EntryType type) {
+<b class="nc">&nbsp;        return BibtexEntryTypeDefinitions.ALL.stream().anyMatch(bibEntryType -&gt; bibEntryType.getType().equals(type));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isBiblatex(EntryType type) {
+<b class="nc">&nbsp;        return BiblatexEntryTypeDefinitions.ALL.stream().anyMatch(bibEntryType -&gt; bibEntryType.getType().equals(type));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static EntryType parse(String typeName) {
+<b class="nc">&nbsp;        List&lt;EntryType&gt; types = new ArrayList&lt;&gt;(Arrays.&lt;EntryType&gt;asList(StandardEntryType.values()));</b>
+<b class="nc">&nbsp;        types.addAll(Arrays.&lt;EntryType&gt;asList(IEEETranEntryType.values()));</b>
+<b class="nc">&nbsp;        types.addAll(Arrays.&lt;EntryType&gt;asList(BiblatexSoftwareEntryType.values()));</b>
+<b class="nc">&nbsp;        types.addAll(Arrays.&lt;EntryType&gt;asList(BiblatexApaEntryType.values()));</b>
+<b class="nc">&nbsp;        types.addAll(Arrays.&lt;EntryType&gt;asList(SystematicLiteratureReviewStudyEntryType.values()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return types.stream().filter(type -&gt; type.getName().equals(typeName.toLowerCase(Locale.ENGLISH))).findFirst().orElse(new UnknownEntryType(typeName));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

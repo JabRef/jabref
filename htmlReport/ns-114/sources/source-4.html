@@ -1,0 +1,404 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationGroups</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.style</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationGroups (org.jabref.model.openoffice.style)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationGroups</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/89)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.style;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.openoffice.util.OOListUtil;
+&nbsp;import org.jabref.model.openoffice.util.OOPair;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * CitationGroups : the set of citation groups in the document.
+&nbsp; * &lt;p&gt;
+&nbsp; * This is the main input (as well as output) for creating citation markers and bibliography.
+&nbsp; */
+&nbsp;public class CitationGroups {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CitationGroups.class);</b>
+&nbsp;
+&nbsp;    private final Map&lt;CitationGroupId, CitationGroup&gt; citationGroupsUnordered;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Provides order of appearance for the citation groups.
+&nbsp;     */
+&nbsp;    private Optional&lt;List&lt;CitationGroupId&gt;&gt; globalOrder;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is going to be the bibliography
+&nbsp;     */
+&nbsp;    private Optional&lt;CitedKeys&gt; bibliography;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor
+&nbsp;     */
+<b class="nc">&nbsp;    public CitationGroups(Map&lt;CitationGroupId, CitationGroup&gt; citationGroups) {</b>
+<b class="nc">&nbsp;        this.citationGroupsUnordered = citationGroups;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.globalOrder = Optional.empty();</b>
+<b class="nc">&nbsp;        this.bibliography = Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int numberOfCitationGroups() {
+<b class="nc">&nbsp;        return citationGroupsUnordered.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For each citation in {@code where} call {@code fun.accept(new Pair(citation, value));}
+&nbsp;     */
+&nbsp;    public &lt;T&gt; void distributeToCitations(List&lt;CitationPath&gt; where,
+&nbsp;                                          Consumer&lt;OOPair&lt;Citation, T&gt;&gt; fun,
+&nbsp;                                          T value) {
+&nbsp;
+<b class="nc">&nbsp;        for (CitationPath p : where) {</b>
+<b class="nc">&nbsp;            CitationGroup group = citationGroupsUnordered.get(p.group);</b>
+<b class="nc">&nbsp;            if (group == null) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;CitationGroups.distributeToCitations: group missing&quot;);</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            Citation cit = group.citationsInStorageOrder.get(p.storageIndexInGroup);</b>
+<b class="nc">&nbsp;            fun.accept(new OOPair&lt;&gt;(cit, value));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Look up each Citation in databases.
+&nbsp;     */
+&nbsp;    public void lookupCitations(List&lt;BibDatabase&gt; databases) {
+&nbsp;        /*
+&nbsp;         * It is not clear which of the two solutions below is better.
+&nbsp;         */
+&nbsp;
+&nbsp;        // (1) collect-lookup-distribute
+&nbsp;        //
+&nbsp;        // CitationDatabaseLookupResult for the same citation key is the same object. Until we
+&nbsp;        // insert a new citation from the GUI.
+<b class="nc">&nbsp;        CitedKeys cks = getCitedKeysUnordered();</b>
+<b class="nc">&nbsp;        cks.lookupInDatabases(databases);</b>
+<b class="nc">&nbsp;        cks.distributeLookupResults(this);</b>
+&nbsp;
+&nbsp;        // (2) lookup each citation directly
+&nbsp;        //
+&nbsp;        // CitationDatabaseLookupResult for the same citation key may be a different object:
+&nbsp;        // CitedKey.addPath has to use equals, so CitationDatabaseLookupResult has to override
+&nbsp;        // Object.equals, which depends on BibEntry.equals and BibDatabase.equals doing the
+&nbsp;        // right thing. Seems to work. But what we gained from avoiding collect-and-distribute
+&nbsp;        // may be lost in more complicated consistency checking in addPath.
+&nbsp;        //
+&nbsp;        ///            for (CitationGroup group : getCitationGroupsUnordered()) {
+&nbsp;        ///                for (Citation cit : group.citationsInStorageOrder) {
+&nbsp;        ///                    cit.lookupInDatabases(databases);
+&nbsp;        ///                }
+&nbsp;        ///            }
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;CitationGroup&gt; getCitationGroupsUnordered() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(citationGroupsUnordered.values());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Citation groups in {@code globalOrder}
+&nbsp;     */
+&nbsp;    public List&lt;CitationGroup&gt; getCitationGroupsInGlobalOrder() {
+<b class="nc">&nbsp;        if (globalOrder.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;getCitationGroupsInGlobalOrder: not ordered yet&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return OOListUtil.map(globalOrder.get(), citationGroupsUnordered::get);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Impose an order of citation groups by providing the order of their citation group idendifiers.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Also set indexInGlobalOrder for each citation group.
+&nbsp;     */
+&nbsp;    public void setGlobalOrder(List&lt;CitationGroupId&gt; globalOrder) {
+<b class="nc">&nbsp;        Objects.requireNonNull(globalOrder);</b>
+<b class="nc">&nbsp;        if (globalOrder.size() != numberOfCitationGroups()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;setGlobalOrder: globalOrder.size() != numberOfCitationGroups()&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.globalOrder = Optional.of(globalOrder);</b>
+&nbsp;
+&nbsp;        // Propagate to each CitationGroup
+<b class="nc">&nbsp;        for (int i = 0; i &lt; globalOrder.size(); i++) {</b>
+<b class="nc">&nbsp;            CitationGroupId groupId = globalOrder.get(i);</b>
+<b class="nc">&nbsp;            citationGroupsUnordered.get(groupId).setIndexInGlobalOrder(Optional.of(i));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasGlobalOrder() {
+<b class="nc">&nbsp;        return globalOrder.isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Impose an order for citations within each group.
+&nbsp;     */
+&nbsp;    public void imposeLocalOrder(Comparator&lt;BibEntry&gt; entryComparator) {
+<b class="nc">&nbsp;        for (CitationGroup group : citationGroupsUnordered.values()) {</b>
+<b class="nc">&nbsp;            group.imposeLocalOrder(entryComparator);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Collect citations into a list of cited sources using neither CitationGroup.globalOrder or Citation.localOrder
+&nbsp;     */
+&nbsp;    public CitedKeys getCitedKeysUnordered() {
+<b class="nc">&nbsp;        LinkedHashMap&lt;String, CitedKey&gt; res = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (CitationGroup group : citationGroupsUnordered.values()) {</b>
+<b class="nc">&nbsp;            int storageIndexInGroup = 0;</b>
+<b class="nc">&nbsp;            for (Citation cit : group.citationsInStorageOrder) {</b>
+<b class="nc">&nbsp;                String key = cit.citationKey;</b>
+<b class="nc">&nbsp;                CitationPath path = new CitationPath(group.groupId, storageIndexInGroup);</b>
+<b class="nc">&nbsp;                if (res.containsKey(key)) {</b>
+<b class="nc">&nbsp;                    res.get(key).addPath(path, cit);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    res.put(key, new CitedKey(key, path, cit));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                storageIndexInGroup++;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return new CitedKeys(res);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * CitedKeys created iterating citations in (globalOrder,localOrder)
+&nbsp;     */
+&nbsp;    public CitedKeys getCitedKeysSortedInOrderOfAppearance() {
+<b class="nc">&nbsp;        if (!hasGlobalOrder()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;getSortedCitedKeys: no globalOrder&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LinkedHashMap&lt;String, CitedKey&gt; res = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (CitationGroup group : getCitationGroupsInGlobalOrder()) {</b>
+<b class="nc">&nbsp;            for (int i : group.getLocalOrder()) {</b>
+<b class="nc">&nbsp;                Citation cit = group.citationsInStorageOrder.get(i);</b>
+<b class="nc">&nbsp;                String citationKey = cit.citationKey;</b>
+<b class="nc">&nbsp;                CitationPath path = new CitationPath(group.groupId, i);</b>
+<b class="nc">&nbsp;                if (res.containsKey(citationKey)) {</b>
+<b class="nc">&nbsp;                    res.get(citationKey).addPath(path, cit);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    res.put(citationKey, new CitedKey(citationKey, path, cit));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return new CitedKeys(res);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;CitedKeys&gt; getBibliography() {
+<b class="nc">&nbsp;        return bibliography;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return Citation keys where lookupCitations() failed.
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; getUnresolvedKeys() {
+<b class="nc">&nbsp;        CitedKeys bib = getBibliography().orElse(getCitedKeysUnordered());</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; unresolvedKeys = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (CitedKey ck : bib.values()) {</b>
+<b class="nc">&nbsp;            if (ck.getLookupResult().isEmpty()) {</b>
+<b class="nc">&nbsp;                unresolvedKeys.add(ck.citationKey);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return unresolvedKeys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void createNumberedBibliographySortedInOrderOfAppearance() {
+<b class="nc">&nbsp;        if (bibliography.isPresent()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;createNumberedBibliographySortedInOrderOfAppearance:&quot;</b>
+&nbsp;                    + &quot; already have a bibliography&quot;);
+&nbsp;        }
+<b class="nc">&nbsp;        CitedKeys citedKeys = getCitedKeysSortedInOrderOfAppearance();</b>
+<b class="nc">&nbsp;        citedKeys.numberCitedKeysInCurrentOrder();</b>
+<b class="nc">&nbsp;        citedKeys.distributeNumbers(this);</b>
+<b class="nc">&nbsp;        bibliography = Optional.of(citedKeys);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * precondition: database lookup already performed (otherwise we just sort citation keys)
+&nbsp;     */
+&nbsp;    public void createPlainBibliographySortedByComparator(Comparator&lt;BibEntry&gt; entryComparator) {
+<b class="nc">&nbsp;        if (bibliography.isPresent()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;createPlainBibliographySortedByComparator: already have a bibliography&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        CitedKeys citedKeys = getCitedKeysUnordered();</b>
+<b class="nc">&nbsp;        citedKeys.sortByComparator(entryComparator);</b>
+<b class="nc">&nbsp;        bibliography = Optional.of(citedKeys);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * precondition: database lookup already performed (otherwise we just sort citation keys)
+&nbsp;     */
+&nbsp;    public void createNumberedBibliographySortedByComparator(Comparator&lt;BibEntry&gt; entryComparator) {
+<b class="nc">&nbsp;        if (bibliography.isPresent()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;createNumberedBibliographySortedByComparator: already have a bibliography&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        CitedKeys citedKeys = getCitedKeysUnordered();</b>
+<b class="nc">&nbsp;        citedKeys.sortByComparator(entryComparator);</b>
+<b class="nc">&nbsp;        citedKeys.numberCitedKeysInCurrentOrder();</b>
+<b class="nc">&nbsp;        citedKeys.distributeNumbers(this);</b>
+<b class="nc">&nbsp;        bibliography = Optional.of(citedKeys);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Query by CitationGroupId
+&nbsp;     */
+&nbsp;
+&nbsp;    public Optional&lt;CitationGroup&gt; getCitationGroup(CitationGroupId groupId) {
+<b class="nc">&nbsp;        CitationGroup group = citationGroupsUnordered.get(groupId);</b>
+<b class="nc">&nbsp;        return Optional.ofNullable(group);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return true if all citation groups have referenceMarkNameForLinking
+&nbsp;     */
+&nbsp;    public boolean citationGroupsProvideReferenceMarkNameForLinking() {
+<b class="nc">&nbsp;        for (CitationGroup group : citationGroupsUnordered.values()) {</b>
+<b class="nc">&nbsp;            if (group.getReferenceMarkNameForLinking().isEmpty()) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Callbacks.
+&nbsp;     */
+&nbsp;
+&nbsp;    public void afterCreateCitationGroup(CitationGroup group) {
+<b class="nc">&nbsp;        citationGroupsUnordered.put(group.groupId, group);</b>
+&nbsp;
+<b class="nc">&nbsp;        globalOrder = Optional.empty();</b>
+<b class="nc">&nbsp;        bibliography = Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void afterRemoveCitationGroup(CitationGroup group) {
+<b class="nc">&nbsp;        citationGroupsUnordered.remove(group.groupId);</b>
+<b class="nc">&nbsp;        globalOrder.map(l -&gt; l.remove(group.groupId));</b>
+&nbsp;
+<b class="nc">&nbsp;        bibliography = Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

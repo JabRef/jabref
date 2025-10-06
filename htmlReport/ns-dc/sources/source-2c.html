@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HayagrivaType</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: HayagrivaType (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HayagrivaType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HayagrivaType$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+<b class="nc">&nbsp;public class HayagrivaType implements LayoutFormatter {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String value) {
+<b class="nc">&nbsp;        return switch (StandardEntryType.valueOf(value)) {</b>
+&nbsp;            case Article,
+&nbsp;                 Conference -&gt;
+<b class="nc">&nbsp;                    &quot;article&quot;;</b>
+&nbsp;            case Book -&gt;
+<b class="nc">&nbsp;                    &quot;book&quot;;</b>
+&nbsp;            case InBook -&gt;
+<b class="nc">&nbsp;                    &quot;chapter&quot;;</b>
+&nbsp;            case Report,
+&nbsp;                 TechReport -&gt;
+<b class="nc">&nbsp;                    &quot;report&quot;;</b>
+&nbsp;            case Thesis,
+&nbsp;                 MastersThesis,
+&nbsp;                 PhdThesis -&gt;
+<b class="nc">&nbsp;                    &quot;thesis&quot;;</b>
+&nbsp;            case WWW,
+&nbsp;                 Online -&gt;
+<b class="nc">&nbsp;                    &quot;web&quot;;</b>
+&nbsp;            case Proceedings -&gt;
+<b class="nc">&nbsp;                    &quot;proceedings&quot;;</b>
+&nbsp;            case Reference -&gt;
+<b class="nc">&nbsp;                    &quot;reference&quot;;</b>
+&nbsp;
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    &quot;Misc&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

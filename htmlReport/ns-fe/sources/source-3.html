@@ -1,0 +1,372 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RtfCharMap</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.strings</a>
+</div>
+
+<h1>Coverage Summary for Class: RtfCharMap (org.jabref.logic.util.strings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RtfCharMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/191)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.strings;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;
+&nbsp;public class RtfCharMap {
+&nbsp;
+<b class="nc">&nbsp;    private final HashMap&lt;String, String&gt; rtfMap = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    public RtfCharMap() {</b>
+<b class="nc">&nbsp;        put(&quot;`a&quot;, &quot;\\&#39;e0&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;`e&quot;, &quot;\\&#39;e8&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;`i&quot;, &quot;\\&#39;ec&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;`o&quot;, &quot;\\&#39;f2&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;`u&quot;, &quot;\\&#39;f9&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;a&quot;, &quot;\\&#39;e1&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;e&quot;, &quot;\\&#39;e9&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;i&quot;, &quot;\\&#39;ed&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;o&quot;, &quot;\\&#39;f3&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;u&quot;, &quot;\\&#39;fa&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^a&quot;, &quot;\\&#39;e2&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^e&quot;, &quot;\\&#39;ea&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^i&quot;, &quot;\\&#39;ee&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^o&quot;, &quot;\\&#39;f4&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^u&quot;, &quot;\\&#39;fa&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;a&quot;, &quot;\\&#39;e4&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;e&quot;, &quot;\\&#39;eb&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;i&quot;, &quot;\\&#39;ef&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;o&quot;, &quot;\\&#39;f6&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;u&quot;, &quot;\\u252u&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;~n&quot;, &quot;\\&#39;f1&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;`A&quot;, &quot;\\&#39;c0&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;`E&quot;, &quot;\\&#39;c8&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;`I&quot;, &quot;\\&#39;cc&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;`O&quot;, &quot;\\&#39;d2&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;`U&quot;, &quot;\\&#39;d9&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;A&quot;, &quot;\\&#39;c1&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;E&quot;, &quot;\\&#39;c9&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;I&quot;, &quot;\\&#39;cd&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;O&quot;, &quot;\\&#39;d3&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;&#39;U&quot;, &quot;\\&#39;da&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^A&quot;, &quot;\\&#39;c2&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^E&quot;, &quot;\\&#39;ca&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^I&quot;, &quot;\\&#39;ce&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^O&quot;, &quot;\\&#39;d4&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;^U&quot;, &quot;\\&#39;db&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;A&quot;, &quot;\\&#39;c4&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;E&quot;, &quot;\\&#39;cb&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;I&quot;, &quot;\\&#39;cf&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;O&quot;, &quot;\\&#39;d6&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;U&quot;, &quot;\\&#39;dc&quot;);</b>
+&nbsp;
+&nbsp;        // Use UNICODE characters for RTF-Chars which cannot be found in the
+&nbsp;        // standard codepage
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;S&quot;, &quot;\\u167S&quot;); // Section sign</b>
+<b class="nc">&nbsp;        put(&quot;`!&quot;, &quot;\\u161!&quot;); // Inverted exclamation point</b>
+<b class="nc">&nbsp;        put(&quot;pounds&quot;, &quot;\\u163?&quot;); // Pound sign</b>
+<b class="nc">&nbsp;        put(&quot;copyright&quot;, &quot;\\u169?&quot;); // Copyright sign</b>
+<b class="nc">&nbsp;        put(&quot;P&quot;, &quot;\\u182P&quot;); // Paragraph sign</b>
+<b class="nc">&nbsp;        put(&quot;`?&quot;, &quot;\\u191?&quot;); // Inverted question mark</b>
+<b class="nc">&nbsp;        put(&quot;~A&quot;, &quot;\\u195A&quot;); // &quot;Atilde&quot;</b>
+<b class="nc">&nbsp;        put(&quot;AA&quot;, &quot;\\u197A&quot;); // &quot;Aring&quot;</b>
+&nbsp;        // RTFCHARS.put(&quot;AE&quot;, &quot;{\\uc2\\u198AE}&quot;); // &quot;AElig&quot;
+<b class="nc">&nbsp;        put(&quot;AE&quot;, &quot;{\\u198AE}&quot;); // &quot;AElig&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;cC&quot;, &quot;\\u199C&quot;); // &quot;Ccedil&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;DH&quot;, &quot;\\u208D&quot;); // &quot;ETH&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;~N&quot;, &quot;\\u209N&quot;); // &quot;Ntilde&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;~O&quot;, &quot;\\u213O&quot;); // &quot;Otilde&quot;</b>
+&nbsp;        // According to ISO 8859-1 the &quot;\times&quot; symbol should be placed here
+&nbsp;        // (#215).
+&nbsp;        // Omitting this, because it is a mathematical symbol.
+<b class="nc">&nbsp;        put(&quot;O&quot;, &quot;\\u216O&quot;); // &quot;Oslash&quot;</b>
+&nbsp;        //  RTFCHARS.put(&quot;O&quot;, &quot;\\&#39;d8&quot;);
+<b class="nc">&nbsp;        put(&quot;o&quot;, &quot;\\&#39;f8&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;&#39;Y&quot;, &quot;\\u221Y&quot;); // &quot;Yacute&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;TH&quot;, &quot;\\u222TH&quot;); // &quot;THORN&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;ss&quot;, &quot;\\u223ss&quot;); // &quot;szlig&quot;</b>
+&nbsp;        // RTFCHARS.put(&quot;ss&quot;, &quot;AFFEN&quot;); // &quot;szlig&quot;
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;~a&quot;, &quot;\\u227a&quot;); // &quot;atilde&quot;</b>
+<b class="nc">&nbsp;        put(&quot;aa&quot;, &quot;\\u229a&quot;); // &quot;aring&quot;</b>
+&nbsp;        //  RTFCHARS.put(&quot;ae&quot;, &quot;{\\uc2\\u230ae}&quot;); // &quot;aelig&quot; \\u230e6
+<b class="nc">&nbsp;        put(&quot;ae&quot;, &quot;{\\u230ae}&quot;); // &quot;aelig&quot; \\u230e6</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;cc&quot;, &quot;\\u231c&quot;); // &quot;ccedil&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;dh&quot;, &quot;\\u240d&quot;); // &quot;eth&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;~o&quot;, &quot;\\u245o&quot;); // &quot;otilde&quot;</b>
+&nbsp;        // According to ISO 8859-1 the &quot;\div&quot; symbol should be placed here
+&nbsp;        // (#247).
+&nbsp;        // Omitting this, because it is a mathematical symbol.
+<b class="nc">&nbsp;        put(&quot;o&quot;, &quot;\\u248o&quot;); // &quot;oslash&quot;</b>
+&nbsp;
+&nbsp;        // RTFCHARS.put(&quot;\&quot;u&quot;, &quot;\\u252&quot;); // &quot;uuml&quot; exists in standard
+&nbsp;        // codepage
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;&#39;y&quot;, &quot;\\u253y&quot;); // &quot;yacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;th&quot;, &quot;\\u254th&quot;); // &quot;thorn&quot;</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;y&quot;, &quot;\\u255y&quot;); // &quot;yuml&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;=A&quot;, &quot;\\u256A&quot;); // &quot;Amacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;=a&quot;, &quot;\\u257a&quot;); // &quot;amacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;uA&quot;, &quot;\\u258A&quot;); // &quot;Abreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ua&quot;, &quot;\\u259a&quot;); // &quot;abreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;kA&quot;, &quot;\\u260A&quot;); // &quot;Aogon&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ka&quot;, &quot;\\u261a&quot;); // &quot;aogon&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;&#39;C&quot;, &quot;\\u262C&quot;); // &quot;Cacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;&#39;c&quot;, &quot;\\u263c&quot;); // &quot;cacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;^C&quot;, &quot;\\u264C&quot;); // &quot;Ccirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;^c&quot;, &quot;\\u265c&quot;); // &quot;ccirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;.C&quot;, &quot;\\u266C&quot;); // &quot;Cdot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;.c&quot;, &quot;\\u267c&quot;); // &quot;cdot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vC&quot;, &quot;\\u268C&quot;); // &quot;Ccaron&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vc&quot;, &quot;\\u269c&quot;); // &quot;ccaron&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;vD&quot;, &quot;\\u270D&quot;); // &quot;Dcaron&quot;</b>
+&nbsp;        // Symbol #271 (d) has no special Latex command
+<b class="nc">&nbsp;        put(&quot;DJ&quot;, &quot;\\u272D&quot;); // &quot;Dstrok&quot;</b>
+<b class="nc">&nbsp;        put(&quot;dj&quot;, &quot;\\u273d&quot;); // &quot;dstrok&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;=E&quot;, &quot;\\u274E&quot;); // &quot;Emacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;=e&quot;, &quot;\\u275e&quot;); // &quot;emacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;uE&quot;, &quot;\\u276E&quot;); // &quot;Ebreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ue&quot;, &quot;\\u277e&quot;); // &quot;ebreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;.E&quot;, &quot;\\u278E&quot;); // &quot;Edot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;.e&quot;, &quot;\\u279e&quot;); // &quot;edot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;kE&quot;, &quot;\\u280E&quot;); // &quot;Eogon&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ke&quot;, &quot;\\u281e&quot;); // &quot;eogon&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vE&quot;, &quot;\\u282E&quot;); // &quot;Ecaron&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ve&quot;, &quot;\\u283e&quot;); // &quot;ecaron&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;^G&quot;, &quot;\\u284G&quot;); // &quot;Gcirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;^g&quot;, &quot;\\u285g&quot;); // &quot;gcirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;uG&quot;, &quot;\\u286G&quot;); // &quot;Gbreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ug&quot;, &quot;\\u287g&quot;); // &quot;gbreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;.G&quot;, &quot;\\u288G&quot;); // &quot;Gdot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;.g&quot;, &quot;\\u289g&quot;); // &quot;gdot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;cG&quot;, &quot;\\u290G&quot;); // &quot;Gcedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;&#39;g&quot;, &quot;\\u291g&quot;); // &quot;gacute&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;^H&quot;, &quot;\\u292H&quot;); // &quot;Hcirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;^h&quot;, &quot;\\u293h&quot;); // &quot;hcirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;Hstrok&quot;, &quot;\\u294H&quot;); // &quot;Hstrok&quot;</b>
+<b class="nc">&nbsp;        put(&quot;hstrok&quot;, &quot;\\u295h&quot;); // &quot;hstrok&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;~I&quot;, &quot;\\u296I&quot;); // &quot;Itilde&quot;</b>
+<b class="nc">&nbsp;        put(&quot;~i&quot;, &quot;\\u297i&quot;); // &quot;itilde&quot;</b>
+<b class="nc">&nbsp;        put(&quot;=I&quot;, &quot;\\u298I&quot;); // &quot;Imacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;=i&quot;, &quot;\\u299i&quot;); // &quot;imacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;uI&quot;, &quot;\\u300I&quot;); // &quot;Ibreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ui&quot;, &quot;\\u301i&quot;); // &quot;ibreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;kI&quot;, &quot;\\u302I&quot;); // &quot;Iogon&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ki&quot;, &quot;\\u303i&quot;); // &quot;iogon&quot;</b>
+<b class="nc">&nbsp;        put(&quot;.I&quot;, &quot;\\u304I&quot;); // &quot;Idot&quot;</b>
+&nbsp;
+&nbsp;        // Symbol #306 (IJ) has no special Latex command
+&nbsp;        // Symbol #307 (ij) has no special Latex command
+<b class="nc">&nbsp;        put(&quot;^J&quot;, &quot;\\u308J&quot;); // &quot;Jcirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;^j&quot;, &quot;\\u309j&quot;); // &quot;jcirc&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;cK&quot;, &quot;\\u310K&quot;); // &quot;Kcedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ck&quot;, &quot;\\u311k&quot;); // &quot;kcedil&quot;</b>
+&nbsp;
+&nbsp;        // Symbol #312 (k) has no special Latex command
+<b class="nc">&nbsp;        put(&quot;&#39;L&quot;, &quot;\\u313L&quot;); // &quot;Lacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;&#39;l&quot;, &quot;\\u314l&quot;); // &quot;lacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;cL&quot;, &quot;\\u315L&quot;); // &quot;Lcedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;cl&quot;, &quot;\\u316l&quot;); // &quot;lcedil&quot;</b>
+&nbsp;        // Symbol #317 (L) has no special Latex command
+&nbsp;        // Symbol #318 (l) has no special Latex command
+<b class="nc">&nbsp;        put(&quot;Lmidot&quot;, &quot;\\u319L&quot;); // &quot;Lmidot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;lmidot&quot;, &quot;\\u320l&quot;); // &quot;lmidot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;L&quot;, &quot;\\u321L&quot;); // &quot;Lstrok&quot;</b>
+<b class="nc">&nbsp;        put(&quot;l&quot;, &quot;\\u322l&quot;); // &quot;lstrok&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;&#39;N&quot;, &quot;\\u323N&quot;); // &quot;Nacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;&#39;n&quot;, &quot;\\u324n&quot;); // &quot;nacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;cN&quot;, &quot;\\u325N&quot;); // &quot;Ncedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;cn&quot;, &quot;\\u326n&quot;); // &quot;ncedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vN&quot;, &quot;\\u327N&quot;); // &quot;Ncaron&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vn&quot;, &quot;\\u328n&quot;); // &quot;ncaron&quot;</b>
+&nbsp;
+&nbsp;        // Symbol #329 (n) has no special Latex command
+<b class="nc">&nbsp;        put(&quot;NG&quot;, &quot;\\u330G&quot;); // &quot;ENG&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ng&quot;, &quot;\\u331g&quot;); // &quot;eng&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;=O&quot;, &quot;\\u332O&quot;); // &quot;Omacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;=o&quot;, &quot;\\u333o&quot;); // &quot;omacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;uO&quot;, &quot;\\u334O&quot;); // &quot;Obreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;uo&quot;, &quot;\\u335o&quot;); // &quot;obreve&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;HO&quot;, &quot;\\u336?&quot;); // &quot;Odblac&quot;</b>
+<b class="nc">&nbsp;        put(&quot;Ho&quot;, &quot;\\u337?&quot;); // &quot;odblac&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;OE&quot;, &quot;{\\u338OE}&quot;); // &quot;OElig&quot;</b>
+<b class="nc">&nbsp;        put(&quot;oe&quot;, &quot;{\\u339oe}&quot;); // &quot;oelig&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;&#39;R&quot;, &quot;\\u340R&quot;); // &quot;Racute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;&#39;r&quot;, &quot;\\u341r&quot;); // &quot;racute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;cR&quot;, &quot;\\u342R&quot;); // &quot;Rcedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;cr&quot;, &quot;\\u343r&quot;); // &quot;rcedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vR&quot;, &quot;\\u344R&quot;); // &quot;Rcaron&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vr&quot;, &quot;\\u345r&quot;); // &quot;rcaron&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;&#39;S&quot;, &quot;\\u346S&quot;); // &quot;Sacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;&#39;s&quot;, &quot;\\u347s&quot;); // &quot;sacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;^S&quot;, &quot;\\u348S&quot;); // &quot;Scirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;^s&quot;, &quot;\\u349s&quot;); // &quot;scirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;cS&quot;, &quot;\\u350S&quot;); // &quot;Scedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;cs&quot;, &quot;\\u351s&quot;); // &quot;scedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vS&quot;, &quot;\\u352S&quot;); // &quot;Scaron&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vs&quot;, &quot;\\u353s&quot;); // &quot;scaron&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;cT&quot;, &quot;\\u354T&quot;); // &quot;Tcedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ct&quot;, &quot;\\u355t&quot;); // &quot;tcedil&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vT&quot;, &quot;\\u356T&quot;); // &quot;Tcaron&quot;</b>
+&nbsp;        // Symbol #357 (t) has no special Latex command
+<b class="nc">&nbsp;        put(&quot;Tstrok&quot;, &quot;\\u358T&quot;); // &quot;Tstrok&quot;</b>
+<b class="nc">&nbsp;        put(&quot;tstrok&quot;, &quot;\\u359t&quot;); // &quot;tstrok&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;~U&quot;, &quot;\\u360U&quot;); // &quot;Utilde&quot;</b>
+<b class="nc">&nbsp;        put(&quot;~u&quot;, &quot;\\u361u&quot;); // &quot;utilde&quot;</b>
+<b class="nc">&nbsp;        put(&quot;=U&quot;, &quot;\\u362U&quot;); // &quot;Umacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;=u&quot;, &quot;\\u363u&quot;); // &quot;umacr&quot;</b>
+<b class="nc">&nbsp;        put(&quot;uU&quot;, &quot;\\u364U&quot;); // &quot;Ubreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;uu&quot;, &quot;\\u365u&quot;); // &quot;ubreve&quot;</b>
+<b class="nc">&nbsp;        put(&quot;rU&quot;, &quot;\\u366U&quot;); // &quot;Uring&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ru&quot;, &quot;\\u367u&quot;); // &quot;uring&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;HU&quot;, &quot;\\u368?&quot;); // &quot;Odblac&quot;</b>
+<b class="nc">&nbsp;        put(&quot;Hu&quot;, &quot;\\u369?&quot;); // &quot;odblac&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;kU&quot;, &quot;\\u370U&quot;); // &quot;Uogon&quot;</b>
+<b class="nc">&nbsp;        put(&quot;ku&quot;, &quot;\\u371u&quot;); // &quot;uogon&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;^W&quot;, &quot;\\u372W&quot;); // &quot;Wcirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;^w&quot;, &quot;\\u373w&quot;); // &quot;wcirc&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;^Y&quot;, &quot;\\u374Y&quot;); // &quot;Ycirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;^y&quot;, &quot;\\u375y&quot;); // &quot;ycirc&quot;</b>
+<b class="nc">&nbsp;        put(&quot;\&quot;Y&quot;, &quot;\\u376Y&quot;); // &quot;Yuml&quot;</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;&#39;Z&quot;, &quot;\\u377Z&quot;); // &quot;Zacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;&#39;z&quot;, &quot;\\u378z&quot;); // &quot;zacute&quot;</b>
+<b class="nc">&nbsp;        put(&quot;.Z&quot;, &quot;\\u379Z&quot;); // &quot;Zdot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;.z&quot;, &quot;\\u380z&quot;); // &quot;zdot&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vZ&quot;, &quot;\\u381Z&quot;); // &quot;Zcaron&quot;</b>
+<b class="nc">&nbsp;        put(&quot;vz&quot;, &quot;\\u382z&quot;); // &quot;zcaron&quot;</b>
+&nbsp;        // Symbol #383 (f) has no special Latex command
+&nbsp;    }
+&nbsp;
+&nbsp;    private void put(String key, String value) {
+<b class="nc">&nbsp;        rtfMap.put(key, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String get(String key) {
+<b class="nc">&nbsp;        return rtfMap.get(key);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

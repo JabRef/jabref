@@ -1,0 +1,271 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UndoableAddOrRemoveGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.groups</a>
+</div>
+
+<h1>Coverage Summary for Class: UndoableAddOrRemoveGroup (org.jabref.gui.groups)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UndoableAddOrRemoveGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.groups;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.gui.undo.AbstractUndoableJabRefEdit;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;
+&nbsp;public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adding of a single node (group).
+&nbsp;     */
+&nbsp;    public static final int ADD_NODE = 0;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removal of a single node. Children, if any, are kept.
+&nbsp;     */
+&nbsp;    public static final int REMOVE_NODE_KEEP_CHILDREN = 1;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removal of a node and all of its children.
+&nbsp;     */
+&nbsp;    public static final int REMOVE_NODE_AND_CHILDREN = 2;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The root of the global groups tree
+&nbsp;     */
+&nbsp;    private final GroupTreeNodeViewModel m_groupsRootHandle;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The subtree that was added or removed
+&nbsp;     */
+&nbsp;    private final GroupTreeNode m_subtreeBackup;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * In case of removing a node but keeping all of its children, the number of children has to be stored.
+&nbsp;     */
+&nbsp;    private final int m_subtreeRootChildCount;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The path to the edited subtree&#39;s root node
+&nbsp;     */
+&nbsp;    private final List&lt;Integer&gt; m_pathToNode;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The type of the editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN, REMOVE_NODE_AND_CHILDREN)
+&nbsp;     */
+&nbsp;    private final int m_editType;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an object that can undo/redo an edit event.
+&nbsp;     *
+&nbsp;     * @param groupsRoot The global groups root.
+&nbsp;     * @param editType   The type of editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN,
+&nbsp;     *                   REMOVE_NODE_AND_CHILDREN)
+&nbsp;     * @param editedNode The edited node (which was added or will be removed). The node
+&nbsp;     *                   must be a descendant of node &lt;b&gt;groupsRoot&lt;/b&gt;! This means
+&nbsp;     *                   that, in case of adding, you first have to add it to the tree,
+&nbsp;     *                   then call this constructor. When removing, you first have to
+&nbsp;     *                   call this constructor, then remove the node.
+&nbsp;     */
+&nbsp;    public UndoableAddOrRemoveGroup(GroupTreeNodeViewModel groupsRoot,
+<b class="nc">&nbsp;                                    GroupTreeNodeViewModel editedNode, int editType) {</b>
+<b class="nc">&nbsp;        m_groupsRootHandle = groupsRoot;</b>
+<b class="nc">&nbsp;        m_editType = editType;</b>
+<b class="nc">&nbsp;        m_subtreeRootChildCount = editedNode.getChildren().size();</b>
+&nbsp;        // storing a backup of the whole subtree is not required when children
+&nbsp;        // are kept
+<b class="nc">&nbsp;        m_subtreeBackup = editType != UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN ?</b>
+<b class="nc">&nbsp;                          editedNode.getNode()</b>
+<b class="nc">&nbsp;                                    .copySubtree()</b>
+<b class="nc">&nbsp;                                                                                         : GroupTreeNode.fromGroup(editedNode.getNode().getGroup().deepCopy());</b>
+&nbsp;        // remember path to edited node. this cannot be stored as a reference,
+&nbsp;        // because the reference itself might change. the method below is more
+&nbsp;        // robust.
+<b class="nc">&nbsp;        m_pathToNode = editedNode.getNode().getIndexedPathFromRoot();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getPresentationName() {
+<b class="nc">&nbsp;        return switch (m_editType) {</b>
+&nbsp;            case ADD_NODE -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Add group&quot;);</b>
+&nbsp;            case REMOVE_NODE_KEEP_CHILDREN -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Keep subgroups)&quot;);</b>
+&nbsp;            case REMOVE_NODE_AND_CHILDREN -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Also remove subgroups&quot;);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    &quot;? (&quot; + Localization.lang(&quot;unknown edit&quot;) + &quot;)&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void undo() {
+<b class="nc">&nbsp;        super.undo();</b>
+<b class="nc">&nbsp;        doOperation(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void redo() {
+<b class="nc">&nbsp;        super.redo();</b>
+<b class="nc">&nbsp;        doOperation(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doOperation(boolean undo) {
+<b class="nc">&nbsp;        GroupTreeNode cursor = m_groupsRootHandle.getNode();</b>
+<b class="nc">&nbsp;        final int childIndex = m_pathToNode.getLast();</b>
+&nbsp;        // traverse path up to but last element
+<b class="nc">&nbsp;        for (int i = 0; i &lt; (m_pathToNode.size() - 1); ++i) {</b>
+<b class="nc">&nbsp;            cursor = cursor.getChildAt(m_pathToNode.get(i)).get();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (undo) {</b>
+<b class="nc">&nbsp;            switch (m_editType) {</b>
+&nbsp;                case ADD_NODE:
+<b class="nc">&nbsp;                    cursor.removeChild(childIndex);</b>
+&nbsp;                    break;
+&nbsp;                case REMOVE_NODE_KEEP_CHILDREN:
+&nbsp;                    // move all children to newNode, then add newNode
+<b class="nc">&nbsp;                    GroupTreeNode newNode = m_subtreeBackup.copySubtree();</b>
+<b class="nc">&nbsp;                    for (int i = childIndex; i &lt; (childIndex</b>
+<b class="nc">&nbsp;                            + m_subtreeRootChildCount); ++i) {</b>
+<b class="nc">&nbsp;                        cursor.getChildAt(childIndex).get().moveTo(newNode);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    newNode.moveTo(cursor, childIndex);</b>
+&nbsp;                    break;
+&nbsp;                case REMOVE_NODE_AND_CHILDREN:
+<b class="nc">&nbsp;                    m_subtreeBackup.copySubtree().moveTo(cursor, childIndex);</b>
+&nbsp;                    break;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+&nbsp;        } else { // redo
+<b class="nc">&nbsp;            switch (m_editType) {</b>
+&nbsp;                case ADD_NODE:
+<b class="nc">&nbsp;                    m_subtreeBackup.copySubtree().moveTo(cursor, childIndex);</b>
+&nbsp;                    break;
+&nbsp;                case REMOVE_NODE_KEEP_CHILDREN:
+&nbsp;                    // remove node, then insert all children
+<b class="nc">&nbsp;                    GroupTreeNode removedNode = cursor</b>
+<b class="nc">&nbsp;                            .getChildAt(childIndex).get();</b>
+<b class="nc">&nbsp;                    cursor.removeChild(childIndex);</b>
+<b class="nc">&nbsp;                    while (removedNode.getNumberOfChildren() &gt; 0) {</b>
+<b class="nc">&nbsp;                        removedNode.getFirstChild().get().moveTo(cursor, childIndex);</b>
+&nbsp;                    }
+&nbsp;                    break;
+&nbsp;                case REMOVE_NODE_AND_CHILDREN:
+<b class="nc">&nbsp;                    cursor.removeChild(childIndex);</b>
+&nbsp;                    break;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

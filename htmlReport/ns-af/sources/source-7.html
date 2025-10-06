@@ -1,0 +1,178 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibtexStringComparator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bibtex.comparator</a>
+</div>
+
+<h1>Coverage Summary for Class: BibtexStringComparator (org.jabref.logic.bibtex.comparator)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibtexStringComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bibtex.comparator;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;
+&nbsp;public class BibtexStringComparator implements Comparator&lt;BibtexString&gt; {
+&nbsp;
+&nbsp;    private final boolean considerRefs;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param considerRefs Indicates whether the strings should be
+&nbsp;     *                     sorted according to internal references in addition to
+&nbsp;     *                     alphabetical sorting.
+&nbsp;     */
+<b class="nc">&nbsp;    public BibtexStringComparator(boolean considerRefs) {</b>
+<b class="nc">&nbsp;        this.considerRefs = considerRefs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int compare(BibtexString s1, BibtexString s2) {
+&nbsp;        int res;
+&nbsp;
+&nbsp;        // First check their names:
+<b class="nc">&nbsp;        String name1 = s1.getName().toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;        String name2 = s2.getName().toLowerCase(Locale.ROOT);</b>
+&nbsp;
+<b class="nc">&nbsp;        res = name1.compareTo(name2);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (res == 0) {</b>
+<b class="nc">&nbsp;            return res;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Then, if we are supposed to, see if the ordering needs
+&nbsp;        // to be changed because of one string referring to the other.x
+<b class="nc">&nbsp;        if (considerRefs) {</b>
+&nbsp;            // First order them:
+&nbsp;            BibtexString pre;
+&nbsp;            BibtexString post;
+<b class="nc">&nbsp;            if (res &lt; 0) {</b>
+<b class="nc">&nbsp;                pre = s1;</b>
+<b class="nc">&nbsp;                post = s2;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                pre = s2;</b>
+<b class="nc">&nbsp;                post = s1;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Then see if &quot;pre&quot; refers to &quot;post&quot;, which is the only
+&nbsp;            // situation when we must change the ordering:
+<b class="nc">&nbsp;            String namePost = post.getName().toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;            String textPre = pre.getContent().toLowerCase(Locale.ROOT);</b>
+&nbsp;
+&nbsp;            // If that is the case, reverse the order found:
+<b class="nc">&nbsp;            if (textPre.contains(&quot;#&quot; + namePost + &quot;#&quot;)) {</b>
+<b class="nc">&nbsp;                res = -res;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return res;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

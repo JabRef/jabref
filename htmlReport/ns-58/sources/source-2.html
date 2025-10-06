@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SplitDiffHighlighter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.threewaymerge.diffhighlighter</a>
+</div>
+
+<h1>Coverage Summary for Class: SplitDiffHighlighter (org.jabref.gui.mergeentries.threewaymerge.diffhighlighter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SplitDiffHighlighter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SplitDiffHighlighter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.threewaymerge.diffhighlighter;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.DiffMethod;
+&nbsp;
+&nbsp;import com.github.difflib.DiffUtils;
+&nbsp;import com.github.difflib.patch.AbstractDelta;
+&nbsp;import org.fxmisc.richtext.StyleClassedTextArea;
+&nbsp;
+&nbsp;/**
+&nbsp; * A diff highlighter in which changes are split between source and target text view.
+&nbsp; * They are represented by an addition in the target text view and deletion in the source text view.
+&nbsp; */
+&nbsp;public final class SplitDiffHighlighter extends DiffHighlighter {
+&nbsp;
+&nbsp;    public SplitDiffHighlighter(StyleClassedTextArea sourceTextview, StyleClassedTextArea targetTextview, DiffMethod diffMethod) {
+<b class="nc">&nbsp;        super(sourceTextview, targetTextview, diffMethod);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void highlight() {
+<b class="nc">&nbsp;        String sourceContent = sourceTextview.getText();</b>
+<b class="nc">&nbsp;        String targetContent = targetTextview.getText();</b>
+<b class="nc">&nbsp;        if (sourceContent.equals(targetContent)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; sourceTokens = splitString(sourceContent);</b>
+<b class="nc">&nbsp;        List&lt;String&gt; targetTokens = splitString(targetContent);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;AbstractDelta&lt;String&gt;&gt; deltaList = DiffUtils.diff(sourceTokens, targetTokens).getDeltas();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (AbstractDelta&lt;String&gt; delta : deltaList) {</b>
+<b class="nc">&nbsp;            int affectedSourceTokensPosition = delta.getSource().getPosition();</b>
+<b class="nc">&nbsp;            int affectedTargetTokensPosition = delta.getTarget().getPosition();</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;String&gt; affectedTokensInSource = delta.getSource().getLines();</b>
+<b class="nc">&nbsp;            List&lt;String&gt; affectedTokensInTarget = delta.getTarget().getLines();</b>
+<b class="nc">&nbsp;            int joinedSourceTokensLength = affectedTokensInSource.stream()</b>
+<b class="nc">&nbsp;                                                                 .map(String::length)</b>
+<b class="nc">&nbsp;                                                                 .reduce(Integer::sum)</b>
+<b class="nc">&nbsp;                                                                 .map(value -&gt; value + (getSeparator().length() * (affectedTokensInSource.size() - 1)))</b>
+<b class="nc">&nbsp;                                                                 .orElse(0);</b>
+&nbsp;
+<b class="nc">&nbsp;            int joinedTargetTokensLength = affectedTokensInTarget.stream()</b>
+<b class="nc">&nbsp;                                                                 .map(String::length)</b>
+<b class="nc">&nbsp;                                                                 .reduce(Integer::sum)</b>
+<b class="nc">&nbsp;                                                                 .map(value -&gt; value + (getSeparator().length() * (affectedTokensInTarget.size() - 1)))</b>
+<b class="nc">&nbsp;                                                                 .orElse(0);</b>
+<b class="nc">&nbsp;            int affectedSourceTokensPositionInText = getPositionInText(affectedSourceTokensPosition, sourceTokens);</b>
+<b class="nc">&nbsp;            int affectedTargetTokensPositionInText = getPositionInText(affectedTargetTokensPosition, targetTokens);</b>
+<b class="nc">&nbsp;            switch (delta.getType()) {</b>
+&nbsp;                case CHANGE -&gt; {
+<b class="nc">&nbsp;                    sourceTextview.setStyleClass(affectedSourceTokensPositionInText, affectedSourceTokensPositionInText + joinedSourceTokensLength, &quot;deletion&quot;);</b>
+<b class="nc">&nbsp;                    targetTextview.setStyleClass(affectedTargetTokensPositionInText, affectedTargetTokensPositionInText + joinedTargetTokensLength, &quot;updated&quot;);</b>
+&nbsp;                }
+&nbsp;                case DELETE -&gt;
+<b class="nc">&nbsp;                        sourceTextview.setStyleClass(affectedSourceTokensPositionInText, affectedSourceTokensPositionInText + joinedSourceTokensLength, &quot;deletion&quot;);</b>
+&nbsp;                case INSERT -&gt;
+<b class="nc">&nbsp;                        targetTextview.setStyleClass(affectedTargetTokensPositionInText, affectedTargetTokensPositionInText + joinedTargetTokensLength, &quot;addition&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getPositionInText(int positionInTokenList, List&lt;String&gt; tokenList) {
+<b class="nc">&nbsp;        if (positionInTokenList == 0) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return tokenList.stream().limit(positionInTokenList).map(String::length)</b>
+<b class="nc">&nbsp;                            .reduce(Integer::sum)</b>
+<b class="nc">&nbsp;                            .map(value -&gt; value + (getSeparator().length() * positionInTokenList))</b>
+<b class="nc">&nbsp;                            .orElse(0);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

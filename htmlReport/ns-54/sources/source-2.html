@@ -1,0 +1,325 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DiffHighlightingEllipsingTextFlow</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.multiwaymerge</a>
+</div>
+
+<h1>Coverage Summary for Class: DiffHighlightingEllipsingTextFlow (org.jabref.gui.mergeentries.multiwaymerge)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DiffHighlightingEllipsingTextFlow</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/76)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DiffHighlightingEllipsingTextFlow$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.multiwaymerge;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.beans.DefaultProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.beans.value.ChangeListener;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;import javafx.scene.text.TextFlow;
+&nbsp;
+&nbsp;import org.jabref.gui.mergeentries.DiffMode;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyObservableValue;
+&nbsp;
+&nbsp;@DefaultProperty(&quot;children&quot;)
+&nbsp;public class DiffHighlightingEllipsingTextFlow extends TextFlow {
+&nbsp;
+&nbsp;    private final static String DEFAULT_ELLIPSIS_STRING = &quot;...&quot;;
+&nbsp;    private StringProperty ellipsisString;
+&nbsp;
+<b class="nc">&nbsp;    private final ObservableList&lt;Node&gt; allChildren = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final ChangeListener&lt;Number&gt; sizeChangeListener = (observableValue, number, t1) -&gt; adjustText();</b>
+<b class="nc">&nbsp;    private final ListChangeListener&lt;Node&gt; listChangeListener = this::adjustChildren;</b>
+&nbsp;
+&nbsp;    private final String fullText;
+&nbsp;    private final EasyObservableValue&lt;String&gt; comparisonString;
+&nbsp;    private final ObjectProperty&lt;DiffMode&gt; diffMode;
+&nbsp;
+<b class="nc">&nbsp;    public DiffHighlightingEllipsingTextFlow(String fullText, EasyObservableValue&lt;String&gt; comparisonString, ObjectProperty&lt;DiffMode&gt; diffMode) {</b>
+<b class="nc">&nbsp;        this.fullText = fullText;</b>
+<b class="nc">&nbsp;        allChildren.addListener(listChangeListener);</b>
+<b class="nc">&nbsp;        widthProperty().addListener(sizeChangeListener);</b>
+<b class="nc">&nbsp;        heightProperty().addListener(sizeChangeListener);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.comparisonString = comparisonString;</b>
+<b class="nc">&nbsp;        this.diffMode = diffMode;</b>
+<b class="nc">&nbsp;        comparisonString.addListener((obs, oldValue, newValue) -&gt; highlightDiff());</b>
+<b class="nc">&nbsp;        diffMode.addListener((obs, oldValue, newValue) -&gt; highlightDiff());</b>
+<b class="nc">&nbsp;        highlightDiff();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObservableList&lt;Node&gt; getChildren() {
+<b class="nc">&nbsp;        return allChildren;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void adjustChildren(ListChangeListener.Change&lt;? extends Node&gt; change) {
+<b class="nc">&nbsp;        super.getChildren().clear();</b>
+<b class="nc">&nbsp;        super.getChildren().addAll(allChildren);</b>
+<b class="nc">&nbsp;        super.autosize();</b>
+<b class="nc">&nbsp;        adjustText();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void adjustText() {
+<b class="nc">&nbsp;        if (allChildren.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        // remove listeners
+<b class="nc">&nbsp;        widthProperty().removeListener(sizeChangeListener);</b>
+<b class="nc">&nbsp;        heightProperty().removeListener(sizeChangeListener);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (removeUntilTextFits() &amp;&amp; fillUntilOverflowing()) {</b>
+<b class="nc">&nbsp;            ellipseUntilTextFits();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        widthProperty().addListener(sizeChangeListener);</b>
+<b class="nc">&nbsp;        heightProperty().addListener(sizeChangeListener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean removeUntilTextFits() {
+<b class="nc">&nbsp;        while (getHeight() &gt; getMaxHeight() || getWidth() &gt; getMaxWidth()) {</b>
+<b class="nc">&nbsp;            if (super.getChildren().isEmpty()) {</b>
+&nbsp;                // nothing fits
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            super.getChildren().removeLast();</b>
+<b class="nc">&nbsp;            super.autosize();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean fillUntilOverflowing() {
+<b class="nc">&nbsp;        while (getHeight() &lt;= getMaxHeight() &amp;&amp; getWidth() &lt;= getMaxWidth()) {</b>
+<b class="nc">&nbsp;            if (super.getChildren().size() == allChildren.size()) {</b>
+<b class="nc">&nbsp;                if (!allChildren.isEmpty()) {</b>
+&nbsp;                    // all Texts are displayed, let&#39;s make sure all chars are as well
+<b class="nc">&nbsp;                    Node lastChildAsShown = super.getChildren().getLast();</b>
+<b class="nc">&nbsp;                    Node lastChild = allChildren.getLast();</b>
+<b class="nc">&nbsp;                    if (lastChildAsShown instanceof Text text &amp;&amp; text.getText().length() &lt; ((Text) lastChild).getText().length()) {</b>
+<b class="nc">&nbsp;                        text.setText(((Text) lastChild).getText());</b>
+&nbsp;                    } else {
+&nbsp;                        // nothing to fill the space with
+<b class="nc">&nbsp;                        return false;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                super.getChildren().add(allChildren.get(super.getChildren().size()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            super.autosize();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean ellipseUntilTextFits() {
+<b class="nc">&nbsp;        while (getHeight() &gt; getMaxHeight() || getWidth() &gt; getMaxWidth()) {</b>
+<b class="nc">&nbsp;            Text lastChildAsShown = (Text) super.getChildren().removeLast();</b>
+<b class="nc">&nbsp;            while (getEllipsisString().equals(lastChildAsShown.getText()) || &quot;&quot;.equals(lastChildAsShown.getText())) {</b>
+<b class="nc">&nbsp;                if (super.getChildren().isEmpty()) {</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                lastChildAsShown = (Text) super.getChildren().removeLast();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Text shortenedChild = new Text(ellipseString(lastChildAsShown.getText()));</b>
+<b class="nc">&nbsp;            shortenedChild.getStyleClass().addAll(lastChildAsShown.getStyleClass());</b>
+<b class="nc">&nbsp;            super.getChildren().add(shortenedChild);</b>
+<b class="nc">&nbsp;            super.autosize();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void highlightDiff() {
+<b class="nc">&nbsp;        allChildren.clear();</b>
+<b class="nc">&nbsp;        if (comparisonString.get() != null &amp;&amp; !comparisonString.get().equals(fullText)) {</b>
+<b class="nc">&nbsp;            final List&lt;Text&gt; highlightedText = switch (diffMode.getValue()) {</b>
+&nbsp;                case PLAIN -&gt; {
+<b class="nc">&nbsp;                    Text text = new Text(fullText);</b>
+<b class="nc">&nbsp;                    text.getStyleClass().add(&quot;text-unchanged&quot;);</b>
+<b class="nc">&nbsp;                    yield List.of(text);</b>
+&nbsp;                }
+&nbsp;                case WORD -&gt;
+<b class="nc">&nbsp;                        DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, &quot; &quot;);</b>
+&nbsp;                case CHARACTER -&gt;
+<b class="nc">&nbsp;                        DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, &quot;&quot;);</b>
+&nbsp;                default -&gt;
+<b class="nc">&nbsp;                        throw new UnsupportedOperationException(&quot;Not implemented &quot; + diffMode.getValue());</b>
+&nbsp;            };
+<b class="nc">&nbsp;            allChildren.addAll(highlightedText);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Text text = new Text(fullText);</b>
+<b class="nc">&nbsp;            text.getStyleClass().add(&quot;text-unchanged&quot;);</b>
+<b class="nc">&nbsp;            allChildren.add(text);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        super.autosize();</b>
+<b class="nc">&nbsp;        adjustText();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String ellipseString(String s) {
+<b class="nc">&nbsp;        int spacePos = s.lastIndexOf(&#39; &#39;);</b>
+<b class="nc">&nbsp;        if (spacePos &lt;= 0) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return s.substring(0, spacePos) + getEllipsisString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final void setEllipsisString(String value) {
+<b class="nc">&nbsp;        ellipsisString.set(value == null ? &quot;&quot; : value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getEllipsisString() {
+<b class="nc">&nbsp;        return ellipsisString == null ? DEFAULT_ELLIPSIS_STRING : ellipsisString.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final StringProperty ellipsisStringProperty() {
+<b class="nc">&nbsp;        return ellipsisString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFullText() {
+<b class="nc">&nbsp;        return fullText;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

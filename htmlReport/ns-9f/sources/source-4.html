@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LibraryPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic</a>
+</div>
+
+<h1>Coverage Summary for Class: LibraryPreferences (org.jabref.logic)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LibraryPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;
+&nbsp;public class LibraryPreferences {
+&nbsp;
+&nbsp;    private final ObjectProperty&lt;BibDatabaseMode&gt; defaultBibDatabaseMode;
+&nbsp;    private final BooleanProperty alwaysReformatOnSave;
+&nbsp;    private final BooleanProperty autoSave;
+&nbsp;    private final BooleanProperty addImportedEntries;
+&nbsp;    private final StringProperty addImportedEntriesGroupName;
+&nbsp;
+&nbsp;    public LibraryPreferences(BibDatabaseMode defaultBibDatabaseMode,
+&nbsp;                              boolean alwaysReformatOnSave,
+&nbsp;                              boolean autoSave,
+&nbsp;                              boolean addImportedEntries,
+<b class="nc">&nbsp;                              String addImportedEntriesGroupName) {</b>
+<b class="nc">&nbsp;        this.defaultBibDatabaseMode = new SimpleObjectProperty&lt;&gt;(defaultBibDatabaseMode);</b>
+<b class="nc">&nbsp;        this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);</b>
+<b class="nc">&nbsp;        this.autoSave = new SimpleBooleanProperty(autoSave);</b>
+<b class="nc">&nbsp;        this.addImportedEntries = new SimpleBooleanProperty(addImportedEntries);</b>
+<b class="nc">&nbsp;        this.addImportedEntriesGroupName = new SimpleStringProperty(addImportedEntriesGroupName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibDatabaseMode getDefaultBibDatabaseMode() {
+<b class="nc">&nbsp;        return defaultBibDatabaseMode.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;BibDatabaseMode&gt; defaultBibDatabaseModeProperty() {
+<b class="nc">&nbsp;        return defaultBibDatabaseMode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDefaultBibDatabaseMode(BibDatabaseMode defaultBibDatabaseMode) {
+<b class="nc">&nbsp;        this.defaultBibDatabaseMode.set(defaultBibDatabaseMode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldAlwaysReformatOnSave() {
+<b class="nc">&nbsp;        return alwaysReformatOnSave.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty alwaysReformatOnSaveProperty() {
+<b class="nc">&nbsp;        return alwaysReformatOnSave;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAlwaysReformatOnSave(boolean alwaysReformatOnSave) {
+<b class="nc">&nbsp;        this.alwaysReformatOnSave.set(alwaysReformatOnSave);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldAutoSave() {
+<b class="nc">&nbsp;        return autoSave.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty autoSaveProperty() {
+<b class="nc">&nbsp;        return autoSave;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutoSave(boolean shouldAutoSave) {
+<b class="nc">&nbsp;        this.autoSave.set(shouldAutoSave);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isAddImportedEntriesEnabled() {
+<b class="nc">&nbsp;        return addImportedEntries.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty addImportedEntriesProperty() {
+<b class="nc">&nbsp;        return addImportedEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAddImportedEntries(boolean addImportedEntries) {
+<b class="nc">&nbsp;        this.addImportedEntries.set(addImportedEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAddImportedEntriesGroupName() {
+<b class="nc">&nbsp;        return addImportedEntriesGroupName.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty addImportedEntriesGroupNameProperty() {
+<b class="nc">&nbsp;        return addImportedEntriesGroupName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAddImportedEntriesGroupName(String addImportedEntriesGroupName) {
+<b class="nc">&nbsp;        this.addImportedEntriesGroupName.set(addImportedEntriesGroupName);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

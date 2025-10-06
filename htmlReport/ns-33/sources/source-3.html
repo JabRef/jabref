@@ -1,0 +1,311 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoSetFileLinksUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoSetFileLinksUtil (org.jabref.gui.externalfiles)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoSetFileLinksUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoSetFileLinksUtil$LinkFilesResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiles;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.util.io.AutoLinkPreferences;
+&nbsp;import org.jabref.logic.util.io.FileFinder;
+&nbsp;import org.jabref.logic.util.io.FileFinders;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class AutoSetFileLinksUtil {
+&nbsp;
+<b class="nc">&nbsp;    public static class LinkFilesResult {</b>
+<b class="nc">&nbsp;        private final List&lt;BibEntry&gt; changedEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        private final List&lt;IOException&gt; fileExceptions = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        protected void addBibEntry(BibEntry bibEntry) {
+<b class="nc">&nbsp;            changedEntries.add(bibEntry);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        protected void addFileException(IOException exception) {
+<b class="nc">&nbsp;            fileExceptions.add(exception);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public List&lt;BibEntry&gt; getChangedEntries() {
+<b class="nc">&nbsp;            return changedEntries;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public List&lt;IOException&gt; getFileExceptions() {
+<b class="nc">&nbsp;            return fileExceptions;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);</b>
+&nbsp;
+&nbsp;    private final List&lt;Path&gt; directories;
+&nbsp;    private final AutoLinkPreferences autoLinkPreferences;
+&nbsp;    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+&nbsp;
+&nbsp;    public AutoSetFileLinksUtil(BibDatabaseContext databaseContext,
+&nbsp;                                ExternalApplicationsPreferences externalApplicationsPreferences,
+&nbsp;                                FilePreferences filePreferences,
+&nbsp;                                AutoLinkPreferences autoLinkPreferences) {
+<b class="nc">&nbsp;        this(databaseContext.getFileDirectories(filePreferences), externalApplicationsPreferences, autoLinkPreferences);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private AutoSetFileLinksUtil(List&lt;Path&gt; directories, ExternalApplicationsPreferences externalApplicationsPreferences, AutoLinkPreferences autoLinkPreferences) {</b>
+<b class="nc">&nbsp;        this.directories = directories;</b>
+<b class="nc">&nbsp;        this.autoLinkPreferences = autoLinkPreferences;</b>
+<b class="nc">&nbsp;        this.externalApplicationsPreferences = externalApplicationsPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkFilesResult linkAssociatedFiles(List&lt;BibEntry&gt; entries, BiConsumer&lt;LinkedFile, BibEntry&gt; onAddLinkedFile) {
+<b class="nc">&nbsp;        LinkFilesResult result = new LinkFilesResult();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            List&lt;LinkedFile&gt; linkedFiles = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                linkedFiles = findAssociatedNotLinkedFiles(entry);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                result.addFileException(e);</b>
+<b class="nc">&nbsp;                LOGGER.error(&quot;Problem finding files&quot;, e);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            for (LinkedFile linkedFile : linkedFiles) {</b>
+&nbsp;                // store undo information
+<b class="nc">&nbsp;                onAddLinkedFile.accept(linkedFile, entry);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            result.addBibEntry(entry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Scans for missing files which should be linked to the given entry.
+&nbsp;    ///
+&nbsp;    /// Related: {@link org.jabref.gui.externalfiles.UnlinkedFilesCrawler} for scanning files missing at all entries
+&nbsp;    ///
+&nbsp;    /// NOTE: This method does not check if the file is already linked to another entry.
+&nbsp;    public List&lt;LinkedFile&gt; findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; linkedFiles = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; extensions = externalApplicationsPreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Searching for extensions {} in directories {}&quot;, extensions, directories);</b>
+&nbsp;
+&nbsp;        // Run the search operation
+<b class="nc">&nbsp;        FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);</b>
+<b class="nc">&nbsp;        List&lt;Path&gt; result = new ArrayList&lt;&gt;(fileFinder.findAssociatedFiles(entry, directories, extensions));</b>
+<b class="nc">&nbsp;        result.addAll(findByBrokenLinkName(entry));</b>
+&nbsp;
+&nbsp;        // Collect the found files that are not yet linked
+<b class="nc">&nbsp;        for (Path foundFile : result) {</b>
+<b class="nc">&nbsp;            boolean fileAlreadyLinked = entry.getFiles().stream()</b>
+<b class="nc">&nbsp;                                             .map(file -&gt; file.findIn(directories))</b>
+<b class="nc">&nbsp;                                             .anyMatch(linked -&gt; linked.filter(path -&gt; {</b>
+&nbsp;                                                 try {
+<b class="nc">&nbsp;                                                     return Files.isSameFile(path, foundFile);</b>
+&nbsp;                                                 } catch (IOException e) {
+<b class="nc">&nbsp;                                                     LOGGER.debug(&quot;Unable to check file identity, assuming no identity&quot;, e);</b>
+<b class="nc">&nbsp;                                                     return false;</b>
+&nbsp;                                                 }
+<b class="nc">&nbsp;                                             }).isPresent());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!fileAlreadyLinked) {</b>
+<b class="nc">&nbsp;                Optional&lt;ExternalFileType&gt; type = FileUtil.getFileExtension(foundFile)</b>
+<b class="nc">&nbsp;                                                          .map(extension -&gt; ExternalFileTypes.getExternalFileTypeByExt(extension, externalApplicationsPreferences))</b>
+<b class="nc">&nbsp;                                                          .orElse(Optional.of(new UnknownExternalFileType(&quot;&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;                String strType = type.map(ExternalFileType::getName).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                Path relativeFilePath = FileUtil.relativize(foundFile, directories);</b>
+<b class="nc">&nbsp;                LinkedFile linkedFile = new LinkedFile(&quot;&quot;, relativeFilePath, strType);</b>
+<b class="nc">&nbsp;                linkedFiles.add(linkedFile);</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Found file {} for entry {}&quot;, linkedFile, entry.getCitationKey());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return linkedFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Path&gt; findByBrokenLinkName(BibEntry entry) throws IOException {
+<b class="nc">&nbsp;        List&lt;Path&gt; matches = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (LinkedFile brokenLink : entry.getFiles()) {</b>
+<b class="nc">&nbsp;            if (brokenLink.findIn(directories).isPresent()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String wantedBase = FileUtil.getBaseName(brokenLink.getLink());</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Path directory : directories) {</b>
+<b class="nc">&nbsp;                try (Stream&lt;Path&gt; walk = Files.walk(directory)) {</b>
+<b class="nc">&nbsp;                    walk.filter(path -&gt; !Files.isDirectory(path))</b>
+<b class="nc">&nbsp;                        .filter(path -&gt; FileUtil.getBaseName(path).equalsIgnoreCase(wantedBase))</b>
+<b class="nc">&nbsp;                        .findFirst()</b>
+<b class="nc">&nbsp;                        .ifPresent(matches::add);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return matches;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

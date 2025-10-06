@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WalkthroughPane</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough</a>
+</div>
+
+<h1>Coverage Summary for Class: WalkthroughPane (org.jabref.gui.walkthrough)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WalkthroughPane</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;import javafx.stage.Window;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// A specialized StackPane that manages walkthrough overlays for a specific window.
+&nbsp;/// Each window can have at most one WalkthroughPane instance.
+&nbsp;///
+&nbsp;/// @implNote This pane is created since [impl.org.controlsfx.skin.DecorationPane] from
+&nbsp;/// ControlsFX also modifies the scene root, which can lead to issues with overlapping,
+&nbsp;/// never-removed Walkthrough effects. To prevent this, we use a dedicated pane that can
+&nbsp;/// be identified as part of the walkthrough system.
+&nbsp;public class WalkthroughPane extends StackPane {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughPane.class);</b>
+&nbsp;    /// Mutable map of all the instances created. Not thread-safe because the entire
+&nbsp;    /// life-cycle of this class is used in JavaFX-thread.
+<b class="nc">&nbsp;    private static final Map&lt;Window, WalkthroughPane&gt; INSTANCES = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final Window window;
+&nbsp;    private @Nullable Parent root;
+<b class="nc">&nbsp;    private boolean isAttached = false;</b>
+&nbsp;
+<b class="nc">&nbsp;    private WalkthroughPane(@NonNull Window window) {</b>
+<b class="nc">&nbsp;        this.window = window;</b>
+<b class="nc">&nbsp;        setMinSize(0, 0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Returns the WalkthroughPane instance for the specified window, creating and
+&nbsp;    /// attach it if necessary.
+&nbsp;    public static @NonNull WalkthroughPane getInstance(@NonNull Window window) {
+<b class="nc">&nbsp;        return INSTANCES.computeIfAbsent(window, key -&gt; {</b>
+<b class="nc">&nbsp;            WalkthroughPane newPane = new WalkthroughPane(key);</b>
+<b class="nc">&nbsp;            newPane.attach();</b>
+<b class="nc">&nbsp;            return newPane;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void attach() {
+<b class="nc">&nbsp;        if (isAttached) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;WalkthroughPane already attached to window: {}&quot;, window.getClass().getSimpleName());</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;WalkthroughPane already attached to window: &quot; + window.getClass().getSimpleName());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Scene scene = window.getScene();</b>
+<b class="nc">&nbsp;        if (scene == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Cannot attach WalkthroughPane: scene is null for window: &quot; + window.getClass().getSimpleName());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        root = scene.getRoot();</b>
+<b class="nc">&nbsp;        if (root == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Cannot attach WalkthroughPane: original root is null for window: &quot; + window.getClass().getSimpleName());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        getChildren().add(root);</b>
+<b class="nc">&nbsp;        scene.setRoot(this);</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;WalkthroughPane attached to window: {}&quot;, window.getClass().getSimpleName());</b>
+<b class="nc">&nbsp;        isAttached = true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Ensure the WalkthroughPane is detached from the window.
+&nbsp;    public void detach() {
+<b class="nc">&nbsp;        if (!isAttached) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;WalkthroughPane not attached to window: {}&quot;, window.getClass().getSimpleName());</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;WalkthroughPane not attached to window: &quot; + window.getClass().getSimpleName());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Scene scene = window.getScene();</b>
+<b class="nc">&nbsp;        if (scene == null || root == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Cannot detach WalkthroughPane: scene or root is null for window: &quot; + window.getClass().getSimpleName());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        getChildren().remove(root);</b>
+<b class="nc">&nbsp;        scene.setRoot(root);</b>
+<b class="nc">&nbsp;        root = null;</b>
+<b class="nc">&nbsp;        INSTANCES.remove(window);</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;WalkthroughPane detached from window: {}&quot;, window.getClass().getSimpleName());</b>
+<b class="nc">&nbsp;        isAttached = false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

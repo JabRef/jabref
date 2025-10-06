@@ -1,0 +1,334 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JabRefItemDataProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citationstyle</a>
+</div>
+
+<h1>Coverage Summary for Class: JabRefItemDataProvider (org.jabref.logic.citationstyle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JabRefItemDataProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citationstyle;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.SequencedCollection;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+&nbsp;import org.jabref.logic.integrity.PagesChecker;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.Month;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.strings.LatexToUnicodeAdapter;
+&nbsp;
+&nbsp;import de.undercouch.citeproc.ItemDataProvider;
+&nbsp;import de.undercouch.citeproc.bibtex.BibTeXConverter;
+&nbsp;import de.undercouch.citeproc.csl.CSLItemData;
+&nbsp;import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
+&nbsp;import org.jbibtex.BibTeXEntry;
+&nbsp;import org.jbibtex.DigitStringValue;
+&nbsp;import org.jbibtex.Key;
+&nbsp;
+&nbsp;/**
+&nbsp; * Custom {@link ItemDataProvider} that allows to set the data so that we don&#39;t have to instantiate a new CSL object
+&nbsp; * every time.
+&nbsp; */
+&nbsp;public class JabRefItemDataProvider implements ItemDataProvider {
+&nbsp;
+<b class="nc">&nbsp;    private static final BibTeXConverter BIBTEX_CONVERTER = new BibTeXConverter();</b>
+&nbsp;
+&nbsp;    private final StringJsonBuilderFactory stringJsonBuilderFactory;
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;BibEntry&gt; data = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private BibDatabaseContext bibDatabaseContext;
+&nbsp;    private BibEntryTypesManager entryTypesManager;
+&nbsp;    private PagesChecker pagesChecker;
+&nbsp;
+<b class="nc">&nbsp;    public JabRefItemDataProvider() {</b>
+<b class="nc">&nbsp;        stringJsonBuilderFactory = new StringJsonBuilderFactory();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts the {@link BibEntry} into {@link CSLItemData}.
+&nbsp;     *
+&nbsp;     * &lt;br&gt;
+&nbsp;     * &lt;table&gt;
+&nbsp;     * &lt;thead&gt;
+&nbsp;     * &lt;tr&gt;
+&nbsp;     * &lt;th style=&quot;text-align:left&quot;&gt;BibTeX&lt;/th&gt;
+&nbsp;     * &lt;th style=&quot;text-align:left&quot;&gt;BibLaTeX&lt;/th&gt;
+&nbsp;     * &lt;th style=&quot;text-align:left&quot;&gt;EntryPreview/CSL&lt;/th&gt;
+&nbsp;     * &lt;th style=&quot;text-align:left&quot;&gt;proposed logic, conditions and info&lt;/th&gt;
+&nbsp;     * &lt;/tr&gt;
+&nbsp;     * &lt;/thead&gt;
+&nbsp;     * &lt;tbody&gt;
+&nbsp;     * &lt;tr&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;volume&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;volume&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;volume&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;
+&nbsp;     * &lt;/tr&gt;
+&nbsp;     * &lt;tr&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;number&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;issue&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;issue&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;For conversion to CSL or BibTeX: BibLaTeX &lt;code&gt;number&lt;/code&gt; takes priority and supersedes BibLaTeX &lt;code&gt;issue&lt;/code&gt;&lt;/td&gt;
+&nbsp;     * &lt;/tr&gt;
+&nbsp;     * &lt;tr&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;number&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;number&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;issue&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;same as above&lt;/td&gt;
+&nbsp;     * &lt;/tr&gt;
+&nbsp;     * &lt;tr&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;pages&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;eid&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;number&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;Some journals put the article-number (= eid) into the pages field. If BibLaTeX &lt;code&gt;eid&lt;/code&gt; exists, provide csl &lt;code&gt;number&lt;/code&gt; to the style. If &lt;code&gt;pages&lt;/code&gt; exists, provide csl &lt;code&gt;page&lt;/code&gt;.  If &lt;code&gt;eid&lt;/code&gt; WITHIN the &lt;code&gt;pages&lt;/code&gt; field exists, detect the eid and provide csl &lt;code&gt;number&lt;/code&gt;. If both &lt;code&gt;eid&lt;/code&gt; and &lt;code&gt;pages&lt;/code&gt; exists, ideally provide both csl &lt;code&gt;number&lt;/code&gt; and csl &lt;code&gt;page&lt;/code&gt;. Ideally the citationstyle should be able to flexibly choose the rendering.&lt;/td&gt;
+&nbsp;     * &lt;/tr&gt;
+&nbsp;     * &lt;tr&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;pages&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;pages&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;page&lt;/td&gt;
+&nbsp;     * &lt;td style=&quot;text-align:left&quot;&gt;same as above&lt;/td&gt;
+&nbsp;     * &lt;/tr&gt;
+&nbsp;     * &lt;/tbody&gt;
+&nbsp;     * &lt;/table&gt;
+&nbsp;     */
+&nbsp;    private CSLItemData bibEntryToCSLItemData(BibEntry originalBibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+&nbsp;        // We need to make a deep copy, because we modify the entry according to the logic presented at
+&nbsp;        // https://github.com/JabRef/jabref/issues/8372#issuecomment-1014941935
+<b class="nc">&nbsp;        BibEntry bibEntry = new BibEntry(originalBibEntry);</b>
+<b class="nc">&nbsp;        String citeKey = bibEntry.getCitationKey().orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));</b>
+&nbsp;
+&nbsp;        // Not every field is already generated into latex free fields
+<b class="nc">&nbsp;        RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;BibEntryType&gt; entryType = entryTypesManager.enrich(bibEntry.getType(), bibDatabaseContext.getMode());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bibEntry.getType().equals(StandardEntryType.Article)) {</b>
+&nbsp;            // Patch bibEntry to contain the right BibTeX (not BibLaTeX) fields
+&nbsp;            // Note that we do not need to convert from &quot;pages&quot; to &quot;page&quot;, because CiteProc already handles it
+&nbsp;            // See BibTeXConverter
+<b class="nc">&nbsp;            if (bibDatabaseContext.isBiblatexMode()) {</b>
+&nbsp;                // Map &quot;number&quot; to CSL &quot;issue&quot;, unless no number exists
+<b class="nc">&nbsp;                Optional&lt;String&gt; numberField = bibEntry.getField(StandardField.NUMBER);</b>
+<b class="nc">&nbsp;                numberField.ifPresent(number -&gt; {</b>
+<b class="nc">&nbsp;                            bibEntry.setField(StandardField.ISSUE, number);</b>
+<b class="nc">&nbsp;                            bibEntry.clearField(StandardField.NUMBER);</b>
+&nbsp;                        }
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                bibEntry.getField(StandardField.EID).ifPresent(eid -&gt; {</b>
+<b class="nc">&nbsp;                    if (!bibEntry.hasField(StandardField.NUMBER)) {</b>
+<b class="nc">&nbsp;                        bibEntry.setField(StandardField.NUMBER, eid);</b>
+<b class="nc">&nbsp;                        bibEntry.clearField(StandardField.EID);</b>
+&nbsp;                    }
+&nbsp;                });
+&nbsp;            } else {
+&nbsp;                // BibTeX mode
+<b class="nc">&nbsp;                bibEntry.getField(StandardField.NUMBER).ifPresent(number -&gt; {</b>
+<b class="nc">&nbsp;                    bibEntry.setField(StandardField.ISSUE, number);</b>
+<b class="nc">&nbsp;                    bibEntry.clearField(StandardField.NUMBER);</b>
+&nbsp;                });
+<b class="nc">&nbsp;                bibEntry.getField(StandardField.PAGES).ifPresent(pages -&gt; {</b>
+<b class="nc">&nbsp;                    if (pages.toLowerCase(Locale.ROOT).startsWith(&quot;article &quot;)) {</b>
+<b class="nc">&nbsp;                        pages = pages.substring(&quot;Article &quot;.length());</b>
+<b class="nc">&nbsp;                        bibEntry.setField(StandardField.NUMBER, pages);</b>
+&nbsp;                    }
+&nbsp;                });
+<b class="nc">&nbsp;                bibEntry.getField(StandardField.EID).ifPresent(eid -&gt; {</b>
+<b class="nc">&nbsp;                    if (!bibEntry.hasField(StandardField.PAGES)) {</b>
+<b class="nc">&nbsp;                        bibEntry.setField(StandardField.PAGES, eid);</b>
+<b class="nc">&nbsp;                        bibEntry.clearField(StandardField.EID);</b>
+&nbsp;                    }
+&nbsp;                });
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        SequencedCollection&lt;Field&gt; fields;
+<b class="nc">&nbsp;        if (entryType.isPresent()) {</b>
+<b class="nc">&nbsp;            fields = entryType.map(BibEntryType::getAllFields).map(LinkedHashSet::new).get();</b>
+<b class="nc">&nbsp;            fields.addAll(bibEntry.getFields());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            fields = bibEntry.getFields();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (Field key : fields) {</b>
+<b class="nc">&nbsp;            bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())</b>
+<b class="nc">&nbsp;                    .map(removeNewlinesFormatter::format)</b>
+<b class="nc">&nbsp;                    .map(LatexToUnicodeAdapter::format)</b>
+<b class="nc">&nbsp;                    .ifPresent(value -&gt; {</b>
+<b class="nc">&nbsp;                        if (StandardField.MONTH == key) {</b>
+&nbsp;                            // Change month from #mon# to mon because CSL does not support the former format
+<b class="nc">&nbsp;                            value = bibEntry.getMonth().map(Month::getShortName).orElse(value);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        bibTeXEntry.addField(new Key(key.getName()), new DigitStringValue(value));</b>
+&nbsp;                    });
+&nbsp;        }
+<b class="nc">&nbsp;        return BIBTEX_CONVERTER.toItemData(bibTeXEntry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fills the data with all entries in given bibDatabaseContext
+&nbsp;     */
+&nbsp;    public void setData(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+<b class="nc">&nbsp;        this.setData(bibDatabaseContext.getEntries(), bibDatabaseContext, entryTypesManager);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setData(List&lt;BibEntry&gt; data, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+<b class="nc">&nbsp;        this.data.clear();</b>
+<b class="nc">&nbsp;        this.data.addAll(data);</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+&nbsp;
+&nbsp;        // Quick solution to always use BibLaTeX mode at the checker to allow pages ranges with single dash, too
+&nbsp;        // Example: pages = {1-2}
+<b class="nc">&nbsp;        BibDatabaseContext ctx = new BibDatabaseContext();</b>
+<b class="nc">&nbsp;        ctx.setMode(BibDatabaseMode.BIBLATEX);</b>
+<b class="nc">&nbsp;        this.pagesChecker = new PagesChecker(ctx);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public CSLItemData retrieveItem(String id) {
+<b class="nc">&nbsp;        return data.stream()</b>
+<b class="nc">&nbsp;                   .filter(entry -&gt; entry.getCitationKey().orElse(&quot;&quot;).equals(id))</b>
+<b class="nc">&nbsp;                   .map(entry -&gt; bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))</b>
+<b class="nc">&nbsp;                   .findFirst().orElse(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;String&gt; getIds() {
+<b class="nc">&nbsp;        return data.stream()</b>
+<b class="nc">&nbsp;                   .map(entry -&gt; entry.getCitationKey().orElse(&quot;&quot;))</b>
+<b class="nc">&nbsp;                   .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String toJson() {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = bibDatabaseContext.getEntries();</b>
+<b class="nc">&nbsp;        this.setData(entries, bibDatabaseContext, entryTypesManager);</b>
+<b class="nc">&nbsp;        return entries.stream()</b>
+<b class="nc">&nbsp;                      .map(entry -&gt; bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))</b>
+<b class="nc">&nbsp;                      .map(item -&gt; item.toJson(stringJsonBuilderFactory.createJsonBuilder()))</b>
+<b class="nc">&nbsp;                      .map(String.class::cast)</b>
+<b class="nc">&nbsp;                      .collect(Collectors.joining(&quot;,&quot;, &quot;[&quot;, &quot;]&quot;));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

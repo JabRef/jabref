@@ -1,0 +1,315 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MetaDataDiff</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bibtex.comparator</a>
+</div>
+
+<h1>Coverage Summary for Class: MetaDataDiff (org.jabref.logic.bibtex.comparator)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MetaDataDiff</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MetaDataDiff$Difference</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MetaDataDiff$DifferenceType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bibtex.comparator;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+&nbsp;import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+&nbsp;import org.jabref.logic.groups.DefaultGroupsFactory;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.metadata.ContentSelectors;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;
+&nbsp;public class MetaDataDiff {
+<b class="nc">&nbsp;    public enum DifferenceType {</b>
+<b class="nc">&nbsp;        CONTENT_SELECTOR,</b>
+<b class="nc">&nbsp;        DEFAULT_KEY_PATTERN,</b>
+<b class="nc">&nbsp;        ENCODING,</b>
+<b class="nc">&nbsp;        LIBRARY_SPECIFIC_FILE_DIRECTORY,</b>
+<b class="nc">&nbsp;        GROUPS,</b>
+<b class="nc">&nbsp;        KEY_PATTERNS,</b>
+<b class="nc">&nbsp;        LATEX_FILE_DIRECTORY,</b>
+<b class="nc">&nbsp;        MODE,</b>
+<b class="nc">&nbsp;        PROTECTED,</b>
+<b class="nc">&nbsp;        SAVE_ACTIONS,</b>
+<b class="nc">&nbsp;        SAVE_SORT_ORDER,</b>
+<b class="nc">&nbsp;        USER_FILE_DIRECTORY</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Difference(DifferenceType differenceType, Object originalObject, Object newObject) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final Optional&lt;GroupDiff&gt; groupDiff;
+&nbsp;    private final MetaData originalMetaData;
+&nbsp;    private final MetaData newMetaData;
+&nbsp;
+<b class="nc">&nbsp;    private MetaDataDiff(MetaData originalMetaData, MetaData newMetaData) {</b>
+<b class="nc">&nbsp;        this.originalMetaData = originalMetaData;</b>
+<b class="nc">&nbsp;        this.newMetaData = newMetaData;</b>
+<b class="nc">&nbsp;        this.groupDiff = GroupDiff.compare(originalMetaData, newMetaData);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;MetaDataDiff&gt; compare(MetaData originalMetaData, MetaData newMetaData) {
+<b class="nc">&nbsp;        if (originalMetaData.equals(newMetaData)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            MetaDataDiff diff = new MetaDataDiff(originalMetaData, newMetaData);</b>
+<b class="nc">&nbsp;            List&lt;Difference&gt; differences = diff.getDifferences(new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN));</b>
+<b class="nc">&nbsp;            if (differences.isEmpty()) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Optional.of(diff);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if given content selectors are empty or default
+&nbsp;     */
+&nbsp;    private static boolean isDefaultContentSelectors(ContentSelectors contentSelectors) {
+<b class="nc">&nbsp;        if (contentSelectors.getContentSelectors().isEmpty()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Map&lt;Field, List&lt;String&gt;&gt; fieldKeywordsMap = ContentSelectors.getFieldKeywordsMap(contentSelectors.getContentSelectors());</b>
+<b class="nc">&nbsp;        return ContentSelectors.isDefaultMap(fieldKeywordsMap);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addToListIfDiff(List&lt;Difference&gt; changes, DifferenceType differenceType, Object originalObject, Object newObject) {
+<b class="nc">&nbsp;        if (!Objects.equals(originalObject, newObject)) {</b>
+<b class="nc">&nbsp;            if (differenceType == DifferenceType.CONTENT_SELECTOR) {</b>
+<b class="nc">&nbsp;                ContentSelectors originalContentSelectors = (ContentSelectors) originalObject;</b>
+<b class="nc">&nbsp;                ContentSelectors newContentSelectors = (ContentSelectors) newObject;</b>
+<b class="nc">&nbsp;                if (isDefaultContentSelectors(originalContentSelectors) &amp;&amp; isDefaultContentSelectors(newContentSelectors)) {</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (differenceType == DifferenceType.GROUPS) {</b>
+<b class="nc">&nbsp;                Optional&lt;GroupTreeNode&gt; originalGroups = (Optional&lt;GroupTreeNode&gt;) originalObject;</b>
+<b class="nc">&nbsp;                Optional&lt;GroupTreeNode&gt; newGroups = (Optional&lt;GroupTreeNode&gt;) newObject;</b>
+<b class="nc">&nbsp;                if (isDefaultGroup(originalGroups) &amp;&amp; isDefaultGroup(newGroups)) {</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            changes.add(new Difference(differenceType, originalObject, newObject));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isDefaultGroup(Optional&lt;GroupTreeNode&gt; groups) {
+<b class="nc">&nbsp;        if (groups.isEmpty()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        GroupTreeNode groupRoot = groups.get();</b>
+<b class="nc">&nbsp;        if (!groupRoot.getChildren().isEmpty()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return groupRoot.getGroup().equals(DefaultGroupsFactory.getAllEntriesGroup());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Should be kept in sync with {@link MetaData#equals(Object)}
+&nbsp;     */
+&nbsp;    public List&lt;Difference&gt; getDifferences(GlobalCitationKeyPatterns globalCitationKeyPatterns) {
+<b class="nc">&nbsp;        List&lt;Difference&gt; changes = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.PROTECTED, originalMetaData.isProtected(), newMetaData.isProtected());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.GROUPS, originalMetaData.getGroups(), newMetaData.getGroups());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.ENCODING, originalMetaData.getEncoding(), newMetaData.getEncoding());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.SAVE_SORT_ORDER, originalMetaData.getSaveOrder(), newMetaData.getSaveOrder());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.KEY_PATTERNS,</b>
+<b class="nc">&nbsp;                originalMetaData.getCiteKeyPatterns(globalCitationKeyPatterns),</b>
+<b class="nc">&nbsp;                newMetaData.getCiteKeyPatterns(globalCitationKeyPatterns));</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.USER_FILE_DIRECTORY, originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.LATEX_FILE_DIRECTORY, originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.DEFAULT_KEY_PATTERN, originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.SAVE_ACTIONS, originalMetaData.getSaveActions(), newMetaData.getSaveActions());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.MODE, originalMetaData.getMode(), newMetaData.getMode());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.LIBRARY_SPECIFIC_FILE_DIRECTORY, originalMetaData.getLibrarySpecificFileDirectory(), newMetaData.getLibrarySpecificFileDirectory());</b>
+<b class="nc">&nbsp;        addToListIfDiff(changes, DifferenceType.CONTENT_SELECTOR, originalMetaData.getContentSelectors(), newMetaData.getContentSelectors());</b>
+<b class="nc">&nbsp;        return changes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MetaData getNewMetaData() {
+<b class="nc">&nbsp;        return newMetaData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MetaData getOriginalMetaData() {
+<b class="nc">&nbsp;        return originalMetaData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Currently, the groups diff is contained here - and as entry in {@link #getDifferences(GlobalCitationKeyPatterns)}
+&nbsp;     */
+&nbsp;    public Optional&lt;GroupDiff&gt; getGroupDifferences() {
+<b class="nc">&nbsp;        return groupDiff;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;MetaDataDiff{&quot; +</b>
+&nbsp;                &quot;groupDiff=&quot; + groupDiff +
+&nbsp;                &quot;, originalMetaData=&quot; + originalMetaData +
+<b class="nc">&nbsp;                &quot;, newMetaData=&quot; + getNewMetaData() +</b>
+<b class="nc">&nbsp;                &quot;, getDifferences()=&quot; + getDifferences(new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) +</b>
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

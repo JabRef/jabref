@@ -1,0 +1,156 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitSemanticMergeExecutorImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.git.merge</a>
+</div>
+
+<h1>Coverage Summary for Class: GitSemanticMergeExecutorImpl (org.jabref.logic.git.merge)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitSemanticMergeExecutorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.git.merge;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import org.jabref.logic.git.conflicts.SemanticConflictDetector;
+&nbsp;import org.jabref.logic.git.io.GitFileWriter;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;
+&nbsp;public class GitSemanticMergeExecutorImpl implements GitSemanticMergeExecutor {
+&nbsp;
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public GitSemanticMergeExecutorImpl(ImportFormatPreferences importFormatPreferences) {</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = importFormatPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public MergePlan merge(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote, Path bibFilePath) throws IOException {
+&nbsp;        // 1. extract merge plan from base -&gt; remote
+<b class="nc">&nbsp;        MergePlan plan = SemanticConflictDetector.extractMergePlan(base, local, remote);</b>
+&nbsp;
+<b class="nc">&nbsp;        BibDatabaseContext working = new BibDatabaseContext(new BibDatabase(), new MetaData());</b>
+<b class="nc">&nbsp;        for (BibEntry entry : local.getDatabase().getEntries()) {</b>
+<b class="nc">&nbsp;            working.getDatabase().insertEntry(new BibEntry(entry));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // 2. apply remote changes to local
+<b class="nc">&nbsp;        SemanticMerger.applyMergePlan(working, plan);</b>
+&nbsp;
+&nbsp;        // 3. write back merged content
+<b class="nc">&nbsp;        GitFileWriter.write(bibFilePath, working, importFormatPreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        return plan;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

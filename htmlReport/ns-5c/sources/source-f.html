@@ -1,0 +1,876 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OpenOfficePanel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.openoffice</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenOfficePanel (org.jabref.gui.openoffice)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenOfficePanel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/110)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/314)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OpenOfficePanel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OpenOfficePanel$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/110)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/320)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.openoffice;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.concurrent.Task;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.geometry.Side;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckMenuItem;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.ProgressBar;
+&nbsp;import javafx.scene.control.RadioMenuItem;
+&nbsp;import javafx.scene.control.SeparatorMenuItem;
+&nbsp;import javafx.scene.control.ToggleGroup;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.FlowPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableKeyChange;
+&nbsp;import org.jabref.gui.util.DirectoryDialogConfiguration;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.citationstyle.CSLStyleLoader;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyle;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.LayoutFormatterPreferences;
+&nbsp;import org.jabref.logic.openoffice.OpenOfficeFileSearch;
+&nbsp;import org.jabref.logic.openoffice.OpenOfficePreferences;
+&nbsp;import org.jabref.logic.openoffice.action.Update;
+&nbsp;import org.jabref.logic.openoffice.style.JStyle;
+&nbsp;import org.jabref.logic.openoffice.style.JStyleLoader;
+&nbsp;import org.jabref.logic.openoffice.style.OOStyle;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.openoffice.style.CitationType;
+&nbsp;import org.jabref.model.openoffice.uno.CreationException;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.sun.star.comp.helper.BootstrapException;
+&nbsp;import com.sun.star.container.NoSuchElementException;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Pane to manage the interaction between JabRef and OpenOffice.
+&nbsp; */
+&nbsp;public class OpenOfficePanel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);</b>
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+&nbsp;    private final Button connect;
+&nbsp;    private final Button manualConnect;
+&nbsp;    private final Button selectDocument;
+<b class="nc">&nbsp;    private final Button setStyleFile = new Button(Localization.lang(&quot;Select style&quot;));</b>
+<b class="nc">&nbsp;    private final Button pushEntries = new Button(Localization.lang(&quot;Cite&quot;));</b>
+<b class="nc">&nbsp;    private final Button pushEntriesInt = new Button(Localization.lang(&quot;Cite in-text&quot;));</b>
+<b class="nc">&nbsp;    private final Button pushEntriesEmpty = new Button(Localization.lang(&quot;Insert empty citation&quot;));</b>
+<b class="nc">&nbsp;    private final Button pushEntriesAdvanced = new Button(Localization.lang(&quot;Cite special&quot;));</b>
+&nbsp;    private final Button update;
+<b class="nc">&nbsp;    private final Button merge = new Button(Localization.lang(&quot;Merge citations&quot;));</b>
+<b class="nc">&nbsp;    private final Button unmerge = new Button(Localization.lang(&quot;Separate citations&quot;));</b>
+<b class="nc">&nbsp;    private final Button manageCitations = new Button(Localization.lang(&quot;Manage citations&quot;));</b>
+<b class="nc">&nbsp;    private final Button exportCitations = new Button(Localization.lang(&quot;Export cited&quot;));</b>
+<b class="nc">&nbsp;    private final Button modifyBibliographyProperties = new Button(Localization.lang(&quot;Bibliography properties&quot;));</b>
+<b class="nc">&nbsp;    private final Button settingsB = new Button(Localization.lang(&quot;Settings&quot;));</b>
+&nbsp;    private final Button help;
+<b class="nc">&nbsp;    private final VBox vbox = new VBox();</b>
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final OpenOfficePreferences openOfficePreferences;
+&nbsp;    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final UiTaskExecutor taskExecutor;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final JStyleLoader jStyleLoader;
+&nbsp;    private final CSLStyleLoader cslStyleLoader;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private OOBibBase ooBase;
+&nbsp;    private OOStyle currentStyle;
+&nbsp;
+&nbsp;    private final SimpleObjectProperty&lt;OOStyle&gt; currentStyleProperty;
+&nbsp;
+&nbsp;    public OpenOfficePanel(LibraryTabContainer tabContainer,
+&nbsp;                           GuiPreferences preferences,
+&nbsp;                           OpenOfficePreferences openOfficePreferences,
+&nbsp;                           ExternalApplicationsPreferences externalApplicationsPreferences,
+&nbsp;                           LayoutFormatterPreferences layoutFormatterPreferences,
+&nbsp;                           CitationKeyPatternPreferences citationKeyPatternPreferences,
+&nbsp;                           JournalAbbreviationRepository abbreviationRepository,
+&nbsp;                           UiTaskExecutor taskExecutor,
+&nbsp;                           DialogService dialogService,
+&nbsp;                           AiService aiService,
+&nbsp;                           StateManager stateManager,
+&nbsp;                           FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                           BibEntryTypesManager entryTypesManager,
+&nbsp;                           ClipBoardManager clipBoardManager,
+<b class="nc">&nbsp;                           UndoManager undoManager) {</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.openOfficePreferences = openOfficePreferences;</b>
+<b class="nc">&nbsp;        this.citationKeyPatternPreferences = citationKeyPatternPreferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.clipBoardManager = clipBoardManager;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.currentStyle = openOfficePreferences.getCurrentStyle();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.currentStyleProperty = new SimpleObjectProperty&lt;&gt;(currentStyle);</b>
+&nbsp;
+<b class="nc">&nbsp;        jStyleLoader = new JStyleLoader(</b>
+&nbsp;                openOfficePreferences,
+&nbsp;                layoutFormatterPreferences,
+&nbsp;                abbreviationRepository);
+&nbsp;
+<b class="nc">&nbsp;        cslStyleLoader = new CSLStyleLoader(openOfficePreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+&nbsp;
+<b class="nc">&nbsp;        connect = new Button();</b>
+<b class="nc">&nbsp;        connect.setGraphic(IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode());</b>
+<b class="nc">&nbsp;        connect.setTooltip(new Tooltip(Localization.lang(&quot;Connect&quot;)));</b>
+<b class="nc">&nbsp;        connect.setMaxWidth(Double.MAX_VALUE);</b>
+&nbsp;
+<b class="nc">&nbsp;        manualConnect = new Button();</b>
+<b class="nc">&nbsp;        manualConnect.setGraphic(IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode());</b>
+<b class="nc">&nbsp;        manualConnect.setTooltip(new Tooltip(Localization.lang(&quot;Manual connect&quot;)));</b>
+<b class="nc">&nbsp;        manualConnect.setMaxWidth(Double.MAX_VALUE);</b>
+&nbsp;
+<b class="nc">&nbsp;        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService, externalApplicationsPreferences));</b>
+<b class="nc">&nbsp;        help.setMaxWidth(Double.MAX_VALUE);</b>
+&nbsp;
+<b class="nc">&nbsp;        selectDocument = new Button();</b>
+<b class="nc">&nbsp;        selectDocument.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());</b>
+<b class="nc">&nbsp;        selectDocument.setTooltip(new Tooltip(Localization.lang(&quot;Select Writer document&quot;)));</b>
+<b class="nc">&nbsp;        selectDocument.setMaxWidth(Double.MAX_VALUE);</b>
+&nbsp;
+<b class="nc">&nbsp;        update = new Button();</b>
+<b class="nc">&nbsp;        update.setGraphic(IconTheme.JabRefIcons.ADD_OR_MAKE_BIBLIOGRAPHY.getGraphicNode());</b>
+<b class="nc">&nbsp;        update.setTooltip(new Tooltip(Localization.lang(&quot;Sync OpenOffice/LibreOffice bibliography&quot;)));</b>
+<b class="nc">&nbsp;        update.setMaxWidth(Double.MAX_VALUE);</b>
+&nbsp;
+<b class="nc">&nbsp;        initPanel();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Node getContent() {
+<b class="nc">&nbsp;        return vbox;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* Note: the style may still be null on return.
+&nbsp;     *
+&nbsp;     * Return true if failed. In this case the dialog is already shown.
+&nbsp;     */
+&nbsp;    private boolean getOrUpdateTheStyle(String title) {
+<b class="nc">&nbsp;        final boolean FAIL = true;</b>
+<b class="nc">&nbsp;        final boolean PASS = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (currentStyle == null) {</b>
+<b class="nc">&nbsp;            currentStyle = openOfficePreferences.getCurrentStyle();</b>
+<b class="nc">&nbsp;            currentStyleProperty.set(currentStyle);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (currentStyle instanceof JStyle jStyle) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    jStyle = jStyleLoader.getUsedJstyle();</b>
+<b class="nc">&nbsp;                    jStyle.ensureUpToDate();</b>
+&nbsp;                } catch (IOException ex) {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Unable to reload style file &#39;{}&#39;&quot;, jStyle.getPath(), ex);</b>
+<b class="nc">&nbsp;                    String msg = Localization.lang(&quot;Unable to reload style file&quot;)</b>
+<b class="nc">&nbsp;                            + &quot;&#39;&quot; + jStyle.getPath() + &quot;&#39;&quot;</b>
+<b class="nc">&nbsp;                            + &quot;\n&quot; + ex.getMessage();</b>
+<b class="nc">&nbsp;                    new OOError(title, msg, ex).showErrorDialog(dialogService);</b>
+<b class="nc">&nbsp;                    return FAIL;</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // CSL Styles don&#39;t need to be updated
+<b class="nc">&nbsp;                return PASS;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return PASS;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initPanel() {
+<b class="nc">&nbsp;        connect.setOnAction(_ -&gt; connectAutomatically());</b>
+<b class="nc">&nbsp;        manualConnect.setOnAction(_ -&gt; connectManually());</b>
+&nbsp;
+<b class="nc">&nbsp;        selectDocument.setTooltip(new Tooltip(Localization.lang(&quot;Select which open Writer document to work on&quot;)));</b>
+<b class="nc">&nbsp;        selectDocument.setOnAction(_ -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                ooBase.guiActionSelectDocument(false);</b>
+&nbsp;            } catch (WrappedTargetException
+&nbsp;                     | NoSuchElementException ex) {
+<b class="nc">&nbsp;                throw new RuntimeException(ex);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        setStyleFile.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        setStyleFile.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader);</b>
+<b class="nc">&nbsp;            dialogService.showCustomDialogAndWait(styleDialog)</b>
+<b class="nc">&nbsp;                         .ifPresent(selectedStyle -&gt; {</b>
+<b class="nc">&nbsp;                             currentStyle = selectedStyle;</b>
+<b class="nc">&nbsp;                             currentStyleProperty.set(currentStyle);</b>
+&nbsp;
+<b class="nc">&nbsp;                             if (currentStyle instanceof JStyle jStyle) {</b>
+&nbsp;                                 try {
+<b class="nc">&nbsp;                                     jStyle.ensureUpToDate();</b>
+&nbsp;                                 } catch (IOException e) {
+<b class="nc">&nbsp;                                     LOGGER.warn(&quot;Unable to reload style file &#39;{}&#39;&quot;, jStyle.getPath(), e);</b>
+&nbsp;                                 }
+<b class="nc">&nbsp;                                 dialogService.notify(Localization.lang(&quot;Currently selected JStyle: &#39;%0&#39;&quot;, jStyle.getName()));</b>
+<b class="nc">&nbsp;                             } else if (currentStyle instanceof CitationStyle cslStyle) {</b>
+<b class="nc">&nbsp;                                 dialogService.notify(Localization.lang(&quot;Currently selected CSL Style: &#39;%0&#39;&quot;, cslStyle.getName()));</b>
+&nbsp;                             }
+<b class="nc">&nbsp;                             updateButtonAvailability();</b>
+&nbsp;                         });
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        pushEntries.setTooltip(new Tooltip(Localization.lang(&quot;Cite selected entries between parenthesis&quot;)));</b>
+<b class="nc">&nbsp;        pushEntries.setOnAction(_ -&gt; pushEntries(CitationType.AUTHORYEAR_PAR, false));</b>
+<b class="nc">&nbsp;        pushEntries.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        pushEntriesInt.setTooltip(new Tooltip(Localization.lang(&quot;Cite selected entries with in-text citation&quot;)));</b>
+<b class="nc">&nbsp;        pushEntriesInt.setOnAction(_ -&gt; pushEntries(CitationType.AUTHORYEAR_INTEXT, false));</b>
+<b class="nc">&nbsp;        pushEntriesInt.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        pushEntriesEmpty.setTooltip(new Tooltip(Localization.lang(&quot;Insert a citation without text (the entry will appear in the reference list)&quot;)));</b>
+<b class="nc">&nbsp;        pushEntriesEmpty.setOnAction(_ -&gt; pushEntries(CitationType.INVISIBLE_CIT, false));</b>
+<b class="nc">&nbsp;        pushEntriesEmpty.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        pushEntriesAdvanced.setTooltip(new Tooltip(Localization.lang(&quot;Cite selected entries with extra information&quot;)));</b>
+<b class="nc">&nbsp;        pushEntriesAdvanced.setOnAction(_ -&gt; pushEntries(CitationType.AUTHORYEAR_INTEXT, true));</b>
+<b class="nc">&nbsp;        pushEntriesAdvanced.setMaxWidth(Double.MAX_VALUE);</b>
+&nbsp;
+<b class="nc">&nbsp;        update.setTooltip(new Tooltip(Localization.lang(&quot;Make/Sync bibliography&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        update.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            String title = Localization.lang(&quot;Could not update bibliography&quot;);</b>
+<b class="nc">&nbsp;            if (getOrUpdateTheStyle(title)) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            List&lt;BibDatabase&gt; databases = getBaseList();</b>
+<b class="nc">&nbsp;            ooBase.guiActionUpdateDocument(databases, currentStyle);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        merge.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        merge.setTooltip(new Tooltip(Localization.lang(&quot;Combine pairs of citations that are separated by spaces only&quot;)));</b>
+<b class="nc">&nbsp;        merge.setOnAction(_ -&gt; ooBase.guiActionMergeCitationGroups(getBaseList(), currentStyle));</b>
+&nbsp;
+<b class="nc">&nbsp;        unmerge.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        unmerge.setTooltip(new Tooltip(Localization.lang(&quot;Separate merged citations&quot;)));</b>
+<b class="nc">&nbsp;        unmerge.setOnAction(_ -&gt; ooBase.guiActionSeparateCitations(getBaseList(), currentStyle));</b>
+&nbsp;
+<b class="nc">&nbsp;        ContextMenu settingsMenu = createSettingsPopup();</b>
+<b class="nc">&nbsp;        settingsB.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        settingsB.setContextMenu(settingsMenu);</b>
+<b class="nc">&nbsp;        settingsB.setOnAction(_ -&gt; settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));</b>
+<b class="nc">&nbsp;        manageCitations.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        manageCitations.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            ManageCitationsDialogView dialog = new ManageCitationsDialogView(ooBase);</b>
+<b class="nc">&nbsp;            if (dialog.isOkToShowThisDialog()) {</b>
+<b class="nc">&nbsp;                dialogService.showCustomDialogAndWait(dialog);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        modifyBibliographyProperties.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        modifyBibliographyProperties.setOnAction(_ -&gt; modifyBibliographyProperties());</b>
+&nbsp;
+<b class="nc">&nbsp;        exportCitations.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        exportCitations.setOnAction(_ -&gt; exportEntries());</b>
+&nbsp;
+<b class="nc">&nbsp;        updateButtonAvailability();</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox hbox = new HBox();</b>
+<b class="nc">&nbsp;        hbox.getChildren().addAll(connect, manualConnect, selectDocument, update, help);</b>
+<b class="nc">&nbsp;        hbox.getChildren().forEach(btn -&gt; HBox.setHgrow(btn, Priority.ALWAYS));</b>
+&nbsp;
+<b class="nc">&nbsp;        FlowPane flow = new FlowPane();</b>
+<b class="nc">&nbsp;        flow.setPadding(new Insets(5, 5, 5, 5));</b>
+<b class="nc">&nbsp;        flow.setVgap(4);</b>
+<b class="nc">&nbsp;        flow.setHgap(4);</b>
+<b class="nc">&nbsp;        flow.setPrefWrapLength(200);</b>
+<b class="nc">&nbsp;        flow.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt);</b>
+<b class="nc">&nbsp;        flow.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge, unmerge);</b>
+<b class="nc">&nbsp;        flow.getChildren().addAll(manageCitations, exportCitations, modifyBibliographyProperties, settingsB);</b>
+&nbsp;
+<b class="nc">&nbsp;        vbox.setFillWidth(true);</b>
+<b class="nc">&nbsp;        vbox.getChildren().addAll(hbox, flow);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void modifyBibliographyProperties() {
+<b class="nc">&nbsp;        ModifyCSLBibliographyPropertiesDialogView modifyBibliographyPropertiesDialogView = new ModifyCSLBibliographyPropertiesDialogView(openOfficePreferences);</b>
+<b class="nc">&nbsp;        dialogService.showCustomDialog(modifyBibliographyPropertiesDialogView);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void exportEntries() {
+<b class="nc">&nbsp;        List&lt;BibDatabase&gt; databases = getBaseList();</b>
+<b class="nc">&nbsp;        boolean returnPartialResult = false;</b>
+<b class="nc">&nbsp;        Optional&lt;BibDatabase&gt; newDatabase = ooBase.exportCitedHelper(databases, returnPartialResult);</b>
+<b class="nc">&nbsp;        if (newDatabase.isPresent()) {</b>
+<b class="nc">&nbsp;            BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase.get());</b>
+<b class="nc">&nbsp;            LibraryTab libraryTab = LibraryTab.createLibraryTab(</b>
+&nbsp;                    databaseContext,
+&nbsp;                    tabContainer,
+&nbsp;                    dialogService,
+&nbsp;                    aiService,
+&nbsp;                    preferences,
+&nbsp;                    stateManager,
+&nbsp;                    fileUpdateMonitor,
+&nbsp;                    entryTypesManager,
+&nbsp;                    undoManager,
+&nbsp;                    clipBoardManager,
+&nbsp;                    taskExecutor);
+<b class="nc">&nbsp;            tabContainer.addTab(libraryTab, true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibDatabase&gt; getBaseList() {
+<b class="nc">&nbsp;        List&lt;BibDatabase&gt; databases = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        if (openOfficePreferences.getUseAllDatabases()) {</b>
+<b class="nc">&nbsp;            for (BibDatabaseContext database : stateManager.getOpenDatabases()) {</b>
+<b class="nc">&nbsp;                databases.add(database.getDatabase());</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            databases.add(stateManager.getActiveDatabase()</b>
+<b class="nc">&nbsp;                                      .map(BibDatabaseContext::getDatabase)</b>
+<b class="nc">&nbsp;                                      .orElse(new BibDatabase()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return databases;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void connectAutomatically() {
+<b class="nc">&nbsp;        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (officeInstallation.isExecutablePathDefined()) {</b>
+<b class="nc">&nbsp;            connect();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Task&lt;List&lt;Path&gt;&gt; taskConnectIfInstalled = new Task&lt;&gt;() {</b>
+&nbsp;                @Override
+&nbsp;                protected List&lt;Path&gt; call() {
+<b class="nc">&nbsp;                    return OpenOfficeFileSearch.detectInstallations();</b>
+&nbsp;                }
+&nbsp;            };
+&nbsp;
+<b class="nc">&nbsp;            taskConnectIfInstalled.setOnSucceeded(_ -&gt; {</b>
+<b class="nc">&nbsp;                List&lt;Path&gt; installations = new ArrayList&lt;&gt;(taskConnectIfInstalled.getValue());</b>
+<b class="nc">&nbsp;                if (installations.isEmpty()) {</b>
+<b class="nc">&nbsp;                    officeInstallation.selectInstallationPath().ifPresent(installations::add);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                Optional&lt;Path&gt; chosenInstallationDirectory = officeInstallation.chooseAmongInstallations(installations);</b>
+<b class="nc">&nbsp;                if (chosenInstallationDirectory.isPresent() &amp;&amp; officeInstallation.setOpenOfficePreferences(chosenInstallationDirectory.get())) {</b>
+<b class="nc">&nbsp;                    connect();</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            taskConnectIfInstalled.setOnFailed(_ -&gt; dialogService.showErrorDialogAndWait(Localization.lang(&quot;Autodetection failed&quot;), Localization.lang(&quot;Autodetection failed&quot;), taskConnectIfInstalled.getException()));</b>
+&nbsp;
+<b class="nc">&nbsp;            dialogService.showProgressDialog(Localization.lang(&quot;Autodetecting paths...&quot;), Localization.lang(&quot;Autodetecting paths...&quot;), taskConnectIfInstalled);</b>
+<b class="nc">&nbsp;            taskExecutor.execute(taskConnectIfInstalled);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void connectManually() {
+<b class="nc">&nbsp;        DirectoryDialogConfiguration fileDialogConfiguration = new DirectoryDialogConfiguration.Builder().withInitialDirectory(System.getProperty(&quot;user.home&quot;)).build();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; selectedPath = dialogService.showDirectorySelectionDialog(fileDialogConfiguration);</b>
+&nbsp;
+<b class="nc">&nbsp;        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selectedPath.isPresent()) {</b>
+<b class="nc">&nbsp;            BackgroundTask.wrap(() -&gt; officeInstallation.setOpenOfficePreferences(selectedPath.get()))</b>
+<b class="nc">&nbsp;                          .withInitialMessage(&quot;Searching for executable&quot;)</b>
+<b class="nc">&nbsp;                          .onFailure(dialogService::showErrorDialogAndWait).onSuccess(value -&gt; {</b>
+<b class="nc">&nbsp;                              if (value) {</b>
+<b class="nc">&nbsp;                                  connect();</b>
+&nbsp;                              } else {
+<b class="nc">&nbsp;                                  dialogService.showErrorDialogAndWait(Localization.lang(&quot;Could not connect to running OpenOffice/LibreOffice.&quot;), Localization.lang(&quot;If connecting manually, please verify program and library paths.&quot;));</b>
+&nbsp;                              }
+&nbsp;                          })
+<b class="nc">&nbsp;                          .executeWith(taskExecutor);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Could not connect to running OpenOffice/LibreOffice.&quot;), Localization.lang(&quot;If connecting manually, please verify program and library paths.&quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateButtonAvailability() {
+<b class="nc">&nbsp;        boolean isConnectedToDocument = ooBase != null &amp;&amp; !ooBase.isDocumentConnectionMissing();</b>
+<b class="nc">&nbsp;        boolean hasStyle = currentStyle != null;</b>
+<b class="nc">&nbsp;        boolean hasDatabase = !getBaseList().isEmpty();</b>
+<b class="nc">&nbsp;        boolean canCite = isConnectedToDocument &amp;&amp; hasStyle &amp;&amp; hasDatabase;</b>
+<b class="nc">&nbsp;        boolean canRefreshDocument = isConnectedToDocument &amp;&amp; hasStyle;</b>
+<b class="nc">&nbsp;        boolean cslStyleSelected = currentStyle instanceof CitationStyle;</b>
+<b class="nc">&nbsp;        boolean canGenerateBibliography = (currentStyle instanceof JStyle) || (currentStyle instanceof CitationStyle citationStyle &amp;&amp; citationStyle.hasBibliography());</b>
+&nbsp;
+<b class="nc">&nbsp;        selectDocument.setDisable(!isConnectedToDocument);</b>
+&nbsp;
+<b class="nc">&nbsp;        pushEntries.setDisable(!canCite);</b>
+<b class="nc">&nbsp;        pushEntriesInt.setDisable(!canCite);</b>
+<b class="nc">&nbsp;        pushEntriesEmpty.setDisable(!canCite);</b>
+<b class="nc">&nbsp;        pushEntriesAdvanced.setDisable(!canCite || cslStyleSelected);</b>
+&nbsp;
+<b class="nc">&nbsp;        update.setDisable(!canRefreshDocument || !canGenerateBibliography);</b>
+<b class="nc">&nbsp;        merge.setDisable(!canRefreshDocument || cslStyleSelected);</b>
+<b class="nc">&nbsp;        unmerge.setDisable(!canRefreshDocument || cslStyleSelected);</b>
+<b class="nc">&nbsp;        manageCitations.setDisable(!canRefreshDocument || cslStyleSelected);</b>
+<b class="nc">&nbsp;        exportCitations.setDisable(!(isConnectedToDocument &amp;&amp; hasDatabase) || cslStyleSelected);</b>
+<b class="nc">&nbsp;        modifyBibliographyProperties.setDisable(!cslStyleSelected);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void connect() {
+<b class="nc">&nbsp;        Task&lt;OOBibBase&gt; connectTask = new Task&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            protected OOBibBase call() throws BootstrapException, CreationException, IOException, InterruptedException {
+<b class="nc">&nbsp;                updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);</b>
+&nbsp;
+<b class="nc">&nbsp;                Path path = Path.of(openOfficePreferences.getExecutablePath());</b>
+<b class="nc">&nbsp;                return createBibBase(path);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        connectTask.setOnSucceeded(_ -&gt; {</b>
+<b class="nc">&nbsp;            ooBase = connectTask.getValue();</b>
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                ooBase.guiActionSelectDocument(true);</b>
+&nbsp;            } catch (WrappedTargetException
+&nbsp;                     | NoSuchElementException e) {
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Enable actions that depend on a connection
+<b class="nc">&nbsp;            updateButtonAvailability();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        connectTask.setOnFailed(_ -&gt; {</b>
+<b class="nc">&nbsp;            Throwable ex = connectTask.getException();</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;autodetect failed&quot;, ex);</b>
+<b class="nc">&nbsp;            switch (ex) {</b>
+<b class="nc">&nbsp;                case UnsatisfiedLinkError unsatisfiedLinkError -&gt; {</b>
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Could not connect to running OpenOffice/LibreOffice&quot;, unsatisfiedLinkError);</b>
+&nbsp;
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(Localization.lang(&quot;Unable to connect. One possible reason is that JabRef &quot;</b>
+&nbsp;                            + &quot;and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode.&quot;));
+&nbsp;                }
+<b class="nc">&nbsp;                case IOException ioException -&gt; {</b>
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Could not connect to running OpenOffice/LibreOffice&quot;, ioException);</b>
+&nbsp;
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(Localization.lang(&quot;Could not connect to running OpenOffice/LibreOffice.&quot;),</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Could not connect to running OpenOffice/LibreOffice.&quot;)</b>
+&nbsp;                                    + &quot;\n&quot;
+<b class="nc">&nbsp;                                    + Localization.lang(&quot;Make sure you have installed OpenOffice/LibreOffice with Java support.&quot;) + &quot;\n&quot;</b>
+<b class="nc">&nbsp;                                    + Localization.lang(&quot;If connecting manually, please verify program and library paths.&quot;) + &quot;\n&quot; + &quot;\n&quot; + Localization.lang(&quot;Error message:&quot;),</b>
+&nbsp;                            ex);
+&nbsp;                }
+<b class="nc">&nbsp;                case BootstrapException bootstrapEx -&gt; {</b>
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Exception boostrap cause&quot;, bootstrapEx.getTargetException());</b>
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(&quot;Bootstrap error&quot;, bootstrapEx.getTargetException());</b>
+&nbsp;                }
+&nbsp;                case null,
+&nbsp;                     default -&gt;
+<b class="nc">&nbsp;                        dialogService.showErrorDialogAndWait(Localization.lang(&quot;Autodetection failed&quot;), Localization.lang(&quot;Autodetection failed&quot;), ex);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showProgressDialog(Localization.lang(&quot;Autodetecting paths...&quot;), Localization.lang(&quot;Autodetecting paths...&quot;), connectTask);</b>
+<b class="nc">&nbsp;        taskExecutor.execute(connectTask);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException, IOException, InterruptedException {
+<b class="nc">&nbsp;        return new OOBibBase(loPath, dialogService, openOfficePreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Given the withText and inParenthesis options, return the corresponding citationType.
+&nbsp;     *
+&nbsp;     * @param withText      False means invisible citation (no text).
+&nbsp;     * @param inParenthesis True means &quot;(Au and Thor 2000)&quot;. False means &quot;Au and Thor (2000)&quot;.
+&nbsp;     */
+&nbsp;    private static CitationType citationTypeFromOptions(boolean withText, boolean inParenthesis) {
+<b class="nc">&nbsp;        if (!withText) {</b>
+<b class="nc">&nbsp;            return CitationType.INVISIBLE_CIT;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return inParenthesis</b>
+<b class="nc">&nbsp;               ? CitationType.AUTHORYEAR_PAR</b>
+<b class="nc">&nbsp;               : CitationType.AUTHORYEAR_INTEXT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void pushEntries(CitationType citationType, boolean addPageInfo) {
+<b class="nc">&nbsp;        final String errorDialogTitle = Localization.lang(&quot;Error pushing entries&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        final Optional&lt;BibDatabaseContext&gt; activeDatabase = stateManager.getActiveDatabase();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (activeDatabase.isEmpty() || (activeDatabase.get().getDatabase() == null)) {</b>
+<b class="nc">&nbsp;            OOError.noDataBaseIsOpenForCiting()</b>
+<b class="nc">&nbsp;                   .setTitle(errorDialogTitle)</b>
+<b class="nc">&nbsp;                   .showErrorDialog(dialogService);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final BibDatabaseContext bibDatabaseContext = activeDatabase.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = stateManager.getSelectedEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            OOError.noEntriesSelectedForCitation()</b>
+<b class="nc">&nbsp;                   .setTitle(errorDialogTitle)</b>
+<b class="nc">&nbsp;                   .showErrorDialog(dialogService);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (getOrUpdateTheStyle(errorDialogTitle)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String pageInfo = null;</b>
+<b class="nc">&nbsp;        if (addPageInfo) {</b>
+<b class="nc">&nbsp;            boolean withText = citationType.withText();</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;AdvancedCiteDialogViewModel&gt; citeDialogViewModel = dialogService.showCustomDialogAndWait(new AdvancedCiteDialogView());</b>
+<b class="nc">&nbsp;            if (citeDialogViewModel.isPresent()) {</b>
+<b class="nc">&nbsp;                AdvancedCiteDialogViewModel model = citeDialogViewModel.get();</b>
+<b class="nc">&nbsp;                if (!model.pageInfoProperty().getValue().isEmpty()) {</b>
+<b class="nc">&nbsp;                    pageInfo = model.pageInfoProperty().getValue();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                citationType = citationTypeFromOptions(withText, model.citeInParProperty().getValue());</b>
+&nbsp;            } else {
+&nbsp;                // user canceled
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!checkThatEntriesHaveKeys(entries)) {</b>
+&nbsp;            // Not all entries have keys and key generation was declined.
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        Optional&lt;Update.SyncOptions&gt; syncOptions =
+<b class="nc">&nbsp;                openOfficePreferences.getSyncWhenCiting()</b>
+<b class="nc">&nbsp;                ? Optional.of(new Update.SyncOptions(getBaseList()))</b>
+<b class="nc">&nbsp;                : Optional.empty();</b>
+&nbsp;
+&nbsp;        // Sync options are non-null only when &quot;Automatically sync bibliography when inserting citations&quot; is enabled
+<b class="nc">&nbsp;        if (syncOptions.isPresent() &amp;&amp; openOfficePreferences.getSyncWhenCiting()) {</b>
+<b class="nc">&nbsp;            syncOptions.get().setUpdateBibliography(true);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        ooBase.guiActionInsertEntry(entries,</b>
+&nbsp;                bibDatabaseContext,
+&nbsp;                entryTypesManager,
+&nbsp;                currentStyle,
+&nbsp;                citationType,
+&nbsp;                pageInfo,
+&nbsp;                syncOptions);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check that all entries in the list have citation keys, if not ask if they should be generated
+&nbsp;     *
+&nbsp;     * @param entries A list of entries to be checked
+&nbsp;     * @return true if all entries have citation keys, if it so may be after generating them
+&nbsp;     */
+&nbsp;    private boolean checkThatEntriesHaveKeys(List&lt;BibEntry&gt; entries) {
+&nbsp;        // Check if there are empty keys
+<b class="nc">&nbsp;        boolean emptyKeys = false;</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            if (entry.getCitationKey().isEmpty()) {</b>
+&nbsp;                // Found one, no need to look further for now
+<b class="nc">&nbsp;                emptyKeys = true;</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // If no empty keys, return true
+<b class="nc">&nbsp;        if (!emptyKeys) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Ask if keys should be generated
+<b class="nc">&nbsp;        boolean citePressed = dialogService.showConfirmationDialogAndWait(Localization.lang(&quot;Cite&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Cannot cite entries without citation keys. Generate keys now?&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Generate keys&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Cancel&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;BibDatabaseContext&gt; databaseContext = stateManager.getActiveDatabase();</b>
+<b class="nc">&nbsp;        if (citePressed &amp;&amp; databaseContext.isPresent()) {</b>
+&nbsp;            // Generate keys
+<b class="nc">&nbsp;            NamedCompoundEdit undoCompound = new NamedCompoundEdit(Localization.lang(&quot;Cite&quot;));</b>
+<b class="nc">&nbsp;            for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;                if (entry.getCitationKey().isEmpty()) {</b>
+&nbsp;                    // Generate key
+<b class="nc">&nbsp;                    new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)</b>
+<b class="nc">&nbsp;                            .generateAndSetKey(entry)</b>
+<b class="nc">&nbsp;                            .ifPresent(change -&gt; undoCompound.addEdit(new UndoableKeyChange(change)));</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            undoCompound.end();</b>
+&nbsp;            // Add all undos
+<b class="nc">&nbsp;            undoManager.addEdit(undoCompound);</b>
+&nbsp;            // Now every entry has a key
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } else {
+&nbsp;            // No, we canceled (or there is no panel to get the database from, highly unlikely)
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private ContextMenu createSettingsPopup() {
+<b class="nc">&nbsp;        ContextMenu contextMenu = new ContextMenu();</b>
+&nbsp;
+<b class="nc">&nbsp;        CheckMenuItem autoSync = new CheckMenuItem(Localization.lang(&quot;Automatically sync bibliography when inserting citations&quot;));</b>
+<b class="nc">&nbsp;        autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());</b>
+&nbsp;
+<b class="nc">&nbsp;        CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang(&quot;Add space after citation&quot;));</b>
+<b class="nc">&nbsp;        addSpaceAfter.selectedProperty().set(openOfficePreferences.getAddSpaceAfter());</b>
+<b class="nc">&nbsp;        addSpaceAfter.setOnAction(_ -&gt; openOfficePreferences.setAddSpaceAfter(addSpaceAfter.isSelected()));</b>
+&nbsp;
+<b class="nc">&nbsp;        CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang(&quot;Automatically add \&quot;Cited on pages...\&quot; at the end of bibliographic entries&quot;));</b>
+<b class="nc">&nbsp;        alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());</b>
+<b class="nc">&nbsp;        alwaysAddCitedOnPagesText.setOnAction(_ -&gt; openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(currentStyleProperty, (_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            switch (newValue) {</b>
+&nbsp;                case JStyle _ -&gt; {
+<b class="nc">&nbsp;                    if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {</b>
+<b class="nc">&nbsp;                        contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case CitationStyle _ -&gt;
+<b class="nc">&nbsp;                        contextMenu.getItems().remove(alwaysAddCitedOnPagesText);</b>
+&nbsp;                default -&gt; {
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        ToggleGroup toggleGroup = new ToggleGroup();</b>
+<b class="nc">&nbsp;        RadioMenuItem useActiveBase = new RadioMenuItem(Localization.lang(&quot;Look up BibTeX entries in the active tab only&quot;));</b>
+<b class="nc">&nbsp;        RadioMenuItem useAllBases = new RadioMenuItem(Localization.lang(&quot;Look up BibTeX entries in all open libraries&quot;));</b>
+<b class="nc">&nbsp;        useActiveBase.setToggleGroup(toggleGroup);</b>
+<b class="nc">&nbsp;        useAllBases.setToggleGroup(toggleGroup);</b>
+&nbsp;
+<b class="nc">&nbsp;        MenuItem clearConnectionSettings = new MenuItem(Localization.lang(&quot;Clear connection settings&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (openOfficePreferences.getUseAllDatabases()) {</b>
+<b class="nc">&nbsp;            useAllBases.setSelected(true);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            useActiveBase.setSelected(true);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        autoSync.setOnAction(_ -&gt; openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));</b>
+<b class="nc">&nbsp;        useAllBases.setOnAction(_ -&gt; openOfficePreferences.setUseAllDatabases(useAllBases.isSelected()));</b>
+<b class="nc">&nbsp;        useActiveBase.setOnAction(_ -&gt; openOfficePreferences.setUseAllDatabases(!useActiveBase.isSelected()));</b>
+<b class="nc">&nbsp;        clearConnectionSettings.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            openOfficePreferences.clearConnectionSettings();</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Cleared connection settings&quot;));</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        contextMenu.getItems().addAll(</b>
+&nbsp;                autoSync,
+&nbsp;                addSpaceAfter,
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;                useActiveBase,
+&nbsp;                useAllBases,
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;                clearConnectionSettings);
+&nbsp;
+<b class="nc">&nbsp;        if (currentStyle instanceof JStyle) {</b>
+<b class="nc">&nbsp;            contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return contextMenu;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

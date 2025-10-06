@@ -1,0 +1,220 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReferenceMark</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice</a>
+</div>
+
+<h1>Coverage Summary for Class: ReferenceMark (org.jabref.logic.openoffice)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReferenceMark</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import io.github.thibaultmeyer.cuid.CUID;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class ReferenceMark {
+<b class="nc">&nbsp;    public static final String[] PREFIXES = {&quot;JABREF_&quot;, &quot;CID_&quot;};</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMark.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile(</b>
+&nbsp;            &quot;^(JABREF_[\\w-:./]+ CID_\\d+(?:, JABREF_[\\w-:./]+ CID_\\d+)*) (\\w+)$&quot;,
+&nbsp;            Pattern.UNICODE_CHARACTER_CLASS);
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern ENTRY_PATTERN = Pattern.compile(</b>
+&nbsp;            &quot;JABREF_([\\w-:./]+) CID_(\\d+)&quot;,
+&nbsp;            Pattern.UNICODE_CHARACTER_CLASS);
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private List&lt;String&gt; citationKeys;
+&nbsp;    private List&lt;Integer&gt; citationNumbers;
+&nbsp;    private String uniqueId;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param name Allowed formats:
+&nbsp;     *             Single entry: &lt;code&gt;JABREF_{citationKey} CID_{citationNumber} {uniqueId}&lt;/code&gt;
+&nbsp;     *             Group of entries: &lt;code&gt;JABREF_{citationKey1} CID_{citationNumber1}, JABREF_{citationKey2} CID_{citationNumber2}, ..., JABREF_{citationKeyN} CID_{citationNumberN} {uniqueId}&lt;/code&gt;
+&nbsp;     *             Disallowed: &lt;code&gt;JABREF_{citationKey} CID_{citationNumber}&lt;/code&gt; (no unique ID at the end)
+&nbsp;     *             Disallowed: &lt;code&gt;JABREF_{citationKey1} CID_{citationNumber1} JABREF_{citationKey2} CID_{citationNumber2} {uniqueId}&lt;/code&gt; (no comma between entries)
+&nbsp;     */
+<b class="nc">&nbsp;    public ReferenceMark(String name) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        parse(name);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public ReferenceMark(String name, List&lt;String&gt; citationKeys, List&lt;Integer&gt; citationNumbers, String uniqueId) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.citationKeys = citationKeys;</b>
+<b class="nc">&nbsp;        this.citationNumbers = citationNumbers;</b>
+<b class="nc">&nbsp;        this.uniqueId = uniqueId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parse(String name) {
+<b class="nc">&nbsp;        Matcher matcher = REFERENCE_MARK_FORMAT.matcher(name);</b>
+<b class="nc">&nbsp;        if (!matcher.matches()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;CSLReferenceMark: name={} does not match pattern. Assuming random values&quot;, name);</b>
+<b class="nc">&nbsp;            this.citationKeys = List.of(CUID.randomCUID2(8).toString());</b>
+<b class="nc">&nbsp;            this.citationNumbers = List.of(0);</b>
+<b class="nc">&nbsp;            this.uniqueId = this.citationKeys.getFirst();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String entriesString = matcher.group(1).trim();</b>
+<b class="nc">&nbsp;        this.uniqueId = matcher.group(2) != null ? matcher.group(2).trim() : CUID.randomCUID2(8).toString();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.citationKeys = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        this.citationNumbers = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Matcher entryMatcher = ENTRY_PATTERN.matcher(entriesString);</b>
+<b class="nc">&nbsp;        while (entryMatcher.find()) {</b>
+<b class="nc">&nbsp;            this.citationKeys.add(entryMatcher.group(1));</b>
+<b class="nc">&nbsp;            this.citationNumbers.add(Integer.parseInt(entryMatcher.group(2)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (this.citationKeys.isEmpty() || this.citationNumbers.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;CSLReferenceMark: Failed to parse any entries from name={}. Assuming random values&quot;, name);</b>
+<b class="nc">&nbsp;            this.citationKeys = List.of(CUID.randomCUID2(8).toString());</b>
+<b class="nc">&nbsp;            this.citationNumbers = List.of(0);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;CSLReferenceMark: citationKeys={} citationNumbers={} uniqueId={}&quot;, getCitationKeys(), getCitationNumbers(), getUniqueId());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The BibTeX citation keys
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; getCitationKeys() {
+<b class="nc">&nbsp;        return citationKeys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Integer&gt; getCitationNumbers() {
+<b class="nc">&nbsp;        return citationNumbers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getUniqueId() {
+<b class="nc">&nbsp;        return uniqueId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;ReferenceMark&gt; of(String name) {
+<b class="nc">&nbsp;        ReferenceMark mark = new ReferenceMark(name);</b>
+<b class="nc">&nbsp;        return mark.citationKeys.isEmpty() ? Optional.empty() : Optional.of(mark);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

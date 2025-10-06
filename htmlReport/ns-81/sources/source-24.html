@@ -1,0 +1,333 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ValueTableCellFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ValueTableCellFactory (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ValueTableCellFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ValueTableCellFactory$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import javafx.beans.binding.BooleanExpression;
+&nbsp;import javafx.event.EventHandler;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.TableCell;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.input.MouseButton;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.stage.Screen;
+&nbsp;import javafx.util.Callback;
+&nbsp;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * Constructs a {@link TableCell} based on the value of the cell and a bunch of specified converter methods.
+&nbsp; *
+&nbsp; * @param &lt;S&gt; view model of table row
+&nbsp; * @param &lt;T&gt; cell value
+&nbsp; */
+<b class="nc">&nbsp;public class ValueTableCellFactory&lt;S, T&gt; implements Callback&lt;TableColumn&lt;S, T&gt;, TableCell&lt;S, T&gt;&gt; {</b>
+&nbsp;
+&nbsp;    private Function&lt;T, String&gt; toText;
+&nbsp;    private BiFunction&lt;S, T, Node&gt; toGraphic;
+&nbsp;    private BiFunction&lt;S, T, EventHandler&lt;? super MouseEvent&gt;&gt; toOnMouseClickedEvent;
+&nbsp;    private BiFunction&lt;S, T, EventHandler&lt;? super MouseEvent&gt;&gt; toOnMouseEnterEvent;
+&nbsp;    private Function&lt;T, BooleanExpression&gt; toDisableExpression;
+&nbsp;    private Function&lt;T, BooleanExpression&gt; toVisibleExpression;
+&nbsp;    private BiFunction&lt;S, T, String&gt; toTooltip;
+&nbsp;    private BiFunction&lt;S, T, Tooltip&gt; tooltip;
+&nbsp;    private Function&lt;T, ContextMenu&gt; contextMenuFactory;
+&nbsp;    private BiFunction&lt;S, T, ContextMenu&gt; menuFactory;
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withText(Function&lt;T, String&gt; toText) {
+<b class="nc">&nbsp;        this.toText = toText;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withGraphic(Function&lt;T, Node&gt; toGraphic) {
+<b class="nc">&nbsp;        this.toGraphic = (rowItem, value) -&gt; toGraphic.apply(value);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withGraphic(BiFunction&lt;S, T, Node&gt; toGraphic) {
+<b class="nc">&nbsp;        this.toGraphic = toGraphic;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withTooltip(BiFunction&lt;S, T, String&gt; toTooltip) {
+<b class="nc">&nbsp;        this.toTooltip = toTooltip;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; graphicTooltip(BiFunction&lt;S, T, Tooltip&gt; tooltip) {
+<b class="nc">&nbsp;        this.tooltip = tooltip;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withTooltip(Function&lt;T, String&gt; toTooltip) {
+<b class="nc">&nbsp;        this.toTooltip = (rowItem, value) -&gt; toTooltip.apply(value);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withOnMouseClickedEvent(BiFunction&lt;S, T, EventHandler&lt;? super MouseEvent&gt;&gt; toOnMouseClickedEvent) {
+<b class="nc">&nbsp;        this.toOnMouseClickedEvent = toOnMouseClickedEvent;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withOnMouseClickedEvent(Function&lt;T, EventHandler&lt;? super MouseEvent&gt;&gt; toOnMouseClickedEvent) {
+<b class="nc">&nbsp;        this.toOnMouseClickedEvent = (rowItem, value) -&gt; toOnMouseClickedEvent.apply(value);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withDisableExpression(Function&lt;T, BooleanExpression&gt; toDisableBinding) {
+<b class="nc">&nbsp;        this.toDisableExpression = toDisableBinding;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withVisibleExpression(Function&lt;T, BooleanExpression&gt; toVisibleBinding) {
+<b class="nc">&nbsp;        this.toVisibleExpression = toVisibleBinding;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withContextMenu(Function&lt;T, ContextMenu&gt; contextMenuFactory) {
+<b class="nc">&nbsp;        this.contextMenuFactory = contextMenuFactory;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValueTableCellFactory&lt;S, T&gt; withMenu(BiFunction&lt;S, T, ContextMenu&gt; menuFactory) {
+<b class="nc">&nbsp;        this.menuFactory = menuFactory;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TableCell&lt;S, T&gt; call(TableColumn&lt;S, T&gt; param) {
+<b class="nc">&nbsp;        return new TableCell&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            protected void updateItem(T item, boolean empty) {
+<b class="nc">&nbsp;                super.updateItem(item, empty);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (empty || (item == null) || (getTableRow() == null) || (getTableRow().getItem() == null)) {</b>
+<b class="nc">&nbsp;                    setText(null);</b>
+<b class="nc">&nbsp;                    setGraphic(null);</b>
+<b class="nc">&nbsp;                    setOnMouseClicked(null);</b>
+<b class="nc">&nbsp;                    setTooltip(null);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    S rowItem = getTableRow().getItem();</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (toText != null) {</b>
+<b class="nc">&nbsp;                        setText(toText.apply(item));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (toGraphic != null) {</b>
+<b class="nc">&nbsp;                        setGraphic(toGraphic.apply(rowItem, item));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (toTooltip != null) {</b>
+<b class="nc">&nbsp;                        String tooltipText = toTooltip.apply(rowItem, item);</b>
+<b class="nc">&nbsp;                        if (StringUtil.isNotBlank(tooltipText)) {</b>
+<b class="nc">&nbsp;                            Screen currentScreen = Screen.getPrimary();</b>
+<b class="nc">&nbsp;                            double maxWidth = currentScreen.getBounds().getWidth();</b>
+<b class="nc">&nbsp;                            Tooltip tooltip = new Tooltip(tooltipText);</b>
+<b class="nc">&nbsp;                            tooltip.setMaxWidth(maxWidth * 2 / 3);</b>
+<b class="nc">&nbsp;                            tooltip.setWrapText(true);</b>
+<b class="nc">&nbsp;                            setTooltip(tooltip);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (contextMenuFactory != null) {</b>
+&nbsp;                        // We only create the context menu when really necessary
+<b class="nc">&nbsp;                        setOnContextMenuRequested(event -&gt; {</b>
+<b class="nc">&nbsp;                            if (!isEmpty()) {</b>
+<b class="nc">&nbsp;                                setContextMenu(contextMenuFactory.apply(item));</b>
+<b class="nc">&nbsp;                                getContextMenu().show(this, event.getScreenX(), event.getScreenY());</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                            event.consume();</b>
+&nbsp;                        });
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    setOnMouseEntered(event -&gt; {</b>
+<b class="nc">&nbsp;                        int rowIndex = getTableRow().getIndex();</b>
+<b class="nc">&nbsp;                        int totalItems = getTableView().getItems().size();</b>
+&nbsp;                        // tooltip is != null even for empty lines. Not easy to fix, therefore, there is a check if the current line is a real entry
+<b class="nc">&nbsp;                        if (tooltip != null &amp;&amp; rowIndex &lt; totalItems) {</b>
+<b class="nc">&nbsp;                            setTooltip(tooltip.apply(rowItem, item));</b>
+&nbsp;                        }
+&nbsp;                    });
+&nbsp;
+<b class="nc">&nbsp;                    setOnMouseClicked(event -&gt; {</b>
+<b class="nc">&nbsp;                        if (toOnMouseClickedEvent != null) {</b>
+<b class="nc">&nbsp;                            toOnMouseClickedEvent.apply(rowItem, item).handle(event);</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        if ((menuFactory != null) &amp;&amp; !event.isConsumed()) {</b>
+<b class="nc">&nbsp;                            if (event.getButton() == MouseButton.PRIMARY) {</b>
+<b class="nc">&nbsp;                                ContextMenu menu = menuFactory.apply(rowItem, item);</b>
+<b class="nc">&nbsp;                                if (menu != null) {</b>
+<b class="nc">&nbsp;                                    menu.show(this, event.getScreenX(), event.getScreenY());</b>
+<b class="nc">&nbsp;                                    event.consume();</b>
+&nbsp;                                }
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;                    });
+&nbsp;
+<b class="nc">&nbsp;                    if (toDisableExpression != null) {</b>
+<b class="nc">&nbsp;                        disableProperty().bind(toDisableExpression.apply(item));</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (toVisibleExpression != null) {</b>
+<b class="nc">&nbsp;                        visibleProperty().bind(toVisibleExpression.apply(item));</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public void install(TableColumn&lt;S, T&gt; column) {
+<b class="nc">&nbsp;        column.setCellFactory(this);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

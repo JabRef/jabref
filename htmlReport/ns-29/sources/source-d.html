@@ -1,0 +1,235 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReplaceStringViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.edit</a>
+</div>
+
+<h1>Coverage Summary for Class: ReplaceStringViewModel (org.jabref.gui.edit)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReplaceStringViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.edit;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableFieldChange;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;
+&nbsp;public class ReplaceStringViewModel extends AbstractViewModel {
+&nbsp;    private boolean allFieldReplace;
+&nbsp;    private String findString;
+&nbsp;    private String replaceString;
+&nbsp;    private Set&lt;Field&gt; fields;
+&nbsp;    private LibraryTab panel;
+&nbsp;
+<b class="nc">&nbsp;    private StringProperty findStringProperty = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private StringProperty replaceStringProperty = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private StringProperty fieldStringProperty = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private BooleanProperty allFieldReplaceProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    public ReplaceStringViewModel(LibraryTab libraryTab) {</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(libraryTab);</b>
+<b class="nc">&nbsp;        this.panel = libraryTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int replace() {
+<b class="nc">&nbsp;        findString = findStringProperty.getValue();</b>
+<b class="nc">&nbsp;        replaceString = replaceStringProperty.getValue();</b>
+<b class="nc">&nbsp;        fields = FieldFactory.parseFieldList(fieldStringProperty.getValue());</b>
+<b class="nc">&nbsp;        boolean selOnly = selectOnlyProperty.getValue();</b>
+<b class="nc">&nbsp;        allFieldReplace = allFieldReplaceProperty.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;        final NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang(&quot;Replace string&quot;));</b>
+<b class="nc">&nbsp;        int counter = 0;</b>
+<b class="nc">&nbsp;        if (selOnly) {</b>
+<b class="nc">&nbsp;            for (BibEntry bibEntry : this.panel.getSelectedEntries()) {</b>
+<b class="nc">&nbsp;                counter += replaceItem(bibEntry, compound);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            for (BibEntry bibEntry : this.panel.getDatabase().getEntries()) {</b>
+<b class="nc">&nbsp;                counter += replaceItem(bibEntry, compound);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return counter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Does the actual operation on a Bibtex entry based on the settings specified in this same dialog. Returns the
+&nbsp;     * number of occurrences replaced.
+&nbsp;     */
+&nbsp;    private int replaceItem(BibEntry entry, NamedCompoundEdit compound) {
+<b class="nc">&nbsp;        int counter = 0;</b>
+<b class="nc">&nbsp;        if (this.allFieldReplace) {</b>
+<b class="nc">&nbsp;            for (Field field : entry.getFields()) {</b>
+<b class="nc">&nbsp;                counter += replaceField(entry, field, compound);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            for (Field espField : fields) {</b>
+<b class="nc">&nbsp;                counter += replaceField(entry, espField, compound);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return counter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int replaceField(BibEntry entry, Field field, NamedCompoundEdit compound) {
+<b class="nc">&nbsp;        if (!entry.hasField(field)) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String txt = entry.getField(field).get();</b>
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+&nbsp;        int ind;
+<b class="nc">&nbsp;        int piv = 0;</b>
+<b class="nc">&nbsp;        int counter = 0;</b>
+<b class="nc">&nbsp;        int len1 = this.findString.length();</b>
+<b class="nc">&nbsp;        while ((ind = txt.indexOf(this.findString, piv)) &gt;= 0) {</b>
+<b class="nc">&nbsp;            counter++;</b>
+<b class="nc">&nbsp;            stringBuilder.append(txt, piv, ind); // Text leading up to s1</b>
+<b class="nc">&nbsp;            stringBuilder.append(this.replaceString); // Insert s2</b>
+<b class="nc">&nbsp;            piv = ind + len1;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        stringBuilder.append(txt.substring(piv));</b>
+<b class="nc">&nbsp;        String newStr = stringBuilder.toString();</b>
+<b class="nc">&nbsp;        entry.setField(field, newStr);</b>
+<b class="nc">&nbsp;        compound.addEdit(new UndoableFieldChange(entry, field, txt, newStr));</b>
+<b class="nc">&nbsp;        return counter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty allFieldReplaceProperty() {
+<b class="nc">&nbsp;        return allFieldReplaceProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty selectOnlyProperty() {
+<b class="nc">&nbsp;        return selectOnlyProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty fieldStringProperty() {
+<b class="nc">&nbsp;        return fieldStringProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty findStringProperty() {
+<b class="nc">&nbsp;        return findStringProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty replaceStringProperty() {
+<b class="nc">&nbsp;        return replaceStringProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

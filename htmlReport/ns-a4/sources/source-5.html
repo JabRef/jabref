@@ -1,0 +1,321 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IngestionService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.ingestion</a>
+</div>
+
+<h1>Coverage Summary for Class: IngestionService (org.jabref.logic.ai.ingestion)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IngestionService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">IngestionService$EntriesChangedListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.ingestion;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.TreeMap;
+&nbsp;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.ai.processingstatus.ProcessingInfo;
+&nbsp;import org.jabref.logic.ai.processingstatus.ProcessingState;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.event.EntriesAddedEvent;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.event.FieldChangedEvent;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import com.google.common.eventbus.Subscribe;
+&nbsp;import dev.langchain4j.data.segment.TextSegment;
+&nbsp;import dev.langchain4j.model.embedding.EmbeddingModel;
+&nbsp;import dev.langchain4j.store.embedding.EmbeddingStore;
+&nbsp;
+&nbsp;/**
+&nbsp; * Main class for generating embedding for files.
+&nbsp; * Use this class in the logic and UI.
+&nbsp; */
+&nbsp;public class IngestionService {
+&nbsp;    // We use a {@link TreeMap} here for the same reasons we use it in {@link ChatHistoryService}.
+<b class="nc">&nbsp;    private final TreeMap&lt;LinkedFile, ProcessingInfo&lt;LinkedFile, Void&gt;&gt; ingestionStatusMap = new TreeMap&lt;&gt;(Comparator.comparing(LinkedFile::getLink));</b>
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;List&lt;LinkedFile&gt;&gt; listsUnderIngestion = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    private final FileEmbeddingsManager fileEmbeddingsManager;
+&nbsp;
+&nbsp;    private final ReadOnlyBooleanProperty shutdownSignal;
+&nbsp;
+&nbsp;    public IngestionService(AiPreferences aiPreferences,
+&nbsp;                            ReadOnlyBooleanProperty shutdownSignal,
+&nbsp;                            EmbeddingModel embeddingModel,
+&nbsp;                            EmbeddingStore&lt;TextSegment&gt; embeddingStore,
+&nbsp;                            FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker,
+&nbsp;                            FilePreferences filePreferences,
+&nbsp;                            TaskExecutor taskExecutor
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.fileEmbeddingsManager = new FileEmbeddingsManager(</b>
+&nbsp;                aiPreferences,
+&nbsp;                shutdownSignal,
+&nbsp;                embeddingModel,
+&nbsp;                embeddingStore,
+&nbsp;                fullyIngestedDocumentsTracker
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        this.shutdownSignal = shutdownSignal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
+&nbsp;        // GC was eating the listeners, so we have to fall back to the event bus.
+<b class="nc">&nbsp;        bibDatabaseContext.getDatabase().registerListener(new EntriesChangedListener(bibDatabaseContext));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private class EntriesChangedListener {
+&nbsp;        private final BibDatabaseContext bibDatabaseContext;
+&nbsp;
+<b class="nc">&nbsp;        public EntriesChangedListener(BibDatabaseContext bibDatabaseContext) {</b>
+<b class="nc">&nbsp;            this.bibDatabaseContext = bibDatabaseContext;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(EntriesAddedEvent e) {
+<b class="nc">&nbsp;            e.getBibEntries().forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;                if (aiPreferences.getAutoGenerateEmbeddings()) {</b>
+<b class="nc">&nbsp;                    entry.getFiles().forEach(linkedFile -&gt; ingest(linkedFile, bibDatabaseContext));</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                entry.registerListener(this);</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(FieldChangedEvent e) {
+<b class="nc">&nbsp;            if (e.getField() == StandardField.FILE &amp;&amp; aiPreferences.getAutoGenerateEmbeddings()) {</b>
+<b class="nc">&nbsp;                e.getBibEntry().getFiles().forEach(linkedFile -&gt; ingest(linkedFile, bibDatabaseContext));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Start ingesting of a {@link LinkedFile}, if it was not ingested.
+&nbsp;     * This method returns a {@link ProcessingInfo} that can be used for tracking state of the ingestion.
+&nbsp;     * Returned {@link ProcessingInfo} is related to the passed {@link LinkedFile}, so if you call this method twice
+&nbsp;     * on the same {@link LinkedFile}, the method will return the same {@link ProcessingInfo}.
+&nbsp;     */
+&nbsp;    public ProcessingInfo&lt;LinkedFile, Void&gt; ingest(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        ProcessingInfo&lt;LinkedFile, Void&gt; processingInfo = getProcessingInfo(linkedFile);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (processingInfo.getState() == ProcessingState.STOPPED) {</b>
+<b class="nc">&nbsp;            startEmbeddingsGenerationTask(linkedFile, bibDatabaseContext, processingInfo);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return processingInfo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get {@link ProcessingInfo} of a {@link LinkedFile}. Initially, it is in state {@link ProcessingState#STOPPED}.
+&nbsp;     * This method will not start ingesting. If you need to start it, use {@link IngestionService#ingest(LinkedFile, BibDatabaseContext)}.
+&nbsp;     */
+&nbsp;    public ProcessingInfo&lt;LinkedFile, Void&gt; getProcessingInfo(LinkedFile linkedFile) {
+<b class="nc">&nbsp;        return ingestionStatusMap.computeIfAbsent(linkedFile, file -&gt; new ProcessingInfo&lt;&gt;(linkedFile, ProcessingState.STOPPED));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ProcessingInfo&lt;LinkedFile, Void&gt;&gt; getProcessingInfo(List&lt;LinkedFile&gt; linkedFiles) {
+<b class="nc">&nbsp;        return linkedFiles.stream().map(this::getProcessingInfo).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ProcessingInfo&lt;LinkedFile, Void&gt;&gt; ingest(StringProperty groupName, List&lt;LinkedFile&gt; linkedFiles, BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        List&lt;ProcessingInfo&lt;LinkedFile, Void&gt;&gt; result = getProcessingInfo(linkedFiles);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (listsUnderIngestion.contains(linkedFiles)) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        listsUnderIngestion.add(linkedFiles);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ProcessingInfo&lt;LinkedFile, Void&gt;&gt; needToProcess = result.stream().filter(processingInfo -&gt; processingInfo.getState() == ProcessingState.STOPPED).toList();</b>
+<b class="nc">&nbsp;        startEmbeddingsGenerationTask(groupName, needToProcess, bibDatabaseContext);</b>
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void startEmbeddingsGenerationTask(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, ProcessingInfo&lt;LinkedFile, Void&gt; processingInfo) {
+<b class="nc">&nbsp;        processingInfo.setState(ProcessingState.PROCESSING);</b>
+&nbsp;
+<b class="nc">&nbsp;        new GenerateEmbeddingsTask(linkedFile, fileEmbeddingsManager, bibDatabaseContext, filePreferences, shutdownSignal)</b>
+<b class="nc">&nbsp;                .showToUser(true)</b>
+<b class="nc">&nbsp;                .onSuccess(v -&gt; processingInfo.setState(ProcessingState.SUCCESS))</b>
+<b class="nc">&nbsp;                .onFailure(processingInfo::setException)</b>
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void startEmbeddingsGenerationTask(StringProperty groupName, List&lt;ProcessingInfo&lt;LinkedFile, Void&gt;&gt; linkedFiles, BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        linkedFiles.forEach(processingInfo -&gt; processingInfo.setState(ProcessingState.PROCESSING));</b>
+&nbsp;
+<b class="nc">&nbsp;        new GenerateEmbeddingsForSeveralTask(groupName, linkedFiles, fileEmbeddingsManager, bibDatabaseContext, filePreferences, taskExecutor, shutdownSignal)</b>
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearEmbeddingsFor(List&lt;LinkedFile&gt; linkedFiles) {
+<b class="nc">&nbsp;        fileEmbeddingsManager.clearEmbeddingsFor(linkedFiles);</b>
+<b class="nc">&nbsp;        ingestionStatusMap.values().forEach(processingInfo -&gt; processingInfo.setState(ProcessingState.STOPPED));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

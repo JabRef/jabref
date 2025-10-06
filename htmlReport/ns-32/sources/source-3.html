@@ -1,0 +1,309 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExportCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: ExportCommand (org.jabref.gui.exporter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExportCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExportCommand$ExportMethod</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.exporter;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.stage.FileChooser;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.gui.util.FileFilterConverter;
+&nbsp;import org.jabref.logic.exporter.Exporter;
+&nbsp;import org.jabref.logic.exporter.ExporterFactory;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import org.controlsfx.control.action.Action;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Performs an export action
+&nbsp; */
+&nbsp;public class ExportCommand extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    public enum ExportMethod { EXPORT_ALL, EXPORT_SELECTED }</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ExportCommand.class);</b>
+&nbsp;
+&nbsp;    private final ExportMethod exportMethod;
+&nbsp;    private final Supplier&lt;LibraryTab&gt; tabSupplier;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public ExportCommand(ExportMethod exportMethod,
+&nbsp;                         Supplier&lt;LibraryTab&gt; tabSupplier,
+&nbsp;                         StateManager stateManager,
+&nbsp;                         DialogService dialogService,
+&nbsp;                         GuiPreferences preferences,
+&nbsp;                         BibEntryTypesManager entryTypesManager,
+&nbsp;                         JournalAbbreviationRepository abbreviationRepository,
+<b class="nc">&nbsp;                         TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.exportMethod = exportMethod;</b>
+<b class="nc">&nbsp;        this.tabSupplier = tabSupplier;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(exportMethod == ExportMethod.EXPORT_SELECTED</b>
+<b class="nc">&nbsp;                             ? ActionHelper.needsEntriesSelected(stateManager)</b>
+<b class="nc">&nbsp;                             : ActionHelper.needsDatabase(stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+&nbsp;        // Get list of exporters and sort before adding to file dialog
+<b class="nc">&nbsp;        ExporterFactory exporterFactory = ExporterFactory.create(preferences);</b>
+<b class="nc">&nbsp;        List&lt;Exporter&gt; exporters = exporterFactory.getExporters().stream()</b>
+<b class="nc">&nbsp;                                                  .sorted(Comparator.comparing(Exporter::getName))</b>
+<b class="nc">&nbsp;                                                  .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))</b>
+<b class="nc">&nbsp;                .withDefaultExtension(preferences.getExportPreferences().getLastExportExtension())</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getExportPreferences().getExportWorkingDirectory())</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        dialogService.showFileSaveDialog(fileDialogConfiguration)</b>
+<b class="nc">&nbsp;                     .ifPresent(path -&gt; export(path, fileDialogConfiguration.getSelectedExtensionFilter(), exporters));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void export(Path file, FileChooser.ExtensionFilter selectedExtensionFilter, List&lt;Exporter&gt; exporters) {
+<b class="nc">&nbsp;        String selectedExtension = selectedExtensionFilter.getExtensions().getFirst().replace(&quot;*&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        if (!file.endsWith(selectedExtension)) {</b>
+<b class="nc">&nbsp;            FileUtil.addExtension(file, selectedExtension);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final Exporter format = FileFilterConverter.getExporter(selectedExtensionFilter, exporters)</b>
+<b class="nc">&nbsp;                                                   .orElseThrow(() -&gt; new IllegalStateException(&quot;User didn&#39;t selected a file type for the extension&quot;));</b>
+&nbsp;        List&lt;BibEntry&gt; entries;
+<b class="nc">&nbsp;        if (exportMethod == ExportMethod.EXPORT_SELECTED) {</b>
+&nbsp;            // Selected entries
+<b class="nc">&nbsp;            entries = stateManager.getSelectedEntries();</b>
+&nbsp;        } else {
+&nbsp;            // All entries
+<b class="nc">&nbsp;            entries = stateManager.getActiveDatabase()</b>
+<b class="nc">&nbsp;                                  .map(BibDatabaseContext::getEntries)</b>
+<b class="nc">&nbsp;                                  .orElse(List.of());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Path&gt; fileDirForDatabase = stateManager.getActiveDatabase()</b>
+<b class="nc">&nbsp;                                                    .map(db -&gt; db.getFileDirectories(preferences.getFilePreferences()))</b>
+<b class="nc">&nbsp;                                                    .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));</b>
+&nbsp;
+&nbsp;        // Make sure we remember which filter was used, to set
+&nbsp;        // the default for next time:
+<b class="nc">&nbsp;        preferences.getExportPreferences().setLastExportExtension(format.getName());</b>
+<b class="nc">&nbsp;        preferences.getExportPreferences().setExportWorkingDirectory(file.getParent());</b>
+&nbsp;
+<b class="nc">&nbsp;        final List&lt;BibEntry&gt; finEntries = entries;</b>
+&nbsp;
+<b class="nc">&nbsp;        BackgroundTask</b>
+<b class="nc">&nbsp;                .wrap(() -&gt; {</b>
+<b class="nc">&nbsp;                    format.export(stateManager.getActiveDatabase().get(),</b>
+&nbsp;                            file,
+&nbsp;                            finEntries,
+&nbsp;                            fileDirForDatabase,
+&nbsp;                            abbreviationRepository);
+<b class="nc">&nbsp;                    return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can&#39;t throw Exceptions</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onSuccess(save -&gt; {</b>
+<b class="nc">&nbsp;                    LibraryTab.DatabaseNotification notificationPane = tabSupplier.get().getNotificationPane();</b>
+<b class="nc">&nbsp;                    notificationPane.notify(</b>
+<b class="nc">&nbsp;                            IconTheme.JabRefIcons.FOLDER.getGraphicNode(),</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Export operation finished successfully.&quot;),</b>
+<b class="nc">&nbsp;                            List.of(new Action(Localization.lang(&quot;Reveal in File Explorer&quot;), event -&gt; {</b>
+&nbsp;                                try {
+<b class="nc">&nbsp;                                    NativeDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);</b>
+&nbsp;                                } catch (IOException e) {
+<b class="nc">&nbsp;                                    LOGGER.error(&quot;Could not open export folder.&quot;, e);</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                                notificationPane.hide();</b>
+&nbsp;                            })),
+<b class="nc">&nbsp;                            Duration.seconds(5));</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onFailure(this::handleError)</b>
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleError(Exception ex) {
+<b class="nc">&nbsp;        LOGGER.warn(&quot;Problem exporting&quot;, ex);</b>
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Could not save file.&quot;));</b>
+&nbsp;        // Need to warn the user that saving failed!
+<b class="nc">&nbsp;        dialogService.showErrorDialogAndWait(Localization.lang(&quot;Save library&quot;), Localization.lang(&quot;Could not save file.&quot;), ex);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

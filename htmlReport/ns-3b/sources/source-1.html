@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExternalApplicationsPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.frame</a>
+</div>
+
+<h1>Coverage Summary for Class: ExternalApplicationsPreferences (org.jabref.gui.frame)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExternalApplicationsPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.frame;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableSet;
+&nbsp;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;
+&nbsp;public class ExternalApplicationsPreferences {
+&nbsp;
+&nbsp;    private final StringProperty eMailSubject;
+&nbsp;    private final BooleanProperty shouldAutoOpenEmailAttachmentsFolder;
+&nbsp;
+&nbsp;    private final BooleanProperty useCustomTerminal;
+&nbsp;    private final StringProperty customTerminalCommand;
+&nbsp;    private final BooleanProperty useCustomFileBrowser;
+&nbsp;    private final StringProperty customFileBrowserCommand;
+&nbsp;    private final StringProperty kindleEmail;
+<b class="nc">&nbsp;    private final ObservableSet&lt;ExternalFileType&gt; externalFileTypes = FXCollections.observableSet(new TreeSet&lt;&gt;(Comparator.comparing(ExternalFileType::getName)));</b>
+&nbsp;
+&nbsp;    public ExternalApplicationsPreferences(String eMailSubject,
+&nbsp;                                           boolean shouldAutoOpenEmailAttachmentsFolder,
+&nbsp;                                           Set&lt;ExternalFileType&gt; externalFileTypes,
+&nbsp;                                           boolean useCustomTerminal,
+&nbsp;                                           String customTerminalCommand,
+&nbsp;                                           boolean useCustomFileBrowser,
+&nbsp;                                           String customFileBrowserCommand,
+<b class="nc">&nbsp;                                           String kindleEmail) {</b>
+&nbsp;
+<b class="nc">&nbsp;        this.eMailSubject = new SimpleStringProperty(eMailSubject);</b>
+<b class="nc">&nbsp;        this.shouldAutoOpenEmailAttachmentsFolder = new SimpleBooleanProperty(shouldAutoOpenEmailAttachmentsFolder);</b>
+<b class="nc">&nbsp;        this.externalFileTypes.addAll(externalFileTypes);</b>
+<b class="nc">&nbsp;        this.useCustomTerminal = new SimpleBooleanProperty(useCustomTerminal);</b>
+<b class="nc">&nbsp;        this.customTerminalCommand = new SimpleStringProperty(customTerminalCommand);</b>
+<b class="nc">&nbsp;        this.useCustomFileBrowser = new SimpleBooleanProperty(useCustomFileBrowser);</b>
+<b class="nc">&nbsp;        this.customFileBrowserCommand = new SimpleStringProperty(customFileBrowserCommand);</b>
+<b class="nc">&nbsp;        this.kindleEmail = new SimpleStringProperty(kindleEmail);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getEmailSubject() {
+<b class="nc">&nbsp;        return eMailSubject.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty eMailSubjectProperty() {
+<b class="nc">&nbsp;        return eMailSubject;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEMailSubject(String eMailSubject) {
+<b class="nc">&nbsp;        this.eMailSubject.set(eMailSubject);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldAutoOpenEmailAttachmentsFolder() {
+<b class="nc">&nbsp;        return shouldAutoOpenEmailAttachmentsFolder.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty autoOpenEmailAttachmentsFolderProperty() {
+<b class="nc">&nbsp;        return shouldAutoOpenEmailAttachmentsFolder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutoOpenEmailAttachmentsFolder(boolean shouldAutoOpenEmailAttachmentsFolder) {
+<b class="nc">&nbsp;        this.shouldAutoOpenEmailAttachmentsFolder.set(shouldAutoOpenEmailAttachmentsFolder);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean useCustomTerminal() {
+<b class="nc">&nbsp;        return useCustomTerminal.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty useCustomTerminalProperty() {
+<b class="nc">&nbsp;        return useCustomTerminal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUseCustomTerminal(boolean useCustomTerminal) {
+<b class="nc">&nbsp;        this.useCustomTerminal.set(useCustomTerminal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCustomTerminalCommand() {
+<b class="nc">&nbsp;        return customTerminalCommand.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty customTerminalCommandProperty() {
+<b class="nc">&nbsp;        return customTerminalCommand;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCustomTerminalCommand(String customTerminalCommand) {
+<b class="nc">&nbsp;        this.customTerminalCommand.set(customTerminalCommand);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean useCustomFileBrowser() {
+<b class="nc">&nbsp;        return useCustomFileBrowser.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty useCustomFileBrowserProperty() {
+<b class="nc">&nbsp;        return useCustomFileBrowser;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUseCustomFileBrowser(boolean useCustomFileBrowser) {
+<b class="nc">&nbsp;        this.useCustomFileBrowser.set(useCustomFileBrowser);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCustomFileBrowserCommand() {
+<b class="nc">&nbsp;        return customFileBrowserCommand.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty customFileBrowserCommandProperty() {
+<b class="nc">&nbsp;        return customFileBrowserCommand;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCustomFileBrowserCommand(String customFileBrowserCommand) {
+<b class="nc">&nbsp;        this.customFileBrowserCommand.set(customFileBrowserCommand);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getKindleEmail() {
+<b class="nc">&nbsp;        return kindleEmail.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty kindleEmailProperty() {
+<b class="nc">&nbsp;        return kindleEmail;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setKindleEmail(String kindleEmail) {
+<b class="nc">&nbsp;        this.kindleEmail.set(kindleEmail);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableSet&lt;ExternalFileType&gt; getExternalFileTypes() {
+<b class="nc">&nbsp;        return this.externalFileTypes;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PrefixTree</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.journals.ltwa</a>
+</div>
+
+<h1>Coverage Summary for Class: PrefixTree (org.jabref.logic.journals.ltwa)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PrefixTree</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.1%
+  </span>
+  <span class="absValue">
+    (2/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PrefixTree$Node</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (3/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PrefixTree$SearchState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (2/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.6%
+  </span>
+  <span class="absValue">
+    (5/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.journals.ltwa;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;public class PrefixTree&lt;D&gt; {
+&nbsp;    /**
+&nbsp;     * Wildcard character used to match any character in the prefix tree.
+&nbsp;     * For example, WILD_CARD + WILD_CARD + WILD_CARD + &quot;Hello World&quot; -&gt; would match .{,3}Hello World in this prefix tree
+&nbsp;     */
+&nbsp;    public static final int WILD_CARD = &#39;*&#39;;
+&nbsp;    private final Node&lt;D&gt; root;
+&nbsp;
+<b class="fc">&nbsp;    public PrefixTree() {</b>
+<b class="fc">&nbsp;        this.root = new Node&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void insert(String key, List&lt;D&gt; data) {
+<b class="nc">&nbsp;        StringBuilder normalized = new StringBuilder();</b>
+<b class="nc">&nbsp;        boolean lastWasWildcard = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; key.length(); ) {</b>
+<b class="nc">&nbsp;            int codepoint = key.codePointAt(i);</b>
+<b class="nc">&nbsp;            int charCount = Character.charCount(codepoint);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (codepoint == WILD_CARD) {</b>
+<b class="nc">&nbsp;                if (!lastWasWildcard) {</b>
+<b class="nc">&nbsp;                    normalized.appendCodePoint(codepoint);</b>
+<b class="nc">&nbsp;                    lastWasWildcard = true;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                normalized.appendCodePoint(codepoint);</b>
+<b class="nc">&nbsp;                lastWasWildcard = false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            i += charCount;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        root.insert(normalized.toString(), data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;D&gt; search(String word) {
+<b class="nc">&nbsp;        Set&lt;D&gt; result = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        searchRecursive(root, word, 0, result, new HashSet&lt;&gt;());</b>
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void searchRecursive(Node&lt;D&gt; node, String word, int index, Set&lt;D&gt; result, Set&lt;SearchState&gt; visited) {
+<b class="nc">&nbsp;        result.addAll(node.data);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (index == word.length()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SearchState state = new SearchState(node, index);</b>
+<b class="nc">&nbsp;        if (visited.contains(state)) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        visited.add(state);</b>
+&nbsp;
+<b class="nc">&nbsp;        int codepoint = word.codePointAt(index);</b>
+<b class="nc">&nbsp;        int charCount = Character.charCount(codepoint);</b>
+&nbsp;
+<b class="nc">&nbsp;        Node&lt;D&gt; exactMatch = node.children.get(codepoint);</b>
+<b class="nc">&nbsp;        if (exactMatch != null) {</b>
+<b class="nc">&nbsp;            searchRecursive(exactMatch, word, index + charCount, result, visited);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Node&lt;D&gt; wildcardMatch = node.children.get(WILD_CARD);</b>
+<b class="nc">&nbsp;        if (wildcardMatch != null) {</b>
+<b class="nc">&nbsp;            searchRecursive(wildcardMatch, word, index, result, visited);</b>
+<b class="nc">&nbsp;            if (index + charCount &lt;= word.length()) {</b>
+<b class="nc">&nbsp;                searchRecursive(wildcardMatch, word, index + charCount, result, visited);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record SearchState(Node&lt;?&gt; node, int index) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class Node&lt;D&gt; {
+&nbsp;        private final Map&lt;Integer, Node&lt;D&gt;&gt; children;
+&nbsp;        private final List&lt;D&gt; data;
+&nbsp;
+<b class="fc">&nbsp;        public Node() {</b>
+<b class="fc">&nbsp;            this.children = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;            this.data = new ArrayList&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void insert(String key, List&lt;D&gt; data) {
+<b class="nc">&nbsp;            Node&lt;D&gt; current = this;</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; key.length(); ) {</b>
+<b class="nc">&nbsp;                int codepoint = key.codePointAt(i);</b>
+<b class="nc">&nbsp;                i += Character.charCount(codepoint);</b>
+<b class="nc">&nbsp;                current = current.children.computeIfAbsent(codepoint, _ -&gt; new Node&lt;&gt;());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            current.data.addAll(data);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,325 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PushToApplicationDetector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.push</a>
+</div>
+
+<h1>Coverage Summary for Class: PushToApplicationDetector (org.jabref.logic.push)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PushToApplicationDetector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/105)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.push;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class PushToApplicationDetector {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PushToApplicationDetector.class);</b>
+&nbsp;
+&nbsp;    public static &lt;T extends PushToApplication&gt; Map&lt;T, String&gt; detectApplicationPaths(List&lt;T&gt; apps) {
+<b class="nc">&nbsp;        return apps.parallelStream()</b>
+<b class="nc">&nbsp;                   .map(app -&gt; {</b>
+<b class="nc">&nbsp;                       String path = findApplicationPath(app);</b>
+<b class="nc">&nbsp;                       if (path != null) {</b>
+<b class="nc">&nbsp;                           LOGGER.debug(&quot;Detected application {}: {}&quot;, app.getDisplayName(), path);</b>
+<b class="nc">&nbsp;                           return Optional.of(Map.entry(app, path));</b>
+&nbsp;                       }
+<b class="nc">&nbsp;                       return Optional.&lt;Map.Entry&lt;T, String&gt;&gt;empty();</b>
+&nbsp;                   })
+<b class="nc">&nbsp;                   .filter(Optional::isPresent)</b>
+<b class="nc">&nbsp;                   .map(Optional::get)</b>
+<b class="nc">&nbsp;                   .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isValidAbsolutePath(String path) {
+<b class="nc">&nbsp;        if (path == null || path.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Path p = Path.of(path);</b>
+<b class="nc">&nbsp;        return p.isAbsolute() &amp;&amp; p.toFile().exists();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static @Nullable String findApplicationPath(PushToApplication app) {
+<b class="nc">&nbsp;        String name = app.getDisplayName();</b>
+<b class="nc">&nbsp;        String[] names = getPossibleExecutableNames(name);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String exe : names) {</b>
+<b class="nc">&nbsp;            String path = findExecutableInPath(exe);</b>
+<b class="nc">&nbsp;            if (path != null) {</b>
+<b class="nc">&nbsp;                return path;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return findExecutableInCommonPaths(names);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static @Nullable String findExecutableInCommonPaths(String[] names) {
+<b class="nc">&nbsp;        List&lt;Path&gt; paths = getCommonPaths();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Path base : paths) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                if (base.toFile().exists()) {</b>
+<b class="nc">&nbsp;                    String result = findExecutableInDirectory(base, names);</b>
+<b class="nc">&nbsp;                    if (result != null) {</b>
+<b class="nc">&nbsp;                        return result;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } catch (Exception e) {
+<b class="nc">&nbsp;                LOGGER.trace(&quot;Error checking path {}: {}&quot;, base, e.getMessage(), e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;Path&gt; getCommonPaths() {
+<b class="nc">&nbsp;        List&lt;Path&gt; paths = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (OS.WINDOWS) {</b>
+<b class="nc">&nbsp;            paths.addAll(List.of(</b>
+<b class="nc">&nbsp;                    Path.of(&quot;C:/Program Files&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(&quot;C:/Program Files (x86)&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(System.getProperty(&quot;user.home&quot;), &quot;AppData/Local&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(System.getProperty(&quot;user.home&quot;), &quot;AppData/Roaming&quot;)</b>
+&nbsp;            ));
+<b class="nc">&nbsp;        } else if (OS.OS_X) {</b>
+<b class="nc">&nbsp;            paths.addAll(List.of(</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/Applications&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/usr/local/bin&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/opt/homebrew/bin&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(System.getProperty(&quot;user.home&quot;), &quot;Applications&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/usr/local/texlive&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/Library/TeX/texbin&quot;)</b>
+&nbsp;            ));
+<b class="nc">&nbsp;        } else if (OS.LINUX) {</b>
+<b class="nc">&nbsp;            paths.addAll(List.of(</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/usr/bin&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/usr/local/bin&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/opt&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/snap/bin&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(System.getProperty(&quot;user.home&quot;), &quot;.local/bin&quot;),</b>
+<b class="nc">&nbsp;                    Path.of(&quot;/usr/local/texlive&quot;)</b>
+&nbsp;            ));
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return paths;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static @Nullable String findExecutableInDirectory(Path dir, String[] names) {
+<b class="nc">&nbsp;        try (Stream&lt;Path&gt; stream = Files.walk(dir, 3)) {</b>
+<b class="nc">&nbsp;            return stream</b>
+<b class="nc">&nbsp;                    .filter(p -&gt; isValidExecutable(p, names))</b>
+<b class="nc">&nbsp;                    .map(Path::toAbsolutePath)</b>
+<b class="nc">&nbsp;                    .map(Path::toString)</b>
+<b class="nc">&nbsp;                    .findFirst().orElse(null);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.trace(&quot;Error searching directory {}: {}&quot;, dir, e.getMessage(), e);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isValidExecutable(Path path, String[] names) {
+<b class="nc">&nbsp;        if (!path.toFile().exists()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String file = path.getFileName().toString().toLowerCase();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String name : names) {</b>
+<b class="nc">&nbsp;            if (isExecutableNameMatch(file, name)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isExecutableNameMatch(String file, String name) {
+<b class="nc">&nbsp;        if (OS.WINDOWS) {</b>
+<b class="nc">&nbsp;            return file.equals(name + &quot;.exe&quot;) ||</b>
+<b class="nc">&nbsp;                    file.equals(name + &quot;.bat&quot;) ||</b>
+<b class="nc">&nbsp;                    file.equals(name + &quot;.cmd&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return file.equals(name) ||</b>
+<b class="nc">&nbsp;                    file.equals(name + &quot;.sh&quot;) ||</b>
+<b class="nc">&nbsp;                    file.equals(name + &quot;.app&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String[] getPossibleExecutableNames(String name) {
+<b class="nc">&nbsp;        return switch (name) {</b>
+&nbsp;            case &quot;Emacs&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;emacs&quot;, &quot;emacsclient&quot;};</b>
+&nbsp;            case &quot;LyX/Kile&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;lyx&quot;, &quot;kile&quot;};</b>
+&nbsp;            case &quot;Texmaker&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;texmaker&quot;};</b>
+&nbsp;            case &quot;TeXstudio&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;texstudio&quot;};</b>
+&nbsp;            case &quot;TeXworks&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;texworks&quot;};</b>
+&nbsp;            case &quot;Vim&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;vim&quot;, &quot;nvim&quot;, &quot;gvim&quot;};</b>
+&nbsp;            case &quot;WinEdt&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;winedt&quot;};</b>
+&nbsp;            case &quot;Sublime Text&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;subl&quot;, &quot;sublime_text&quot;};</b>
+&nbsp;            case &quot;TeXShop&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;texshop&quot;};</b>
+&nbsp;            case &quot;VScode&quot; -&gt;
+<b class="nc">&nbsp;                    new String[] {&quot;code&quot;, &quot;code-insiders&quot;};</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    new String[] {name.replace(&quot; &quot;, &quot;&quot;).toLowerCase()};</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static @Nullable String findExecutableInPath(String exe) {
+<b class="nc">&nbsp;        String result = trySystemCommand(&quot;which&quot;, exe);</b>
+<b class="nc">&nbsp;        if (result != null) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        result = trySystemCommand(&quot;where&quot;, exe);</b>
+<b class="nc">&nbsp;        if (result != null) {</b>
+<b class="nc">&nbsp;            String[] lines = result.split(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;            return lines.length &gt; 0 &amp;&amp; !lines[0].trim().isEmpty() ? lines[0].trim() : null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static @Nullable String trySystemCommand(String cmd, String arg) {
+&nbsp;        try {
+<b class="nc">&nbsp;            ProcessBuilder pb = new ProcessBuilder(cmd, arg);</b>
+<b class="nc">&nbsp;            Process proc = pb.start();</b>
+<b class="nc">&nbsp;            if (proc.waitFor() == 0) {</b>
+<b class="nc">&nbsp;                String result = new String(proc.getInputStream().readAllBytes()).trim();</b>
+<b class="nc">&nbsp;                if (!result.isEmpty()) {</b>
+<b class="nc">&nbsp;                    return result;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (IOException | InterruptedException e) {
+<b class="nc">&nbsp;            LOGGER.trace(&quot;Failed to execute &#39;{}&#39; command: {}&quot;, cmd, e.getMessage(), e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

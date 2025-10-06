@@ -1,0 +1,171 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibDatabaseMode</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.database</a>
+</div>
+
+<h1>Coverage Summary for Class: BibDatabaseMode (org.jabref.model.database)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibDatabaseMode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.5%
+  </span>
+  <span class="absValue">
+    (5/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.database;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/**
+&nbsp; * An enum which contains the possible {@link BibDatabase} Modes.
+&nbsp; * Possible are BibTeX and biblatex.
+&nbsp; */
+<b class="fc">&nbsp;public enum BibDatabaseMode {</b>
+<b class="fc">&nbsp;    BIBTEX,</b>
+<b class="fc">&nbsp;    BIBLATEX;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return the name of the current mode as String
+&nbsp;     */
+&nbsp;    public String getFormattedName() {
+<b class="pc">&nbsp;        if (this == BIBTEX) {</b>
+<b class="fc">&nbsp;            return &quot;BibTeX&quot;;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return &quot;biblatex&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the opposite mode of the current mode as {@link BibDatabaseMode}.
+&nbsp;     *
+&nbsp;     * @return biblatex if the current mode is BIBTEX, BibTeX else
+&nbsp;     */
+&nbsp;    public BibDatabaseMode getOppositeMode() {
+<b class="nc">&nbsp;        if (this == BIBTEX) {</b>
+<b class="nc">&nbsp;            return BIBLATEX;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return BIBTEX;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the {@link BibDatabaseMode} that equals the given string. The use of capital and small letters
+&nbsp;     * in the string doesn&#39;t matter.If neither &quot;bibtex&quot; nor &quot;biblatex&quot; is the given string, then an
+&nbsp;     * {@link IllegalArgumentException} will be thrown.
+&nbsp;     *
+&nbsp;     * @return BIBTEX, if the string is bibtex&lt;br&gt;
+&nbsp;     * BIBLATEX, if the string is biblatex&lt;br&gt;
+&nbsp;     */
+&nbsp;    public static BibDatabaseMode parse(String data) {
+<b class="nc">&nbsp;        return BibDatabaseMode.valueOf(data.toUpperCase(Locale.ENGLISH));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return The current mode as String in lowercase
+&nbsp;     */
+&nbsp;    public String getAsString() {
+<b class="nc">&nbsp;        return getFormattedName().toLowerCase(Locale.ENGLISH);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

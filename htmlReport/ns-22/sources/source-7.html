@@ -1,0 +1,315 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SaveOrderConfigPanel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.commonfxcontrols</a>
+</div>
+
+<h1>Coverage Summary for Class: SaveOrderConfigPanel (org.jabref.gui.commonfxcontrols)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SaveOrderConfigPanel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/85)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.commonfxcontrols;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.RadioButton;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIconView;
+&nbsp;import org.jabref.gui.util.FieldsUtil;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class SaveOrderConfigPanel extends VBox {
+&nbsp;    @FXML private RadioButton exportInSpecifiedOrder;
+&nbsp;    @FXML private RadioButton exportInTableOrder;
+&nbsp;    @FXML private RadioButton exportInOriginalOrder;
+&nbsp;    @FXML private GridPane sortCriterionList;
+&nbsp;    @FXML private Button addButton;
+&nbsp;
+&nbsp;    @Inject private CliPreferences preferences;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;
+&nbsp;    private SaveOrderConfigPanelViewModel viewModel;
+&nbsp;
+<b class="nc">&nbsp;    public SaveOrderConfigPanel() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        viewModel = new SaveOrderConfigPanelViewModel();</b>
+&nbsp;
+<b class="nc">&nbsp;        exportInOriginalOrder.selectedProperty().bindBidirectional(viewModel.saveInOriginalProperty());</b>
+<b class="nc">&nbsp;        exportInTableOrder.selectedProperty().bindBidirectional(viewModel.saveInTableOrderProperty());</b>
+<b class="nc">&nbsp;        exportInSpecifiedOrder.selectedProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.sortCriteriaProperty().addListener((ListChangeListener&lt;SortCriterionViewModel&gt;) change -&gt; {</b>
+<b class="nc">&nbsp;            while (change.next()) {</b>
+<b class="nc">&nbsp;                if (change.wasReplaced()) {</b>
+<b class="nc">&nbsp;                    clearCriterionRow(change.getFrom());</b>
+<b class="nc">&nbsp;                    createCriterionRow(change.getAddedSubList().getFirst(), change.getFrom());</b>
+<b class="nc">&nbsp;                } else if (change.wasAdded()) {</b>
+<b class="nc">&nbsp;                    for (SortCriterionViewModel criterionViewModel : change.getAddedSubList()) {</b>
+<b class="nc">&nbsp;                        int row = change.getFrom() + change.getAddedSubList().indexOf(criterionViewModel);</b>
+<b class="nc">&nbsp;                        createCriterionRow(criterionViewModel, row);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } else if (change.wasRemoved()) {</b>
+<b class="nc">&nbsp;                    for (SortCriterionViewModel criterionViewModel : change.getRemoved()) {</b>
+<b class="nc">&nbsp;                        clearCriterionRow(change.getFrom());</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createCriterionRow(SortCriterionViewModel criterionViewModel, int row) {
+<b class="nc">&nbsp;        sortCriterionList.getChildren().stream()</b>
+<b class="nc">&nbsp;                         .filter(item -&gt; GridPane.getRowIndex(item) &gt;= row)</b>
+<b class="nc">&nbsp;                         .forEach(item -&gt; {</b>
+<b class="nc">&nbsp;                             GridPane.setRowIndex(item, GridPane.getRowIndex(item) + 1);</b>
+<b class="nc">&nbsp;                             if (item instanceof Label label) {</b>
+<b class="nc">&nbsp;                                 label.setText(String.valueOf(GridPane.getRowIndex(item) + 1));</b>
+&nbsp;                             }
+&nbsp;                         });
+&nbsp;
+<b class="nc">&nbsp;        Label label = new Label(String.valueOf(row + 1));</b>
+<b class="nc">&nbsp;        sortCriterionList.add(label, 0, row);</b>
+&nbsp;
+<b class="nc">&nbsp;        ComboBox&lt;Field&gt; field = new ComboBox&lt;&gt;(viewModel.sortableFieldsProperty());</b>
+<b class="nc">&nbsp;        field.setMaxWidth(Double.MAX_VALUE);</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;Field&gt;()</b>
+<b class="nc">&nbsp;                .withText(item -&gt; FieldsUtil.getNameWithType(item, preferences, undoManager))</b>
+<b class="nc">&nbsp;                .install(field);</b>
+<b class="nc">&nbsp;        field.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);</b>
+<b class="nc">&nbsp;        field.itemsProperty().bindBidirectional(viewModel.sortableFieldsProperty());</b>
+<b class="nc">&nbsp;        field.valueProperty().bindBidirectional(criterionViewModel.fieldProperty());</b>
+<b class="nc">&nbsp;        sortCriterionList.add(field, 1, row);</b>
+<b class="nc">&nbsp;        GridPane.getHgrow(field);</b>
+&nbsp;
+<b class="nc">&nbsp;        CheckBox descending = new CheckBox(Localization.lang(&quot;Descending&quot;));</b>
+<b class="nc">&nbsp;        descending.selectedProperty().bindBidirectional(criterionViewModel.descendingProperty());</b>
+<b class="nc">&nbsp;        sortCriterionList.add(descending, 2, row);</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox hBox = new HBox();</b>
+<b class="nc">&nbsp;        hBox.getChildren().addAll(createRowButtons(criterionViewModel));</b>
+<b class="nc">&nbsp;        sortCriterionList.add(hBox, 3, row);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Node&gt; createRowButtons(SortCriterionViewModel criterionViewModel) {
+<b class="nc">&nbsp;        Button remove = new Button(&quot;&quot;, new JabRefIconView(IconTheme.JabRefIcons.REMOVE_NOBOX));</b>
+<b class="nc">&nbsp;        remove.getStyleClass().addAll(&quot;icon-button&quot;, &quot;narrow&quot;);</b>
+<b class="nc">&nbsp;        remove.setPrefHeight(20.0);</b>
+<b class="nc">&nbsp;        remove.setPrefWidth(20.0);</b>
+<b class="nc">&nbsp;        remove.setOnAction(event -&gt; removeCriterion(criterionViewModel));</b>
+&nbsp;
+<b class="nc">&nbsp;        Button moveUp = new Button(&quot;&quot;, new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_UP));</b>
+<b class="nc">&nbsp;        moveUp.getStyleClass().addAll(&quot;icon-button&quot;, &quot;narrow&quot;);</b>
+<b class="nc">&nbsp;        moveUp.setPrefHeight(20.0);</b>
+<b class="nc">&nbsp;        moveUp.setPrefWidth(20.0);</b>
+<b class="nc">&nbsp;        moveUp.setOnAction(event -&gt; moveCriterionUp(criterionViewModel));</b>
+&nbsp;
+<b class="nc">&nbsp;        Button moveDown = new Button(&quot;&quot;, new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_DOWN));</b>
+<b class="nc">&nbsp;        moveDown.getStyleClass().addAll(&quot;icon-button&quot;, &quot;narrow&quot;);</b>
+<b class="nc">&nbsp;        moveDown.setPrefHeight(20.0);</b>
+<b class="nc">&nbsp;        moveDown.setPrefWidth(20.0);</b>
+<b class="nc">&nbsp;        moveDown.setOnAction(event -&gt; moveCriterionDown(criterionViewModel));</b>
+&nbsp;
+<b class="nc">&nbsp;        return List.of(moveUp, moveDown, remove);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearCriterionRow(int row) {
+<b class="nc">&nbsp;        List&lt;Node&gt; criterionRow = sortCriterionList.getChildren().stream()</b>
+<b class="nc">&nbsp;                                                   .filter(item -&gt; GridPane.getRowIndex(item) == row)</b>
+<b class="nc">&nbsp;                                                   .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;        sortCriterionList.getChildren().removeAll(criterionRow);</b>
+&nbsp;
+<b class="nc">&nbsp;        sortCriterionList.getChildren().stream()</b>
+<b class="nc">&nbsp;                         .filter(item -&gt; GridPane.getRowIndex(item) &gt; row)</b>
+<b class="nc">&nbsp;                         .forEach(item -&gt; {</b>
+<b class="nc">&nbsp;                             GridPane.setRowIndex(item, GridPane.getRowIndex(item) - 1);</b>
+<b class="nc">&nbsp;                             if (item instanceof Label label) {</b>
+<b class="nc">&nbsp;                                 label.setText(String.valueOf(GridPane.getRowIndex(item) + 1));</b>
+&nbsp;                             }
+&nbsp;                         });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCriteriaLimit(int limit) {
+<b class="nc">&nbsp;        addButton.disableProperty().unbind();</b>
+<b class="nc">&nbsp;        addButton.disableProperty().bind(</b>
+<b class="nc">&nbsp;                Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                        () -&gt; viewModel.sortCriteriaProperty().size() &gt;= limit || !exportInSpecifiedOrder.selectedProperty().get(),</b>
+<b class="nc">&nbsp;                        viewModel.sortCriteriaProperty().sizeProperty(),</b>
+<b class="nc">&nbsp;                        exportInSpecifiedOrder.selectedProperty()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void addCriterion() {
+<b class="nc">&nbsp;        viewModel.addCriterion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void moveCriterionUp(SortCriterionViewModel criterionViewModel) {
+<b class="nc">&nbsp;        viewModel.moveCriterionUp(criterionViewModel);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void moveCriterionDown(SortCriterionViewModel criterionViewModel) {
+<b class="nc">&nbsp;        viewModel.moveCriterionDown(criterionViewModel);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void removeCriterion(SortCriterionViewModel criterionViewModel) {
+<b class="nc">&nbsp;        viewModel.removeCriterion(criterionViewModel);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty saveInOriginalProperty() {
+<b class="nc">&nbsp;        return viewModel.saveInOriginalProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty saveInTableOrderProperty() {
+<b class="nc">&nbsp;        return viewModel.saveInTableOrderProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty saveInSpecifiedOrderProperty() {
+<b class="nc">&nbsp;        return viewModel.saveInSpecifiedOrderProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;Field&gt; sortableFieldsProperty() {
+<b class="nc">&nbsp;        return viewModel.sortableFieldsProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;SortCriterionViewModel&gt; sortCriteriaProperty() {
+<b class="nc">&nbsp;        return viewModel.sortCriteriaProperty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

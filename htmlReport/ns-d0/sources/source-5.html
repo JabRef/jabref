@@ -1,0 +1,1321 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibtexParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: BibtexParser (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibtexParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/306)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/487)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.PushbackReader;
+&nbsp;import java.io.Reader;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayDeque;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Deque;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;import org.jabref.logic.exporter.BibDatabaseWriter;
+&nbsp;import org.jabref.logic.exporter.SaveConfiguration;
+&nbsp;import org.jabref.logic.groups.DefaultGroupsFactory;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.util.MetaDataParser;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.KeyCollisionException;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.FieldProperty;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryTypeFactory;
+&nbsp;import org.jabref.model.groups.ExplicitGroup;
+&nbsp;import org.jabref.model.groups.GroupHierarchyType;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;import org.jabref.model.util.DummyFileUpdateMonitor;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.dd.plist.BinaryPropertyListParser;
+&nbsp;import com.dd.plist.NSArray;
+&nbsp;import com.dd.plist.NSDictionary;
+&nbsp;import com.dd.plist.NSString;
+&nbsp;import io.github.adr.linked.ADR;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;
+&nbsp;import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_QUOTE_CHAR;
+&nbsp;import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYPE_SUFFIX;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class for importing BibTeX-files.
+&nbsp; * &lt;p&gt;
+&nbsp; * Use:
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;code&gt;BibtexParser parser = new BibtexParser(reader);&lt;/code&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;code&gt;ParserResult result = parser.parse();&lt;/code&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * or
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;code&gt;ParserResult result = BibtexParser.parse(reader);&lt;/code&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Can be used stand-alone.
+&nbsp; * &lt;p&gt;
+&nbsp; * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
+&nbsp; * &lt;p&gt;
+&nbsp; * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
+&nbsp; */
+&nbsp;public class BibtexParser implements Parser {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);</b>
+&nbsp;    private static final int LOOKAHEAD = 1024;
+&nbsp;    private static final String BIB_DESK_ROOT_GROUP_NAME = &quot;BibDeskGroups&quot;;
+<b class="nc">&nbsp;    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();</b>
+<b class="nc">&nbsp;    private static final Pattern EPILOG_PATTERN = Pattern.compile(&quot;\\w+\\s*=.*,&quot;);</b>
+&nbsp;    private static final int INDEX_RELATIVE_PATH_IN_PLIST = 4;
+<b class="nc">&nbsp;    private final Deque&lt;Character&gt; pureTextFromFile = new LinkedList&lt;&gt;();</b>
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;    private PushbackReader pushbackReader;
+&nbsp;    private BibDatabase database;
+&nbsp;    private Set&lt;BibEntryType&gt; entryTypes;
+&nbsp;    private boolean eof;
+&nbsp;
+<b class="nc">&nbsp;    private int line = 1;</b>
+<b class="nc">&nbsp;    private int column = 1;</b>
+&nbsp;    // Stores the last read column of the highest column number encountered on any line so far.
+&nbsp;    // The intended data structure is Stack, but it is not used because Java code style checkers complain.
+&nbsp;    // In basic JDK data structures, there is no size-limited stack. We did not want to include Apache Commons Collections only for &quot;CircularFifoBuffer&quot;
+<b class="nc">&nbsp;    private final Deque&lt;Integer&gt; highestColumns = new ArrayDeque&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private ParserResult parserResult;
+&nbsp;    private final MetaDataParser metaDataParser;
+&nbsp;    private final Map&lt;String, String&gt; parsedBibDeskGroups;
+&nbsp;
+&nbsp;    private GroupTreeNode bibDeskGroupTreeNode;
+&nbsp;
+<b class="nc">&nbsp;    public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);</b>
+<b class="nc">&nbsp;        this.metaDataParser = new MetaDataParser(fileMonitor);</b>
+<b class="nc">&nbsp;        this.parsedBibDeskGroups = new HashMap&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibtexParser(ImportFormatPreferences importFormatPreferences) {
+<b class="nc">&nbsp;        this(importFormatPreferences, new DummyFileUpdateMonitor());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses BibtexEntries from the given string and returns one entry found (or null if none found)
+&nbsp;     * &lt;p&gt;
+&nbsp;     * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
+&nbsp;     *
+&nbsp;     * @return An {@code Optional&lt;BibEntry&gt;. Optional.empty()} if non was found or an error occurred.
+&nbsp;     */
+&nbsp;    public static Optional&lt;BibEntry&gt; singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) throws ParseException {
+<b class="nc">&nbsp;        Collection&lt;BibEntry&gt; entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);</b>
+<b class="nc">&nbsp;        if ((entries == null) || entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(entries.iterator().next());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; parseEntries(InputStream inputStream) throws ParseException {
+&nbsp;        Reader reader;
+&nbsp;        try {
+<b class="nc">&nbsp;            reader = Importer.getReader(inputStream);</b>
+<b class="nc">&nbsp;            return parse(reader).getDatabase().getEntries();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            throw new ParseException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Collection&lt;BibtexString&gt; getStringValues() {
+<b class="nc">&nbsp;        return database.getStringValues();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;BibEntry&gt; parseSingleEntry(String bibtexString) throws ParseException {
+<b class="nc">&nbsp;        return parseEntries(bibtexString).stream().findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses BibTeX data found when reading from reader.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The reader will be consumed.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Multiple calls to parse() return the same results
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Handling of encoding is done at {@link BibtexImporter}
+&nbsp;     */
+&nbsp;    public ParserResult parse(Reader in) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(in);</b>
+<b class="nc">&nbsp;        pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);</b>
+&nbsp;
+<b class="nc">&nbsp;        String newLineSeparator = determineNewLineSeparator();</b>
+&nbsp;
+&nbsp;        // BibTeX related contents
+<b class="nc">&nbsp;        initializeParserResult(newLineSeparator);</b>
+&nbsp;
+<b class="nc">&nbsp;        parseDatabaseID();</b>
+&nbsp;
+<b class="nc">&nbsp;        skipWhitespace();</b>
+&nbsp;
+<b class="nc">&nbsp;        return parseFileContent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String determineNewLineSeparator() throws IOException {
+<b class="nc">&nbsp;        String newLineSeparator = OS.NEWLINE;</b>
+<b class="nc">&nbsp;        StringWriter stringWriter = new StringWriter(BibtexParser.LOOKAHEAD);</b>
+<b class="nc">&nbsp;        int i = 0;</b>
+&nbsp;        int currentChar;
+&nbsp;        // @formatter:off
+&nbsp;        do {
+&nbsp;            // @formatter:on
+<b class="nc">&nbsp;            currentChar = pushbackReader.read();</b>
+<b class="nc">&nbsp;            stringWriter.append((char) currentChar);</b>
+<b class="nc">&nbsp;            i++;</b>
+<b class="nc">&nbsp;        } while ((i &lt; BibtexParser.LOOKAHEAD) &amp;&amp; (currentChar != &#39;\r&#39;) &amp;&amp; (currentChar != &#39;\n&#39;));</b>
+<b class="nc">&nbsp;        if (currentChar == &#39;\r&#39;) {</b>
+<b class="nc">&nbsp;            newLineSeparator = &quot;\r\n&quot;;</b>
+<b class="nc">&nbsp;        } else if (currentChar == &#39;\n&#39;) {</b>
+<b class="nc">&nbsp;            newLineSeparator = &quot;\n&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // unread all sneaked characters
+<b class="nc">&nbsp;        pushbackReader.unread(stringWriter.toString().toCharArray());</b>
+&nbsp;
+<b class="nc">&nbsp;        return newLineSeparator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeParserResult(String newLineSeparator) {
+<b class="nc">&nbsp;        database = new BibDatabase();</b>
+<b class="nc">&nbsp;        database.setNewLineSeparator(newLineSeparator);</b>
+<b class="nc">&nbsp;        entryTypes = new HashSet&lt;&gt;(); // To store custom entry types parsed.</b>
+<b class="nc">&nbsp;        parserResult = new ParserResult(database, new MetaData(), entryTypes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseDatabaseID() throws IOException {
+<b class="nc">&nbsp;        while (!eof) {</b>
+<b class="nc">&nbsp;            skipWhitespace();</b>
+<b class="nc">&nbsp;            char c = (char) read();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (c == &#39;%&#39;) {</b>
+<b class="nc">&nbsp;                skipWhitespace();</b>
+<b class="nc">&nbsp;                String label = parseTextToken().trim();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (BibDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {</b>
+<b class="nc">&nbsp;                    skipWhitespace();</b>
+<b class="nc">&nbsp;                    database.setSharedDatabaseID(parseTextToken().trim());</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (c == &#39;@&#39;) {</b>
+<b class="nc">&nbsp;                unread(c);</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private ParserResult parseFileContent() throws IOException {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; meta = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        while (!eof) {</b>
+<b class="nc">&nbsp;            boolean found = consumeUncritically(&#39;@&#39;);</b>
+<b class="nc">&nbsp;            if (!found) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            skipWhitespace();</b>
+&nbsp;
+&nbsp;            // Try to read the entry type
+<b class="nc">&nbsp;            String entryType = parseTextToken().toLowerCase(Locale.ROOT).trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            switch (entryType) {</b>
+&nbsp;                case &quot;preamble&quot; -&gt; {
+<b class="nc">&nbsp;                    database.setPreamble(parsePreamble());</b>
+&nbsp;                    // Consume a new line which separates the preamble from the next part (if the file was written with JabRef)
+<b class="nc">&nbsp;                    skipOneNewline();</b>
+&nbsp;                    // the preamble is saved verbatim anyway, so the text read so far can be dropped
+<b class="nc">&nbsp;                    dumpTextReadSoFarToString();</b>
+&nbsp;                }
+&nbsp;                case &quot;string&quot; -&gt;
+<b class="nc">&nbsp;                        parseBibtexString();</b>
+&nbsp;                case &quot;comment&quot; -&gt;
+<b class="nc">&nbsp;                        parseJabRefComment(meta);</b>
+&nbsp;                default -&gt;
+&nbsp;                    // Not a comment, preamble, or string. Thus, it is an entry
+<b class="nc">&nbsp;                        parseAndAddEntry(entryType);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            skipWhitespace();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addBibDeskGroupEntriesToJabRefGroups();</b>
+&nbsp;
+<b class="nc">&nbsp;        int startLine = line;</b>
+<b class="nc">&nbsp;        int startColumn = column;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            MetaData metaData = metaDataParser.parse(</b>
+&nbsp;                    meta,
+<b class="nc">&nbsp;                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator(),</b>
+<b class="nc">&nbsp;                    importFormatPreferences.filePreferences().getUserAndHost());</b>
+<b class="nc">&nbsp;            if (bibDeskGroupTreeNode != null) {</b>
+<b class="nc">&nbsp;                metaData.getGroups().ifPresentOrElse(existingGroupTree -&gt; {</b>
+<b class="nc">&nbsp;                            String existingGroups = meta.get(MetaData.GROUPSTREE);</b>
+&nbsp;                            // We only have one Group BibDeskGroup with n children
+&nbsp;                            // instead of iterating through the whole group structure every time we just search in the metadata for the group name
+<b class="nc">&nbsp;                            List&lt;GroupTreeNode&gt; groupsToAdd = bibDeskGroupTreeNode.getChildren()</b>
+<b class="nc">&nbsp;                                                                                  .stream()</b>
+<b class="nc">&nbsp;                                                                                  .filter(Predicate.not(groupTreeNode -&gt; existingGroups.contains(GROUP_TYPE_SUFFIX + groupTreeNode.getName() + GROUP_QUOTE_CHAR)))</b>
+<b class="nc">&nbsp;                                                                                  .toList();</b>
+<b class="nc">&nbsp;                            groupsToAdd.forEach(existingGroupTree::moveTo);</b>
+&nbsp;                        },
+&nbsp;                        // metadata does not contain any groups, so we need to create an AllEntriesGroup and add the other groups as children
+&nbsp;                        () -&gt; {
+<b class="nc">&nbsp;                            GroupTreeNode rootNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());</b>
+<b class="nc">&nbsp;                            bibDeskGroupTreeNode.moveTo(rootNode);</b>
+<b class="nc">&nbsp;                            metaData.setGroups(rootNode);</b>
+&nbsp;                        }
+&nbsp;                );
+&nbsp;            }
+<b class="nc">&nbsp;            parserResult.setMetaData(metaData);</b>
+&nbsp;        } catch (ParseException exception) {
+<b class="nc">&nbsp;            parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), exception);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        parseRemainingContent();</b>
+&nbsp;
+<b class="nc">&nbsp;        checkEpilog();</b>
+&nbsp;
+<b class="nc">&nbsp;        return parserResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void checkEpilog() {
+&nbsp;        // This is an incomplete and inaccurate try to verify if something went wrong with previous parsing activity even though there were no warnings so far
+&nbsp;        // regex looks for something like &#39;identifier = blabla ,&#39;
+<b class="nc">&nbsp;        if (!parserResult.hasWarnings() &amp;&amp; EPILOG_PATTERN.matcher(database.getEpilog()).find()) {</b>
+<b class="nc">&nbsp;            parserResult.addWarning(new ParserResult.Range(line, column, line, column), &quot;following BibTeX fragment has not been parsed:\n&quot; + database.getEpilog());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseRemainingContent() {
+<b class="nc">&nbsp;        database.setEpilog(dumpTextReadSoFarToString().trim());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseAndAddEntry(String type) {
+<b class="nc">&nbsp;        int startLine = line;</b>
+<b class="nc">&nbsp;        int startColumn = column;</b>
+&nbsp;        try {
+&nbsp;            // collect all comments and the entry type definition in front of the actual entry
+&nbsp;            // this is at least `@Type`
+<b class="nc">&nbsp;            String commentsAndEntryTypeDefinition = dumpTextReadSoFarToString();</b>
+&nbsp;
+&nbsp;            // remove first newline
+&nbsp;            // this is appended by JabRef during writing automatically
+<b class="nc">&nbsp;            if (commentsAndEntryTypeDefinition.startsWith(&quot;\r\n&quot;)) {</b>
+<b class="nc">&nbsp;                commentsAndEntryTypeDefinition = commentsAndEntryTypeDefinition.substring(2);</b>
+<b class="nc">&nbsp;            } else if (commentsAndEntryTypeDefinition.startsWith(&quot;\n&quot;)) {</b>
+<b class="nc">&nbsp;                commentsAndEntryTypeDefinition = commentsAndEntryTypeDefinition.substring(1);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            BibEntry entry = parseEntry(type);</b>
+&nbsp;            // store comments collected without type definition
+<b class="nc">&nbsp;            entry.setCommentsBeforeEntry(</b>
+<b class="nc">&nbsp;                    commentsAndEntryTypeDefinition.substring(0, commentsAndEntryTypeDefinition.lastIndexOf(&#39;@&#39;)));</b>
+&nbsp;
+&nbsp;            // store complete parsed serialization (comments, type definition + type contents)
+&nbsp;
+<b class="nc">&nbsp;            String parsedSerialization = commentsAndEntryTypeDefinition + dumpTextReadSoFarToString();</b>
+<b class="nc">&nbsp;            entry.setParsedSerialization(parsedSerialization);</b>
+&nbsp;
+<b class="nc">&nbsp;            database.insertEntry(entry);</b>
+&nbsp;        } catch (IOException ex) {
+&nbsp;            // This makes the parser more robust:
+&nbsp;            // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not parse entry&quot;, ex);</b>
+<b class="nc">&nbsp;            String errorMessage = Localization.lang(&quot;Error occurred when parsing entry&quot;) + &quot;: &#39;&quot; + ex.getMessage()</b>
+<b class="nc">&nbsp;                    + &quot;&#39;. &quot; + &quot;\n\n&quot; + Localization.lang(&quot;JabRef skipped the entry.&quot;);</b>
+<b class="nc">&nbsp;            parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseJabRefComment(Map&lt;String, String&gt; meta) {
+&nbsp;        StringBuilder buffer;
+<b class="nc">&nbsp;        int startLine = line;</b>
+<b class="nc">&nbsp;        int startColumn = column;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            buffer = parseBracketedFieldContent();</b>
+&nbsp;        } catch (IOException e) {
+&nbsp;            // if we get an IO Exception here, then we have an unbracketed comment,
+&nbsp;            // which means that we should just return and the comment will be picked up as arbitrary text
+&nbsp;            // by the parser
+<b class="nc">&nbsp;            LOGGER.info(&quot;Found unbracketed comment&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // We remove all line breaks in the metadata
+&nbsp;        // These have been inserted to prevent too long lines when the file was saved, and are not part of the data.
+<b class="nc">&nbsp;        String comment = buffer.toString().replaceAll(&quot;[\\x0d\\x0a]&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        if (comment.startsWith(MetaData.META_FLAG)) {</b>
+<b class="nc">&nbsp;            String rest = comment.substring(MetaData.META_FLAG.length());</b>
+&nbsp;
+<b class="nc">&nbsp;            int pos = rest.indexOf(&#39;:&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (pos &gt; 0) {</b>
+<b class="nc">&nbsp;                meta.put(rest.substring(0, pos), rest.substring(pos + 1));</b>
+&nbsp;
+&nbsp;                // meta comments are always re-written by JabRef and not stored in the file
+<b class="nc">&nbsp;                dumpTextReadSoFarToString();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (comment.startsWith(MetaData.ENTRYTYPE_FLAG)) {</b>
+&nbsp;            // A custom entry type can also be stored in a
+&nbsp;            // &quot;@comment&quot;
+<b class="nc">&nbsp;            Optional&lt;BibEntryType&gt; typ = MetaDataParser.parseCustomEntryType(comment);</b>
+<b class="nc">&nbsp;            if (typ.isPresent()) {</b>
+<b class="nc">&nbsp;                entryTypes.add(typ.get());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), Localization.lang(&quot;Ill-formed entrytype comment in BIB file&quot;) + &quot;: &quot; + comment);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // custom entry types are always re-written by JabRef and not stored in the file
+<b class="nc">&nbsp;            dumpTextReadSoFarToString();</b>
+<b class="nc">&nbsp;        } else if (comment.startsWith(MetaData.BIBDESK_STATIC_FLAG)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                parseBibDeskComment(comment, meta);</b>
+&nbsp;            } catch (ParseException ex) {
+<b class="nc">&nbsp;                parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), ex);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds BibDesk group entries to the JabRef database
+&nbsp;     */
+&nbsp;    private void addBibDeskGroupEntriesToJabRefGroups() {
+<b class="nc">&nbsp;        for (String groupName : parsedBibDeskGroups.keySet()) {</b>
+<b class="nc">&nbsp;            String[] citationKeys = parsedBibDeskGroups.get(groupName).split(&quot;,&quot;);</b>
+<b class="nc">&nbsp;            for (String citation : citationKeys) {</b>
+<b class="nc">&nbsp;                Optional&lt;BibEntry&gt; bibEntry = database.getEntryByCitationKey(citation);</b>
+<b class="nc">&nbsp;                Optional&lt;String&gt; groupValue = bibEntry.flatMap(entry -&gt; entry.getField(StandardField.GROUPS));</b>
+<b class="nc">&nbsp;                if (groupValue.isEmpty()) { // if the citation does not belong to a group already</b>
+<b class="nc">&nbsp;                    bibEntry.flatMap(entry -&gt; entry.setField(StandardField.GROUPS, groupName));</b>
+<b class="nc">&nbsp;                } else if (!groupValue.get().contains(groupName)) {</b>
+&nbsp;                    // if the citation does belong to a group already and is not yet assigned to the same group, we concatenate
+<b class="nc">&nbsp;                    String concatGroup = groupValue.get() + &quot;,&quot; + groupName;</b>
+<b class="nc">&nbsp;                    bibEntry.flatMap(entryByCitationKey -&gt; entryByCitationKey.setField(StandardField.GROUPS, concatGroup));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses comment types found in BibDesk, to migrate BibDesk Static Groups to JabRef.
+&nbsp;     */
+&nbsp;    private void parseBibDeskComment(String comment, Map&lt;String, String&gt; meta) throws ParseException {
+<b class="nc">&nbsp;        String xml = comment.substring(MetaData.BIBDESK_STATIC_FLAG.length() + 1, comment.length() - 1);</b>
+&nbsp;        try {
+&nbsp;            // Build a document to handle the xml tags
+<b class="nc">&nbsp;            Document doc = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));</b>
+<b class="nc">&nbsp;            doc.getDocumentElement().normalize();</b>
+&nbsp;
+<b class="nc">&nbsp;            NodeList dictList = doc.getElementsByTagName(&quot;dict&quot;);</b>
+<b class="nc">&nbsp;            meta.putIfAbsent(MetaData.DATABASE_TYPE, &quot;bibtex;&quot;);</b>
+<b class="nc">&nbsp;            bibDeskGroupTreeNode = GroupTreeNode.fromGroup(new ExplicitGroup(BIB_DESK_ROOT_GROUP_NAME, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));</b>
+&nbsp;
+&nbsp;            // Since each static group has their own dict element, we iterate through them
+<b class="nc">&nbsp;            for (int i = 0; i &lt; dictList.getLength(); i++) {</b>
+<b class="nc">&nbsp;                Element dictElement = (Element) dictList.item(i);</b>
+<b class="nc">&nbsp;                NodeList keyList = dictElement.getElementsByTagName(&quot;key&quot;);</b>
+<b class="nc">&nbsp;                NodeList stringList = dictElement.getElementsByTagName(&quot;string&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                String groupName = null;</b>
+<b class="nc">&nbsp;                String citationKeys = null;</b>
+&nbsp;
+&nbsp;                // Retrieves group name and group entries and adds these to the metadata
+<b class="nc">&nbsp;                for (int j = 0; j &lt; keyList.getLength(); j++) {</b>
+<b class="nc">&nbsp;                    if (keyList.item(j).getTextContent().matches(&quot;group name&quot;)) {</b>
+<b class="nc">&nbsp;                        groupName = stringList.item(j).getTextContent();</b>
+<b class="nc">&nbsp;                        ExplicitGroup staticGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());</b>
+<b class="nc">&nbsp;                        bibDeskGroupTreeNode.addSubgroup(staticGroup);</b>
+<b class="nc">&nbsp;                    } else if (keyList.item(j).getTextContent().matches(&quot;keys&quot;)) {</b>
+<b class="nc">&nbsp;                        citationKeys = stringList.item(j).getTextContent(); // adds group entries</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                // Adds the group name and citation keys to the field so all the entries can be added in the groups once parsed
+<b class="nc">&nbsp;                parsedBibDeskGroups.putIfAbsent(groupName, citationKeys);</b>
+&nbsp;            }
+&nbsp;        } catch (ParserConfigurationException | IOException | SAXException e) {
+<b class="nc">&nbsp;            throw new ParseException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseBibtexString() throws IOException {
+<b class="nc">&nbsp;        int startLine = line;</b>
+<b class="nc">&nbsp;        int startColumn = column;</b>
+<b class="nc">&nbsp;        BibtexString bibtexString = parseString();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            database.addString(bibtexString);</b>
+&nbsp;        } catch (KeyCollisionException ex) {
+<b class="nc">&nbsp;            parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), Localization.lang(&quot;Duplicate string name: &#39;%0&#39;&quot;, bibtexString.getName()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Puts all text that has been read from the reader, including newlines, etc., since the last call of this method into a string. Removes the JabRef file header, if it is found
+&nbsp;     *
+&nbsp;     * @return the text read so far
+&nbsp;     */
+&nbsp;    private String dumpTextReadSoFarToString() {
+<b class="nc">&nbsp;        String result = getPureTextFromFile();</b>
+<b class="nc">&nbsp;        int indexOfAt = result.indexOf(&quot;@&quot;);</b>
+&nbsp;
+&nbsp;        // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
+<b class="nc">&nbsp;        if (indexOfAt == -1) {</b>
+<b class="nc">&nbsp;            return purgeEOFCharacters(result);</b>
+<b class="nc">&nbsp;        } else if (result.contains(BibDatabaseWriter.DATABASE_ID_PREFIX)) {</b>
+<b class="nc">&nbsp;            return purge(result, BibDatabaseWriter.DATABASE_ID_PREFIX);</b>
+<b class="nc">&nbsp;        } else if (result.contains(SaveConfiguration.ENCODING_PREFIX)) {</b>
+<b class="nc">&nbsp;            return purge(result, SaveConfiguration.ENCODING_PREFIX);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Purges the given stringToPurge (if it exists) from the given context
+&nbsp;     *
+&nbsp;     * @return a stripped version of the context
+&nbsp;     */
+&nbsp;    private String purge(String context, String stringToPurge) {
+&nbsp;        // purge the given string line if it exists
+<b class="nc">&nbsp;        int runningIndex = context.indexOf(stringToPurge);</b>
+<b class="nc">&nbsp;        int indexOfAt = context.indexOf(&quot;@&quot;);</b>
+<b class="nc">&nbsp;        while (runningIndex &lt; indexOfAt) {</b>
+<b class="nc">&nbsp;            if (context.charAt(runningIndex) == &#39;\n&#39;) {</b>
+&nbsp;                break;
+<b class="nc">&nbsp;            } else if (context.charAt(runningIndex) == &#39;\r&#39;) {</b>
+<b class="nc">&nbsp;                if (context.charAt(runningIndex + 1) == &#39;\n&#39;) {</b>
+<b class="nc">&nbsp;                    runningIndex++;</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            }
+<b class="nc">&nbsp;            runningIndex++;</b>
+&nbsp;        }
+&nbsp;        // strip empty lines
+<b class="nc">&nbsp;        while ((runningIndex &lt; indexOfAt) &amp;&amp;</b>
+<b class="nc">&nbsp;                ((context.charAt(runningIndex) == &#39;\r&#39;) ||</b>
+<b class="nc">&nbsp;                        (context.charAt(runningIndex) == &#39;\n&#39;))) {</b>
+<b class="nc">&nbsp;            runningIndex++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return context.substring(runningIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getPureTextFromFile() {
+<b class="nc">&nbsp;        StringBuilder entry = new StringBuilder();</b>
+<b class="nc">&nbsp;        while (!pureTextFromFile.isEmpty()) {</b>
+<b class="nc">&nbsp;            entry.append(pureTextFromFile.pollFirst());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return entry.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes all eof characters from a StringBuilder and returns a new String with the resulting content
+&nbsp;     *
+&nbsp;     * @return a String without eof characters
+&nbsp;     */
+&nbsp;    private String purgeEOFCharacters(String input) {
+<b class="nc">&nbsp;        StringBuilder remainingText = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (Character character : input.toCharArray()) {</b>
+<b class="nc">&nbsp;            if (!isEOFCharacter(character)) {</b>
+<b class="nc">&nbsp;                remainingText.append(character);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return remainingText.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void skipWhitespace() throws IOException {
+&nbsp;        int character;
+&nbsp;
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            character = read();</b>
+<b class="nc">&nbsp;            if (isEOFCharacter(character)) {</b>
+<b class="nc">&nbsp;                eof = true;</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!Character.isWhitespace((char) character)) {</b>
+&nbsp;                // found non-whitespace char
+<b class="nc">&nbsp;                unread(character);</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void skipSpace() throws IOException {
+&nbsp;        int character;
+&nbsp;
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            character = read();</b>
+<b class="nc">&nbsp;            if (isEOFCharacter(character)) {</b>
+<b class="nc">&nbsp;                eof = true;</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if ((char) character != &#39; &#39;) {</b>
+&nbsp;                // found non-space char
+<b class="nc">&nbsp;                unread(character);</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void skipOneNewline() throws IOException {
+<b class="nc">&nbsp;        skipSpace();</b>
+<b class="nc">&nbsp;        if (peek() == &#39;\r&#39;) {</b>
+<b class="nc">&nbsp;            read();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (peek() == &#39;\n&#39;) {</b>
+<b class="nc">&nbsp;            read();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isEOFCharacter(int character) {
+<b class="nc">&nbsp;        return (character == -1) || (character == 65535);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String skipAndRecordWhitespace(int character) throws IOException {
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;        if (character != &#39; &#39;) {</b>
+<b class="nc">&nbsp;            stringBuilder.append((char) character);</b>
+&nbsp;        }
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            int nextCharacter = read();</b>
+<b class="nc">&nbsp;            if (isEOFCharacter(nextCharacter)) {</b>
+<b class="nc">&nbsp;                eof = true;</b>
+<b class="nc">&nbsp;                return stringBuilder.toString();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (Character.isWhitespace((char) nextCharacter)) {</b>
+<b class="nc">&nbsp;                if (nextCharacter != &#39; &#39;) {</b>
+<b class="nc">&nbsp;                    stringBuilder.append((char) nextCharacter);</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // found non-whitespace char
+<b class="nc">&nbsp;                unread(nextCharacter);</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return stringBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int peek() throws IOException {
+<b class="nc">&nbsp;        int character = read();</b>
+<b class="nc">&nbsp;        unread(character);</b>
+&nbsp;
+<b class="nc">&nbsp;        return character;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private char[] peekTwoCharacters() throws IOException {
+<b class="nc">&nbsp;        char character1 = (char) read();</b>
+<b class="nc">&nbsp;        char character2 = (char) read();</b>
+<b class="nc">&nbsp;        unread(character2);</b>
+<b class="nc">&nbsp;        unread(character1);</b>
+<b class="nc">&nbsp;        return new char[] {</b>
+&nbsp;                character1, character2
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private int read() throws IOException {
+<b class="nc">&nbsp;        int character = pushbackReader.read();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!isEOFCharacter(character)) {</b>
+<b class="nc">&nbsp;            pureTextFromFile.offerLast((char) character);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (character == &#39;\n&#39;) {</b>
+<b class="nc">&nbsp;            line++;</b>
+<b class="nc">&nbsp;            highestColumns.push(column);</b>
+<b class="nc">&nbsp;            column = 1;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            column++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return character;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void unread(int character) throws IOException {
+<b class="nc">&nbsp;        if (character == &#39;\n&#39;) {</b>
+<b class="nc">&nbsp;            line--;</b>
+<b class="nc">&nbsp;            column = highestColumns.pop();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            column--;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        pushbackReader.unread(character);</b>
+<b class="nc">&nbsp;        if (pureTextFromFile.getLast() == character) {</b>
+<b class="nc">&nbsp;            pureTextFromFile.pollLast();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibtexString parseString() throws IOException {
+<b class="nc">&nbsp;        skipWhitespace();</b>
+<b class="nc">&nbsp;        consume(&#39;{&#39;, &#39;(&#39;);</b>
+<b class="nc">&nbsp;        skipWhitespace();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Parsing string name&quot;);</b>
+<b class="nc">&nbsp;        String name = parseTextToken();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Parsed string name&quot;);</b>
+<b class="nc">&nbsp;        skipWhitespace();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Now the contents&quot;);</b>
+<b class="nc">&nbsp;        consume(&#39;=&#39;);</b>
+<b class="nc">&nbsp;        String content = parseFieldContent(FieldFactory.parseField(name));</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Now I&#39;m going to consume a }&quot;);</b>
+<b class="nc">&nbsp;        consume(&#39;}&#39;, &#39;)&#39;);</b>
+&nbsp;        // Consume new line which signals end of entry
+<b class="nc">&nbsp;        skipOneNewline();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Finished string parsing.&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new BibtexString(name, content, dumpTextReadSoFarToString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String parsePreamble() throws IOException {
+<b class="nc">&nbsp;        skipWhitespace();</b>
+<b class="nc">&nbsp;        String result = parseBracketedText();</b>
+&nbsp;        // also &quot;include&quot; the newline in the preamble
+<b class="nc">&nbsp;        skipOneNewline();</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry parseEntry(String entryType) throws IOException {
+<b class="nc">&nbsp;        BibEntry result = new BibEntry(EntryTypeFactory.parse(entryType));</b>
+&nbsp;
+<b class="nc">&nbsp;        int articleStartLine = line;</b>
+<b class="nc">&nbsp;        int articleStartColumn = column;</b>
+&nbsp;
+<b class="nc">&nbsp;        skipWhitespace();</b>
+<b class="nc">&nbsp;        consume(&#39;{&#39;, &#39;(&#39;);</b>
+<b class="nc">&nbsp;        int character = peek();</b>
+<b class="nc">&nbsp;        if ((character != &#39;\n&#39;) &amp;&amp; (character != &#39;\r&#39;)) {</b>
+<b class="nc">&nbsp;            skipWhitespace();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        int keyStartLine = line;</b>
+<b class="nc">&nbsp;        int keyStartColumn = column;</b>
+<b class="nc">&nbsp;        String key = parseKey();</b>
+&nbsp;
+<b class="nc">&nbsp;        ParserResult.Range keyRange = new ParserResult.Range(keyStartLine, keyStartColumn, line, column);</b>
+<b class="nc">&nbsp;        parserResult.getFieldRanges().computeIfAbsent(result, _ -&gt; new HashMap&lt;&gt;()).put(InternalField.KEY_FIELD, keyRange);</b>
+&nbsp;
+<b class="nc">&nbsp;        result.setCitationKey(key);</b>
+<b class="nc">&nbsp;        skipWhitespace();</b>
+&nbsp;
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            character = peek();</b>
+<b class="nc">&nbsp;            if ((character == &#39;}&#39;) || (character == &#39;)&#39;)) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (character == &#39;,&#39;) {</b>
+<b class="nc">&nbsp;                consume(&#39;,&#39;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            skipWhitespace();</b>
+&nbsp;
+<b class="nc">&nbsp;            character = peek();</b>
+<b class="nc">&nbsp;            if ((character == &#39;}&#39;) || (character == &#39;)&#39;)) {</b>
+&nbsp;                break;
+&nbsp;            }
+<b class="nc">&nbsp;            parseField(result);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        consume(&#39;}&#39;, &#39;)&#39;);</b>
+&nbsp;
+&nbsp;        // Consume new line which signals end of entry
+<b class="nc">&nbsp;        skipOneNewline();</b>
+&nbsp;
+<b class="nc">&nbsp;        parserResult.getArticleRanges().put(result, new ParserResult.Range(articleStartLine, articleStartColumn, line, column));</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ADR(49)
+&nbsp;    private void parseField(BibEntry entry) throws IOException {
+<b class="nc">&nbsp;        int startLine = line;</b>
+<b class="nc">&nbsp;        int startColumn = column;</b>
+<b class="nc">&nbsp;        Field field = FieldFactory.parseField(parseTextToken());</b>
+&nbsp;
+<b class="nc">&nbsp;        skipWhitespace();</b>
+<b class="nc">&nbsp;        consume(&#39;=&#39;);</b>
+<b class="nc">&nbsp;        String content = parseFieldContent(field);</b>
+<b class="nc">&nbsp;        if (!content.isEmpty()) {</b>
+<b class="nc">&nbsp;            if (entry.hasField(field)) {</b>
+&nbsp;                // The following hack enables the parser to deal with multiple
+&nbsp;                // author or editor lines, stringing them together instead of getting just
+&nbsp;                // one of them.
+&nbsp;                // Multiple author or editor lines are not allowed by the bibtex
+&nbsp;                // format, but at least one online database exports bibtex likes to do that, making
+&nbsp;                // it inconvenient for users if JabRef did not accept it.
+<b class="nc">&nbsp;                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {</b>
+<b class="nc">&nbsp;                    entry.setField(field, entry.getField(field).orElse(&quot;&quot;) + &quot; and &quot; + content);</b>
+<b class="nc">&nbsp;                } else if (StandardField.KEYWORDS == field) {</b>
+&nbsp;                    // TODO: multiple keywords fields should be combined to one
+<b class="nc">&nbsp;                    entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // If a BibDesk File Field is encountered
+<b class="nc">&nbsp;                if (field.getName().length() &gt; 10 &amp;&amp; field.getName().startsWith(&quot;bdsk-file-&quot;)) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        byte[] decodedBytes = Base64.getDecoder().decode(content);</b>
+&nbsp;
+&nbsp;                        // Parse the base64 encoded binary plist to get the relative (to the .bib file) path
+<b class="nc">&nbsp;                        NSDictionary plist = (NSDictionary) BinaryPropertyListParser.parse(decodedBytes);</b>
+&nbsp;
+<b class="nc">&nbsp;                        if (plist.containsKey(&quot;relativePath&quot;)) {</b>
+<b class="nc">&nbsp;                            NSString relativePath = (NSString) plist.objectForKey(&quot;relativePath&quot;);</b>
+<b class="nc">&nbsp;                            Path path = Path.of(relativePath.getContent());</b>
+&nbsp;
+<b class="nc">&nbsp;                            LinkedFile file = new LinkedFile(&quot;&quot;, path, &quot;&quot;);</b>
+<b class="nc">&nbsp;                            entry.addFile(file);</b>
+<b class="nc">&nbsp;                        } else if (plist.containsKey(&quot;$objects&quot;) &amp;&amp; plist.objectForKey(&quot;$objects&quot;) instanceof NSArray nsArray) {</b>
+<b class="nc">&nbsp;                            if (nsArray.getArray().length &gt; INDEX_RELATIVE_PATH_IN_PLIST) {</b>
+<b class="nc">&nbsp;                                NSString relativePath = (NSString) nsArray.objectAtIndex(INDEX_RELATIVE_PATH_IN_PLIST);</b>
+<b class="nc">&nbsp;                                Path path = Path.of(relativePath.getContent());</b>
+&nbsp;
+<b class="nc">&nbsp;                                LinkedFile file = new LinkedFile(&quot;&quot;, path, &quot;&quot;);</b>
+<b class="nc">&nbsp;                                entry.addFile(file);</b>
+&nbsp;                            }
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            LOGGER.error(&quot;Could not find attribute &#39;relativePath&#39; for entry {} in decoded BibDesk field bdsk-file...) &quot;, entry);</b>
+&nbsp;                        }
+&nbsp;                    } catch (Exception e) {
+<b class="nc">&nbsp;                        LOGGER.error(&quot;Could not parse BibDesk files content (field: bdsk-file...) for entry {}&quot;, entry, e);</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    entry.setField(field, content);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        ParserResult.Range keyRange = new ParserResult.Range(startLine, startColumn, line, column);</b>
+<b class="nc">&nbsp;        parserResult.getFieldRanges().computeIfAbsent(entry, _ -&gt; new HashMap&lt;&gt;()).put(field, keyRange);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String parseFieldContent(Field field) throws IOException {
+<b class="nc">&nbsp;        skipWhitespace();</b>
+<b class="nc">&nbsp;        StringBuilder value = new StringBuilder();</b>
+&nbsp;        int character;
+&nbsp;
+<b class="nc">&nbsp;        while (((character = peek()) != &#39;,&#39;) &amp;&amp; (character != &#39;}&#39;) &amp;&amp; (character != &#39;)&#39;)) {</b>
+<b class="nc">&nbsp;            if (eof) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Error in line &quot; + line + &quot;: EOF in mid-string&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (character == &#39;&quot;&#39;) {</b>
+<b class="nc">&nbsp;                StringBuilder text = parseQuotedFieldExactly();</b>
+<b class="nc">&nbsp;                value.append(text);</b>
+<b class="nc">&nbsp;            } else if (character == &#39;{&#39;) {</b>
+&nbsp;                // Value is a string enclosed in brackets. There can be pairs
+&nbsp;                // of brackets inside a field, so we need to count the
+&nbsp;                // brackets to know when the string is finished.
+<b class="nc">&nbsp;                StringBuilder text = parseBracketedFieldContent();</b>
+<b class="nc">&nbsp;                value.append(text.toString());</b>
+<b class="nc">&nbsp;            } else if (Character.isDigit((char) character)) { // value is a number</b>
+<b class="nc">&nbsp;                String number = parseTextToken();</b>
+<b class="nc">&nbsp;                value.append(number);</b>
+<b class="nc">&nbsp;            } else if (character == &#39;#&#39;) {</b>
+&nbsp;                // Here, we hit the case of BibTeX string concatenation. E.g., &quot;author = Kopp # Kolb&quot;.
+&nbsp;                // We did NOT hit org.jabref.logic.bibtex.FieldWriter#BIBTEX_STRING_START_END_SYMBOL
+&nbsp;                // See also ADR-0024
+<b class="nc">&nbsp;                consume(&#39;#&#39;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                String textToken = parseTextToken();</b>
+<b class="nc">&nbsp;                if (textToken.isEmpty()) {</b>
+<b class="nc">&nbsp;                    throw new IOException(&quot;Error in line &quot; + line + &quot; or above: &quot;</b>
+&nbsp;                            + &quot;Empty text token.\nThis could be caused &quot; + &quot;by a missing comma between two fields.&quot;);
+&nbsp;                }
+<b class="nc">&nbsp;                value.append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL).append(textToken).append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            skipWhitespace();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return value.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is used to parse string labels, field names, entry type and numbers outside brackets.
+&nbsp;     */
+&nbsp;    private String parseTextToken() throws IOException {
+<b class="nc">&nbsp;        StringBuilder token = new StringBuilder(20);</b>
+&nbsp;
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            int character = read();</b>
+<b class="nc">&nbsp;            if (character == -1) {</b>
+<b class="nc">&nbsp;                eof = true;</b>
+<b class="nc">&nbsp;                return token.toString();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (Character.isLetterOrDigit((char) character) || (&quot;:-_*+./&#39;&quot;.indexOf(character) &gt;= 0)) {</b>
+<b class="nc">&nbsp;                token.append((char) character);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                unread(character);</b>
+<b class="nc">&nbsp;                return token.toString();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tries to restore the key
+&nbsp;     *
+&nbsp;     * @return rest of key on success, otherwise empty string
+&nbsp;     * @throws IOException on Reader-Error
+&nbsp;     */
+&nbsp;    private String fixKey() throws IOException {
+<b class="nc">&nbsp;        StringBuilder key = new StringBuilder();</b>
+<b class="nc">&nbsp;        int lookaheadUsed = 0;</b>
+&nbsp;        char currentChar;
+&nbsp;
+&nbsp;        // Find a char which ends key (&#39;,&#39;&amp;&amp;&#39;\n&#39;) or entryfield (&#39;=&#39;):
+&nbsp;        // @formatter:off
+&nbsp;        do {
+&nbsp;            // @formatter:on
+<b class="nc">&nbsp;            currentChar = (char) read();</b>
+<b class="nc">&nbsp;            key.append(currentChar);</b>
+<b class="nc">&nbsp;            lookaheadUsed++;</b>
+<b class="nc">&nbsp;        } while ((currentChar != &#39;,&#39;) &amp;&amp; (currentChar != &#39;\n&#39;) &amp;&amp; (currentChar != &#39;=&#39;)</b>
+&nbsp;                &amp;&amp; (lookaheadUsed &lt; BibtexParser.LOOKAHEAD));
+&nbsp;
+&nbsp;        // Consumed a char too much, back into reader and remove from key:
+<b class="nc">&nbsp;        unread(currentChar);</b>
+<b class="nc">&nbsp;        key.deleteCharAt(key.length() - 1);</b>
+&nbsp;
+&nbsp;        // Restore if possible:
+<b class="nc">&nbsp;        switch (currentChar) {</b>
+&nbsp;            case &#39;=&#39;:
+&nbsp;                // Get entryfieldname, push it back and take rest as key
+<b class="nc">&nbsp;                key = key.reverse();</b>
+&nbsp;
+<b class="nc">&nbsp;                boolean matchedAlpha = false;</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; key.length(); i++) {</b>
+<b class="nc">&nbsp;                    currentChar = key.charAt(i);</b>
+&nbsp;
+&nbsp;                    // Skip spaces:
+<b class="nc">&nbsp;                    if (!matchedAlpha &amp;&amp; (currentChar == &#39; &#39;)) {</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    matchedAlpha = true;</b>
+&nbsp;
+&nbsp;                    // Begin of entryfieldname (e.g. author) -&gt; push back:
+<b class="nc">&nbsp;                    unread(currentChar);</b>
+<b class="nc">&nbsp;                    if ((currentChar == &#39; &#39;) || (currentChar == &#39;\n&#39;)) {</b>
+&nbsp;                        /*
+&nbsp;                         * found whitespaces, entryfieldname completed -&gt; key in
+&nbsp;                         * keybuffer, skip whitespaces
+&nbsp;                         */
+<b class="nc">&nbsp;                        StringBuilder newKey = new StringBuilder();</b>
+<b class="nc">&nbsp;                        for (int j = i; j &lt; key.length(); j++) {</b>
+<b class="nc">&nbsp;                            currentChar = key.charAt(j);</b>
+<b class="nc">&nbsp;                            if (!Character.isWhitespace(currentChar)) {</b>
+<b class="nc">&nbsp;                                newKey.append(currentChar);</b>
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;
+&nbsp;                        // Finished, now reverse newKey and remove whitespaces:
+<b class="nc">&nbsp;                        key = newKey.reverse();</b>
+<b class="nc">&nbsp;                        parserResult.addWarning(new ParserResult.Range(line, column),</b>
+<b class="nc">&nbsp;                                Localization.lang(&quot;Line %0: Found corrupted citation key %1.&quot;, String.valueOf(line), key.toString()));</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                break;
+&nbsp;
+&nbsp;            case &#39;,&#39;:
+<b class="nc">&nbsp;                parserResult.addWarning(new ParserResult.Range(line, column),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Line %0: Found corrupted citation key %1 (contains whitespaces).&quot;, String.valueOf(line), key.toString()));</b>
+&nbsp;                break;
+&nbsp;
+&nbsp;            case &#39;\n&#39;:
+<b class="nc">&nbsp;                parserResult.addWarning(new ParserResult.Range(line, column),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Line %0: Found corrupted citation key %1 (comma missing).&quot;, String.valueOf(line), key.toString()));</b>
+&nbsp;                break;
+&nbsp;
+&nbsp;            default:
+&nbsp;
+&nbsp;                // No more lookahead, give up:
+<b class="nc">&nbsp;                unreadBuffer(key);</b>
+<b class="nc">&nbsp;                return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return removeWhitespaces(key).toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * returns a new &lt;code&gt;StringBuilder&lt;/code&gt; which corresponds to &lt;code&gt;toRemove&lt;/code&gt; without whitespaces
+&nbsp;     */
+&nbsp;    private StringBuilder removeWhitespaces(StringBuilder toRemove) {
+<b class="nc">&nbsp;        StringBuilder result = new StringBuilder();</b>
+&nbsp;        char current;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; toRemove.length(); ++i) {</b>
+<b class="nc">&nbsp;            current = toRemove.charAt(i);</b>
+<b class="nc">&nbsp;            if (!Character.isWhitespace(current)) {</b>
+<b class="nc">&nbsp;                result.append(current);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * pushes buffer back into input
+&nbsp;     *
+&nbsp;     * @throws IOException can be thrown if buffer is bigger than LOOKAHEAD
+&nbsp;     */
+&nbsp;    private void unreadBuffer(StringBuilder stringBuilder) throws IOException {
+<b class="nc">&nbsp;        for (int i = stringBuilder.length() - 1; i &gt;= 0; --i) {</b>
+<b class="nc">&nbsp;            unread(stringBuilder.charAt(i));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is used to parse the citation key of an entry.
+&nbsp;     */
+&nbsp;    private String parseKey() throws IOException {
+<b class="nc">&nbsp;        StringBuilder token = new StringBuilder(20);</b>
+&nbsp;
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            int character = read();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (character == -1) {</b>
+<b class="nc">&nbsp;                eof = true;</b>
+&nbsp;
+<b class="nc">&nbsp;                return token.toString();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!Character.isWhitespace((char) character) &amp;&amp; (Character.isLetterOrDigit((char) character)</b>
+<b class="nc">&nbsp;                    || (character == &#39;:&#39;) || (&quot;#{}~,=\uFFFD&quot;.indexOf(character) == -1))) {</b>
+<b class="nc">&nbsp;                token.append((char) character);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (Character.isWhitespace((char) character)) {</b>
+&nbsp;                    // We have encountered white space instead of the comma at
+&nbsp;                    // the end of
+&nbsp;                    // the key. Possibly the comma is missing, so we try to
+&nbsp;                    // return what we
+&nbsp;                    // have found, as the key and try to restore the rest in fixKey().
+<b class="nc">&nbsp;                    return token + fixKey();</b>
+<b class="nc">&nbsp;                } else if ((character == &#39;,&#39;) || (character == &#39;}&#39;)) {</b>
+<b class="nc">&nbsp;                    unread(character);</b>
+<b class="nc">&nbsp;                    return token.toString();</b>
+<b class="nc">&nbsp;                } else if (character == &#39;=&#39;) {</b>
+&nbsp;                    // If we find a &#39;=&#39; sign, it is either an error, or
+&nbsp;                    // the entry lacked a comma signifying the end of the key.
+<b class="nc">&nbsp;                    return token.toString();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new IOException(&quot;Error in line &quot; + line + &quot;:&quot; + &quot;Character &#39;&quot; + (char) character + &quot;&#39; is not &quot;</b>
+&nbsp;                            + &quot;allowed in citation keys.&quot;);
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String parseBracketedText() throws IOException {
+<b class="nc">&nbsp;        StringBuilder value = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        consume(&#39;{&#39;, &#39;(&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        int brackets = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (!((isClosingBracketNext()) &amp;&amp; (brackets == 0))) {</b>
+<b class="nc">&nbsp;            int character = read();</b>
+<b class="nc">&nbsp;            if (isEOFCharacter(character)) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Error in line &quot; + line + &quot;: EOF in mid-string&quot;);</b>
+<b class="nc">&nbsp;            } else if ((character == &#39;{&#39;) || (character == &#39;(&#39;)) {</b>
+<b class="nc">&nbsp;                brackets++;</b>
+<b class="nc">&nbsp;            } else if ((character == &#39;}&#39;) || (character == &#39;)&#39;)) {</b>
+<b class="nc">&nbsp;                brackets--;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // If we encounter whitespace of any kind, read it as a
+&nbsp;            // simple space, and ignore any others that follow immediately.
+&nbsp;            /*
+&nbsp;             * if (j == &#39;\n&#39;) { if (peek() == &#39;\n&#39;) value.append(&#39;\n&#39;); } else
+&nbsp;             */
+<b class="nc">&nbsp;            if (Character.isWhitespace((char) character)) {</b>
+<b class="nc">&nbsp;                String whitespacesReduced = skipAndRecordWhitespace(character);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!whitespacesReduced.isEmpty() &amp;&amp; !&quot;\n\t&quot;.equals(whitespacesReduced)) { // &amp;&amp;</b>
+<b class="nc">&nbsp;                    whitespacesReduced = whitespacesReduced.replace(&quot;\t&quot;, &quot;&quot;); // Remove tabulators.</b>
+<b class="nc">&nbsp;                    value.append(whitespacesReduced);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    value.append(&#39; &#39;);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                value.append((char) character);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        consume(&#39;}&#39;, &#39;)&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return value.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isClosingBracketNext() {
+&nbsp;        try {
+<b class="nc">&nbsp;            int peek = peek();</b>
+<b class="nc">&nbsp;            boolean isCurlyBracket = peek == &#39;}&#39;;</b>
+<b class="nc">&nbsp;            boolean isRoundBracket = peek == &#39;)&#39;;</b>
+<b class="nc">&nbsp;            return isCurlyBracket || isRoundBracket;</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is called if a field in the form of &lt;code&gt;field = {content}&lt;/code&gt; is parsed.
+&nbsp;     * The global variable &lt;code&gt;character&lt;/code&gt; contains &lt;code&gt;{&lt;/code&gt;.
+&nbsp;     */
+&nbsp;    private StringBuilder parseBracketedFieldContent() throws IOException {
+<b class="nc">&nbsp;        StringBuilder value = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        consume(&#39;{&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        int brackets = 0;</b>
+&nbsp;        char character;
+<b class="nc">&nbsp;        char lastCharacter = &#39;\0&#39;;</b>
+&nbsp;
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            character = (char) read();</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean isClosingBracket = false;</b>
+<b class="nc">&nbsp;            if (character == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                if (lastCharacter == &#39;\\&#39;) {</b>
+&nbsp;                    // We hit `\}`
+&nbsp;                    // It could be that a user has a backslash at the end of the entry, but intended to put a file path
+&nbsp;                    // We want to be relaxed at that case
+&nbsp;                    // First described at https://github.com/JabRef/jabref/issues/9668
+<b class="nc">&nbsp;                    char[] nextTwoCharacters = peekTwoCharacters();</b>
+&nbsp;                    // Check for &quot;\},\n&quot; - Example context: `  path = {c:\temp\},\n`
+&nbsp;                    // On Windows, it could be &quot;\},\r\n&quot;, thus we rely in OS.NEWLINE.charAt(0) (which returns &#39;\r&#39; or &#39;\n&#39;).
+&nbsp;                    //   In all cases, we should check for &#39;\n&#39; as the file could be encoded with Linux line endings on Windows.
+&nbsp;                    // We hit &#39;\}\r` or `\}\n`
+&nbsp;                    // Heuristics: Unwanted escaping of }
+&nbsp;                    //
+&nbsp;                    // Two consequences:
+&nbsp;                    //
+&nbsp;                    // 1. Keep `\` as read
+&nbsp;                    //   This is already done
+&nbsp;                    //
+&nbsp;                    // 2. Treat `}` as closing bracket
+<b class="nc">&nbsp;                    isClosingBracket = (nextTwoCharacters[0] == &#39;,&#39;) &amp;&amp; ((nextTwoCharacters[1] == OS.NEWLINE.charAt(0)) || (nextTwoCharacters[1] == &#39;\n&#39;));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    isClosingBracket = true;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (isClosingBracket &amp;&amp; (brackets == 0)) {</b>
+<b class="nc">&nbsp;                return value;</b>
+<b class="nc">&nbsp;            } else if (isEOFCharacter(character)) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Error in line &quot; + line + &quot;: EOF in mid-string&quot;);</b>
+<b class="nc">&nbsp;            } else if ((character == &#39;{&#39;) &amp;&amp; (!isEscapeSymbol(lastCharacter))) {</b>
+<b class="nc">&nbsp;                brackets++;</b>
+<b class="nc">&nbsp;            } else if (isClosingBracket) {</b>
+<b class="nc">&nbsp;                brackets--;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            value.append(character);</b>
+&nbsp;
+<b class="nc">&nbsp;            lastCharacter = character;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isEscapeSymbol(char character) {
+<b class="nc">&nbsp;        return &#39;\\&#39; == character;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private StringBuilder parseQuotedFieldExactly() throws IOException {
+<b class="nc">&nbsp;        StringBuilder value = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        consume(&#39;&quot;&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        int brackets = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (!((peek() == &#39;&quot;&#39;) &amp;&amp; (brackets == 0))) {</b>
+<b class="nc">&nbsp;            int j = read();</b>
+<b class="nc">&nbsp;            if (isEOFCharacter(j)) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Error in line &quot; + line + &quot;: EOF in mid-string&quot;);</b>
+<b class="nc">&nbsp;            } else if (j == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                brackets++;</b>
+<b class="nc">&nbsp;            } else if (j == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                brackets--;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            value.append((char) j);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        consume(&#39;&quot;&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void consume(char expected) throws IOException {
+<b class="nc">&nbsp;        int character = read();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (character != expected) {</b>
+<b class="nc">&nbsp;            throw new IOException(</b>
+&nbsp;                    &quot;Error in line &quot; + line + &quot;: Expected &quot; + expected + &quot; but received &quot; + (char) character);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean consumeUncritically(char expected) throws IOException {
+&nbsp;        int character;
+&nbsp;        // @formatter:off
+&nbsp;        do {
+&nbsp;            // @formatter:on
+<b class="nc">&nbsp;            character = read();</b>
+<b class="nc">&nbsp;        } while ((character != expected) &amp;&amp; (character != -1) &amp;&amp; (character != 65535));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isEOFCharacter(character)) {</b>
+<b class="nc">&nbsp;            eof = true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Return true if we actually found the character we were looking for:
+<b class="nc">&nbsp;        return character == expected;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void consume(char firstOption, char secondOption) throws IOException {
+&nbsp;        // Consumes one of the two, doesn&#39;t care which appears.
+&nbsp;
+<b class="nc">&nbsp;        int character = read();</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((character != firstOption) &amp;&amp; (character != secondOption)) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Error in line &quot; + line + &quot;: Expected &quot; + firstOption + &quot; or &quot; + secondOption</b>
+&nbsp;                    + &quot; but received &quot; + (char) character);
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

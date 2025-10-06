@@ -1,0 +1,327 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreferencesDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences</a>
+</div>
+
+<h1>Coverage Summary for Class: PreferencesDialogViewModel (org.jabref.gui.preferences)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreferencesDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.prefs.BackingStoreException;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ReadOnlyListWrapper;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.preferences.ai.AiTab;
+&nbsp;import org.jabref.gui.preferences.autocompletion.AutoCompletionTab;
+&nbsp;import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
+&nbsp;import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
+&nbsp;import org.jabref.gui.preferences.customexporter.CustomExporterTab;
+&nbsp;import org.jabref.gui.preferences.customimporter.CustomImporterTab;
+&nbsp;import org.jabref.gui.preferences.entry.EntryTab;
+&nbsp;import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
+&nbsp;import org.jabref.gui.preferences.export.ExportTab;
+&nbsp;import org.jabref.gui.preferences.external.ExternalTab;
+&nbsp;import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
+&nbsp;import org.jabref.gui.preferences.general.GeneralTab;
+&nbsp;import org.jabref.gui.preferences.groups.GroupsTab;
+&nbsp;import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
+&nbsp;import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
+&nbsp;import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
+&nbsp;import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
+&nbsp;import org.jabref.gui.preferences.network.NetworkTab;
+&nbsp;import org.jabref.gui.preferences.preview.PreviewTab;
+&nbsp;import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
+&nbsp;import org.jabref.gui.preferences.table.TableTab;
+&nbsp;import org.jabref.gui.preferences.websearch.WebSearchTab;
+&nbsp;import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class PreferencesDialogViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialogViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();</b>
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final ObservableList&lt;PreferencesTab&gt; preferenceTabs;
+&nbsp;
+<b class="nc">&nbsp;    public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;
+&nbsp;        // This enables passing unsaved preference values from the AI tab to the &quot;web search&quot; tab.
+<b class="nc">&nbsp;        AiTab aiTab = new AiTab();</b>
+&nbsp;
+<b class="nc">&nbsp;        preferenceTabs = FXCollections.observableArrayList(</b>
+&nbsp;                new GeneralTab(),
+&nbsp;                new KeyBindingsTab(),
+&nbsp;                new GroupsTab(),
+<b class="nc">&nbsp;                new WebSearchTab(aiTab.aiEnabledProperty()),</b>
+&nbsp;                aiTab,
+&nbsp;                new EntryTab(),
+&nbsp;                new TableTab(),
+&nbsp;                new PreviewTab(),
+&nbsp;                new EntryEditorTab(),
+&nbsp;                new CustomEntryTypesTab(),
+&nbsp;                new CitationKeyPatternTab(),
+&nbsp;                new LinkedFilesTab(),
+&nbsp;                new ExportTab(),
+&nbsp;                new AutoCompletionTab(),
+&nbsp;                new ProtectedTermsTab(),
+&nbsp;                new ExternalTab(),
+&nbsp;                new ExternalFileTypesTab(),
+&nbsp;                new JournalAbbreviationsTab(),
+&nbsp;                new NameFormatterTab(),
+&nbsp;                new XmpPrivacyTab(),
+&nbsp;                new CustomImporterTab(),
+&nbsp;                new CustomExporterTab(),
+&nbsp;                new NetworkTab()
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;PreferencesTab&gt; getPreferenceTabs() {
+<b class="nc">&nbsp;        return new ReadOnlyListWrapper&lt;&gt;(preferenceTabs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void importPreferences() {
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.XML)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.XML)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getInternalPreferences().getLastPreferencesExportPath()).build();</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileDialogConfiguration)</b>
+<b class="nc">&nbsp;                     .ifPresent(file -&gt; {</b>
+&nbsp;                         try {
+<b class="nc">&nbsp;                             preferences.importPreferences(file);</b>
+<b class="nc">&nbsp;                             setValues();</b>
+&nbsp;
+<b class="nc">&nbsp;                             dialogService.showWarningDialogAndWait(Localization.lang(&quot;Import preferences&quot;),</b>
+<b class="nc">&nbsp;                                     Localization.lang(&quot;You must restart JabRef for this to come into effect.&quot;));</b>
+&nbsp;                         } catch (JabRefException ex) {
+<b class="nc">&nbsp;                             LOGGER.error(&quot;Error while importing preferences&quot;, ex);</b>
+<b class="nc">&nbsp;                             dialogService.showErrorDialogAndWait(Localization.lang(&quot;Import preferences&quot;), ex);</b>
+&nbsp;                         }
+&nbsp;                     });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void exportPreferences() {
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.XML)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.XML)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getInternalPreferences().getLastPreferencesExportPath())</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showFileSaveDialog(fileDialogConfiguration)</b>
+<b class="nc">&nbsp;                     .ifPresent(exportFile -&gt; {</b>
+&nbsp;                         try {
+<b class="nc">&nbsp;                             storeAllSettings();</b>
+<b class="nc">&nbsp;                             preferences.exportPreferences(exportFile);</b>
+<b class="nc">&nbsp;                             preferences.getInternalPreferences().setLastPreferencesExportPath(exportFile);</b>
+&nbsp;                         } catch (JabRefException ex) {
+<b class="nc">&nbsp;                             LOGGER.warn(ex.getMessage(), ex);</b>
+<b class="nc">&nbsp;                             dialogService.showErrorDialogAndWait(Localization.lang(&quot;Export preferences&quot;), ex);</b>
+&nbsp;                         }
+&nbsp;                     });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void showPreferences() {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new PreferencesFilterDialog(new PreferencesFilter(preferences)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetPreferences() {
+<b class="nc">&nbsp;        boolean resetPreferencesConfirmed = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Reset preferences&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Are you sure you want to reset all settings to default values?&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Reset preferences&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Cancel&quot;));</b>
+<b class="nc">&nbsp;        if (resetPreferencesConfirmed) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                preferences.clear();</b>
+<b class="nc">&nbsp;                dialogService.showWarningDialogAndWait(Localization.lang(&quot;Reset preferences&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;You must restart JabRef for this to come into effect.&quot;));</b>
+&nbsp;            } catch (BackingStoreException ex) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Error while resetting preferences&quot;, ex);</b>
+<b class="nc">&nbsp;                dialogService.showErrorDialogAndWait(Localization.lang(&quot;Reset preferences&quot;), ex);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            setValues();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if all tabs are valid
+&nbsp;     */
+&nbsp;    public boolean validSettings() {
+<b class="nc">&nbsp;        for (PreferencesTab tab : preferenceTabs) {</b>
+<b class="nc">&nbsp;            if (!tab.validateSettings()) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void storeAllSettings() {
+<b class="nc">&nbsp;        if (!validSettings()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Store settings
+<b class="nc">&nbsp;        preferences.getInternalPreferences().setMemoryStickMode(memoryStickProperty.get());</b>
+<b class="nc">&nbsp;        List&lt;String&gt; restartWarnings = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (PreferencesTab tab : preferenceTabs) {</b>
+<b class="nc">&nbsp;            tab.storeSettings();</b>
+<b class="nc">&nbsp;            restartWarnings.addAll(tab.getRestartWarnings());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        preferences.flush();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!restartWarnings.isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.showWarningDialogAndWait(Localization.lang(&quot;Restart required&quot;),</b>
+<b class="nc">&nbsp;                    String.join(&quot;,\n&quot;, restartWarnings)</b>
+&nbsp;                            + &quot;\n\n&quot;
+<b class="nc">&nbsp;                            + Localization.lang(&quot;You must restart JabRef for this to come into effect.&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());</b>
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Preferences recorded.&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts the preference values into the Properties of the ViewModel
+&nbsp;     */
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        memoryStickProperty.setValue(preferences.getInternalPreferences().isMemoryStickMode());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (PreferencesTab preferencesTab : preferenceTabs) {</b>
+<b class="nc">&nbsp;            preferencesTab.setValues();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty getMemoryStickProperty() {
+<b class="nc">&nbsp;        return memoryStickProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

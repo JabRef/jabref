@@ -1,0 +1,282 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibDatabaseDiff</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bibtex.comparator</a>
+</div>
+
+<h1>Coverage Summary for Class: BibDatabaseDiff (org.jabref.logic.bibtex.comparator)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibDatabaseDiff</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bibtex.comparator;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.jabref.logic.database.DuplicateCheck;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class BibDatabaseDiff {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseDiff.class);</b>
+&nbsp;
+&nbsp;    private static final double MATCH_THRESHOLD = 0.8;
+&nbsp;    private final Optional&lt;MetaDataDiff&gt; metaDataDiff;
+&nbsp;    private final Optional&lt;PreambleDiff&gt; preambleDiff;
+&nbsp;    private final List&lt;BibStringDiff&gt; bibStringDiffs;
+&nbsp;    private final List&lt;BibEntryDiff&gt; entryDiffs;
+&nbsp;
+<b class="nc">&nbsp;    private BibDatabaseDiff(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {</b>
+<b class="nc">&nbsp;        metaDataDiff = MetaDataDiff.compare(originalDatabase.getMetaData(), newDatabase.getMetaData());</b>
+<b class="nc">&nbsp;        preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase);</b>
+<b class="nc">&nbsp;        bibStringDiffs = BibStringDiff.compare(originalDatabase.getDatabase(), newDatabase.getDatabase());</b>
+<b class="nc">&nbsp;        entryDiffs = getBibEntryDiffs(originalDatabase, newDatabase);</b>
+<b class="nc">&nbsp;        if (LOGGER.isDebugEnabled() &amp;&amp; !isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Differences detected&quot;);</b>
+<b class="nc">&nbsp;            metaDataDiff.ifPresent(diff -&gt; LOGGER.debug(&quot;Metadata differences: {}&quot;, diff));</b>
+<b class="nc">&nbsp;            preambleDiff.ifPresent(diff -&gt; LOGGER.debug(&quot;Premble differences: {}&quot;, diff));</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;BibString differences: {}&quot;, bibStringDiffs);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Entry differences: {}&quot;, entryDiffs);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isEmpty() {
+<b class="nc">&nbsp;        return metaDataDiff.isEmpty() &amp;&amp; preambleDiff.isEmpty() &amp;&amp; bibStringDiffs.isEmpty() &amp;&amp; entryDiffs.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntryDiff&gt; getBibEntryDiffs(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {
+&nbsp;        final List&lt;BibEntryDiff&gt; entryDiffs;
+&nbsp;        // Sort both databases according to a common sort key.
+<b class="nc">&nbsp;        EntryComparator comparator = getEntryComparator();</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; originalEntriesSorted = originalDatabase.getDatabase().getEntriesSorted(comparator);</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; newEntriesSorted = newDatabase.getDatabase().getEntriesSorted(comparator);</b>
+&nbsp;
+&nbsp;        // Ignore empty entries
+<b class="nc">&nbsp;        originalEntriesSorted.removeIf(BibEntry::isEmpty);</b>
+<b class="nc">&nbsp;        newEntriesSorted.removeIf(BibEntry::isEmpty);</b>
+&nbsp;
+<b class="nc">&nbsp;        entryDiffs = compareEntries(originalEntriesSorted, newEntriesSorted, originalDatabase.getMode());</b>
+<b class="nc">&nbsp;        return entryDiffs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static EntryComparator getEntryComparator() {
+<b class="nc">&nbsp;        EntryComparator comparator = new EntryComparator(false, true, StandardField.TITLE);</b>
+<b class="nc">&nbsp;        comparator = new EntryComparator(false, true, StandardField.AUTHOR, comparator);</b>
+<b class="nc">&nbsp;        comparator = new EntryComparator(false, true, StandardField.YEAR, comparator);</b>
+<b class="nc">&nbsp;        return comparator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;BibEntryDiff&gt; compareEntries(List&lt;BibEntry&gt; originalEntries, List&lt;BibEntry&gt; newEntries, BibDatabaseMode mode) {
+<b class="nc">&nbsp;        List&lt;BibEntryDiff&gt; differences = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Prevent IndexOutOfBoundException
+<b class="nc">&nbsp;        if (newEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;            return differences;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Create a HashSet where we can put references to entries in the new
+&nbsp;        // database that we have matched. This is to avoid matching them twice.
+<b class="nc">&nbsp;        Set&lt;Integer&gt; matchedEntries = new HashSet&lt;&gt;(newEntries.size());</b>
+<b class="nc">&nbsp;        Set&lt;BibEntry&gt; notMatched = new HashSet&lt;&gt;(originalEntries.size());</b>
+&nbsp;
+&nbsp;        // Loop through the entries of the original database, looking for exact matches in the new one.
+&nbsp;        // We must finish scanning for exact matches before looking for near matches, to avoid an exact
+&nbsp;        // match being &quot;stolen&quot; from another entry.
+&nbsp;        mainLoop:
+<b class="nc">&nbsp;        for (BibEntry originalEntry : originalEntries) {</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; newEntries.size(); i++) {</b>
+<b class="nc">&nbsp;                if (!matchedEntries.contains(i)) {</b>
+<b class="nc">&nbsp;                    double score = DuplicateCheck.compareEntriesStrictly(originalEntry, newEntries.get(i));</b>
+<b class="nc">&nbsp;                    if (score &gt; 1) {</b>
+<b class="nc">&nbsp;                        matchedEntries.add(i);</b>
+&nbsp;                        continue mainLoop;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // No? Add this entry to the list of non-matched entries.
+<b class="nc">&nbsp;            notMatched.add(originalEntry);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // We&#39;ve found all exact matches - and stored the non-matched entries in the notMatched set.
+&nbsp;        // Look through the remaining entries, looking for close matches.
+<b class="nc">&nbsp;        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());</b>
+<b class="nc">&nbsp;        for (BibEntry originalEntry : notMatched) {</b>
+&nbsp;            // These two variables will keep track of which entry most closely matches the one we&#39;re looking at.
+<b class="nc">&nbsp;            double bestMatch = 0;</b>
+<b class="nc">&nbsp;            int bestMatchIndex = 0;</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; newEntries.size(); i++) {</b>
+<b class="nc">&nbsp;                if (!matchedEntries.contains(i)) {</b>
+<b class="nc">&nbsp;                    double score = DuplicateCheck.compareEntriesStrictly(originalEntry, newEntries.get(i));</b>
+<b class="nc">&nbsp;                    if (score &gt; bestMatch) {</b>
+<b class="nc">&nbsp;                        bestMatch = score;</b>
+<b class="nc">&nbsp;                        bestMatchIndex = i;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            BibEntry bestEntry = newEntries.get(bestMatchIndex);</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean isDuplicate = duplicateCheck.isDuplicate(originalEntry, bestEntry, mode);</b>
+<b class="nc">&nbsp;            boolean hasEqualCitationKey = hasEqualCitationKey(originalEntry, bestEntry);</b>
+&nbsp;            // For a diff, it could be nice to have a pair of entries being similar, but not being a duplicate or having the same citation key.
+<b class="nc">&nbsp;            boolean ratioOfEqualFieldsAboveThreshold = bestMatch &gt; MATCH_THRESHOLD;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isDuplicate || hasEqualCitationKey || ratioOfEqualFieldsAboveThreshold) {</b>
+<b class="nc">&nbsp;                matchedEntries.add(bestMatchIndex);</b>
+<b class="nc">&nbsp;                differences.add(new BibEntryDiff(originalEntry, newEntries.get(bestMatchIndex)));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                differences.add(new BibEntryDiff(originalEntry, null));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Finally, look if there are still untouched entries in the new database. These may have been added.
+<b class="nc">&nbsp;        for (int i = 0; i &lt; newEntries.size(); i++) {</b>
+<b class="nc">&nbsp;            if (!matchedEntries.contains(i)) {</b>
+<b class="nc">&nbsp;                differences.add(new BibEntryDiff(null, newEntries.get(i)));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return differences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasEqualCitationKey(BibEntry oneEntry, BibEntry twoEntry) {
+<b class="nc">&nbsp;        return oneEntry.hasCitationKey() &amp;&amp; twoEntry.hasCitationKey() &amp;&amp; oneEntry.getCitationKey().equals(twoEntry.getCitationKey());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static BibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext changed) {
+<b class="nc">&nbsp;        return new BibDatabaseDiff(base, changed);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;MetaDataDiff&gt; getMetaDataDifferences() {
+<b class="nc">&nbsp;        return metaDataDiff;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;PreambleDiff&gt; getPreambleDifferences() {
+<b class="nc">&nbsp;        return preambleDiff;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BibStringDiff&gt; getBibStringDifferences() {
+<b class="nc">&nbsp;        return bibStringDiffs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BibEntryDiff&gt; getEntryDifferences() {
+<b class="nc">&nbsp;        return entryDiffs;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

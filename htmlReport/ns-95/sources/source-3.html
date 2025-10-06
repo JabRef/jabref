@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Server</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.server</a>
+</div>
+
+<h1>Coverage Summary for Class: Server (org.jabref.http.server)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Server</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.server;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javax.net.ssl.SSLContext;
+&nbsp;
+&nbsp;import org.jabref.http.JabRefSrvStateManager;
+&nbsp;import org.jabref.http.SrvStateManager;
+&nbsp;import org.jabref.http.dto.GlobalExceptionMapper;
+&nbsp;import org.jabref.http.dto.GsonFactory;
+&nbsp;import org.jabref.http.server.cayw.CAYWResource;
+&nbsp;import org.jabref.http.server.cayw.format.FormatterService;
+&nbsp;import org.jabref.http.server.command.CommandResource;
+&nbsp;import org.jabref.http.server.resources.LibrariesResource;
+&nbsp;import org.jabref.http.server.resources.LibraryResource;
+&nbsp;import org.jabref.http.server.resources.MapResource;
+&nbsp;import org.jabref.http.server.resources.RootResource;
+&nbsp;import org.jabref.http.server.services.FilesToServe;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;
+&nbsp;import net.harawata.appdirs.AppDirsFactory;
+&nbsp;import org.glassfish.grizzly.http.server.HttpServer;
+&nbsp;import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+&nbsp;import org.glassfish.hk2.api.ServiceLocator;
+&nbsp;import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
+&nbsp;import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+&nbsp;import org.glassfish.jersey.server.ResourceConfig;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class Server {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);</b>
+&nbsp;
+&nbsp;    /// Entry point for the CLI
+&nbsp;    public HttpServer run(List&lt;Path&gt; files, URI uri) {
+&nbsp;        List&lt;Path&gt; filesToServeList;
+<b class="nc">&nbsp;        if (files == null || files.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;No library available to serve, serving the demo library...&quot;);</b>
+&nbsp;            // Server.class.getResource(&quot;...&quot;) is always null here, thus trying relative path
+&nbsp;            // Path bibPath = Path.of(Server.class.getResource(&quot;http-server-demo.bib&quot;).toURI());
+<b class="nc">&nbsp;            Path bibPath = Path.of(&quot;src/main/resources/org/jabref/http/server/http-server-demo.bib&quot;).toAbsolutePath();</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Location of demo library: {}&quot;, bibPath);</b>
+<b class="nc">&nbsp;            filesToServeList = List.of(bibPath);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            filesToServeList = files;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Libraries to serve: {}&quot;, filesToServeList);</b>
+&nbsp;
+<b class="nc">&nbsp;        FilesToServe filesToServe = new FilesToServe();</b>
+<b class="nc">&nbsp;        filesToServe.setFilesToServe(filesToServeList);</b>
+&nbsp;
+<b class="nc">&nbsp;        SrvStateManager srvStateManager = new JabRefSrvStateManager();</b>
+&nbsp;
+<b class="nc">&nbsp;        ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();</b>
+<b class="nc">&nbsp;        ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);</b>
+<b class="nc">&nbsp;        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, &quot;statemanager&quot;, SrvStateManager.class);</b>
+<b class="nc">&nbsp;        HttpServer httpServer = startServer(serviceLocator, uri);</b>
+&nbsp;
+&nbsp;        // Required for CLI only
+&nbsp;        // GUI uses HttpServerManager
+<b class="nc">&nbsp;        Runtime.getRuntime().addShutdownHook(new Thread(() -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Shutting down jabsrv...&quot;);</b>
+<b class="nc">&nbsp;                httpServer.shutdownNow();</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Done, exit.&quot;);</b>
+&nbsp;            } catch (Exception e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Could not shut down server&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }));
+&nbsp;
+<b class="nc">&nbsp;        return httpServer;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    ///  Entry point for the GUI
+&nbsp;    public HttpServer run(SrvStateManager srvStateManager, URI uri) {
+<b class="nc">&nbsp;        FilesToServe filesToServe = new FilesToServe();</b>
+&nbsp;
+<b class="nc">&nbsp;        ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();</b>
+<b class="nc">&nbsp;        ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);</b>
+<b class="nc">&nbsp;        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, &quot;statemanager&quot;, SrvStateManager.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        return startServer(serviceLocator, uri);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
+<b class="nc">&nbsp;        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());</b>
+<b class="nc">&nbsp;        ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());</b>
+<b class="nc">&nbsp;        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory());</b>
+&nbsp;
+&nbsp;        // see https://stackoverflow.com/a/33794265/873282
+<b class="nc">&nbsp;        final ResourceConfig resourceConfig = new ResourceConfig();</b>
+<b class="nc">&nbsp;        resourceConfig.property(&quot;jersey.config.server.wadl.disableWadl&quot;, true);</b>
+&nbsp;        // TODO: Add SSL
+&nbsp;
+&nbsp;        // RESTish resources
+<b class="nc">&nbsp;        resourceConfig.register(RootResource.class);</b>
+<b class="nc">&nbsp;        resourceConfig.register(LibrariesResource.class);</b>
+<b class="nc">&nbsp;        resourceConfig.register(LibraryResource.class);</b>
+<b class="nc">&nbsp;        resourceConfig.register(MapResource.class);</b>
+&nbsp;
+&nbsp;        // Other resources
+<b class="nc">&nbsp;        resourceConfig.register(CommandResource.class);</b>
+<b class="nc">&nbsp;        resourceConfig.register(CAYWResource.class);</b>
+&nbsp;
+&nbsp;        // Supporting classes
+<b class="nc">&nbsp;        resourceConfig.register(CORSFilter.class);</b>
+<b class="nc">&nbsp;        resourceConfig.register(GlobalExceptionMapper.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Starting HTTP server...&quot;);</b>
+<b class="nc">&nbsp;        final HttpServer httpServer =</b>
+&nbsp;                GrizzlyHttpServerFactory
+<b class="nc">&nbsp;                        .createHttpServer(uri, resourceConfig, serviceLocator);</b>
+&nbsp;
+<b class="nc">&nbsp;        return httpServer;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean sslCertExists() {
+<b class="nc">&nbsp;        Path serverKeyStore = getSslCert();</b>
+<b class="nc">&nbsp;        return Files.exists(serverKeyStore);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SSLContext getSslContext() {
+<b class="nc">&nbsp;        SSLContextConfigurator sslContextConfig = new SSLContextConfigurator();</b>
+<b class="nc">&nbsp;        Path serverKeyStore = getSslCert();</b>
+<b class="nc">&nbsp;        if (Files.exists(serverKeyStore)) {</b>
+<b class="nc">&nbsp;            sslContextConfig.setKeyStoreFile(serverKeyStore.toString());</b>
+<b class="nc">&nbsp;            sslContextConfig.setKeyStorePass(&quot;changeit&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not find server key store {}.&quot;, serverKeyStore);</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;One create one by following the steps described in [http-server.md](/docs/code-howtos/http-server.md), which is rendered at &lt;https://devdocs.jabref.org/code-howtos/http-server.html&gt;&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return sslContextConfig.createSSLContext(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    private Path getSslCert() {
+<b class="nc">&nbsp;        return Path.of(AppDirsFactory.getInstance()</b>
+<b class="nc">&nbsp;                                     .getUserDataDir(</b>
+&nbsp;                                             OS.APP_DIR_APP_NAME,
+&nbsp;                                             &quot;ssl&quot;,
+&nbsp;                                             OS.APP_DIR_APP_AUTHOR))
+<b class="nc">&nbsp;                   .resolve(&quot;server.p12&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static void stopServer() {
+&nbsp;        // serverInstance.stop();
+<b class="nc">&nbsp;    }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

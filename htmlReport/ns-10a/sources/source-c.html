@@ -1,0 +1,164 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SystematicLiteratureReviewStudyEntryTypeDefinitions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.types</a>
+</div>
+
+<h1>Coverage Summary for Class: SystematicLiteratureReviewStudyEntryTypeDefinitions (org.jabref.model.entry.types)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SystematicLiteratureReviewStudyEntryTypeDefinitions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.types;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypeBuilder;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class represents all supported entry types used in a study definition file
+&nbsp; */
+&nbsp;public class SystematicLiteratureReviewStudyEntryTypeDefinitions {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Entry type used for study meta data within a study definition file
+&nbsp;     *
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;Required fields: author, lastsearchdate, name, enabled&lt;/li&gt;
+&nbsp;     * &lt;li&gt;Optional fields:&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+<b class="nc">&nbsp;    private static final BibEntryType STUDY_ENTRY = new BibEntryTypeBuilder()</b>
+<b class="nc">&nbsp;            .withType(SystematicLiteratureReviewStudyEntryType.STUDY_ENTRY)</b>
+<b class="nc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, new UnknownField(&quot;lastsearchdate&quot;), new UnknownField(&quot;name&quot;), new UnknownField(&quot;researchquestions&quot;))</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Entry type for the queries within the study definition file
+&nbsp;     *
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;Required fields: query&lt;/li&gt;
+&nbsp;     * &lt;li&gt;Optional fields:&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+<b class="nc">&nbsp;    private static final BibEntryType SEARCH_QUERY_ENTRY = new BibEntryTypeBuilder()</b>
+<b class="nc">&nbsp;            .withType(SystematicLiteratureReviewStudyEntryType.SEARCH_QUERY_ENTRY)</b>
+<b class="nc">&nbsp;            .withRequiredFields(new UnknownField(&quot;query&quot;))</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Entry type for the targeted libraries within a study definition file
+&nbsp;     *
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;Required fields: name, enabled&lt;/li&gt;
+&nbsp;     * &lt;li&gt;Optional fields: comment&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+<b class="nc">&nbsp;    private static final BibEntryType LIBRARY_ENTRY = new BibEntryTypeBuilder()</b>
+<b class="nc">&nbsp;            .withType(SystematicLiteratureReviewStudyEntryType.STUDY_ENTRY)</b>
+<b class="nc">&nbsp;            .withRequiredFields(new UnknownField(&quot;name&quot;), new UnknownField(&quot;enabled&quot;))</b>
+<b class="nc">&nbsp;            .withImportantFields(StandardField.COMMENT)</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;
+<b class="nc">&nbsp;    public static final List&lt;BibEntryType&gt; ALL = Arrays.asList(STUDY_ENTRY, SEARCH_QUERY_ENTRY, LIBRARY_ENTRY);</b>
+&nbsp;
+&nbsp;    private SystematicLiteratureReviewStudyEntryTypeDefinitions() {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

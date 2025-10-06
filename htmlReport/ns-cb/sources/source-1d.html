@@ -1,0 +1,301 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IacrEprintFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: IacrEprintFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IacrEprintFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.FulltextFetcher;
+&nbsp;import org.jabref.logic.importer.IdBasedFetcher;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
+&nbsp;    public static final String NAME = &quot;IACR eprints&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(IacrEprintFetcher.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern WITHOUT_LETTERS_SPACE = Pattern.compile(&quot;[^0-9/]&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Predicate&lt;String&gt; IDENTIFIER_PREDICATE = Pattern.compile(&quot;\\d{4}/\\d{3,5}&quot;).asPredicate();</b>
+&nbsp;    private static final String CITATION_URL_PREFIX = &quot;https://eprint.iacr.org/&quot;;
+&nbsp;    private static final String DESCRIPTION_URL_PREFIX = &quot;https://eprint.iacr.org/&quot;;
+&nbsp;    private static final String FULLTEXT_URL_PREFIX = &quot;https://eprint.iacr.org/&quot;;
+&nbsp;    private static final String VERSION_URL_PREFIX = &quot;https://eprint.iacr.org/archive/versions/&quot;;
+&nbsp;
+&nbsp;    private final ImportFormatPreferences prefs;
+&nbsp;
+<b class="nc">&nbsp;    public IacrEprintFetcher(ImportFormatPreferences prefs) {</b>
+<b class="nc">&nbsp;        this.prefs = prefs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;BibEntry&gt; performSearchById(String identifier) throws FetcherException {
+<b class="nc">&nbsp;        String identifierWithoutLettersAndSpaces = WITHOUT_LETTERS_SPACE.matcher(identifier).replaceAll(&quot; &quot;).trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!IDENTIFIER_PREDICATE.test(identifierWithoutLettersAndSpaces)) {</b>
+<b class="nc">&nbsp;            throw new FetcherException(Localization.lang(&quot;Invalid identifier: &#39;%0&#39;.&quot;, identifier));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;BibEntry&gt; entry = createEntryFromIacrCitation(identifierWithoutLettersAndSpaces);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entry.isPresent()) {</b>
+<b class="nc">&nbsp;            setAdditionalFields(entry.get(), identifierWithoutLettersAndSpaces);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;BibEntry&gt; createEntryFromIacrCitation(String validIdentifier) throws FetcherException {
+&nbsp;        URL url;
+&nbsp;        try {
+<b class="nc">&nbsp;            url = URLUtil.create(CITATION_URL_PREFIX + validIdentifier);</b>
+&nbsp;        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Invalid URL&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String bibtexCitationHtml = getHtml(url);</b>
+<b class="nc">&nbsp;        if (bibtexCitationHtml.contains(&quot;No such report found&quot;)) {</b>
+<b class="nc">&nbsp;            throw new FetcherException(Localization.lang(&quot;No results found.&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String actualEntry = getRequiredValueBetween(&quot;&lt;pre id=\&quot;bibtex\&quot;&gt;&quot;, &quot;&lt;/pre&gt;&quot;, bibtexCitationHtml);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return BibtexParser.singleFromString(actualEntry, prefs);</b>
+&nbsp;        } catch (ParseException e) {
+<b class="nc">&nbsp;            throw new FetcherException(Localization.lang(&quot;Entry from %0 could not be parsed.&quot;, &quot;IACR&quot;), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
+&nbsp;        URL entryUrl;
+&nbsp;        try {
+<b class="nc">&nbsp;            entryUrl = URLUtil.create(DESCRIPTION_URL_PREFIX + identifier);</b>
+&nbsp;        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Invalid URL&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String descriptiveHtml = getHtml(entryUrl);</b>
+&nbsp;
+<b class="nc">&nbsp;        entry.setField(StandardField.ABSTRACT, getAbstract(descriptiveHtml));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.DATE, getDate(descriptiveHtml));</b>
+&nbsp;
+&nbsp;        // Version information for entries after year 2000
+<b class="nc">&nbsp;        if (isFromOrAfterYear2000(entry)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                entryUrl = URLUtil.create(VERSION_URL_PREFIX + identifier);</b>
+&nbsp;            } catch (MalformedURLException e) {
+<b class="nc">&nbsp;                throw new FetcherException(&quot;Invalid URL&quot;, e);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String versionHtml = getHtml(entryUrl);</b>
+<b class="nc">&nbsp;            String version = getVersion(identifier, versionHtml);</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.VERSION, version);</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.URL, entryUrl + &quot;/&quot; + version);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getVersion(String identifier, String versionHtml) throws FetcherException {
+<b class="nc">&nbsp;        String startOfVersionString = &quot;&lt;li&gt;&lt;a href=\&quot;/archive/&quot; + identifier + &quot;/&quot;;</b>
+<b class="nc">&nbsp;        String version = getRequiredValueBetween(startOfVersionString, &quot;\&quot;&gt;&quot;, versionHtml);</b>
+<b class="nc">&nbsp;        return version;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getAbstract(String descriptiveHtml) throws FetcherException {
+<b class="nc">&nbsp;        String startOfAbstractString = &quot;&lt;h5 class=\&quot;mt-3\&quot;&gt;Abstract&lt;/h5&gt;\n    &lt;p style=\&quot;white-space: pre-wrap;\&quot;&gt;&quot;;</b>
+<b class="nc">&nbsp;        String abstractText = getRequiredValueBetween(startOfAbstractString, &quot;&lt;/p&gt;&quot;, descriptiveHtml);</b>
+<b class="nc">&nbsp;        return abstractText;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getDate(String descriptiveHtml) throws FetcherException {
+<b class="nc">&nbsp;        String startOfHistoryString = &quot;&lt;dt&gt;History&lt;/dt&gt;\n      \n      \n      &lt;dd&gt;&quot;;</b>
+<b class="nc">&nbsp;        String dateStringAsInHtml = getRequiredValueBetween(startOfHistoryString, &quot;:&quot;, descriptiveHtml);</b>
+<b class="nc">&nbsp;        return dateStringAsInHtml;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getHtml(URL url) throws FetcherException {
+<b class="nc">&nbsp;        URLDownload download = new URLDownload(url);</b>
+<b class="nc">&nbsp;        return download.asString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getRequiredValueBetween(String from, String to, String haystack) throws FetcherException {
+<b class="nc">&nbsp;        String value = StringUtil.substringBetween(haystack, from, to);</b>
+<b class="nc">&nbsp;        if (value == null) {</b>
+<b class="nc">&nbsp;            throw new FetcherException(Localization.lang(&quot;Entry from %0 could not be parsed.&quot;, &quot;IACR&quot;));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isFromOrAfterYear2000(BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;        Optional&lt;String&gt; yearField = entry.getField(StandardField.YEAR);</b>
+<b class="nc">&nbsp;        if (yearField.isPresent()) {</b>
+<b class="nc">&nbsp;            return Integer.parseInt(yearField.get()) &gt; 2000;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new FetcherException(Localization.lang(&quot;Entry from %0 could not be parsed.&quot;, &quot;IACR&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URL&gt; findFullText(BibEntry entry) throws IOException, FetcherException {
+<b class="nc">&nbsp;        Objects.requireNonNull(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; urlField = entry.getField(StandardField.URL);</b>
+<b class="nc">&nbsp;        if (urlField.isPresent()) {</b>
+&nbsp;            URL url;
+&nbsp;            try {
+<b class="nc">&nbsp;                url = URLUtil.create(urlField.get());</b>
+&nbsp;            } catch (MalformedURLException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Invalid URL {}&quot;, urlField.get(), e);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String descriptiveHtml = getHtml(url);</b>
+<b class="nc">&nbsp;            String startOfFulltextLink = &quot;&lt;a class=\&quot;btn btn-sm btn-outline-dark\&quot;&quot;;</b>
+<b class="nc">&nbsp;            String fulltextLinkAsInHtml = getRequiredValueBetween(startOfFulltextLink, &quot;.pdf&quot;, descriptiveHtml);</b>
+&nbsp;            // There is an additional &quot;\n           href=\&quot;/archive/&quot; we have to remove - and for some reason,
+&nbsp;            // getRequiredValueBetween refuses to match across the line break.
+<b class="nc">&nbsp;            fulltextLinkAsInHtml = fulltextLinkAsInHtml.replaceFirst(&quot;.*href=\&quot;/&quot;, &quot;&quot;).trim();</b>
+<b class="nc">&nbsp;            String fulltextLink = FULLTEXT_URL_PREFIX + fulltextLinkAsInHtml + &quot;.pdf&quot;;</b>
+<b class="nc">&nbsp;            return Optional.of(URLUtil.create(fulltextLink));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TrustLevel getTrustLevel() {
+<b class="nc">&nbsp;        return TrustLevel.PREPRINT;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

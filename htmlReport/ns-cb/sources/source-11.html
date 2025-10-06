@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DBLPFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: DBLPFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DBLPFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.DoiCleanup;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanups;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.SearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.DBLPQueryTransformer;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.layout.LayoutFormatterBasedFormatter;
+&nbsp;import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetches BibTeX data from DBLP (dblp.org)
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://dblp.dagstuhl.de/faq/13501473&quot;&gt;Basic API documentation&lt;/a&gt;
+&nbsp; */
+&nbsp;public class DBLPFetcher implements SearchBasedParserFetcher {
+&nbsp;    public static final String FETCHER_NAME = &quot;DBLP&quot;;
+&nbsp;
+&nbsp;    private static final String BASIC_SEARCH_URL = &quot;https://dblp.org/search/publ/api&quot;;
+&nbsp;
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public DBLPFetcher(ImportFormatPreferences importFormatPreferences) {</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(importFormatPreferences);</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = importFormatPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;q&quot;, new DBLPQueryTransformer().transformSearchQuery(queryNode).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;h&quot;, String.valueOf(100)); // number of hits</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;c&quot;, String.valueOf(0)); // no need for auto-completion</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;f&quot;, String.valueOf(0)); // &quot;from&quot;, index of first hit to download</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;format&quot;, &quot;bib1&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return new BibtexParser(importFormatPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPostCleanup(BibEntry entry) {
+<b class="nc">&nbsp;        DoiCleanup doiCleaner = new DoiCleanup();</b>
+<b class="nc">&nbsp;        doiCleaner.cleanup(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        FieldFormatterCleanups cleanups = new FieldFormatterCleanups(true,</b>
+<b class="nc">&nbsp;                List.of(</b>
+&nbsp;                        new FieldFormatterCleanup(StandardField.TIMESTAMP, new ClearFormatter()),
+&nbsp;                        // unescape the contents of the URL field, e.g., some\_url\_part becomes some_url_part
+&nbsp;                        new FieldFormatterCleanup(StandardField.URL, new LayoutFormatterBasedFormatter(new RemoveLatexCommandsFormatter()))
+&nbsp;                ));
+<b class="nc">&nbsp;        cleanups.applySaveActions(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return FETCHER_NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_DBLP);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

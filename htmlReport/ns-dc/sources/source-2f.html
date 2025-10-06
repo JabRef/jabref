@@ -1,0 +1,199 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Iso690NamesAuthors</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: Iso690NamesAuthors (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Iso690NamesAuthors</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+<b class="nc">&nbsp;public class Iso690NamesAuthors implements LayoutFormatter {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String s) {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(s)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        String[] authors = s.split(&quot;and&quot;);</b>
+&nbsp;
+&nbsp;        // parte el string en los distintos autores
+<b class="nc">&nbsp;        for (int i = 0; i &lt; authors.length; i++) {</b>
+&nbsp;            // parte el string author en varios campos, según el separador &quot;,&quot;
+<b class="nc">&nbsp;            String[] author = authors[i].split(&quot;,&quot;);</b>
+&nbsp;
+&nbsp;            // No separa apellidos y nombre con coma (,)
+<b class="nc">&nbsp;            if (author.length &lt; 2) { // Caso 1: Nombre Apellidos</b>
+&nbsp;                // parte el string author en varios campos, según el separador &quot; &quot;
+<b class="nc">&nbsp;                author = authors[i].split(&quot; &quot;);</b>
+&nbsp;                // declaramos y damos un valor para evitar problemas
+&nbsp;                String name;
+&nbsp;                String surname;
+&nbsp;
+<b class="nc">&nbsp;                if (author.length == 1) { // Caso 1.0: Sólo un campo</b>
+<b class="nc">&nbsp;                    sb.append(author[0].trim().toUpperCase(Locale.ROOT));</b>
+<b class="nc">&nbsp;                } else if (author.length == 2) { // Caso 1.1: Nombre Apellido</b>
+&nbsp;                    // primer campo Nombre
+<b class="nc">&nbsp;                    name = author[0].trim();</b>
+&nbsp;                    // Segundo campo Apellido
+<b class="nc">&nbsp;                    surname = author[1].trim().toUpperCase(Locale.ROOT);</b>
+&nbsp;
+&nbsp;                    // añadimos los campos modificados al string final
+<b class="nc">&nbsp;                    sb.append(surname);</b>
+<b class="nc">&nbsp;                    sb.append(&quot;, &quot;);</b>
+<b class="nc">&nbsp;                    sb.append(name);</b>
+<b class="nc">&nbsp;                } else if (author.length == 3) { // Caso 1.2: Nombre Apellido1 Apellido2</b>
+&nbsp;                    // primer campo Nombre
+<b class="nc">&nbsp;                    name = author[0].trim();</b>
+&nbsp;                    // Segundo y tercer campo Apellido1 Apellido2
+<b class="nc">&nbsp;                    surname = author[1].trim().toUpperCase(Locale.ROOT) + &#39; &#39; + author[2].trim().toUpperCase(Locale.ROOT);</b>
+&nbsp;
+&nbsp;                    // añadimos los campos modificados al string final
+<b class="nc">&nbsp;                    sb.append(surname);</b>
+<b class="nc">&nbsp;                    sb.append(&quot;, &quot;);</b>
+<b class="nc">&nbsp;                    sb.append(name);</b>
+<b class="nc">&nbsp;                } else if (author.length == 4) { // Caso 1.3: Nombre SegundoNombre Apellido1 Apellido2</b>
+&nbsp;                    // primer y segundo campo Nombre SegundoNombre
+<b class="nc">&nbsp;                    name = author[0].trim() + &#39; &#39; + author[1].trim();</b>
+&nbsp;                    // tercer y cuarto campo Apellido1 Apellido2
+<b class="nc">&nbsp;                    surname = author[2].trim().toUpperCase(Locale.ROOT) + &#39; &#39; + author[3].trim().toUpperCase(Locale.ROOT);</b>
+&nbsp;
+&nbsp;                    // añadimos los campos modificados al string final
+<b class="nc">&nbsp;                    sb.append(surname);</b>
+<b class="nc">&nbsp;                    sb.append(&quot;, &quot;);</b>
+<b class="nc">&nbsp;                    sb.append(name);</b>
+&nbsp;                }
+&nbsp;            } else { // Caso 2: Apellidos, Nombre
+&nbsp;                // Campo 1 apellidos, lo pasamos a mayusculas
+<b class="nc">&nbsp;                String surname = author[0].trim().toUpperCase(Locale.ROOT);</b>
+&nbsp;                // campo 2 nombre
+<b class="nc">&nbsp;                String name = author[1].trim();</b>
+&nbsp;                // añadimos los campos modificados al string final
+<b class="nc">&nbsp;                sb.append(surname);</b>
+<b class="nc">&nbsp;                sb.append(&quot;, &quot;);</b>
+<b class="nc">&nbsp;                sb.append(name);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (i &lt; authors.length - 2) { // si hay mas de 2 autores, lo separamos por &quot;, &quot;</b>
+<b class="nc">&nbsp;                sb.append(&quot;, &quot;);</b>
+<b class="nc">&nbsp;            } else if (i == authors.length - 2) { // si hay 2 autores, lo separamos por &quot; y &quot;</b>
+<b class="nc">&nbsp;                sb.append(&quot; y &quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString(); // retorna el string creado de autores.</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

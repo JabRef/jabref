@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SuggestionProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.autocompleter</a>
+</div>
+
+<h1>Coverage Summary for Class: SuggestionProvider (org.jabref.gui.autocompleter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SuggestionProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/**
+&nbsp; * Copyright (c) 2014, 2016 ControlsFX
+&nbsp; * All rights reserved.
+&nbsp; *
+&nbsp; * Redistribution and use in source and binary forms, with or without
+&nbsp; * modification, are permitted provided that the following conditions are met:
+&nbsp; * * Redistributions of source code must retain the above copyright
+&nbsp; * notice, this list of conditions and the following disclaimer.
+&nbsp; * * Redistributions in binary form must reproduce the above copyright
+&nbsp; * notice, this list of conditions and the following disclaimer in the
+&nbsp; * documentation and/or other materials provided with the distribution.
+&nbsp; * * Neither the name of ControlsFX, any associated website, nor the
+&nbsp; * names of its contributors may be used to endorse or promote products
+&nbsp; * derived from this software without specific prior written permission.
+&nbsp; *
+&nbsp; * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+&nbsp; * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+&nbsp; * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+&nbsp; * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+&nbsp; * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+&nbsp; * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+&nbsp; * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+&nbsp; * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+&nbsp; * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+&nbsp; * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+&nbsp; */
+&nbsp;package org.jabref.gui.autocompleter;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import com.google.common.base.Equivalence;
+&nbsp;import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * This is a simple implementation of a generic suggestion provider callback.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; Type of suggestions
+&nbsp; */
+<b class="nc">&nbsp;public abstract class SuggestionProvider&lt;T&gt; {</b>
+&nbsp;
+&nbsp;    public final Collection&lt;T&gt; provideSuggestions(ISuggestionRequest request) {
+<b class="nc">&nbsp;        if (!request.getUserText().isEmpty()) {</b>
+<b class="nc">&nbsp;            Comparator&lt;T&gt; comparator = getComparator();</b>
+<b class="nc">&nbsp;            Equivalence&lt;T&gt; equivalence = getEquivalence();</b>
+<b class="nc">&nbsp;            return getSource().filter(candidate -&gt; isMatch(candidate, request))</b>
+<b class="nc">&nbsp;                              .map(equivalence::wrap) // Need to do a bit of acrobatic as there is no distinctBy method</b>
+<b class="nc">&nbsp;                              .distinct()</b>
+<b class="nc">&nbsp;                              .limit(10)</b>
+<b class="nc">&nbsp;                              .map(Equivalence.Wrapper::get)</b>
+<b class="nc">&nbsp;                              .sorted(comparator)</b>
+<b class="nc">&nbsp;                              .collect(Collectors.toList());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract Equivalence&lt;T&gt; getEquivalence();
+&nbsp;
+&nbsp;    public List&lt;T&gt; getPossibleSuggestions() {
+<b class="nc">&nbsp;        Comparator&lt;T&gt; comparator = getComparator().reversed();</b>
+<b class="nc">&nbsp;        Equivalence&lt;T&gt; equivalence = getEquivalence();</b>
+<b class="nc">&nbsp;        return getSource().map(equivalence::wrap) // Need to do a bit of acrobatic as there is no distinctBy method</b>
+<b class="nc">&nbsp;                          .distinct()</b>
+<b class="nc">&nbsp;                          .map(Equivalence.Wrapper::get)</b>
+<b class="nc">&nbsp;                          .sorted(comparator)</b>
+<b class="nc">&nbsp;                          .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the comparator to order the suggestions
+&nbsp;     */
+&nbsp;    protected abstract Comparator&lt;T&gt; getComparator();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check the given candidate is a match (ie a valid suggestion)
+&nbsp;     */
+&nbsp;    protected abstract boolean isMatch(T candidate, ISuggestionRequest request);
+&nbsp;
+&nbsp;    public abstract Stream&lt;T&gt; getSource();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IEEETranEntryTypeDefinitions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.types</a>
+</div>
+
+<h1>Coverage Summary for Class: IEEETranEntryTypeDefinitions (org.jabref.model.entry.types)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IEEETranEntryTypeDefinitions</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (24/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.types;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypeBuilder;
+&nbsp;import org.jabref.model.entry.field.IEEEField;
+&nbsp;import org.jabref.model.entry.field.OrFields;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class represents all supported IEEETran entry types.
+&nbsp; * &lt;p&gt;
+&nbsp; * See &lt;a href=&quot;http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEtran_bst_HOWTO.pdf&quot;&gt;http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEtran_bst_HOWTO.pdf&lt;/a&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Electronic, IEEETranBSTCTL, Periodical, Patent, Standard
+&nbsp; */
+&nbsp;public class IEEETranEntryTypeDefinitions {
+&nbsp;    /**
+&nbsp;     * Electronic entry type for internet references
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields:
+&nbsp;     * Optional fields: author, month, year, title, language, howpublished, organization, address, note, url
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType ELECTRONIC = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(IEEETranEntryType.Electronic)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.AUTHOR, StandardField.MONTH, StandardField.YEAR, StandardField.TITLE, StandardField.LANGUAGE,</b>
+&nbsp;                    StandardField.HOWPUBLISHED, StandardField.ORGANIZATION, StandardField.ADDRESS, StandardField.NOTE, StandardField.URL)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Special entry type that can be used to externally control some aspects of the bibliography style.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType IEEETRANBSTCTL = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(IEEETranEntryType.IEEEtranBSTCTL)</b>
+<b class="fc">&nbsp;            .withImportantFields(IEEEField.CTLUSE_ARTICLE_NUMBER, IEEEField.CTLUSE_PAPER, IEEEField.CTLUSE_FORCED_ETAL,</b>
+&nbsp;                    IEEEField.CTLUSE_URL, IEEEField.CTLMAX_NAMES_FORCED_ETAL, IEEEField.CTLNAMES_SHOW_ETAL,
+&nbsp;                    IEEEField.CTLUSE_ALT_SPACING, IEEEField.CTLALT_STRETCH_FACTOR, IEEEField.CTLDASH_REPEATED_NAMES,
+&nbsp;                    IEEEField.CTLNAME_FORMAT_STRING, IEEEField.CTLNAME_LATEX_CMD, IEEEField.CTLNAME_URL_PREFIX)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The periodical entry type is used for journals and magazines.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: title, year
+&nbsp;     * Optional fields: editor, language, series, volume, number, organization, month, note, url
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType PERIODICAL = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(IEEETranEntryType.Periodical)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.TITLE, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.EDITOR, StandardField.LANGUAGE, StandardField.SERIES, StandardField.VOLUME, StandardField.NUMBER, StandardField.ORGANIZATION, StandardField.MONTH, StandardField.NOTE, StandardField.URL)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Entry type for patents.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: nationality, number, year or yearfiled
+&nbsp;     * Optional fields: author, title, language, assignee, address, type, number, day, dayfiled, month, monthfiled, note, url
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType PATENT = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(IEEETranEntryType.Patent)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.YEAR, StandardField.YEARFILED), StandardField.NATIONALITY, StandardField.NUMBER)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.LANGUAGE, StandardField.ASSIGNEE, StandardField.ADDRESS,</b>
+&nbsp;                    StandardField.TYPE, StandardField.DAY, StandardField.DAYFILED, StandardField.MONTH,
+&nbsp;                    StandardField.MONTHFILED, StandardField.NOTE, StandardField.URL)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The standard entry type is used for proposed or formally published standards.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: title, organization or institution
+&nbsp;     * Optional fields: author, language, howpublished, type, number, revision, address, month, year, note, url
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType STANDARD = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(IEEETranEntryType.Standard)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.ORGANIZATION, StandardField.INSTITUTION), StandardField.TITLE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.AUTHOR, StandardField.LANGUAGE, StandardField.HOWPUBLISHED, StandardField.TYPE,</b>
+&nbsp;                    StandardField.NUMBER, StandardField.REVISION, StandardField.ADDRESS, StandardField.MONTH, StandardField.YEAR,
+&nbsp;                    StandardField.NOTE, StandardField.URL)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final List&lt;BibEntryType&gt; ALL = Arrays.asList(ELECTRONIC, IEEETRANBSTCTL, PERIODICAL, PATENT, STANDARD);</b>
+&nbsp;
+&nbsp;    private IEEETranEntryTypeDefinitions() {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

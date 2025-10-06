@@ -1,0 +1,345 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DuplicateResolverDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.duplicationFinder</a>
+</div>
+
+<h1>Coverage Summary for Class: DuplicateResolverDialog (org.jabref.gui.duplicationFinder)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DuplicateResolverDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DuplicateResolverDialog$DuplicateResolverResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DuplicateResolverDialog$DuplicateResolverType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    23.1%
+  </span>
+  <span class="absValue">
+    (3/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.4%
+  </span>
+  <span class="absValue">
+    (9/79)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.duplicationFinder;
+&nbsp;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonBar;
+&nbsp;import javafx.scene.control.ButtonBar.ButtonData;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.layout.BorderPane;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.ThreeWayMergeView;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.DialogWindowState;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;public class DuplicateResolverDialog extends BaseDialog&lt;DuplicateResolverResult&gt; {
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+<b class="nc">&nbsp;    public enum DuplicateResolverType {</b>
+<b class="nc">&nbsp;        DUPLICATE_SEARCH,</b>
+<b class="nc">&nbsp;        IMPORT_CHECK,</b>
+<b class="nc">&nbsp;        DUPLICATE_SEARCH_WITH_EXACT</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum DuplicateResolverResult {</b>
+<b class="fc">&nbsp;        KEEP_BOTH(Localization.lang(&quot;Keep both&quot;)),</b>
+<b class="fc">&nbsp;        KEEP_LEFT(Localization.lang(&quot;Keep existing entry&quot;)),</b>
+<b class="fc">&nbsp;        KEEP_RIGHT(Localization.lang(&quot;Keep from import&quot;)),</b>
+<b class="fc">&nbsp;        AUTOREMOVE_EXACT(Localization.lang(&quot;Automatically remove exact duplicates&quot;)),</b>
+<b class="fc">&nbsp;        KEEP_MERGE(Localization.lang(&quot;Keep merged&quot;)),</b>
+<b class="fc">&nbsp;        BREAK(Localization.lang(&quot;Ask every time&quot;));</b>
+&nbsp;
+&nbsp;        final String defaultTranslationForImport;
+&nbsp;
+<b class="fc">&nbsp;        DuplicateResolverResult(String defaultTranslationForImport) {</b>
+<b class="fc">&nbsp;            this.defaultTranslationForImport = defaultTranslationForImport;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getDefaultTranslationForImport() {
+<b class="nc">&nbsp;            return defaultTranslationForImport;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static DuplicateResolverResult parse(String name) {
+&nbsp;            try {
+<b class="nc">&nbsp;                return DuplicateResolverResult.valueOf(name);</b>
+&nbsp;            } catch (IllegalArgumentException e) {
+<b class="nc">&nbsp;                return BREAK; // default</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private ThreeWayMergeView threeWayMerge;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final ActionFactory actionFactory;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;
+&nbsp;    public DuplicateResolverDialog(BibEntry one,
+&nbsp;                                   BibEntry two,
+&nbsp;                                   DuplicateResolverType type,
+&nbsp;                                   StateManager stateManager,
+&nbsp;                                   DialogService dialogService,
+<b class="nc">&nbsp;                                   GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;Possible duplicate entries&quot;));</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.actionFactory = new ActionFactory();</b>
+<b class="nc">&nbsp;        init(one, two, type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
+<b class="nc">&nbsp;        ButtonType cancel = ButtonType.CANCEL;</b>
+<b class="nc">&nbsp;        ButtonType merge = new ButtonType(Localization.lang(&quot;Keep merged&quot;), ButtonData.OK_DONE);</b>
+&nbsp;
+&nbsp;        ButtonType both;
+&nbsp;        ButtonType second;
+&nbsp;        ButtonType first;
+<b class="nc">&nbsp;        ButtonType removeExact = new ButtonType(Localization.lang(&quot;Automatically remove exact duplicates&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;        boolean removeExactVisible = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (type) {</b>
+&nbsp;            case DUPLICATE_SEARCH -&gt; {
+<b class="nc">&nbsp;                first = new ButtonType(Localization.lang(&quot;Keep left&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;                second = new ButtonType(Localization.lang(&quot;Keep right&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;                both = new ButtonType(Localization.lang(&quot;Keep both&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;                threeWayMerge = new ThreeWayMergeView(one, two, preferences);</b>
+&nbsp;            }
+&nbsp;            case DUPLICATE_SEARCH_WITH_EXACT -&gt; {
+<b class="nc">&nbsp;                first = new ButtonType(Localization.lang(&quot;Keep left&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;                second = new ButtonType(Localization.lang(&quot;Keep right&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;                both = new ButtonType(Localization.lang(&quot;Keep both&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;                removeExactVisible = true;</b>
+<b class="nc">&nbsp;                threeWayMerge = new ThreeWayMergeView(one, two, preferences);</b>
+&nbsp;            }
+&nbsp;            case IMPORT_CHECK -&gt; {
+<b class="nc">&nbsp;                first = new ButtonType(Localization.lang(&quot;Keep existing entry&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;                second = new ButtonType(Localization.lang(&quot;Keep from import&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;                both = new ButtonType(Localization.lang(&quot;Keep both&quot;), ButtonData.LEFT);</b>
+<b class="nc">&nbsp;                threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang(&quot;Existing entry&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;From import&quot;), preferences);</b>
+&nbsp;            }
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    throw new IllegalStateException(&quot;Switch expression should be exhaustive&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel);</b>
+<b class="nc">&nbsp;        this.getDialogPane().setFocusTraversable(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (removeExactVisible) {</b>
+<b class="nc">&nbsp;            this.getDialogPane().getButtonTypes().add(removeExact);</b>
+&nbsp;
+&nbsp;            // This will prevent all dialog buttons from having the same size
+&nbsp;            // Read more: https://stackoverflow.com/questions/45866249/javafx-8-alert-different-button-sizes
+<b class="nc">&nbsp;            getDialogPane().getButtonTypes().stream()</b>
+<b class="nc">&nbsp;                           .map(getDialogPane()::lookupButton)</b>
+<b class="nc">&nbsp;                           .forEach(btn -&gt; ButtonBar.setButtonUniformSize(btn, false));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Retrieves the previous window state and sets the new dialog window size and position to match it
+<b class="nc">&nbsp;        DialogWindowState state = stateManager.getDialogWindowState(getClass().getSimpleName());</b>
+<b class="nc">&nbsp;        if (state != null) {</b>
+<b class="nc">&nbsp;            this.getDialogPane().setPrefSize(state.getWidth(), state.getHeight());</b>
+<b class="nc">&nbsp;            this.setX(state.getX());</b>
+<b class="nc">&nbsp;            this.setY(state.getY());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BorderPane borderPane = new BorderPane(threeWayMerge);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setResultConverter(button -&gt; {</b>
+&nbsp;            // Updates the window state on button press
+<b class="nc">&nbsp;            stateManager.setDialogWindowState(getClass().getSimpleName(), new DialogWindowState(this.getX(), this.getY(), this.getDialogPane().getHeight(), this.getDialogPane().getWidth()));</b>
+<b class="nc">&nbsp;            threeWayMerge.saveConfiguration();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (button.equals(first)) {</b>
+<b class="nc">&nbsp;                return DuplicateResolverResult.KEEP_LEFT;</b>
+<b class="nc">&nbsp;            } else if (button.equals(second)) {</b>
+<b class="nc">&nbsp;                return DuplicateResolverResult.KEEP_RIGHT;</b>
+<b class="nc">&nbsp;            } else if (button.equals(both)) {</b>
+<b class="nc">&nbsp;                return DuplicateResolverResult.KEEP_BOTH;</b>
+<b class="nc">&nbsp;            } else if (button.equals(merge)) {</b>
+<b class="nc">&nbsp;                return DuplicateResolverResult.KEEP_MERGE;</b>
+<b class="nc">&nbsp;            } else if (button.equals(removeExact)) {</b>
+<b class="nc">&nbsp;                return DuplicateResolverResult.AUTOREMOVE_EXACT;</b>
+<b class="nc">&nbsp;            } else if (button.equals(cancel)) {</b>
+<b class="nc">&nbsp;                return DuplicateResolverResult.KEEP_LEFT;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService, preferences.getExternalApplicationsPreferences());</b>
+<b class="nc">&nbsp;        Button helpButton = actionFactory.createIconButton(StandardActions.HELP, helpCommand);</b>
+<b class="nc">&nbsp;        borderPane.setRight(helpButton);</b>
+&nbsp;
+<b class="nc">&nbsp;        getDialogPane().setContent(borderPane);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry getMergedEntry() {
+<b class="nc">&nbsp;        return threeWayMerge.getMergedEntry();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry getNewLeftEntry() {
+<b class="nc">&nbsp;        return threeWayMerge.getLeftEntry();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry getNewRightEntry() {
+<b class="nc">&nbsp;        return threeWayMerge.getRightEntry();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

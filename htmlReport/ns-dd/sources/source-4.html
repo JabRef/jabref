@@ -1,0 +1,481 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MSBibEntry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.msbib</a>
+</div>
+
+<h1>Coverage Summary for Class: MSBibEntry (org.jabref.logic.msbib)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MSBibEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/176)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.msbib;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.Date;
+&nbsp;import org.jabref.model.entry.Month;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;
+&nbsp;/**
+&nbsp; * MSBib entry representation
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/&quot;&gt;ms office 2007 bibliography format compared to bibtex&lt;/a&gt;
+&nbsp; * @see &lt;a href=&quot;http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/&quot;&gt;deciphering ms office 2007 bibliography format&lt;/a&gt;
+&nbsp; * @see &lt;a href=&quot;http://www.ecma-international.org/publications/standards/Ecma-376.htm&quot;&gt;ECMA Standard&lt;/a&gt;
+&nbsp; */
+&nbsp;class MSBibEntry {
+&nbsp;
+<b class="nc">&nbsp;    public Map&lt;String, String&gt; fields = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public List&lt;MsBibAuthor&gt; authors;
+&nbsp;    public List&lt;MsBibAuthor&gt; bookAuthors;
+&nbsp;    public List&lt;MsBibAuthor&gt; editors;
+&nbsp;    public List&lt;MsBibAuthor&gt; translators;
+&nbsp;    public List&lt;MsBibAuthor&gt; producerNames;
+&nbsp;    public List&lt;MsBibAuthor&gt; composers;
+&nbsp;    public List&lt;MsBibAuthor&gt; conductors;
+&nbsp;    public List&lt;MsBibAuthor&gt; performers;
+&nbsp;    public List&lt;MsBibAuthor&gt; writers;
+&nbsp;    public List&lt;MsBibAuthor&gt; directors;
+&nbsp;    public List&lt;MsBibAuthor&gt; compilers;
+&nbsp;    public List&lt;MsBibAuthor&gt; interviewers;
+&nbsp;    public List&lt;MsBibAuthor&gt; interviewees;
+&nbsp;    public List&lt;MsBibAuthor&gt; inventors;
+&nbsp;
+&nbsp;    public List&lt;MsBibAuthor&gt; counsels;
+&nbsp;
+&nbsp;    public PageNumbers pages;
+&nbsp;    public String standardNumber;
+&nbsp;    public String address;
+&nbsp;    public String conferenceName;
+&nbsp;    public String thesisType;
+&nbsp;    public String internetSiteTitle;
+&nbsp;    public String dateAccessed;
+&nbsp;    public String publicationTitle;
+&nbsp;    public String albumTitle;
+&nbsp;    public String broadcastTitle;
+&nbsp;    public String year;
+&nbsp;    public String month;
+&nbsp;    public String day;
+&nbsp;    public String number;
+&nbsp;    public String patentNumber;
+&nbsp;
+&nbsp;    public String journalName;
+&nbsp;
+&nbsp;    private String bibtexEntryType;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * reduced subset, supports only &quot;CITY , STATE, COUNTRY&quot; &lt;br&gt;
+&nbsp;     * &lt;b&gt;\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b&lt;/b&gt; &lt;br&gt;
+&nbsp;     * WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more) &lt;br&gt;
+&nbsp;     * Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA &lt;br&gt;
+&nbsp;     * tested using http://www.regexpal.com/
+&nbsp;     */
+<b class="nc">&nbsp;    private final Pattern ADDRESS_PATTERN = Pattern.compile(&quot;\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    public MSBibEntry() {</b>
+&nbsp;        // empty
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a new {@link MSBibEntry} to import from an XML element
+&nbsp;     */
+<b class="nc">&nbsp;    public MSBibEntry(Element entry) {</b>
+<b class="nc">&nbsp;        populateFromXml(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getType() {
+<b class="nc">&nbsp;        return fields.get(&quot;SourceType&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCiteKey() {
+<b class="nc">&nbsp;        return fields.get(&quot;Tag&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getXmlElementTextContent(String name, Element entry) {
+<b class="nc">&nbsp;        String value = null;</b>
+<b class="nc">&nbsp;        NodeList nodeLst = entry.getElementsByTagNameNS(&quot;*&quot;, name);</b>
+<b class="nc">&nbsp;        if (nodeLst.getLength() &gt; 0) {</b>
+<b class="nc">&nbsp;            value = nodeLst.item(0).getTextContent();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void populateFromXml(Element entry) {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; entry.getChildNodes().getLength(); i++) {</b>
+<b class="nc">&nbsp;            Node node = entry.getChildNodes().item(i);</b>
+<b class="nc">&nbsp;            if (node.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc">&nbsp;                String key = node.getLocalName();</b>
+<b class="nc">&nbsp;                String value = node.getTextContent();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (&quot;SourceType&quot;.equals(key)) {</b>
+<b class="nc">&nbsp;                    this.bibtexEntryType = value;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                fields.put(key, value);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String temp = getXmlElementTextContent(&quot;Pages&quot;, entry);</b>
+<b class="nc">&nbsp;        if (temp != null) {</b>
+<b class="nc">&nbsp;            pages = new PageNumbers(temp);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        standardNumber = getXmlElementTextContent(&quot;StandardNumber&quot;, entry);</b>
+<b class="nc">&nbsp;        conferenceName = getXmlElementTextContent(&quot;ConferenceName&quot;, entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        String city = getXmlElementTextContent(&quot;City&quot;, entry);</b>
+<b class="nc">&nbsp;        String state = getXmlElementTextContent(&quot;StateProvince&quot;, entry);</b>
+<b class="nc">&nbsp;        String country = getXmlElementTextContent(&quot;CountryRegion&quot;, entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder addressBuffer = new StringBuilder();</b>
+<b class="nc">&nbsp;        if (city != null) {</b>
+<b class="nc">&nbsp;            addressBuffer.append(city);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((state != null) &amp;&amp; !state.isEmpty()) &amp;&amp; ((city != null) &amp;&amp; !city.isEmpty())) {</b>
+<b class="nc">&nbsp;            addressBuffer.append(&quot;,&quot;).append(&#39; &#39;);</b>
+<b class="nc">&nbsp;            addressBuffer.append(state);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((country != null) &amp;&amp; !country.isEmpty()) {</b>
+<b class="nc">&nbsp;            addressBuffer.append(&quot;,&quot;).append(&#39; &#39;);</b>
+<b class="nc">&nbsp;            addressBuffer.append(country);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        address = addressBuffer.toString().trim();</b>
+<b class="nc">&nbsp;        if (address.isEmpty() || &quot;,&quot;.equals(address)) {</b>
+<b class="nc">&nbsp;            address = null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (&quot;Patent&quot;.equalsIgnoreCase(bibtexEntryType)) {</b>
+<b class="nc">&nbsp;            number = getXmlElementTextContent(&quot;PatentNumber&quot;, entry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        journalName = getXmlElementTextContent(&quot;JournalName&quot;, entry);</b>
+<b class="nc">&nbsp;        month = getXmlElementTextContent(&quot;Month&quot;, entry);</b>
+<b class="nc">&nbsp;        internetSiteTitle = getXmlElementTextContent(&quot;InternetSiteTitle&quot;, entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        String monthAccessed = getXmlElementTextContent(&quot;MonthAccessed&quot;, entry);</b>
+<b class="nc">&nbsp;        String dayAccessed = getXmlElementTextContent(&quot;DayAccessed&quot;, entry);</b>
+<b class="nc">&nbsp;        String yearAccessed = getXmlElementTextContent(&quot;YearAccessed&quot;, entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Date&gt; parsedDateAcessed = Date.parse(Optional.ofNullable(yearAccessed),</b>
+<b class="nc">&nbsp;                Optional.ofNullable(monthAccessed),</b>
+<b class="nc">&nbsp;                Optional.ofNullable(dayAccessed));</b>
+&nbsp;
+<b class="nc">&nbsp;        parsedDateAcessed.map(Date::getNormalized).ifPresent(date -&gt; dateAccessed = date);</b>
+&nbsp;
+<b class="nc">&nbsp;        NodeList nodeLst = entry.getElementsByTagNameNS(&quot;*&quot;, &quot;Author&quot;);</b>
+<b class="nc">&nbsp;        if (nodeLst.getLength() &gt; 0) {</b>
+<b class="nc">&nbsp;            getAuthors((Element) nodeLst.item(0));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void getAuthors(Element authorsElem) {
+<b class="nc">&nbsp;        authors = getSpecificAuthors(&quot;Author&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        bookAuthors = getSpecificAuthors(&quot;BookAuthor&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        editors = getSpecificAuthors(&quot;Editor&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        translators = getSpecificAuthors(&quot;Translator&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        producerNames = getSpecificAuthors(&quot;ProducerName&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        composers = getSpecificAuthors(&quot;Composer&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        conductors = getSpecificAuthors(&quot;Conductor&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        performers = getSpecificAuthors(&quot;Performer&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        writers = getSpecificAuthors(&quot;Writer&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        directors = getSpecificAuthors(&quot;Director&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        compilers = getSpecificAuthors(&quot;Compiler&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        interviewers = getSpecificAuthors(&quot;Interviewer&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        interviewees = getSpecificAuthors(&quot;Interviewee&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        inventors = getSpecificAuthors(&quot;Inventor&quot;, authorsElem);</b>
+<b class="nc">&nbsp;        counsels = getSpecificAuthors(&quot;Counsel&quot;, authorsElem);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;MsBibAuthor&gt; getSpecificAuthors(String type, Element authors) {
+<b class="nc">&nbsp;        List&lt;MsBibAuthor&gt; result = null;</b>
+<b class="nc">&nbsp;        NodeList nodeLst = authors.getElementsByTagNameNS(&quot;*&quot;, type);</b>
+<b class="nc">&nbsp;        if (nodeLst.getLength() &lt;= 0) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        nodeLst = ((Element) nodeLst.item(0)).getElementsByTagNameNS(&quot;*&quot;, &quot;NameList&quot;);</b>
+<b class="nc">&nbsp;        if (nodeLst.getLength() &lt;= 0) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        NodeList person = ((Element) nodeLst.item(0)).getElementsByTagNameNS(&quot;*&quot;, &quot;Person&quot;);</b>
+<b class="nc">&nbsp;        if (person.getLength() &lt;= 0) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        result = new LinkedList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; person.getLength(); i++) {</b>
+<b class="nc">&nbsp;            NodeList firstName = ((Element) person.item(i)).getElementsByTagNameNS(&quot;*&quot;, &quot;First&quot;);</b>
+<b class="nc">&nbsp;            NodeList lastName = ((Element) person.item(i)).getElementsByTagNameNS(&quot;*&quot;, &quot;Last&quot;);</b>
+<b class="nc">&nbsp;            NodeList middleName = ((Element) person.item(i)).getElementsByTagNameNS(&quot;*&quot;, &quot;Middle&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            StringBuilder sb = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (firstName.getLength() &gt; 0) {</b>
+<b class="nc">&nbsp;                sb.append(firstName.item(0).getTextContent());</b>
+<b class="nc">&nbsp;                sb.append(&quot; &quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (middleName.getLength() &gt; 0) {</b>
+<b class="nc">&nbsp;                sb.append(middleName.item(0).getTextContent());</b>
+<b class="nc">&nbsp;                sb.append(&quot; &quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (lastName.getLength() &gt; 0) {</b>
+<b class="nc">&nbsp;                sb.append(lastName.item(0).getTextContent());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            AuthorList authorList = AuthorList.parse(sb.toString());</b>
+<b class="nc">&nbsp;            for (Author author : authorList.getAuthors()) {</b>
+<b class="nc">&nbsp;                result.add(new MsBibAuthor(author));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the dom representation for one entry, used for export
+&nbsp;     *
+&nbsp;     * @param document XmlDocument
+&nbsp;     * @return XmlElement represenation of one entry
+&nbsp;     */
+&nbsp;    public Element getEntryDom(Document document) {
+<b class="nc">&nbsp;        Element rootNode = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + &quot;Source&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; entry : fields.entrySet()) {</b>
+<b class="nc">&nbsp;            addField(document, rootNode, entry.getKey(), entry.getValue());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional.ofNullable(dateAccessed).ifPresent(field -&gt; addDateAcessedFields(document, rootNode));</b>
+&nbsp;
+<b class="nc">&nbsp;        Element allAuthors = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + &quot;Author&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Author&quot;, authors);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;BookAuthor&quot;, bookAuthors);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Editor&quot;, editors);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Translator&quot;, translators);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;ProducerName&quot;, producerNames);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Composer&quot;, composers);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Conductor&quot;, conductors);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Performer&quot;, performers);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Writer&quot;, writers);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Director&quot;, directors);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Compiler&quot;, compilers);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Interviewer&quot;, interviewers);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Interviewee&quot;, interviewees);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Inventor&quot;, inventors);</b>
+<b class="nc">&nbsp;        addAuthor(document, allAuthors, &quot;Counsel&quot;, counsels);</b>
+&nbsp;
+<b class="nc">&nbsp;        rootNode.appendChild(allAuthors);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (pages != null) {</b>
+<b class="nc">&nbsp;            addField(document, rootNode, &quot;Pages&quot;, pages.toString(&quot;-&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;Year&quot;, year);</b>
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;Month&quot;, month);</b>
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;Day&quot;, day);</b>
+&nbsp;
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;JournalName&quot;, journalName);</b>
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;PatentNumber&quot;, patentNumber);</b>
+&nbsp;
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;Number&quot;, number);</b>
+&nbsp;
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;StandardNumber&quot;, standardNumber);</b>
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;ConferenceName&quot;, conferenceName);</b>
+&nbsp;
+<b class="nc">&nbsp;        addAddress(document, rootNode, address);</b>
+&nbsp;
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;ThesisType&quot;, thesisType);</b>
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;InternetSiteTitle&quot;, internetSiteTitle);</b>
+&nbsp;
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;PublicationTitle&quot;, publicationTitle);</b>
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;AlbumTitle&quot;, albumTitle);</b>
+<b class="nc">&nbsp;        addField(document, rootNode, &quot;BroadcastTitle&quot;, broadcastTitle);</b>
+&nbsp;
+<b class="nc">&nbsp;        return rootNode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addField(Document document, Element parent, String name, String value) {
+<b class="nc">&nbsp;        if (value == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        Element elem = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + name);</b>
+<b class="nc">&nbsp;        elem.appendChild(document.createTextNode(StringUtil.stripNonValidXMLCharacters(value)));</b>
+<b class="nc">&nbsp;        parent.appendChild(elem);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Add authors for export
+&nbsp;    private void addAuthor(Document document, Element allAuthors, String entryName, List&lt;MsBibAuthor&gt; authorsLst) {
+<b class="nc">&nbsp;        if (authorsLst == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        Element authorTop = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + entryName);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;MsBibAuthor&gt; personName = authorsLst.stream()</b>
+<b class="nc">&nbsp;                                                     .filter(MsBibAuthor::isCorporate)</b>
+<b class="nc">&nbsp;                                                     .findFirst();</b>
+<b class="nc">&nbsp;        if (personName.isPresent()) {</b>
+<b class="nc">&nbsp;            MsBibAuthor person = personName.get();</b>
+<b class="nc">&nbsp;            Element corporate = document.createElementNS(MSBibDatabase.NAMESPACE,</b>
+&nbsp;                    MSBibDatabase.PREFIX + &quot;Corporate&quot;);
+<b class="nc">&nbsp;            corporate.setTextContent(person.getLastName());</b>
+<b class="nc">&nbsp;            authorTop.appendChild(corporate);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Element nameList = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + &quot;NameList&quot;);</b>
+<b class="nc">&nbsp;            for (MsBibAuthor name : authorsLst) {</b>
+<b class="nc">&nbsp;                Element person = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + &quot;Person&quot;);</b>
+<b class="nc">&nbsp;                addField(document, person, &quot;Last&quot;, name.getLastName());</b>
+<b class="nc">&nbsp;                addField(document, person, &quot;Middle&quot;, name.getMiddleName());</b>
+<b class="nc">&nbsp;                addField(document, person, &quot;First&quot;, name.getFirstName());</b>
+<b class="nc">&nbsp;                nameList.appendChild(person);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            authorTop.appendChild(nameList);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        allAuthors.appendChild(authorTop);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addDateAcessedFields(Document document, Element rootNode) {
+<b class="nc">&nbsp;        Optional&lt;Date&gt; parsedDateAcesseField = Date.parse(dateAccessed);</b>
+<b class="nc">&nbsp;        parsedDateAcesseField.flatMap(Date::getYear)</b>
+<b class="nc">&nbsp;                             .map(Object::toString)</b>
+<b class="nc">&nbsp;                             .ifPresent(yearAccessed -&gt; addField(document, rootNode, &quot;Year&quot; + &quot;Accessed&quot;, yearAccessed));</b>
+&nbsp;
+<b class="nc">&nbsp;        parsedDateAcesseField.flatMap(Date::getMonth)</b>
+<b class="nc">&nbsp;                             .map(Month::getFullName)</b>
+<b class="nc">&nbsp;                             .ifPresent(monthAcessed -&gt; addField(document, rootNode, &quot;Month&quot; + &quot;Accessed&quot;, monthAcessed));</b>
+<b class="nc">&nbsp;        parsedDateAcesseField.flatMap(Date::getDay)</b>
+<b class="nc">&nbsp;                             .map(Object::toString)</b>
+<b class="nc">&nbsp;                             .ifPresent(dayAccessed -&gt; addField(document, rootNode, &quot;Day&quot; + &quot;Accessed&quot;, dayAccessed));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addAddress(Document document, Element parent, String addressToSplit) {
+<b class="nc">&nbsp;        if (addressToSplit == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Matcher matcher = ADDRESS_PATTERN.matcher(addressToSplit);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (addressToSplit.contains(&quot;,&quot;) &amp;&amp; matcher.matches() &amp;&amp; (matcher.groupCount() &gt;= 3)) {</b>
+<b class="nc">&nbsp;            addField(document, parent, &quot;City&quot;, matcher.group(1));</b>
+<b class="nc">&nbsp;            addField(document, parent, &quot;StateProvince&quot;, matcher.group(2));</b>
+<b class="nc">&nbsp;            addField(document, parent, &quot;CountryRegion&quot;, matcher.group(3));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            addField(document, parent, &quot;City&quot;, addressToSplit);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

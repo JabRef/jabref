@@ -1,0 +1,251 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SidePaneContentFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.sidepane</a>
+</div>
+
+<h1>Coverage Summary for Class: SidePaneContentFactory (org.jabref.gui.sidepane)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SidePaneContentFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SidePaneContentFactory$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.sidepane;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+&nbsp;import org.jabref.gui.groups.GroupTreeView;
+&nbsp;import org.jabref.gui.importer.fetcher.WebSearchPaneView;
+&nbsp;import org.jabref.gui.openoffice.OpenOfficePanel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;
+&nbsp;public class SidePaneContentFactory {
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final AdaptVisibleTabs adaptVisibleTabs;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;
+&nbsp;    public SidePaneContentFactory(LibraryTabContainer tabContainer,
+&nbsp;                                  GuiPreferences preferences,
+&nbsp;                                  JournalAbbreviationRepository abbreviationRepository,
+&nbsp;                                  TaskExecutor taskExecutor,
+&nbsp;                                  DialogService dialogService,
+&nbsp;                                  AiService aiService,
+&nbsp;                                  StateManager stateManager,
+&nbsp;                                  AdaptVisibleTabs adaptVisibleTabs,
+&nbsp;                                  FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                                  BibEntryTypesManager entryTypesManager,
+&nbsp;                                  ClipBoardManager clipBoardManager,
+<b class="nc">&nbsp;                                  UndoManager undoManager) {</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.adaptVisibleTabs = adaptVisibleTabs;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.clipBoardManager = clipBoardManager;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Node create(SidePaneType sidePaneType) {
+<b class="nc">&nbsp;        return switch (sidePaneType) {</b>
+&nbsp;            case GROUPS -&gt;
+<b class="nc">&nbsp;                    new GroupTreeView(</b>
+&nbsp;                            taskExecutor,
+&nbsp;                            stateManager,
+&nbsp;                            adaptVisibleTabs,
+&nbsp;                            preferences,
+&nbsp;                            dialogService,
+&nbsp;                            aiService,
+&nbsp;                            undoManager,
+&nbsp;                            fileUpdateMonitor);
+&nbsp;            case OPEN_OFFICE -&gt;
+<b class="nc">&nbsp;                    new OpenOfficePanel(</b>
+&nbsp;                            tabContainer,
+&nbsp;                            preferences,
+<b class="nc">&nbsp;                            preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),</b>
+<b class="nc">&nbsp;                            preferences.getExternalApplicationsPreferences(),</b>
+<b class="nc">&nbsp;                            preferences.getLayoutFormatterPreferences(),</b>
+<b class="nc">&nbsp;                            preferences.getCitationKeyPatternPreferences(),</b>
+&nbsp;                            abbreviationRepository,
+&nbsp;                            (UiTaskExecutor) taskExecutor,
+&nbsp;                            dialogService,
+&nbsp;                            aiService,
+&nbsp;                            stateManager,
+&nbsp;                            fileUpdateMonitor,
+&nbsp;                            entryTypesManager,
+&nbsp;                            clipBoardManager,
+<b class="nc">&nbsp;                            undoManager).getContent();</b>
+&nbsp;            case WEB_SEARCH -&gt;
+<b class="nc">&nbsp;                    new WebSearchPaneView(</b>
+&nbsp;                            preferences,
+&nbsp;                            dialogService,
+&nbsp;                            stateManager);
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

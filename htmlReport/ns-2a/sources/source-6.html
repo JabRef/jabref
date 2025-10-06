@@ -1,0 +1,148 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LastAutomaticFieldEditorEdit</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.edit.automaticfiededitor</a>
+</div>
+
+<h1>Coverage Summary for Class: LastAutomaticFieldEditorEdit (org.jabref.gui.edit.automaticfiededitor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LastAutomaticFieldEditorEdit</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.edit.automaticfiededitor;
+&nbsp;
+&nbsp;import javax.swing.undo.AbstractUndoableEdit;
+&nbsp;import javax.swing.undo.CannotRedoException;
+&nbsp;import javax.swing.undo.CannotUndoException;
+&nbsp;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;
+&nbsp;public class LastAutomaticFieldEditorEdit extends AbstractUndoableEdit {
+&nbsp;    private final Integer affectedEntries;
+&nbsp;    private final NamedCompoundEdit edit;
+&nbsp;
+&nbsp;    private final Integer tabIndex;
+&nbsp;
+<b class="nc">&nbsp;    public LastAutomaticFieldEditorEdit(Integer affectedEntries, Integer tabIndex, NamedCompoundEdit edit) {</b>
+<b class="nc">&nbsp;        this.affectedEntries = affectedEntries;</b>
+<b class="nc">&nbsp;        this.edit = edit;</b>
+<b class="nc">&nbsp;        this.tabIndex = tabIndex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getAffectedEntries() {
+<b class="nc">&nbsp;        return affectedEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public NamedCompoundEdit getEdit() {
+<b class="nc">&nbsp;        return edit;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getTabIndex() {
+<b class="nc">&nbsp;        return tabIndex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void undo() throws CannotUndoException {
+<b class="nc">&nbsp;        super.undo();</b>
+<b class="nc">&nbsp;        edit.undo();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void redo() throws CannotRedoException {
+<b class="nc">&nbsp;        super.redo();</b>
+<b class="nc">&nbsp;        edit.redo();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

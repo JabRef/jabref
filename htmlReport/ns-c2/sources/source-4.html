@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SemanticMerger</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.git.merge</a>
+</div>
+
+<h1>Coverage Summary for Class: SemanticMerger (org.jabref.logic.git.merge)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SemanticMerger</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.git.merge;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.git.conflicts.SemanticConflictDetector;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class SemanticMerger {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SemanticMerger.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Implementation-only merge logic: applies changes from remote (relative to base) to local.
+&nbsp;     * does not check for &quot;modifications&quot; or &quot;conflicts&quot;
+&nbsp;     * all decisions should be handled in advance by the {@link SemanticConflictDetector}
+&nbsp;     */
+&nbsp;    public static void applyMergePlan(BibDatabaseContext localCopy, MergePlan plan) {
+<b class="nc">&nbsp;        applyPatchToDatabase(localCopy, plan.fieldPatches());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry newEntry : plan.newEntries()) {</b>
+<b class="nc">&nbsp;            BibEntry clone = new BibEntry(newEntry);</b>
+&nbsp;
+<b class="nc">&nbsp;            clone.getCitationKey().ifPresent(citationKey -&gt;</b>
+<b class="nc">&nbsp;                    localCopy.getDatabase().getEntryByCitationKey(citationKey).ifPresent(existing -&gt; {</b>
+<b class="nc">&nbsp;                        localCopy.getDatabase().removeEntry(existing);</b>
+<b class="nc">&nbsp;                        LOGGER.debug(&quot;Removed existing entry &#39;{}&#39; before re-inserting&quot;, citationKey);</b>
+&nbsp;                    })
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            localCopy.getDatabase().insertEntry(clone);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Inserted (or replaced) entry &#39;{}&#39;, fields={}, marked as changed&quot;,</b>
+<b class="nc">&nbsp;                    clone.getCitationKey().orElse(&quot;?&quot;),</b>
+<b class="nc">&nbsp;                    clone.getFieldMap());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void applyPatchToDatabase(BibDatabaseContext localCopy, Map&lt;String, Map&lt;Field, String&gt;&gt; patchMap) {
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, Map&lt;Field, String&gt;&gt; entry : patchMap.entrySet()) {</b>
+<b class="nc">&nbsp;            String key = entry.getKey();</b>
+<b class="nc">&nbsp;            Map&lt;Field, String&gt; fieldPatch = entry.getValue();</b>
+<b class="nc">&nbsp;            Optional&lt;BibEntry&gt; localEntryOpt = localCopy.getDatabase().getEntryByCitationKey(key);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (localEntryOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Skip patch: local does not contain entry &#39;{}&#39;&quot;, key);</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            BibEntry localEntry = localEntryOpt.get();</b>
+<b class="nc">&nbsp;            applyFieldPatchToEntry(localEntry, fieldPatch);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void applyFieldPatchToEntry(BibEntry localEntry, Map&lt;Field, String&gt; patch) {
+<b class="nc">&nbsp;        for (Map.Entry&lt;Field, String&gt; diff : patch.entrySet()) {</b>
+<b class="nc">&nbsp;            Field field = diff.getKey();</b>
+<b class="nc">&nbsp;            String newValue = diff.getValue();</b>
+<b class="nc">&nbsp;            String oldValue = localEntry.getField(field).orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (newValue == null) {</b>
+<b class="nc">&nbsp;                localEntry.clearField(field);</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Cleared field &#39;{}&#39; (was &#39;{}&#39;)&quot;, field.getName(), oldValue);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                localEntry.setField(field, newValue);</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Set field &#39;{}&#39; to &#39;{}&#39;, replacing &#39;{}&#39;&quot;, field.getName(), newValue, oldValue);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

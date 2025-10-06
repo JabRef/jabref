@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
@@ -11,6 +10,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +29,7 @@ public class CleanupWorker {
         this.failures = new ArrayList<>();
     }
 
-    public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
-        Objects.requireNonNull(preset);
-        Objects.requireNonNull(entry);
-
+    public List<FieldChange> cleanup(@NonNull CleanupPreferences preset, @NonNull BibEntry entry) {
         List<CleanupJob> jobs = determineCleanupActions(preset);
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {

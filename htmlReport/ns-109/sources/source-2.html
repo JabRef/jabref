@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ArXivIdentifier</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.identifier</a>
+</div>
+
+<h1>Coverage Summary for Class: ArXivIdentifier (org.jabref.model.entry.identifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArXivIdentifier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.identifier;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Identifier for the arXiv. See https://arxiv.org/help/arxiv_identifier
+&nbsp; */
+&nbsp;public class ArXivIdentifier extends EprintIdentifier {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ArXivIdentifier.class);</b>
+&nbsp;
+&nbsp;    private static final String ARXIV_PREFIX = &quot;http(s)?://arxiv.org/(abs|pdf)/|arxiv|arXiv&quot;;
+&nbsp;    private final String identifier;
+&nbsp;    private final String classification;
+&nbsp;    private final String version;
+&nbsp;
+&nbsp;    ArXivIdentifier(String identifier) {
+<b class="nc">&nbsp;        this(identifier, &quot;&quot;, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    ArXivIdentifier(String identifier, String classification) {
+<b class="nc">&nbsp;        this(identifier, &quot;&quot;, classification);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    ArXivIdentifier(String identifier, String version, String classification) {</b>
+<b class="nc">&nbsp;        this.identifier = identifier.trim();</b>
+<b class="nc">&nbsp;        this.version = version.trim();</b>
+<b class="nc">&nbsp;        this.classification = classification.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;ArXivIdentifier&gt; parse(String value) {
+<b class="nc">&nbsp;        String identifier = value.replace(&quot; &quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        Pattern identifierPattern = Pattern.compile(&quot;(&quot; + ARXIV_PREFIX + &quot;)?\\s?:?\\s?(?&lt;id&gt;\\d{4}\\.\\d{4,5})(v(?&lt;version&gt;\\d+))?\\s?(\\[(?&lt;classification&gt;\\S+)\\])?&quot;);</b>
+<b class="nc">&nbsp;        Matcher identifierMatcher = identifierPattern.matcher(identifier);</b>
+<b class="nc">&nbsp;        if (identifierMatcher.matches()) {</b>
+<b class="nc">&nbsp;            return getArXivIdentifier(identifierMatcher);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Pattern oldIdentifierPattern = Pattern.compile(&quot;(&quot; + ARXIV_PREFIX + &quot;)?\\s?:?\\s?(?&lt;id&gt;(?&lt;classification&gt;[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})(v(?&lt;version&gt;\\d+))?&quot;);</b>
+<b class="nc">&nbsp;        Matcher oldIdentifierMatcher = oldIdentifierPattern.matcher(identifier);</b>
+<b class="nc">&nbsp;        if (oldIdentifierMatcher.matches()) {</b>
+<b class="nc">&nbsp;            return getArXivIdentifier(oldIdentifierMatcher);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;ArXivIdentifier&gt; getArXivIdentifier(Matcher matcher) {
+<b class="nc">&nbsp;        String id = matcher.group(&quot;id&quot;);</b>
+<b class="nc">&nbsp;        String classification = matcher.group(&quot;classification&quot;);</b>
+<b class="nc">&nbsp;        if (classification == null) {</b>
+<b class="nc">&nbsp;            classification = &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String version = matcher.group(&quot;version&quot;);</b>
+<b class="nc">&nbsp;        if (version == null) {</b>
+<b class="nc">&nbsp;            version = &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(new ArXivIdentifier(id, version, classification));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getClassification() {
+<b class="nc">&nbsp;        if (classification.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.of(classification);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// ArXiv articles are automatically assigned DOIs starting with the prefix
+&nbsp;    /// `10.48550/`, followed by the ArXiv ID (with the colon replaced by a period).
+&nbsp;    ///
+&nbsp;    /// More information:
+&nbsp;    /// [new-arxiv-articles-are-now-automatically-assigned-dois](https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/)
+&nbsp;    public Optional&lt;DOI&gt; inferDOI() {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(identifier)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return DOI.parse(&quot;10.48550/arxiv.&quot; + identifier);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;ArXivIdentifier{&quot; +</b>
+&nbsp;                &quot;identifier=&#39;&quot; + identifier + &#39;\&#39;&#39; +
+&nbsp;                &quot;, classification=&#39;&quot; + classification + &#39;\&#39;&#39; +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ArXivIdentifier that = (ArXivIdentifier) o;</b>
+<b class="nc">&nbsp;        return Objects.equals(identifier, that.identifier) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(classification, that.classification);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(identifier, classification);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String asString() {
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(version)) {</b>
+<b class="nc">&nbsp;            return identifier + &quot;v&quot; + version;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return identifier;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String asStringWithoutVersion() {
+<b class="nc">&nbsp;        return identifier;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URI&gt; getExternalURI() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return Optional.of(new URI(&quot;https://arxiv.org/abs/&quot; + asString()));</b>
+&nbsp;        } catch (URISyntaxException e) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

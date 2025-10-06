@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OOFormat</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.ootext</a>
+</div>
+
+<h1>Coverage Summary for Class: OOFormat (org.jabref.model.openoffice.ootext)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OOFormat</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.ootext;
+&nbsp;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * Helper functions to produce some of the markup as understood by OOTextIntoOO.write
+&nbsp; * &lt;p&gt;
+&nbsp; * These do not cover all tags, only those needed to embed markup from Layout and citation marker formatters into citation markers and bibliography.
+&nbsp; */
+&nbsp;public class OOFormat {
+&nbsp;
+&nbsp;    private OOFormat() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mark {@code ootext} as using a character locale known to OO.
+&nbsp;     *
+&nbsp;     * @param locale language[-country[-territory]]
+&nbsp;     *               &lt;p&gt;
+&nbsp;     *               https://www.openoffice.org/api/docs/common/ref/com/sun/star/lang/Locale.html
+&nbsp;     *               &lt;p&gt;
+&nbsp;     *               The country part is optional.
+&nbsp;     *               &lt;p&gt;
+&nbsp;     *               The territory part is not only optional, the allowed &quot;codes are vendor and browser-specific&quot;, so probably best to avoid them if possible.
+&nbsp;     */
+&nbsp;    public static OOText setLocale(OOText ootext, String locale) {
+<b class="nc">&nbsp;        return OOText.fromString(&quot;&lt;span lang=\&quot;%s\&quot;&gt;&quot;.formatted(locale) + ootext.toString() + &quot;&lt;/span&gt;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mark {@code ootext} as using the character locale &quot;zxx&quot;, which means &quot;no language&quot;, &quot;no linguistic content&quot;.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Used around citation marks, probably to turn off spellchecking.
+&nbsp;     */
+&nbsp;    public static OOText setLocaleNone(OOText ootext) {
+<b class="nc">&nbsp;        return OOFormat.setLocale(ootext, &quot;zxx&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mark {@code ootext} using a character style {@code charStyle}
+&nbsp;     *
+&nbsp;     * @param charStyle Name of a character style known to OO. May be empty for &quot;Standard&quot;, which in turn means do not override any properties.
+&nbsp;     */
+&nbsp;    public static OOText setCharStyle(OOText ootext, String charStyle) {
+<b class="nc">&nbsp;        return OOText.fromString(&quot;&lt;span oo:CharStyleName=\&quot;%s\&quot;&gt;&quot;.formatted(charStyle)</b>
+<b class="nc">&nbsp;                + ootext.toString()</b>
+&nbsp;                + &quot;&lt;/span&gt;&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mark {@code ootext} as part of a paragraph with style {@code paraStyle}
+&nbsp;     */
+&nbsp;    public static OOText paragraph(OOText ootext, String paraStyle) {
+<b class="nc">&nbsp;        if (StringUtil.isNullOrEmpty(paraStyle)) {</b>
+<b class="nc">&nbsp;            return paragraph(ootext);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String startTag = &quot;&lt;p oo:ParaStyleName=\&quot;%s\&quot;&gt;&quot;.formatted(paraStyle);</b>
+<b class="nc">&nbsp;        return OOText.fromString(startTag + ootext.toString() + &quot;&lt;/p&gt;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mark {@code ootext} as part of a paragraph.
+&nbsp;     */
+&nbsp;    public static OOText paragraph(OOText ootext) {
+<b class="nc">&nbsp;        return OOText.fromString(&quot;&lt;p&gt;&quot; + ootext.toString() + &quot;&lt;/p&gt;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Format an OO cross-reference showing the target&#39;s page number as label to a reference mark.
+&nbsp;     */
+&nbsp;    public static OOText formatReferenceToPageNumberOfReferenceMark(String referenceMarkName) {
+<b class="nc">&nbsp;        String string = &quot;&lt;oo:referenceToPageNumberOfReferenceMark target=\&quot;%s\&quot;&gt;&quot;.formatted(referenceMarkName);</b>
+<b class="nc">&nbsp;        return OOText.fromString(string);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

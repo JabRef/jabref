@@ -1,0 +1,401 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MainTableHeaderContextMenu</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: MainTableHeaderContextMenu (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MainTableHeaderContextMenu</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MainTableHeaderContextMenu$RightClickMenuItem</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.RadioMenuItem;
+&nbsp;import javafx.scene.control.SeparatorMenuItem;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.maintable.columns.MainTableColumn;
+&nbsp;import org.jabref.gui.preferences.ShowPreferencesAction;
+&nbsp;import org.jabref.gui.preferences.table.TableTab;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;public class MainTableHeaderContextMenu extends ContextMenu {
+&nbsp;
+&nbsp;    private static final int OUT_OF_BOUNDS = -1;
+&nbsp;    MainTable mainTable;
+&nbsp;    MainTableColumnFactory factory;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+&nbsp;    public MainTableHeaderContextMenu(MainTable mainTable,
+&nbsp;                                      MainTableColumnFactory factory,
+&nbsp;                                      LibraryTabContainer tabContainer,
+&nbsp;                                      DialogService dialogService) {
+<b class="nc">&nbsp;        super();</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.mainTable = mainTable;</b>
+<b class="nc">&nbsp;        this.factory = factory;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+&nbsp;
+<b class="nc">&nbsp;        constructItems();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles showing the menu in the cursors position when right-clicked.
+&nbsp;     */
+&nbsp;    public void show(boolean show) {
+&nbsp;        // TODO: 20/10/2022 unknown bug where issue does not show unless parameter is passed through this method.
+<b class="nc">&nbsp;        mainTable.setOnContextMenuRequested(event -&gt; {</b>
+&nbsp;            // Display the menu if header is clicked, otherwise, remove from display.
+<b class="nc">&nbsp;            if (!(event.getTarget() instanceof StackPane) &amp;&amp; show) {</b>
+<b class="nc">&nbsp;                this.show(mainTable, event.getScreenX(), event.getScreenY());</b>
+<b class="nc">&nbsp;            } else if (this.isShowing()) {</b>
+<b class="nc">&nbsp;                this.hide();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs the items for the list and places them in the menu.
+&nbsp;     */
+&nbsp;    private void constructItems() {
+&nbsp;        // Reset the right-click menu
+<b class="nc">&nbsp;        this.getItems().clear();</b>
+<b class="nc">&nbsp;        List&lt;TableColumn&lt;BibEntryTableViewModel, ?&gt;&gt; commonColumns = commonColumns();</b>
+&nbsp;
+&nbsp;        // Populate the menu with currently used fields
+<b class="nc">&nbsp;        for (TableColumn&lt;BibEntryTableViewModel, ?&gt; column : mainTable.getColumns()) {</b>
+<b class="nc">&nbsp;            if (((MainTableColumn&lt;?&gt;) column).getModel().getType() == MainTableColumnModel.Type.MATCH_CATEGORY) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;            // Append only if the column has not already been added (a common column)
+<b class="nc">&nbsp;            RightClickMenuItem itemToAdd = createMenuItem(column, true);</b>
+<b class="nc">&nbsp;            this.getItems().add(itemToAdd);</b>
+&nbsp;
+&nbsp;            // Remove from remaining common columns pool
+<b class="nc">&nbsp;            MainTableColumn&lt;?&gt; searchCol = (MainTableColumn&lt;?&gt;) column;</b>
+<b class="nc">&nbsp;            if (isACommonColumn(searchCol)) {</b>
+<b class="nc">&nbsp;                commonColumns.removeIf(tableCol -&gt; ((MainTableColumn&lt;?&gt;) tableCol).getModel().equals(searchCol.getModel()));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!commonColumns.isEmpty()) {</b>
+<b class="nc">&nbsp;            this.getItems().add(new SeparatorMenuItem());</b>
+&nbsp;
+&nbsp;            // Append to the menu the current remaining columns in the common columns.
+<b class="nc">&nbsp;            for (TableColumn&lt;BibEntryTableViewModel, ?&gt; tableColumn : commonColumns) {</b>
+<b class="nc">&nbsp;                RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);</b>
+<b class="nc">&nbsp;                this.getItems().add(itemToAdd);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.getItems().add(new SeparatorMenuItem());</b>
+<b class="nc">&nbsp;        ActionFactory actionfactory = new ActionFactory();</b>
+<b class="nc">&nbsp;        MenuItem showMoreItem = actionfactory.createMenuItem(</b>
+<b class="nc">&nbsp;                StandardActions.SHOW_PREFS.withText(Localization.lang(&quot;More options...&quot;)),</b>
+&nbsp;                new ShowPreferencesAction(tabContainer, TableTab.class, dialogService));
+<b class="nc">&nbsp;        this.getItems().add(showMoreItem);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an item for the menu constructed with the name/visibility of the table column.
+&nbsp;     */
+&nbsp;    private RightClickMenuItem createMenuItem(TableColumn&lt;BibEntryTableViewModel, ?&gt; column, boolean isDisplaying) {
+&nbsp;        // Gets display name and constructs Radio Menu Item.
+<b class="nc">&nbsp;        MainTableColumn&lt;?&gt; tableColumn = (MainTableColumn&lt;?&gt;) column;</b>
+<b class="nc">&nbsp;        String displayName = tableColumn.getDisplayName();</b>
+<b class="nc">&nbsp;        return new RightClickMenuItem(displayName, tableColumn, isDisplaying);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the current position of the inputted column in the table (index).
+&nbsp;     */
+&nbsp;    private int obtainIndexOfColumn(MainTableColumn&lt;?&gt; searchColumn) {
+<b class="nc">&nbsp;        ObservableList&lt;TableColumn&lt;BibEntryTableViewModel, ?&gt;&gt; columns = mainTable.getColumns();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; columns.size(); i++) {</b>
+<b class="nc">&nbsp;            TableColumn&lt;BibEntryTableViewModel, ?&gt; column = columns.get(i);</b>
+<b class="nc">&nbsp;            MainTableColumnModel model = ((MainTableColumn&lt;?&gt;) column).getModel();</b>
+<b class="nc">&nbsp;            if (model.equals(searchColumn.getModel())) {</b>
+<b class="nc">&nbsp;                return i;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return OUT_OF_BOUNDS;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds the column into the MainTable for display.
+&nbsp;     */
+&nbsp;    private void addColumn(MainTableColumn&lt;?&gt; tableColumn, int index) {
+<b class="nc">&nbsp;        if ((index &lt;= OUT_OF_BOUNDS) || (index &gt;= mainTable.getColumns().size())) {</b>
+<b class="nc">&nbsp;            mainTable.getColumns().add(tableColumn);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            mainTable.getColumns().add(index, tableColumn);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the column from the MainTable to remove visibility.
+&nbsp;     */
+&nbsp;    private void removeColumn(MainTableColumn&lt;?&gt; tableColumn) {
+<b class="nc">&nbsp;        mainTable.getColumns().removeIf(tableCol -&gt; ((MainTableColumn&lt;?&gt;) tableCol).getModel().equals(tableColumn.getModel()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if a column is one of the commonly used columns.
+&nbsp;     */
+&nbsp;    private boolean isACommonColumn(MainTableColumn&lt;?&gt; tableColumn) {
+<b class="nc">&nbsp;        return isColumnInList(tableColumn, commonColumns());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines if a list of TableColumns contains the searched column.
+&nbsp;     */
+&nbsp;    private boolean isColumnInList(MainTableColumn&lt;?&gt; searchColumn, List&lt;TableColumn&lt;BibEntryTableViewModel, ?&gt;&gt; tableColumns) {
+<b class="nc">&nbsp;        for (TableColumn&lt;BibEntryTableViewModel, ?&gt; column : tableColumns) {</b>
+<b class="nc">&nbsp;            MainTableColumnModel model = ((MainTableColumn&lt;?&gt;) column).getModel();</b>
+<b class="nc">&nbsp;            if (model.equals(searchColumn.getModel())) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the list of the &quot;commonly used&quot; columns (currently based on the default preferences).
+&nbsp;     */
+&nbsp;    private List&lt;TableColumn&lt;BibEntryTableViewModel, ?&gt;&gt; commonColumns() {
+&nbsp;        // Qualifier strings
+<b class="nc">&nbsp;        String entryTypeQualifier = &quot;entrytype&quot;;</b>
+<b class="nc">&nbsp;        String authorEditQualifier = &quot;author/editor&quot;;</b>
+<b class="nc">&nbsp;        String titleQualifier = &quot;title&quot;;</b>
+<b class="nc">&nbsp;        String yearQualifier = &quot;year&quot;;</b>
+<b class="nc">&nbsp;        String journalBookQualifier = &quot;journal/booktitle&quot;;</b>
+<b class="nc">&nbsp;        String rankQualifier = &quot;ranking&quot;;</b>
+<b class="nc">&nbsp;        String readStatusQualifier = &quot;readstatus&quot;;</b>
+<b class="nc">&nbsp;        String priorityQualifier = &quot;priority&quot;;</b>
+&nbsp;
+&nbsp;        // Create the MainTableColumn Models from qualifiers + types.
+<b class="nc">&nbsp;        List&lt;MainTableColumnModel&gt; commonColumns = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUP_ICONS));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, entryTypeQualifier));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, authorEditQualifier));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, titleQualifier));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, yearQualifier));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, journalBookQualifier));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, rankQualifier));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, readStatusQualifier));</b>
+<b class="nc">&nbsp;        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, priorityQualifier));</b>
+&nbsp;
+&nbsp;        // Create the Table Columns from the models using factory methods.
+<b class="nc">&nbsp;        List&lt;TableColumn&lt;BibEntryTableViewModel, ?&gt;&gt; commonTableColumns = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (MainTableColumnModel columnModel : commonColumns) {</b>
+<b class="nc">&nbsp;            TableColumn&lt;BibEntryTableViewModel, ?&gt; tableColumn = factory.createColumn(columnModel);</b>
+<b class="nc">&nbsp;            commonTableColumns.add(tableColumn);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return commonTableColumns;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * RightClickMenuItem: RadioMenuItem holding position in MainTable and its visibility.
+&nbsp;     */
+&nbsp;    private class RightClickMenuItem extends RadioMenuItem {
+&nbsp;        private int index;
+&nbsp;        private boolean visibleInTable;
+&nbsp;
+&nbsp;        RightClickMenuItem(String displayName, MainTableColumn&lt;?&gt; column, boolean isVisible) {
+<b class="nc">&nbsp;            super(displayName);</b>
+<b class="nc">&nbsp;            setVisibleInTable(isVisible);</b>
+&nbsp;            // Flag item as selected if the item is already in the main table.
+<b class="nc">&nbsp;            this.setSelected(isVisible);</b>
+&nbsp;
+<b class="nc">&nbsp;            setIndex(OUT_OF_BOUNDS);</b>
+&nbsp;
+&nbsp;            // Set action to toggle visibility from main table when item is clicked
+<b class="nc">&nbsp;            this.setOnAction(event -&gt; {</b>
+<b class="nc">&nbsp;                if (isVisibleInTable()) {</b>
+<b class="nc">&nbsp;                    setIndex(obtainIndexOfColumn(column));</b>
+<b class="nc">&nbsp;                    removeColumn(column);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    addColumn(column, this.index);</b>
+<b class="nc">&nbsp;                    setIndex(obtainIndexOfColumn(column));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                setVisibleInTable(!this.visibleInTable);</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+&nbsp;        public void setIndex(int index) {
+<b class="nc">&nbsp;            this.index = index;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void setVisibleInTable(boolean visibleInTable) {
+<b class="nc">&nbsp;            this.visibleInTable = visibleInTable;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean isVisibleInTable() {
+<b class="nc">&nbsp;            return visibleInTable;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StudyFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.crawler</a>
+</div>
+
+<h1>Coverage Summary for Class: StudyFetcher (org.jabref.logic.crawler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StudyFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.crawler;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.PagedSearchBasedFetcher;
+&nbsp;import org.jabref.logic.importer.SearchBasedFetcher;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.study.FetchResult;
+&nbsp;import org.jabref.model.study.QueryResult;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Delegates the search of the provided set of targeted E-Libraries with the provided queries to the E-Library specific fetchers,
+&nbsp; * and aggregates the results returned by the fetchers by query and E-Library.
+&nbsp; */
+&nbsp;class StudyFetcher {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(StudyFetcher.class);</b>
+&nbsp;    private static final int MAX_AMOUNT_OF_RESULTS_PER_FETCHER = 100;
+&nbsp;
+&nbsp;    private final List&lt;SearchBasedFetcher&gt; activeFetchers;
+&nbsp;    private final List&lt;String&gt; searchQueries;
+&nbsp;
+<b class="nc">&nbsp;    StudyFetcher(List&lt;SearchBasedFetcher&gt; activeFetchers, List&lt;String&gt; searchQueries) throws IllegalArgumentException {</b>
+<b class="nc">&nbsp;        this.searchQueries = searchQueries;</b>
+<b class="nc">&nbsp;        this.activeFetchers = activeFetchers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Each Map Entry contains the results for one search term for all libraries.
+&nbsp;     * Each entry of the internal map contains the results for a given library.
+&nbsp;     * If any library API is not available, its corresponding entry is missing from the internal map.
+&nbsp;     */
+&nbsp;    public List&lt;QueryResult&gt; crawl() {
+<b class="nc">&nbsp;        return searchQueries.parallelStream()</b>
+<b class="nc">&nbsp;                            .map(this::getQueryResult)</b>
+<b class="nc">&nbsp;                            .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private QueryResult getQueryResult(String searchQuery) {
+<b class="nc">&nbsp;        return new QueryResult(searchQuery, performSearchOnQuery(searchQuery));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Queries all catalogs on the given searchQuery.
+&nbsp;     *
+&nbsp;     * @param searchQuery The query the search is performed for.
+&nbsp;     * @return Mapping of each fetcher by name and all their retrieved publications as a BibDatabase
+&nbsp;     */
+&nbsp;    private List&lt;FetchResult&gt; performSearchOnQuery(String searchQuery) {
+<b class="nc">&nbsp;        return activeFetchers.parallelStream()</b>
+<b class="nc">&nbsp;                             .map(fetcher -&gt; performSearchOnQueryForFetcher(searchQuery, fetcher))</b>
+<b class="nc">&nbsp;                             .filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;                             .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FetchResult performSearchOnQueryForFetcher(String searchQuery, SearchBasedFetcher fetcher) {
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; fetchResult = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {</b>
+<b class="nc">&nbsp;                int pages = (int) Math.ceil(((double) MAX_AMOUNT_OF_RESULTS_PER_FETCHER) / basedFetcher.getPageSize());</b>
+<b class="nc">&nbsp;                for (int page = 0; page &lt; pages; page++) {</b>
+<b class="nc">&nbsp;                    fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery, page).getContent());</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                fetchResult = fetcher.performSearch(searchQuery);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));</b>
+&nbsp;        } catch (FetcherException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;{} API request failed&quot;, fetcher.getName(), e);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

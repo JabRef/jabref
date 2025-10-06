@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationKeyBasedFileFinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationKeyBasedFileFinder (org.jabref.logic.util.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationKeyBasedFileFinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.io;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.file.FileVisitOption;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.attribute.BasicFileAttributes;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.function.BiPredicate;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;class CitationKeyBasedFileFinder implements FileFinder {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyBasedFileFinder.class);</b>
+&nbsp;
+&nbsp;    private final boolean exactKeyOnly;
+&nbsp;
+<b class="nc">&nbsp;    CitationKeyBasedFileFinder(boolean exactKeyOnly) {</b>
+<b class="nc">&nbsp;        this.exactKeyOnly = exactKeyOnly;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;Path&gt; findAssociatedFiles(BibEntry entry, List&lt;Path&gt; directories, List&lt;String&gt; extensions) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(directories);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; citeKeyOptional = entry.getCitationKey();</b>
+<b class="nc">&nbsp;        if (StringUtil.isBlank(citeKeyOptional)) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;No citation key found in entry {}&quot;, entry);</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String citeKey = citeKeyOptional.get();</b>
+&nbsp;
+&nbsp;        Function&lt;Path, Boolean&gt; filteringFunction;
+&nbsp;
+<b class="nc">&nbsp;        if (exactKeyOnly) {</b>
+&nbsp;            // LOGGER.debug(&quot;Found exact match for key {} in file {}&quot;, citeKey, file);
+<b class="nc">&nbsp;            filteringFunction = (Path p) -&gt; FileUtil.getBaseName(p.getFileName().toString()).equals(citeKey);</b>
+&nbsp;        } else {
+&nbsp;            // LOGGER.debug(&quot;Found non-exact match for key {} in file {}&quot;, citeKey, file);
+<b class="nc">&nbsp;            filteringFunction = (Path p) -&gt; matches(p.getFileName().toString(), citeKey);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SortedSet&lt;Path&gt; result = findFilesByExtension(directories, extensions, filteringFunction);</b>
+&nbsp;
+<b class="nc">&nbsp;        return result.stream().toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean matches(String filename, String citeKey) {
+<b class="nc">&nbsp;        boolean startsWithKey = filename.startsWith(citeKey) || filename.startsWith(FileNameCleaner.cleanFileName(citeKey));</b>
+<b class="nc">&nbsp;        if (startsWithKey) {</b>
+&nbsp;            // The file name starts with the key, that&#39;s already a good start
+&nbsp;            // However, we do not want to match &quot;JabRefa&quot; for &quot;JabRef&quot; since this is probably a file belonging to another entry published in the same time / same name
+<b class="nc">&nbsp;            char charAfterKey = filename.charAt(citeKey.length());</b>
+<b class="nc">&nbsp;            return !CitationKeyGenerator.APPENDIX_CHARACTERS.contains(Character.toString(charAfterKey));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a list of all files in the given directories which have one of the given extension.
+&nbsp;     */
+&nbsp;    private SortedSet&lt;Path&gt; findFilesByExtension(List&lt;Path&gt; directories, Collection&lt;String&gt; extensions, Function&lt;Path, Boolean&gt; filteringFunction) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(extensions, &quot;Extensions must not be null!&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        BiPredicate&lt;Path, BasicFileAttributes&gt; isFileWithCorrectExtension = (path, attributes) -&gt; !Files.isDirectory(path)</b>
+<b class="nc">&nbsp;                &amp;&amp; extensions.contains(FileUtil.getFileExtension(path).orElse(&quot;&quot;)) &amp;&amp; filteringFunction.apply(path);</b>
+&nbsp;
+<b class="nc">&nbsp;        SortedSet&lt;Path&gt; result = new TreeSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Path directory : directories) {</b>
+<b class="nc">&nbsp;            if (Files.exists(directory)) {</b>
+<b class="nc">&nbsp;                try (Stream&lt;Path&gt; pathStream = Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension, FileVisitOption.FOLLOW_LINKS)) {</b>
+<b class="nc">&nbsp;                    result.addAll(pathStream.collect(Collectors.toSet()));</b>
+&nbsp;                } catch (UncheckedIOException e) {
+<b class="nc">&nbsp;                    throw new IOException(&quot;Problem in finding files&quot;, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

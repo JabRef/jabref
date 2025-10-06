@@ -1,0 +1,159 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DOICheck</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: DOICheck (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DOICheck</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.logic.preferences.DOIPreferences;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;
+&nbsp;/**
+&nbsp; * Used to fix [ 1588028 ] export HTML table DOI URL.
+&nbsp; * &lt;p&gt;
+&nbsp; * Will prepend &quot;&lt;a href=&quot;http://doi.org/&quot;&gt;http://doi.org/&lt;/a&gt;&quot; or the DOI url with a custom base URL defined in the {@link DOIPreferences}
+&nbsp; * if only DOI and not an URL is given.
+&nbsp; */
+&nbsp;public class DOICheck implements LayoutFormatter {
+&nbsp;
+&nbsp;    private final DOIPreferences doiPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public DOICheck(DOIPreferences doiPreferences) {</b>
+<b class="nc">&nbsp;        this.doiPreferences = doiPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String fieldText) {
+<b class="nc">&nbsp;        if (fieldText == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String result = fieldText;</b>
+<b class="nc">&nbsp;        if (result.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;            result = result.substring(1);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (doiPreferences.isUseCustom()) {</b>
+<b class="nc">&nbsp;            URI base = URLUtil.createUri(doiPreferences.getDefaultBaseURI());</b>
+<b class="nc">&nbsp;            return DOI.parse(result).flatMap(doi -&gt; doi.getExternalURIFromBase(base))</b>
+<b class="nc">&nbsp;                      .map(URI::toASCIIString)</b>
+<b class="nc">&nbsp;                      .orElse(result);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return DOI.parse(result).map(DOI::getURIAsASCIIString).orElse(result);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

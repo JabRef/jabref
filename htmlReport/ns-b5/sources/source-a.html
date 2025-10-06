@@ -1,0 +1,157 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JabRefLocaleProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citationstyle</a>
+</div>
+
+<h1>Coverage Summary for Class: JabRefLocaleProvider (org.jabref.logic.citationstyle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JabRefLocaleProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citationstyle;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import de.undercouch.citeproc.LocaleProvider;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link LocaleProvider} that loads locales from a directory in the current module.
+&nbsp; * &lt;p&gt;
+&nbsp; * This implementation is only a slight adaption of {@link de.undercouch.citeproc.DefaultLocaleProvider}.
+&nbsp; */
+<b class="nc">&nbsp;public class JabRefLocaleProvider implements LocaleProvider {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefLocaleProvider.class);</b>
+&nbsp;
+&nbsp;    private static final String LOCALES_ROOT = &quot;/csl-locales&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;String, String&gt; locales = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String retrieveLocale(String lang) {
+<b class="nc">&nbsp;        return locales.computeIfAbsent(lang, locale -&gt; {</b>
+<b class="nc">&nbsp;            try (InputStream inputStream = getClass().getResourceAsStream(LOCALES_ROOT + &quot;/locales-&quot; + locale + &quot;.xml&quot;)) {</b>
+<b class="nc">&nbsp;                if (inputStream == null) {</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Unable to load locale &quot; + locale);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;failed to read locale {}&quot;, locale, e);</b>
+<b class="nc">&nbsp;                throw new UncheckedIOException(&quot;failed to read locale &quot; + locale, e);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

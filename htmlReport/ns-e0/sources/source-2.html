@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OpenOfficeFileSearch</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenOfficeFileSearch (org.jabref.logic.openoffice)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenOfficeFileSearch</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.attribute.BasicFileAttributes;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.function.BiPredicate;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class OpenOfficeFileSearch {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeFileSearch.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Detects existing installation of OpenOffice and LibreOffice.
+&nbsp;     *
+&nbsp;     * @return a list of detected installation paths
+&nbsp;     */
+&nbsp;    public static List&lt;Path&gt; detectInstallations() {
+<b class="nc">&nbsp;        if (OS.WINDOWS) {</b>
+<b class="nc">&nbsp;            List&lt;Path&gt; programDirs = findWindowsOpenOfficeDirs();</b>
+<b class="nc">&nbsp;            return programDirs.stream().filter(dir -&gt; FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, dir).isPresent()).toList();</b>
+<b class="nc">&nbsp;        } else if (OS.OS_X) {</b>
+<b class="nc">&nbsp;            List&lt;Path&gt; programDirs = findOSXOpenOfficeDirs();</b>
+<b class="nc">&nbsp;            return programDirs.stream().filter(dir -&gt; FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, dir).isPresent()).toList();</b>
+<b class="nc">&nbsp;        } else if (OS.LINUX) {</b>
+<b class="nc">&nbsp;            List&lt;Path&gt; programDirs = findLinuxOpenOfficeDirs();</b>
+<b class="nc">&nbsp;            return programDirs.stream().filter(dir -&gt; FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, dir).isPresent()).toList();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;Path&gt; findOpenOfficeDirectories(List&lt;Path&gt; programDirectories) {
+<b class="nc">&nbsp;        BiPredicate&lt;Path, BasicFileAttributes&gt; filePredicate = (path, attr) -&gt;</b>
+<b class="nc">&nbsp;                attr.isDirectory() &amp;&amp; (path.toString().toLowerCase(Locale.ROOT).contains(&quot;openoffice&quot;)</b>
+<b class="nc">&nbsp;                        || path.toString().toLowerCase(Locale.ROOT).contains(&quot;libreoffice&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        return programDirectories.stream()</b>
+<b class="nc">&nbsp;                                 .flatMap(dirs -&gt; {</b>
+&nbsp;                                     try {
+<b class="nc">&nbsp;                                         return Files.find(dirs, 1, filePredicate);</b>
+&nbsp;                                     } catch (IOException e) {
+<b class="nc">&nbsp;                                         LOGGER.error(&quot;Problem searching for openoffice/libreoffice install directory&quot;, e);</b>
+<b class="nc">&nbsp;                                         return Stream.empty();</b>
+&nbsp;                                     }
+&nbsp;                                 })
+<b class="nc">&nbsp;                                 .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;Path&gt; findWindowsOpenOfficeDirs() {
+<b class="nc">&nbsp;        List&lt;Path&gt; sourceList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // 64-bit program directory
+<b class="nc">&nbsp;        String progFiles = System.getenv(&quot;ProgramFiles&quot;);</b>
+<b class="nc">&nbsp;        if (progFiles != null) {</b>
+<b class="nc">&nbsp;            sourceList.add(Path.of(progFiles));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // 32-bit program directory
+<b class="nc">&nbsp;        progFiles = System.getenv(&quot;ProgramFiles(x86)&quot;);</b>
+<b class="nc">&nbsp;        if (progFiles != null) {</b>
+<b class="nc">&nbsp;            sourceList.add(Path.of(progFiles));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return findOpenOfficeDirectories(sourceList)</b>
+<b class="nc">&nbsp;                .stream()</b>
+&nbsp;                // On Windows, the executable is nested in subdirectory &quot;program&quot;
+<b class="nc">&nbsp;                .map(dir -&gt; dir.resolve(&quot;program&quot;))</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;Path&gt; findOSXOpenOfficeDirs() {
+<b class="nc">&nbsp;        List&lt;Path&gt; sourceList = List.of(Path.of(&quot;/Applications&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        return findOpenOfficeDirectories(sourceList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;Path&gt; findLinuxOpenOfficeDirs() {
+<b class="nc">&nbsp;        List&lt;Path&gt; sourceList = Arrays.asList(Path.of(&quot;/usr/lib&quot;), Path.of(&quot;/usr/lib64&quot;), Path.of(&quot;/opt&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        return findOpenOfficeDirectories(sourceList);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

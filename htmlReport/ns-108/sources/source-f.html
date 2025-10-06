@@ -1,0 +1,322 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StandardField</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.field</a>
+</div>
+
+<h1>Coverage Summary for Class: StandardField (org.jabref.model.entry.field)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StandardField</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (8/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.7%
+  </span>
+  <span class="absValue">
+    (148/150)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.field;
+&nbsp;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/// Standard BibTeX and BibLaTeX fields, as well as &quot;normal&quot; JabRef specific fields.
+&nbsp;/// See `org.jabref.gui.fieldeditors.FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)` for a description of each field.
+<b class="fc">&nbsp;public enum StandardField implements Field {</b>
+<b class="fc">&nbsp;    ABSTRACT(&quot;abstract&quot;, FieldProperty.MULTILINE_TEXT),</b>
+<b class="fc">&nbsp;    ADDENDUM(&quot;addendum&quot;),</b>
+<b class="fc">&nbsp;    ADDRESS(&quot;address&quot;),</b>
+<b class="fc">&nbsp;    AFTERWORD(&quot;afterword&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    ANNOTE(&quot;annote&quot;),</b>
+<b class="fc">&nbsp;    ANNOTATION(&quot;annotation&quot;),</b>
+<b class="fc">&nbsp;    ANNOTATOR(&quot;annotator&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    ARCHIVEPREFIX(&quot;archiveprefix&quot;),</b>
+<b class="fc">&nbsp;    ASSIGNEE(&quot;assignee&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    AUTHOR(&quot;author&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    BOOKAUTHOR(&quot;bookauthor&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    BOOKPAGINATION(&quot;bookpagination&quot;, FieldProperty.PAGINATION),</b>
+<b class="fc">&nbsp;    BOOKSUBTITLE(&quot;booksubtitle&quot;, FieldProperty.BOOK_NAME),</b>
+<b class="fc">&nbsp;    BOOKTITLE(&quot;booktitle&quot;, FieldProperty.BOOK_NAME),</b>
+<b class="fc">&nbsp;    BOOKTITLEADDON(&quot;booktitleaddon&quot;),</b>
+<b class="fc">&nbsp;    CHAPTER(&quot;chapter&quot;),</b>
+<b class="fc">&nbsp;    COMMENTATOR(&quot;commentator&quot;, FieldProperty.PERSON_NAMES),</b>
+&nbsp;    // Comments of users are handled at {@link org.jabref.model.entry.field.UserSpecificCommentField}
+<b class="fc">&nbsp;    COMMENT(&quot;comment&quot;, FieldProperty.MULTILINE_TEXT, FieldProperty.MARKDOWN),</b>
+<b class="fc">&nbsp;    CROSSREF(&quot;crossref&quot;, FieldProperty.SINGLE_ENTRY_LINK),</b>
+<b class="fc">&nbsp;    CITES(&quot;cites&quot;, FieldProperty.MULTIPLE_ENTRY_LINK),</b>
+<b class="fc">&nbsp;    DATE(&quot;date&quot;, FieldProperty.DATE),</b>
+<b class="fc">&nbsp;    DAY(&quot;day&quot;),</b>
+<b class="fc">&nbsp;    DAYFILED(&quot;dayfiled&quot;),</b>
+<b class="fc">&nbsp;    DOI(&quot;doi&quot;, &quot;DOI&quot;, FieldProperty.VERBATIM, FieldProperty.IDENTIFIER),</b>
+<b class="fc">&nbsp;    EDITION(&quot;edition&quot;, FieldProperty.NUMERIC),</b>
+<b class="fc">&nbsp;    EDITOR(&quot;editor&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    EDITORA(&quot;editora&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    EDITORB(&quot;editorb&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    EDITORC(&quot;editorc&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    EDITORTYPE(&quot;editortype&quot;, FieldProperty.EDITOR_TYPE),</b>
+<b class="fc">&nbsp;    EDITORATYPE(&quot;editoratype&quot;, FieldProperty.EDITOR_TYPE),</b>
+<b class="fc">&nbsp;    EDITORBTYPE(&quot;editorbtype&quot;, FieldProperty.EDITOR_TYPE),</b>
+<b class="fc">&nbsp;    EDITORCTYPE(&quot;editorctype&quot;, FieldProperty.EDITOR_TYPE),</b>
+<b class="fc">&nbsp;    EID(&quot;eid&quot;),</b>
+<b class="fc">&nbsp;    ENTRYSET(&quot;entryset&quot;, FieldProperty.MULTIPLE_ENTRY_LINK),</b>
+&nbsp;
+&nbsp;    // For the syntax of a &quot;combined&quot; field, see {@link org.jabref.logic.cleanup.EprintCleanupTest.cleanupCompleteEntry} for examples
+<b class="fc">&nbsp;    EPRINT(&quot;eprint&quot;, FieldProperty.VERBATIM, FieldProperty.IDENTIFIER),</b>
+<b class="fc">&nbsp;    EPRINTCLASS(&quot;eprintclass&quot;),</b>
+<b class="fc">&nbsp;    EPRINTTYPE(&quot;eprinttype&quot;),</b>
+&nbsp;
+<b class="fc">&nbsp;    EVENTDATE(&quot;eventdate&quot;, FieldProperty.DATE),</b>
+<b class="fc">&nbsp;    EVENTTITLE(&quot;eventtitle&quot;),</b>
+<b class="fc">&nbsp;    EVENTTITLEADDON(&quot;eventtitleaddon&quot;),</b>
+<b class="fc">&nbsp;    FILE(&quot;file&quot;, FieldProperty.VERBATIM),</b>
+<b class="fc">&nbsp;    FOREWORD(&quot;foreword&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    FOLDER(&quot;folder&quot;),</b>
+<b class="fc">&nbsp;    GENDER(&quot;gender&quot;),</b>
+<b class="fc">&nbsp;    HOLDER(&quot;holder&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    HOWPUBLISHED(&quot;howpublished&quot;),</b>
+<b class="fc">&nbsp;    IDS(&quot;ids&quot;, FieldProperty.MULTIPLE_ENTRY_LINK),</b>
+<b class="fc">&nbsp;    INSTITUTION(&quot;institution&quot;),</b>
+<b class="fc">&nbsp;    INTRODUCTION(&quot;introduction&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    ISBN(&quot;isbn&quot;, &quot;ISBN&quot;, FieldProperty.VERBATIM),</b>
+<b class="fc">&nbsp;    ISRN(&quot;isrn&quot;, &quot;ISRN&quot;, FieldProperty.VERBATIM),</b>
+<b class="fc">&nbsp;    ISSN(&quot;issn&quot;, &quot;ISSN&quot;, FieldProperty.VERBATIM),</b>
+<b class="fc">&nbsp;    ISSUE(&quot;issue&quot;),</b>
+<b class="fc">&nbsp;    ISSUETITLE(&quot;issuetitle&quot;),</b>
+<b class="fc">&nbsp;    ISSUESUBTITLE(&quot;issuesubtitle&quot;),</b>
+<b class="fc">&nbsp;    JOURNAL(&quot;journal&quot;, FieldProperty.JOURNAL_NAME),</b>
+<b class="fc">&nbsp;    JOURNALSUBTITLE(&quot;journalsubtitle&quot;, FieldProperty.JOURNAL_NAME),</b>
+<b class="fc">&nbsp;    JOURNALTITLE(&quot;journaltitle&quot;, FieldProperty.JOURNAL_NAME),</b>
+<b class="fc">&nbsp;    KEY(&quot;key&quot;),</b>
+<b class="fc">&nbsp;    KEYWORDS(&quot;keywords&quot;),</b>
+<b class="fc">&nbsp;    LANGUAGE(&quot;language&quot;, FieldProperty.LANGUAGE),</b>
+<b class="fc">&nbsp;    LANGUAGEID(&quot;langid&quot;, FieldProperty.LANGUAGE),</b>
+<b class="fc">&nbsp;    LABEL(&quot;label&quot;),</b>
+<b class="fc">&nbsp;    LIBRARY(&quot;library&quot;),</b>
+<b class="fc">&nbsp;    LOCATION(&quot;location&quot;),</b>
+<b class="fc">&nbsp;    MAINSUBTITLE(&quot;mainsubtitle&quot;, FieldProperty.BOOK_NAME),</b>
+<b class="fc">&nbsp;    MAINTITLE(&quot;maintitle&quot;, FieldProperty.BOOK_NAME),</b>
+<b class="fc">&nbsp;    MAINTITLEADDON(&quot;maintitleaddon&quot;),</b>
+<b class="fc">&nbsp;    MONTH(&quot;month&quot;, FieldProperty.MONTH),</b>
+<b class="fc">&nbsp;    MONTHFILED(&quot;monthfiled&quot;, FieldProperty.MONTH),</b>
+<b class="fc">&nbsp;    NAMEADDON(&quot;nameaddon&quot;),</b>
+<b class="fc">&nbsp;    NATIONALITY(&quot;nationality&quot;),</b>
+<b class="fc">&nbsp;    NOTE(&quot;note&quot;),</b>
+<b class="fc">&nbsp;    NUMBER(&quot;number&quot;, FieldProperty.NUMERIC),</b>
+<b class="fc">&nbsp;    ORGANIZATION(&quot;organization&quot;),</b>
+<b class="fc">&nbsp;    ORIGDATE(&quot;origdate&quot;, FieldProperty.DATE),</b>
+<b class="fc">&nbsp;    ORIGLANGUAGE(&quot;origlanguage&quot;, FieldProperty.LANGUAGE),</b>
+<b class="fc">&nbsp;    PAGES(&quot;pages&quot;),</b>
+<b class="fc">&nbsp;    PAGETOTAL(&quot;pagetotal&quot;, FieldProperty.NUMERIC),</b>
+<b class="fc">&nbsp;    PAGINATION(&quot;pagination&quot;, FieldProperty.PAGINATION),</b>
+<b class="fc">&nbsp;    PART(&quot;part&quot;),</b>
+<b class="fc">&nbsp;    PDF(&quot;pdf&quot;, &quot;PDF&quot;),</b>
+<b class="fc">&nbsp;    PMID(&quot;pmid&quot;, &quot;PMID&quot;, FieldProperty.NUMERIC, FieldProperty.IDENTIFIER),</b>
+<b class="fc">&nbsp;    PS(&quot;ps&quot;, &quot;PS&quot;),</b>
+<b class="fc">&nbsp;    PUBLISHER(&quot;publisher&quot;),</b>
+<b class="fc">&nbsp;    PUBSTATE(&quot;pubstate&quot;),</b>
+<b class="fc">&nbsp;    PRIMARYCLASS(&quot;primaryclass&quot;),</b>
+<b class="fc">&nbsp;    RELATED(&quot;related&quot;, FieldProperty.MULTIPLE_ENTRY_LINK),</b>
+<b class="fc">&nbsp;    REPORTNO(&quot;reportno&quot;),</b>
+<b class="fc">&nbsp;    REVIEW(&quot;review&quot;, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN),</b>
+<b class="fc">&nbsp;    REVISION(&quot;revision&quot;),</b>
+<b class="fc">&nbsp;    SCHOOL(&quot;school&quot;),</b>
+<b class="fc">&nbsp;    SERIES(&quot;series&quot;),</b>
+<b class="fc">&nbsp;    SHORTAUTHOR(&quot;shortauthor&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    SHORTEDITOR(&quot;shorteditor&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    SHORTTITLE(&quot;shorttitle&quot;),</b>
+<b class="fc">&nbsp;    SORTKEY(&quot;sortkey&quot;),</b>
+<b class="fc">&nbsp;    SORTNAME(&quot;sortname&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    SUBTITLE(&quot;subtitle&quot;),</b>
+<b class="fc">&nbsp;    TITLE(&quot;title&quot;),</b>
+<b class="fc">&nbsp;    TITLEADDON(&quot;titleaddon&quot;),</b>
+<b class="fc">&nbsp;    TRANSLATOR(&quot;translator&quot;, FieldProperty.PERSON_NAMES),</b>
+<b class="fc">&nbsp;    TYPE(&quot;type&quot;),</b>
+<b class="fc">&nbsp;    URI(&quot;uri&quot;, &quot;URI&quot;, FieldProperty.EXTERNAL, FieldProperty.VERBATIM),</b>
+<b class="fc">&nbsp;    URL(&quot;url&quot;, &quot;URL&quot;, FieldProperty.EXTERNAL, FieldProperty.VERBATIM),</b>
+<b class="fc">&nbsp;    URLDATE(&quot;urldate&quot;, FieldProperty.DATE),</b>
+<b class="fc">&nbsp;    VENUE(&quot;venue&quot;),</b>
+<b class="fc">&nbsp;    VERSION(&quot;version&quot;),</b>
+<b class="fc">&nbsp;    VOLUME(&quot;volume&quot;, FieldProperty.NUMERIC),</b>
+<b class="fc">&nbsp;    VOLUMES(&quot;volumes&quot;, FieldProperty.NUMERIC),</b>
+<b class="fc">&nbsp;    YEAR(&quot;year&quot;, FieldProperty.NUMERIC),</b>
+<b class="fc">&nbsp;    YEARDIVISION(&quot;yeardivision&quot;, FieldProperty.YEARDIVISION),</b>
+<b class="fc">&nbsp;    YEARFILED(&quot;yearfiled&quot;),</b>
+<b class="fc">&nbsp;    MR_NUMBER(&quot;mrnumber&quot;),</b>
+<b class="fc">&nbsp;    ZBL_NUMBER(&quot;zbl&quot;), // needed for fetcher</b>
+<b class="fc">&nbsp;    XDATA(&quot;xdata&quot;, FieldProperty.MULTIPLE_ENTRY_LINK),</b>
+<b class="fc">&nbsp;    XREF(&quot;xref&quot;, FieldProperty.SINGLE_ENTRY_LINK),</b>
+&nbsp;
+&nbsp;    // region: JabRef-specific fields
+&nbsp;
+<b class="fc">&nbsp;    CITATIONCOUNT(&quot;citationcount&quot;),</b>
+<b class="fc">&nbsp;    GROUPS(&quot;groups&quot;),</b>
+<b class="fc">&nbsp;    ICORERANKING(&quot;icore&quot;),</b>
+<b class="fc">&nbsp;    OWNER(&quot;owner&quot;),</b>
+&nbsp;
+&nbsp;    // Timestamp-realted
+<b class="fc">&nbsp;    CREATIONDATE(&quot;creationdate&quot;, FieldProperty.DATE),</b>
+<b class="fc">&nbsp;    MODIFICATIONDATE(&quot;modificationdate&quot;, FieldProperty.DATE),</b>
+<b class="fc">&nbsp;    TIMESTAMP(&quot;timestamp&quot;, FieldProperty.DATE);</b>
+&nbsp;
+&nbsp;    // endregion
+&nbsp;
+<b class="fc">&nbsp;    public static final Set&lt;Field&gt; AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Map&lt;String, StandardField&gt; NAME_TO_STANDARD_FIELD = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private final String displayName;
+&nbsp;    private final EnumSet&lt;FieldProperty&gt; properties;
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        for (StandardField field : StandardField.values()) {</b>
+<b class="fc">&nbsp;            NAME_TO_STANDARD_FIELD.put(field.getName().toLowerCase(Locale.ROOT), field);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    StandardField(String name) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.displayName = null;</b>
+<b class="fc">&nbsp;        this.properties = EnumSet.noneOf(FieldProperty.class);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    StandardField(String name, String displayName) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.displayName = displayName;</b>
+<b class="fc">&nbsp;        this.properties = EnumSet.noneOf(FieldProperty.class);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    StandardField(String name, String displayName, FieldProperty first, FieldProperty... rest) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.displayName = displayName;</b>
+<b class="fc">&nbsp;        this.properties = EnumSet.of(first, rest);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    StandardField(String name, FieldProperty first, FieldProperty... rest) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.displayName = null;</b>
+<b class="fc">&nbsp;        this.properties = EnumSet.of(first, rest);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;StandardField&gt; fromName(String name) {
+<b class="fc">&nbsp;        return Optional.ofNullable(NAME_TO_STANDARD_FIELD.get(name.toLowerCase(Locale.ROOT)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public EnumSet&lt;FieldProperty&gt; getProperties() {
+<b class="nc">&nbsp;        return properties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isStandardField() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

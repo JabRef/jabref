@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EditExternalFileTypeEntryDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.externalfiletypes</a>
+</div>
+
+<h1>Coverage Summary for Class: EditExternalFileTypeEntryDialog (org.jabref.gui.preferences.externalfiletypes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EditExternalFileTypeEntryDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.externalfiletypes;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.event.ActionEvent;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.RadioButton;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.ToggleGroup;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class EditExternalFileTypeEntryDialog extends BaseDialog&lt;Void&gt; {
+&nbsp;
+&nbsp;    @FXML private RadioButton defaultApplication;
+&nbsp;    @FXML private ToggleGroup applicationToggleGroup;
+&nbsp;    @FXML private TextField extension;
+&nbsp;    @FXML private TextField name;
+&nbsp;    @FXML private TextField mimeType;
+&nbsp;    @FXML private RadioButton customApplication;
+&nbsp;    @FXML private TextField selectedApplication;
+&nbsp;    @FXML private Button btnBrowse;
+&nbsp;    @FXML private Label icon;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;
+<b class="nc">&nbsp;    private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(NativeDesktop.get().getApplicationDirectory()).build();</b>
+&nbsp;    private final ExternalFileTypeItemViewModel item;
+&nbsp;
+&nbsp;    private final ObservableList&lt;ExternalFileTypeItemViewModel&gt; fileTypes;
+&nbsp;    private EditExternalFileTypeViewModel viewModel;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;    public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle, ObservableList&lt;ExternalFileTypeItemViewModel&gt; fileTypes) {</b>
+<b class="nc">&nbsp;        this.item = item;</b>
+<b class="nc">&nbsp;        this.fileTypes = fileTypes;</b>
+<b class="nc">&nbsp;        this.setTitle(dialogTitle);</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);</b>
+&nbsp;
+<b class="nc">&nbsp;        final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);</b>
+<b class="nc">&nbsp;        confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());</b>
+<b class="nc">&nbsp;        this.setResultConverter(button -&gt; {</b>
+<b class="nc">&nbsp;            if (button == ButtonType.OK) {</b>
+<b class="nc">&nbsp;                viewModel.storeSettings();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        visualizer.setDecoration(new IconValidationDecorator());</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel = new EditExternalFileTypeViewModel(item, fileTypes);</b>
+&nbsp;
+<b class="nc">&nbsp;        icon.setGraphic(viewModel.getIcon());</b>
+&nbsp;
+<b class="nc">&nbsp;        defaultApplication.selectedProperty().bindBidirectional(viewModel.defaultApplicationSelectedProperty());</b>
+<b class="nc">&nbsp;        customApplication.selectedProperty().bindBidirectional(viewModel.customApplicationSelectedProperty());</b>
+<b class="nc">&nbsp;        selectedApplication.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());</b>
+<b class="nc">&nbsp;        btnBrowse.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());</b>
+<b class="nc">&nbsp;        extension.textProperty().bindBidirectional(viewModel.extensionProperty());</b>
+<b class="nc">&nbsp;        name.textProperty().bindBidirectional(viewModel.nameProperty());</b>
+<b class="nc">&nbsp;        mimeType.textProperty().bindBidirectional(viewModel.mimeTypeProperty());</b>
+<b class="nc">&nbsp;        selectedApplication.textProperty().bindBidirectional(viewModel.selectedApplicationProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.extensionValidation(), extension, true);</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.nameValidation(), name, true);</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.mimeTypeValidation(), mimeType, true);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void openFileChooser(ActionEvent event) {
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -&gt; viewModel.selectedApplicationProperty().setValue(path.toAbsolutePath().toString()));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

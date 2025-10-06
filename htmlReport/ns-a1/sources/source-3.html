@@ -1,0 +1,429 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChatHistoryService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.chatting</a>
+</div>
+
+<h1>Coverage Summary for Class: ChatHistoryService (org.jabref.logic.ai.chatting)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChatHistoryService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ChatHistoryService$ChatHistoryManagementRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ChatHistoryService$CitationKeyChangeListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.chatting;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.TreeMap;
+&nbsp;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage;
+&nbsp;import org.jabref.logic.ai.util.CitationKeyCheck;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.event.FieldChangedEvent;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;
+&nbsp;import com.google.common.eventbus.Subscribe;
+&nbsp;import dev.langchain4j.data.message.ChatMessage;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// Main class for getting and storing chat history for entries and groups.
+&nbsp;/// Use this class &lt;s&gt;in logic and&lt;/s&gt; UI.
+&nbsp;/// It currently resides in the UI package because it relies on the `org.jabref.gui.StateManager` to get the open databases and to find the correct [BibDatabaseContext] based on an entry.
+&nbsp;///
+&nbsp;/// The returned chat history is a [ObservableList]. So chat history exists for every possible
+&nbsp;/// [BibEntry] and [org.jabref.model.groups.AbstractGroup]. The chat history is stored in runtime.
+&nbsp;///
+&nbsp;/// To save and load chat history, [BibEntry] and [org.jabref.model.groups.AbstractGroup] must satisfy several constraints.
+&nbsp;/// Serialization and deserialization is handled in [ChatHistoryStorage].
+&nbsp;///
+&nbsp;/// Constraints for serialization and deserialization of a chat history of a [BibEntry]:
+&nbsp;/// 1. There should exist an associated [BibDatabaseContext] for the [BibEntry].
+&nbsp;/// 2. The database path of the associated [BibDatabaseContext] must be set.
+&nbsp;/// 3. The citation key of the [BibEntry] must be set and unique.
+&nbsp;///
+&nbsp;/// Constraints for serialization and deserialization of a chat history of an [GroupTreeNode]:
+&nbsp;/// 1. There should exist an associated [BibDatabaseContext] for the [GroupTreeNode].
+&nbsp;/// 2. The database path of the associated [BibDatabaseContext] must be set.
+&nbsp;/// 3. The name of an [GroupTreeNode] must be set and unique (this requirement is possibly already satisfied in
+&nbsp;///    JabRef, but for [BibEntry] it is definitely not).
+&nbsp;public class ChatHistoryService implements AutoCloseable {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryService.class);</b>
+&nbsp;
+&nbsp;    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+&nbsp;    private final ChatHistoryStorage implementation;
+&nbsp;
+&nbsp;    // Note about `Optional&lt;BibDatabaseContext&gt;`: it was necessary in previous version, but currently we never save an `Optional.empty()`.
+&nbsp;    // However, we decided to left it here: to reduce migrations and to make possible to chat with a {@link BibEntry} without {@link BibDatabaseContext}
+&nbsp;    // ({@link BibDatabaseContext} is required only for load/store of the chat).
+<b class="nc">&nbsp;    private record ChatHistoryManagementRecord(Optional&lt;BibDatabaseContext&gt; bibDatabaseContext, ObservableList&lt;ChatMessage&gt; chatHistory) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // We use a {@link TreeMap} here to store {@link BibEntry} chat histories by their id.
+&nbsp;    // When you compare {@link BibEntry} instances, they are compared by value, not by reference.
+&nbsp;    // And when you store {@link BibEntry} instances in a {@link HashMap}, an old hash may be stored when the {@link BibEntry} is changed.
+&nbsp;    // See also ADR-38.
+<b class="nc">&nbsp;    private final TreeMap&lt;BibEntry, ChatHistoryManagementRecord&gt; bibEntriesChatHistory = new TreeMap&lt;&gt;(Comparator.comparing(BibEntry::getId));</b>
+&nbsp;
+&nbsp;    // We use {@link TreeMap} for group chat history for the same reason as for {@link BibEntry}ies.
+<b class="nc">&nbsp;    private final TreeMap&lt;GroupTreeNode, ChatHistoryManagementRecord&gt; groupsChatHistory = new TreeMap&lt;&gt;(Comparator.comparing(GroupTreeNode::getName));</b>
+&nbsp;
+<b class="nc">&nbsp;    public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences, ChatHistoryStorage implementation) {</b>
+<b class="nc">&nbsp;        this.citationKeyPatternPreferences = citationKeyPatternPreferences;</b>
+<b class="nc">&nbsp;        this.implementation = implementation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        bibDatabaseContext.getMetaData().getGroups().ifPresent(rootGroupTreeNode -&gt;</b>
+<b class="nc">&nbsp;                rootGroupTreeNode.iterateOverTree().forEach(groupNode -&gt; {</b>
+<b class="nc">&nbsp;                    groupNode.getGroup().nameProperty().addListener((observable, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;                        if (newValue != null &amp;&amp; oldValue != null) {</b>
+<b class="nc">&nbsp;                            transferGroupHistory(bibDatabaseContext, groupNode, oldValue, newValue);</b>
+&nbsp;                        }
+&nbsp;                    });
+&nbsp;
+<b class="nc">&nbsp;                    groupNode.getGroupProperty().addListener((obs, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;                        if (oldValue != null &amp;&amp; newValue != null) {</b>
+<b class="nc">&nbsp;                            transferGroupHistory(bibDatabaseContext, groupNode, oldValue.getName(), newValue.getName());</b>
+&nbsp;                        }
+&nbsp;                    });
+&nbsp;                }));
+&nbsp;
+<b class="nc">&nbsp;        bibDatabaseContext.getDatabase().getEntries().forEach(entry -&gt; entry.registerListener(new CitationKeyChangeListener(bibDatabaseContext)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;ChatMessage&gt; getChatHistoryForEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+<b class="nc">&nbsp;        return bibEntriesChatHistory.computeIfAbsent(entry, entryArg -&gt; {</b>
+&nbsp;            ObservableList&lt;ChatMessage&gt; chatHistory;
+&nbsp;
+<b class="nc">&nbsp;            if (entry.getCitationKey().isEmpty() || !correctCitationKey(bibDatabaseContext, entry) || bibDatabaseContext.getDatabasePath().isEmpty()) {</b>
+<b class="nc">&nbsp;                chatHistory = FXCollections.observableArrayList();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                List&lt;ChatMessage&gt; chatMessagesList = implementation.loadMessagesForEntry(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());</b>
+<b class="nc">&nbsp;                chatHistory = FXCollections.observableArrayList(chatMessagesList);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), chatHistory);</b>
+&nbsp;        }).chatHistory;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the chat history for the given {@link BibEntry} from the internal RAM map.
+&nbsp;     * If the {@link BibEntry} satisfies requirements for serialization and deserialization of chat history (see
+&nbsp;     * the docstring for the {@link ChatHistoryService}), then the chat history will be stored via the
+&nbsp;     * {@link ChatHistoryStorage}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * It is not necessary to call this method (everything will be stored in {@link ChatHistoryService#close()},
+&nbsp;     * but it&#39;s best to call it when the chat history {@link BibEntry} is no longer needed.
+&nbsp;     */
+&nbsp;    public void closeChatHistoryForEntry(BibEntry entry) {
+<b class="nc">&nbsp;        ChatHistoryManagementRecord chatHistoryManagementRecord = bibEntriesChatHistory.get(entry);</b>
+<b class="nc">&nbsp;        if (chatHistoryManagementRecord == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;BibDatabaseContext&gt; bibDatabaseContext = chatHistoryManagementRecord.bibDatabaseContext();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bibDatabaseContext.isPresent() &amp;&amp; entry.getCitationKey().isPresent() &amp;&amp; correctCitationKey(bibDatabaseContext.get(), entry) &amp;&amp; bibDatabaseContext.get().getDatabasePath().isPresent()) {</b>
+&nbsp;            // Method `correctCitationKey` will already check `entry.getCitationKey().isPresent()`, but it is still
+&nbsp;            // there, to suppress warning from IntelliJ IDEA on `entry.getCitationKey().get()`.
+<b class="nc">&nbsp;            implementation.storeMessagesForEntry(</b>
+<b class="nc">&nbsp;                    bibDatabaseContext.get().getDatabasePath().get(),</b>
+<b class="nc">&nbsp;                    entry.getCitationKey().get(),</b>
+<b class="nc">&nbsp;                    chatHistoryManagementRecord.chatHistory()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        // TODO: What if there is two AI chats for the same entry? And one is closed and one is not?
+<b class="nc">&nbsp;        bibEntriesChatHistory.remove(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;ChatMessage&gt; getChatHistoryForGroup(BibDatabaseContext bibDatabaseContext, GroupTreeNode group) {
+<b class="nc">&nbsp;        return groupsChatHistory.computeIfAbsent(group, groupArg -&gt; {</b>
+&nbsp;            ObservableList&lt;ChatMessage&gt; chatHistory;
+&nbsp;
+<b class="nc">&nbsp;            if (bibDatabaseContext.getDatabasePath().isEmpty()) {</b>
+<b class="nc">&nbsp;                chatHistory = FXCollections.observableArrayList();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                List&lt;ChatMessage&gt; chatMessagesList = implementation.loadMessagesForGroup(</b>
+<b class="nc">&nbsp;                        bibDatabaseContext.getDatabasePath().get(),</b>
+<b class="nc">&nbsp;                        group.getGroup().getName()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                chatHistory = FXCollections.observableArrayList(chatMessagesList);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), chatHistory);</b>
+&nbsp;        }).chatHistory;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the chat history for the given {@link GroupTreeNode} from the internal RAM map.
+&nbsp;     * If the {@link GroupTreeNode} satisfies requirements for serialization and deserialization of chat history (see
+&nbsp;     * the docstring for the {@link ChatHistoryService}), then the chat history will be stored via the
+&nbsp;     * {@link ChatHistoryStorage}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * It is not necessary to call this method (everything will be stored in {@link ChatHistoryService#close()},
+&nbsp;     * but it&#39;s best to call it when the chat history {@link GroupTreeNode} is no longer needed.
+&nbsp;     */
+&nbsp;    public void closeChatHistoryForGroup(GroupTreeNode group) {
+<b class="nc">&nbsp;        ChatHistoryManagementRecord chatHistoryManagementRecord = groupsChatHistory.get(group);</b>
+<b class="nc">&nbsp;        if (chatHistoryManagementRecord == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;BibDatabaseContext&gt; bibDatabaseContext = chatHistoryManagementRecord.bibDatabaseContext();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bibDatabaseContext.isPresent() &amp;&amp; bibDatabaseContext.get().getDatabasePath().isPresent()) {</b>
+<b class="nc">&nbsp;            implementation.storeMessagesForGroup(</b>
+<b class="nc">&nbsp;                    bibDatabaseContext.get().getDatabasePath().get(),</b>
+<b class="nc">&nbsp;                    group.getGroup().getName(),</b>
+<b class="nc">&nbsp;                    chatHistoryManagementRecord.chatHistory()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        // TODO: What if there is two AI chats for the same entry? And one is closed and one is not?
+<b class="nc">&nbsp;        groupsChatHistory.remove(group);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean correctCitationKey(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
+<b class="nc">&nbsp;        if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry)) {</b>
+<b class="nc">&nbsp;            tryToGenerateCitationKey(bibDatabaseContext, bibEntry);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void tryToGenerateCitationKey(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
+<b class="nc">&nbsp;        new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences).generateAndSetKey(bibEntry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+&nbsp;        // We need to clone `bibEntriesChatHistory.keySet()` because closeChatHistoryForEntry() modifies the `bibEntriesChatHistory` map.
+<b class="nc">&nbsp;        new HashSet&lt;&gt;(bibEntriesChatHistory.keySet()).forEach(this::closeChatHistoryForEntry);</b>
+&nbsp;
+&nbsp;        // Clone is for the same reason, as written above.
+<b class="nc">&nbsp;        new HashSet&lt;&gt;(groupsChatHistory.keySet()).forEach(this::closeChatHistoryForGroup);</b>
+&nbsp;
+<b class="nc">&nbsp;        implementation.commit();</b>
+<b class="nc">&nbsp;        implementation.close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void transferGroupHistory(BibDatabaseContext bibDatabaseContext, GroupTreeNode groupTreeNode, String oldName, String newName) {
+<b class="nc">&nbsp;        if (bibDatabaseContext.getDatabasePath().isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not transfer chat history of group {} (old name: {}): database path is empty.&quot;, newName, oldName);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ChatMessage&gt; chatMessages = groupsChatHistory.computeIfAbsent(groupTreeNode,</b>
+<b class="nc">&nbsp;                e -&gt; new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), FXCollections.observableArrayList())).chatHistory;</b>
+<b class="nc">&nbsp;        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldName, List.of());</b>
+<b class="nc">&nbsp;        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), newName, chatMessages);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void transferEntryHistory(BibDatabaseContext bibDatabaseContext, BibEntry entry, String oldCitationKey, String newCitationKey) {
+&nbsp;        // TODO: This method does not check if the citation key is valid.
+&nbsp;
+<b class="nc">&nbsp;        if (bibDatabaseContext.getDatabasePath().isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not transfer chat history of entry {} (old key: {}): database path is empty.&quot;, newCitationKey, oldCitationKey);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ChatMessage&gt; chatMessages = bibEntriesChatHistory.computeIfAbsent(entry,</b>
+<b class="nc">&nbsp;                e -&gt; new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), FXCollections.observableArrayList())).chatHistory;</b>
+<b class="nc">&nbsp;        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldCitationKey, List.of());</b>
+<b class="nc">&nbsp;        implementation.storeMessagesForEntry(bibDatabaseContext.getDatabasePath().get(), newCitationKey, chatMessages);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private class CitationKeyChangeListener {
+&nbsp;        private final BibDatabaseContext bibDatabaseContext;
+&nbsp;
+<b class="nc">&nbsp;        public CitationKeyChangeListener(BibDatabaseContext bibDatabaseContext) {</b>
+<b class="nc">&nbsp;            this.bibDatabaseContext = bibDatabaseContext;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        void listen(FieldChangedEvent e) {
+<b class="nc">&nbsp;            if (e.getField() != InternalField.KEY_FIELD) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            transferEntryHistory(bibDatabaseContext, e.getBibEntry(), e.getOldValue(), e.getNewValue());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

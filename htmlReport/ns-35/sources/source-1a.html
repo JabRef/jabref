@@ -1,0 +1,616 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedFileViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedFileViewModel (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedFileViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/172)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.BiPredicate;
+&nbsp;
+&nbsp;import javafx.beans.Observable;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.ObjectBinding;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.DoubleProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleDoubleProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Alert;
+&nbsp;import javafx.scene.control.ButtonBar;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.externalfiles.PdfMergeDialog;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.gui.linkedfile.DeleteFileAction;
+&nbsp;import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
+&nbsp;import org.jabref.gui.linkedfile.LinkedFileEditDialog;
+&nbsp;import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.ControlHelper;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.externalfiles.LinkedFileHandler;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileNameUniqueness;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;import org.jabref.model.util.OptionalUtil;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class LinkedFileViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileViewModel.class);</b>
+&nbsp;
+&nbsp;    private final LinkedFile linkedFile;
+&nbsp;    private final BibDatabaseContext databaseContext;
+<b class="nc">&nbsp;    private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);</b>
+<b class="nc">&nbsp;    private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty isOfflinePdf = new SimpleBooleanProperty(false);</b>
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final BibEntry entry;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final LinkedFileHandler linkedFileHandler;
+&nbsp;
+&nbsp;    private ObjectBinding&lt;Node&gt; linkedFileIconBinding;
+&nbsp;
+&nbsp;    private final Validator fileExistsValidator;
+&nbsp;
+&nbsp;    public LinkedFileViewModel(LinkedFile linkedFile,
+&nbsp;                               BibEntry entry,
+&nbsp;                               BibDatabaseContext databaseContext,
+&nbsp;                               TaskExecutor taskExecutor,
+&nbsp;                               DialogService dialogService,
+<b class="nc">&nbsp;                               GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.linkedFile = linkedFile;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        fileExistsValidator = new FunctionBasedValidator&lt;&gt;(</b>
+<b class="nc">&nbsp;                linkedFile.linkProperty(),</b>
+&nbsp;                link -&gt; {
+<b class="nc">&nbsp;                    if (linkedFile.isOnlineLink()) {</b>
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        Optional&lt;Path&gt; path = FileUtil.find(databaseContext, link, preferences.getFilePreferences());</b>
+<b class="nc">&nbsp;                        return path.isPresent() &amp;&amp; Files.exists(path.get());</b>
+&nbsp;                    }
+&nbsp;                },
+<b class="nc">&nbsp;                ValidationMessage.warning(Localization.lang(&quot;Could not find file &#39;%0&#39;.&quot;, linkedFile.getLink())));</b>
+&nbsp;
+<b class="nc">&nbsp;        downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));</b>
+<b class="nc">&nbsp;        isOfflinePdf.setValue(!linkedFile.isOnlineLink() &amp;&amp; &quot;pdf&quot;.equalsIgnoreCase(linkedFile.getFileType()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static LinkedFileViewModel fromLinkedFile(
+&nbsp;            LinkedFile linkedFile,
+&nbsp;            BibEntry entry,
+&nbsp;            BibDatabaseContext databaseContext,
+&nbsp;            TaskExecutor taskExecutor,
+&nbsp;            DialogService dialogService,
+&nbsp;            GuiPreferences preferences) {
+<b class="nc">&nbsp;        return new LinkedFileViewModel(</b>
+&nbsp;                linkedFile,
+&nbsp;                entry,
+&nbsp;                databaseContext,
+&nbsp;                taskExecutor,
+&nbsp;                dialogService,
+&nbsp;                preferences);
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isOfflinePdfProperty() {
+<b class="nc">&nbsp;        return isOfflinePdf;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isAutomaticallyFound() {
+<b class="nc">&nbsp;        return isAutomaticallyFound.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isAutomaticallyFoundProperty() {
+<b class="nc">&nbsp;        return isAutomaticallyFound;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty downloadOngoingProperty() {
+<b class="nc">&nbsp;        return downloadOngoing;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty downloadProgressProperty() {
+<b class="nc">&nbsp;        return downloadProgress;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty linkProperty() {
+<b class="nc">&nbsp;        return linkedFile.linkProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty descriptionProperty() {
+<b class="nc">&nbsp;        return linkedFile.descriptionProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return linkedFile.getDescription();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDescriptionAndLink() {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(linkedFile.getDescription())) {</b>
+<b class="nc">&nbsp;            return linkedFile.getLink();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return linkedFile.getDescription() + &quot; (&quot; + linkedFile.getLink() + &quot;)&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTruncatedDescriptionAndLink() {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(linkedFile.getDescription())) {</b>
+<b class="nc">&nbsp;            return ControlHelper.truncateString(linkedFile.getLink(), -1, &quot;...&quot;,</b>
+&nbsp;                    ControlHelper.EllipsisPosition.CENTER);
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ControlHelper.truncateString(linkedFile.getDescription(), -1, &quot;...&quot;,</b>
+&nbsp;                    ControlHelper.EllipsisPosition.CENTER) + &quot; (&quot; +
+<b class="nc">&nbsp;                    ControlHelper.truncateString(linkedFile.getLink(), -1, &quot;...&quot;,</b>
+&nbsp;                            ControlHelper.EllipsisPosition.CENTER) + &quot;)&quot;;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Path&gt; findIn(List&lt;Path&gt; directories) {
+<b class="nc">&nbsp;        return linkedFile.findIn(directories);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JabRefIcon getTypeIcon() {
+<b class="nc">&nbsp;        return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, preferences.getExternalApplicationsPreferences())</b>
+<b class="nc">&nbsp;                                .map(ExternalFileType::getIcon)</b>
+<b class="nc">&nbsp;                                .orElse(IconTheme.JabRefIcons.FILE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectBinding&lt;Node&gt; typeIconProperty() {
+<b class="nc">&nbsp;        if (linkedFileIconBinding == null) {</b>
+<b class="nc">&nbsp;            linkedFileIconBinding = Bindings.createObjectBinding(() -&gt; this.getTypeIcon().getGraphicNode(), linkedFile.fileTypeProperty());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return linkedFileIconBinding;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void markAsAutomaticallyFound() {
+<b class="nc">&nbsp;        isAutomaticallyFound.setValue(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void acceptAsLinked() {
+<b class="nc">&nbsp;        isAutomaticallyFound.setValue(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Observable[] getObservables() {
+<b class="nc">&nbsp;        List&lt;Observable&gt; observables = new ArrayList&lt;&gt;(Arrays.asList(linkedFile.getObservables()));</b>
+<b class="nc">&nbsp;        observables.add(downloadOngoing);</b>
+<b class="nc">&nbsp;        observables.add(downloadProgress);</b>
+<b class="nc">&nbsp;        observables.add(isAutomaticallyFound);</b>
+<b class="nc">&nbsp;        return observables.toArray(new Observable[0]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void open() {
+&nbsp;        try {
+<b class="nc">&nbsp;            Optional&lt;ExternalFileType&gt; type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getExternalApplicationsPreferences());</b>
+<b class="nc">&nbsp;            boolean successful = NativeDesktop.openExternalFileAnyFormat(databaseContext, preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), linkedFile.getLink(), type);</b>
+<b class="nc">&nbsp;            if (!successful) {</b>
+<b class="nc">&nbsp;                dialogService.showErrorDialogAndWait(Localization.lang(&quot;File not found&quot;), Localization.lang(&quot;Could not find file &#39;%0&#39;.&quot;, linkedFile.getLink()));</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Error opening file &#39;%0&#39;&quot;, linkedFile.getLink()), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openFolder() {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (!linkedFile.isOnlineLink()) {</b>
+<b class="nc">&nbsp;                Optional&lt;Path&gt; resolvedPath = FileUtil.find(</b>
+&nbsp;                        databaseContext,
+<b class="nc">&nbsp;                        linkedFile.getLink(),</b>
+<b class="nc">&nbsp;                        preferences.getFilePreferences());</b>
+<b class="nc">&nbsp;                if (resolvedPath.isPresent()) {</b>
+<b class="nc">&nbsp;                    NativeDesktop.openFolderAndSelectFile(resolvedPath.get(), preferences.getExternalApplicationsPreferences(), dialogService);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(Localization.lang(&quot;File not found&quot;));</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.showErrorDialogAndWait(Localization.lang(&quot;Cannot open folder as the file is an online link.&quot;));</b>
+&nbsp;            }
+&nbsp;        } catch (IOException ex) {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Cannot open folder&quot;, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void renameToSuggestion() {
+<b class="nc">&nbsp;        renameFileToName(linkedFileHandler.getSuggestedFileName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void askForNameAndRename() {
+<b class="nc">&nbsp;        String oldFile = this.linkedFile.getLink();</b>
+<b class="nc">&nbsp;        Path oldFilePath = Path.of(oldFile);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; askedFileName = dialogService.showInputDialogWithDefaultAndWait(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Rename file&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;New Filename&quot;),</b>
+<b class="nc">&nbsp;                oldFilePath.getFileName().toString());</b>
+<b class="nc">&nbsp;        askedFileName.ifPresent(this::renameFileToName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void renameFileToName(String targetFileName) {
+<b class="nc">&nbsp;        if (linkedFile.isOnlineLink()) {</b>
+&nbsp;            // Cannot rename remote links
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());</b>
+<b class="nc">&nbsp;        if (file.isPresent()) {</b>
+<b class="nc">&nbsp;            performRenameWithConflictCheck(targetFileName);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;File not found&quot;), Localization.lang(&quot;Could not find file &#39;%0&#39;.&quot;, linkedFile.getLink()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void performRenameWithConflictCheck(String targetFileName) {
+&nbsp;        // Check if a file with the same name already exists
+<b class="nc">&nbsp;        Optional&lt;Path&gt; existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);</b>
+<b class="nc">&nbsp;        boolean overwriteFile = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existingFile.isPresent()) {</b>
+&nbsp;            // Get existing file path and its directory
+<b class="nc">&nbsp;            Path existingFilePath = existingFile.get();</b>
+<b class="nc">&nbsp;            Path targetDirectory = existingFilePath.getParent();</b>
+&nbsp;
+&nbsp;            // Suggest a non-conflicting file name
+<b class="nc">&nbsp;            String suggestedFileName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory, targetFileName);</b>
+&nbsp;
+&nbsp;            // Define available dialog options
+<b class="nc">&nbsp;            ButtonType replace = new ButtonType(Localization.lang(&quot;Replace&quot;), ButtonBar.ButtonData.OTHER);</b>
+<b class="nc">&nbsp;            ButtonType keepBoth = new ButtonType(Localization.lang(&quot;Keep both&quot;), ButtonBar.ButtonData.OTHER);</b>
+<b class="nc">&nbsp;            ButtonType provideAlternative = new ButtonType(Localization.lang(&quot;Provide alternative file name&quot;), ButtonBar.ButtonData.OTHER);</b>
+<b class="nc">&nbsp;            ButtonType cancel = new ButtonType(Localization.lang(&quot;Cancel&quot;), ButtonBar.ButtonData.CANCEL_CLOSE);</b>
+&nbsp;
+&nbsp;            // Define tooltips for dialog buttons
+<b class="nc">&nbsp;            Map&lt;ButtonType, String&gt; tooltips = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;            tooltips.put(keepBoth, Localization.lang(&quot;New filename: %0&quot;, suggestedFileName));</b>
+&nbsp;
+&nbsp;            // Use JabRefDialogService to show a custom dialog with tooltips
+<b class="nc">&nbsp;            Optional&lt;ButtonType&gt; result = dialogService.showCustomButtonDialogWithTooltipsAndWait(</b>
+&nbsp;                    Alert.AlertType.CONFIRMATION,
+<b class="nc">&nbsp;                    Localization.lang(&quot;File already exists&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;File name: \n&#39;%0&#39;&quot;, targetFileName),</b>
+&nbsp;                    tooltips,
+&nbsp;                    replace, keepBoth, provideAlternative, cancel
+&nbsp;            );
+&nbsp;
+&nbsp;            // Show dialog and handle user response
+<b class="nc">&nbsp;            if (result.isEmpty() || result.get() == cancel) {</b>
+&nbsp;                return; // User canceled
+<b class="nc">&nbsp;            } else if (result.get() == replace) {</b>
+<b class="nc">&nbsp;                overwriteFile = true;</b>
+<b class="nc">&nbsp;            } else if (result.get() == keepBoth) {</b>
+<b class="nc">&nbsp;                targetFileName = suggestedFileName;</b>
+<b class="nc">&nbsp;            } else if (result.get() == provideAlternative) {</b>
+<b class="nc">&nbsp;                askForNameAndRename();</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+&nbsp;            // Attempt the rename operation
+<b class="nc">&nbsp;            linkedFileHandler.renameToName(targetFileName, overwriteFile);</b>
+&nbsp;        } catch (IOException e) {
+&nbsp;            // Display an error dialog if file is locked or inaccessible
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Rename failed&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;JabRef cannot access the file because it is being used by another process.&quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void moveToDefaultDirectory() {
+<b class="nc">&nbsp;        if (linkedFile.isOnlineLink()) {</b>
+&nbsp;            // Cannot move remote links
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Get target folder
+<b class="nc">&nbsp;        Optional&lt;Path&gt; fileDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());</b>
+<b class="nc">&nbsp;        if (fileDir.isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Move file&quot;), Localization.lang(&quot;File directory is not set or does not exist.&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());</b>
+<b class="nc">&nbsp;        if (file.isPresent()) {</b>
+&nbsp;            // Found the linked file, so move it
+&nbsp;            try {
+<b class="nc">&nbsp;                linkedFileHandler.moveToDefaultDirectory();</b>
+&nbsp;            } catch (IOException exception) {
+<b class="nc">&nbsp;                dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Move file&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Could not move file &#39;%0&#39;.&quot;, file.get().toString()),</b>
+&nbsp;                        exception);
+&nbsp;            }
+&nbsp;        } else {
+&nbsp;            // File doesn&#39;t exist, so we can&#39;t move it.
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;File not found&quot;), Localization.lang(&quot;Could not find file &#39;%0&#39;.&quot;, linkedFile.getLink()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the filename for the current linked file and compares it to the new suggested filename.
+&nbsp;     *
+&nbsp;     * @return true if the suggested filename is same as current filename.
+&nbsp;     */
+&nbsp;    public boolean isGeneratedNameSameAsOriginal() {
+<b class="nc">&nbsp;        Path file = Path.of(this.linkedFile.getLink());</b>
+<b class="nc">&nbsp;        String currentFileName = file.getFileName().toString();</b>
+<b class="nc">&nbsp;        String suggestedFileName = this.linkedFileHandler.getSuggestedFileName();</b>
+&nbsp;
+<b class="nc">&nbsp;        return currentFileName.equals(suggestedFileName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compares suggested directory of current linkedFile with existing filepath directory.
+&nbsp;     *
+&nbsp;     * @return true if suggested filepath is same as existing filepath.
+&nbsp;     */
+&nbsp;    public boolean isGeneratedPathSameAsOriginal() {
+<b class="nc">&nbsp;        FilePreferences filePreferences = preferences.getFilePreferences();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; baseDir = databaseContext.getFirstExistingFileDir(filePreferences);</b>
+<b class="nc">&nbsp;        if (baseDir.isEmpty()) {</b>
+&nbsp;            // could not find default path
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // append File directory pattern if exits
+<b class="nc">&nbsp;        String targetDirectoryName = FileUtil.createDirNameFromPattern(</b>
+<b class="nc">&nbsp;                databaseContext.getDatabase(),</b>
+&nbsp;                entry,
+<b class="nc">&nbsp;                filePreferences.getFileDirectoryPattern());</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; targetDir = baseDir.map(dir -&gt; dir.resolve(targetDirectoryName));</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; currentDir = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).map(Path::getParent);</b>
+<b class="nc">&nbsp;        if (currentDir.isEmpty()) {</b>
+&nbsp;            // Could not find file
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BiPredicate&lt;Path, Path&gt; equality = (fileA, fileB) -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return Files.isSameFile(fileA, fileB);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        return OptionalUtil.equals(targetDir, currentDir, equality);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void moveToDefaultDirectoryAndRename() {
+<b class="nc">&nbsp;        moveToDefaultDirectory();</b>
+<b class="nc">&nbsp;        renameToSuggestion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link)
+&nbsp;     * and then proceeds accordingly.
+&nbsp;     *
+&nbsp;     * @return true if the linked file has been removed afterward from the entry (i.e., because it was deleted
+&nbsp;     * successfully, does not exist in the first place, or the user choose to remove it)
+&nbsp;     */
+&nbsp;    public boolean delete() {
+<b class="nc">&nbsp;        DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext, null, List.of(this));</b>
+<b class="nc">&nbsp;        deleteFileAction.execute();</b>
+<b class="nc">&nbsp;        return deleteFileAction.isSuccess();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void edit() {
+<b class="nc">&nbsp;        Optional&lt;LinkedFile&gt; editedFile = dialogService.showCustomDialogAndWait(new LinkedFileEditDialog(this.linkedFile));</b>
+<b class="nc">&nbsp;        editedFile.ifPresent(file -&gt; {</b>
+<b class="nc">&nbsp;            this.linkedFile.setLink(file.getLink());</b>
+<b class="nc">&nbsp;            this.linkedFile.setDescription(file.getDescription());</b>
+<b class="nc">&nbsp;            this.linkedFile.setFileType(file.getFileType());</b>
+<b class="nc">&nbsp;            this.linkedFile.setSourceURL(file.getSourceUrl());</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @implNote Similar method {@link org.jabref.gui.linkedfile.RedownloadMissingFilesAction#redownloadMissing}
+&nbsp;     */
+&nbsp;    public void redownload() {
+<b class="nc">&nbsp;        LOGGER.info(&quot;Redownloading file from {}&quot;, linkedFile.getSourceUrl());</b>
+<b class="nc">&nbsp;        if (linkedFile.getSourceUrl().isEmpty() || !LinkedFile.isOnlineLink(linkedFile.getSourceUrl())) {</b>
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;In order to download the file, the source url has to be an online link&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String fileName = Path.of(linkedFile.getLink()).getFileName().toString();</b>
+&nbsp;
+<b class="nc">&nbsp;        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(</b>
+&nbsp;                databaseContext,
+&nbsp;                entry,
+&nbsp;                linkedFile,
+<b class="nc">&nbsp;                linkedFile.getSourceUrl(),</b>
+&nbsp;                dialogService,
+<b class="nc">&nbsp;                preferences.getExternalApplicationsPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getFilePreferences(),</b>
+&nbsp;                taskExecutor,
+&nbsp;                fileName,
+&nbsp;                true);
+<b class="nc">&nbsp;        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());</b>
+<b class="nc">&nbsp;        downloadLinkedFileAction.execute();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void download(boolean keepHtmlLink) {
+<b class="nc">&nbsp;        LOGGER.info(&quot;Downloading file from {}&quot;, linkedFile.getSourceUrl());</b>
+<b class="nc">&nbsp;        if (!linkedFile.isOnlineLink()) {</b>
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;In order to download the file it has to be an online link&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(</b>
+&nbsp;                databaseContext,
+&nbsp;                entry,
+&nbsp;                linkedFile,
+<b class="nc">&nbsp;                linkedFile.getLink(),</b>
+&nbsp;                dialogService,
+<b class="nc">&nbsp;                preferences.getExternalApplicationsPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getFilePreferences(),</b>
+&nbsp;                taskExecutor,
+&nbsp;                &quot;&quot;,
+&nbsp;                keepHtmlLink);
+<b class="nc">&nbsp;        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());</b>
+<b class="nc">&nbsp;        downloadLinkedFileAction.execute();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedFile getFile() {
+<b class="nc">&nbsp;        return linkedFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus fileExistsValidationStatus() {
+<b class="nc">&nbsp;        return fileExistsValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void parsePdfMetadataAndShowMergeDialog() {
+<b class="nc">&nbsp;        linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -&gt; {</b>
+<b class="nc">&nbsp;            MultiMergeEntriesView dialog = PdfMergeDialog.createMergeDialog(entry, filePath, preferences, taskExecutor);</b>
+<b class="nc">&nbsp;            dialogService.showCustomDialogAndWait(dialog).ifPresent(newEntry -&gt; {</b>
+<b class="nc">&nbsp;                databaseContext.getDatabase().removeEntry(entry);</b>
+<b class="nc">&nbsp;                databaseContext.getDatabase().insertEntry(newEntry);</b>
+&nbsp;            });
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

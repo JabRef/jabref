@@ -1,0 +1,261 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MrDLibFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: MrDLibFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MrDLibFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Calendar;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.EntryBasedFetcher;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.MrDLibImporter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.util.Version;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class is responsible for getting the recommendations from Mr. DLib
+&nbsp; */
+&nbsp;public class MrDLibFetcher implements EntryBasedFetcher {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);</b>
+&nbsp;    private static final String NAME = &quot;MDL_FETCHER&quot;;
+&nbsp;    private static final String MDL_JABREF_PARTNER_ID = &quot;1&quot;;
+&nbsp;    private static final String MDL_URL = &quot;api.mr-dlib.org&quot;;
+<b class="nc">&nbsp;    private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = Localization.lang(&quot;Error while fetching recommendations from Mr.DLib.&quot;);</b>
+&nbsp;    private final String LANGUAGE;
+&nbsp;    private final Version VERSION;
+&nbsp;    private String heading;
+&nbsp;    private String description;
+&nbsp;    private String recommendationSetId;
+&nbsp;    private final MrDlibPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public MrDLibFetcher(String language, Version version, MrDlibPreferences preferences) {</b>
+<b class="nc">&nbsp;        LANGUAGE = language;</b>
+<b class="nc">&nbsp;        VERSION = version;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; performSearch(BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;        Optional&lt;String&gt; title = entry.getFieldLatexFree(StandardField.TITLE);</b>
+<b class="nc">&nbsp;        if (title.isEmpty()) {</b>
+&nbsp;            // without a title there is no reason to ask MrDLib
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        URL url;
+&nbsp;        try {
+<b class="nc">&nbsp;            url = constructQuery(title.get());</b>
+&nbsp;        } catch (URISyntaxException | MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Invalid URL&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String response = makeServerRequest(url);</b>
+<b class="nc">&nbsp;        MrDLibImporter importer = new MrDLibImporter();</b>
+&nbsp;        ParserResult parserResult;
+&nbsp;        try {
+<b class="nc">&nbsp;            if (importer.isRecognizedFormat(response)) {</b>
+<b class="nc">&nbsp;                parserResult = importer.importDatabase(response);</b>
+<b class="nc">&nbsp;                heading = importer.getRecommendationsHeading();</b>
+<b class="nc">&nbsp;                description = importer.getRecommendationsDescription();</b>
+<b class="nc">&nbsp;                recommendationSetId = importer.getRecommendationSetId();</b>
+&nbsp;            } else {
+&nbsp;                // For displaying An ErrorMessage
+<b class="nc">&nbsp;                description = DEFAULT_MRDLIB_ERROR_MESSAGE;</b>
+<b class="nc">&nbsp;                BibDatabase errorBibDataBase = new BibDatabase();</b>
+<b class="nc">&nbsp;                parserResult = new ParserResult(errorBibDataBase);</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error while fetching&quot;, e);</b>
+<b class="nc">&nbsp;            throw new FetcherException(url, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return parserResult.getDatabase().getEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getHeading() {
+<b class="nc">&nbsp;        return heading;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Contact the server with the title of the selected item
+&nbsp;     *
+&nbsp;     * @return Returns the server response. This is an XML document as a String.
+&nbsp;     */
+&nbsp;    private String makeServerRequest(URL url) throws FetcherException {
+<b class="nc">&nbsp;        URLDownload urlDownload = new URLDownload(url);</b>
+<b class="nc">&nbsp;        String response = urlDownload.asString();</b>
+&nbsp;
+&nbsp;        // Conversion of &lt; and &gt;
+<b class="nc">&nbsp;        response = response.replace(&quot;&amp;gt;&quot;, &quot;&gt;&quot;);</b>
+<b class="nc">&nbsp;        response = response.replace(&quot;&amp;lt;&quot;, &quot;&lt;&quot;);</b>
+<b class="nc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs the query based on title of the BibEntry. Adds statistical stuff to the url.
+&nbsp;     *
+&nbsp;     * @param queryWithTitle the query holds the title of the selected entry. Used to make a query to the MDL Server
+&nbsp;     * @return the string used to make the query at mdl server
+&nbsp;     */
+&nbsp;    private URL constructQuery(String queryWithTitle) throws URISyntaxException, MalformedURLException {
+&nbsp;        // The encoding does not work for / so we convert them by our own
+<b class="nc">&nbsp;        queryWithTitle = queryWithTitle.replace(&quot;/&quot;, &quot; &quot;);</b>
+<b class="nc">&nbsp;        URIBuilder builder = new URIBuilder();</b>
+<b class="nc">&nbsp;        builder.setScheme(&quot;http&quot;);</b>
+<b class="nc">&nbsp;        builder.setHost(MDL_URL);</b>
+<b class="nc">&nbsp;        builder.setPath(&quot;/v2/documents/&quot; + queryWithTitle + &quot;/related_documents&quot;);</b>
+<b class="nc">&nbsp;        builder.addParameter(&quot;partner_id&quot;, MDL_JABREF_PARTNER_ID);</b>
+<b class="nc">&nbsp;        builder.addParameter(&quot;app_id&quot;, &quot;jabref_desktop&quot;);</b>
+<b class="nc">&nbsp;        builder.addParameter(&quot;app_version&quot;, VERSION.getFullVersion());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (preferences.shouldSendLanguage()) {</b>
+<b class="nc">&nbsp;            builder.addParameter(&quot;app_lang&quot;, LANGUAGE);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (preferences.shouldSendOs()) {</b>
+<b class="nc">&nbsp;            builder.addParameter(&quot;os&quot;, System.getProperty(&quot;os.name&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (preferences.shouldSendTimezone()) {</b>
+<b class="nc">&nbsp;            builder.addParameter(&quot;timezone&quot;, Calendar.getInstance().getTimeZone().getID());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        URI uri = builder.build();</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Request: {}&quot;, uri.toString());</b>
+<b class="nc">&nbsp;        return uri.toURL();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

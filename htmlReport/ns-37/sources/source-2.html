@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DoiIdentifierEditorViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors.identifier</a>
+</div>
+
+<h1>Coverage Summary for Class: DoiIdentifierEditorViewModel (org.jabref.gui.fieldeditors.identifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DoiIdentifierEditorViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors.identifier;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.mergeentries.FetchAndMergeEntry;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
+&nbsp;import org.jabref.logic.importer.fetcher.CrossRef;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel&lt;DOI&gt; {
+<b class="nc">&nbsp;    public static final Logger LOGGER = LoggerFactory.getLogger(DoiIdentifierEditorViewModel.class);</b>
+&nbsp;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final ShortenDOIFormatter shortenDOIFormatter;
+&nbsp;
+&nbsp;    public DoiIdentifierEditorViewModel(SuggestionProvider&lt;?&gt; suggestionProvider,
+&nbsp;                                        FieldCheckers fieldCheckers,
+&nbsp;                                        DialogService dialogService,
+&nbsp;                                        TaskExecutor taskExecutor,
+&nbsp;                                        GuiPreferences preferences,
+&nbsp;                                        UndoManager undoManager,
+&nbsp;                                        StateManager stateManager) {
+<b class="nc">&nbsp;        super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.shortenDOIFormatter = new ShortenDOIFormatter();</b>
+<b class="nc">&nbsp;        configure(true, true, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void lookupIdentifier(BibEntry bibEntry) {
+<b class="nc">&nbsp;        CrossRef doiFetcher = new CrossRef();</b>
+&nbsp;
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; doiFetcher.findIdentifier(entry))</b>
+<b class="nc">&nbsp;                      .onRunning(() -&gt; identifierLookupInProgress.setValue(true))</b>
+<b class="nc">&nbsp;                      .onFinished(() -&gt; identifierLookupInProgress.setValue(false))</b>
+<b class="nc">&nbsp;                      .onSuccess(identifier -&gt; {</b>
+<b class="nc">&nbsp;                          if (identifier.isPresent()) {</b>
+<b class="nc">&nbsp;                              entry.setField(field, identifier.get().asString());</b>
+&nbsp;                          } else {
+<b class="nc">&nbsp;                              dialogService.notify(Localization.lang(&quot;No %0 found&quot;, FieldTextMapper.getDisplayName(field)));</b>
+&nbsp;                          }
+<b class="nc">&nbsp;                      }).onFailure(e -&gt; handleIdentifierFetchingError(e, doiFetcher)).executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void fetchBibliographyInformation(BibEntry bibEntry) {
+<b class="nc">&nbsp;        stateManager.getActiveDatabase().ifPresentOrElse(</b>
+<b class="nc">&nbsp;                databaseContext -&gt; new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager)</b>
+<b class="nc">&nbsp;                        .fetchAndMerge(entry, field),</b>
+<b class="nc">&nbsp;                () -&gt; dialogService.notify(Localization.lang(&quot;No library selected&quot;))</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void openExternalLink() {
+<b class="nc">&nbsp;        identifier.get().map(DOI::asString)</b>
+<b class="nc">&nbsp;                  .ifPresent(s -&gt; NativeDesktop.openCustomDoi(s, preferences, dialogService));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void shortenID() {
+<b class="nc">&nbsp;        entry.getField(field).ifPresent(doi -&gt; {</b>
+<b class="nc">&nbsp;            String shortenedDOI = shortenDOIFormatter.format(doi);</b>
+<b class="nc">&nbsp;            entry.setField(field, shortenedDOI);</b>
+<b class="nc">&nbsp;            if (shortenedDOI.equals(doi)) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;DOI is already shortened&quot;);</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;DOI is already shortened&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.info(&quot;Shortened DOI: {} to {}&quot;, doi, shortenedDOI);</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Shortened DOI to: %0&quot;, shortenedDOI));</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

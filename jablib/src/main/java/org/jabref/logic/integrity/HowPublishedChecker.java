@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -9,14 +8,16 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
+import org.jspecify.annotations.NonNull;
+
 public class HowPublishedChecker implements ValueChecker {
 
     private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[^a-z]").asPredicate();
 
     private final BibDatabaseContext databaseContext;
 
-    public HowPublishedChecker(BibDatabaseContext databaseContext) {
-        this.databaseContext = Objects.requireNonNull(databaseContext);
+    public HowPublishedChecker(@NonNull BibDatabaseContext databaseContext) {
+        this.databaseContext = databaseContext;
     }
 
     /**

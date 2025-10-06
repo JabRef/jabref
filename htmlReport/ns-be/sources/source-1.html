@@ -1,0 +1,197 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MinifyNameListFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.minifier</a>
+</div>
+
+<h1>Coverage Summary for Class: MinifyNameListFormatter (org.jabref.logic.formatter.minifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MinifyNameListFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.minifier;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;/**
+&nbsp; * Replaces three or more authors with and others
+&nbsp; */
+<b class="nc">&nbsp;public class MinifyNameListFormatter extends Formatter {</b>
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Minify list of person names&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKey() {
+<b class="nc">&nbsp;        return &quot;minify_name_list&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replaces three or more authors with and others.
+&nbsp;     *
+&nbsp;     * &lt;h4&gt;Example&lt;/h4&gt;
+&nbsp;     * &lt;pre&gt;{@code
+&nbsp;     *     Stefan Kolb -&gt; Stefan Kolb
+&nbsp;     *     Stefan Kolb and Simon Harrer -&gt; Stefan Kolb and Simon Harrer
+&nbsp;     *     Stefan Kolb and Simon Harrer and Jörg Lenhard -&gt; Stefan Kolb and others
+&nbsp;     * }&lt;/pre&gt;
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String format(String value) {
+<b class="nc">&nbsp;        Objects.requireNonNull(value);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (value.isEmpty()) {</b>
+&nbsp;            // nothing to do
+<b class="nc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return abbreviateAuthor(value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Shortens lists of persons if there are more than 2 persons to \&quot;et al.\&quot;.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExampleInput() {
+<b class="nc">&nbsp;        return &quot;Stefan Kolb and Simon Harrer and Oliver Kopp&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String abbreviateAuthor(String authorField) {
+&nbsp;        // single author
+<b class="nc">&nbsp;        String authorSeparator = &quot; and &quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!authorField.contains(authorSeparator)) {</b>
+<b class="nc">&nbsp;            return authorField;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String[] authors = authorField.split(authorSeparator);</b>
+&nbsp;
+&nbsp;        // trim authors
+<b class="nc">&nbsp;        for (int i = 0; i &lt; authors.length; i++) {</b>
+<b class="nc">&nbsp;            authors[i] = authors[i].trim();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // already abbreviated
+<b class="nc">&nbsp;        if (&quot;others&quot;.equals(authors[authors.length - 1]) &amp;&amp; (authors.length == 2)) {</b>
+<b class="nc">&nbsp;            return authorField;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // abbreviate
+<b class="nc">&nbsp;        if (authors.length &lt; 3) {</b>
+<b class="nc">&nbsp;            return authorField;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return authors[0] + authorSeparator + &quot;others&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

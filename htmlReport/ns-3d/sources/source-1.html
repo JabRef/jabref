@@ -1,0 +1,178 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GroupColorPicker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.groups</a>
+</div>
+
+<h1>Coverage Summary for Class: GroupColorPicker (org.jabref.gui.groups)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroupColorPicker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.groups;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.scene.paint.Color;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NullMarked;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+&nbsp;@NullMarked
+<b class="nc">&nbsp;public class GroupColorPicker {</b>
+&nbsp;
+&nbsp;    // Generate color for top groups
+&nbsp;    public static Color generateColor(List&lt;Color&gt; siblingColors) {
+<b class="nc">&nbsp;        return generateColor(siblingColors, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Algorithm optimized for colors, not for gray-scale (where it does not work)
+&nbsp;     */
+&nbsp;    public static Color generateColor(List&lt;Color&gt; siblingColors, @Nullable Color parentColor) {
+<b class="nc">&nbsp;        if (siblingColors.isEmpty()) {</b>
+<b class="nc">&nbsp;            if (parentColor == null) {</b>
+&nbsp;                // We need something colorful to derive other colors based on the color
+<b class="nc">&nbsp;                return Color.hsb(Math.random() * 360.0, .50, .75);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return generateSubGroupColor(parentColor);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double sumSin = 0;</b>
+<b class="nc">&nbsp;        double sumCos = 0;</b>
+&nbsp;
+&nbsp;        // Calculate the mean angle
+<b class="nc">&nbsp;        for (Color color : siblingColors) {</b>
+<b class="nc">&nbsp;            double hue = color.getHue();</b>
+<b class="nc">&nbsp;            sumSin += Math.sin(Math.toRadians(hue));</b>
+<b class="nc">&nbsp;            sumCos += Math.cos(Math.toRadians(hue));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double meanAngle = Math.toDegrees(Math.atan2(sumSin, sumCos));</b>
+<b class="nc">&nbsp;        meanAngle = (meanAngle + 360) % 360;</b>
+&nbsp;
+&nbsp;        // The opposite angle is potentially the point of maximum average distance
+<b class="nc">&nbsp;        double newHue = (meanAngle + 180) % 360;</b>
+&nbsp;
+<b class="nc">&nbsp;        double sumSaturation = 0;</b>
+<b class="nc">&nbsp;        double sumBrightness = 0;</b>
+<b class="nc">&nbsp;        for (Color color : siblingColors) {</b>
+<b class="nc">&nbsp;            sumSaturation += color.getSaturation();</b>
+<b class="nc">&nbsp;            sumBrightness += color.getBrightness();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double averageSaturation = sumSaturation / siblingColors.size();</b>
+<b class="nc">&nbsp;        double averageBrightness = sumBrightness / siblingColors.size();</b>
+&nbsp;
+<b class="nc">&nbsp;        return Color.hsb(newHue, averageSaturation, averageBrightness);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Color generateSubGroupColor(Color baseColor) {
+<b class="nc">&nbsp;        return baseColor.deriveColor(0.0, 1.0, .9, 1.0);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

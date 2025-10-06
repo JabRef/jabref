@@ -1,0 +1,349 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HTMLChars</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: HTMLChars (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HTMLChars</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/79)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/97)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.ParamLayoutFormatter;
+&nbsp;import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * This formatter escapes characters so that they are suitable for HTML.
+&nbsp; */
+<b class="nc">&nbsp;public class HTMLChars implements ParamLayoutFormatter {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Map&lt;String, String&gt; HTML_CHARS = HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;</b>
+&nbsp;
+&nbsp;    /// This regex matches `&amp;` that **do not begin** an HTML entity.
+&nbsp;    ///
+&nbsp;    /// - `&amp;amp;` **Not Matched**
+&nbsp;    /// - `&amp;#34;` **Not Matched**
+&nbsp;    /// - `&amp;Hey` **Matched**
+<b class="nc">&nbsp;    private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile(&quot;&amp;(?!(?:[a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});)&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private boolean keepCurlyBraces = false;</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setArgument(String arg) {
+<b class="nc">&nbsp;        if (&quot;keepCurlyBraces&quot;.equalsIgnoreCase(arg)) {</b>
+<b class="nc">&nbsp;            this.keepCurlyBraces = true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String inField) {
+<b class="nc">&nbsp;        String field = normalizedField(inField);</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        StringBuilder currentCommand = null;</b>
+&nbsp;
+&nbsp;        char c;
+<b class="nc">&nbsp;        boolean escaped = false;</b>
+<b class="nc">&nbsp;        boolean incommand = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; field.length(); i++) {</b>
+<b class="nc">&nbsp;            c = field.charAt(i);</b>
+<b class="nc">&nbsp;            if (escaped &amp;&amp; (c == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                sb.append(&#39;\\&#39;);</b>
+<b class="nc">&nbsp;                escaped = false;</b>
+<b class="nc">&nbsp;            } else if (c == &#39;\\&#39;) {</b>
+<b class="nc">&nbsp;                if (incommand) {</b>
+&nbsp;                    /* Close Command */
+<b class="nc">&nbsp;                    String command = currentCommand.toString();</b>
+<b class="nc">&nbsp;                    String result = HTML_CHARS.get(command);</b>
+<b class="nc">&nbsp;                    sb.append(Objects.requireNonNullElse(result, command));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                escaped = true;</b>
+<b class="nc">&nbsp;                incommand = true;</b>
+<b class="nc">&nbsp;                currentCommand = new StringBuilder();</b>
+<b class="nc">&nbsp;            } else if (!this.keepCurlyBraces &amp;&amp; !incommand &amp;&amp; ((c == &#39;{&#39;) || (c == &#39;}&#39;))) {</b>
+&nbsp;                // Swallow the brace.
+<b class="nc">&nbsp;            } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {</b>
+<b class="nc">&nbsp;                escaped = false;</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!incommand) {</b>
+<b class="nc">&nbsp;                    sb.append(c);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    currentCommand.append(c);</b>
+&nbsp;                    testCharCom:
+<b class="nc">&nbsp;                    if ((currentCommand.length() == 1)</b>
+<b class="nc">&nbsp;                            &amp;&amp; StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {</b>
+&nbsp;                        // This indicates that we are in a command of the type
+&nbsp;                        // \^o or \~{n}
+<b class="nc">&nbsp;                        if (i &gt;= (field.length() - 1)) {</b>
+&nbsp;                            break testCharCom;
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        String command = currentCommand.toString();</b>
+<b class="nc">&nbsp;                        i++;</b>
+<b class="nc">&nbsp;                        c = field.charAt(i);</b>
+&nbsp;                        String commandBody;
+<b class="nc">&nbsp;                        if (c == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                            String part = StringUtil.getPart(field, i, false);</b>
+<b class="nc">&nbsp;                            i += this.keepCurlyBraces ? part.length() + 1 : part.length();</b>
+<b class="nc">&nbsp;                            commandBody = part;</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            commandBody = field.substring(i, i + 1);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        String result = HTML_CHARS.get(command + commandBody);</b>
+&nbsp;
+<b class="nc">&nbsp;                        sb.append(Objects.requireNonNullElse(result, commandBody));</b>
+&nbsp;
+<b class="nc">&nbsp;                        incommand = false;</b>
+&nbsp;                    } else {
+&nbsp;                        // Are we already at the end of the string?
+<b class="nc">&nbsp;                        if ((i + 1) == field.length()) {</b>
+<b class="nc">&nbsp;                            String command = currentCommand.toString();</b>
+<b class="nc">&nbsp;                            String result = HTML_CHARS.get(command);</b>
+&nbsp;                            /* If found, then use translated version. If not,
+&nbsp;                             * then keep
+&nbsp;                             * the text of the parameter intact.
+&nbsp;                             */
+<b class="nc">&nbsp;                            sb.append(Objects.requireNonNullElse(result, command));</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (!incommand) {</b>
+<b class="nc">&nbsp;                    sb.append(c);</b>
+<b class="nc">&nbsp;                } else if (Character.isWhitespace(c) || (c == &#39;{&#39;) || (c == &#39;}&#39;)) {</b>
+<b class="nc">&nbsp;                    String command = currentCommand.toString();</b>
+&nbsp;
+&nbsp;                    // Test if we are dealing with a formatting
+&nbsp;                    // command.
+&nbsp;                    // If so, handle.
+<b class="nc">&nbsp;                    String tag = getHTMLTag(command);</b>
+<b class="nc">&nbsp;                    if (!tag.isEmpty()) {</b>
+<b class="nc">&nbsp;                        String part = StringUtil.getPart(field, i, true);</b>
+<b class="nc">&nbsp;                        if (this.keepCurlyBraces &amp;&amp; (c == &#39;{&#39; || (c == &#39;}&#39;))) {</b>
+<b class="nc">&nbsp;                            i++;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        i += part.length();</b>
+<b class="nc">&nbsp;                        sb.append(&#39;&lt;&#39;).append(tag).append(&#39;&gt;&#39;).append(part).append(&quot;&lt;/&quot;).append(tag).append(&#39;&gt;&#39;);</b>
+<b class="nc">&nbsp;                    } else if (c == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                        String argument = StringUtil.getPart(field, i, true);</b>
+<b class="nc">&nbsp;                        i += this.keepCurlyBraces ? argument.length() + 1 : argument.length();</b>
+&nbsp;                        // handle common case of general latex command
+<b class="nc">&nbsp;                        String result = HTML_CHARS.get(command + argument);</b>
+&nbsp;                        // If found, then use translated version. If not, then keep
+&nbsp;                        // the text of the parameter intact.
+&nbsp;
+<b class="nc">&nbsp;                        if (result == null) {</b>
+<b class="nc">&nbsp;                            if (argument.isEmpty()) {</b>
+&nbsp;                                // Maybe a separator, such as in \LaTeX{}, so use command
+<b class="nc">&nbsp;                                sb.append(command);</b>
+&nbsp;                            } else {
+&nbsp;                                // Otherwise, use argument
+<b class="nc">&nbsp;                                sb.append(argument);</b>
+&nbsp;                            }
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            sb.append(result);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    } else if (c == &#39;}&#39;) {</b>
+&nbsp;                        // This end brace terminates a command. This can be the case in
+&nbsp;                        // constructs like {\aa}. The correct behaviour should be to
+&nbsp;                        // substitute the evaluated command.
+<b class="nc">&nbsp;                        String result = HTML_CHARS.get(command);</b>
+&nbsp;                        // If the command is unknown, just print it:
+<b class="nc">&nbsp;                        sb.append(Objects.requireNonNullElse(result, command));</b>
+&nbsp;                        // We only keep the brace if we are in &#39;KEEP&#39; mode.
+<b class="nc">&nbsp;                        if (this.keepCurlyBraces) {</b>
+<b class="nc">&nbsp;                            sb.append(c);</b>
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        String result = HTML_CHARS.get(command);</b>
+<b class="nc">&nbsp;                        sb.append(Objects.requireNonNullElse(result, command));</b>
+<b class="nc">&nbsp;                        sb.append(&#39; &#39;);</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    sb.append(c);</b>
+&nbsp;                    /*
+&nbsp;                     * TODO: this point is reached, apparently, if a command is
+&nbsp;                     * terminated in a strange way, such as with &quot;$\omega$&quot;.
+&nbsp;                     * Also, the command &quot;\&amp;&quot; causes us to get here. The former
+&nbsp;                     * issue is maybe a little difficult to address, since it
+&nbsp;                     * involves the LaTeX math mode. We don&#39;t have a complete
+&nbsp;                     * LaTeX parser, so maybe it&#39;s better to ignore these
+&nbsp;                     * commands?
+&nbsp;                     */
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                incommand = false;</b>
+<b class="nc">&nbsp;                escaped = false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return sb.toString().replace(&quot;~&quot;, &quot;&amp;nbsp;&quot;); // Replace any remaining ~ with &amp;nbsp; (non-breaking spaces)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String normalizedField(String inField) {
+&nbsp;        // Cannot use StringEscapeUtils#escapeHtml4 because it does not handle LaTeX characters and commands.
+<b class="nc">&nbsp;        return HTML_ENTITY_PATTERN.matcher(inField).replaceAll(&quot;&amp;amp;&quot;) // Replace &amp; with &amp;amp; if it does not begin an HTML entity</b>
+<b class="nc">&nbsp;                                  .replaceAll(&quot;\\\\&amp;&quot;, &quot;&amp;amp;&quot;) // Replace \&amp; with &amp;amp;</b>
+<b class="nc">&nbsp;                                  .replaceAll(&quot;[\\n]{2,}&quot;, &quot;&lt;p&gt;&quot;) // Replace double line breaks with &lt;p&gt;</b>
+<b class="nc">&nbsp;                                  .replace(&quot;\n&quot;, &quot;&lt;br&gt;&quot;) // Replace single line breaks with &lt;br&gt;</b>
+<b class="nc">&nbsp;                                  .replace(&quot;\\$&quot;, &quot;&amp;dollar;&quot;) // Replace \$ with &amp;dollar;</b>
+<b class="nc">&nbsp;                                  .replaceAll(&quot;\\$([^$]*)\\$&quot;, this.keepCurlyBraces ? &quot;\\\\{$1\\\\}&quot; : &quot;$1}&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getHTMLTag(String latexCommand) {
+<b class="nc">&nbsp;        String result = &quot;&quot;;</b>
+<b class="nc">&nbsp;        switch (latexCommand) {</b>
+&nbsp;            // Italic
+&nbsp;            case &quot;textit&quot;:
+&nbsp;            case &quot;it&quot;:
+<b class="nc">&nbsp;                result = &quot;i&quot;;</b>
+&nbsp;                break;
+&nbsp;            // Emphasize
+&nbsp;            case &quot;emph&quot;:
+&nbsp;            case &quot;em&quot;:
+<b class="nc">&nbsp;                result = &quot;em&quot;;</b>
+&nbsp;                break;
+&nbsp;            // Bold font
+&nbsp;            case &quot;textbf&quot;:
+&nbsp;            case &quot;bf&quot;:
+<b class="nc">&nbsp;                result = &quot;b&quot;;</b>
+&nbsp;                break;
+&nbsp;            // Underline
+&nbsp;            case &quot;underline&quot;:
+<b class="nc">&nbsp;                result = &quot;u&quot;;</b>
+&nbsp;                break;
+&nbsp;            // Strikeout, sout is the &quot;standard&quot; command, although it is actually based on the package ulem
+&nbsp;            case &quot;sout&quot;:
+<b class="nc">&nbsp;                result = &quot;s&quot;;</b>
+&nbsp;                break;
+&nbsp;            // Monospace font
+&nbsp;            case &quot;texttt&quot;:
+<b class="nc">&nbsp;                result = &quot;tt&quot;;</b>
+&nbsp;                break;
+&nbsp;            // Superscript
+&nbsp;            case &quot;textsuperscript&quot;:
+<b class="nc">&nbsp;                result = &quot;sup&quot;;</b>
+&nbsp;                break;
+&nbsp;            // Subscript
+&nbsp;            case &quot;textsubscript&quot;:
+<b class="nc">&nbsp;                result = &quot;sub&quot;;</b>
+&nbsp;                break;
+&nbsp;            default:
+&nbsp;                break;
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

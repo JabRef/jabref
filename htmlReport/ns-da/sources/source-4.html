@@ -1,0 +1,146 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LocalizationKeyParams</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.l10n</a>
+</div>
+
+<h1>Coverage Summary for Class: LocalizationKeyParams (org.jabref.logic.l10n)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LocalizationKeyParams</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.l10n;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;
+&nbsp;public class LocalizationKeyParams {
+&nbsp;
+&nbsp;    private final LocalizationKey key;
+&nbsp;    private final List&lt;String&gt; params;
+&nbsp;
+<b class="fc">&nbsp;    public LocalizationKeyParams(String key, String... params) {</b>
+<b class="fc">&nbsp;        this.key = LocalizationKey.fromKey(key);</b>
+<b class="fc">&nbsp;        this.params = Arrays.asList(params);</b>
+<b class="pc">&nbsp;        if (this.params.size() &gt; 10) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Translations can only have at most 10 parameters&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String replacePlaceholders() {
+<b class="fc">&nbsp;        String translation = key.getKey();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int i = 0; i &lt; params.size(); i++) {</b>
+<b class="fc">&nbsp;            String param = params.get(i);</b>
+<b class="fc">&nbsp;            translation = translation.replaceAll(&quot;%&quot; + i, Matcher.quoteReplacement(param));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return translation;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,328 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FieldWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bibtex</a>
+</div>
+
+<h1>Coverage Summary for Class: FieldWriter (org.jabref.logic.bibtex)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FieldWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/75)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bibtex;
+&nbsp;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Converts JabRef&#39;s internal BibTeX representation of a BibTeX field to BibTeX text representation
+&nbsp; */
+&nbsp;public class FieldWriter {
+&nbsp;
+&nbsp;    // See also ADR-0024
+&nbsp;    public static final char BIBTEX_STRING_START_END_SYMBOL = &#39;#&#39;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FieldWriter.class);</b>
+&nbsp;
+&nbsp;    private static final char FIELD_START = &#39;{&#39;;
+&nbsp;    private static final char FIELD_END = &#39;}&#39;;
+&nbsp;
+&nbsp;    private final boolean neverFailOnHashes;
+&nbsp;    private final FieldPreferences preferences;
+&nbsp;
+&nbsp;    public FieldWriter(FieldPreferences preferences) {
+<b class="nc">&nbsp;        this(true, preferences);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.neverFailOnHashes = neverFailOnHashes;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static FieldWriter buildIgnoreHashes(FieldPreferences prefs) {
+<b class="nc">&nbsp;        return new FieldWriter(true, prefs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void checkBraces(String text) throws InvalidFieldValueException {
+<b class="nc">&nbsp;        int left = 0;</b>
+<b class="nc">&nbsp;        int right = 0;</b>
+&nbsp;
+&nbsp;        // First we collect all occurrences:
+<b class="nc">&nbsp;        for (int i = 0; i &lt; text.length(); i++) {</b>
+<b class="nc">&nbsp;            char item = text.charAt(i);</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean charBeforeIsEscape = false;</b>
+<b class="nc">&nbsp;            if ((i &gt; 0) &amp;&amp; (text.charAt(i - 1) == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                charBeforeIsEscape = true;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!charBeforeIsEscape &amp;&amp; (item == &#39;{&#39;)) {</b>
+<b class="nc">&nbsp;                left++;</b>
+<b class="nc">&nbsp;            } else if (!charBeforeIsEscape &amp;&amp; (item == &#39;}&#39;)) {</b>
+<b class="nc">&nbsp;                right++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Then we throw an exception if the error criteria are met.
+<b class="nc">&nbsp;        if (right != 0 &amp;&amp; (left == 0)) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Unescaped &#39;}&#39; character without opening bracket ends string prematurely. Field value: {}&quot;, text);</b>
+<b class="nc">&nbsp;            throw new InvalidFieldValueException(&quot;Unescaped &#39;}&#39; character without opening bracket ends string prematurely. Field value: &quot; + text);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (right != 0 &amp;&amp; (right &lt; left)) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Unescaped &#39;}&#39; character without opening bracket ends string prematurely. Field value: {}&quot;, text);</b>
+<b class="nc">&nbsp;            throw new InvalidFieldValueException(&quot;Unescaped &#39;}&#39; character without opening bracket ends string prematurely. Field value: &quot; + text);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (left != right) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Braces don&#39;t match. Field value: {}&quot;, text);</b>
+<b class="nc">&nbsp;            throw new InvalidFieldValueException(&quot;Braces don&#39;t match. Field value: &quot; + text);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Formats the content of a field.
+&nbsp;     *
+&nbsp;     * @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
+&nbsp;     * @param content the content of the field
+&nbsp;     * @return a formatted string suitable for output
+&nbsp;     * @throws InvalidFieldValueException if content is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
+&nbsp;     */
+&nbsp;    public String write(Field field, String content) throws InvalidFieldValueException {
+<b class="nc">&nbsp;        if (content == null) {</b>
+<b class="nc">&nbsp;            return FIELD_START + &quot;&quot; + FIELD_END;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!shouldResolveStrings(field) || field.equals(InternalField.BIBTEX_STRING)) {</b>
+<b class="nc">&nbsp;            return formatWithoutResolvingStrings(content);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return formatAndResolveStrings(content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method handles # in the field content to get valid bibtex strings
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For instance, &lt;code&gt;#jan# - #feb#&lt;/code&gt; gets  &lt;code&gt;jan #{ - } # feb&lt;/code&gt; (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
+&nbsp;     */
+&nbsp;    private String formatAndResolveStrings(String content) throws InvalidFieldValueException {
+<b class="nc">&nbsp;        checkBraces(content);</b>
+&nbsp;
+<b class="nc">&nbsp;        content = content.replace(&quot;##&quot;, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+&nbsp;
+&nbsp;        // Here we assume that the user encloses any bibtex strings in #, e.g.:
+&nbsp;        // #jan# - #feb#
+&nbsp;        // ...which will be written to the file like this:
+&nbsp;        // jan # { - } # feb
+<b class="nc">&nbsp;        int pivot = 0;</b>
+<b class="nc">&nbsp;        while (pivot &lt; content.length()) {</b>
+<b class="nc">&nbsp;            int pos1 = getFirstOccurrenceOfStartEndSymbol(content, pivot);</b>
+&nbsp;            int pos2;
+<b class="nc">&nbsp;            if (pos1 == -1) {</b>
+&nbsp;                // Process content and end the loop after that
+<b class="nc">&nbsp;                pos1 = content.length();</b>
+<b class="nc">&nbsp;                pos2 = -1;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                pos2 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (pos2 == -1) {</b>
+<b class="nc">&nbsp;                if (neverFailOnHashes) {</b>
+<b class="nc">&nbsp;                    pos1 = content.length(); // just write out the rest of the text, and throw no exception</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;The character {} is not allowed in BibTeX strings unless escaped as in &#39;\\\\{}&#39;. &quot;</b>
+&nbsp;                                    + &quot;In JabRef, use pairs of # characters to indicate a string. &quot;
+&nbsp;                                    + &quot;Note that the entry causing the problem has been selected. Field value: {}&quot;,
+<b class="nc">&nbsp;                            BIBTEX_STRING_START_END_SYMBOL,</b>
+<b class="nc">&nbsp;                            BIBTEX_STRING_START_END_SYMBOL,</b>
+&nbsp;                            content);
+<b class="nc">&nbsp;                    throw new InvalidFieldValueException(</b>
+&nbsp;                            &quot;The character &quot; + BIBTEX_STRING_START_END_SYMBOL + &quot; is not allowed in BibTeX strings unless escaped as in &#39;\\&quot; + BIBTEX_STRING_START_END_SYMBOL + &quot;&#39;.\n&quot;
+&nbsp;                                    + &quot;In JabRef, use pairs of # characters to indicate a string.\n&quot;
+&nbsp;                                    + &quot;Note that the entry causing the problem has been selected. Field value: &quot; + content);
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (pos1 &gt; pivot) {</b>
+<b class="nc">&nbsp;                writeText(stringBuilder, content, pivot, pos1);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((pos1 &lt; content.length()) &amp;&amp; ((pos2 - 1) &gt; pos1)) {</b>
+&nbsp;                // We check that the string label is not empty. That means
+&nbsp;                // an occurrence of ## will simply be ignored. Should it instead
+&nbsp;                // cause an error message?
+<b class="nc">&nbsp;                writeStringLabel(stringBuilder, content, pos1 + 1, pos2, pos1 == pivot,</b>
+<b class="nc">&nbsp;                        (pos2 + 1) == content.length());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (pos2 &gt; -1) {</b>
+<b class="nc">&nbsp;                pivot = pos2 + 1;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                pivot = pos1 + 1;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return stringBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds the first occurrence of # from the pivot point
+&nbsp;     */
+&nbsp;    private static int getFirstOccurrenceOfStartEndSymbol(String content, int pivot) {
+<b class="nc">&nbsp;        int goFrom = pivot;</b>
+<b class="nc">&nbsp;        int pos1 = pivot;</b>
+<b class="nc">&nbsp;        while (goFrom == pos1) {</b>
+<b class="nc">&nbsp;            pos1 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, goFrom);</b>
+<b class="nc">&nbsp;            if ((pos1 &gt; 0) &amp;&amp; (content.charAt(pos1 - 1) == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                pos1++;</b>
+<b class="nc">&nbsp;                goFrom = pos1;</b>
+&nbsp;            } else {
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return pos1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean shouldResolveStrings(Field field) {
+<b class="nc">&nbsp;        if (preferences.shouldResolveStrings()) {</b>
+&nbsp;            // Resolve strings for the list of fields only
+<b class="nc">&nbsp;            return preferences.getResolvableFields().contains(field);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String formatWithoutResolvingStrings(String content) throws InvalidFieldValueException {
+<b class="nc">&nbsp;        checkBraces(content);</b>
+<b class="nc">&nbsp;        return FIELD_START + content + FIELD_END;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param stringBuilder the StringBuilder to append the text to
+&nbsp;     * @param text          the text to append
+&nbsp;     */
+&nbsp;    private void writeText(StringBuilder stringBuilder, String text, int startPos, int endPos) {
+<b class="nc">&nbsp;        stringBuilder.append(FIELD_START);</b>
+<b class="nc">&nbsp;        stringBuilder.append(text, startPos, endPos);</b>
+<b class="nc">&nbsp;        stringBuilder.append(FIELD_END);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param stringBuilder the StringBuilder to append the text to
+&nbsp;     * @param text          the text use as basis to get the text to append
+&nbsp;     * @param startPos      the position in text where the text to add starts
+&nbsp;     * @param endPos        the position in text where the text to add ends
+&nbsp;     * @param isFirst       true if the label to write is the first one to write
+&nbsp;     * @param isLast        true if the label to write is the last one to write
+&nbsp;     */
+&nbsp;    private void writeStringLabel(StringBuilder stringBuilder, String text, int startPos, int endPos, boolean isFirst, boolean isLast) {
+<b class="nc">&nbsp;        String line = (isFirst ? &quot;&quot; : &quot; # &quot;) + text.substring(startPos, endPos) + (isLast ? &quot;&quot; : &quot; # &quot;);</b>
+<b class="nc">&nbsp;        stringBuilder.append(line);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UpdateBibliography</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.frontend</a>
+</div>
+
+<h1>Coverage Summary for Class: UpdateBibliography (org.jabref.logic.openoffice.frontend)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UpdateBibliography</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.frontend;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.openoffice.style.JStyle;
+&nbsp;import org.jabref.logic.openoffice.style.OOFormatBibliography;
+&nbsp;import org.jabref.model.openoffice.DocumentAnnotation;
+&nbsp;import org.jabref.model.openoffice.ootext.OOText;
+&nbsp;import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+&nbsp;import org.jabref.model.openoffice.style.CitedKeys;
+&nbsp;import org.jabref.model.openoffice.uno.CreationException;
+&nbsp;import org.jabref.model.openoffice.uno.NoDocumentException;
+&nbsp;import org.jabref.model.openoffice.uno.UnoBookmark;
+&nbsp;import org.jabref.model.openoffice.uno.UnoTextSection;
+&nbsp;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.sun.star.text.XTextCursor;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;
+&nbsp;public class UpdateBibliography {
+&nbsp;
+&nbsp;    private static final String BIB_SECTION_NAME = &quot;JR_bib&quot;;
+&nbsp;    private static final String BIB_SECTION_END_NAME = &quot;JR_bib_end&quot;;
+&nbsp;
+&nbsp;    private UpdateBibliography() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;XTextRange&gt; getBibliographyRange(XTextDocument doc)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+<b class="nc">&nbsp;        return UnoTextSection.getAnchor(doc, BIB_SECTION_NAME);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Rebuilds the bibliography.
+&nbsp;     */
+&nbsp;    public static void rebuildBibTextSection(XTextDocument doc,
+&nbsp;                                             OOFrontend frontend,
+&nbsp;                                             CitedKeys bibliography,
+&nbsp;                                             JStyle style,
+&nbsp;                                             boolean alwaysAddCitedOnPages)
+&nbsp;            throws
+&nbsp;            WrappedTargetException,
+&nbsp;            CreationException,
+&nbsp;            NoDocumentException, IOException {
+&nbsp;
+<b class="nc">&nbsp;        clearBibTextSectionContent2(doc);</b>
+&nbsp;
+<b class="nc">&nbsp;        populateBibTextSection(doc,</b>
+&nbsp;                frontend,
+&nbsp;                bibliography,
+&nbsp;                style,
+&nbsp;                alwaysAddCitedOnPages);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Insert a paragraph break and create a text section for the bibliography.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Only called from `clearBibTextSectionContent2`
+&nbsp;     */
+&nbsp;    private static void createBibTextSection2(XTextDocument doc)
+&nbsp;            throws
+&nbsp;            CreationException {
+&nbsp;
+&nbsp;        // Always creating at the end of the document.
+&nbsp;        // Alternatively, we could receive a cursor.
+<b class="nc">&nbsp;        XTextCursor textCursor = doc.getText().createTextCursor();</b>
+<b class="nc">&nbsp;        textCursor.gotoEnd(false);</b>
+<b class="nc">&nbsp;        DocumentAnnotation annotation = new DocumentAnnotation(doc, BIB_SECTION_NAME, textCursor, false);</b>
+<b class="nc">&nbsp;        UnoTextSection.create(annotation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find and clear the text section BIB_SECTION_NAME to &quot;&quot;, or create it.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Only called from: `rebuildBibTextSection`
+&nbsp;     */
+&nbsp;    private static void clearBibTextSectionContent2(XTextDocument doc)
+&nbsp;            throws
+&nbsp;            CreationException,
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+&nbsp;        // Optional&lt;XTextRange&gt; sectionRange = UnoTextSection.getAnchor(doc, BIB_SECTION_NAME);
+<b class="nc">&nbsp;        Optional&lt;XTextRange&gt; sectionRange = getBibliographyRange(doc);</b>
+<b class="nc">&nbsp;        if (sectionRange.isEmpty()) {</b>
+<b class="nc">&nbsp;            createBibTextSection2(doc);</b>
+&nbsp;        } else {
+&nbsp;            // Clear it
+<b class="nc">&nbsp;            XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange.get());</b>
+<b class="nc">&nbsp;            cursor.setString(&quot;&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Only called from: `rebuildBibTextSection`
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Assumes the section named BIB_SECTION_NAME exists.
+&nbsp;     */
+&nbsp;    private static void populateBibTextSection(XTextDocument doc,
+&nbsp;                                               OOFrontend frontend,
+&nbsp;                                               CitedKeys bibliography,
+&nbsp;                                               JStyle style,
+&nbsp;                                               boolean alwaysAddCitedOnPages)
+&nbsp;            throws
+&nbsp;            CreationException,
+&nbsp;            IllegalArgumentException,
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException, IOException {
+&nbsp;
+<b class="nc">&nbsp;        XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);</b>
+&nbsp;
+<b class="nc">&nbsp;        XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange);</b>
+&nbsp;
+&nbsp;        // emit the title of the bibliography
+<b class="nc">&nbsp;        OOTextIntoOO.removeDirectFormatting(cursor);</b>
+<b class="nc">&nbsp;        OOText bibliographyText = OOFormatBibliography.formatBibliography(frontend.citationGroups,</b>
+&nbsp;                bibliography,
+&nbsp;                style,
+&nbsp;                alwaysAddCitedOnPages);
+<b class="nc">&nbsp;        OOTextIntoOO.write(doc, cursor, bibliographyText);</b>
+<b class="nc">&nbsp;        cursor.collapseToEnd();</b>
+&nbsp;
+&nbsp;        // remove the initial empty paragraph from the section.
+<b class="nc">&nbsp;        sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);</b>
+<b class="nc">&nbsp;        XTextCursor initialParagraph = doc.getText().createTextCursorByRange(sectionRange);</b>
+<b class="nc">&nbsp;        initialParagraph.collapseToStart();</b>
+<b class="nc">&nbsp;        initialParagraph.goRight((short) 1, true);</b>
+<b class="nc">&nbsp;        initialParagraph.setString(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        UnoBookmark.removeIfExists(doc, BIB_SECTION_END_NAME);</b>
+<b class="nc">&nbsp;        DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, BIB_SECTION_END_NAME, cursor, true);</b>
+<b class="nc">&nbsp;        UnoBookmark.create(documentAnnotation);</b>
+&nbsp;
+<b class="nc">&nbsp;        cursor.collapseToEnd();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

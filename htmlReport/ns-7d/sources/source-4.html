@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpecialFieldViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.specialfields</a>
+</div>
+
+<h1>Coverage Summary for Class: SpecialFieldViewModel (org.jabref.gui.specialfields)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpecialFieldViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpecialFieldViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.specialfields;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.Action;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.gui.undo.UndoableFieldChange;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.UpdateField;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.SpecialField;
+&nbsp;import org.jabref.model.entry.field.SpecialFieldValue;
+&nbsp;
+&nbsp;public class SpecialFieldViewModel {
+&nbsp;
+&nbsp;    private final SpecialField field;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;
+<b class="nc">&nbsp;    public SpecialFieldViewModel(SpecialField field, CliPreferences preferences, UndoManager undoManager) {</b>
+<b class="nc">&nbsp;        this.field = Objects.requireNonNull(field);</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+<b class="nc">&nbsp;        this.undoManager = Objects.requireNonNull(undoManager);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SpecialField getField() {
+<b class="nc">&nbsp;        return field;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SpecialFieldAction getSpecialFieldAction(SpecialFieldValue value,
+&nbsp;                                                    Supplier&lt;LibraryTab&gt; tabSupplier,
+&nbsp;                                                    DialogService dialogService,
+&nbsp;                                                    StateManager stateManager) {
+<b class="nc">&nbsp;        return new SpecialFieldAction(</b>
+&nbsp;                tabSupplier,
+&nbsp;                field,
+<b class="nc">&nbsp;                value.getFieldValue().orElse(null),</b>
+&nbsp;                // if field contains only one value, it has to be nulled, as another setting does not empty the field
+<b class="nc">&nbsp;                field.getValues().size() == 1,</b>
+<b class="nc">&nbsp;                getLocalization(),</b>
+&nbsp;                dialogService,
+&nbsp;                preferences,
+&nbsp;                undoManager,
+&nbsp;                stateManager);
+&nbsp;    }
+&nbsp;
+&nbsp;    public JabRefIcon getIcon() {
+<b class="nc">&nbsp;        return getAction().getIcon().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLocalization() {
+<b class="nc">&nbsp;        return getAction().getText();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Action getAction() {
+<b class="nc">&nbsp;        return switch (field) {</b>
+&nbsp;            case PRINTED -&gt;
+<b class="nc">&nbsp;                    StandardActions.PRINTED;</b>
+&nbsp;            case PRIORITY -&gt;
+<b class="nc">&nbsp;                    StandardActions.PRIORITY;</b>
+&nbsp;            case QUALITY -&gt;
+<b class="nc">&nbsp;                    StandardActions.QUALITY;</b>
+&nbsp;            case RANKING -&gt;
+<b class="nc">&nbsp;                    StandardActions.RANKING;</b>
+&nbsp;            case READ_STATUS -&gt;
+<b class="nc">&nbsp;                    StandardActions.READ_STATUS;</b>
+&nbsp;            case RELEVANCE -&gt;
+<b class="nc">&nbsp;                    StandardActions.RELEVANCE;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public JabRefIcon getEmptyIcon() {
+<b class="nc">&nbsp;        return getIcon();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;SpecialFieldValueViewModel&gt; getValues() {
+<b class="nc">&nbsp;        return field.getValues().stream()</b>
+<b class="nc">&nbsp;                    .map(SpecialFieldValueViewModel::new)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSpecialFieldValue(BibEntry bibEntry, SpecialFieldValue value) {
+<b class="nc">&nbsp;        Optional&lt;FieldChange&gt; change = UpdateField.updateField(bibEntry, getField(), value.getFieldValue().orElse(null), getField().isSingleValueField());</b>
+&nbsp;
+<b class="nc">&nbsp;        change.ifPresent(fieldChange -&gt; undoManager.addEdit(new UndoableFieldChange(fieldChange)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void toggle(BibEntry entry) {
+<b class="nc">&nbsp;        setSpecialFieldValue(entry, getField().getValues().getFirst());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

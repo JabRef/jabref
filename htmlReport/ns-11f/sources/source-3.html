@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Study</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.study</a>
+</div>
+
+<h1>Coverage Summary for Class: Study (org.jabref.model.study)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Study</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.study;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.crawler.StudyYamlParser;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+&nbsp;import com.fasterxml.jackson.annotation.JsonProperty;
+&nbsp;import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class represents a scientific study.
+&nbsp; * &lt;p&gt;
+&nbsp; * This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
+&nbsp; * &lt;p&gt;
+&nbsp; * The file is parsed using by {@link StudyYamlParser}
+&nbsp; */
+&nbsp;@JsonPropertyOrder({&quot;authors&quot;, &quot;title&quot;, &quot;research-questions&quot;, &quot;queries&quot;, &quot;databases&quot;})
+&nbsp;// The user might add arbitrary content to the YAML
+&nbsp;@JsonIgnoreProperties(ignoreUnknown = true)
+&nbsp;public class Study {
+&nbsp;    private List&lt;String&gt; authors;
+&nbsp;
+&nbsp;    private String title;
+&nbsp;
+&nbsp;    @JsonProperty(&quot;research-questions&quot;)
+&nbsp;    private List&lt;String&gt; researchQuestions;
+&nbsp;
+&nbsp;    private List&lt;StudyQuery&gt; queries;
+&nbsp;
+&nbsp;    private List&lt;StudyDatabase&gt; databases;
+&nbsp;
+<b class="nc">&nbsp;    public Study(List&lt;String&gt; authors, String title, List&lt;String&gt; researchQuestions, List&lt;StudyQuery&gt; queryEntries, List&lt;StudyDatabase&gt; databases) {</b>
+<b class="nc">&nbsp;        this.authors = authors;</b>
+<b class="nc">&nbsp;        this.title = title;</b>
+<b class="nc">&nbsp;        this.researchQuestions = researchQuestions;</b>
+<b class="nc">&nbsp;        this.queries = queryEntries;</b>
+<b class="nc">&nbsp;        this.databases = databases;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used for Jackson deserialization
+&nbsp;     */
+<b class="nc">&nbsp;    private Study() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getAuthors() {
+<b class="nc">&nbsp;        return authors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAuthors(List&lt;String&gt; authors) {
+<b class="nc">&nbsp;        this.authors = authors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;StudyQuery&gt; getQueries() {
+<b class="nc">&nbsp;        return queries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setQueries(List&lt;StudyQuery&gt; queries) {
+<b class="nc">&nbsp;        this.queries = queries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;StudyDatabase&gt; getDatabases() {
+<b class="nc">&nbsp;        return databases;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDatabases(List&lt;StudyDatabase&gt; databases) {
+<b class="nc">&nbsp;        this.databases = databases;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTitle() {
+<b class="nc">&nbsp;        return title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTitle(String title) {
+<b class="nc">&nbsp;        this.title = title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getResearchQuestions() {
+<b class="nc">&nbsp;        return researchQuestions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setResearchQuestions(List&lt;String&gt; researchQuestions) {
+<b class="nc">&nbsp;        this.researchQuestions = researchQuestions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;Study{&quot; +</b>
+&nbsp;                &quot;authors=&quot; + authors +
+&nbsp;                &quot;, studyName=&#39;&quot; + title + &#39;\&#39;&#39; +
+&nbsp;                &quot;, researchQuestions=&quot; + researchQuestions +
+&nbsp;                &quot;, queries=&quot; + queries +
+&nbsp;                &quot;, libraries=&quot; + databases +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object other) {
+<b class="nc">&nbsp;        if (this == other) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (other == null || getClass() != other.getClass()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Study otherStudy = (Study) other;</b>
+&nbsp;
+<b class="nc">&nbsp;        return Objects.equals(authors, otherStudy.authors) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(title, otherStudy.title) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(researchQuestions, otherStudy.researchQuestions) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(queries, otherStudy.queries) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(databases, otherStudy.databases);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(authors, title, researchQuestions, queries, databases);</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

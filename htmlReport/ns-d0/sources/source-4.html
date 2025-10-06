@@ -1,0 +1,347 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibtexImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: BibtexImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibtexImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BibtexImporter$EncodingResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedInputStream;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.CharsetDecoder;
+&nbsp;import java.nio.charset.CodingErrorAction;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.exporter.SaveConfiguration;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabaseModeDetection;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This is a full class to read .bib files. It is used for &lt;code&gt;--import&lt;/code&gt; and &lt;code&gt;--importToOpen &lt;/code&gt;, too.
+&nbsp; */
+&nbsp;public class BibtexImporter extends Importer {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexImporter.class);</b>
+&nbsp;
+&nbsp;    // Signature written at the top of the .bib file in earlier versions.
+&nbsp;    private static final String SIGNATURE = &quot;This file was created with JabRef&quot;;
+&nbsp;
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;    private final FileUpdateMonitor fileMonitor;
+&nbsp;
+<b class="nc">&nbsp;    public BibtexImporter(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = importFormatPreferences;</b>
+<b class="nc">&nbsp;        this.fileMonitor = fileMonitor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
+&nbsp;     * https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader reader) {
+<b class="nc">&nbsp;        Objects.requireNonNull(reader);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(Path filePath) throws IOException {
+<b class="nc">&nbsp;        EncodingResult encodingResult = getEncodingResult(filePath);</b>
+<b class="nc">&nbsp;        ParserResult parserResult = importDatabase(Files.newInputStream(filePath), encodingResult);</b>
+<b class="nc">&nbsp;        parserResult.setPath(filePath);</b>
+<b class="nc">&nbsp;        return parserResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ParserResult importDatabase(InputStream filePath, EncodingResult result) throws IOException {
+&nbsp;        // We replace unreadable characters
+&nbsp;        // Unfortunately, no warning will be issued to the user
+&nbsp;        // As this is a very seldom case, we accept that
+<b class="nc">&nbsp;        CharsetDecoder decoder = result.encoding().newDecoder();</b>
+<b class="nc">&nbsp;        decoder.onMalformedInput(CodingErrorAction.REPLACE);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (InputStreamReader inputStreamReader = new InputStreamReader(filePath, decoder);</b>
+<b class="nc">&nbsp;             BufferedReader reader = new BufferedReader(inputStreamReader)) {</b>
+<b class="nc">&nbsp;            ParserResult parserResult = this.importDatabase(reader);</b>
+<b class="nc">&nbsp;            parserResult.getMetaData().setEncoding(result.encoding());</b>
+<b class="nc">&nbsp;            parserResult.getMetaData().setEncodingExplicitlySupplied(result.encodingExplicitlySupplied());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (parserResult.getMetaData().getMode().isEmpty()) {</b>
+<b class="nc">&nbsp;                parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return parserResult;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Charset getEncoding(Path filePath) throws IOException {
+<b class="nc">&nbsp;        return getEncodingResult(filePath).encoding();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the encoding of the supplied BibTeX file. If a JabRef encoding information is present, this information is used.
+&nbsp;     * If there is none present, {@link com.ibm.icu.text.CharsetDetector#CharsetDetector()} is used.
+&nbsp;     */
+&nbsp;    private static EncodingResult getEncodingResult(Path filePath) throws IOException {
+&nbsp;        // We want to check if there is a JabRef encoding heading in the file, because that would tell us
+&nbsp;        // which character encoding is used.
+&nbsp;
+&nbsp;        // In general, we have to use InputStream and not a Reader, because a Reader requires an encoding specification.
+&nbsp;        // We do not want to do a byte-by-byte reading or doing wild try/catch magic.
+&nbsp;        // We therefore use a charset detection library and then read JabRefs &quot;% Encoding&quot; mark
+&nbsp;
+&nbsp;        Charset detectedCharset;
+<b class="nc">&nbsp;        try (InputStream inputStream = Files.newInputStream(filePath)) {</b>
+<b class="nc">&nbsp;            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);</b>
+<b class="nc">&nbsp;            bufferedInputStream.mark(8192);</b>
+<b class="nc">&nbsp;            detectedCharset = getCharset(bufferedInputStream);</b>
+<b class="nc">&nbsp;            bufferedInputStream.reset();</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Detected charset: {}&quot;, detectedCharset.name());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        Charset encoding;
+&nbsp;        boolean encodingExplicitlySupplied;
+<b class="nc">&nbsp;        try (BufferedReader reader = Files.newBufferedReader(filePath, detectedCharset)) {</b>
+<b class="nc">&nbsp;            Optional&lt;Charset&gt; suppliedEncoding = getSuppliedEncoding(reader);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Supplied encoding: {}&quot;, suppliedEncoding);</b>
+<b class="nc">&nbsp;            encodingExplicitlySupplied = suppliedEncoding.isPresent();</b>
+&nbsp;
+&nbsp;            // in case no encoding information is present, use the detected one
+<b class="nc">&nbsp;            encoding = suppliedEncoding.orElse(detectedCharset);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Encoding used to read the file: {}&quot;, encoding);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new EncodingResult(encoding, encodingExplicitlySupplied);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method does not set the metadata encoding information. The caller needs to set the encoding of the supplied
+&nbsp;     * reader manually to the metadata
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;bibtex&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;BibTeX&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StandardFileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.BIBTEX_DB;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;This importer enables \&quot;--importToOpen someEntry.bib\&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Searches the file for &quot;Encoding: myEncoding&quot; and returns the found supplied encoding.
+&nbsp;     */
+&nbsp;    private static Optional&lt;Charset&gt; getSuppliedEncoding(BufferedReader reader) {
+&nbsp;        try {
+&nbsp;            String line;
+<b class="nc">&nbsp;            while ((line = reader.readLine()) != null) {</b>
+<b class="nc">&nbsp;                line = line.trim();</b>
+&nbsp;                // % = char 37, we might have some bom chars in front that we need to skip, so we use index of
+<b class="nc">&nbsp;                int percentPos = line.indexOf(&#39;%&#39;);</b>
+&nbsp;                // Line does not start with %, so there are no comment lines for us and we can stop parsing
+<b class="nc">&nbsp;                if (percentPos == -1) {</b>
+<b class="nc">&nbsp;                    return Optional.empty();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // Only keep the part after %
+<b class="nc">&nbsp;                line = line.substring(percentPos + 1).trim();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (line.startsWith(BibtexImporter.SIGNATURE)) {</b>
+&nbsp;                    // Signature line, so keep reading and skip to next line
+<b class="nc">&nbsp;                } else if (line.startsWith(SaveConfiguration.ENCODING_PREFIX)) {</b>
+&nbsp;                    // Line starts with &quot;Encoding: &quot;, so the rest of the line should contain the name of the encoding
+&nbsp;                    // Except if there is already a @ symbol signaling the starting of a BibEntry
+<b class="nc">&nbsp;                    int atSymbolIndex = line.indexOf(&#39;@&#39;);</b>
+&nbsp;                    String encoding;
+<b class="nc">&nbsp;                    if (atSymbolIndex &gt; 0) {</b>
+<b class="nc">&nbsp;                        encoding = line.substring(SaveConfiguration.ENCODING_PREFIX.length(), atSymbolIndex);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        encoding = line.substring(SaveConfiguration.ENCODING_PREFIX.length());</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    return Optional.of(Charset.forName(encoding));</b>
+&nbsp;                } else {
+&nbsp;                    // Line not recognized so stop parsing
+<b class="nc">&nbsp;                    return Optional.empty();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Supplied encoding could not be determined&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

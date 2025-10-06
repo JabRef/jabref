@@ -1,0 +1,324 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoCompletionTextInputBinding</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.autocompleter</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoCompletionTextInputBinding (org.jabref.gui.autocompleter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoCompletionTextInputBinding</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoCompletionTextInputBinding$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/**
+&nbsp; * Copyright (c) 2014, 2015, ControlsFX
+&nbsp; * All rights reserved.
+&nbsp; *
+&nbsp; * Redistribution and use in source and binary forms, with or without
+&nbsp; * modification, are permitted provided that the following conditions are met:
+&nbsp; * * Redistributions of source code must retain the above copyright
+&nbsp; * notice, this list of conditions and the following disclaimer.
+&nbsp; * * Redistributions in binary form must reproduce the above copyright
+&nbsp; * notice, this list of conditions and the following disclaimer in the
+&nbsp; * documentation and/or other materials provided with the distribution.
+&nbsp; * * Neither the name of ControlsFX, any associated website, nor the
+&nbsp; * names of its contributors may be used to endorse or promote products
+&nbsp; * derived from this software without specific prior written permission.
+&nbsp; *
+&nbsp; * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+&nbsp; * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+&nbsp; * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+&nbsp; * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+&nbsp; * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+&nbsp; * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+&nbsp; * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+&nbsp; * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+&nbsp; * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+&nbsp; * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+&nbsp; */
+&nbsp;package org.jabref.gui.autocompleter;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;
+&nbsp;import javafx.beans.value.ChangeListener;
+&nbsp;import javafx.scene.control.TextInputControl;
+&nbsp;import javafx.util.Callback;
+&nbsp;import javafx.util.StringConverter;
+&nbsp;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;
+&nbsp;import org.controlsfx.control.textfield.AutoCompletionBinding;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a binding between a text input control and an auto-completion popup
+&nbsp; * This class is a slightly modified version of {@link impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding}
+&nbsp; * that works with general text input controls instead of just text fields.
+&nbsp; */
+&nbsp;public class AutoCompletionTextInputBinding&lt;T&gt; extends AutoCompletionBinding&lt;T&gt; {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * String converter to be used to convert suggestions to strings.
+&nbsp;     */
+&nbsp;    private StringConverter&lt;T&gt; converter;
+&nbsp;    private AutoCompletionStrategy inputAnalyzer;
+<b class="nc">&nbsp;    private final ChangeListener&lt;String&gt; textChangeListener = (_, _, newText) -&gt; {</b>
+<b class="nc">&nbsp;        if (getCompletionTarget().isFocused()) {</b>
+<b class="nc">&nbsp;            setUserInputText(newText);</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;    private boolean showOnFocus;
+<b class="nc">&nbsp;    private final ChangeListener&lt;Boolean&gt; focusChangedListener = (_, _, newFocused) -&gt; {</b>
+<b class="nc">&nbsp;        if (newFocused) {</b>
+<b class="nc">&nbsp;            if (showOnFocus) {</b>
+<b class="nc">&nbsp;                setUserInputText(getCompletionTarget().getText());</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            hidePopup();</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new auto-completion binding between the given textInputControl
+&nbsp;     * and the given suggestion provider.
+&nbsp;     */
+&nbsp;    private AutoCompletionTextInputBinding(final TextInputControl textInputControl,
+&nbsp;                                           Callback&lt;ISuggestionRequest, Collection&lt;T&gt;&gt; suggestionProvider) {
+&nbsp;
+<b class="nc">&nbsp;        this(textInputControl,</b>
+&nbsp;                suggestionProvider,
+<b class="nc">&nbsp;                AutoCompletionTextInputBinding.defaultStringConverter(),</b>
+&nbsp;                new ReplaceStrategy());
+&nbsp;    }
+&nbsp;
+&nbsp;    private AutoCompletionTextInputBinding(final TextInputControl textInputControl,
+&nbsp;                                           final Callback&lt;ISuggestionRequest, Collection&lt;T&gt;&gt; suggestionProvider,
+&nbsp;                                           final StringConverter&lt;T&gt; converter) {
+<b class="nc">&nbsp;        this(textInputControl, suggestionProvider, converter, new ReplaceStrategy());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private AutoCompletionTextInputBinding(final TextInputControl textInputControl,
+&nbsp;                                           final Callback&lt;ISuggestionRequest, Collection&lt;T&gt;&gt; suggestionProvider,
+&nbsp;                                           final StringConverter&lt;T&gt; converter,
+&nbsp;                                           final AutoCompletionStrategy inputAnalyzer) {
+&nbsp;
+<b class="nc">&nbsp;        super(textInputControl, suggestionProvider, converter);</b>
+<b class="nc">&nbsp;        this.converter = converter;</b>
+<b class="nc">&nbsp;        this.inputAnalyzer = inputAnalyzer;</b>
+&nbsp;
+<b class="nc">&nbsp;        getCompletionTarget().textProperty().addListener(textChangeListener);</b>
+<b class="nc">&nbsp;        getCompletionTarget().focusedProperty().addListener(focusChangedListener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static &lt;T&gt; StringConverter&lt;T&gt; defaultStringConverter() {
+<b class="nc">&nbsp;        return new StringConverter&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public String toString(T t) {
+<b class="nc">&nbsp;                return t == null ? null : t.toString();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;            @Override
+&nbsp;            public T fromString(String string) {
+<b class="nc">&nbsp;                return (T) string;</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; void autoComplete(TextInputControl textArea, Callback&lt;ISuggestionRequest, Collection&lt;T&gt;&gt; suggestionProvider) {
+<b class="nc">&nbsp;        new AutoCompletionTextInputBinding&lt;&gt;(textArea, suggestionProvider);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; void autoComplete(TextInputControl textArea, Callback&lt;ISuggestionRequest, Collection&lt;T&gt;&gt; suggestionProvider, StringConverter&lt;T&gt; converter) {
+<b class="nc">&nbsp;        new AutoCompletionTextInputBinding&lt;&gt;(textArea, suggestionProvider, converter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; AutoCompletionTextInputBinding&lt;T&gt; autoComplete(TextInputControl textArea, Callback&lt;ISuggestionRequest, Collection&lt;T&gt;&gt; suggestionProvider, StringConverter&lt;T&gt; converter, AutoCompletionStrategy inputAnalyzer) {
+<b class="nc">&nbsp;        return new AutoCompletionTextInputBinding&lt;&gt;(textArea, suggestionProvider, converter, inputAnalyzer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; AutoCompletionTextInputBinding&lt;T&gt; autoComplete(TextInputControl textArea, Callback&lt;ISuggestionRequest, Collection&lt;T&gt;&gt; suggestionProvider, AutoCompletionStrategy inputAnalyzer) {
+<b class="nc">&nbsp;        return autoComplete(textArea, suggestionProvider, AutoCompletionTextInputBinding.defaultStringConverter(), inputAnalyzer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setUserInputText(String newText) {
+<b class="nc">&nbsp;        if (newText == null) {</b>
+<b class="nc">&nbsp;            newText = &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        AutoCompletionInput input = inputAnalyzer.analyze(newText);</b>
+<b class="nc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; setUserInput(input.getUnfinishedPart()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TextInputControl getCompletionTarget() {
+<b class="nc">&nbsp;        return (TextInputControl) super.getCompletionTarget();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void dispose() {
+<b class="nc">&nbsp;        getCompletionTarget().textProperty().removeListener(textChangeListener);</b>
+<b class="nc">&nbsp;        getCompletionTarget().focusedProperty().removeListener(focusChangedListener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void completeUserInput(T completion) {
+<b class="nc">&nbsp;        String completionText = converter.toString(completion);</b>
+<b class="nc">&nbsp;        String inputText = getCompletionTarget().getText();</b>
+<b class="nc">&nbsp;        if (inputText == null) {</b>
+<b class="nc">&nbsp;            inputText = &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        AutoCompletionInput input = inputAnalyzer.analyze(inputText);</b>
+<b class="nc">&nbsp;        String newText = input.getPrefix() + completionText;</b>
+<b class="nc">&nbsp;        getCompletionTarget().setText(newText);</b>
+<b class="nc">&nbsp;        getCompletionTarget().positionCaret(newText.length());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShowOnFocus(boolean showOnFocus) {
+<b class="nc">&nbsp;        this.showOnFocus = showOnFocus;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

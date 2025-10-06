@@ -1,0 +1,285 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > URLUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util</a>
+</div>
+
+<h1>Coverage Summary for Class: URLUtil (org.jabref.logic.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">URLUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLDecoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;
+&nbsp;/// URL utilities for URLs in the JabRef logic.
+&nbsp;///
+&nbsp;/// For GUI-oriented URL utilities see `org.jabref.gui.fieldeditors.URLUtil`
+<b class="nc">&nbsp;public class URLUtil {</b>
+&nbsp;
+&nbsp;    private static final String URL_REGEX = &quot;(?i)\\b((?:https?|ftp)://[^\\s]+)&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pattern matches a string containing a URL with a protocol
+&nbsp;     */
+<b class="nc">&nbsp;    public static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+&nbsp;    private static final String URL_EXP = &quot;^(https?|ftp)://.+&quot;;
+&nbsp;    // Detect Google search URL
+&nbsp;    private static final String GOOGLE_SEARCH_EXP = &quot;^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cleans URLs returned by Google search.
+&nbsp;     * &lt;h4&gt;Example&lt;/h4&gt;
+&nbsp;     * &lt;pre&gt;{@code
+&nbsp;     * If you copy links from search results from Google, all links will be enriched with search meta data, e.g.
+&nbsp;     * https://www.google.de/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=1&amp;cad=rja&amp;uact=8&amp;&amp;url=http%3A%2F%2Fwww.inrg.csie.ntu.edu.tw%2Falgorithm2014%2Fhomework%2FWagner-74.pdf&amp;ei=DifeVYHkDYWqU5W0j6gD&amp;usg=AFQjCNFl638rl5KVta1jIMWLyb4CPSZidg&amp;sig2=0hSSMw9XZXL3HJWwEcJtOg
+&nbsp;     * }&lt;/pre&gt;
+&nbsp;     *
+&nbsp;     * @param url the Google search URL string
+&nbsp;     * @return the cleaned Google URL or @code{url} if no search URL was detected
+&nbsp;     */
+&nbsp;    public static String cleanGoogleSearchURL(String url) {
+<b class="nc">&nbsp;        Objects.requireNonNull(url);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!url.matches(GOOGLE_SEARCH_EXP)) {</b>
+<b class="nc">&nbsp;            return url;</b>
+&nbsp;        }
+&nbsp;        // Extract destination URL
+&nbsp;        try {
+<b class="nc">&nbsp;            URL searchURL = create(url);</b>
+&nbsp;            // URL parameters
+<b class="nc">&nbsp;            String query = searchURL.getQuery();</b>
+&nbsp;            // no parameters
+<b class="nc">&nbsp;            if (query == null) {</b>
+<b class="nc">&nbsp;                return url;</b>
+&nbsp;            }
+&nbsp;            // extract url parameter
+<b class="nc">&nbsp;            String[] pairs = query.split(&quot;&amp;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (String pair : pairs) {</b>
+&nbsp;                // &quot;clean&quot; url is decoded value of &quot;url&quot; parameter
+<b class="nc">&nbsp;                if (pair.startsWith(&quot;url=&quot;)) {</b>
+<b class="nc">&nbsp;                    String value = pair.substring(pair.indexOf(&#39;=&#39;) + 1);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String decode = URLDecoder.decode(value, StandardCharsets.UTF_8);</b>
+&nbsp;                    // url?
+<b class="nc">&nbsp;                    if (decode.matches(URL_EXP)) {</b>
+<b class="nc">&nbsp;                        return decode;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return url;</b>
+&nbsp;        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;            return url;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Checks whether the given String is a URL.
+&nbsp;    ///
+&nbsp;    /// Currently only checks for a protocol String.
+&nbsp;    ///
+&nbsp;    /// @param url the String to check for a URL
+&nbsp;    /// @return true if `url` contains a valid URL
+&nbsp;    public static boolean isURL(String url) {
+<b class="nc">&nbsp;        if (url == null || url.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Check if the URL has a protocol (http://, https://, ftp://)
+<b class="nc">&nbsp;        if (!URL_PATTERN.matcher(url).matches()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            create(url);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } catch (MalformedURLException | IllegalArgumentException e) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link URL} object from the given string URL.
+&nbsp;     *
+&nbsp;     * @param url the URL string to be converted into a {@link URL}.
+&nbsp;     * @return the {@link URL} object created from the string URL.
+&nbsp;     * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
+&nbsp;     */
+&nbsp;    public static URL create(String url) throws MalformedURLException {
+<b class="nc">&nbsp;        if (url == null || url.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;URL must not be null or empty.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String trimmedUrl = url.trim();</b>
+&nbsp;
+&nbsp;        // Add https:// prefix to URLs starting with www. to make them absolute
+<b class="nc">&nbsp;        if (trimmedUrl.startsWith(&quot;www.&quot;)) {</b>
+<b class="nc">&nbsp;            trimmedUrl = &quot;https://&quot; + trimmedUrl;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            URI parsedUri = new URI(trimmedUrl);</b>
+<b class="nc">&nbsp;            if (!parsedUri.isAbsolute()) {</b>
+<b class="nc">&nbsp;                throw new MalformedURLException(&quot;URI is not absolute: &quot; + url);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (parsedUri.getScheme() == null || parsedUri.getHost() == null) {</b>
+<b class="nc">&nbsp;                throw new MalformedURLException(&quot;URI must include both scheme and host: &quot; + url);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return parsedUri.toURL();</b>
+&nbsp;        } catch (URISyntaxException | IllegalArgumentException e) {
+<b class="nc">&nbsp;            throw new MalformedURLException(&quot;Invalid URI: &quot; + url + &quot; | &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link URI} object from the given string URL.
+&nbsp;     * This method attempts to convert the given URL string into a {@link URI} object.
+&nbsp;     * The pipe character (&#39;|&#39;) is replaced with its percent-encoded equivalent (&quot;%7C&quot;) because the pipe character
+&nbsp;     * is only a valid character according to RFC3986. However, JDK&#39;s URI implementation is implementing RFC2396 and RFC2732, but not RFC3986.
+&nbsp;     *
+&nbsp;     * @param url the URL string to be converted into a {@link URI}.
+&nbsp;     * @return the {@link URI} object created from the string URL.
+&nbsp;     * @throws IllegalArgumentException if the string URL is not a valid URI or if the URI format is incorrect.
+&nbsp;     * @throws URISyntaxException       if the string URL has an invalid syntax and cannot be converted into a {@link URI}.
+&nbsp;     */
+&nbsp;    public static URI createUri(String url) {
+&nbsp;        try {
+&nbsp;            // Replace &#39;|&#39; character with its percent-encoded representation &#39;%7C&#39;.
+<b class="nc">&nbsp;            String urlFormat = url.replace(&quot;|&quot;, &quot;%7C&quot;);</b>
+<b class="nc">&nbsp;            return new URI(urlFormat);</b>
+&nbsp;        } catch (URISyntaxException e) {
+<b class="nc">&nbsp;            throw new IllegalArgumentException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extracts the filename from a URL.
+&nbsp;     * If the URL doesn&#39;t have a filename (ends with &#39;/&#39;), returns a default name.
+&nbsp;     *
+&nbsp;     * @param url the URL string to extract the filename from
+&nbsp;     * @return the extracted filename or a default name if none found
+&nbsp;     */
+&nbsp;    public static String getFileNameFromUrl(String url) {
+<b class="nc">&nbsp;        String fileName = url.substring(url.lastIndexOf(&#39;/&#39;) + 1);</b>
+<b class="nc">&nbsp;        if (fileName.isBlank()) {</b>
+<b class="nc">&nbsp;            fileName = &quot;downloaded.pdf&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return FileUtil.getValidFileName(fileName);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

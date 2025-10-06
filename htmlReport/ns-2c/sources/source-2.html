@@ -1,0 +1,280 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EditFieldContentViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.edit.automaticfiededitor.editfieldcontent</a>
+</div>
+
+<h1>Coverage Summary for Class: EditFieldContentViewModel (org.jabref.gui.edit.automaticfiededitor.editfieldcontent)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EditFieldContentViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableFieldChange;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;
+&nbsp;public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
+&nbsp;    public static final int TAB_INDEX = 0;
+&nbsp;
+&nbsp;    private final List&lt;BibEntry&gt; selectedEntries;
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty fieldValue = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Field&gt; selectedField = new SimpleObjectProperty&lt;&gt;(StandardField.AUTHOR);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty(Boolean.FALSE);</b>
+&nbsp;
+&nbsp;    private final Validator fieldValidator;
+&nbsp;    private final BooleanBinding canAppend;
+&nbsp;
+&nbsp;    public EditFieldContentViewModel(BibDatabase database, List&lt;BibEntry&gt; selectedEntries, StateManager stateManager) {
+<b class="nc">&nbsp;        super(database, stateManager);</b>
+<b class="nc">&nbsp;        this.selectedEntries = new ArrayList&lt;&gt;(selectedEntries);</b>
+&nbsp;
+<b class="nc">&nbsp;        fieldValidator = new FunctionBasedValidator&lt;&gt;(selectedField, field -&gt; {</b>
+<b class="nc">&nbsp;            if (StringUtil.isBlank(field.getName())) {</b>
+<b class="nc">&nbsp;                return ValidationMessage.error(&quot;Field name cannot be empty&quot;);</b>
+<b class="nc">&nbsp;            } else if (StringUtil.containsWhitespace(field.getName())) {</b>
+<b class="nc">&nbsp;                return ValidationMessage.error(&quot;Field name cannot have whitespace characters&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        canAppend = Bindings.and(overwriteFieldContentProperty(), fieldValidationStatus().validProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus fieldValidationStatus() {
+<b class="nc">&nbsp;        return fieldValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding canAppendProperty() {
+<b class="nc">&nbsp;        return canAppend;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearSelectedField() {
+<b class="nc">&nbsp;        NamedCompoundEdit clearFieldEdit = new NamedCompoundEdit(&quot;CLEAR_SELECTED_FIELD&quot;);</b>
+<b class="nc">&nbsp;        int affectedEntriesCount = 0;</b>
+<b class="nc">&nbsp;        for (BibEntry entry : selectedEntries) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; oldFieldValue = entry.getField(selectedField.get());</b>
+<b class="nc">&nbsp;            if (oldFieldValue.isPresent()) {</b>
+<b class="nc">&nbsp;                entry.clearField(selectedField.get())</b>
+<b class="nc">&nbsp;                     .ifPresent(fieldChange -&gt; clearFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));</b>
+<b class="nc">&nbsp;                affectedEntriesCount++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (clearFieldEdit.hasEdits()) {</b>
+<b class="nc">&nbsp;            clearFieldEdit.end();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(</b>
+<b class="nc">&nbsp;                affectedEntriesCount,</b>
+<b class="nc">&nbsp;                TAB_INDEX,</b>
+&nbsp;                clearFieldEdit
+&nbsp;        ));
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFieldValue() {
+<b class="nc">&nbsp;        NamedCompoundEdit setFieldEdit = new NamedCompoundEdit(&quot;CHANGE_SELECTED_FIELD&quot;);</b>
+<b class="nc">&nbsp;        String toSetFieldValue = fieldValue.getValue();</b>
+<b class="nc">&nbsp;        int affectedEntriesCount = 0;</b>
+<b class="nc">&nbsp;        for (BibEntry entry : selectedEntries) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; oldFieldValue = entry.getField(selectedField.get());</b>
+<b class="nc">&nbsp;            if (oldFieldValue.isEmpty() || overwriteFieldContent.get()) {</b>
+<b class="nc">&nbsp;                entry.setField(selectedField.get(), toSetFieldValue)</b>
+<b class="nc">&nbsp;                     .ifPresent(fieldChange -&gt; setFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));</b>
+<b class="nc">&nbsp;                fieldValue.set(&quot;&quot;);</b>
+&nbsp;                // TODO: increment affected entries only when UndoableFieldChange.isPresent()
+<b class="nc">&nbsp;                affectedEntriesCount++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (setFieldEdit.hasEdits()) {</b>
+<b class="nc">&nbsp;            setFieldEdit.end();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(</b>
+<b class="nc">&nbsp;                affectedEntriesCount,</b>
+<b class="nc">&nbsp;                TAB_INDEX,</b>
+&nbsp;                setFieldEdit
+&nbsp;        ));
+&nbsp;    }
+&nbsp;
+&nbsp;    public void appendToFieldValue() {
+<b class="nc">&nbsp;        NamedCompoundEdit appendToFieldEdit = new NamedCompoundEdit(&quot;APPEND_TO_SELECTED_FIELD&quot;);</b>
+<b class="nc">&nbsp;        String toAppendFieldValue = fieldValue.getValue();</b>
+<b class="nc">&nbsp;        int affectedEntriesCount = 0;</b>
+<b class="nc">&nbsp;        for (BibEntry entry : selectedEntries) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; oldFieldValue = entry.getField(selectedField.get());</b>
+&nbsp;            // Append button should be disabled if &#39;overwriteNonEmptyFields&#39; is false
+<b class="nc">&nbsp;            if (overwriteFieldContent.get()) {</b>
+<b class="nc">&nbsp;                String newFieldValue = oldFieldValue.orElse(&quot;&quot;).concat(toAppendFieldValue);</b>
+&nbsp;
+<b class="nc">&nbsp;                entry.setField(selectedField.get(), newFieldValue)</b>
+<b class="nc">&nbsp;                     .ifPresent(fieldChange -&gt; appendToFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));</b>
+&nbsp;
+<b class="nc">&nbsp;                fieldValue.set(&quot;&quot;);</b>
+<b class="nc">&nbsp;                affectedEntriesCount++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (appendToFieldEdit.hasEdits()) {</b>
+<b class="nc">&nbsp;            appendToFieldEdit.end();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(</b>
+<b class="nc">&nbsp;                affectedEntriesCount,</b>
+<b class="nc">&nbsp;                TAB_INDEX,</b>
+&nbsp;                appendToFieldEdit
+&nbsp;        ));
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Field&gt; selectedFieldProperty() {
+<b class="nc">&nbsp;        return selectedField;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Field getSelectedField() {
+<b class="nc">&nbsp;        return selectedFieldProperty().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFieldValue() {
+<b class="nc">&nbsp;        return fieldValue.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty fieldValueProperty() {
+<b class="nc">&nbsp;        return fieldValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty overwriteFieldContentProperty() {
+<b class="nc">&nbsp;        return overwriteFieldContent;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

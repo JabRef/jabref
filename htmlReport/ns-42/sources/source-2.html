@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebSearchPaneView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: WebSearchPaneView (org.jabref.gui.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebSearchPaneView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.importer.fetcher;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanExpression;
+&nbsp;import javafx.beans.value.ObservableBooleanValue;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.search.SearchTextField;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.importer.SearchBasedFetcher;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;public class WebSearchPaneView extends VBox {
+&nbsp;
+<b class="nc">&nbsp;    private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass(&quot;invalid&quot;);</b>
+&nbsp;
+&nbsp;    private final WebSearchPaneViewModel viewModel;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+<b class="nc">&nbsp;    public WebSearchPaneView(GuiPreferences preferences, DialogService dialogService, StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);</b>
+<b class="nc">&nbsp;        initialize();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        StackPane helpButtonContainer = createHelpButtonContainer();</b>
+<b class="nc">&nbsp;        HBox fetcherContainer = new HBox(createFetcherComboBox(), helpButtonContainer);</b>
+&nbsp;
+<b class="nc">&nbsp;        getChildren().addAll(</b>
+&nbsp;                fetcherContainer,
+<b class="nc">&nbsp;                createQueryField(),</b>
+<b class="nc">&nbsp;                createSearchButton()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        this.disableProperty().bind(searchDisabledProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows triggering search on pressing enter
+&nbsp;     */
+&nbsp;    private void enableEnterToTriggerSearch(TextField query) {
+<b class="nc">&nbsp;        query.setOnKeyPressed(event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getCode() == KeyCode.ENTER) {</b>
+<b class="nc">&nbsp;                viewModel.search();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addQueryValidationHints(TextField query) {
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.queryValidationStatus().validProperty(),</b>
+&nbsp;                valid -&gt; {
+<b class="nc">&nbsp;                    if (!valid &amp;&amp; viewModel.queryValidationStatus().getHighestMessage().isPresent()) {</b>
+<b class="nc">&nbsp;                        query.setTooltip(new Tooltip(viewModel.queryValidationStatus().getHighestMessage().get().getMessage()));</b>
+<b class="nc">&nbsp;                        query.pseudoClassStateChanged(QUERY_INVALID, true);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        query.setTooltip(null);</b>
+<b class="nc">&nbsp;                        query.pseudoClassStateChanged(QUERY_INVALID, false);</b>
+&nbsp;                    }
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create combo box for selecting fetcher
+&nbsp;     */
+&nbsp;    private ComboBox&lt;SearchBasedFetcher&gt; createFetcherComboBox() {
+<b class="nc">&nbsp;        ComboBox&lt;SearchBasedFetcher&gt; fetchers = new ComboBox&lt;&gt;();</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;SearchBasedFetcher&gt;()</b>
+<b class="nc">&nbsp;                .withText(SearchBasedFetcher::getName)</b>
+<b class="nc">&nbsp;                .install(fetchers);</b>
+<b class="nc">&nbsp;        fetchers.itemsProperty().bind(viewModel.fetchersProperty());</b>
+<b class="nc">&nbsp;        fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());</b>
+<b class="nc">&nbsp;        fetchers.setMaxWidth(Double.POSITIVE_INFINITY);</b>
+<b class="nc">&nbsp;        HBox.setHgrow(fetchers, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        return fetchers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create text field for search query
+&nbsp;     */
+&nbsp;    private TextField createQueryField() {
+<b class="nc">&nbsp;        TextField query = SearchTextField.create(preferences.getKeyBindingRepository());</b>
+<b class="nc">&nbsp;        viewModel.queryProperty().bind(query.textProperty());</b>
+<b class="nc">&nbsp;        addQueryValidationHints(query);</b>
+<b class="nc">&nbsp;        enableEnterToTriggerSearch(query);</b>
+<b class="nc">&nbsp;        ClipBoardManager.addX11Support(query);</b>
+<b class="nc">&nbsp;        return query;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create button that triggers search
+&nbsp;     */
+&nbsp;    private Button createSearchButton() {
+<b class="nc">&nbsp;        BooleanExpression importerEnabled = preferences.getImporterPreferences().importerEnabledProperty();</b>
+<b class="nc">&nbsp;        Button search = new Button(Localization.lang(&quot;Search&quot;));</b>
+<b class="nc">&nbsp;        search.setDefaultButton(false);</b>
+<b class="nc">&nbsp;        search.setOnAction(event -&gt; viewModel.search());</b>
+<b class="nc">&nbsp;        search.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        search.disableProperty().bind(importerEnabled.not());</b>
+<b class="nc">&nbsp;        return search;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creatse help button for currently selected fetcher
+&nbsp;     */
+&nbsp;    private StackPane createHelpButtonContainer() {
+<b class="nc">&nbsp;        StackPane helpButtonContainer = new StackPane();</b>
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -&gt; {</b>
+<b class="nc">&nbsp;            if ((fetcher != null) &amp;&amp; fetcher.getHelpPage().isPresent()) {</b>
+<b class="nc">&nbsp;                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, preferences.getExternalApplicationsPreferences()));</b>
+<b class="nc">&nbsp;                helpButtonContainer.getChildren().setAll(helpButton);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                helpButtonContainer.getChildren().clear();</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        return helpButtonContainer;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an observable boolean value that is true if no database is open
+&nbsp;     */
+&nbsp;    private ObservableBooleanValue searchDisabledProperty() {
+<b class="nc">&nbsp;        return Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                () -&gt; stateManager.getOpenDatabases().isEmpty(),</b>
+<b class="nc">&nbsp;                stateManager.getOpenDatabases()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

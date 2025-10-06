@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UnoReferenceMark</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.uno</a>
+</div>
+
+<h1>Coverage Summary for Class: UnoReferenceMark (org.jabref.model.openoffice.uno)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnoReferenceMark</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.uno;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.openoffice.DocumentAnnotation;
+&nbsp;
+&nbsp;import com.sun.star.container.NoSuchElementException;
+&nbsp;import com.sun.star.container.XNameAccess;
+&nbsp;import com.sun.star.container.XNamed;
+&nbsp;import com.sun.star.lang.DisposedException;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.sun.star.text.XReferenceMarksSupplier;
+&nbsp;import com.sun.star.text.XTextContent;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;
+&nbsp;public class UnoReferenceMark {
+&nbsp;
+&nbsp;    private UnoReferenceMark() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @throws NoDocumentException If cannot get reference marks
+&nbsp;     *                             &lt;p&gt;
+&nbsp;     *                             Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
+&nbsp;     */
+&nbsp;    public static XNameAccess getNameAccess(XTextDocument doc)
+&nbsp;            throws
+&nbsp;            NoDocumentException {
+&nbsp;
+<b class="nc">&nbsp;        XReferenceMarksSupplier supplier = UnoCast.cast(XReferenceMarksSupplier.class, doc).get();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return supplier.getReferenceMarks();</b>
+&nbsp;        } catch (DisposedException ex) {
+<b class="nc">&nbsp;            throw new NoDocumentException(&quot;UnoReferenceMarks.getNameAccess failed with&quot; + ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Names of all reference marks.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Empty list for nothing.
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; getListOfNames(XTextDocument doc)
+&nbsp;            throws NoDocumentException {
+&nbsp;
+<b class="nc">&nbsp;        XNameAccess nameAccess = UnoReferenceMark.getNameAccess(doc);</b>
+<b class="nc">&nbsp;        String[] names = nameAccess.getElementNames();</b>
+<b class="nc">&nbsp;        if (names == null) {</b>
+<b class="nc">&nbsp;            return new ArrayList&lt;&gt;();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Arrays.asList(names);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remove the named reference mark.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Removes both the text and the mark itself.
+&nbsp;     */
+&nbsp;    public static void removeIfExists(XTextDocument doc, String name)
+&nbsp;            throws
+&nbsp;            WrappedTargetException,
+&nbsp;            NoDocumentException {
+&nbsp;
+<b class="nc">&nbsp;        XNameAccess xReferenceMarks = UnoReferenceMark.getNameAccess(doc);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (xReferenceMarks.hasByName(name)) {</b>
+<b class="nc">&nbsp;            Optional&lt;XTextContent&gt; mark = UnoNameAccess.getTextContentByName(xReferenceMarks, name);</b>
+<b class="nc">&nbsp;            if (mark.isEmpty()) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;            try {
+<b class="nc">&nbsp;                doc.getText().removeTextContent(mark.get());</b>
+&nbsp;            } catch (NoSuchElementException ex) {
+&nbsp;                // The caller gets what it expects.
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return reference mark as XTextContent, Optional.empty if not found.
+&nbsp;     */
+&nbsp;    public static Optional&lt;XTextContent&gt; getAsTextContent(XTextDocument doc, String name)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+<b class="nc">&nbsp;        XNameAccess nameAccess = UnoReferenceMark.getNameAccess(doc);</b>
+<b class="nc">&nbsp;        return UnoNameAccess.getTextContentByName(nameAccess, name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * XTextRange for the named reference mark, Optional.empty if not found.
+&nbsp;     */
+&nbsp;    public static Optional&lt;XTextRange&gt; getAnchor(XTextDocument doc, String name)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+<b class="nc">&nbsp;        return UnoReferenceMark.getAsTextContent(doc, name)</b>
+<b class="nc">&nbsp;                               .map(XTextContent::getAnchor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Insert a new reference mark at the provided cursor position.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If {@code documentAnnotation.getAbsorb} is true, the text in the cursor range will become the text with gray background.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note: LibreOffice 6.4.6.2 will create multiple reference marks with the same name without error or renaming. Its GUI does not allow this, but we can create them programmatically. In the GUI, clicking on any of those identical names will move the cursor to the same mark.
+&nbsp;     *
+&nbsp;     */
+&nbsp;    public static XNamed create(DocumentAnnotation documentAnnotation)
+&nbsp;            throws
+&nbsp;            CreationException {
+<b class="nc">&nbsp;        return UnoNamed.insertNamedTextContent(&quot;com.sun.star.text.ReferenceMark&quot;, documentAnnotation);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

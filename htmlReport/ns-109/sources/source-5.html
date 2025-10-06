@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ISBN</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.identifier</a>
+</div>
+
+<h1>Coverage Summary for Class: ISBN (org.jabref.model.entry.identifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ISBN</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.identifier;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;public class ISBN implements Identifier {
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern ISBN_PATTERN = Pattern.compile(&quot;^(\\d{9}[\\dxX]|\\d{13})$&quot;);</b>
+&nbsp;
+&nbsp;    private final String isbnString;
+&nbsp;
+<b class="nc">&nbsp;    public ISBN(String isbnString) {</b>
+<b class="nc">&nbsp;        this.isbnString = Objects.requireNonNull(isbnString).trim().replace(&quot;-&quot;, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;ISBN&gt; parse(String input) {
+<b class="nc">&nbsp;        ISBN isbn = new ISBN(input);</b>
+<b class="nc">&nbsp;        if (isbn.isValid()) {</b>
+<b class="nc">&nbsp;            return Optional.of(isbn);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isValidFormat() {
+<b class="nc">&nbsp;        Matcher isbnMatcher = ISBN_PATTERN.matcher(isbnString);</b>
+<b class="nc">&nbsp;        return isbnMatcher.matches();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isValidChecksum() {
+&nbsp;        boolean valid;
+<b class="nc">&nbsp;        if (isbnString.length() == 10) {</b>
+<b class="nc">&nbsp;            valid = isbn10check();</b>
+&nbsp;        } else {
+&nbsp;            // length is either 10 or 13 based on regexp so will be 13 here
+<b class="nc">&nbsp;            valid = isbn13check();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return valid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isIsbn10() {
+<b class="nc">&nbsp;        return isbn10check();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isIsbn13() {
+<b class="nc">&nbsp;        return isbn13check();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Check that the control digit is correct, see e.g. https://en.wikipedia.org/wiki/International_Standard_Book_Number#Check_digits
+&nbsp;    private boolean isbn10check() {
+<b class="nc">&nbsp;        if (isbnString.length() != 10) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int sum = 0;</b>
+<b class="nc">&nbsp;        for (int pos = 0; pos &lt;= 8; pos++) {</b>
+<b class="nc">&nbsp;            sum += (isbnString.charAt(pos) - &#39;0&#39;) * (10 - pos);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        char control = isbnString.charAt(9);</b>
+<b class="nc">&nbsp;        if ((control == &#39;x&#39;) || (control == &#39;X&#39;)) {</b>
+<b class="nc">&nbsp;            control = &#39;9&#39; + 1;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        sum += control - &#39;0&#39;;</b>
+<b class="nc">&nbsp;        return (sum % 11) == 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Check that the control digit is correct, see e.g. https://en.wikipedia.org/wiki/International_Standard_Book_Number#Check_digits
+&nbsp;    private boolean isbn13check() {
+<b class="nc">&nbsp;        if (isbnString.length() != 13) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int sum = 0;</b>
+<b class="nc">&nbsp;        for (int pos = 0; pos &lt;= 12; pos++) {</b>
+<b class="nc">&nbsp;            sum += (isbnString.charAt(pos) - &#39;0&#39;) * ((pos % 2) == 0 ? 1 : 3);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return (sum % 10) == 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isValid() {
+<b class="nc">&nbsp;        return isValidFormat() &amp;&amp; isValidChecksum();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Field getDefaultField() {
+<b class="nc">&nbsp;        return StandardField.ISBN;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String asString() {
+<b class="nc">&nbsp;        return isbnString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URI&gt; getExternalURI() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return Optional.of(new URI(&quot;https://www.worldcat.org/isbn/&quot; + isbnString));</b>
+&nbsp;        } catch (URISyntaxException e) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        ISBN other = (ISBN) o;</b>
+<b class="nc">&nbsp;        return isbnString.equalsIgnoreCase(other.isbnString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(isbnString.toLowerCase(Locale.ENGLISH));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

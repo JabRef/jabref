@@ -1,0 +1,160 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoRenameFileOnEntryChange</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoRenameFileOnEntryChange (org.jabref.gui.externalfiles)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoRenameFileOnEntryChange</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiles;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.cleanup.RenamePdfCleanup;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.event.FieldChangedEvent;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import com.google.common.eventbus.Subscribe;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class AutoRenameFileOnEntryChange {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(AutoRenameFileOnEntryChange.class);</b>
+&nbsp;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final RenamePdfCleanup renamePdfCleanup;
+&nbsp;
+<b class="nc">&nbsp;    public AutoRenameFileOnEntryChange(BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        renamePdfCleanup = new RenamePdfCleanup(false, () -&gt; bibDatabaseContext, filePreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Subscribe
+&nbsp;    public void listen(FieldChangedEvent event) {
+<b class="nc">&nbsp;        if (!filePreferences.shouldAutoRenameFilesOnChange()</b>
+<b class="nc">&nbsp;                || filePreferences.getFileNamePattern().isEmpty()</b>
+<b class="nc">&nbsp;                || filePreferences.getFileNamePattern() == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (event.getField().equals(StandardField.FILE)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BibEntry entry = event.getBibEntry();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Field changed for entry {}: {}&quot;, entry.getCitationKey().orElse(&quot;defaultCitationKey&quot;), event.getField().getName());</b>
+<b class="nc">&nbsp;        if (entry.getFiles().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        renamePdfCleanup.cleanup(entry);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

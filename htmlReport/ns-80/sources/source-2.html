@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CountingUndoManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.undo</a>
+</div>
+
+<h1>Coverage Summary for Class: CountingUndoManager (org.jabref.gui.undo)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CountingUndoManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.3%
+  </span>
+  <span class="absValue">
+    (1/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.8%
+  </span>
+  <span class="absValue">
+    (4/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.undo;
+&nbsp;
+&nbsp;import javax.swing.undo.CannotUndoException;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;import javax.swing.undo.UndoableEdit;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;
+<b class="fc">&nbsp;public class CountingUndoManager extends UndoManager {</b>
+&nbsp;
+&nbsp;    private int unchangedPoint;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates the number of edits aka balance of edits on the stack +1 when an edit is added/redone and -1 when an edit is undoed.
+&nbsp;     */
+<b class="fc">&nbsp;    private final IntegerProperty balanceProperty = new SimpleIntegerProperty(0);</b>
+<b class="fc">&nbsp;    private final BooleanProperty undoableProperty = new SimpleBooleanProperty(false);</b>
+<b class="fc">&nbsp;    private final BooleanProperty redoableProperty = new SimpleBooleanProperty(false);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public synchronized boolean addEdit(UndoableEdit edit) {
+<b class="nc">&nbsp;        boolean editAdded = super.addEdit(edit);</b>
+<b class="nc">&nbsp;        if (editAdded) {</b>
+<b class="nc">&nbsp;            incrementBalance();</b>
+<b class="nc">&nbsp;            updateUndoableStatus();</b>
+<b class="nc">&nbsp;            updateRedoableStatus();</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public synchronized void undo() throws CannotUndoException {
+<b class="nc">&nbsp;        super.undo();</b>
+<b class="nc">&nbsp;        decrementBalance();</b>
+<b class="nc">&nbsp;        updateUndoableStatus();</b>
+<b class="nc">&nbsp;        updateRedoableStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public synchronized void redo() throws CannotUndoException {
+<b class="nc">&nbsp;        super.redo();</b>
+<b class="nc">&nbsp;        incrementBalance();</b>
+<b class="nc">&nbsp;        updateUndoableStatus();</b>
+<b class="nc">&nbsp;        updateRedoableStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void markUnchanged() {
+<b class="nc">&nbsp;        unchangedPoint = balanceProperty.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized boolean hasChanged() {
+<b class="nc">&nbsp;        return balanceProperty.get() != unchangedPoint;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void incrementBalance() {
+<b class="nc">&nbsp;        balanceProperty.setValue(balanceProperty.getValue() + 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void decrementBalance() {
+<b class="nc">&nbsp;        balanceProperty.setValue(balanceProperty.getValue() - 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateUndoableStatus() {
+<b class="nc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; undoableProperty.setValue(canUndo()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateRedoableStatus() {
+<b class="nc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; redoableProperty.setValue(canRedo()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty getUndoableProperty() {
+<b class="nc">&nbsp;        return undoableProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty getRedoableProperty() {
+<b class="nc">&nbsp;        return redoableProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

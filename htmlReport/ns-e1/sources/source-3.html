@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EditSeparate</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.action</a>
+</div>
+
+<h1>Coverage Summary for Class: EditSeparate (org.jabref.logic.openoffice.action)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EditSeparate</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.action;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.openoffice.frontend.OOFrontend;
+&nbsp;import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
+&nbsp;import org.jabref.logic.openoffice.style.JStyle;
+&nbsp;import org.jabref.logic.openoffice.style.OOProcess;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.openoffice.ootext.OOText;
+&nbsp;import org.jabref.model.openoffice.style.Citation;
+&nbsp;import org.jabref.model.openoffice.style.CitationGroup;
+&nbsp;import org.jabref.model.openoffice.uno.CreationException;
+&nbsp;import org.jabref.model.openoffice.uno.NoDocumentException;
+&nbsp;import org.jabref.model.openoffice.uno.UnoScreenRefresh;
+&nbsp;
+&nbsp;import com.sun.star.beans.IllegalTypeException;
+&nbsp;import com.sun.star.beans.NotRemoveableException;
+&nbsp;import com.sun.star.beans.PropertyVetoException;
+&nbsp;import com.sun.star.lang.IllegalArgumentException;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.sun.star.text.XTextCursor;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;
+&nbsp;public class EditSeparate {
+&nbsp;
+&nbsp;    private EditSeparate() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean separateCitations(XTextDocument doc,
+&nbsp;                                            OOFrontend frontend,
+&nbsp;                                            List&lt;BibDatabase&gt; databases,
+&nbsp;                                            JStyle style)
+&nbsp;            throws
+&nbsp;            CreationException,
+&nbsp;            IllegalTypeException,
+&nbsp;            NoDocumentException,
+&nbsp;            NotRemoveableException,
+&nbsp;            PropertyVetoException,
+&nbsp;            WrappedTargetException,
+&nbsp;            IllegalArgumentException {
+&nbsp;
+<b class="nc">&nbsp;        boolean madeModifications = false;</b>
+&nbsp;
+&nbsp;        // To reduce surprises in JabRef52 mode, impose localOrder to
+&nbsp;        // decide the visually last Citation in the group. Unless the
+&nbsp;        // style changed since refresh this is the last on the screen
+&nbsp;        // as well.
+<b class="nc">&nbsp;        frontend.citationGroups.lookupCitations(databases);</b>
+<b class="nc">&nbsp;        frontend.citationGroups.imposeLocalOrder(OOProcess.comparatorForMulticite(style));</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;CitationGroup&gt; groups = frontend.citationGroups.getCitationGroupsUnordered();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            UnoScreenRefresh.lockControllers(doc);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (CitationGroup group : groups) {</b>
+<b class="nc">&nbsp;                XTextRange range1 = frontend</b>
+<b class="nc">&nbsp;                        .getMarkRange(doc, group)</b>
+<b class="nc">&nbsp;                        .orElseThrow(IllegalStateException::new);</b>
+<b class="nc">&nbsp;                XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);</b>
+&nbsp;
+<b class="nc">&nbsp;                List&lt;Citation&gt; citations = group.citationsInStorageOrder;</b>
+<b class="nc">&nbsp;                if (citations.size() &lt;= 1) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                frontend.removeCitationGroup(group, doc);</b>
+&nbsp;                // Now we own the content of citations
+&nbsp;
+&nbsp;                // Create a citation group for each citation.
+<b class="nc">&nbsp;                final int last = citations.size() - 1;</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; citations.size(); i++) {</b>
+<b class="nc">&nbsp;                    boolean insertSpaceAfter = i != last;</b>
+<b class="nc">&nbsp;                    Citation citation = citations.get(i);</b>
+&nbsp;
+<b class="nc">&nbsp;                    UpdateCitationMarkers.createAndFillCitationGroup(frontend,</b>
+&nbsp;                            doc,
+<b class="nc">&nbsp;                            List.of(citation.citationKey),</b>
+<b class="nc">&nbsp;                            List.of(citation.getPageInfo()),</b>
+&nbsp;                            group.citationType,
+<b class="nc">&nbsp;                            OOText.fromString(citation.citationKey),</b>
+&nbsp;                            textCursor,
+&nbsp;                            style,
+&nbsp;                            insertSpaceAfter);
+&nbsp;
+<b class="nc">&nbsp;                    textCursor.collapseToEnd();</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                madeModifications = true;</b>
+&nbsp;            }
+&nbsp;        } finally {
+<b class="nc">&nbsp;            UnoScreenRefresh.unlockControllers(doc);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return madeModifications;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

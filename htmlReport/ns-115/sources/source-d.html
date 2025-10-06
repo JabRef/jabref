@@ -1,0 +1,203 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UnoSelection</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.uno</a>
+</div>
+
+<h1>Coverage Summary for Class: UnoSelection (org.jabref.model.openoffice.uno)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnoSelection</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.uno;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import com.sun.star.frame.XController;
+&nbsp;import com.sun.star.lang.XServiceInfo;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.view.XSelectionSupplier;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Selection in the document.
+&nbsp; */
+&nbsp;public class UnoSelection {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(UnoSelection.class);</b>
+&nbsp;
+&nbsp;    private UnoSelection() {
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;XSelectionSupplier&gt; getSelectionSupplier(XTextDocument doc) {
+<b class="nc">&nbsp;        if (doc == null) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;UnoSelection.getSelectionSupplier: doc is null&quot;);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Optional&lt;XController&gt; controller = UnoTextDocument.getCurrentController(doc);</b>
+<b class="nc">&nbsp;        if (controller.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;UnoSelection.getSelectionSupplier: getCurrentController(doc) returned empty&quot;);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Optional&lt;XSelectionSupplier&gt; supplier = UnoCast.cast(XSelectionSupplier.class, controller.get());</b>
+<b class="nc">&nbsp;        if (supplier.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;UnoSelection.getSelectionSupplier: cast to XSelectionSupplier returned empty&quot;);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return supplier;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return may be Optional.empty(), or some type supporting XServiceInfo
+&nbsp;     * So far it seems the first thing we have to do with a selection is to decide what do we have.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * One way to do that is accessing its XServiceInfo interface.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Experiments using printServiceInfo with cursor in various positions in the document:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * With cursor within the frame, in text: *** xserviceinfo.getImplementationName: &quot;SwXTextRanges&quot; &quot;com.sun.star.text.TextRanges&quot;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * With cursor somewhere else in text: *** xserviceinfo.getImplementationName: &quot;SwXTextRanges&quot; &quot;com.sun.star.text.TextRanges&quot;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * With cursor in comment (also known as &quot;annotation&quot;): *** XSelectionSupplier is OK *** Object initialSelection is null *** xserviceinfo is null
+&nbsp;     * &lt;p&gt;
+&nbsp;     * With frame selected: *** xserviceinfo.getImplementationName: &quot;SwXTextFrame&quot; &quot;com.sun.star.text.BaseFrame&quot; &quot;com.sun.star.text.TextContent&quot; &quot;com.sun.star.document.LinkTarget&quot; &quot;com.sun.star.text.TextFrame&quot; &quot;com.sun.star.text.Text&quot;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * With cursor selecting an inserted image: *** XSelectionSupplier is OK *** Object initialSelection is OK *** xserviceinfo is OK *** xserviceinfo.getImplementationName: &quot;SwXTextGraphicObject&quot; &quot;com.sun.star.text.BaseFrame&quot; &quot;com.sun.star.text.TextContent&quot; &quot;com.sun.star.document.LinkTarget&quot; &quot;com.sun.star.text.TextGraphicObject&quot;
+&nbsp;     */
+&nbsp;    public static Optional&lt;XServiceInfo&gt; getSelectionAsXServiceInfo(XTextDocument doc) {
+<b class="nc">&nbsp;        Objects.requireNonNull(doc);</b>
+<b class="nc">&nbsp;        Optional&lt;XSelectionSupplier&gt; supplier = getSelectionSupplier(doc);</b>
+<b class="nc">&nbsp;        if (supplier.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;getSelectionSupplier returned empty&quot;);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Object selection = supplier.get().getSelection();</b>
+<b class="nc">&nbsp;        if (selection == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Optional&lt;XServiceInfo&gt; result = UnoCast.cast(XServiceInfo.class, selection);</b>
+<b class="nc">&nbsp;        if (result.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;cast to XServiceInfo returned empty&quot;);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Select the object represented by {@code newSelection} if it is known and selectable in this {@code XSelectionSupplier} object.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Presumably result from {@code XSelectionSupplier.getSelection()} is usually OK. It also accepted {@code XTextRange newSelection = doc.getText().getStart();}
+&nbsp;     */
+&nbsp;    public static void select(XTextDocument doc, Object newSelection) {
+<b class="nc">&nbsp;        Objects.requireNonNull(doc);</b>
+<b class="nc">&nbsp;        getSelectionSupplier(doc).ifPresent(e -&gt; e.select(newSelection));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

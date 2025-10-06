@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GenerateEmbeddingsTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.ingestion</a>
+</div>
+
+<h1>Coverage Summary for Class: GenerateEmbeddingsTask (org.jabref.logic.ai.ingestion)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GenerateEmbeddingsTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.ingestion;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.attribute.BasicFileAttributes;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.ProgressCounter;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import dev.langchain4j.data.document.Document;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This task generates embeddings for a {@link LinkedFile}.
+&nbsp; * It will check if embeddings were already generated.
+&nbsp; * And it also will store the embeddings.
+&nbsp; */
+&nbsp;public class GenerateEmbeddingsTask extends BackgroundTask&lt;Void&gt; {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsTask.class);</b>
+&nbsp;
+&nbsp;    private final LinkedFile linkedFile;
+&nbsp;    private final FileEmbeddingsManager fileEmbeddingsManager;
+&nbsp;    private final BibDatabaseContext bibDatabaseContext;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final ReadOnlyBooleanProperty shutdownSignal;
+&nbsp;
+<b class="nc">&nbsp;    private final ProgressCounter progressCounter = new ProgressCounter();</b>
+&nbsp;
+&nbsp;    public GenerateEmbeddingsTask(LinkedFile linkedFile,
+&nbsp;                                  FileEmbeddingsManager fileEmbeddingsManager,
+&nbsp;                                  BibDatabaseContext bibDatabaseContext,
+&nbsp;                                  FilePreferences filePreferences,
+&nbsp;                                  ReadOnlyBooleanProperty shutdownSignal
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        this.linkedFile = linkedFile;</b>
+<b class="nc">&nbsp;        this.fileEmbeddingsManager = fileEmbeddingsManager;</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        this.shutdownSignal = shutdownSignal;</b>
+&nbsp;
+<b class="nc">&nbsp;        configure();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void configure() {
+<b class="nc">&nbsp;        showToUser(true);</b>
+<b class="nc">&nbsp;        titleProperty().set(Localization.lang(&quot;Generating embeddings for file &#39;%0&#39;&quot;, linkedFile.getLink()));</b>
+&nbsp;
+<b class="nc">&nbsp;        progressCounter.listenToAllProperties(this::updateProgress);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Void call() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Starting embeddings generation task for file \&quot;{}\&quot;&quot;, linkedFile.getLink());</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            ingestLinkedFile(linkedFile);</b>
+&nbsp;        } catch (InterruptedException e) {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;There is a embeddings generation task for file \&quot;{}\&quot;. It will be cancelled, because user quits JabRef.&quot;, linkedFile.getLink());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Finished embeddings generation task for file \&quot;{}\&quot;&quot;, linkedFile.getLink());</b>
+<b class="nc">&nbsp;        progressCounter.stop();</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void ingestLinkedFile(LinkedFile linkedFile) throws InterruptedException {
+&nbsp;        // Rationale for RuntimeException here:
+&nbsp;        // See org.jabref.logic.ai.summarization.GenerateSummaryTask.summarizeAll
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Generating embeddings for file \&quot;{}\&quot;&quot;, linkedFile.getLink());</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; path = linkedFile.findIn(bibDatabaseContext, filePreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (path.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not find path for a linked file \&quot;{}\&quot;, while generating embeddings&quot;, linkedFile.getLink());</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Unable to generate embeddings for file \&quot;{}\&quot;, because it was not found while generating embeddings&quot;, linkedFile.getLink());</b>
+<b class="nc">&nbsp;            throw new RuntimeException(Localization.lang(&quot;Could not find path for a linked file &#39;%0&#39; while generating embeddings.&quot;, linkedFile.getLink()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Long&gt; modTime = Optional.empty();</b>
+<b class="nc">&nbsp;        boolean shouldIngest = true;</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            BasicFileAttributes attributes = Files.readAttributes(path.get(), BasicFileAttributes.class);</b>
+&nbsp;
+<b class="nc">&nbsp;            long currentModificationTimeInSeconds = attributes.lastModifiedTime().to(TimeUnit.SECONDS);</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;Long&gt; ingestedModificationTimeInSeconds = fileEmbeddingsManager.getIngestedDocumentModificationTimeInSeconds(linkedFile.getLink());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (ingestedModificationTimeInSeconds.isEmpty()) {</b>
+<b class="nc">&nbsp;                modTime = Optional.of(currentModificationTimeInSeconds);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (currentModificationTimeInSeconds &gt; ingestedModificationTimeInSeconds.get()) {</b>
+<b class="nc">&nbsp;                    modTime = Optional.of(currentModificationTimeInSeconds);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;No need to generate embeddings for file \&quot;{}\&quot;, because it was already generated&quot;, linkedFile.getLink());</b>
+<b class="nc">&nbsp;                    shouldIngest = false;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not retrieve attributes of a linked file \&quot;{}\&quot;&quot;, linkedFile.getLink(), e);</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Possibly regenerating embeddings for linked file \&quot;{}\&quot;&quot;, linkedFile.getLink());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!shouldIngest) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Document&gt; document = new FileToDocument(shutdownSignal).fromFile(path.get());</b>
+<b class="nc">&nbsp;        if (document.isPresent()) {</b>
+<b class="nc">&nbsp;            fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), modTime.orElse(0L), progressCounter.workDoneProperty(), progressCounter.workMaxProperty());</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Embeddings for file \&quot;{}\&quot; were generated successfully&quot;, linkedFile.getLink());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Unable to generate embeddings for file \&quot;{}\&quot;, because JabRef was unable to extract text from the file&quot;, linkedFile.getLink());</b>
+<b class="nc">&nbsp;            throw new RuntimeException(Localization.lang(&quot;Unable to generate embeddings for file &#39;%0&#39;, because JabRef was unable to extract text from the file&quot;, linkedFile.getLink()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateProgress() {
+<b class="nc">&nbsp;        updateProgress(progressCounter.getWorkDone(), progressCounter.getWorkMax());</b>
+<b class="nc">&nbsp;        updateMessage(progressCounter.getMessage());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

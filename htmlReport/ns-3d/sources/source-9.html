@@ -1,0 +1,980 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GroupTreeView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.groups</a>
+</div>
+
+<h1>Coverage Summary for Class: GroupTreeView (org.jabref.gui.groups)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroupTreeView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/130)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/311)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GroupTreeView$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GroupTreeView$ContextAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GroupTreeView$DragExpansionHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/190)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/355)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.groups;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.text.DecimalFormat;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.value.ObservableBooleanValue;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.geometry.Orientation;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.Control;
+&nbsp;import javafx.scene.control.Menu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.ScrollBar;
+&nbsp;import javafx.scene.control.SelectionMode;
+&nbsp;import javafx.scene.control.SeparatorMenuItem;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.control.TreeItem;
+&nbsp;import javafx.scene.control.TreeTableColumn;
+&nbsp;import javafx.scene.control.TreeTableRow;
+&nbsp;import javafx.scene.control.TreeTableView;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.input.MouseButton;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;import javafx.scene.layout.BorderPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.DragAndDropDataFormats;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+&nbsp;import org.jabref.gui.externalfiles.ImportHandler;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.search.SearchTextField;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.gui.util.ControlHelper;
+&nbsp;import org.jabref.gui.util.CustomLocalDragboard;
+&nbsp;import org.jabref.gui.util.RecursiveTreeItem;
+&nbsp;import org.jabref.gui.util.ViewModelTreeTableCellFactory;
+&nbsp;import org.jabref.gui.util.ViewModelTreeTableRowFactory;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.controlsfx.control.textfield.CustomTextField;
+&nbsp;import org.controlsfx.control.textfield.TextFields;
+&nbsp;import org.reactfx.util.FxTimer;
+&nbsp;import org.reactfx.util.Timer;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class GroupTreeView extends BorderPane {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeView.class);</b>
+<b class="nc">&nbsp;    private static final PseudoClass PSEUDOCLASS_ANYSELECTED = PseudoClass.getPseudoClass(&quot;any-selected&quot;);</b>
+<b class="nc">&nbsp;    private static final PseudoClass PSEUDOCLASS_ALLSELECTED = PseudoClass.getPseudoClass(&quot;all-selected&quot;);</b>
+<b class="nc">&nbsp;    private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass(&quot;root&quot;);</b>
+<b class="nc">&nbsp;    private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass(&quot;sub&quot;); // &gt; 1 deep</b>
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final AdaptVisibleTabs adaptVisibleTabs;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final KeyBindingRepository keyBindingRepository;
+&nbsp;
+&nbsp;    private TreeTableView&lt;GroupNodeViewModel&gt; groupTree;
+&nbsp;    private TreeTableColumn&lt;GroupNodeViewModel, GroupNodeViewModel&gt; mainColumn;
+&nbsp;    private TreeTableColumn&lt;GroupNodeViewModel, GroupNodeViewModel&gt; numberColumn;
+&nbsp;    private TreeTableColumn&lt;GroupNodeViewModel, GroupNodeViewModel&gt; expansionNodeColumn;
+&nbsp;    private CustomTextField searchField;
+&nbsp;    private GroupTreeViewModel viewModel;
+&nbsp;    private CustomLocalDragboard localDragboard;
+&nbsp;    private DragExpansionHandler dragExpansionHandler;
+&nbsp;    private Timer scrollTimer;
+&nbsp;    private ImportHandler importHandler;
+&nbsp;    private BibDatabaseContext database;
+<b class="nc">&nbsp;    private double scrollVelocity = 0;</b>
+&nbsp;    private double scrollableAreaHeight;
+&nbsp;    private double upperBorder;
+&nbsp;    private double lowerBorder;
+&nbsp;    private double baseFactor;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
+&nbsp;     */
+&nbsp;    public GroupTreeView(TaskExecutor taskExecutor,
+&nbsp;                         StateManager stateManager,
+&nbsp;                         AdaptVisibleTabs adaptVisibleTabs,
+&nbsp;                         GuiPreferences preferences,
+&nbsp;                         DialogService dialogService,
+&nbsp;                         AiService aiService,
+&nbsp;                         UndoManager undoManager,
+<b class="nc">&nbsp;                         FileUpdateMonitor fileUpdateMonitor) {</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.adaptVisibleTabs = adaptVisibleTabs;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.keyBindingRepository = preferences.getKeyBindingRepository();</b>
+<b class="nc">&nbsp;        this.disableProperty().bind(groupsDisabledProperty());</b>
+<b class="nc">&nbsp;        createNodes();</b>
+<b class="nc">&nbsp;        initialize();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createNodes() {
+<b class="nc">&nbsp;        searchField = SearchTextField.create(keyBindingRepository);</b>
+<b class="nc">&nbsp;        searchField.setPromptText(Localization.lang(&quot;Filter groups...&quot;));</b>
+<b class="nc">&nbsp;        searchField.setId(&quot;groupFilterBar&quot;);</b>
+<b class="nc">&nbsp;        this.setTop(searchField);</b>
+&nbsp;
+<b class="nc">&nbsp;        mainColumn = new TreeTableColumn&lt;&gt;();</b>
+<b class="nc">&nbsp;        mainColumn.setId(&quot;mainColumn&quot;);</b>
+<b class="nc">&nbsp;        mainColumn.setResizable(true);</b>
+<b class="nc">&nbsp;        numberColumn = new TreeTableColumn&lt;&gt;();</b>
+<b class="nc">&nbsp;        numberColumn.getStyleClass().add(&quot;numberColumn&quot;);</b>
+<b class="nc">&nbsp;        numberColumn.setMinWidth(60d);</b>
+<b class="nc">&nbsp;        numberColumn.setMaxWidth(60d);</b>
+<b class="nc">&nbsp;        numberColumn.setPrefWidth(60d);</b>
+<b class="nc">&nbsp;        numberColumn.setResizable(false);</b>
+<b class="nc">&nbsp;        expansionNodeColumn = new TreeTableColumn&lt;&gt;();</b>
+<b class="nc">&nbsp;        expansionNodeColumn.getStyleClass().add(&quot;expansionNodeColumn&quot;);</b>
+<b class="nc">&nbsp;        expansionNodeColumn.setMaxWidth(20d);</b>
+<b class="nc">&nbsp;        expansionNodeColumn.setMinWidth(20d);</b>
+<b class="nc">&nbsp;        expansionNodeColumn.setPrefWidth(20d);</b>
+<b class="nc">&nbsp;        expansionNodeColumn.setResizable(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        groupTree = new TreeTableView&lt;&gt;();</b>
+<b class="nc">&nbsp;        groupTree.setId(&quot;groupTree&quot;);</b>
+<b class="nc">&nbsp;        groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);</b>
+<b class="nc">&nbsp;        groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));</b>
+<b class="nc">&nbsp;        groupTree.setOnKeyPressed(event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getCode().toString().equals(KeyBinding.GROUP_SUBGROUP_RENAME.getDefaultKeyBinding())) {</b>
+<b class="nc">&nbsp;                TreeItem&lt;GroupNodeViewModel&gt; selectedItem = groupTree.getSelectionModel().getSelectedItem();</b>
+<b class="nc">&nbsp;                if (selectedItem != null &amp;&amp; selectedItem.getParent() != null) {</b>
+<b class="nc">&nbsp;                    viewModel.editGroup(selectedItem.getValue());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        this.setCenter(groupTree);</b>
+&nbsp;
+<b class="nc">&nbsp;        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));</b>
+&nbsp;
+<b class="nc">&nbsp;        Button addNewGroup = new Button(Localization.lang(&quot;Add group&quot;));</b>
+<b class="nc">&nbsp;        addNewGroup.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        HBox.setHgrow(addNewGroup, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        addNewGroup.setTooltip(new Tooltip(Localization.lang(&quot;New group&quot;)));</b>
+<b class="nc">&nbsp;        addNewGroup.setOnAction(event -&gt; addNewGroup());</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox groupBar = new HBox(addNewGroup);</b>
+<b class="nc">&nbsp;        groupBar.setId(&quot;groupBar&quot;);</b>
+<b class="nc">&nbsp;        this.setBottom(groupBar);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        this.localDragboard = stateManager.getLocalDragboard();</b>
+<b class="nc">&nbsp;        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, adaptVisibleTabs, taskExecutor, localDragboard);</b>
+&nbsp;
+&nbsp;        // Set-up groups tree
+<b class="nc">&nbsp;        groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);</b>
+<b class="nc">&nbsp;        dragExpansionHandler = new DragExpansionHandler();</b>
+&nbsp;
+&nbsp;        // Set-up bindings
+<b class="nc">&nbsp;        Platform.runLater(() -&gt;</b>
+<b class="nc">&nbsp;                BindingsHelper.bindContentBidirectional(</b>
+<b class="nc">&nbsp;                        groupTree.getSelectionModel().getSelectedItems(),</b>
+<b class="nc">&nbsp;                        viewModel.selectedGroupsProperty(),</b>
+&nbsp;                        newSelectedGroups -&gt; {
+<b class="nc">&nbsp;                            groupTree.getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;                            newSelectedGroups.forEach(this::selectNode);</b>
+&nbsp;                        },
+&nbsp;                        this::updateSelection
+&nbsp;                ));
+&nbsp;
+&nbsp;        // We try to prevent publishing changes in the search field directly to the search task that takes some time
+&nbsp;        // for larger group structures.
+<b class="nc">&nbsp;        final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Run group search {}&quot;, searchField.getText());</b>
+<b class="nc">&nbsp;            viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());</b>
+&nbsp;        });
+<b class="nc">&nbsp;        searchField.textProperty().addListener((observable, oldValue, newValue) -&gt; searchTask.restart());</b>
+&nbsp;
+<b class="nc">&nbsp;        groupTree.rootProperty().bind(</b>
+<b class="nc">&nbsp;                EasyBind.map(viewModel.rootGroupProperty(),</b>
+&nbsp;                        group -&gt; {
+<b class="nc">&nbsp;                            if (group == null) {</b>
+<b class="nc">&nbsp;                                return null;</b>
+&nbsp;                            } else {
+<b class="nc">&nbsp;                                return new RecursiveTreeItem&lt;&gt;(</b>
+&nbsp;                                        group,
+&nbsp;                                        GroupNodeViewModel::getChildren,
+&nbsp;                                        GroupNodeViewModel::expandedProperty,
+<b class="nc">&nbsp;                                        viewModel.filterPredicateProperty());</b>
+&nbsp;                            }
+&nbsp;                        }));
+&nbsp;
+&nbsp;        // Icon and group name
+<b class="nc">&nbsp;        new ViewModelTreeTableCellFactory&lt;GroupNodeViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withText(GroupNodeViewModel::getDisplayName)</b>
+<b class="nc">&nbsp;                .withIcon(GroupNodeViewModel::getIcon)</b>
+<b class="nc">&nbsp;                .withTooltip(GroupNodeViewModel::getDescription)</b>
+<b class="nc">&nbsp;                .install(mainColumn);</b>
+&nbsp;
+&nbsp;        // Number of hits (only if user wants to see them)
+<b class="nc">&nbsp;        new ViewModelTreeTableCellFactory&lt;GroupNodeViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(this::createNumberCell)</b>
+<b class="nc">&nbsp;                .install(numberColumn);</b>
+&nbsp;
+&nbsp;        // Arrow indicating expanded status
+<b class="nc">&nbsp;        new ViewModelTreeTableCellFactory&lt;GroupNodeViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(this::getArrowCell)</b>
+<b class="nc">&nbsp;                .withOnMouseClickedEvent(group -&gt; event -&gt; {</b>
+<b class="nc">&nbsp;                    group.toggleExpansion();</b>
+<b class="nc">&nbsp;                    event.consume();</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .install(expansionNodeColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelTreeTableRowFactory&lt;GroupNodeViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withContextMenu(this::createContextMenuForGroup)</b>
+<b class="nc">&nbsp;                .withEventFilter(MouseEvent.MOUSE_PRESSED, (row, event) -&gt; {</b>
+<b class="nc">&nbsp;                    if (((MouseEvent) event).getButton() == MouseButton.SECONDARY &amp;&amp; !stateManager.getSelectedEntries().isEmpty()) {</b>
+&nbsp;                        // Prevent right-click to select group whe we have selected entries
+<b class="nc">&nbsp;                        event.consume();</b>
+<b class="nc">&nbsp;                    } else if (event.getTarget() instanceof StackPane pane) {</b>
+<b class="nc">&nbsp;                        if (pane.getStyleClass().contains(&quot;arrow&quot;) || pane.getStyleClass().contains(&quot;tree-disclosure-node&quot;)) {</b>
+<b class="nc">&nbsp;                            event.consume();</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                })
+<b class="nc">&nbsp;                .withCustomInitializer(row -&gt; {</b>
+&nbsp;                    // Remove disclosure node since we display custom version in separate column
+&nbsp;                    // Simply setting to null is not enough since it would be replaced by the default node on every change
+<b class="nc">&nbsp;                    row.setDisclosureNode(null);</b>
+<b class="nc">&nbsp;                    row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -&gt; row.setDisclosureNode(null));</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .setOnDragDetected(this::handleOnDragDetected)</b>
+<b class="nc">&nbsp;                .setOnDragDropped(this::handleOnDragDropped)</b>
+<b class="nc">&nbsp;                .setOnDragExited(this::handleOnDragExited)</b>
+<b class="nc">&nbsp;                .setOnDragOver(this::handleOnDragOver)</b>
+<b class="nc">&nbsp;                .withPseudoClass(PSEUDOCLASS_ROOTELEMENT, row -&gt; Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                        () -&gt; (row != null) &amp;&amp; (groupTree.getRoot() != null) &amp;&amp; (row.getItem() == groupTree.getRoot().getValue()), row.treeItemProperty()))</b>
+<b class="nc">&nbsp;                .withPseudoClass(PSEUDOCLASS_SUBELEMENT, row -&gt; Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                        () -&gt; (row != null) &amp;&amp; (groupTree.getTreeItemLevel(row.getTreeItem()) &gt; 1), row.treeItemProperty()))</b>
+<b class="nc">&nbsp;                .install(groupTree);</b>
+&nbsp;
+<b class="nc">&nbsp;        setupDragScrolling();</b>
+&nbsp;
+&nbsp;        // Filter text field
+<b class="nc">&nbsp;        setupClearButtonField(searchField);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private StackPane getArrowCell(GroupNodeViewModel viewModel) {
+<b class="nc">&nbsp;        final StackPane disclosureNode = new StackPane();</b>
+<b class="nc">&nbsp;        disclosureNode.visibleProperty().bind(viewModel.hasChildrenProperty());</b>
+<b class="nc">&nbsp;        disclosureNode.getStyleClass().setAll(&quot;tree-disclosure-node&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        final StackPane disclosureNodeArrow = new StackPane();</b>
+<b class="nc">&nbsp;        disclosureNodeArrow.getStyleClass().setAll(&quot;arrow&quot;);</b>
+<b class="nc">&nbsp;        disclosureNode.getChildren().add(disclosureNodeArrow);</b>
+<b class="nc">&nbsp;        return disclosureNode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private StackPane createNumberCell(GroupNodeViewModel group) {
+<b class="nc">&nbsp;        final StackPane node = new StackPane();</b>
+<b class="nc">&nbsp;        node.getStyleClass().add(&quot;hits&quot;);</b>
+<b class="nc">&nbsp;        if (!group.isRoot()) {</b>
+<b class="nc">&nbsp;            BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ANYSELECTED,</b>
+<b class="nc">&nbsp;                    group.anySelectedEntriesMatchedProperty());</b>
+<b class="nc">&nbsp;            BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ALLSELECTED,</b>
+<b class="nc">&nbsp;                    group.allSelectedEntriesMatchedProperty());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Text text = new Text();</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(),</b>
+&nbsp;                shouldDisplayGroupCount -&gt; {
+<b class="nc">&nbsp;                    if (text.textProperty().isBound()) {</b>
+<b class="nc">&nbsp;                        text.textProperty().unbind();</b>
+<b class="nc">&nbsp;                        text.setText(&quot;&quot;);</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (shouldDisplayGroupCount) {</b>
+<b class="nc">&nbsp;                        text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));</b>
+<b class="nc">&nbsp;                        Tooltip tooltip = new Tooltip();</b>
+<b class="nc">&nbsp;                        tooltip.textProperty().bind(group.getHits().asString());</b>
+<b class="nc">&nbsp;                        Tooltip.install(text, tooltip);</b>
+&nbsp;                    }
+&nbsp;                });
+<b class="nc">&nbsp;        text.getStyleClass().setAll(&quot;text&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        text.styleProperty().bind(Bindings.createStringBinding(() -&gt; {</b>
+&nbsp;            double reducedFontSize;
+<b class="nc">&nbsp;            double font_size = preferences.getWorkspacePreferences().getMainFontSize();</b>
+&nbsp;            // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
+<b class="nc">&nbsp;            if (font_size &gt; 26.0) {</b>
+<b class="nc">&nbsp;                reducedFontSize = 0.25;</b>
+<b class="nc">&nbsp;            } else if (font_size &gt; 22.0) {</b>
+<b class="nc">&nbsp;                reducedFontSize = 0.35;</b>
+<b class="nc">&nbsp;            } else if (font_size &gt; 18.0) {</b>
+<b class="nc">&nbsp;                reducedFontSize = 0.55;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                reducedFontSize = 0.75;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return &quot;-fx-font-size: %fem;&quot;.formatted(reducedFontSize);</b>
+<b class="nc">&nbsp;        }, preferences.getWorkspacePreferences().mainFontSizeProperty()));</b>
+&nbsp;
+<b class="nc">&nbsp;        node.getChildren().add(text);</b>
+<b class="nc">&nbsp;        node.setMaxWidth(Control.USE_PREF_SIZE);</b>
+<b class="nc">&nbsp;        return node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragExited(TreeTableRow&lt;GroupNodeViewModel&gt; row, GroupNodeViewModel fieldViewModel, DragEvent dragEvent) {
+<b class="nc">&nbsp;        ControlHelper.removeDroppingPseudoClasses(row);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragDetected(TreeTableRow&lt;GroupNodeViewModel&gt; row, GroupNodeViewModel groupViewModel, MouseEvent event) {
+<b class="nc">&nbsp;        List&lt;String&gt; groupsToMove = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (TreeItem&lt;GroupNodeViewModel&gt; selectedItem : row.getTreeTableView().getSelectionModel().getSelectedItems()) {</b>
+<b class="nc">&nbsp;            if ((selectedItem != null) &amp;&amp; (selectedItem.getValue() != null)) {</b>
+<b class="nc">&nbsp;                groupsToMove.add(selectedItem.getValue().getPath());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!groupsToMove.isEmpty()) {</b>
+<b class="nc">&nbsp;            localDragboard.clearAll();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Put the group nodes as content
+<b class="nc">&nbsp;        Dragboard dragboard = row.startDragAndDrop(TransferMode.MOVE);</b>
+&nbsp;        // Display the group when dragging
+<b class="nc">&nbsp;        dragboard.setDragView(row.snapshot(null, null));</b>
+<b class="nc">&nbsp;        ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;        content.put(DragAndDropDataFormats.GROUP, groupsToMove);</b>
+<b class="nc">&nbsp;        dragboard.setContent(content);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragDropped(TreeTableRow&lt;GroupNodeViewModel&gt; row, GroupNodeViewModel originalItem, DragEvent event) {
+<b class="nc">&nbsp;        Dragboard dragboard = event.getDragboard();</b>
+<b class="nc">&nbsp;        boolean success = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (dragboard.hasContent(DragAndDropDataFormats.GROUP) &amp;&amp; row.getItem().canAddGroupsIn()) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; pathToSources = (List&lt;String&gt;) dragboard.getContent(DragAndDropDataFormats.GROUP);</b>
+<b class="nc">&nbsp;            List&lt;GroupNodeViewModel&gt; changedGroups = new LinkedList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (String pathToSource : pathToSources) {</b>
+<b class="nc">&nbsp;                Optional&lt;GroupNodeViewModel&gt; source = viewModel</b>
+<b class="nc">&nbsp;                        .rootGroupProperty().get()</b>
+<b class="nc">&nbsp;                        .getChildByPath(pathToSource);</b>
+<b class="nc">&nbsp;                if (source.isPresent() &amp;&amp; source.get().canBeDragged()) {</b>
+<b class="nc">&nbsp;                    source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));</b>
+<b class="nc">&nbsp;                    changedGroups.add(source.get());</b>
+<b class="nc">&nbsp;                    success = true;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            groupTree.getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;            changedGroups.forEach(value -&gt; selectNode(value, true));</b>
+<b class="nc">&nbsp;            if (success) {</b>
+<b class="nc">&nbsp;                viewModel.writeGroupChangesToMetaData();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (localDragboard.hasBibEntries()) {</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; entries = localDragboard.getBibEntries();</b>
+<b class="nc">&nbsp;            row.getItem().addEntriesToGroup(entries);</b>
+<b class="nc">&nbsp;            success = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (dragboard.hasFiles()) {</b>
+<b class="nc">&nbsp;            this.database = stateManager.getActiveDatabase().orElse(null);</b>
+<b class="nc">&nbsp;            this.importHandler = new ImportHandler(</b>
+&nbsp;                    database,
+&nbsp;                    preferences,
+&nbsp;                    fileUpdateMonitor,
+&nbsp;                    undoManager,
+&nbsp;                    stateManager,
+&nbsp;                    dialogService,
+&nbsp;                    taskExecutor);
+<b class="nc">&nbsp;            List&lt;Path&gt; files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());</b>
+<b class="nc">&nbsp;            stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));</b>
+<b class="nc">&nbsp;            importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), event.getTransferMode())</b>
+<b class="nc">&nbsp;                         .executeWith(taskExecutor);</b>
+<b class="nc">&nbsp;            success = true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        event.setDropCompleted(success);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragOver(TreeTableRow&lt;GroupNodeViewModel&gt; row, GroupNodeViewModel originalItem, DragEvent event) {
+<b class="nc">&nbsp;        Dragboard dragboard = event.getDragboard();</b>
+<b class="nc">&nbsp;        if ((event.getGestureSource() != row) &amp;&amp; (row.getItem() != null) &amp;&amp; row.getItem().acceptableDrop(dragboard)) {</b>
+<b class="nc">&nbsp;            event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);</b>
+&nbsp;
+&nbsp;            // expand node and all children on drag over
+<b class="nc">&nbsp;            dragExpansionHandler.expandGroup(row.getTreeItem());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (localDragboard.hasBibEntries() || dragboard.hasFiles()) {</b>
+<b class="nc">&nbsp;                ControlHelper.setDroppingPseudoClasses(row);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                ControlHelper.setDroppingPseudoClasses(row, event);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateSelection(List&lt;TreeItem&lt;GroupNodeViewModel&gt;&gt; newSelectedGroups) {
+<b class="nc">&nbsp;        if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {</b>
+<b class="nc">&nbsp;            viewModel.selectedGroupsProperty().clear();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            List&lt;GroupNodeViewModel&gt; list = newSelectedGroups.stream().filter(model -&gt; (model != null) &amp;&amp; (model.getValue() != null)).map(TreeItem::getValue).collect(Collectors.toList());</b>
+<b class="nc">&nbsp;            viewModel.selectedGroupsProperty().setAll(list);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void selectNode(GroupNodeViewModel value) {
+<b class="nc">&nbsp;        selectNode(value, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void selectNode(GroupNodeViewModel value, boolean expandParents) {
+<b class="nc">&nbsp;        getTreeItemByValue(value)</b>
+<b class="nc">&nbsp;                .ifPresent(treeItem -&gt; {</b>
+<b class="nc">&nbsp;                    if (expandParents) {</b>
+<b class="nc">&nbsp;                        TreeItem&lt;GroupNodeViewModel&gt; parent = treeItem.getParent();</b>
+<b class="nc">&nbsp;                        while (parent != null) {</b>
+<b class="nc">&nbsp;                            parent.setExpanded(true);</b>
+<b class="nc">&nbsp;                            parent = parent.getParent();</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    groupTree.getSelectionModel().select(treeItem);</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;TreeItem&lt;GroupNodeViewModel&gt;&gt; getTreeItemByValue(GroupNodeViewModel value) {
+<b class="nc">&nbsp;        return getTreeItemByValue(groupTree.getRoot(), value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;TreeItem&lt;GroupNodeViewModel&gt;&gt; getTreeItemByValue(TreeItem&lt;GroupNodeViewModel&gt; root,
+&nbsp;                                                                      GroupNodeViewModel value) {
+<b class="nc">&nbsp;        if (root == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (root.getValue().equals(value)) {</b>
+<b class="nc">&nbsp;            return Optional.of(root);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;TreeItem&lt;GroupNodeViewModel&gt;&gt; node = Optional.empty();</b>
+<b class="nc">&nbsp;        for (TreeItem&lt;GroupNodeViewModel&gt; child : root.getChildren()) {</b>
+<b class="nc">&nbsp;            node = getTreeItemByValue(child, value);</b>
+<b class="nc">&nbsp;            if (node.isPresent()) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupDragScrolling() {
+&nbsp;        // see http://programmingtipsandtraps.blogspot.com/2015/10/drag-and-drop-in-treetableview-with.html
+&nbsp;
+&nbsp;        // timer used to implement scrolling
+<b class="nc">&nbsp;        scrollTimer = FxTimer.createPeriodic(Duration.ofMillis(100), () -&gt;</b>
+<b class="nc">&nbsp;                getVerticalScrollbar().ifPresent(scrollBar -&gt; {</b>
+<b class="nc">&nbsp;                    double newValue = scrollBar.getValue() + scrollVelocity;</b>
+<b class="nc">&nbsp;                    newValue = Math.min(newValue, 1d);</b>
+<b class="nc">&nbsp;                    newValue = Math.max(newValue, 0d);</b>
+<b class="nc">&nbsp;                    scrollBar.setValue(newValue);</b>
+&nbsp;                }));
+&nbsp;
+&nbsp;        // Start
+<b class="nc">&nbsp;        groupTree.setOnDragEntered(event -&gt; {</b>
+<b class="nc">&nbsp;            initScrolling();</b>
+<b class="nc">&nbsp;            scrollTimer.restart();</b>
+&nbsp;        });
+&nbsp;
+&nbsp;        // During dragging
+<b class="nc">&nbsp;        groupTree.setOnDragOver(event -&gt; {</b>
+<b class="nc">&nbsp;            boolean scrollingUp = event.getY() &lt; upperBorder;</b>
+<b class="nc">&nbsp;            boolean scrollingDown = event.getY() &gt; lowerBorder;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!scrollingUp &amp;&amp; !scrollingDown) {</b>
+<b class="nc">&nbsp;                scrollVelocity = 0;</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+&nbsp;            double distanceFromNonScrollableInsideArea;
+<b class="nc">&nbsp;            if (scrollingUp) {</b>
+<b class="nc">&nbsp;                distanceFromNonScrollableInsideArea = scrollableAreaHeight - event.getY();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                distanceFromNonScrollableInsideArea = scrollableAreaHeight - (groupTree.getHeight() - event.getY());</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // part &quot;(1+x)&quot; of formula &quot;speed = 20px/s (1+x)&quot; (proposed by https://github.com/JabRef/jabref/issues/9754#issuecomment-1766864908)
+&nbsp;            // / 10.0 is because of the 100 milliseconds above. (it is 20px per second, 10.0 * 100.0 ms = 1 second)
+<b class="nc">&nbsp;            scrollVelocity = (baseFactor * (1.0 + distanceFromNonScrollableInsideArea)) / 10.0;</b>
+<b class="nc">&nbsp;            if (scrollingUp) {</b>
+<b class="nc">&nbsp;                scrollVelocity = -scrollVelocity;</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+&nbsp;        // Stop
+<b class="nc">&nbsp;        groupTree.setOnScroll(event -&gt; scrollTimer.stop());</b>
+<b class="nc">&nbsp;        groupTree.setOnDragDone(event -&gt; scrollTimer.stop());</b>
+<b class="nc">&nbsp;        groupTree.setOnDragDropped(event -&gt; scrollTimer.stop());</b>
+<b class="nc">&nbsp;        groupTree.setOnDragExited(event -&gt; scrollTimer.stop());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initScrolling() {
+<b class="nc">&nbsp;        int numberOfShownGroups = groupTree.getExpandedItemCount();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (numberOfShownGroups == 0) {</b>
+<b class="nc">&nbsp;            scrollVelocity = 0;</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double heightOfOneNode = groupTree.getChildrenUnmodifiable().getFirst().getLayoutBounds().getHeight();</b>
+&nbsp;        // heightOfOneNode is the size of text. We need including surroundings.
+&nbsp;        // We found no way to get this. We can only do a heuristics here.
+&nbsp;        // 2.0 is backed by measurement using the screen ruler utility (https://learn.microsoft.com/en-us/windows/powertoys/screen-ruler)
+<b class="nc">&nbsp;        heightOfOneNode = heightOfOneNode * 2.0;</b>
+&nbsp;
+&nbsp;        // At most scroll area is three entries large
+<b class="nc">&nbsp;        scrollableAreaHeight = Math.min(heightOfOneNode * 3.0, groupTree.getHeight() / 3.0);</b>
+<b class="nc">&nbsp;        upperBorder = scrollableAreaHeight;</b>
+<b class="nc">&nbsp;        lowerBorder = groupTree.getHeight() - scrollableAreaHeight;</b>
+&nbsp;
+&nbsp;        // 20 is derived from &quot;speed = 20px/s (1+x)&quot; (proposed by https://github.com/JabRef/jabref/issues/9754#issuecomment-1766864908)
+&nbsp;        // (1.0 / groupTree.getHeight()) is the factor to convert from px to fraction of total height
+<b class="nc">&nbsp;        double totalHeight = heightOfOneNode * numberOfShownGroups;</b>
+<b class="nc">&nbsp;        baseFactor = 20.0 * (1.0 / totalHeight);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;ScrollBar&gt; getVerticalScrollbar() {
+<b class="nc">&nbsp;        for (Node node : groupTree.lookupAll(&quot;.scroll-bar&quot;)) {</b>
+<b class="nc">&nbsp;            if (node instanceof ScrollBar scrollbar</b>
+<b class="nc">&nbsp;                    &amp;&amp; scrollbar.getOrientation() == Orientation.VERTICAL) {</b>
+<b class="nc">&nbsp;                return Optional.of(scrollbar);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
+<b class="nc">&nbsp;        if (group == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ContextMenu contextMenu = new ContextMenu();</b>
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+&nbsp;
+&nbsp;        MenuItem removeGroup;
+<b class="nc">&nbsp;        if (group.hasSubgroups() &amp;&amp; group.canAddGroupsIn() &amp;&amp; !group.isRoot()) {</b>
+<b class="nc">&nbsp;            removeGroup = new Menu(Localization.lang(&quot;Remove group&quot;), null,</b>
+<b class="nc">&nbsp;                    factory.createMenuItem(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS,</b>
+&nbsp;                            new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS, group)),
+<b class="nc">&nbsp;                    factory.createMenuItem(StandardActions.GROUP_REMOVE_WITH_SUBGROUPS,</b>
+&nbsp;                            new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_WITH_SUBGROUPS, group))
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            removeGroup = factory.createMenuItem(StandardActions.GROUP_REMOVE, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE, group));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (preferences.getAiPreferences().getEnableAi()) {</b>
+<b class="nc">&nbsp;            contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_CHAT, new ContextAction(StandardActions.GROUP_CHAT, group)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        contextMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),</b>
+&nbsp;                removeGroup,
+&nbsp;                new SeparatorMenuItem()
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (group.isAllEntriesGroup()) {</b>
+<b class="nc">&nbsp;            contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_SUGGESTED_GROUPS_ADD,</b>
+&nbsp;                    new ContextAction(StandardActions.GROUP_SUGGESTED_GROUPS_ADD, group)));
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        contextMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, group)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group)),</b>
+&nbsp;                new SeparatorMenuItem(),
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        contextMenu.getItems().forEach(item -&gt; item.setGraphic(null));</b>
+<b class="nc">&nbsp;        contextMenu.getStyleClass().add(&quot;context-menu&quot;);</b>
+<b class="nc">&nbsp;        return contextMenu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addNewGroup() {
+<b class="nc">&nbsp;        viewModel.addNewGroupToRoot();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getFormattedNumber(int hits) {
+<b class="nc">&nbsp;        if (hits &gt;= 1000000) {</b>
+<b class="nc">&nbsp;            double millions = hits / 1000000.0;</b>
+<b class="nc">&nbsp;            return new DecimalFormat(&quot;#,##0.#&quot;).format(millions) + &quot;m&quot;;</b>
+<b class="nc">&nbsp;        } else if (hits &gt;= 1000) {</b>
+<b class="nc">&nbsp;            double thousands = hits / 1000.0;</b>
+<b class="nc">&nbsp;            return new DecimalFormat(&quot;#,##0.#&quot;).format(thousands) + &quot;k&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Integer.toString(hits);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // ToDo: reflective access, should be removed
+&nbsp;    //  Workaround taken from https://github.com/controlsfx/controlsfx/issues/330
+&nbsp;    private void setupClearButtonField(CustomTextField customTextField) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Method m = TextFields.class.getDeclaredMethod(&quot;setupClearButtonField&quot;, TextField.class, ObjectProperty.class);</b>
+<b class="nc">&nbsp;            m.setAccessible(true);</b>
+<b class="nc">&nbsp;            m.invoke(null, customTextField, customTextField.rightProperty());</b>
+&nbsp;        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Failed to decorate text field with clear button&quot;, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an observable boolean value that is true if no database is open
+&nbsp;     */
+&nbsp;    private ObservableBooleanValue groupsDisabledProperty() {
+<b class="nc">&nbsp;        return Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                () -&gt; stateManager.getOpenDatabases().isEmpty(),</b>
+<b class="nc">&nbsp;                stateManager.getOpenDatabases()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class DragExpansionHandler {</b>
+&nbsp;        private static final long DRAG_TIME_BEFORE_EXPANDING_MS = 1000;
+&nbsp;        private TreeItem&lt;GroupNodeViewModel&gt; draggedItem;
+&nbsp;        private long dragStarted;
+&nbsp;
+&nbsp;        public void expandGroup(TreeItem&lt;GroupNodeViewModel&gt; treeItem) {
+<b class="nc">&nbsp;            if (!treeItem.equals(draggedItem)) {</b>
+<b class="nc">&nbsp;                this.draggedItem = treeItem;</b>
+<b class="nc">&nbsp;                this.dragStarted = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                this.draggedItem.setExpanded(this.draggedItem.isExpanded());</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if ((System.currentTimeMillis() - this.dragStarted) &gt; DRAG_TIME_BEFORE_EXPANDING_MS) {</b>
+&nbsp;                // expand or collapse the tree item and reset the time
+<b class="nc">&nbsp;                this.dragStarted = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                this.draggedItem.setExpanded(!this.draggedItem.isExpanded());</b>
+&nbsp;            } else {
+&nbsp;                // leave the expansion state of the tree item as it is
+<b class="nc">&nbsp;                this.draggedItem.setExpanded(this.draggedItem.isExpanded());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private class ContextAction extends SimpleCommand {
+&nbsp;
+&nbsp;        private final StandardActions command;
+&nbsp;        private final GroupNodeViewModel group;
+&nbsp;
+<b class="nc">&nbsp;        public ContextAction(StandardActions command, GroupNodeViewModel group) {</b>
+<b class="nc">&nbsp;            this.command = command;</b>
+<b class="nc">&nbsp;            this.group = group;</b>
+&nbsp;
+<b class="nc">&nbsp;            this.executable.bind(BindingsHelper.constantOf(</b>
+<b class="nc">&nbsp;                    switch (command) {</b>
+&nbsp;                        case GROUP_EDIT,
+&nbsp;                             GROUP_SUBGROUP_RENAME -&gt;
+<b class="nc">&nbsp;                                group.isEditable();</b>
+&nbsp;                        case GROUP_REMOVE,
+&nbsp;                             GROUP_REMOVE_WITH_SUBGROUPS,
+&nbsp;                             GROUP_REMOVE_KEEP_SUBGROUPS -&gt;
+<b class="nc">&nbsp;                                group.isEditable() &amp;&amp; group.canRemove();</b>
+&nbsp;                        case GROUP_SUGGESTED_GROUPS_ADD -&gt;
+<b class="nc">&nbsp;                                !group.hasAllSuggestedGroups();</b>
+&nbsp;                        case GROUP_SUBGROUP_ADD -&gt;
+<b class="nc">&nbsp;                                group.isEditable() &amp;&amp; group.canAddGroupsIn()</b>
+<b class="nc">&nbsp;                                        || group.isRoot();</b>
+&nbsp;                        case GROUP_SUBGROUP_REMOVE -&gt;
+<b class="nc">&nbsp;                                group.isEditable() &amp;&amp; group.hasSubgroups() &amp;&amp; group.canRemove()</b>
+<b class="nc">&nbsp;                                        || group.isRoot();</b>
+&nbsp;                        case GROUP_SUBGROUP_SORT -&gt;
+<b class="nc">&nbsp;                                group.isEditable() &amp;&amp; group.hasSubgroups() &amp;&amp; group.canAddEntriesIn()</b>
+<b class="nc">&nbsp;                                        || group.isRoot();</b>
+&nbsp;                        case GROUP_ENTRIES_ADD,
+&nbsp;                             GROUP_ENTRIES_REMOVE -&gt;
+<b class="nc">&nbsp;                                group.canAddEntriesIn();</b>
+&nbsp;                        default -&gt;
+<b class="nc">&nbsp;                                true;</b>
+&nbsp;                    }));
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void execute() {
+<b class="nc">&nbsp;            switch (command) {</b>
+&nbsp;                case GROUP_REMOVE -&gt;
+<b class="nc">&nbsp;                        viewModel.removeGroupNoSubgroups(group);</b>
+&nbsp;                case GROUP_REMOVE_KEEP_SUBGROUPS -&gt;
+<b class="nc">&nbsp;                        viewModel.removeGroupKeepSubgroups(group);</b>
+&nbsp;                case GROUP_REMOVE_WITH_SUBGROUPS -&gt;
+<b class="nc">&nbsp;                        viewModel.removeGroupAndSubgroups(group);</b>
+&nbsp;                case GROUP_EDIT,
+&nbsp;                     GROUP_SUBGROUP_RENAME -&gt;
+<b class="nc">&nbsp;                        viewModel.editGroup(group);</b>
+&nbsp;                case GROUP_GENERATE_EMBEDDINGS -&gt;
+<b class="nc">&nbsp;                        viewModel.generateEmbeddings(group);</b>
+&nbsp;                case GROUP_GENERATE_SUMMARIES -&gt;
+<b class="nc">&nbsp;                        viewModel.generateSummaries(group);</b>
+&nbsp;                case GROUP_CHAT -&gt;
+<b class="nc">&nbsp;                        viewModel.chatWithGroup(group);</b>
+&nbsp;                case GROUP_SUGGESTED_GROUPS_ADD -&gt;
+<b class="nc">&nbsp;                        viewModel.addSuggestedGroups(group);</b>
+&nbsp;                case GROUP_SUBGROUP_ADD -&gt;
+<b class="nc">&nbsp;                        viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);</b>
+&nbsp;                case GROUP_SUBGROUP_REMOVE -&gt;
+<b class="nc">&nbsp;                        viewModel.removeSubgroups(group);</b>
+&nbsp;                case GROUP_SUBGROUP_SORT -&gt;
+<b class="nc">&nbsp;                        viewModel.sortAlphabeticallyRecursive(group.getGroupNode());</b>
+&nbsp;                case GROUP_SUBGROUP_SORT_REVERSE -&gt;
+<b class="nc">&nbsp;                        viewModel.sortReverseAlphabeticallyRecursive(group.getGroupNode());</b>
+&nbsp;                case GROUP_SUBGROUP_SORT_ENTRIES -&gt;
+<b class="nc">&nbsp;                        viewModel.sortEntriesRecursive(group.getGroupNode());</b>
+&nbsp;                case GROUP_SUBGROUP_SORT_ENTRIES_REVERSE -&gt;
+<b class="nc">&nbsp;                        viewModel.sortReverseEntriesRecursive(group.getGroupNode());</b>
+&nbsp;                case GROUP_ENTRIES_ADD -&gt;
+<b class="nc">&nbsp;                        viewModel.addSelectedEntries(group);</b>
+&nbsp;                case GROUP_ENTRIES_REMOVE -&gt;
+<b class="nc">&nbsp;                        viewModel.removeSelectedEntries(group);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            groupTree.refresh();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Focus on GroupTree
+&nbsp;     */
+&nbsp;    public void requestFocusGroupTree() {
+<b class="nc">&nbsp;        groupTree.requestFocus();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

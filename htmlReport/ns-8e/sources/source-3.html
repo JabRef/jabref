@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > QuickSettings</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.welcome.components</a>
+</div>
+
+<h1>Coverage Summary for Class: QuickSettings (org.jabref.gui.welcome.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QuickSettings</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.welcome.components;
+&nbsp;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.welcome.quicksettings.EntryTableConfigurationDialog;
+&nbsp;import org.jabref.gui.welcome.quicksettings.LargeLibraryOptimizationDialog;
+&nbsp;import org.jabref.gui.welcome.quicksettings.MainFileDirectoryDialog;
+&nbsp;import org.jabref.gui.welcome.quicksettings.OnlineServicesDialog;
+&nbsp;import org.jabref.gui.welcome.quicksettings.PushApplicationDialog;
+&nbsp;import org.jabref.gui.welcome.quicksettings.ThemeDialog;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;
+&nbsp;public class QuickSettings extends VBox {
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    private final Label header;
+<b class="nc">&nbsp;    private boolean isScrollEnabled = true;</b>
+&nbsp;
+<b class="nc">&nbsp;    public QuickSettings(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        getStyleClass().add(&quot;welcome-section&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        header = new Label(Localization.lang(&quot;Quick settings&quot;));</b>
+<b class="nc">&nbsp;        header.getStyleClass().add(&quot;welcome-header-label&quot;);</b>
+<b class="nc">&nbsp;        enableScroll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void enableScroll() {
+<b class="nc">&nbsp;        if (isScrollEnabled) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        isScrollEnabled = true;</b>
+<b class="nc">&nbsp;        getChildren().clear();</b>
+<b class="nc">&nbsp;        getChildren().addAll(header, createScrollPane(createContent()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void disableScroll() {
+<b class="nc">&nbsp;        if (!isScrollEnabled) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        isScrollEnabled = false;</b>
+<b class="nc">&nbsp;        getChildren().clear();</b>
+<b class="nc">&nbsp;        getChildren().addAll(header, createContent());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createContent() {
+<b class="nc">&nbsp;        Button mainFileDirButton = createButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Set main file directory&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.FOLDER,
+&nbsp;                this::showMainFileDirectoryDialog);
+&nbsp;
+<b class="nc">&nbsp;        Button themeButton = createButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Change visual theme&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.PREFERENCES,
+&nbsp;                this::showThemeDialog);
+&nbsp;
+<b class="nc">&nbsp;        Button largeLibraryButton = createButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Optimize for large libraries&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.SELECTORS,
+&nbsp;                this::showLargeLibraryOptimizationDialog);
+&nbsp;
+<b class="nc">&nbsp;        Button pushApplicationButton = createButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Configure push to applications&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.APPLICATION_GENERIC,
+&nbsp;                this::showPushApplicationConfigurationDialog);
+&nbsp;
+<b class="nc">&nbsp;        Button onlineServicesButton = createButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Configure web search services&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.WWW,
+&nbsp;                this::showOnlineServicesConfigurationDialog);
+&nbsp;
+<b class="nc">&nbsp;        Button entryTableButton = createButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Customize entry table&quot;),</b>
+&nbsp;                IconTheme.JabRefIcons.TOGGLE_GROUPS,
+&nbsp;                this::showEntryTableConfigurationDialog);
+&nbsp;
+<b class="nc">&nbsp;        VBox newContent = new VBox(mainFileDirButton,</b>
+&nbsp;                themeButton,
+&nbsp;                largeLibraryButton,
+&nbsp;                entryTableButton,
+&nbsp;                pushApplicationButton,
+&nbsp;                onlineServicesButton);
+<b class="nc">&nbsp;        newContent.getStyleClass().add(&quot;quick-settings-container&quot;);</b>
+<b class="nc">&nbsp;        return newContent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ScrollPane createScrollPane(VBox contentPane) {
+<b class="nc">&nbsp;        ScrollPane scrollPane = new ScrollPane(contentPane);</b>
+<b class="nc">&nbsp;        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);</b>
+<b class="nc">&nbsp;        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);</b>
+<b class="nc">&nbsp;        scrollPane.setFitToWidth(true);</b>
+<b class="nc">&nbsp;        scrollPane.getStyleClass().add(&quot;quick-settings-scroll-pane&quot;);</b>
+<b class="nc">&nbsp;        scrollPane.setMaxHeight(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        VBox.setVgrow(scrollPane, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        return scrollPane;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Button createButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
+<b class="nc">&nbsp;        Button button = new Button(text);</b>
+<b class="nc">&nbsp;        button.setGraphic(icon.getGraphicNode());</b>
+<b class="nc">&nbsp;        button.getStyleClass().add(&quot;quick-settings-button&quot;);</b>
+<b class="nc">&nbsp;        button.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        button.setOnAction(event -&gt; action.run());</b>
+<b class="nc">&nbsp;        return button;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showMainFileDirectoryDialog() {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new MainFileDirectoryDialog(preferences, dialogService));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showThemeDialog() {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new ThemeDialog(preferences, dialogService));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showLargeLibraryOptimizationDialog() {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new LargeLibraryOptimizationDialog(preferences));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showPushApplicationConfigurationDialog() {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new PushApplicationDialog(preferences, dialogService, taskExecutor));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showOnlineServicesConfigurationDialog() {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new OnlineServicesDialog(preferences));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showEntryTableConfigurationDialog() {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new EntryTableConfigurationDialog(preferences));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

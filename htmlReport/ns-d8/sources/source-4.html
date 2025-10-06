@@ -1,0 +1,155 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbbreviationWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.journals</a>
+</div>
+
+<h1>Coverage Summary for Class: AbbreviationWriter (org.jabref.logic.journals)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbbreviationWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.journals;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.apache.commons.csv.CSVPrinter;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class provides handy static methods to save abbreviations to the file system.
+&nbsp; */
+&nbsp;public final class AbbreviationWriter {
+&nbsp;
+&nbsp;    private AbbreviationWriter() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method will write the list of abbreviations to a file on the file system specified by the given path. If the
+&nbsp;     * file already exists its content will be overridden, otherwise a new file will be created.
+&nbsp;     *
+&nbsp;     * @param path          to a file (doesn&#39;t have to exist just yet)
+&nbsp;     * @param abbreviations as a list specifying which entries should be written
+&nbsp;     */
+&nbsp;    public static void writeOrCreate(Path path, List&lt;Abbreviation&gt; abbreviations) throws IOException {
+<b class="nc">&nbsp;        try (OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(path), StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;             CSVPrinter csvPrinter = new CSVPrinter(writer, AbbreviationFormat.getCSVFormatWithDefaultDilimeter())) {</b>
+<b class="nc">&nbsp;            for (Abbreviation entry : abbreviations) {</b>
+<b class="nc">&nbsp;                if (entry.isDefaultShortestUniqueAbbreviation()) {</b>
+<b class="nc">&nbsp;                    csvPrinter.printRecord(entry.getName(), entry.getAbbreviation());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    csvPrinter.printRecord(entry.getName(), entry.getAbbreviation(), entry.getShortestUniqueAbbreviation());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

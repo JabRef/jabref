@@ -1,0 +1,567 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WindowOverlay</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough</a>
+</div>
+
+<h1>Coverage Summary for Class: WindowOverlay (org.jabref.gui.walkthrough)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WindowOverlay</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/141)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WindowOverlay$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WindowOverlay$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/166)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.atomic.AtomicReference;
+&nbsp;
+&nbsp;import javafx.beans.value.ChangeListener;
+&nbsp;import javafx.event.EventHandler;
+&nbsp;import javafx.event.EventTarget;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.stage.Window;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIconView;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
+&nbsp;import org.jabref.gui.keyboard.WalkthroughKeyBindings;
+&nbsp;import org.jabref.gui.util.DelayedExecution;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.PanelStep;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.sun.javafx.scene.NodeHelper;
+&nbsp;import org.controlsfx.control.PopOver;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// Manages the overlay for displaying walkthrough steps in a single window.
+<b class="nc">&nbsp;class WindowOverlay {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(WindowOverlay.class);</b>
+&nbsp;    private static final int POPOVER_CREATION_DELAY = 200;
+&nbsp;
+&nbsp;    private final Window window;
+&nbsp;    private final WalkthroughPane pane;
+&nbsp;    private final WalkthroughRenderer renderer;
+&nbsp;    private final Walkthrough walkthrough;
+&nbsp;    /// Mutable list of clean up tasks that are executed when the overlay is hidden or
+&nbsp;    /// detached.
+<b class="nc">&nbsp;    private final List&lt;Runnable&gt; cleanupTasks = new ArrayList&lt;&gt;();</b>
+&nbsp;    private final KeyBindingRepository keyBindingRepository;
+&nbsp;    private final StateManager stateManager;
+<b class="nc">&nbsp;    private boolean showing = true;</b>
+&nbsp;
+&nbsp;    private @Nullable Button quitButton;
+&nbsp;    private @Nullable Node currentContentNode;
+&nbsp;
+<b class="nc">&nbsp;    public WindowOverlay(Window window, WalkthroughPane pane, Walkthrough walkthrough) {</b>
+<b class="nc">&nbsp;        this.window = window;</b>
+<b class="nc">&nbsp;        this.pane = pane;</b>
+<b class="nc">&nbsp;        this.renderer = new WalkthroughRenderer();</b>
+<b class="nc">&nbsp;        this.walkthrough = walkthrough;</b>
+<b class="nc">&nbsp;        this.keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);</b>
+<b class="nc">&nbsp;        this.stateManager = Injector.instantiateModelOrService(StateManager.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        Scene scene = window.getScene();</b>
+<b class="nc">&nbsp;        assert scene != null;</b>
+&nbsp;
+<b class="nc">&nbsp;        listenKeybindings(pane, scene);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Display a tooltip for the given step at the specified node.
+&nbsp;    ///
+&nbsp;    /// @param step           The step to display.
+&nbsp;    /// @param node           The node to anchor the tooltip to, or null to show it at
+&nbsp;    ///                                             the window. The node is expected to be positionable by
+&nbsp;    ///                                             [WalkthroughUtils#cannotPositionNode(Node)] standard.
+&nbsp;    /// @param beforeNavigate A runnable to execute before navigating to the next step.
+&nbsp;    ///                                             More precisely, the runnable to execute immediately upon
+&nbsp;    ///                                             the button press before Walkthrough&#39;s state change to the
+&nbsp;    ///                                             next step and before the original button/node&#39;s action is
+&nbsp;    ///                                             executed. Usually used to prevent automatic revert from
+&nbsp;    ///                                             unexpected reverting to the previous step when the node is
+&nbsp;    ///                                             not yet ready to be displayed
+&nbsp;    /// @implNote The requirement for the node to be positionable by
+&nbsp;    /// [WalkthroughUtils#cannotPositionNode(Node)] standard is just to make things
+&nbsp;    /// easier to define. This requirement come from
+&nbsp;    /// [javafx.stage.PopupWindow#show(Node)], which check whether the node is tree
+&nbsp;    /// visible before showing the popup and [PopOver#show(Node)], which checks whether
+&nbsp;    /// the node contains a scene and window to assign the owning window to the
+&nbsp;    /// popover.
+&nbsp;    /// @see WindowOverlay#showPanel(PanelStep, Runnable)
+&nbsp;    /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable)
+&nbsp;    public void showTooltip(TooltipStep step, @Nullable Node node, Runnable beforeNavigate) {
+<b class="nc">&nbsp;        hide();</b>
+<b class="nc">&nbsp;        showing = true;</b>
+<b class="nc">&nbsp;        if (node == null) {</b>
+<b class="nc">&nbsp;            PopOver popover = createPopover(step, beforeNavigate);</b>
+<b class="nc">&nbsp;            cleanupTasks.add(popover::hide);</b>
+<b class="nc">&nbsp;            addQuitButton(step);</b>
+<b class="nc">&nbsp;            popover.show(window);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AtomicReference&lt;PopOver&gt; popOverRef = new AtomicReference&lt;&gt;();</b>
+<b class="nc">&nbsp;        addQuitButton(step);</b>
+&nbsp;
+<b class="nc">&nbsp;        AtomicReference&lt;ChangeListener&lt;Boolean&gt;&gt; popoverShowingListenerRef = new AtomicReference&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Runnable updatePopoverVisibility = new Runnable() {</b>
+&nbsp;            @Override
+&nbsp;            public void run() {
+<b class="nc">&nbsp;                boolean shouldBeShowing = showing &amp;&amp; NodeHelper.isTreeVisible(node);</b>
+<b class="nc">&nbsp;                PopOver currentPopover = popOverRef.get();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!shouldBeShowing) {</b>
+<b class="nc">&nbsp;                    if (currentPopover != null &amp;&amp; currentPopover.isShowing()) {</b>
+<b class="nc">&nbsp;                        currentPopover.hide();</b>
+&nbsp;                    }
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (currentPopover == null || !currentPopover.isShowing()) {</b>
+<b class="nc">&nbsp;                    if (currentPopover != null) {</b>
+<b class="nc">&nbsp;                        currentPopover.showingProperty().removeListener(popoverShowingListenerRef.get());</b>
+&nbsp;                    }
+&nbsp;                    // Prevent infinite loop. Consider: window want to close -&gt; popover created
+&nbsp;                    // -&gt; popover got notified to be closed -&gt; popover hide -&gt; popover showing again from this...
+<b class="nc">&nbsp;                    DelayedExecution delayedExecution = createPopoverDelayed();</b>
+<b class="nc">&nbsp;                    cleanupTasks.add(delayedExecution::cancel);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            private @NonNull DelayedExecution createPopoverDelayed() {
+<b class="nc">&nbsp;                DelayedExecution delayedExecution = new DelayedExecution(new Duration(POPOVER_CREATION_DELAY), () -&gt; {</b>
+<b class="nc">&nbsp;                    PopOver newPopover = createPopover(step, beforeNavigate);</b>
+<b class="nc">&nbsp;                    popOverRef.set(newPopover);</b>
+&nbsp;
+<b class="nc">&nbsp;                    ChangeListener&lt;Boolean&gt; newListener = (_, wasShowing, isShowing) -&gt; {</b>
+<b class="nc">&nbsp;                        if (wasShowing &amp;&amp; !isShowing) {</b>
+<b class="nc">&nbsp;                            this.run();</b>
+&nbsp;                        }
+&nbsp;                    };
+<b class="nc">&nbsp;                    popoverShowingListenerRef.set(newListener);</b>
+<b class="nc">&nbsp;                    newPopover.showingProperty().addListener(newListener);</b>
+<b class="nc">&nbsp;                    newPopover.show(node);</b>
+&nbsp;                });
+<b class="nc">&nbsp;                delayedExecution.start();</b>
+<b class="nc">&nbsp;                return delayedExecution;</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        WalkthroughUtils.DebouncedRunnable debouncedUpdate = WalkthroughUtils.debounced(updatePopoverVisibility);</b>
+<b class="nc">&nbsp;        ChangeListener&lt;Boolean&gt; treeVisibleListener = (_, _, _) -&gt; debouncedUpdate.run();</b>
+<b class="nc">&nbsp;        NodeHelper.treeVisibleProperty(node).addListener(treeVisibleListener);</b>
+&nbsp;
+<b class="nc">&nbsp;        updatePopoverVisibility.run();</b>
+&nbsp;
+<b class="nc">&nbsp;        cleanupTasks.add(() -&gt; {</b>
+<b class="nc">&nbsp;            NodeHelper.treeVisibleProperty(node).removeListener(treeVisibleListener);</b>
+<b class="nc">&nbsp;            debouncedUpdate.cancel();</b>
+<b class="nc">&nbsp;            PopOver currentPopover = popOverRef.get();</b>
+<b class="nc">&nbsp;            if (currentPopover != null) {</b>
+<b class="nc">&nbsp;                currentPopover.showingProperty().removeListener(popoverShowingListenerRef.get());</b>
+<b class="nc">&nbsp;                currentPopover.hide();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        step.trigger().ifPresent(predicate -&gt;</b>
+<b class="nc">&nbsp;                cleanupTasks.add(predicate.attach(node, beforeNavigate, walkthrough::nextStep)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Convenience method to show a panel for the given step without a node.
+&nbsp;    ///
+&nbsp;    /// See [WindowOverlay#showPanel(PanelStep, Node, Runnable)] for details.
+&nbsp;    public void showPanel(PanelStep step, Runnable beforeNavigate) {
+<b class="nc">&nbsp;        showPanel(step, null, beforeNavigate);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Display a Panel for the given step at the specified node.
+&nbsp;    ///
+&nbsp;    /// @param step           The step to display.
+&nbsp;    /// @param node           The node to anchor highlight to (e.g., BackdropHighlight
+&nbsp;    ///                                             may poke a hole at the position of the node), or null to
+&nbsp;    ///                                             use fallback effect of corresponding position.
+&nbsp;    /// @param beforeNavigate A runnable to execute before navigating to the next step.
+&nbsp;    ///                                             More precisely, the runnable to execute immediately upon
+&nbsp;    ///                                             the button press before Walkthrough&#39;s state change to the
+&nbsp;    ///                                             next step and before the original button/node&#39;s action is
+&nbsp;    ///                                             executed. Usually used to prevent automatic revert from
+&nbsp;    ///                                             unexpected reverting to the previous step when the node is
+&nbsp;    ///                                             not yet ready to be displayed
+&nbsp;    /// @see WindowOverlay#showPanel(PanelStep, Runnable)
+&nbsp;    /// @see WindowOverlay#showTooltip(TooltipStep, Node, Runnable)
+&nbsp;    public void showPanel(PanelStep step, @Nullable Node node, Runnable beforeNavigate) {
+<b class="nc">&nbsp;        hide();</b>
+<b class="nc">&nbsp;        showing = true;</b>
+<b class="nc">&nbsp;        Node content = renderer.render(step, walkthrough, beforeNavigate);</b>
+<b class="nc">&nbsp;        content.setMouseTransparent(false);</b>
+<b class="nc">&nbsp;        currentContentNode = content;</b>
+<b class="nc">&nbsp;        switch (step.position()) {</b>
+&nbsp;            case LEFT -&gt; {
+<b class="nc">&nbsp;                StackPane.setAlignment(content, Pos.CENTER_LEFT);</b>
+<b class="nc">&nbsp;                StackPane.setMargin(content, new Insets(0, 0, 0, 0));</b>
+<b class="nc">&nbsp;                if (content instanceof VBox vbox) {</b>
+<b class="nc">&nbsp;                    vbox.setMaxHeight(Double.MAX_VALUE);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            case RIGHT -&gt; {
+<b class="nc">&nbsp;                StackPane.setAlignment(content, Pos.CENTER_RIGHT);</b>
+<b class="nc">&nbsp;                StackPane.setMargin(content, new Insets(0, 0, 0, 0));</b>
+<b class="nc">&nbsp;                if (content instanceof VBox vbox) {</b>
+<b class="nc">&nbsp;                    vbox.setMaxHeight(Double.MAX_VALUE);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            case TOP -&gt; {
+<b class="nc">&nbsp;                StackPane.setAlignment(content, Pos.TOP_CENTER);</b>
+<b class="nc">&nbsp;                StackPane.setMargin(content, new Insets(0, 0, 0, 0));</b>
+<b class="nc">&nbsp;                if (content instanceof VBox vbox) {</b>
+<b class="nc">&nbsp;                    vbox.setMaxWidth(Double.MAX_VALUE);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            case BOTTOM -&gt; {
+<b class="nc">&nbsp;                StackPane.setAlignment(content, Pos.BOTTOM_CENTER);</b>
+<b class="nc">&nbsp;                StackPane.setMargin(content, new Insets(0, 0, 0, 0));</b>
+<b class="nc">&nbsp;                if (content instanceof VBox vbox) {</b>
+<b class="nc">&nbsp;                    vbox.setMaxWidth(Double.MAX_VALUE);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            default -&gt; {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Unsupported position for panel step: {}&quot;, step.position());</b>
+<b class="nc">&nbsp;                StackPane.setAlignment(content, Pos.CENTER);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        pane.getChildren().add(content);</b>
+<b class="nc">&nbsp;        addQuitButton(step);</b>
+<b class="nc">&nbsp;        if (node != null) {</b>
+<b class="nc">&nbsp;            step.trigger().ifPresent(predicate -&gt;</b>
+<b class="nc">&nbsp;                    cleanupTasks.add(predicate.attach(node, beforeNavigate, walkthrough::nextStep)));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Hide the overlay and clean up any resources.
+&nbsp;    public void hide() {
+<b class="nc">&nbsp;        showing = false;</b>
+<b class="nc">&nbsp;        removeQuitButton();</b>
+<b class="nc">&nbsp;        if (currentContentNode != null) {</b>
+<b class="nc">&nbsp;            pane.getChildren().remove(currentContentNode);</b>
+<b class="nc">&nbsp;            currentContentNode = null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        cleanupTasks.forEach(Runnable::run);</b>
+<b class="nc">&nbsp;        cleanupTasks.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Detaches the overlay.
+&nbsp;    public void detach() {
+<b class="nc">&nbsp;        hide();</b>
+<b class="nc">&nbsp;        pane.detach();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;WindowOverlay detached for window: {}&quot;, window.getClass().getSimpleName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private PopOver createPopover(TooltipStep step, Runnable beforeNavigate) {
+<b class="nc">&nbsp;        Node content = renderer.render(step, walkthrough, beforeNavigate);</b>
+<b class="nc">&nbsp;        PopOver popover = new PopOver();</b>
+<b class="nc">&nbsp;        popover.getStyleClass().add(&quot;walkthrough-tooltip&quot;);</b>
+<b class="nc">&nbsp;        popover.setContentNode(content);</b>
+<b class="nc">&nbsp;        popover.setDetachable(false);</b>
+<b class="nc">&nbsp;        popover.setCloseButtonEnabled(false);</b>
+<b class="nc">&nbsp;        popover.setHeaderAlwaysVisible(false);</b>
+<b class="nc">&nbsp;        popover.setAutoHide(false);</b>
+<b class="nc">&nbsp;        popover.setConsumeAutoHidingEvents(false);</b>
+<b class="nc">&nbsp;        popover.setHideOnEscape(false);</b>
+<b class="nc">&nbsp;        mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);</b>
+&nbsp;
+<b class="nc">&nbsp;        Scene scene = popover.getScene();</b>
+<b class="nc">&nbsp;        if (scene == null) {</b>
+<b class="nc">&nbsp;            return popover;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        listenKeybindings(scene, scene);</b>
+<b class="nc">&nbsp;        return popover;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Adds keybinding listeners to the scene to handle key events for the
+&nbsp;    /// walkthrough.
+&nbsp;    ///
+&nbsp;    /// This method is necessary because:
+&nbsp;    /// 1. PopOver is in a separate scene, so the [org.jabref.gui.JabRefGUI]&#39;s
+&nbsp;    /// keybindings registration on the main scene doesn&#39;t/cannot capture the key events
+&nbsp;    /// on the PopOver scene. If a user, presumably, focus on the PopOver and press Esc,
+&nbsp;    /// quit Walkthrough will not work.
+&nbsp;    /// 2. Likewise, for new dialog windows, the keybindings doesn&#39;t work. If a user is
+&nbsp;    /// interested in copy/paste walkthrough text, they will not be able to do so.
+&nbsp;    private void listenKeybindings(EventTarget target, Scene scene) {
+<b class="nc">&nbsp;        EventHandler&lt;KeyEvent&gt; eventFilter = event -&gt; {</b>
+<b class="nc">&nbsp;            SelectableTextFlowKeyBindings.call(scene, event, keyBindingRepository);</b>
+<b class="nc">&nbsp;            WalkthroughKeyBindings.call(event, stateManager, keyBindingRepository);</b>
+&nbsp;        };
+<b class="nc">&nbsp;        target.addEventFilter(KeyEvent.KEY_PRESSED, eventFilter);</b>
+<b class="nc">&nbsp;        cleanupTasks.add(() -&gt; scene.removeEventFilter(KeyEvent.KEY_PRESSED, eventFilter));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;PopOver.ArrowLocation&gt; mapToArrowLocation(TooltipPosition position) {
+<b class="nc">&nbsp;        return Optional.ofNullable(switch (position) {</b>
+&nbsp;            case TOP -&gt;
+<b class="nc">&nbsp;                    PopOver.ArrowLocation.BOTTOM_CENTER;</b>
+&nbsp;            case BOTTOM -&gt;
+<b class="nc">&nbsp;                    PopOver.ArrowLocation.TOP_CENTER;</b>
+&nbsp;            case LEFT -&gt;
+<b class="nc">&nbsp;                    PopOver.ArrowLocation.RIGHT_CENTER;</b>
+&nbsp;            case RIGHT -&gt;
+<b class="nc">&nbsp;                    PopOver.ArrowLocation.LEFT_CENTER;</b>
+&nbsp;            case AUTO -&gt;
+<b class="nc">&nbsp;                    null;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addQuitButton(VisibleComponent component) {
+<b class="nc">&nbsp;        if (!component.showQuitButton()) {</b>
+<b class="nc">&nbsp;            removeQuitButton();</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        removeQuitButton();</b>
+<b class="nc">&nbsp;        quitButton = createQuitButton();</b>
+<b class="nc">&nbsp;        quitButton.setMouseTransparent(false);</b>
+<b class="nc">&nbsp;        QuitButtonPosition position = resolveQuitButtonPosition(component);</b>
+<b class="nc">&nbsp;        positionQuitButton(quitButton, position);</b>
+<b class="nc">&nbsp;        pane.getChildren().add(quitButton);</b>
+<b class="nc">&nbsp;        quitButton.toFront();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Button createQuitButton() {
+<b class="nc">&nbsp;        Button button = new Button();</b>
+<b class="nc">&nbsp;        button.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.CLOSE));</b>
+<b class="nc">&nbsp;        button.getStyleClass().addAll(&quot;icon-button&quot;, &quot;walkthrough-quit-button&quot;);</b>
+<b class="nc">&nbsp;        button.setOnAction(_ -&gt; walkthrough.showQuitConfirmationAndQuit());</b>
+<b class="nc">&nbsp;        button.setMinSize(32, 32);</b>
+<b class="nc">&nbsp;        button.setMaxSize(32, 32);</b>
+<b class="nc">&nbsp;        button.setPrefSize(32, 32);</b>
+<b class="nc">&nbsp;        return button;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private QuitButtonPosition resolveQuitButtonPosition(VisibleComponent component) {
+<b class="nc">&nbsp;        QuitButtonPosition position = component.quitButtonPosition();</b>
+<b class="nc">&nbsp;        if (position == QuitButtonPosition.AUTO &amp;&amp; component instanceof PanelStep panelStep) {</b>
+<b class="nc">&nbsp;            return switch (panelStep.position()) {</b>
+&nbsp;                case LEFT,
+&nbsp;                     BOTTOM -&gt;
+<b class="nc">&nbsp;                        QuitButtonPosition.TOP_RIGHT;</b>
+&nbsp;                case RIGHT -&gt;
+<b class="nc">&nbsp;                        QuitButtonPosition.TOP_LEFT;</b>
+&nbsp;                case TOP -&gt;
+<b class="nc">&nbsp;                        QuitButtonPosition.BOTTOM_RIGHT;</b>
+&nbsp;            };
+&nbsp;        }
+<b class="nc">&nbsp;        return position == QuitButtonPosition.AUTO ? QuitButtonPosition.BOTTOM_RIGHT : position;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void positionQuitButton(Button button, QuitButtonPosition position) {
+<b class="nc">&nbsp;        switch (position) {</b>
+&nbsp;            case TOP_LEFT -&gt; {
+<b class="nc">&nbsp;                StackPane.setAlignment(button, Pos.TOP_LEFT);</b>
+<b class="nc">&nbsp;                StackPane.setMargin(button, new Insets(12, 0, 0, 12));</b>
+&nbsp;            }
+&nbsp;            case TOP_RIGHT -&gt; {
+<b class="nc">&nbsp;                StackPane.setAlignment(button, Pos.TOP_RIGHT);</b>
+<b class="nc">&nbsp;                StackPane.setMargin(button, new Insets(12, 12, 0, 0));</b>
+&nbsp;            }
+&nbsp;            case BOTTOM_LEFT -&gt; {
+<b class="nc">&nbsp;                StackPane.setAlignment(button, Pos.BOTTOM_LEFT);</b>
+<b class="nc">&nbsp;                StackPane.setMargin(button, new Insets(0, 0, 12, 12));</b>
+&nbsp;            }
+&nbsp;            case BOTTOM_RIGHT -&gt; {
+<b class="nc">&nbsp;                StackPane.setAlignment(button, Pos.BOTTOM_RIGHT);</b>
+<b class="nc">&nbsp;                StackPane.setMargin(button, new Insets(0, 12, 12, 0));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeQuitButton() {
+<b class="nc">&nbsp;        if (quitButton != null) {</b>
+<b class="nc">&nbsp;            pane.getChildren().remove(quitButton);</b>
+<b class="nc">&nbsp;            quitButton = null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

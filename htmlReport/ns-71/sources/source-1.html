@@ -1,0 +1,491 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreviewTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.preview</a>
+</div>
+
+<h1>Coverage Summary for Class: PreviewTab (org.jabref.gui.preferences.preview)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreviewTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PreviewTab$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PreviewTab$EditAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/134)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.preview;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.event.ActionEvent;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.SelectionMode;
+&nbsp;import javafx.scene.control.Tab;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.gui.preview.PreviewViewer;
+&nbsp;import org.jabref.gui.theme.ThemeManager;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preview.PreviewLayout;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.TestEntry;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.controlsfx.control.textfield.CustomTextField;
+&nbsp;import org.fxmisc.richtext.CodeArea;
+&nbsp;import org.fxmisc.richtext.LineNumberFactory;
+&nbsp;
+&nbsp;public class PreviewTab extends AbstractPreferenceTabView&lt;PreviewTabViewModel&gt; implements PreferencesTab {
+&nbsp;
+&nbsp;    @FXML private CheckBox showAsTabCheckBox;
+&nbsp;    @FXML private CheckBox showPreviewTooltipCheckBox;
+&nbsp;    @FXML private ListView&lt;PreviewLayout&gt; availableListView;
+&nbsp;    @FXML private ListView&lt;PreviewLayout&gt; chosenListView;
+&nbsp;    @FXML private Button toRightButton;
+&nbsp;    @FXML private Button toLeftButton;
+&nbsp;    @FXML private Button sortUpButton;
+&nbsp;    @FXML private Button sortDownButton;
+&nbsp;    @FXML private Label readOnlyLabel;
+&nbsp;    @FXML private Button resetDefaultButton;
+&nbsp;    @FXML private Tab previewTab;
+&nbsp;    @FXML private CodeArea editArea;
+&nbsp;    @FXML private CustomTextField searchBox;
+&nbsp;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;    @Inject private ThemeManager themeManager;
+&nbsp;
+<b class="nc">&nbsp;    private final ContextMenu contextMenu = new ContextMenu();</b>
+&nbsp;
+&nbsp;    private long lastKeyPressTime;
+&nbsp;    private String listSearchTerm;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;    public PreviewTab() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private class EditAction extends SimpleCommand {
+&nbsp;
+&nbsp;        private final StandardActions command;
+&nbsp;
+<b class="nc">&nbsp;        public EditAction(StandardActions command) {</b>
+<b class="nc">&nbsp;            this.command = command;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void execute() {
+<b class="nc">&nbsp;            if (editArea != null) {</b>
+<b class="nc">&nbsp;                switch (command) {</b>
+&nbsp;                    case COPY -&gt;
+<b class="nc">&nbsp;                            editArea.copy();</b>
+&nbsp;                    case CUT -&gt;
+<b class="nc">&nbsp;                            editArea.cut();</b>
+&nbsp;                    case PASTE -&gt;
+<b class="nc">&nbsp;                            editArea.paste();</b>
+&nbsp;                    case SELECT_ALL -&gt;
+<b class="nc">&nbsp;                            editArea.selectAll();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                editArea.requestFocus();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Entry preview&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void selectBstFile(ActionEvent event) {
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.BST)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.BST)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -&gt; viewModel.addBstStyle(bstFile));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new PreviewTabViewModel(dialogService, preferences.getPreviewPreferences(), taskExecutor, stateManager);</b>
+<b class="nc">&nbsp;        lastKeyPressTime = System.currentTimeMillis();</b>
+&nbsp;
+<b class="nc">&nbsp;        showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());</b>
+<b class="nc">&nbsp;        showPreviewTooltipCheckBox.selectedProperty().bindBidirectional(viewModel.showPreviewInEntryTableTooltip());</b>
+&nbsp;
+<b class="nc">&nbsp;        searchBox.setPromptText(Localization.lang(&quot;Search...&quot;));</b>
+<b class="nc">&nbsp;        searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());</b>
+&nbsp;
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+<b class="nc">&nbsp;        contextMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(StandardActions.SELECT_ALL))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        contextMenu.getItems().forEach(item -&gt; item.setGraphic(null));</b>
+<b class="nc">&nbsp;        contextMenu.getStyleClass().add(&quot;context-menu&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        availableListView.setItems(viewModel.getFilteredAvailableLayouts());</b>
+<b class="nc">&nbsp;        viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;PreviewLayout&gt;()</b>
+<b class="nc">&nbsp;                .withText(PreviewLayout::getDisplayName)</b>
+<b class="nc">&nbsp;                .install(availableListView);</b>
+<b class="nc">&nbsp;        availableListView.setOnDragOver(this::dragOver);</b>
+<b class="nc">&nbsp;        availableListView.setOnDragDetected(this::dragDetectedInAvailable);</b>
+<b class="nc">&nbsp;        availableListView.setOnDragDropped(event -&gt; dragDropped(viewModel.availableListProperty(), event));</b>
+<b class="nc">&nbsp;        availableListView.setOnKeyTyped(event -&gt; jumpToSearchKey(availableListView, event));</b>
+<b class="nc">&nbsp;        availableListView.setOnMouseClicked(this::mouseClickedAvailable);</b>
+<b class="nc">&nbsp;        availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);</b>
+<b class="nc">&nbsp;        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) -&gt;</b>
+<b class="nc">&nbsp;                viewModel.setPreviewLayout(newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());</b>
+<b class="nc">&nbsp;        viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;PreviewLayout&gt;()</b>
+<b class="nc">&nbsp;                .withText(PreviewLayout::getDisplayName)</b>
+<b class="nc">&nbsp;                .setOnDragDropped(this::dragDroppedInChosenCell)</b>
+<b class="nc">&nbsp;                .install(chosenListView);</b>
+<b class="nc">&nbsp;        chosenListView.setOnDragOver(this::dragOver);</b>
+<b class="nc">&nbsp;        chosenListView.setOnDragDetected(this::dragDetectedInChosen);</b>
+<b class="nc">&nbsp;        chosenListView.setOnDragDropped(event -&gt; dragDropped(viewModel.chosenListProperty(), event));</b>
+<b class="nc">&nbsp;        chosenListView.setOnKeyTyped(event -&gt; jumpToSearchKey(chosenListView, event));</b>
+<b class="nc">&nbsp;        chosenListView.setOnMouseClicked(this::mouseClickedChosen);</b>
+<b class="nc">&nbsp;        chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);</b>
+<b class="nc">&nbsp;        chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) -&gt;</b>
+<b class="nc">&nbsp;                viewModel.setPreviewLayout(newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());</b>
+<b class="nc">&nbsp;        toLeftButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());</b>
+<b class="nc">&nbsp;        sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());</b>
+<b class="nc">&nbsp;        sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());</b>
+&nbsp;
+<b class="nc">&nbsp;        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);</b>
+<b class="nc">&nbsp;        previewViewer.setDatabaseContext(new BibDatabaseContext());</b>
+<b class="nc">&nbsp;        previewViewer.setEntry(TestEntry.getTestEntry());</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);</b>
+<b class="nc">&nbsp;        previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()</b>
+<b class="nc">&nbsp;                                                      .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));</b>
+<b class="nc">&nbsp;        previewTab.setContent(previewViewer);</b>
+&nbsp;
+<b class="nc">&nbsp;        editArea.clear();</b>
+<b class="nc">&nbsp;        editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));</b>
+<b class="nc">&nbsp;        editArea.setContextMenu(contextMenu);</b>
+<b class="nc">&nbsp;        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()</b>
+<b class="nc">&nbsp;                                                 .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));</b>
+&nbsp;
+<b class="nc">&nbsp;        BindingsHelper.bindBidirectional(</b>
+<b class="nc">&nbsp;                editArea.textProperty(),</b>
+<b class="nc">&nbsp;                viewModel.sourceTextProperty(),</b>
+<b class="nc">&nbsp;                newSourceText -&gt; editArea.replaceText(newSourceText),</b>
+&nbsp;                newEditText -&gt; {
+<b class="nc">&nbsp;                    viewModel.sourceTextProperty().setValue(newEditText);</b>
+<b class="nc">&nbsp;                    viewModel.refreshPreview();</b>
+&nbsp;                });
+&nbsp;
+<b class="nc">&nbsp;        editArea.textProperty().addListener((obs, oldValue, newValue) -&gt;</b>
+<b class="nc">&nbsp;                editArea.setStyleSpans(0, viewModel.computeHighlighting(newValue)));</b>
+&nbsp;
+<b class="nc">&nbsp;        editArea.focusedProperty().addListener((observable, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (!newValue) {</b>
+<b class="nc">&nbsp;                viewModel.refreshPreview();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        searchBox.textProperty().addListener((observable, previousText, searchTerm) -&gt; viewModel.setAvailableFilter(searchTerm));</b>
+&nbsp;
+<b class="nc">&nbsp;        readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());</b>
+<b class="nc">&nbsp;        resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());</b>
+<b class="nc">&nbsp;        contextMenu.getItems().getFirst().disableProperty().bind(viewModel.selectedIsEditableProperty().not());</b>
+<b class="nc">&nbsp;        contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());</b>
+<b class="nc">&nbsp;        editArea.editableProperty().bind(viewModel.selectedIsEditableProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        validationVisualizer.setDecoration(new IconValidationDecorator());</b>
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
+&nbsp;     * ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
+&nbsp;     *
+&nbsp;     * @param list       The ListView currently focused
+&nbsp;     * @param keypressed The pressed character
+&nbsp;     */
+&nbsp;
+&nbsp;    private void jumpToSearchKey(ListView&lt;PreviewLayout&gt; list, KeyEvent keypressed) {
+<b class="nc">&nbsp;        if (keypressed.getCharacter() == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if ((System.currentTimeMillis() - lastKeyPressTime) &lt; 1000) {</b>
+<b class="nc">&nbsp;            listSearchTerm += keypressed.getCharacter().toLowerCase();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            listSearchTerm = keypressed.getCharacter().toLowerCase();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        lastKeyPressTime = System.currentTimeMillis();</b>
+&nbsp;
+<b class="nc">&nbsp;        list.getItems().stream().filter(item -&gt; item.getDisplayName().toLowerCase().startsWith(listSearchTerm))</b>
+<b class="nc">&nbsp;            .findFirst().ifPresent(list::scrollTo);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void dragOver(DragEvent event) {
+<b class="nc">&nbsp;        viewModel.dragOver(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void dragDetectedInAvailable(MouseEvent event) {
+<b class="nc">&nbsp;        List&lt;PreviewLayout&gt; selectedLayouts = new ArrayList&lt;&gt;(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());</b>
+<b class="nc">&nbsp;        if (!selectedLayouts.isEmpty()) {</b>
+<b class="nc">&nbsp;            Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);</b>
+<b class="nc">&nbsp;            viewModel.dragDetected(viewModel.availableListProperty(), viewModel.availableSelectionModelProperty(), selectedLayouts, dragboard);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void dragDetectedInChosen(MouseEvent event) {
+<b class="nc">&nbsp;        List&lt;PreviewLayout&gt; selectedLayouts = new ArrayList&lt;&gt;(viewModel.chosenSelectionModelProperty().getValue().getSelectedItems());</b>
+<b class="nc">&nbsp;        if (!selectedLayouts.isEmpty()) {</b>
+<b class="nc">&nbsp;            Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);</b>
+<b class="nc">&nbsp;            viewModel.dragDetected(viewModel.chosenListProperty(), viewModel.chosenSelectionModelProperty(), selectedLayouts, dragboard);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void dragDropped(ListProperty&lt;PreviewLayout&gt; targetList, DragEvent event) {
+<b class="nc">&nbsp;        boolean success = viewModel.dragDropped(targetList, event.getDragboard());</b>
+<b class="nc">&nbsp;        event.setDropCompleted(success);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void dragDroppedInChosenCell(PreviewLayout targetLayout, DragEvent event) {
+<b class="nc">&nbsp;        boolean success = viewModel.dragDroppedInChosenCell(targetLayout, event.getDragboard());</b>
+<b class="nc">&nbsp;        event.setDropCompleted(success);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void toRightButtonAction() {
+<b class="nc">&nbsp;        viewModel.addToChosen();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void toLeftButtonAction() {
+<b class="nc">&nbsp;        viewModel.removeFromChosen();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void sortUpButtonAction() {
+<b class="nc">&nbsp;        viewModel.selectedInChosenUp();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void sortDownButtonAction() {
+<b class="nc">&nbsp;        viewModel.selectedInChosenDown();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetDefaultButtonAction() {
+<b class="nc">&nbsp;        viewModel.resetDefaultLayout();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void mouseClickedAvailable(MouseEvent event) {
+<b class="nc">&nbsp;        if (event.getClickCount() == 2) {</b>
+<b class="nc">&nbsp;            viewModel.addToChosen();</b>
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void mouseClickedChosen(MouseEvent event) {
+<b class="nc">&nbsp;        if (event.getClickCount() == 2) {</b>
+<b class="nc">&nbsp;            viewModel.removeFromChosen();</b>
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

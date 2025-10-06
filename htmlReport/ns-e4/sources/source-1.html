@@ -1,0 +1,499 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CSLCitationOOAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.oocsltext</a>
+</div>
+
+<h1>Coverage Summary for Class: CSLCitationOOAdapter (org.jabref.logic.openoffice.oocsltext)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CSLCitationOOAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/150)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.oocsltext;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyle;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyleGenerator;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+&nbsp;import org.jabref.logic.openoffice.OpenOfficePreferences;
+&nbsp;import org.jabref.logic.openoffice.style.OOStyle;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.openoffice.ootext.OOFormat;
+&nbsp;import org.jabref.model.openoffice.ootext.OOText;
+&nbsp;import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+&nbsp;import org.jabref.model.openoffice.uno.CreationException;
+&nbsp;
+&nbsp;import com.sun.star.container.NoSuchElementException;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.sun.star.text.XTextCursor;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.uno.Exception;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
+&nbsp; * It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
+&nbsp; * It uses {@link OpenOfficePreferences} to retrieve the initial style (last selected style), the bibliography title and its paragraph style.
+&nbsp; * Any method in this class is NOT supposed to be moved (OR internally refactored without complete understanding - see implementation note).
+&nbsp; *
+&nbsp; * @implNote UNO API calls are expensive, and any additional operation slows down the net &quot;macro-task&quot; we are trying to achieve in the document.
+&nbsp; * These &quot;additional&quot; operations may or may not be visible at the level of code in the form of additional function calls.
+&nbsp; * In some cases, the same macro-task may be achieved by two different orders of actions, which may look semantically the same overall, but one order may result into more UNO API calls.
+&nbsp; * For example, see the comment inside {@link CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation}.
+&nbsp; */
+&nbsp;public class CSLCitationOOAdapter {
+&nbsp;
+<b class="nc">&nbsp;    private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;</b>
+&nbsp;
+&nbsp;    private final XTextDocument document;
+&nbsp;    private final CSLReferenceMarkManager markManager;
+&nbsp;    private final Supplier&lt;List&lt;BibDatabaseContext&gt;&gt; databasesSupplier;
+&nbsp;    private final BibEntryTypesManager bibEntryTypesManager;
+&nbsp;    private final OpenOfficePreferences openOfficePreferences;
+&nbsp;
+&nbsp;    private CitationStyle currentStyle;
+&nbsp;    private boolean styleChanged;
+&nbsp;
+<b class="nc">&nbsp;    public CSLCitationOOAdapter(XTextDocument doc, Supplier&lt;List&lt;BibDatabaseContext&gt;&gt; databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {</b>
+<b class="nc">&nbsp;        this.document = doc;</b>
+<b class="nc">&nbsp;        this.markManager = new CSLReferenceMarkManager(doc);</b>
+<b class="nc">&nbsp;        this.databasesSupplier = databasesSupplier;</b>
+<b class="nc">&nbsp;        this.bibEntryTypesManager = bibEntryTypesManager;</b>
+<b class="nc">&nbsp;        this.openOfficePreferences = openOfficePreferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL</b>
+<b class="nc">&nbsp;        if (initialStyle instanceof CitationStyle citationStyle) {</b>
+<b class="nc">&nbsp;            this.currentStyle = citationStyle; // else the currentStyle purposely stays null, still causing a difference with the subsequent style if CSL (valid comparison)</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        markManager.readAndUpdateExistingMarks();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setStyle(CitationStyle newStyle) {
+<b class="nc">&nbsp;        if (currentStyle == null || !currentStyle.getName().equals(newStyle.getName())) {</b>
+<b class="nc">&nbsp;            styleChanged = true;</b>
+<b class="nc">&nbsp;            currentStyle = newStyle;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            styleChanged = false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts a citation for a group of entries.
+&nbsp;     * Comparable to LaTeX&#39;s \cite command.
+&nbsp;     */
+&nbsp;    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List&lt;BibEntry&gt; entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+&nbsp;            throws CreationException, Exception {
+<b class="nc">&nbsp;        setStyle(selectedStyle);</b>
+&nbsp;
+&nbsp;        // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case)
+<b class="nc">&nbsp;        if (styleChanged) {</b>
+<b class="nc">&nbsp;            updateAllCitationsWithNewStyle(currentStyle, false);</b>
+<b class="nc">&nbsp;            styleChanged = false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String style = selectedStyle.getSource();</b>
+<b class="nc">&nbsp;        boolean isNumericStyle = selectedStyle.isNumericStyle();</b>
+<b class="nc">&nbsp;        boolean isAlphanumericStyle = selectedStyle.isAlphanumericStyle();</b>
+&nbsp;
+&nbsp;        String citation;
+&nbsp;
+<b class="nc">&nbsp;        if (isAlphanumericStyle) {</b>
+<b class="nc">&nbsp;            citation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            citation = CitationStyleGenerator.generateCitation(entries, style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String formattedCitation = CSLFormatUtils.transformHTML(citation);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isNumericStyle) {</b>
+<b class="nc">&nbsp;            formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, entries);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));</b>
+<b class="nc">&nbsp;        insertReferences(cursor, entries, ooText, isNumericStyle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts in-text citations for a group of entries.
+&nbsp;     * Comparable to LaTeX&#39;s \citet command.
+&nbsp;     *
+&nbsp;     * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
+&nbsp;     */
+&nbsp;    public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List&lt;BibEntry&gt; entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+&nbsp;            throws CreationException, Exception {
+<b class="nc">&nbsp;        setStyle(selectedStyle);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (styleChanged) {</b>
+<b class="nc">&nbsp;            updateAllCitationsWithNewStyle(currentStyle, true);</b>
+<b class="nc">&nbsp;            styleChanged = false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String style = selectedStyle.getSource();</b>
+<b class="nc">&nbsp;        boolean isNumericStyle = selectedStyle.isNumericStyle();</b>
+<b class="nc">&nbsp;        boolean isAlphanumericStyle = selectedStyle.isAlphanumericStyle();</b>
+&nbsp;
+<b class="nc">&nbsp;        Iterator&lt;BibEntry&gt; iterator = entries.iterator();</b>
+<b class="nc">&nbsp;        while (iterator.hasNext()) {</b>
+<b class="nc">&nbsp;            BibEntry currentEntry = iterator.next();</b>
+&nbsp;
+&nbsp;            String inTextCitation;
+&nbsp;
+<b class="nc">&nbsp;            if (isAlphanumericStyle) {</b>
+<b class="nc">&nbsp;                inTextCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);</b>
+&nbsp;            String finalText;
+&nbsp;
+<b class="nc">&nbsp;            if (isNumericStyle) {</b>
+<b class="nc">&nbsp;                formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));</b>
+<b class="nc">&nbsp;                String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, bibDatabaseContext);</b>
+<b class="nc">&nbsp;                finalText = prefix + formattedCitation;</b>
+<b class="nc">&nbsp;            } else if (isAlphanumericStyle) {</b>
+<b class="nc">&nbsp;                finalText = formattedCitation;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                finalText = CSLFormatUtils.changeToInText(formattedCitation);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (iterator.hasNext()) {</b>
+<b class="nc">&nbsp;                finalText += &quot;,&quot;;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));</b>
+<b class="nc">&nbsp;            insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts &quot;empty&quot; citations for a list of entries at the cursor to the document.
+&nbsp;     * Adds the entries to the list for which bibliography is to be generated.
+&nbsp;     */
+&nbsp;    public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List&lt;BibEntry&gt; entries)
+&nbsp;            throws CreationException, Exception {
+<b class="nc">&nbsp;        OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(&quot;&quot;));</b>
+<b class="nc">&nbsp;        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a &quot;Bibliography&quot; section in the document and inserts a list of references.
+&nbsp;     * The list is generated based on the existing citations, in-text citations and empty citations in the document.
+&nbsp;     */
+&nbsp;    public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List&lt;BibEntry&gt; entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+&nbsp;            throws WrappedTargetException, CreationException {
+<b class="nc">&nbsp;        if (!selectedStyle.hasBibliography()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean isNumericStyle = selectedStyle.isNumericStyle();</b>
+&nbsp;
+<b class="nc">&nbsp;        OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());</b>
+<b class="nc">&nbsp;        OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));</b>
+<b class="nc">&nbsp;        OOText ooBreak = OOFormat.paragraph(OOText.fromString(&quot;&quot;), openOfficePreferences.getCslBibliographyBodyFormat());</b>
+<b class="nc">&nbsp;        OOTextIntoOO.write(document, cursor, ooBreak);</b>
+&nbsp;
+<b class="nc">&nbsp;        String style = selectedStyle.getSource();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isNumericStyle) {</b>
+&nbsp;            // Sort entries based on their order of appearance in the document
+<b class="nc">&nbsp;            entries.sort(Comparator.comparingInt(entry -&gt; markManager.getCitationNumber(entry.getCitationKey().orElse(&quot;&quot;))));</b>
+&nbsp;
+<b class="nc">&nbsp;            for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();</b>
+<b class="nc">&nbsp;                String citationKey = entry.getCitationKey().orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                int currentNumber = markManager.getCitationNumber(citationKey);</b>
+<b class="nc">&nbsp;                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);</b>
+<b class="nc">&nbsp;                formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(formattedBibliographyEntry, currentNumber);</b>
+&nbsp;
+<b class="nc">&nbsp;                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));</b>
+<b class="nc">&nbsp;                OOTextIntoOO.write(document, cursor, ooText);</b>
+&nbsp;            }
+&nbsp;        } else {
+&nbsp;            // Ordering will be according to citeproc item data provider (default)
+<b class="nc">&nbsp;            List&lt;String&gt; bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (String bibliographyEntry : bibliographyEntries) {</b>
+<b class="nc">&nbsp;                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);</b>
+&nbsp;
+<b class="nc">&nbsp;                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));</b>
+<b class="nc">&nbsp;                OOTextIntoOO.write(document, cursor, ooText);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts references and also adds a space before the citation if not already present (&quot;smart space&quot;).
+&nbsp;     */
+&nbsp;    private void insertReferences(XTextCursor cursor, List&lt;BibEntry&gt; entries, OOText ooText, boolean isNumericStyle)
+&nbsp;            throws CreationException, Exception {
+&nbsp;        boolean preceedingSpaceExists;
+<b class="nc">&nbsp;        XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());</b>
+&nbsp;
+&nbsp;        // Check if we&#39;re at the start of the document - if yes we set the flag and don&#39;t insert a space
+<b class="nc">&nbsp;        if (!checkCursor.goLeft((short) 1, true)) {</b>
+&nbsp;            // We&#39;re at the start of the document
+<b class="nc">&nbsp;            preceedingSpaceExists = true;</b>
+&nbsp;        } else {
+&nbsp;            // If not at the start of document, check if there is a space before
+<b class="nc">&nbsp;            preceedingSpaceExists = &quot; &quot;.equals(checkCursor.getString());</b>
+&nbsp;            // If not a space, check if it&#39;s a paragraph break
+<b class="nc">&nbsp;            if (!preceedingSpaceExists) {</b>
+<b class="nc">&nbsp;                preceedingSpaceExists = checkCursor.getString().matches(&quot;\\R&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, openOfficePreferences.getAddSpaceAfter());</b>
+<b class="nc">&nbsp;        markManager.setRealTimeNumberUpdateRequired(isNumericStyle);</b>
+<b class="nc">&nbsp;        markManager.readAndUpdateExistingMarks();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Transforms the numbers in the citation to globally-unique (and thus, reusable) numbers.
+&nbsp;     */
+&nbsp;    private String updateSingleOrMultipleCitationNumbers(String citation, List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        Pattern pattern = Pattern.compile(&quot;(\\D*)(\\d+)(\\D*)&quot;);</b>
+<b class="nc">&nbsp;        Matcher matcher = pattern.matcher(citation);</b>
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        Iterator&lt;BibEntry&gt; iterator = entries.iterator();</b>
+&nbsp;
+<b class="nc">&nbsp;        while (matcher.find() &amp;&amp; iterator.hasNext()) {</b>
+<b class="nc">&nbsp;            String prefix = matcher.group(1);</b>
+<b class="nc">&nbsp;            String suffix = matcher.group(3);</b>
+&nbsp;
+<b class="nc">&nbsp;            int currentNumber = markManager.getCitationNumber(iterator.next().getCitationKey().orElse(&quot;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;            matcher.appendReplacement(sb, Matcher.quoteReplacement(prefix + currentNumber + suffix));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        matcher.appendTail(sb);</b>
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Ideally, the methods of this class are supposed to work with {@link CSLReferenceMarkManager}, and not {@link CSLReferenceMark} directly.
+&nbsp;     * However, all &quot;generation&quot; of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
+&nbsp;     * Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
+&nbsp;     * Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
+&nbsp;     */
+&nbsp;    private void updateAllCitationsWithNewStyle(CitationStyle style, boolean isInTextStyle)
+&nbsp;            throws Exception, CreationException {
+<b class="nc">&nbsp;        boolean isNumericStyle = style.isNumericStyle();</b>
+<b class="nc">&nbsp;        boolean isAlphaNumericStyle = style.isAlphanumericStyle();</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;        Entries from multiple libraries may need to be updated, and new libraries could have been opened after the document connection
+&nbsp;        So, to get all databases in real time without having to refresh the connection, we obtain all open databases via the state manager
+&nbsp;        */
+&nbsp;
+&nbsp;        // Collect all open databases
+<b class="nc">&nbsp;        List&lt;BibDatabaseContext&gt; databaseContexts = databasesSupplier.get();</b>
+<b class="nc">&nbsp;        List&lt;BibDatabase&gt; databases = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (BibDatabaseContext databaseContext : databaseContexts) {</b>
+<b class="nc">&nbsp;            databases.add(databaseContext.getDatabase());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // We first get a list of all cited entries to create a unified database context
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; citedEntries = databases.stream()</b>
+<b class="nc">&nbsp;                                               .flatMap(db -&gt; db.getEntries().stream())</b>
+<b class="nc">&nbsp;                                               .filter(this::isCitedEntry)</b>
+<b class="nc">&nbsp;                                               .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        BibDatabase unifiedDatabase = new BibDatabase(citedEntries);</b>
+<b class="nc">&nbsp;        BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);</b>
+&nbsp;
+&nbsp;        // Next, we get the list of reference marks sorted in order of appearance in the document
+<b class="nc">&nbsp;        List&lt;CSLReferenceMark&gt; marksInOrder = markManager.getMarksInOrder();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isInTextStyle) {</b>
+&nbsp;            // Now, for each such reference mark, we get the entries to be updated
+<b class="nc">&nbsp;            for (CSLReferenceMark mark : marksInOrder) {</b>
+<b class="nc">&nbsp;                List&lt;String&gt; citationKeys = mark.getCitationKeys();</b>
+<b class="nc">&nbsp;                List&lt;BibEntry&gt; entries = citationKeys.stream()</b>
+<b class="nc">&nbsp;                                                     .map(unifiedDatabase::getEntryByCitationKey)</b>
+<b class="nc">&nbsp;                                                     .flatMap(Optional::stream)</b>
+<b class="nc">&nbsp;                                                     .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;                StringBuilder finalText = new StringBuilder();</b>
+<b class="nc">&nbsp;                Iterator&lt;BibEntry&gt; iterator = entries.iterator();</b>
+&nbsp;
+<b class="nc">&nbsp;                while (iterator.hasNext()) {</b>
+<b class="nc">&nbsp;                    BibEntry currentEntry = iterator.next();</b>
+&nbsp;
+&nbsp;                    // We re-generate the citation in the new style and update it in the document
+&nbsp;                    String newCitation;
+&nbsp;
+<b class="nc">&nbsp;                    if (isAlphaNumericStyle) {</b>
+<b class="nc">&nbsp;                        newCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, unifiedBibDatabaseContext);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    String formattedCitation = CSLFormatUtils.transformHTML(newCitation);</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (isNumericStyle) {</b>
+<b class="nc">&nbsp;                        formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));</b>
+<b class="nc">&nbsp;                        String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, unifiedBibDatabaseContext);</b>
+<b class="nc">&nbsp;                        formattedCitation = prefix + formattedCitation;</b>
+<b class="nc">&nbsp;                    } else if (!isAlphaNumericStyle) {</b>
+<b class="nc">&nbsp;                        formattedCitation = CSLFormatUtils.changeToInText(formattedCitation);</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    finalText.append(formattedCitation);</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (iterator.hasNext()) {</b>
+<b class="nc">&nbsp;                        finalText.append(&quot;,&quot;);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                markManager.updateMarkAndTextWithNewStyle(mark, finalText.toString());</b>
+&nbsp;            }
+&nbsp;        } else {
+&nbsp;            // Same flow as above - for each such reference mark, we get the entries to be updated
+<b class="nc">&nbsp;            for (CSLReferenceMark mark : marksInOrder) {</b>
+<b class="nc">&nbsp;                List&lt;String&gt; citationKeys = mark.getCitationKeys();</b>
+<b class="nc">&nbsp;                List&lt;BibEntry&gt; entries = citationKeys.stream()</b>
+<b class="nc">&nbsp;                                                     .map(unifiedDatabase::getEntryByCitationKey)</b>
+<b class="nc">&nbsp;                                                     .flatMap(Optional::stream)</b>
+<b class="nc">&nbsp;                                                     .toList();</b>
+&nbsp;
+&nbsp;                // We re-generate the citation in the new style and update it in the document
+&nbsp;                String newCitation;
+&nbsp;
+<b class="nc">&nbsp;                if (isAlphaNumericStyle) {</b>
+<b class="nc">&nbsp;                    newCitation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    newCitation = CitationStyleGenerator.generateCitation(entries, style.getSource(),</b>
+&nbsp;                            HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                String formattedCitation = CSLFormatUtils.transformHTML(newCitation);</b>
+&nbsp;
+<b class="nc">&nbsp;                markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if an entry has already been cited before in the document.
+&nbsp;     * Required for consistent numbering of numeric citations - if present, the number is to be reused, else a new number is to be assigned.
+&nbsp;     */
+&nbsp;    public boolean isCitedEntry(BibEntry entry) {
+<b class="nc">&nbsp;        String citationKey = entry.getCitationKey().orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        return markManager.hasCitationForKey(citationKey);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

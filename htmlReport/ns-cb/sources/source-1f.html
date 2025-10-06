@@ -1,0 +1,347 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JournalInformationFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: JournalInformationFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JournalInformationFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/99)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.util.Pair;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.WebFetcher;
+&nbsp;import org.jabref.logic.journals.JournalInformation;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.identifier.ISSN;
+&nbsp;
+&nbsp;import kong.unirest.core.HttpResponse;
+&nbsp;import kong.unirest.core.JsonNode;
+&nbsp;import kong.unirest.core.Unirest;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetches journal information from the JabRef Web API
+&nbsp; */
+<b class="nc">&nbsp;public class JournalInformationFetcher implements WebFetcher {</b>
+&nbsp;    public static final String NAME = &quot;Journal Information&quot;;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);</b>
+&nbsp;    // Uses JabRef Online APIs
+&nbsp;    private static final String API_URL = &quot;https://jabref.org/api&quot;;
+<b class="nc">&nbsp;    private static final Pattern QUOTES_BRACKET_PATTERN = Pattern.compile(&quot;[\&quot;\\[\\]]&quot;);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return JournalInformationFetcher.NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;JournalInformation&gt; getJournalInformation(String issnString, String journalName) throws FetcherException {
+<b class="nc">&nbsp;        ISSN issn = new ISSN(issnString);</b>
+<b class="nc">&nbsp;        String cleanedISSN = &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (issn.isValidFormat() || issn.isCanBeCleaned()) {</b>
+<b class="nc">&nbsp;            cleanedISSN = issn.getCleanedISSN();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.warn(Localization.lang(&quot;Incorrect ISSN format&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;JournalInformation&gt; journalInformationOptional = Optional.empty();</b>
+&nbsp;
+<b class="nc">&nbsp;        JSONObject postData = buildPostData(cleanedISSN, journalName);</b>
+&nbsp;
+<b class="nc">&nbsp;        HttpResponse&lt;JsonNode&gt; httpResponse = Unirest.post(API_URL)</b>
+<b class="nc">&nbsp;                                                     .header(&quot;Content-Type&quot;, &quot;application/json&quot;)</b>
+<b class="nc">&nbsp;                                                     .body(postData)</b>
+<b class="nc">&nbsp;                                                     .asJson();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (httpResponse.getBody() != null) {</b>
+<b class="nc">&nbsp;            JSONObject responseJsonObject = httpResponse.getBody().getObject();</b>
+<b class="nc">&nbsp;            journalInformationOptional = Optional.of(parseResponse(responseJsonObject));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return journalInformationOptional;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JournalInformation parseResponse(JSONObject responseJsonObject) throws FetcherException {
+<b class="nc">&nbsp;        String title = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String publisher = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String coverageStartYear = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String coverageEndYear = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String subjectArea = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String country = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String categories = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String scimagoId = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String hIndex = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String issn = &quot;&quot;;</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; sjrArray = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; snipArray = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; docsThisYear = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; docsPrevious3Years = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; citableDocsPrevious3Years = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; citesOutgoing = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; citesOutgoingPerDoc = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; citesIncomingByRecentlyPublished = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; citesIncomingPerDocByRecentlyPublished = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            if (responseJsonObject.has(&quot;errors&quot;)) {</b>
+<b class="nc">&nbsp;                JSONArray errors = responseJsonObject.optJSONArray(&quot;errors&quot;);</b>
+<b class="nc">&nbsp;                if (errors != null &amp;&amp; !errors.isEmpty()) {</b>
+<b class="nc">&nbsp;                    JSONObject error = errors.getJSONObject(0);</b>
+<b class="nc">&nbsp;                    String errorMessage = error.optString(&quot;message&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Error accessing catalog: {}&quot;, errorMessage);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                throw new FetcherException(Localization.lang(&quot;Error accessing catalog&quot;));</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (responseJsonObject.has(&quot;data&quot;)) {</b>
+<b class="nc">&nbsp;                JSONObject data = responseJsonObject.getJSONObject(&quot;data&quot;);</b>
+<b class="nc">&nbsp;                if (data.has(&quot;journal&quot;) &amp;&amp; data.get(&quot;journal&quot;) != null) {</b>
+<b class="nc">&nbsp;                    JSONObject journalData = data.getJSONObject(&quot;journal&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                    title = journalData.optString(&quot;name&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                    publisher = journalData.optString(&quot;publisher&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                    coverageStartYear = journalData.optString(&quot;coverageStartYear&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                    coverageEndYear = journalData.optString(&quot;coverageEndYear&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                    scimagoId = journalData.optString(&quot;scimagoId&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                    country = journalData.optString(&quot;country&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                    issn = getConcatenatedString(journalData, &quot;issn&quot;);</b>
+<b class="nc">&nbsp;                    subjectArea = getConcatenatedString(journalData, &quot;areas&quot;);</b>
+<b class="nc">&nbsp;                    categories = getConcatenatedString(journalData, &quot;categories&quot;);</b>
+<b class="nc">&nbsp;                    hIndex = journalData.optString(&quot;hIndex&quot;, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                    JSONArray citationInfo = journalData.optJSONArray(&quot;citationInfo&quot;);</b>
+<b class="nc">&nbsp;                    if (citationInfo != null) {</b>
+<b class="nc">&nbsp;                        docsThisYear = parseCitationInfo(citationInfo, &quot;docsThisYear&quot;);</b>
+<b class="nc">&nbsp;                        docsPrevious3Years = parseCitationInfo(citationInfo, &quot;docsPrevious3Years&quot;);</b>
+<b class="nc">&nbsp;                        citableDocsPrevious3Years = parseCitationInfo(citationInfo, &quot;citableDocsPrevious3Years&quot;);</b>
+<b class="nc">&nbsp;                        citesOutgoing = parseCitationInfo(citationInfo, &quot;citesOutgoing&quot;);</b>
+<b class="nc">&nbsp;                        citesOutgoingPerDoc = parseCitationInfo(citationInfo, &quot;citesOutgoingPerDoc&quot;);</b>
+<b class="nc">&nbsp;                        citesIncomingByRecentlyPublished = parseCitationInfo(citationInfo, &quot;citesIncomingByRecentlyPublished&quot;);</b>
+<b class="nc">&nbsp;                        citesIncomingPerDocByRecentlyPublished = parseCitationInfo(citationInfo, &quot;citesIncomingPerDocByRecentlyPublished&quot;);</b>
+<b class="nc">&nbsp;                        sjrArray = parseCitationInfo(citationInfo, &quot;sjrIndex&quot;);</b>
+<b class="nc">&nbsp;                        snipArray = parseCitationInfo(citationInfo, &quot;snipIndex&quot;);</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new FetcherException(Localization.lang(&quot;ISSN and/or journal name not found in catalog&quot;));</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                throw new FetcherException(Localization.lang(&quot;ISSN and/or journal name not found in catalog&quot;));</b>
+&nbsp;            }
+&nbsp;        } catch (JSONException e) {
+<b class="nc">&nbsp;            throw new FetcherException(Localization.lang(&quot;Parsing error&quot;), e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new JournalInformation(</b>
+&nbsp;                title,
+&nbsp;                publisher,
+&nbsp;                coverageStartYear,
+&nbsp;                coverageEndYear,
+&nbsp;                subjectArea,
+&nbsp;                country,
+&nbsp;                categories,
+&nbsp;                scimagoId,
+&nbsp;                hIndex,
+&nbsp;                issn,
+&nbsp;                sjrArray,
+&nbsp;                snipArray,
+&nbsp;                docsThisYear,
+&nbsp;                docsPrevious3Years,
+&nbsp;                citableDocsPrevious3Years,
+&nbsp;                citesOutgoing,
+&nbsp;                citesOutgoingPerDoc,
+&nbsp;                citesIncomingByRecentlyPublished,
+&nbsp;                citesIncomingPerDocByRecentlyPublished
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getConcatenatedString(JSONObject jsonObject, String key) {
+<b class="nc">&nbsp;        JSONArray jsonArray = jsonObject.optJSONArray(key);</b>
+<b class="nc">&nbsp;        if (jsonArray != null) {</b>
+<b class="nc">&nbsp;            return QUOTES_BRACKET_PATTERN.matcher(jsonArray.join(&quot;, &quot;)).replaceAll(&quot;&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private JSONObject buildPostData(String issn, String journalName) {
+<b class="nc">&nbsp;        String query = &quot;&quot;&quot;</b>
+&nbsp;                query GetJournal($issn: String, $name: String) {
+&nbsp;                  journal(issn: $issn, name: $name) {
+&nbsp;                    id
+&nbsp;                    name
+&nbsp;                    issn
+&nbsp;                    scimagoId
+&nbsp;                    country
+&nbsp;                    publisher
+&nbsp;                    areas
+&nbsp;                    categories
+&nbsp;                    citationInfo {
+&nbsp;                      year
+&nbsp;                      docsThisYear
+&nbsp;                      docsPrevious3Years
+&nbsp;                      citableDocsPrevious3Years
+&nbsp;                      citesOutgoing
+&nbsp;                      citesOutgoingPerDoc
+&nbsp;                      citesIncomingByRecentlyPublished
+&nbsp;                      citesIncomingPerDocByRecentlyPublished
+&nbsp;                      sjrIndex
+&nbsp;                    }
+&nbsp;                    hIndex
+&nbsp;                  }
+&nbsp;                }&quot;&quot;&quot;;
+&nbsp;
+<b class="nc">&nbsp;        JSONObject postData = new JSONObject();</b>
+<b class="nc">&nbsp;        postData.put(&quot;query&quot;, query);</b>
+<b class="nc">&nbsp;        postData.put(&quot;operationName&quot;, &quot;GetJournal&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        JSONObject variables = new JSONObject();</b>
+<b class="nc">&nbsp;        variables.put(&quot;issn&quot;, issn);</b>
+<b class="nc">&nbsp;        variables.put(&quot;name&quot;, journalName);</b>
+<b class="nc">&nbsp;        postData.put(&quot;variables&quot;, variables);</b>
+&nbsp;
+<b class="nc">&nbsp;        return postData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Pair&lt;Integer, Double&gt;&gt; parseCitationInfo(JSONArray jsonArray, String key) {
+<b class="nc">&nbsp;        List&lt;Pair&lt;Integer, Double&gt;&gt; parsedArray = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Set&lt;Integer&gt; yearSet = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; jsonArray.length(); i++) {</b>
+<b class="nc">&nbsp;            JSONObject item = jsonArray.getJSONObject(i);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (item.has(&quot;year&quot;) &amp;&amp; item.has(key)) {</b>
+<b class="nc">&nbsp;                int year = item.getInt(&quot;year&quot;);</b>
+<b class="nc">&nbsp;                double value = item.getDouble(key);</b>
+<b class="nc">&nbsp;                if (!yearSet.contains(year)) {</b>
+<b class="nc">&nbsp;                    parsedArray.add(new Pair&lt;&gt;(year, value));</b>
+<b class="nc">&nbsp;                    yearSet.add(year);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        parsedArray.sort(Comparator.comparing(Pair::getKey));</b>
+<b class="nc">&nbsp;        return parsedArray;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

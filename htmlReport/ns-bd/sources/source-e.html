@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Word</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.casechanger</a>
+</div>
+
+<h1>Coverage Summary for Class: Word (org.jabref.logic.formatter.casechanger)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Word</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.casechanger;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a word in a title of a bibtex entry.
+&nbsp; * &lt;p&gt;
+&nbsp; * A word can have protected chars (enclosed in &#39;{&#39; &#39;}&#39;) and may be a small (a, an, the, ...) word.
+&nbsp; */
+&nbsp;public final class Word {
+&nbsp;    /**
+&nbsp;     * Set containing common lowercase function words
+&nbsp;     */
+&nbsp;    public static final Set&lt;String&gt; SMALLER_WORDS;
+&nbsp;
+<b class="nc">&nbsp;    public static final Set&lt;Character&gt; DASHES = Set.of(&#39;-&#39;, &#39;~&#39;, &#39;⸗&#39;, &#39;〰&#39;, &#39;᐀&#39;, &#39;֊&#39;, &#39;־&#39;, &#39;‐&#39;, &#39;‑&#39;, &#39;‒&#39;,</b>
+<b class="nc">&nbsp;            &#39;–&#39;, &#39;—&#39;, &#39;―&#39;, &#39;⁓&#39;, &#39;⁻&#39;, &#39;₋&#39;, &#39;−&#39;, &#39;⸺&#39;, &#39;⸻&#39;,</b>
+<b class="nc">&nbsp;            &#39;〜&#39;, &#39;゠&#39;, &#39;︱&#39;, &#39;︲&#39;, &#39;﹘&#39;, &#39;﹣&#39;, &#39;－&#39;);</b>
+&nbsp;
+&nbsp;    // Conjunctions used as part of Title case capitalisation to specifically check if word is conjunction or not
+<b class="nc">&nbsp;    public static final Set&lt;String&gt; CONJUNCTIONS = Set.of(&quot;and&quot;, &quot;but&quot;, &quot;for&quot;, &quot;nor&quot;, &quot;or&quot;, &quot;so&quot;, &quot;yet&quot;);</b>
+&nbsp;
+&nbsp;    private final char[] chars;
+&nbsp;
+&nbsp;    private final boolean[] protectedChars;
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        Set&lt;String&gt; smallerWords = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Articles
+<b class="nc">&nbsp;        smallerWords.addAll(Arrays.asList(&quot;a&quot;, &quot;an&quot;, &quot;the&quot;));</b>
+&nbsp;
+&nbsp;        // Prepositions
+<b class="nc">&nbsp;        smallerWords.addAll(Arrays.asList(&quot;above&quot;, &quot;about&quot;, &quot;across&quot;, &quot;against&quot;, &quot;along&quot;, &quot;among&quot;, &quot;around&quot;, &quot;at&quot;, &quot;before&quot;, &quot;behind&quot;, &quot;below&quot;, &quot;beneath&quot;, &quot;beside&quot;, &quot;between&quot;, &quot;beyond&quot;, &quot;by&quot;, &quot;down&quot;, &quot;during&quot;, &quot;except&quot;, &quot;for&quot;, &quot;from&quot;, &quot;in&quot;, &quot;inside&quot;, &quot;into&quot;, &quot;like&quot;, &quot;near&quot;, &quot;of&quot;, &quot;off&quot;, &quot;on&quot;, &quot;onto&quot;, &quot;since&quot;, &quot;to&quot;, &quot;toward&quot;, &quot;through&quot;, &quot;under&quot;, &quot;until&quot;, &quot;up&quot;, &quot;upon&quot;, &quot;with&quot;, &quot;within&quot;, &quot;without&quot;));</b>
+&nbsp;
+&nbsp;        // Conjunctions used as part of all case capitalisation to check if it is a small word or not
+<b class="nc">&nbsp;        smallerWords.addAll(CONJUNCTIONS);</b>
+&nbsp;
+<b class="nc">&nbsp;        SMALLER_WORDS = smallerWords.stream()</b>
+<b class="nc">&nbsp;                                    .map(word -&gt; word.toLowerCase(Locale.ROOT))</b>
+<b class="nc">&nbsp;                                    .collect(Collectors.toUnmodifiableSet());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public Word(char[] chars, boolean[] protectedChars) {</b>
+<b class="nc">&nbsp;        this.chars = Objects.requireNonNull(chars);</b>
+<b class="nc">&nbsp;        this.protectedChars = Objects.requireNonNull(protectedChars);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (this.chars.length != this.protectedChars.length) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;the chars and the protectedChars array must be of same length&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Case-insensitive check against {@link Word#SMALLER_WORDS}. Checks for common function words.
+&nbsp;     */
+&nbsp;    public static boolean isSmallerWord(String word) {
+<b class="nc">&nbsp;        return SMALLER_WORDS.contains(word.toLowerCase(Locale.ROOT));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Only change letters of the word that are unprotected to upper case.
+&nbsp;     */
+&nbsp;    public void toUpperCase() {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; chars.length; i++) {</b>
+<b class="nc">&nbsp;            if (!protectedChars[i]) {</b>
+<b class="nc">&nbsp;                chars[i] = Character.toUpperCase(chars[i]);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Only change letters of the word that are unprotected to lower case.
+&nbsp;     */
+&nbsp;    public void toLowerCase() {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; chars.length; i++) {</b>
+<b class="nc">&nbsp;            if (!protectedChars[i]) {</b>
+<b class="nc">&nbsp;                chars[i] = Character.toLowerCase(chars[i]);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void toUpperFirst() {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; chars.length; i++) {</b>
+<b class="nc">&nbsp;            if (!protectedChars[i]) {</b>
+<b class="nc">&nbsp;                chars[i] = i == 0 ?</b>
+<b class="nc">&nbsp;                           Character.toUpperCase(chars[i]) :</b>
+<b class="nc">&nbsp;                           Character.toLowerCase(chars[i]);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void toUpperFirstIgnoreHyphen() {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; chars.length; i++) {</b>
+<b class="nc">&nbsp;            if (!protectedChars[i]) {</b>
+<b class="nc">&nbsp;                chars[i] = i == 0 || (DASHES.contains(chars[i - 1])) ?</b>
+<b class="nc">&nbsp;                           Character.toUpperCase(chars[i]) :</b>
+<b class="nc">&nbsp;                           Character.toLowerCase(chars[i]);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void toUpperFirstTitle() {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; chars.length; i++) {</b>
+<b class="nc">&nbsp;            if (!protectedChars[i]) {</b>
+<b class="nc">&nbsp;                chars[i] = i == 0 || (DASHES.contains(chars[i - 1]) &amp;&amp; isConjunction(chars, i)) ?</b>
+<b class="nc">&nbsp;                           Character.toUpperCase(chars[i]) :</b>
+<b class="nc">&nbsp;                           Character.toLowerCase(chars[i]);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isConjunction(char[] chars, int i) {
+<b class="nc">&nbsp;        StringBuilder word = new StringBuilder();</b>
+<b class="nc">&nbsp;        while (i &lt; chars.length &amp;&amp; !DASHES.contains(chars[i])) {</b>
+<b class="nc">&nbsp;            word.append(chars[i]);</b>
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return !CONJUNCTIONS.contains(word.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void stripConsonants() {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; chars.length; i++) {</b>
+<b class="nc">&nbsp;            if (!protectedChars[i]) {</b>
+<b class="nc">&nbsp;                chars[i] = i == 0 || DASHES.contains(chars[i - 1]) ?</b>
+<b class="nc">&nbsp;                           Character.toUpperCase(chars[i]) :</b>
+<b class="nc">&nbsp;                           Character.toLowerCase(chars[i]);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isSmallerWord() {
+&nbsp;        // &quot;word:&quot; is still a small &quot;word&quot;
+<b class="nc">&nbsp;        return SMALLER_WORDS.contains(this.toString().replace(&quot;:&quot;, &quot;&quot;).toLowerCase(Locale.ROOT));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isLargerWord() {
+<b class="nc">&nbsp;        return !isSmallerWord();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return new String(chars);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean endsWithColon() {
+<b class="nc">&nbsp;        return this.toString().endsWith(&quot;:&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

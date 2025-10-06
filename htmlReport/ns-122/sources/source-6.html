@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SearchListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.search</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchListener (org.jabref.search)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">SearchListener</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// Generated from org/jabref/search/Search.g4 by ANTLR 4.13.2
+&nbsp;
+&nbsp;package org.jabref.search;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.tree.ParseTreeListener;
+&nbsp;
+&nbsp;/**
+&nbsp; * This interface defines a complete listener for a parse tree produced by
+&nbsp; * {@link SearchParser}.
+&nbsp; */
+&nbsp;public interface SearchListener extends ParseTreeListener {
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link SearchParser#start}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterStart(SearchParser.StartContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link SearchParser#start}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitStart(SearchParser.StartContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code implicitAndExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#andExpression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code implicitAndExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#andExpression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code binaryExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterBinaryExpression(SearchParser.BinaryExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code binaryExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitBinaryExpression(SearchParser.BinaryExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code negatedExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterNegatedExpression(SearchParser.NegatedExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code negatedExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitNegatedExpression(SearchParser.NegatedExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code comparisonExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterComparisonExpression(SearchParser.ComparisonExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code comparisonExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitComparisonExpression(SearchParser.ComparisonExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code parenExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterParenExpression(SearchParser.ParenExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code parenExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitParenExpression(SearchParser.ParenExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link SearchParser#comparison}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterComparison(SearchParser.ComparisonContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link SearchParser#comparison}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitComparison(SearchParser.ComparisonContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link SearchParser#operator}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterOperator(SearchParser.OperatorContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link SearchParser#operator}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitOperator(SearchParser.OperatorContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link SearchParser#searchValue}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterSearchValue(SearchParser.SearchValueContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link SearchParser#searchValue}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitSearchValue(SearchParser.SearchValueContext ctx);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

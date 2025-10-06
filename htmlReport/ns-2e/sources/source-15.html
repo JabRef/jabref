@@ -1,0 +1,363 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SciteTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: SciteTab (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SciteTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/93)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SciteTab$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/94)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URLEncoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;
+&nbsp;import javafx.event.ActionEvent;
+&nbsp;import javafx.event.EventHandler;
+&nbsp;import javafx.geometry.HPos;
+&nbsp;import javafx.geometry.VPos;
+&nbsp;import javafx.scene.control.Hyperlink;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ProgressIndicator;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.ColumnConstraints;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.controlsfx.control.HyperlinkLabel;
+&nbsp;
+&nbsp;/**
+&nbsp; * @implNote This tab is called &lt;code&gt;SciteTab&lt;/code&gt;, because it uses the service &lt;code&gt;**scite** aI&lt;/code&gt;.
+&nbsp; */
+&nbsp;public class SciteTab extends EntryEditorTab {
+&nbsp;
+&nbsp;    public static final String NAME = &quot;Citation information&quot;;
+&nbsp;    public static final String SCITE_REPORTS_URL_BASE = &quot;https://scite.ai/reports/&quot;;
+&nbsp;
+&nbsp;    private final GridPane sciteResultsPane;
+&nbsp;    private final ProgressIndicator progressIndicator;
+&nbsp;    private final SciteTabViewModel viewModel;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+<b class="nc">&nbsp;    public SciteTab(GuiPreferences preferences, TaskExecutor taskExecutor, DialogService dialogService) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.viewModel = new SciteTabViewModel(preferences, taskExecutor);</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.sciteResultsPane = new GridPane();</b>
+<b class="nc">&nbsp;        this.progressIndicator = new ProgressIndicator();</b>
+<b class="nc">&nbsp;        setText(Localization.lang(&quot;Citation information&quot;));</b>
+<b class="nc">&nbsp;        setTooltip(new Tooltip(Localization.lang(&quot;Search scite.ai for Smart Citations&quot;)));</b>
+<b class="nc">&nbsp;        setSciteResultsPane();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setSciteResultsPane() {
+<b class="nc">&nbsp;        progressIndicator.setMaxSize(100, 100);</b>
+<b class="nc">&nbsp;        sciteResultsPane.add(progressIndicator, 0, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;        ColumnConstraints column = new ColumnConstraints();</b>
+<b class="nc">&nbsp;        column.setPercentWidth(100);</b>
+<b class="nc">&nbsp;        column.setHalignment(HPos.CENTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        sciteResultsPane.getColumnConstraints().setAll(column);</b>
+<b class="nc">&nbsp;        sciteResultsPane.setId(&quot;scitePane&quot;);</b>
+<b class="nc">&nbsp;        setContent(sciteResultsPane);</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.statusProperty(), status -&gt; {</b>
+<b class="nc">&nbsp;            sciteResultsPane.getChildren().clear();</b>
+<b class="nc">&nbsp;            switch (status) {</b>
+&nbsp;                case IN_PROGRESS -&gt;
+<b class="nc">&nbsp;                        onSciteLookUp();</b>
+&nbsp;                case FOUND -&gt;
+<b class="nc">&nbsp;                        viewModel.getCurrentResult().ifPresent(result -&gt; sciteResultsPane.add(getTalliesPane(result), 0, 0));</b>
+&nbsp;                case ERROR -&gt;
+<b class="nc">&nbsp;                        sciteResultsPane.add(getErrorPane(), 0, 0);</b>
+&nbsp;                case DOI_MISSING -&gt;
+<b class="nc">&nbsp;                        onDoiMissing();</b>
+&nbsp;                case DOI_LOOK_UP -&gt;
+<b class="nc">&nbsp;                        onDoiLookUp();</b>
+&nbsp;                case DOI_LOOK_UP_ERROR -&gt;
+<b class="nc">&nbsp;                        onDoiLookUpError();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onDoiLookUpError() {
+<b class="nc">&nbsp;        onDoiMissing();</b>
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;No DOI found.&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean shouldShow(BibEntry entry) {
+<b class="nc">&nbsp;        return viewModel.shouldShow();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        viewModel.bindToEntry(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onSciteLookUp() {
+<b class="nc">&nbsp;        sciteResultsPane.getChildren().clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox vBox = new VBox();</b>
+<b class="nc">&nbsp;        vBox.getChildren().add(progressIndicator);</b>
+<b class="nc">&nbsp;        vBox.setStyle(&quot;-fx-alignment: center;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        sciteResultsPane.add(vBox, 0, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;        GridPane.setHalignment(vBox, HPos.CENTER);</b>
+<b class="nc">&nbsp;        GridPane.setValignment(vBox, VPos.CENTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        GridPane.setHgrow(vBox, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        GridPane.setVgrow(vBox, Priority.ALWAYS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onDoiLookUp() {
+<b class="nc">&nbsp;        sciteResultsPane.getChildren().clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        Label label = new Label(Localization.lang(&quot;Looking up DOI...&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox vBox = new VBox();</b>
+<b class="nc">&nbsp;        vBox.getChildren().add(progressIndicator);</b>
+<b class="nc">&nbsp;        vBox.getChildren().add(label);</b>
+<b class="nc">&nbsp;        vBox.setSpacing(2d);</b>
+<b class="nc">&nbsp;        vBox.setStyle(&quot;-fx-alignment: center;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        sciteResultsPane.add(vBox, 0, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;        GridPane.setHalignment(vBox, HPos.CENTER);</b>
+<b class="nc">&nbsp;        GridPane.setValignment(vBox, VPos.CENTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        GridPane.setHgrow(vBox, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        GridPane.setVgrow(vBox, Priority.ALWAYS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onDoiMissing() {
+<b class="nc">&nbsp;        sciteResultsPane.getChildren().clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        Label label = new Label(Localization.lang(&quot;The selected entry doesn&#39;t have a DOI linked to it.&quot;));</b>
+<b class="nc">&nbsp;        Hyperlink link = new Hyperlink(Localization.lang(&quot;Look up a DOI and try again.&quot;));</b>
+<b class="nc">&nbsp;        link.setOnAction(doiLookUp());</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox hBox = new HBox();</b>
+<b class="nc">&nbsp;        hBox.getChildren().add(label);</b>
+<b class="nc">&nbsp;        hBox.getChildren().add(link);</b>
+<b class="nc">&nbsp;        hBox.setSpacing(2d);</b>
+<b class="nc">&nbsp;        hBox.setStyle(&quot;-fx-alignment: center;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        sciteResultsPane.add(hBox, 0, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;        GridPane.setHalignment(hBox, HPos.CENTER);</b>
+<b class="nc">&nbsp;        GridPane.setValignment(hBox, VPos.CENTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        GridPane.setHgrow(hBox, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        GridPane.setVgrow(hBox, Priority.ALWAYS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private EventHandler&lt;ActionEvent&gt; doiLookUp() {
+<b class="nc">&nbsp;        return actionEvent -&gt; {</b>
+<b class="nc">&nbsp;            viewModel.lookUpDoi(currentEntry);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox getErrorPane() {
+<b class="nc">&nbsp;        Label titleLabel = new Label(Localization.lang(&quot;Error&quot;));</b>
+<b class="nc">&nbsp;        titleLabel.setId(&quot;scite-error-label&quot;);</b>
+<b class="nc">&nbsp;        Text errorMessageText = new Text(viewModel.searchErrorProperty().get());</b>
+<b class="nc">&nbsp;        VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);</b>
+<b class="nc">&nbsp;        errorMessageBox.getStyleClass().add(&quot;scite-error-box&quot;);</b>
+<b class="nc">&nbsp;        return errorMessageBox;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox getTalliesPane(SciteTallyModel tallModel) {
+<b class="nc">&nbsp;        Label titleLabel = new Label(Localization.lang(&quot;Tallies for %0&quot;, tallModel.doi()));</b>
+<b class="nc">&nbsp;        titleLabel.getStyleClass().add(&quot;scite-tallies-label&quot;);</b>
+<b class="nc">&nbsp;        Text message = new Text(Localization.lang(</b>
+&nbsp;                &quot;Total Citations: %0\nSupporting: %1\nContradicting: %2\nMentioning: %3\nUnclassified: %4\nCiting Publications: %5&quot;,
+<b class="nc">&nbsp;                tallModel.total(),</b>
+<b class="nc">&nbsp;                tallModel.supporting(),</b>
+<b class="nc">&nbsp;                tallModel.contradicting(),</b>
+<b class="nc">&nbsp;                tallModel.mentioning(),</b>
+<b class="nc">&nbsp;                tallModel.unclassified(),</b>
+<b class="nc">&nbsp;                tallModel.citingPublications()</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        String url = SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;        VBox messageBox = getMessageBox(url, titleLabel, message);</b>
+<b class="nc">&nbsp;        messageBox.getStyleClass().add(&quot;scite-message-box&quot;);</b>
+<b class="nc">&nbsp;        return messageBox;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox getMessageBox(String url, Label titleLabel, Text message) {
+<b class="nc">&nbsp;        HyperlinkLabel link = new HyperlinkLabel(Localization.lang(&quot;See full report at [%0]&quot;, url));</b>
+<b class="nc">&nbsp;        link.setOnAction(event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getSource() instanceof Hyperlink) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());</b>
+&nbsp;                } catch (IOException ioex) {
+&nbsp;                    // Can&#39;t throw a checked exception from here, so display a message to the user instead.
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(</b>
+&nbsp;                            &quot;An error occurred opening web browser&quot;,
+<b class="nc">&nbsp;                            &quot;JabRef was unable to open a web browser for link:\n\n&quot; + url + &quot;\n\nError Message:\n\n&quot; + ioex.getMessage(),</b>
+&nbsp;                            ioex
+&nbsp;                    );
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        return new VBox(30, titleLabel, message, link);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

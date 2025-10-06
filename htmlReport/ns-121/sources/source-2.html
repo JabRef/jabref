@@ -1,0 +1,167 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ListUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ListUtil (org.jabref.model.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ListUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.util;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import java.util.stream.StreamSupport;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides a few helper methods for lists.
+&nbsp; */
+<b class="nc">&nbsp;public class ListUtil {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Equivalent to list.stream().anyMatch but with slightly better performance (especially for small lists).
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; boolean anyMatch(Iterable&lt;T&gt; list, Predicate&lt;T&gt; predicate) {
+<b class="nc">&nbsp;        for (T element : list) {</b>
+<b class="nc">&nbsp;            if (predicate.test(element)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Equivalent to list.stream().allMatch but with slightly better performance (especially for small lists).
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; boolean allMatch(Iterable&lt;T&gt; list, Predicate&lt;T&gt; predicate) {
+<b class="nc">&nbsp;        for (T element : list) {</b>
+<b class="nc">&nbsp;            if (!predicate.test(element)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extract all {@link LinkedFile}s from a list of {@link BibEntry}s.
+&nbsp;     * The result is a stream of distinct {@link LinkedFile}s.
+&nbsp;     */
+&nbsp;    public static Stream&lt;LinkedFile&gt; getLinkedFiles(Iterable&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        return StreamSupport</b>
+<b class="nc">&nbsp;                .stream(entries.spliterator(), false)</b>
+<b class="nc">&nbsp;                .map(BibEntry::getFiles)</b>
+<b class="nc">&nbsp;                .flatMap(List::stream)</b>
+<b class="nc">&nbsp;                .distinct();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

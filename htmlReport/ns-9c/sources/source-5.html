@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LspLauncher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.languageserver</a>
+</div>
+
+<h1>Coverage Summary for Class: LspLauncher (org.jabref.languageserver)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LspLauncher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.languageserver;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.net.ServerSocket;
+&nbsp;import java.net.Socket;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationLoader;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;
+&nbsp;import org.eclipse.lsp4j.jsonrpc.Launcher;
+&nbsp;import org.eclipse.lsp4j.services.LanguageClient;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class LspLauncher extends Thread {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LspLauncher.class);</b>
+&nbsp;
+&nbsp;    private final CliPreferences cliPreferences;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;    private final ExecutorService threadPool;
+&nbsp;
+&nbsp;    private final int port;
+&nbsp;    private volatile boolean running;
+&nbsp;    private ServerSocket serverSocket;
+&nbsp;
+<b class="nc">&nbsp;    public LspLauncher(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository, int port) {</b>
+<b class="nc">&nbsp;        this.cliPreferences = cliPreferences;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        this.threadPool = Executors.newCachedThreadPool();</b>
+<b class="nc">&nbsp;        this.port = port;</b>
+<b class="nc">&nbsp;        this.setName(&quot;JabLs - JabRef Language Server on: &quot; + port);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LspLauncher(CliPreferences cliPreferences, int port) {
+<b class="nc">&nbsp;        this(cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences()), port);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void run() {
+<b class="nc">&nbsp;        running = true;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            serverSocket = new ServerSocket(port);</b>
+<b class="nc">&nbsp;            threadPool.execute(() -&gt; {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;LSP Server listening on port {}...&quot;, port);</b>
+<b class="nc">&nbsp;                while (running) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        Socket socket = serverSocket.accept();</b>
+<b class="nc">&nbsp;                        LOGGER.info(&quot;LSP Client connected.&quot;);</b>
+<b class="nc">&nbsp;                        threadPool.submit(() -&gt; handleClient(socket));</b>
+&nbsp;                    } catch (IOException e) {
+<b class="nc">&nbsp;                        if (running) {</b>
+<b class="nc">&nbsp;                            LOGGER.error(&quot;Error during LSP run&quot;, e);</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            LOGGER.debug(&quot;Error while not running&quot;, e);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            });
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error during LSP run&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleClient(Socket socket) {
+<b class="nc">&nbsp;        LspClientHandler clientHandler = new LspClientHandler(cliPreferences, abbreviationRepository);</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;LSP clientHandler started.&quot;);</b>
+<b class="nc">&nbsp;        try (socket; // socket should be closed on error</b>
+<b class="nc">&nbsp;             InputStream in = socket.getInputStream();</b>
+<b class="nc">&nbsp;             OutputStream out = socket.getOutputStream()) {</b>
+<b class="nc">&nbsp;            Launcher&lt;LanguageClient&gt; launcher = org.eclipse.lsp4j.launch.LSPLauncher.createServerLauncher(clientHandler, in, out, Executors.newCachedThreadPool(), Function.identity());</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;LSP clientHandler launched.&quot;);</b>
+<b class="nc">&nbsp;            clientHandler.connect(launcher.getRemoteProxy());</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;LSP clientHandler connected.&quot;);</b>
+<b class="nc">&nbsp;            launcher.startListening().get();</b>
+&nbsp;        } catch (Throwable e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error in handleClient&quot;, e);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            LOGGER.info(&quot;LSP Client disconnected.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void interrupt() {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (serverSocket != null &amp;&amp; !serverSocket.isClosed()) {</b>
+<b class="nc">&nbsp;                serverSocket.close();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (threadPool != null &amp;&amp; !threadPool.isShutdown()) {</b>
+<b class="nc">&nbsp;                threadPool.shutdownNow();</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error during LSP shutdown&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        running = false;</b>
+<b class="nc">&nbsp;        LOGGER.info(&quot;LSP Server shutdown.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isRunning() {
+<b class="nc">&nbsp;        return running;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

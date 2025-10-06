@@ -1,0 +1,246 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ManageKeywordsViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.edit</a>
+</div>
+
+<h1>Coverage Summary for Class: ManageKeywordsViewModel (org.jabref.gui.edit)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ManageKeywordsViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.edit;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableFieldChange;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryPreferences;
+&nbsp;import org.jabref.model.entry.Keyword;
+&nbsp;import org.jabref.model.entry.KeywordList;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;public class ManageKeywordsViewModel {
+&nbsp;
+&nbsp;    private final List&lt;BibEntry&gt; entries;
+<b class="nc">&nbsp;    private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();</b>
+&nbsp;    private final BibEntryPreferences bibEntryPreferences;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;ManageKeywordsDisplayType&gt; displayType = new SimpleObjectProperty&lt;&gt;(ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES);</b>
+&nbsp;    private final ObservableList&lt;String&gt; keywords;
+&nbsp;
+<b class="nc">&nbsp;    public ManageKeywordsViewModel(BibEntryPreferences bibEntryPreferences, List&lt;BibEntry&gt; entries) {</b>
+<b class="nc">&nbsp;        this.bibEntryPreferences = bibEntryPreferences;</b>
+<b class="nc">&nbsp;        this.entries = entries;</b>
+<b class="nc">&nbsp;        this.keywords = FXCollections.observableArrayList();</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(displayType, this::fillKeywordsList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ManageKeywordsDisplayType getDisplayType() {
+<b class="nc">&nbsp;        return displayType.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;ManageKeywordsDisplayType&gt; displayTypeProperty() {
+<b class="nc">&nbsp;        return displayType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void fillKeywordsList(ManageKeywordsDisplayType type) {
+<b class="nc">&nbsp;        keywords.clear();</b>
+<b class="nc">&nbsp;        sortedKeywordsOfAllEntriesBeforeUpdateByUser.clear();</b>
+<b class="nc">&nbsp;        Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (type == ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES) {</b>
+<b class="nc">&nbsp;            for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;                KeywordList separatedKeywords = entry.getKeywords(keywordSeparator);</b>
+<b class="nc">&nbsp;                sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (type == ManageKeywordsDisplayType.CONTAINED_IN_ANY_ENTRY) {</b>
+&nbsp;            // all keywords from first entry have to be added
+<b class="nc">&nbsp;            BibEntry firstEntry = entries.getFirst();</b>
+<b class="nc">&nbsp;            KeywordList separatedKeywords = firstEntry.getKeywords(keywordSeparator);</b>
+<b class="nc">&nbsp;            sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);</b>
+&nbsp;
+&nbsp;            // for the remaining entries, intersection has to be used
+&nbsp;            // this approach ensures that one empty keyword list leads to an empty set of common keywords
+<b class="nc">&nbsp;            for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;                separatedKeywords = entry.getKeywords(keywordSeparator);</b>
+<b class="nc">&nbsp;                sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;DisplayType &quot; + type + &quot; not handled&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (Keyword keyword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {</b>
+<b class="nc">&nbsp;            keywords.add(keyword.get());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;String&gt; getKeywords() {
+<b class="nc">&nbsp;        return keywords;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeKeyword(String keyword) {
+<b class="nc">&nbsp;        keywords.remove(keyword);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void saveChanges() {
+<b class="nc">&nbsp;        KeywordList keywordsToAdd = new KeywordList();</b>
+<b class="nc">&nbsp;        KeywordList userSelectedKeywords = new KeywordList();</b>
+&nbsp;        // build keywordsToAdd and userSelectedKeywords in parallel
+<b class="nc">&nbsp;        for (String keyword : keywords) {</b>
+<b class="nc">&nbsp;            userSelectedKeywords.add(keyword);</b>
+<b class="nc">&nbsp;            if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {</b>
+<b class="nc">&nbsp;                keywordsToAdd.add(keyword);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        KeywordList keywordsToRemove = new KeywordList();</b>
+<b class="nc">&nbsp;        for (Keyword kword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {</b>
+<b class="nc">&nbsp;            if (!userSelectedKeywords.contains(kword)) {</b>
+<b class="nc">&nbsp;                keywordsToRemove.add(kword);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (keywordsToAdd.isEmpty() &amp;&amp; keywordsToRemove.isEmpty()) {</b>
+&nbsp;            // nothing to be done if nothing is new and nothing is obsolete
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        NamedCompoundEdit compoundEdit = updateKeywords(entries, keywordsToAdd, keywordsToRemove);</b>
+&nbsp;        // TODO: bp.getUndoManager().addEdit(compoundEdit);
+&nbsp;    }
+&nbsp;
+&nbsp;    private NamedCompoundEdit updateKeywords(List&lt;BibEntry&gt; entries, KeywordList keywordsToAdd,
+&nbsp;                                             KeywordList keywordsToRemove) {
+<b class="nc">&nbsp;        Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();</b>
+&nbsp;
+<b class="nc">&nbsp;        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang(&quot;Update keywords&quot;));</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            KeywordList keywords = entry.getKeywords(keywordSeparator);</b>
+&nbsp;
+&nbsp;            // update keywords
+<b class="nc">&nbsp;            keywords.removeAll(keywordsToRemove);</b>
+<b class="nc">&nbsp;            keywords.addAll(keywordsToAdd);</b>
+&nbsp;
+&nbsp;            // put keywords back
+<b class="nc">&nbsp;            Optional&lt;FieldChange&gt; change = entry.putKeywords(keywords, keywordSeparator);</b>
+<b class="nc">&nbsp;            change.ifPresent(fieldChange -&gt; compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        compoundEdit.end();</b>
+<b class="nc">&nbsp;        return compoundEdit;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

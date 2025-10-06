@@ -1,0 +1,286 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WalkthroughReverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: WalkthroughReverter (org.jabref.gui.walkthrough.utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WalkthroughReverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.utils;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.value.ChangeListener;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.stage.Window;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.util.DelayedExecution;
+&nbsp;import org.jabref.gui.walkthrough.Walkthrough;
+&nbsp;import org.jabref.gui.walkthrough.declarative.WindowResolver;
+&nbsp;import org.jabref.gui.walkthrough.declarative.sideeffect.SideEffectExecutor;
+&nbsp;import org.jabref.gui.walkthrough.declarative.sideeffect.WalkthroughSideEffect;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.SideEffect;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
+&nbsp;
+&nbsp;import com.sun.javafx.scene.NodeHelper;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class WalkthroughReverter {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughReverter.class);</b>
+&nbsp;    /// The use of delay is related to the following error that can be reproduced as of
+&nbsp;    /// [00fc407](https://github.com/JabRef/jabref/tree/00fc407620b3132c0cdea8c65750d0e5616bb597):
+&nbsp;    ///
+&nbsp;    /// If the &quot;Add Group&quot; walkthrough is launched, the following action is performed:
+&nbsp;    /// 1. Launch walkthrough
+&nbsp;    /// 2. Create the new group &quot;Research Papers&quot;
+&nbsp;    /// 3. In step 8 (i.e., immediately after the new group is created), click on other
+&nbsp;    /// group
+&nbsp;    /// 4. The reversion occur because the first-entry that are present in the &quot;All
+&nbsp;    /// Groups&quot; is not visible
+&nbsp;    /// 5. [IndexOutOfBoundsException] is thrown by JavaFX and the walkthrough become
+&nbsp;    /// entirely non-responsive.
+&nbsp;    ///
+&nbsp;    /// It&#39;s not clear why such delay fixes this issue, but it&#39;s necessary. A possible
+&nbsp;    /// hypothesis is that a re-render occurred during the change in the selection state,
+&nbsp;    /// which leads to restoration to the default event dispatcher and error due to the
+&nbsp;    /// monkey-patched dispatcher isn&#39;t perfectly compatible with JavaFX&#39;s inner work.
+<b class="nc">&nbsp;    private static final Duration REVERSION_DELAY = Duration.millis(50);</b>
+&nbsp;
+&nbsp;    private final Walkthrough walkthrough;
+&nbsp;    private final Window fallbackWindow;
+&nbsp;    private final SideEffectExecutor sideEffectExecutor;
+&nbsp;
+&nbsp;    private @Nullable ChangeListener&lt;Boolean&gt; windowShowingListener;
+&nbsp;    private @Nullable ChangeListener&lt;Boolean&gt; nodeVisibleListener;
+&nbsp;
+&nbsp;    private @Nullable Window resolvedWindow;
+&nbsp;    private @Nullable Node resolvedNode;
+&nbsp;    private @Nullable DelayedExecution reversion;
+&nbsp;
+&nbsp;    public WalkthroughReverter(@NonNull Walkthrough walkthrough,
+&nbsp;                               @NonNull Window fallbackWindow,
+<b class="nc">&nbsp;                               @NonNull SideEffectExecutor sideEffectExecutor) {</b>
+<b class="nc">&nbsp;        this.walkthrough = walkthrough;</b>
+<b class="nc">&nbsp;        this.fallbackWindow = fallbackWindow;</b>
+<b class="nc">&nbsp;        this.sideEffectExecutor = sideEffectExecutor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void attach(@NonNull Window resolvedWindow, @Nullable Node resolvedNode) {
+<b class="nc">&nbsp;        detach();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.resolvedWindow = resolvedWindow;</b>
+<b class="nc">&nbsp;        this.resolvedNode = resolvedNode;</b>
+&nbsp;
+<b class="nc">&nbsp;        windowShowingListener = (_, wasShowing, isShowing) -&gt; {</b>
+<b class="nc">&nbsp;            if (wasShowing &amp;&amp; !isShowing) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Window for step &#39;{}&#39; closed. Reverting.&quot;, walkthrough.getCurrentStep().title());</b>
+<b class="nc">&nbsp;                if (reversion != null) {</b>
+<b class="nc">&nbsp;                    reversion.cancel();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                reversion = new DelayedExecution(REVERSION_DELAY, this::findAndUndo);</b>
+<b class="nc">&nbsp;                reversion.start();</b>
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        this.resolvedWindow.showingProperty().addListener(windowShowingListener);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (this.resolvedNode != null) {</b>
+<b class="nc">&nbsp;            nodeVisibleListener = (_, wasVisible, isVisible) -&gt; {</b>
+<b class="nc">&nbsp;                if (wasVisible &amp;&amp; !isVisible) {</b>
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;Node for step &#39;{}&#39; is no longer visible. Reverting.&quot;, walkthrough.getCurrentStep().title());</b>
+<b class="nc">&nbsp;                    if (reversion != null) {</b>
+<b class="nc">&nbsp;                        reversion.cancel();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    reversion = new DelayedExecution(REVERSION_DELAY, this::findAndUndo);</b>
+<b class="nc">&nbsp;                    reversion.start();</b>
+&nbsp;                }
+&nbsp;            };
+<b class="nc">&nbsp;            NodeHelper.treeVisibleProperty(this.resolvedNode).addListener(nodeVisibleListener);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void detach() {
+<b class="nc">&nbsp;        if (reversion != null) {</b>
+<b class="nc">&nbsp;            reversion.cancel();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        reversion = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (resolvedWindow != null &amp;&amp; windowShowingListener != null) {</b>
+<b class="nc">&nbsp;            resolvedWindow.showingProperty().removeListener(windowShowingListener);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        windowShowingListener = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (resolvedNode != null &amp;&amp; nodeVisibleListener != null) {</b>
+<b class="nc">&nbsp;            NodeHelper.treeVisibleProperty(resolvedNode).removeListener(nodeVisibleListener);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        nodeVisibleListener = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        resolvedWindow = null;</b>
+<b class="nc">&nbsp;        resolvedNode = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void findAndUndo() {
+<b class="nc">&nbsp;        detach();</b>
+<b class="nc">&nbsp;        int currentIndex = walkthrough.currentStepProperty().get();</b>
+<b class="nc">&nbsp;        undoTo(currentIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Reverts the walkthrough to the last valid step before the given index. This
+&nbsp;    /// method assumes that the step in the given index is not valid anymore without
+&nbsp;    /// checking whether it&#39;s valid.
+&nbsp;    private void undoTo(int from) {
+<b class="nc">&nbsp;        for (int i = from - 1; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;            switch (walkthrough.getStepAtIndex(i)) {</b>
+<b class="nc">&nbsp;                case VisibleComponent component -&gt; {</b>
+<b class="nc">&nbsp;                    Optional&lt;Window&gt; window = component.windowResolver().flatMap(WindowResolver::resolve);</b>
+<b class="nc">&nbsp;                    if (window.isEmpty() &amp;&amp; component.windowResolver().isPresent()) {</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    Window activeWindow = window.orElse(fallbackWindow);</b>
+<b class="nc">&nbsp;                    if (activeWindow.getScene() != null &amp;&amp;</b>
+<b class="nc">&nbsp;                            (component.nodeResolver().isEmpty() || component.nodeResolver().get().resolve(activeWindow.getScene()).isPresent())) {</b>
+<b class="nc">&nbsp;                        LOGGER.info(&quot;Reverting to step {} from step {}&quot;, i, from);</b>
+<b class="nc">&nbsp;                        walkthrough.goToStep(i);</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case SideEffect _ -&gt;
+<b class="nc">&nbsp;                        undo(i);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.warn(&quot;No previous resolvable step found, quitting walkthrough.&quot;);</b>
+<b class="nc">&nbsp;        walkthrough.quit();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void undo(int stepIndex) {
+<b class="nc">&nbsp;        WalkthroughStep step = walkthrough.getStepAtIndex(stepIndex);</b>
+<b class="nc">&nbsp;        if (step instanceof SideEffect(</b>
+<b class="nc">&nbsp;                String title,</b>
+<b class="nc">&nbsp;                WalkthroughSideEffect sideEffect</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            if (!sideEffectExecutor.executeBackward(sideEffect, walkthrough)) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Failed to revert side effect {}: {}&quot;, title, sideEffect.description());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void revertAll() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Reverting all executed side effects&quot;);</b>
+<b class="nc">&nbsp;        for (int i = walkthrough.currentStepProperty().get(); i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;            undo(i);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

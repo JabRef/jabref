@@ -1,0 +1,188 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RemoveEnclosingBracesFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.bibtexfields</a>
+</div>
+
+<h1>Coverage Summary for Class: RemoveEnclosingBracesFormatter (org.jabref.logic.formatter.bibtexfields)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoveEnclosingBracesFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.bibtexfields;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NullMarked;
+&nbsp;
+&nbsp;@NullMarked
+<b class="nc">&nbsp;public class RemoveEnclosingBracesFormatter extends Formatter {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Remove enclosing braces&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKey() {
+<b class="nc">&nbsp;        return &quot;remove_braces&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Removes braces encapsulating the complete field content.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExampleInput() {
+<b class="nc">&nbsp;        return &quot;{In CDMA}&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String value) {
+<b class="nc">&nbsp;        String formatted = value;</b>
+<b class="nc">&nbsp;        while ((formatted.length() &gt;= 2) &amp;&amp; (formatted.charAt(0) == &#39;{&#39;) &amp;&amp; (formatted.charAt(formatted.length() - 1)</b>
+&nbsp;                == &#39;}&#39;)) {
+<b class="nc">&nbsp;            String trimmed = formatted.substring(1, formatted.length() - 1);</b>
+&nbsp;
+&nbsp;            // It could be that the removed braces were not matching
+&nbsp;            // For example, &quot;{A} test {B}&quot; results in &quot;A} test {B&quot;
+&nbsp;            // In this case, trimmed has a closing } without an opening { before that
+<b class="nc">&nbsp;            if (hasNegativeBraceCount(trimmed)) {</b>
+<b class="nc">&nbsp;                return formatted;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                formatted = trimmed;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return formatted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if a string at any point has had more ending } braces than opening { ones.
+&nbsp;     * Will e.g. return true for the string &quot;DNA} text {EPA&quot;
+&nbsp;     *
+&nbsp;     * @param value The string to check.
+&nbsp;     * @return true if at any index the brace count is negative.
+&nbsp;     */
+&nbsp;    private boolean hasNegativeBraceCount(String value) {
+<b class="nc">&nbsp;        int braceCount = 0;</b>
+<b class="nc">&nbsp;        for (int index = 0; index &lt; value.length(); index++) {</b>
+<b class="nc">&nbsp;            char charAtIndex = value.charAt(index);</b>
+<b class="nc">&nbsp;            if (charAtIndex == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                braceCount++;</b>
+<b class="nc">&nbsp;            } else if (charAtIndex == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                braceCount--;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (braceCount &lt; 0) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

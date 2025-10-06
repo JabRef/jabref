@@ -1,0 +1,171 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MrDlibPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: MrDlibPreferences (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MrDlibPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;
+&nbsp;public class MrDlibPreferences {
+&nbsp;
+&nbsp;    private final BooleanProperty acceptRecommendations;
+&nbsp;    private final BooleanProperty sendLanguage;
+&nbsp;    private final BooleanProperty sendOs;
+&nbsp;    private final BooleanProperty sendTimezone;
+&nbsp;
+<b class="nc">&nbsp;    public MrDlibPreferences(boolean acceptRecommendations, boolean shouldSendLanguage, boolean shouldSendOs, boolean shouldSendTimezone) {</b>
+<b class="nc">&nbsp;        this.acceptRecommendations = new SimpleBooleanProperty(acceptRecommendations);</b>
+<b class="nc">&nbsp;        this.sendLanguage = new SimpleBooleanProperty(shouldSendLanguage);</b>
+<b class="nc">&nbsp;        this.sendOs = new SimpleBooleanProperty(shouldSendOs);</b>
+<b class="nc">&nbsp;        this.sendTimezone = new SimpleBooleanProperty(shouldSendTimezone);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldAcceptRecommendations() {
+<b class="nc">&nbsp;        return acceptRecommendations.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty acceptRecommendationsProperty() {
+<b class="nc">&nbsp;        return acceptRecommendations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAcceptRecommendations(boolean acceptRecommendations) {
+<b class="nc">&nbsp;        this.acceptRecommendations.set(acceptRecommendations);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldSendLanguage() {
+<b class="nc">&nbsp;        return sendLanguage.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty sendLanguageProperty() {
+<b class="nc">&nbsp;        return sendLanguage;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSendLanguage(boolean sendLanguage) {
+<b class="nc">&nbsp;        this.sendLanguage.set(sendLanguage);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldSendOs() {
+<b class="nc">&nbsp;        return sendOs.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty sendOsProperty() {
+<b class="nc">&nbsp;        return sendOs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSendOs(boolean sendOs) {
+<b class="nc">&nbsp;        this.sendOs.set(sendOs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldSendTimezone() {
+<b class="nc">&nbsp;        return sendTimezone.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty sendTimezoneProperty() {
+<b class="nc">&nbsp;        return sendTimezone;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSendTimezone(boolean sendTimezone) {
+<b class="nc">&nbsp;        this.sendTimezone.set(sendTimezone);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

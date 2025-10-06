@@ -1,0 +1,422 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DOI</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.identifier</a>
+</div>
+
+<h1>Coverage Summary for Class: DOI (org.jabref.model.entry.identifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DOI</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.identifier;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URLDecoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseLogic;
+&nbsp;import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class for working with &lt;a href=&quot;https://en.wikipedia.org/wiki/Digital_object_identifier&quot;&gt;Digital object identifiers (DOIs)&lt;/a&gt; and &lt;a href=&quot;http://shortdoi.org&quot;&gt;Short DOIs&lt;/a&gt;
+&nbsp; */
+&nbsp;@AllowedToUseLogic(&quot;because we want to have this class &#39;smart&#39; an be able to parse obscure DOIs, too. For this, we need the LatexToUnicodeformatter.&quot;)
+&nbsp;public class DOI implements Identifier {
+&nbsp;
+<b class="nc">&nbsp;    public static final URI AGENCY_RESOLVER = URLUtil.createUri(&quot;https://doi.org/doiRA&quot;);</b>
+<b class="nc">&nbsp;    public static final URI RESOLVER = URLUtil.createUri(&quot;https://doi.org/&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);</b>
+&nbsp;
+&nbsp;    // Regex
+&nbsp;    // (see http://www.doi.org/doi_handbook/2_Numbering.html)
+&nbsp;    private static final String DOI_EXP = &quot;(?:urn:)?&quot;       // optional urn
+&nbsp;            + &quot;(?:doi:)?&quot;                                   // optional doi
+&nbsp;            + &quot;(&quot;                                           // begin group \1
+&nbsp;            + &quot;10&quot;                                          // directory indicator
+&nbsp;            + &quot;(?:\\.[0-9]+)+&quot;                              // registrant codes
+&nbsp;            + &quot;[/:%]&quot;                                       // divider
+&nbsp;            + &quot;(?:.+)&quot;                                      // suffix alphanumeric string
+&nbsp;            + &quot;)&quot;;                                          // end group \1
+&nbsp;    private static final String FIND_DOI_EXP = &quot;(?:urn:)?&quot;  // optional urn
+&nbsp;            + &quot;(?:doi:)?&quot;                                   // optional doi
+&nbsp;            + &quot;(&quot;                                           // begin group \1
+&nbsp;            + &quot;10&quot;                                          // directory indicator
+&nbsp;            + &quot;(?:\\.[0-9]+)+&quot;                              // registrant codes
+&nbsp;            + &quot;[/:]&quot;                                        // divider
+&nbsp;            + &quot;(?:[^\\s,]+[^,;(\\.\\s)])&quot;                   // suffix alphanumeric without &quot; &quot;/&quot;,&quot; and not ending on &quot;.&quot;/&quot;,&quot;/&quot;;&quot;
+&nbsp;            + &quot;)&quot;;                                          // end group \1
+&nbsp;
+&nbsp;    // Regex (Short DOI)
+&nbsp;    private static final String SHORT_DOI_SHORTCUT = &quot;^\\s*(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})\\s*$&quot;; // eg https://doi.org/bfrhmx
+&nbsp;    private static final String IN_TEXT_SHORT_DOI_SHORTCUT = &quot;(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})&quot;; // eg https://doi.org/bfrhmx somewhere in the text
+&nbsp;    private static final String SHORT_DOI_EXP_PREFIX = &quot;^(?:&quot;   // can begin with...
+&nbsp;            + &quot;\\s*(?:https?://)?(?:www\\.)?&quot;                   // optional url parts &quot;http(s)://&quot;+&quot;www.&quot;
+&nbsp;            + &quot;[a-zA-Z\\.]*doi[a-zA-Z\\.]*&quot;                     //  eg &quot;dx.doi.&quot; or &quot;doi.acm.&quot; or &quot;doi.&quot; if with url, must include &quot;doi&quot;, otherwise too ambiguous
+&nbsp;            + &quot;\\.[a-zA-Z]{2,10}/)?&quot;;                           // &quot;.org&quot; or &quot;.de&quot; or &quot;.academy&quot;
+&nbsp;    private static final String SHORT_DOI_EXP = &quot;(?:&quot;           // begin &quot;any one of these&quot;
+&nbsp;            + &quot;(?:[\\s/]?(?:(?:urn:)|(?:doi:)|(?:urn:doi:)))&quot;   // &quot;doi:10/12ab&quot; or &quot; urn:10/12ab&quot; or &quot;/urn:doi:/10/12ab&quot; ...
+&nbsp;            + &quot;|(?:\\s?/?)&quot;                                     // or &quot;/10/12ab&quot; or &quot; /10/12ab&quot; or &quot;10/12ab&quot; or &quot; 10/12ab&quot;
+&nbsp;            + &quot;)&quot;                                               // end &quot;any one of these&quot;
+&nbsp;            + &quot;(&quot;                                               // begin group \1
+&nbsp;            + &quot;10&quot;                                              // directory indicator
+&nbsp;            + &quot;[/%:]&quot;                                           // divider
+&nbsp;            + &quot;[a-zA-Z0-9]{3,}&quot;                                 // at least 3 characters
+&nbsp;            + &quot;)&quot;                                               // end group \1
+&nbsp;            + &quot;\\s*$&quot;;                                          // must be the end
+&nbsp;    private static final String FIND_SHORT_DOI_EXP = &quot;(?:&quot;          // begin &quot;any one of these&quot; (but not none of those!)
+&nbsp;            + &quot;(?:(?:www\\.)?doi\\.org/)&quot;                           // either doi.org
+&nbsp;            + &quot;|&quot;                                                   // or any of the following with doi.org or not...
+&nbsp;            + &quot;(?:(?:doi.org/)?(?:(?:urn:)|(?:doi:)|(?:urn:doi:)))&quot; // &quot;doi:10/12ab&quot; or &quot; urn:10/12ab&quot; or &quot;/urn:doi:/10/12ab&quot; or &quot;doi.org/doi:10/12ab&quot;...
+&nbsp;            + &quot;)&quot;                                                   // end &quot;any one of these&quot;
+&nbsp;            + &quot;(&quot;                                                   // begin group \1
+&nbsp;            + &quot;10&quot;                                                  // directory indicator
+&nbsp;            + &quot;[/%:]&quot;                                               // divider
+&nbsp;            + &quot;[a-zA-Z0-9]{3,}&quot;                                     // at least 3 characters
+&nbsp;            + &quot;)&quot;;                                                  // end group  \1
+&nbsp;
+&nbsp;    private static final String HTTP_EXP = &quot;https?://[^\\s]+?&quot; + DOI_EXP;
+&nbsp;    private static final String SHORT_DOI_HTTP_EXP = &quot;https?://[^\\s]+?&quot; + SHORT_DOI_EXP;
+&nbsp;    // Pattern
+<b class="nc">&nbsp;    private static final Pattern EXACT_DOI_PATT = Pattern.compile(&quot;^(?:https?://[^\\s]+?)?&quot; + DOI_EXP + &quot;$&quot;, Pattern.CASE_INSENSITIVE);</b>
+<b class="nc">&nbsp;    private static final Pattern FIND_DOI_PATT = Pattern.compile(&quot;(?:https?://[^\\s]+?)?&quot; + FIND_DOI_EXP, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;    // Pattern (short DOI)
+<b class="nc">&nbsp;    private static final Pattern EXACT_SHORT_DOI_SHORTCUT = Pattern.compile(SHORT_DOI_SHORTCUT, Pattern.CASE_INSENSITIVE); // eg doi.org/bfrhmx (no &quot;10/&quot;)</b>
+<b class="nc">&nbsp;    private static final Pattern FIND_SHORT_DOI_SHORTCUT = Pattern.compile(IN_TEXT_SHORT_DOI_SHORTCUT, Pattern.CASE_INSENSITIVE); // eg doi.org/bfrhmx (no &quot;10/&quot;)</b>
+<b class="nc">&nbsp;    private static final Pattern EXACT_SHORT_DOI_PATT = Pattern.compile(SHORT_DOI_EXP_PREFIX + SHORT_DOI_EXP, Pattern.CASE_INSENSITIVE);</b>
+<b class="nc">&nbsp;    private static final Pattern FIND_SHORT_DOI_PATT = Pattern.compile(&quot;(?:https?://[^\\s]+?)?&quot; + FIND_SHORT_DOI_EXP, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+&nbsp;    // See https://www.baeldung.com/java-regex-s-splus for explanation of \\s+
+&nbsp;    // See https://stackoverflow.com/questions/3203190/regex-any-ascii-character for the regexp that includes ASCII characters only
+&nbsp;    // Another reference for regexp for ASCII characters: https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
+&nbsp;    private static final String CHARS_TO_REMOVE = &quot;[\\s+&quot; // remove white space characters, i.e, \t, \n, \x0B, \f, \r . + is a greedy quantifier
+&nbsp;            + &quot;\\\\&quot;            // remove backslashes
+&nbsp;            + &quot;{}&quot;              // remove curly brackets
+&nbsp;            + &quot;\\[\\]`|&quot;        // remove square brackets, backticks, and pipes
+&nbsp;            + &quot;[^\\x00-\\x7F]&quot;  // strips off all non-ASCII characters
+&nbsp;            + &quot;]&quot;;
+&nbsp;
+&nbsp;    // DOI
+&nbsp;    private final String doi;
+&nbsp;    // Short DOI
+<b class="nc">&nbsp;    private boolean isShortDoi = false;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a DOI from various schemes including URL, URN, and plain DOIs/Short DOIs.
+&nbsp;     *
+&nbsp;     * @param doi the DOI/Short DOI string
+&nbsp;     * @throws NullPointerException     if DOI/Short DOI is null
+&nbsp;     * @throws IllegalArgumentException if doi does not include a valid DOI/Short DOI
+&nbsp;     */
+<b class="nc">&nbsp;    public DOI(String doi) {</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(doi);</b>
+&nbsp;
+&nbsp;        // Remove whitespace
+<b class="nc">&nbsp;        String trimmedDoi = doi.trim();</b>
+&nbsp;
+&nbsp;        // HTTP URL decoding
+<b class="nc">&nbsp;        if (doi.matches(HTTP_EXP) || doi.matches(SHORT_DOI_HTTP_EXP)) {</b>
+&nbsp;            // decodes path segment
+<b class="nc">&nbsp;            trimmedDoi = URLDecoder.decode(trimmedDoi, StandardCharsets.UTF_8);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Extract DOI/Short DOI
+<b class="nc">&nbsp;        Matcher matcher = EXACT_DOI_PATT.matcher(trimmedDoi);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+&nbsp;            // match only group \1
+<b class="nc">&nbsp;            this.doi = matcher.group(1);</b>
+&nbsp;        } else {
+&nbsp;            // Short DOI
+<b class="nc">&nbsp;            Matcher shortDoiMatcher = EXACT_SHORT_DOI_PATT.matcher(trimmedDoi);</b>
+<b class="nc">&nbsp;            if (shortDoiMatcher.find()) {</b>
+<b class="nc">&nbsp;                this.doi = shortDoiMatcher.group(1);</b>
+<b class="nc">&nbsp;                isShortDoi = true;</b>
+&nbsp;            } else {
+&nbsp;                // Shortcut DOI without the &quot;10/&quot; as in &quot;doi.org/d8dn&quot;
+<b class="nc">&nbsp;                Matcher shortcutDoiMatcher = EXACT_SHORT_DOI_SHORTCUT.matcher(trimmedDoi);</b>
+<b class="nc">&nbsp;                if (shortcutDoiMatcher.find()) {</b>
+<b class="nc">&nbsp;                    this.doi = &quot;10/&quot; + shortcutDoiMatcher.group(1);</b>
+<b class="nc">&nbsp;                    isShortDoi = true;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(trimmedDoi + &quot; is not a valid DOI/Short DOI.&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an {@code Optional&lt;DOI&gt;} from various schemes including URL, URN, and plain DOIs.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Useful for suppressing the {@link java.lang.IllegalArgumentException IllegalArgumentException}
+&nbsp;     * of the constructor and checking for {@link java.util.Optional#isPresent} instead.
+&nbsp;     *
+&nbsp;     * @param doi the DOI/Short DOI string
+&nbsp;     * @return an Optional containing the DOI or an empty Optional
+&nbsp;     */
+&nbsp;    public static Optional&lt;DOI&gt; parse(String doi) {
+&nbsp;        try {
+<b class="nc">&nbsp;            LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();</b>
+<b class="nc">&nbsp;            String cleanedDOI = doi;</b>
+<b class="nc">&nbsp;            cleanedDOI = URLDecoder.decode(cleanedDOI, StandardCharsets.UTF_8);</b>
+&nbsp;            // needs to be handled before LatexToUnicode, because otherwise `^` will be treated as conversion superscript
+<b class="nc">&nbsp;            cleanedDOI = cleanedDOI.replaceAll(&quot;\\^&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;            cleanedDOI = formatter.format(cleanedDOI);</b>
+<b class="nc">&nbsp;            cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (cleanedDOI.startsWith(&quot;_&quot;) &amp;&amp; cleanedDOI.endsWith(&quot;_&quot;)) {</b>
+<b class="nc">&nbsp;                if (cleanedDOI.length() == 1) {</b>
+<b class="nc">&nbsp;                    return Optional.empty();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                cleanedDOI = cleanedDOI.substring(1, cleanedDOI.length() - 1);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return Optional.of(new DOI(cleanedDOI));</b>
+&nbsp;        } catch (IllegalArgumentException | NullPointerException e) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines whether a DOI/Short DOI is valid or not
+&nbsp;     *
+&nbsp;     * @param doi the DOI/Short DOI string
+&nbsp;     * @return true if DOI is valid, false otherwise
+&nbsp;     */
+&nbsp;    public static boolean isValid(String doi) {
+<b class="nc">&nbsp;        return parse(doi).isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tries to find a DOI/Short DOI inside the given text.
+&nbsp;     *
+&nbsp;     * @param text the Text which might contain a DOI/Short DOI
+&nbsp;     * @return an Optional containing the DOI or an empty Optional
+&nbsp;     */
+&nbsp;    public static Optional&lt;DOI&gt; findInText(String text) {
+<b class="nc">&nbsp;        Optional&lt;DOI&gt; result = Optional.empty();</b>
+<b class="nc">&nbsp;        text = text.replaceAll(&quot;[�]&quot;, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Matcher matcher = FIND_DOI_PATT.matcher(text);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+&nbsp;            // match only group \1
+<b class="nc">&nbsp;            result = Optional.of(new DOI(matcher.group(1)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        matcher = FIND_SHORT_DOI_PATT.matcher(text);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            result = Optional.of(new DOI(matcher.group(1)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        matcher = FIND_SHORT_DOI_SHORTCUT.matcher(text);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            result = Optional.of(new DOI(matcher.group(0)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;DOI{&quot; +</b>
+&nbsp;                &quot;doi=&#39;&quot; + doi + &#39;\&#39;&#39; +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the plain DOI/Short DOI
+&nbsp;     *
+&nbsp;     * @return the plain DOI/Short DOI value.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String asString() {
+<b class="nc">&nbsp;        return doi;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines whether DOI is short DOI or not
+&nbsp;     *
+&nbsp;     * @return true if DOI is short DOI, false otherwise
+&nbsp;     */
+&nbsp;    public boolean isShortDoi() {
+<b class="nc">&nbsp;        return isShortDoi;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a URI presentation for the DOI/Short DOI
+&nbsp;     *
+&nbsp;     * @return an encoded URI representation of the DOI/Short DOI
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URI&gt; getExternalURI() {
+&nbsp;        // TODO: We need dependency injection here. It should never happen that this method is called.
+&nbsp;        //       Always, the user preferences should be honored --&gt; #getExternalURIWithCustomBase
+<b class="nc">&nbsp;        return getExternalURIFromBase(RESOLVER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;URI&gt; getExternalURIWithCustomBase(String customBase) {
+<b class="nc">&nbsp;        return getExternalURIFromBase(URLUtil.createUri(customBase));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;URI&gt; getExternalURIFromBase(URI base) {
+&nbsp;        try {
+<b class="nc">&nbsp;            URI uri = new URI(base.getScheme(), base.getHost(), &quot;/&quot; + doi, null);</b>
+<b class="nc">&nbsp;            return Optional.of(uri);</b>
+&nbsp;        } catch (URISyntaxException e) {
+&nbsp;            // should never happen
+<b class="nc">&nbsp;            LOGGER.error(&quot;{} could not be encoded as URI.&quot;, doi, e);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return an ASCII URL presentation for the DOI/Short DOI
+&nbsp;     *
+&nbsp;     * @return an encoded URL representation of the DOI/Short DOI
+&nbsp;     */
+&nbsp;    public String getURIAsASCIIString() {
+<b class="nc">&nbsp;        return getExternalURI().map(URI::toASCIIString).orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Field getDefaultField() {
+<b class="nc">&nbsp;        return StandardField.DOI;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * DOIs are case-insensitive. Thus, 10.1109/cloud.2017.89 equals 10.1109/CLOUD.2017.89
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        DOI other = (DOI) o;</b>
+<b class="nc">&nbsp;        return doi.equalsIgnoreCase(other.doi);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(doi.toLowerCase(Locale.ENGLISH));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

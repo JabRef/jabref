@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileHistoryMenu</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.frame</a>
+</div>
+
+<h1>Coverage Summary for Class: FileHistoryMenu (org.jabref.gui.frame)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileHistoryMenu</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.frame;
+&nbsp;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.scene.control.Menu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.SeparatorMenuItem;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.importer.actions.OpenDatabaseAction;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.io.FileHistory;
+&nbsp;
+&nbsp;public class FileHistoryMenu extends Menu {
+&nbsp;
+&nbsp;    protected final MenuItem clearRecentLibraries;
+&nbsp;    private final FileHistory history;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final OpenDatabaseAction openDatabaseAction;
+&nbsp;
+<b class="nc">&nbsp;    public FileHistoryMenu(FileHistory fileHistory, DialogService dialogService, OpenDatabaseAction openDatabaseAction) {</b>
+<b class="nc">&nbsp;        setText(Localization.lang(&quot;Recent libraries&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.clearRecentLibraries = new MenuItem();</b>
+<b class="nc">&nbsp;        clearRecentLibraries.setText(Localization.lang(&quot;Clear recent libraries&quot;));</b>
+<b class="nc">&nbsp;        clearRecentLibraries.setOnAction(event -&gt; clearLibrariesHistory());</b>
+&nbsp;
+<b class="nc">&nbsp;        this.history = fileHistory;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.openDatabaseAction = openDatabaseAction;</b>
+<b class="nc">&nbsp;        if (history.isEmpty()) {</b>
+<b class="nc">&nbsp;            setDisable(true);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            setItems();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        history.addListener((InvalidationListener) obs -&gt; setItems());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is to use typed letters to access recent libraries in menu.
+&nbsp;     *
+&nbsp;     * @param keyEvent a KeyEvent.
+&nbsp;     * @return false if typed char is invalid or not a number.
+&nbsp;     */
+&nbsp;    public boolean openFileByKey(KeyEvent keyEvent) {
+<b class="nc">&nbsp;        if (keyEvent.getCharacter() == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        char key = keyEvent.getCharacter().charAt(0);</b>
+<b class="nc">&nbsp;        int num = Character.getNumericValue(key);</b>
+<b class="nc">&nbsp;        if (num &lt;= 0 || num &gt; history.size()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.openFile(history.get(Integer.parseInt(keyEvent.getCharacter()) - 1));</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds the filename to the top of the menu. If it already is in
+&nbsp;     * the menu, it is merely moved to the top.
+&nbsp;     */
+&nbsp;    public void newFile(Path file) {
+<b class="nc">&nbsp;        history.newFile(file);</b>
+<b class="nc">&nbsp;        setItems();</b>
+<b class="nc">&nbsp;        setDisable(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setItems() {
+<b class="nc">&nbsp;        getItems().clear();</b>
+<b class="nc">&nbsp;        for (int index = 0; index &lt; history.size(); index++) {</b>
+<b class="nc">&nbsp;            addItem(history.get(index), index + 1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        getItems().addAll(</b>
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;                clearRecentLibraries
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addItem(Path file, int num) {
+<b class="nc">&nbsp;        String number = Integer.toString(num);</b>
+<b class="nc">&nbsp;        MenuItem item = new MenuItem(number + &quot;. &quot; + file);</b>
+&nbsp;        // By default mnemonic parsing is set to true for anything that is Labeled, if an underscore character
+&nbsp;        // is present, it would create a key combination ALT+the succeeding character (at least for Windows OS)
+&nbsp;        // and the underscore character will be parsed (deleted).
+&nbsp;        // i.e if the file name was called &quot;bib_test.bib&quot;, a key combination &quot;ALT+t&quot; will be created
+&nbsp;        // so to avoid this, mnemonic parsing should be set to false to print normally the underscore character.
+<b class="nc">&nbsp;        item.setMnemonicParsing(false);</b>
+<b class="nc">&nbsp;        item.setOnAction(event -&gt; openFile(file));</b>
+<b class="nc">&nbsp;        getItems().add(item);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openFile(Path file) {
+<b class="nc">&nbsp;        if (!Files.exists(file)) {</b>
+<b class="nc">&nbsp;            this.dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;File not found&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;File not found&quot;) + &quot;: &quot; + file);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        openDatabaseAction.openFile(file);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearLibrariesHistory() {
+<b class="nc">&nbsp;        history.clear();</b>
+<b class="nc">&nbsp;        setDisable(true);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

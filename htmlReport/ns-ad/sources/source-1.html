@@ -1,0 +1,168 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibLogPathResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.biblog</a>
+</div>
+
+<h1>Coverage Summary for Class: BibLogPathResolver (org.jabref.logic.biblog)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibLogPathResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.biblog;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;
+&nbsp;/// Resolves custom or default .blg path for this library.
+&nbsp;///
+&nbsp;/// Priority:
+&nbsp;///
+&nbsp;/// 1. User-defined path from MetaData
+&nbsp;/// 2. Default: same name as .bib file with .blg extension
+<b class="nc">&nbsp;public class BibLogPathResolver {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves .blg path using current user context.
+&nbsp;     */
+&nbsp;    public static Optional&lt;Path&gt; resolve(BibDatabaseContext context) {
+<b class="nc">&nbsp;        if (context == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String user = System.getProperty(&quot;user.name&quot;);</b>
+<b class="nc">&nbsp;        return resolve(context.getMetaData(), context.getDatabasePath(), user);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Test-friendly API (allows direct input of MetaData and Path)
+&nbsp;     */
+&nbsp;    public static Optional&lt;Path&gt; resolve(MetaData metaData, Optional&lt;Path&gt; databasePath, String user) {
+<b class="nc">&nbsp;        if (metaData == null || user == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; userDefined = metaData.getBlgFilePath(user);</b>
+<b class="nc">&nbsp;        if (userDefined.isPresent() &amp;&amp; userDefined != null) {</b>
+<b class="nc">&nbsp;            return userDefined;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (databasePath == null || databasePath.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return databasePath.map(path -&gt;</b>
+<b class="nc">&nbsp;                path.resolveSibling(</b>
+<b class="nc">&nbsp;                        path.getFileName().toString().replaceFirst(&quot;\\.bib$&quot;, &quot;.blg&quot;)</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,402 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FieldsEditorTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: FieldsEditorTab (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FieldsEditorTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/110)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.SequencedSet;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.geometry.VPos;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.control.SplitPane;
+&nbsp;import javafx.scene.layout.ColumnConstraints;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.Region;
+&nbsp;import javafx.scene.layout.RowConstraints;
+&nbsp;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProviders;
+&nbsp;import org.jabref.gui.fieldeditors.FieldEditorFX;
+&nbsp;import org.jabref.gui.fieldeditors.FieldEditors;
+&nbsp;import org.jabref.gui.fieldeditors.FieldNameLabel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.PreviewPanel;
+&nbsp;import org.jabref.gui.undo.RedoAction;
+&nbsp;import org.jabref.gui.undo.UndoAction;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.Subscription;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A single tab displayed in the EntryEditor holding several FieldEditors.
+&nbsp; */
+<b class="nc">&nbsp;abstract class FieldsEditorTab extends TabWithPreviewPanel {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    protected final Map&lt;Field, FieldEditorFX&gt; editors = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;    protected GridPane gridPane;
+&nbsp;    private final boolean isCompressed;
+&nbsp;    private final UndoAction undoAction;
+&nbsp;    private final RedoAction redoAction;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final JournalAbbreviationRepository journalAbbreviationRepository;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;
+<b class="nc">&nbsp;    private Collection&lt;Field&gt; fields = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;FieldCanBeLocal&quot;)
+&nbsp;    private Subscription dividerPositionSubscription;
+&nbsp;
+&nbsp;    public FieldsEditorTab(boolean compressed,
+&nbsp;                           UndoManager undoManager,
+&nbsp;                           UndoAction undoAction,
+&nbsp;                           RedoAction redoAction,
+&nbsp;                           GuiPreferences preferences,
+&nbsp;                           JournalAbbreviationRepository journalAbbreviationRepository,
+&nbsp;                           StateManager stateManager,
+&nbsp;                           PreviewPanel previewPanel) {
+<b class="nc">&nbsp;        super(stateManager, previewPanel);</b>
+<b class="nc">&nbsp;        this.isCompressed = compressed;</b>
+<b class="nc">&nbsp;        this.undoManager = Objects.requireNonNull(undoManager);</b>
+<b class="nc">&nbsp;        this.undoAction = undoAction;</b>
+<b class="nc">&nbsp;        this.redoAction = redoAction;</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+<b class="nc">&nbsp;        this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addColumn(GridPane gridPane, int columnIndex, List&lt;Label&gt; nodes) {
+<b class="nc">&nbsp;        gridPane.addColumn(columnIndex, nodes.toArray(new Node[0]));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addColumn(GridPane gridPane, int columnIndex, Stream&lt;Parent&gt; nodes) {
+<b class="nc">&nbsp;        gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void setupPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed) {
+&nbsp;        // The preferences might be not initialized in tests -&gt; return immediately
+&nbsp;        // TODO: Replace this ugly workaround by proper injection propagation
+<b class="nc">&nbsp;        if (preferences == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        editors.clear();</b>
+<b class="nc">&nbsp;        gridPane.getChildren().clear();</b>
+<b class="nc">&nbsp;        gridPane.getColumnConstraints().clear();</b>
+<b class="nc">&nbsp;        gridPane.getRowConstraints().clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        fields = determineFieldsToShow(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Label&gt; labels = fields</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(field -&gt; createLabelAndEditor(bibDatabaseContext, entry, field))</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        ColumnConstraints columnExpand = new ColumnConstraints();</b>
+<b class="nc">&nbsp;        columnExpand.setHgrow(Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        ColumnConstraints columnDoNotContract = new ColumnConstraints();</b>
+<b class="nc">&nbsp;        columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);</b>
+<b class="nc">&nbsp;        if (compressed) {</b>
+<b class="nc">&nbsp;            int rows = (int) Math.ceil((double) fields.size() / 2);</b>
+&nbsp;
+<b class="nc">&nbsp;            addColumn(gridPane, 0, labels.subList(0, rows));</b>
+<b class="nc">&nbsp;            addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode).limit(rows));</b>
+<b class="nc">&nbsp;            addColumn(gridPane, 3, labels.subList(rows, labels.size()));</b>
+<b class="nc">&nbsp;            addColumn(gridPane, 4, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));</b>
+&nbsp;
+<b class="nc">&nbsp;            columnExpand.setPercentWidth(40);</b>
+<b class="nc">&nbsp;            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(10),</b>
+&nbsp;                    columnDoNotContract, columnExpand);
+&nbsp;
+<b class="nc">&nbsp;            setCompressedRowLayout(gridPane, rows);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            addColumn(gridPane, 0, labels);</b>
+<b class="nc">&nbsp;            addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode));</b>
+&nbsp;
+<b class="nc">&nbsp;            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);</b>
+&nbsp;
+<b class="nc">&nbsp;            setRegularRowLayout(gridPane);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Label createLabelAndEditor(BibDatabaseContext databaseContext, BibEntry entry, Field field) {
+<b class="nc">&nbsp;        SuggestionProviders suggestionProviders = stateManager.activeTabProperty().get()</b>
+<b class="nc">&nbsp;                                                              .map(LibraryTab::getSuggestionProviders)</b>
+<b class="nc">&nbsp;                                                              .orElse(new SuggestionProviders());</b>
+<b class="nc">&nbsp;        FieldEditorFX fieldEditor = FieldEditors.getForField(</b>
+&nbsp;                field,
+&nbsp;                journalAbbreviationRepository,
+&nbsp;                preferences,
+&nbsp;                databaseContext,
+<b class="nc">&nbsp;                entry.getType(),</b>
+&nbsp;                suggestionProviders,
+&nbsp;                undoManager,
+&nbsp;                undoAction,
+&nbsp;                redoAction);
+<b class="nc">&nbsp;        fieldEditor.bindToEntry(entry);</b>
+<b class="nc">&nbsp;        editors.put(field, fieldEditor);</b>
+<b class="nc">&nbsp;        return new FieldNameLabel(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setRegularRowLayout(GridPane gridPane) {
+<b class="nc">&nbsp;        double totalWeight = fields.stream()</b>
+<b class="nc">&nbsp;                                   .mapToDouble(field -&gt; editors.get(field).getWeight())</b>
+<b class="nc">&nbsp;                                   .sum();</b>
+<b class="nc">&nbsp;        List&lt;RowConstraints&gt; constraints = fields</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(field -&gt; {</b>
+<b class="nc">&nbsp;                    RowConstraints rowExpand = new RowConstraints();</b>
+<b class="nc">&nbsp;                    rowExpand.setVgrow(Priority.ALWAYS);</b>
+<b class="nc">&nbsp;                    rowExpand.setValignment(VPos.TOP);</b>
+<b class="nc">&nbsp;                    rowExpand.setPercentHeight(100 * editors.get(field).getWeight() / totalWeight);</b>
+<b class="nc">&nbsp;                    return rowExpand;</b>
+<b class="nc">&nbsp;                }).toList();</b>
+<b class="nc">&nbsp;        gridPane.getRowConstraints().addAll(constraints);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected static void setCompressedRowLayout(GridPane gridPane, int rows) {
+<b class="nc">&nbsp;        RowConstraints rowExpand = new RowConstraints();</b>
+<b class="nc">&nbsp;        rowExpand.setVgrow(Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        rowExpand.setValignment(VPos.TOP);</b>
+<b class="nc">&nbsp;        if (rows == 0) {</b>
+<b class="nc">&nbsp;            rowExpand.setPercentHeight(100);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            rowExpand.setPercentHeight(100 / (double) rows);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ObservableList&lt;RowConstraints&gt; rowConstraints = gridPane.getRowConstraints();</b>
+<b class="nc">&nbsp;        rowConstraints.clear();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; rows; i++) {</b>
+<b class="nc">&nbsp;            rowConstraints.add(rowExpand);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void requestFocus(Field fieldName) {
+<b class="nc">&nbsp;        if (editors.containsKey(fieldName)) {</b>
+<b class="nc">&nbsp;            editors.get(fieldName).focus();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean shouldShow(BibEntry entry) {
+<b class="nc">&nbsp;        return !determineFieldsToShow(entry).isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        initPanel();</b>
+<b class="nc">&nbsp;        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());</b>
+<b class="nc">&nbsp;        setupPanel(bibDatabaseContext, entry, isCompressed);</b>
+<b class="nc">&nbsp;        super.bindToEntry(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract SequencedSet&lt;Field&gt; determineFieldsToShow(BibEntry entry);
+&nbsp;
+&nbsp;    public Collection&lt;Field&gt; getShownFields() {
+<b class="nc">&nbsp;        return fields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initPanel() {
+<b class="nc">&nbsp;        if (gridPane == null) {</b>
+<b class="nc">&nbsp;            gridPane = new GridPane();</b>
+<b class="nc">&nbsp;            gridPane.getStyleClass().add(&quot;editorPane&quot;);</b>
+&nbsp;
+&nbsp;            // Wrap everything in a scroll-pane
+<b class="nc">&nbsp;            ScrollPane scrollPane = new ScrollPane();</b>
+<b class="nc">&nbsp;            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);</b>
+<b class="nc">&nbsp;            scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);</b>
+<b class="nc">&nbsp;            scrollPane.setContent(gridPane);</b>
+<b class="nc">&nbsp;            scrollPane.setFitToWidth(true);</b>
+<b class="nc">&nbsp;            scrollPane.setFitToHeight(true);</b>
+&nbsp;
+<b class="nc">&nbsp;            SplitPane container = new SplitPane(scrollPane);</b>
+<b class="nc">&nbsp;            setContent(container);</b>
+&nbsp;
+&nbsp;            // Adaption of visible tabs done in {@link org.jabref.gui.entryeditor.EntryEditor.EntryEditor}, where the subscription to
+&nbsp;            // preferences.getPreviewPreferences().showPreviewAsExtraTabProperty() is established
+&nbsp;
+&nbsp;            // save divider position
+<b class="nc">&nbsp;            dividerPositionSubscription = EasyBind.valueAt(container.getDividers(), 0)</b>
+<b class="nc">&nbsp;                                                  .mapObservable(SplitPane.Divider::positionProperty)</b>
+<b class="nc">&nbsp;                                                  .subscribeToValues(this::savePreviewWidthDividerPosition);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addPreviewPanel() {
+<b class="nc">&nbsp;        assert this.getContent() instanceof SplitPane;</b>
+&nbsp;
+&nbsp;        // Really ensure it is not already there
+<b class="nc">&nbsp;        removePreviewPanelFromThisTab();</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((this.getContent() instanceof SplitPane splitPane) &amp;&amp; !splitPane.getItems().contains(previewPanel) &amp;&amp; this.getContent().isVisible()) {</b>
+<b class="nc">&nbsp;            splitPane.getItems().add(1, previewPanel);</b>
+<b class="nc">&nbsp;            splitPane.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removePreviewPanelFromThisTab() {
+<b class="nc">&nbsp;        assert this.getContent() instanceof SplitPane;</b>
+<b class="nc">&nbsp;        if (this.getContent() instanceof SplitPane splitPane) {</b>
+<b class="nc">&nbsp;            splitPane.getItems().remove(previewPanel);</b>
+&nbsp;            // Needed to &quot;redraw&quot; the split pane with one item (because JavaFX does not readjust if it is shown)
+&nbsp;            // splitPane.setDividerPositions(1.0);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void handleFocus() {
+<b class="nc">&nbsp;        LOGGER.trace(&quot;This is {}&quot;, preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;This is then {}&quot;, !preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());</b>
+<b class="nc">&nbsp;        if (!preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get()) {</b>
+<b class="nc">&nbsp;            LOGGER.trace(&quot;Focus on preview panel&quot;);</b>
+&nbsp;
+&nbsp;            // We need to move the preview panel from the non-visible tab to the visible tab
+<b class="nc">&nbsp;            removePreviewPanelFromOtherTabs();</b>
+<b class="nc">&nbsp;            addPreviewPanel();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void savePreviewWidthDividerPosition(Number position) {
+<b class="nc">&nbsp;        if (position.doubleValue() == 1.0) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (!preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab()) {</b>
+<b class="nc">&nbsp;            preferences.getEntryEditorPreferences().setPreviewWidthDividerPosition(position.doubleValue());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,147 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MetadataSerializationConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util</a>
+</div>
+
+<h1>Coverage Summary for Class: MetadataSerializationConfiguration (org.jabref.logic.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">MetadataSerializationConfiguration</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util;
+&nbsp;
+&nbsp;import org.jabref.model.groups.AllEntriesGroup;
+&nbsp;import org.jabref.model.groups.AutomaticKeywordGroup;
+&nbsp;import org.jabref.model.groups.AutomaticPersonsGroup;
+&nbsp;import org.jabref.model.groups.ExplicitGroup;
+&nbsp;import org.jabref.model.groups.RegexKeywordGroup;
+&nbsp;import org.jabref.model.groups.SearchGroup;
+&nbsp;import org.jabref.model.groups.SmartGroup;
+&nbsp;import org.jabref.model.groups.TexGroup;
+&nbsp;import org.jabref.model.groups.WordKeywordGroup;
+&nbsp;
+&nbsp;/**
+&nbsp; * Specifies how metadata is read and written.
+&nbsp; */
+&nbsp;public class MetadataSerializationConfiguration {
+&nbsp;    /**
+&nbsp;     * Character used for quoting in the string representation.
+&nbsp;     */
+&nbsp;    public static final char GROUP_QUOTE_CHAR = &#39;\\&#39;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Group Type suffix (part of the GroupType)
+&nbsp;     */
+&nbsp;    public static final String GROUP_TYPE_SUFFIX = &quot;:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For separating units (e.g. name and hierarchic context) in the string representation
+&nbsp;     */
+&nbsp;    public static final String GROUP_UNIT_SEPARATOR = &quot;;&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identifier for {@link WordKeywordGroup} and {@link RegexKeywordGroup}.
+&nbsp;     */
+&nbsp;    public static final String KEYWORD_GROUP_ID = &quot;KeywordGroup:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identifier for {@link AllEntriesGroup}.
+&nbsp;     */
+&nbsp;    public static final String ALL_ENTRIES_GROUP_ID = &quot;AllEntriesGroup:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Old identifier for {@link ExplicitGroup} (explicitly contained a list of {@link org.jabref.model.entry.BibEntry}).
+&nbsp;     */
+&nbsp;    public static final String LEGACY_EXPLICIT_GROUP_ID = &quot;ExplicitGroup:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identifier for {@link ExplicitGroup}.
+&nbsp;     */
+&nbsp;    public static final String EXPLICIT_GROUP_ID = &quot;StaticGroup:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identifier for {@link SmartGroup}.
+&nbsp;     */
+&nbsp;    public static final String SMART_GROUP_ID = &quot;SmartGroup:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identifier for {@link SearchGroup}.
+&nbsp;     */
+&nbsp;    public static final String SEARCH_GROUP_ID = &quot;SearchGroup:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identifier for {@link AutomaticPersonsGroup}.
+&nbsp;     */
+&nbsp;    public static final String AUTOMATIC_PERSONS_GROUP_ID = &quot;AutomaticPersonsGroup:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identifier for {@link AutomaticKeywordGroup}.
+&nbsp;     */
+&nbsp;    public static final String AUTOMATIC_KEYWORD_GROUP_ID = &quot;AutomaticKeywordGroup:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identifier for {@link TexGroup}.
+&nbsp;     */
+&nbsp;    public static final String TEX_GROUP_ID = &quot;TexGroup:&quot;;
+&nbsp;
+&nbsp;    private MetadataSerializationConfiguration() {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MapResource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.server.resources</a>
+</div>
+
+<h1>Coverage Summary for Class: MapResource (org.jabref.http.server.resources)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MapResource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.server.resources;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;
+&nbsp;import org.jabref.http.SrvStateManager;
+&nbsp;import org.jabref.http.server.services.FilesToServe;
+&nbsp;import org.jabref.http.server.services.ServerUtils;
+&nbsp;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import jakarta.ws.rs.Consumes;
+&nbsp;import jakarta.ws.rs.GET;
+&nbsp;import jakarta.ws.rs.PUT;
+&nbsp;import jakarta.ws.rs.Path;
+&nbsp;import jakarta.ws.rs.PathParam;
+&nbsp;import jakarta.ws.rs.Produces;
+&nbsp;import jakarta.ws.rs.core.MediaType;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;@Path(&quot;libraries/{id}/map&quot;)
+<b class="nc">&nbsp;public class MapResource {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MapResource.class);</b>
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    SrvStateManager srvStateManager;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    FilesToServe filesToServe;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * At http://localhost:23119/libraries/{id}/map &lt;br&gt;&lt;br&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Looks for the .jmp file in the directory of the given library ({id}.bib file).
+&nbsp;     *
+&nbsp;     * @param id The given library
+&nbsp;     * @return A JSON String containing the mindmap data. If no {id}.jmp file was found, returns the standard mindmap
+&nbsp;     * @throws IOException
+&nbsp;     */
+&nbsp;    @GET
+&nbsp;    @Produces(MediaType.APPLICATION_JSON)
+&nbsp;    public String getJabMapJson(@PathParam(&quot;id&quot;) String id) throws IOException {
+<b class="nc">&nbsp;        boolean isDemo = &quot;demo&quot;.equals(id);</b>
+&nbsp;        java.nio.file.Path jabMapPath;
+<b class="nc">&nbsp;        if (isDemo) {</b>
+<b class="nc">&nbsp;            jabMapPath = getJabMapDemoPath();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            jabMapPath = getJabMapPath(id);</b>
+&nbsp;        }
+&nbsp;        // if no file is found, return the default mindmap
+<b class="nc">&nbsp;        if (!Files.exists(jabMapPath)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;&quot;</b>
+&nbsp;                    {
+&nbsp;                      &quot;map&quot;: {
+&nbsp;                        &quot;meta&quot;: {
+&nbsp;                          &quot;name&quot;: &quot;JabMap&quot;,
+&nbsp;                          &quot;author&quot;: &quot;JabMap&quot;,
+&nbsp;                          &quot;version&quot;: &quot;1.0&quot;
+&nbsp;                        },
+&nbsp;                        &quot;format&quot;: &quot;node_tree&quot;,
+&nbsp;                        &quot;data&quot;: {
+&nbsp;                          &quot;id&quot;: &quot;root&quot;,
+&nbsp;                          &quot;topic&quot;: &quot;JabMap&quot;,
+&nbsp;                          &quot;expanded&quot;: true,
+&nbsp;                          &quot;icons&quot;: [],
+&nbsp;                          &quot;highlight&quot;: null,
+&nbsp;                          &quot;type&quot;: &quot;Text&quot;
+&nbsp;                        }
+&nbsp;                      }
+&nbsp;                    }
+&nbsp;                    &quot;&quot;&quot;;
+&nbsp;        }
+<b class="nc">&nbsp;        return Files.readString(jabMapPath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * At http://localhost:23119/libraries/{id}/map &lt;br&gt;&lt;br&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Saves the mindmap next to its associated library.
+&nbsp;     *
+&nbsp;     * @param id The given library
+&nbsp;     * @throws IOException
+&nbsp;     */
+&nbsp;    @PUT
+&nbsp;    @Consumes(MediaType.APPLICATION_JSON)
+&nbsp;    public void updateJabMapJson(@PathParam(&quot;id&quot;) String id, String fileContent) throws IOException {
+<b class="nc">&nbsp;        boolean isDemo = &quot;demo&quot;.equals(id);</b>
+&nbsp;        java.nio.file.Path targetPath;
+<b class="nc">&nbsp;        if (isDemo) {</b>
+<b class="nc">&nbsp;            targetPath = getJabMapDemoPath();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            targetPath = getJabMapPath(id);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Files.writeString(targetPath, fileContent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private java.nio.file.Path getJabMapPath(String id) {
+<b class="nc">&nbsp;        java.nio.file.Path libraryPath = ServerUtils.getLibraryPath(id, filesToServe, srvStateManager);</b>
+<b class="nc">&nbsp;        String newName = libraryPath.getFileName().toString().replaceFirst(&quot;\\.bib$&quot;, &quot;.jmp&quot;);</b>
+<b class="nc">&nbsp;        return libraryPath.getParent().resolve(newName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private java.nio.file.Path getJabMapDemoPath() {
+<b class="nc">&nbsp;        java.nio.file.Path result = java.nio.file.Path.of(System.getProperty(&quot;java.io.tmpdir&quot;)).resolve(&quot;demo.jmp&quot;);</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Using temporary file for demo jmp: {}&quot;, result);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

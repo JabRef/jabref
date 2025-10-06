@@ -1,0 +1,88 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ParamLayoutFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout</a>
+</div>
+
+<h1>Coverage Summary for Class: ParamLayoutFormatter (org.jabref.logic.layout)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ParamLayoutFormatter</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout;
+&nbsp;
+&nbsp;/**
+&nbsp; * This interface extends LayoutFormatter, adding the capability of taking
+&nbsp; * and additional parameter. Such a parameter is specified in the layout file
+&nbsp; * by the following construct: \format[MyFormatter(argument){\field}
+&nbsp; * If and only if MyFormatter is a class that implements ParamLayoutFormatter,
+&nbsp; * it will be set up with the argument given in the parenthesis by way of the
+&nbsp; * method setArgument(String). If no argument is given, the formatter will be
+&nbsp; * invoked without the setArgument() method being called first.
+&nbsp; */
+&nbsp;public interface ParamLayoutFormatter extends LayoutFormatter {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Method for setting the argument of this formatter.
+&nbsp;     *
+&nbsp;     * @param arg A String argument.
+&nbsp;     */
+&nbsp;    void setArgument(String arg);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

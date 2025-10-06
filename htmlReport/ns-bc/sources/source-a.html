@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LatexCleanupFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.bibtexfields</a>
+</div>
+
+<h1>Coverage Summary for Class: LatexCleanupFormatter (org.jabref.logic.formatter.bibtexfields)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LatexCleanupFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.bibtexfields;
+&nbsp;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;/**
+&nbsp; * Simplifies LaTeX syntax. See {@link org.jabref.logic.layout.format.RemoveLatexCommandsFormatter} for a formatter removing LaTeX commands completely.
+&nbsp; */
+<b class="nc">&nbsp;public class LatexCleanupFormatter extends Formatter {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern REMOVE_REDUNDANT = Pattern</b>
+<b class="nc">&nbsp;            .compile(&quot;(?&lt;!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern REPLACE_WITH_AT = Pattern.compile(&quot;(^|[^\\\\$])\\$&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern REPLACE_EVERY_OTHER_AT = Pattern.compile(&quot;([^@]*)@@([^@]*)@@&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern MOVE_NUMBERS_WITH_OPERATORS = Pattern.compile(&quot;([0-9\\(\\.]+[ ]?[-+/]?[ ]?)\\$&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern MOVE_NUMBERS_RIGHT_INTO_EQUATION = Pattern.compile(&quot;@@([ ]?[-+/]?[ ]?[0-9\\)\\.]+)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern ESCAPE_PERCENT_SIGN_ONCE = Pattern.compile(&quot;(^|[^\\\\%])%&quot;);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;LaTeX cleanup&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKey() {
+<b class="nc">&nbsp;        return &quot;latex_cleanup&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String oldString) {
+<b class="nc">&nbsp;        String newValue = oldString;</b>
+&nbsp;
+&nbsp;        // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted
+<b class="nc">&nbsp;        newValue = newValue.replace(&quot;$$&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        newValue = REMOVE_REDUNDANT.matcher(newValue).replaceAll(&quot;$1&quot;);</b>
+&nbsp;
+&nbsp;        // Move numbers, +, -, /, and brackets into equations
+<b class="nc">&nbsp;        newValue = REPLACE_WITH_AT.matcher(newValue).replaceAll(&quot;$1@@&quot;); // Replace $, but not \$ with @@</b>
+&nbsp;
+<b class="nc">&nbsp;        newValue = REPLACE_EVERY_OTHER_AT.matcher(newValue).replaceAll(&quot;$1\\$$2@@&quot;); // Replace every other @@ with $</b>
+&nbsp;        // newValue = newValue.replaceAll(&quot;([0-9\\(\\.]+) \\$&quot;,&quot;\\$$1\\\\ &quot;); // Move numbers followed by a space left of $ inside the equation, e.g., 0.35 $\mu$m
+&nbsp;
+<b class="nc">&nbsp;        newValue = MOVE_NUMBERS_WITH_OPERATORS.matcher(newValue).replaceAll(&quot;\\$$1&quot;); // Move numbers, possibly with operators +, -, or /,  left of $ into the equation</b>
+<b class="nc">&nbsp;        newValue = MOVE_NUMBERS_RIGHT_INTO_EQUATION.matcher(newValue).replaceAll(&quot; $1@@&quot;); // Move numbers right of @@ into the equation</b>
+&nbsp;
+<b class="nc">&nbsp;        newValue = newValue.replace(&quot;@@&quot;, &quot;$&quot;); // Replace all @@ with $</b>
+<b class="nc">&nbsp;        newValue = newValue.replace(&quot;  &quot;, &quot; &quot;); // Clean up</b>
+<b class="nc">&nbsp;        newValue = newValue.replace(&quot;$$&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        newValue = newValue.replace(&quot; )$&quot;, &quot;)$&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        newValue = ESCAPE_PERCENT_SIGN_ONCE.matcher(newValue).replaceAll(&quot;$1\\\\%&quot;); // escape %, but do not escapee \% again,  used for comments in TeX</b>
+&nbsp;
+<b class="nc">&nbsp;        return newValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Cleans up LaTeX code.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExampleInput() {
+<b class="nc">&nbsp;        return &quot;{VLSI} {DSP}&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

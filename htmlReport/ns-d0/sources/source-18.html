@@ -1,0 +1,607 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PicaXmlParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: PicaXmlParser (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PicaXmlParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/188)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/242)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilder;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;
+<b class="nc">&nbsp;public class PicaXmlParser implements Parser {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PicaXmlParser.class);</b>
+<b class="nc">&nbsp;    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; parseEntries(InputStream inputStream) throws ParseException {
+&nbsp;        try {
+<b class="nc">&nbsp;            DocumentBuilder dbuild = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();</b>
+<b class="nc">&nbsp;            Document content = dbuild.parse(inputStream);</b>
+<b class="nc">&nbsp;            return this.parseEntries(content);</b>
+&nbsp;        } catch (ParserConfigurationException | SAXException | IOException exception) {
+<b class="nc">&nbsp;            throw new ParseException(exception);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; parseEntries(Document content) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // used for creating test cases
+&nbsp;        // XMLUtil.printDocument(content);
+&nbsp;
+<b class="nc">&nbsp;        Element root = (Element) content.getElementsByTagName(&quot;zs:searchRetrieveResponse&quot;).item(0);</b>
+<b class="nc">&nbsp;        Element srwrecords = getChild(&quot;zs:records&quot;, root);</b>
+<b class="nc">&nbsp;        if (srwrecords == null) {</b>
+&nbsp;            // no records found -&gt; return empty list
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;Element&gt; records = getChildren(&quot;zs:record&quot;, srwrecords);</b>
+<b class="nc">&nbsp;        for (Element gvkRecord : records) {</b>
+<b class="nc">&nbsp;            Element e = getChild(&quot;zs:recordData&quot;, gvkRecord);</b>
+<b class="nc">&nbsp;            if (e != null) {</b>
+<b class="nc">&nbsp;                e = getChild(&quot;record&quot;, e);</b>
+<b class="nc">&nbsp;                if (e != null) {</b>
+<b class="nc">&nbsp;                    BibEntry bibEntry = parseEntry(e);</b>
+&nbsp;                    // TODO: Add filtering on years (based on org.jabref.logic.importer.fetcher.transformers.YearRangeByFilteringQueryTransformer.getStartYear)
+<b class="nc">&nbsp;                    result.add(bibEntry);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry parseEntry(Element e) {
+<b class="nc">&nbsp;        String author = null;</b>
+<b class="nc">&nbsp;        String editor = null;</b>
+<b class="nc">&nbsp;        String title = null;</b>
+<b class="nc">&nbsp;        String publisher = null;</b>
+<b class="nc">&nbsp;        String year = null;</b>
+<b class="nc">&nbsp;        String address = null;</b>
+<b class="nc">&nbsp;        String series = null;</b>
+<b class="nc">&nbsp;        String edition = null;</b>
+<b class="nc">&nbsp;        String isbn = null;</b>
+<b class="nc">&nbsp;        String issn = null;</b>
+<b class="nc">&nbsp;        String number = null;</b>
+<b class="nc">&nbsp;        String pagetotal = null;</b>
+<b class="nc">&nbsp;        String volume = null;</b>
+<b class="nc">&nbsp;        String pages = null;</b>
+<b class="nc">&nbsp;        String journal = null;</b>
+<b class="nc">&nbsp;        String ppn = null;</b>
+<b class="nc">&nbsp;        String booktitle = null;</b>
+<b class="nc">&nbsp;        String url = null;</b>
+<b class="nc">&nbsp;        String note = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        String source = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String bibliographicGenre = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String subtitle = &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        EntryType entryType = StandardEntryType.Book; // Default</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Element&gt; datafields = getChildren(&quot;datafield&quot;, e);</b>
+<b class="nc">&nbsp;        for (Element datafield : datafields) {</b>
+<b class="nc">&nbsp;            String tag = datafield.getAttribute(&quot;tag&quot;);</b>
+<b class="nc">&nbsp;            LOGGER.trace(&quot;tag: {}&quot;, tag);</b>
+&nbsp;
+&nbsp;            // genre/type of the entry https://swbtools.bsz-bw.de/cgi-bin/k10plushelp.pl?cmd=kat&amp;val=0500&amp;katalog=Standard
+<b class="nc">&nbsp;            if (&quot;002@&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                bibliographicGenre = getSubfield(&quot;0&quot;, datafield);</b>
+<b class="nc">&nbsp;                if (bibliographicGenre == null) {</b>
+<b class="nc">&nbsp;                    bibliographicGenre = &quot;&quot;;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // ppn
+<b class="nc">&nbsp;            if (&quot;003@&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                ppn = getSubfield(&quot;0&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // author
+<b class="nc">&nbsp;            if (&quot;028A&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                String vorname = getSubfield(&quot;d&quot;, datafield);</b>
+<b class="nc">&nbsp;                String nachname = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (author == null) {</b>
+<b class="nc">&nbsp;                    author = &quot;&quot;;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    author = author.concat(&quot; and &quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                author = author.concat(vorname + &quot; &quot; + nachname);</b>
+&nbsp;            }
+&nbsp;            // author (weiterer)
+<b class="nc">&nbsp;            if (&quot;028B&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                String vorname = getSubfield(&quot;d&quot;, datafield);</b>
+<b class="nc">&nbsp;                String nachname = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (author == null) {</b>
+<b class="nc">&nbsp;                    author = &quot;&quot;;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    author = author.concat(&quot; and &quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                author = author.concat(vorname + &quot; &quot; + nachname);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // editor
+<b class="nc">&nbsp;            if (&quot;028C&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                String vorname = getSubfield(&quot;d&quot;, datafield);</b>
+<b class="nc">&nbsp;                String nachname = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (editor == null) {</b>
+<b class="nc">&nbsp;                    editor = &quot;&quot;;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    editor = editor.concat(&quot; and &quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                editor = editor.concat(vorname + &quot; &quot; + nachname);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // title and subtitle
+<b class="nc">&nbsp;            if (&quot;021A&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                title = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;                subtitle = getSubfield(&quot;d&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // publisher and address
+<b class="nc">&nbsp;            if (&quot;033A&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                publisher = getSubfield(&quot;n&quot;, datafield);</b>
+<b class="nc">&nbsp;                address = getSubfield(&quot;p&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // year
+<b class="nc">&nbsp;            if (&quot;011@&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                year = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // year, volume, number, pages (year bei Zeitschriften (evtl. redundant mit 011@))
+<b class="nc">&nbsp;            if (&quot;031A&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                year = getSubfield(&quot;j&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;                volume = getSubfield(&quot;e&quot;, datafield);</b>
+<b class="nc">&nbsp;                number = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;                pages = getSubfield(&quot;h&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // 036D seems to contain more information than the other fields
+&nbsp;            // overwrite information using that field
+&nbsp;            // 036D also contains information normally found in 036E
+<b class="nc">&nbsp;            if (&quot;036D&quot;.equals(tag)) {</b>
+&nbsp;                // 021 might have been present
+<b class="nc">&nbsp;                if (title != null) {</b>
+&nbsp;                    // convert old title (contained in &quot;a&quot; of 021A) to volume
+<b class="nc">&nbsp;                    if (title.startsWith(&quot;@&quot;)) {</b>
+&nbsp;                        // &quot;@&quot; indicates a number
+<b class="nc">&nbsp;                        title = title.substring(1);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    number = title;</b>
+&nbsp;                }
+&nbsp;                // title and subtitle
+<b class="nc">&nbsp;                title = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;                subtitle = getSubfield(&quot;d&quot;, datafield);</b>
+<b class="nc">&nbsp;                volume = getSubfield(&quot;l&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // series and number
+<b class="nc">&nbsp;            if (&quot;036E&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                series = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;                number = getSubfield(&quot;l&quot;, datafield);</b>
+<b class="nc">&nbsp;                String kor = getSubfield(&quot;b&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (kor != null) {</b>
+<b class="nc">&nbsp;                    series = series + &quot; / &quot; + kor;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // note
+<b class="nc">&nbsp;            if (&quot;037A&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                note = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // edition
+<b class="nc">&nbsp;            if (&quot;032@&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                edition = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // isbn
+<b class="nc">&nbsp;            if (&quot;004A&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                final String isbn10 = getSubfield(&quot;0&quot;, datafield);</b>
+<b class="nc">&nbsp;                final String isbn13 = getSubfield(&quot;A&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (isbn10 != null) {</b>
+<b class="nc">&nbsp;                    isbn = isbn10;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (isbn13 != null) {</b>
+<b class="nc">&nbsp;                    isbn = isbn13;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // Hochschulschriftenvermerk
+&nbsp;            // Bei einer Verlagsdissertation ist der Ort schon eingetragen
+<b class="nc">&nbsp;            if (&quot;037C&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                if (address == null) {</b>
+<b class="nc">&nbsp;                    address = getSubfield(&quot;b&quot;, datafield);</b>
+<b class="nc">&nbsp;                    if (address != null) {</b>
+<b class="nc">&nbsp;                        address = removeSortCharacters(address);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                String st = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;                if ((st != null) &amp;&amp; st.contains(&quot;Diss&quot;)) {</b>
+<b class="nc">&nbsp;                    entryType = StandardEntryType.PhdThesis;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // journal oder booktitle
+&nbsp;
+&nbsp;            /* Problematiken hier: Sowohl für Artikel in
+&nbsp;             * Zeitschriften als für Beiträge in Büchern
+&nbsp;             * wird 027D verwendet. Der Titel muß je nach
+&nbsp;             * Fall booktitle oder journal zugeordnet
+&nbsp;             * werden. Auch bei Zeitschriften werden hier
+&nbsp;             * ggf. Verlag und Ort angegeben (sind dann
+&nbsp;             * eigentlich überflüssig), während bei
+&nbsp;             * Buchbeiträgen Verlag und Ort wichtig sind
+&nbsp;             * (sonst in Kategorie 033A).
+&nbsp;             */
+<b class="nc">&nbsp;            if (&quot;027D&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                journal = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;                booktitle = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;                address = getSubfield(&quot;p&quot;, datafield);</b>
+<b class="nc">&nbsp;                publisher = getSubfield(&quot;n&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // pagetotal
+<b class="nc">&nbsp;            if (&quot;034D&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                pagetotal = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (pagetotal != null) {</b>
+&nbsp;                    // S, S. etc. entfernen
+<b class="nc">&nbsp;                    pagetotal = pagetotal.replaceAll(&quot; S\\.?$&quot;, &quot;&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // Behandlung von Konferenzen
+<b class="nc">&nbsp;            if (&quot;030F&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                address = getSubfield(&quot;k&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!&quot;proceedings&quot;.equals(entryType.getName())) {</b>
+<b class="nc">&nbsp;                    subtitle = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                entryType = StandardEntryType.Proceedings;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Wenn eine Verlagsdiss vorliegt
+<b class="nc">&nbsp;            if (entryType.equals(StandardEntryType.PhdThesis) &amp;&amp; (isbn != null)) {</b>
+<b class="nc">&nbsp;                entryType = StandardEntryType.Book;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Hilfskategorien zur Entscheidung @article
+&nbsp;            // oder @incollection; hier könnte man auch die
+&nbsp;            // ISBN herausparsen als Erleichterung für das
+&nbsp;            // Auffinden der Quelle, die über die
+&nbsp;            // SRU-Schnittstelle gelieferten Daten zur
+&nbsp;            // Quelle unvollständig sind (z.B. nicht Serie
+&nbsp;            // und Nummer angegeben werden)
+<b class="nc">&nbsp;            if (&quot;039B&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                source = getSubfield(&quot;8&quot;, datafield);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (&quot;046R&quot;.equals(tag) &amp;&amp; ((source == null) || source.isEmpty())) {</b>
+<b class="nc">&nbsp;                source = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // URLs behandeln
+<b class="nc">&nbsp;            if (&quot;009P&quot;.equals(tag) &amp;&amp; (&quot;03&quot;.equals(datafield.getAttribute(&quot;occurrence&quot;))</b>
+<b class="nc">&nbsp;                    || &quot;05&quot;.equals(datafield.getAttribute(&quot;occurrence&quot;))) &amp;&amp; (url == null)) {</b>
+<b class="nc">&nbsp;                url = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (source == null) {</b>
+<b class="nc">&nbsp;            source = &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (author != null) {</b>
+<b class="nc">&nbsp;            author = removeSortCharacters(author);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (editor != null) {</b>
+<b class="nc">&nbsp;            editor = removeSortCharacters(editor);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (title != null) {</b>
+<b class="nc">&nbsp;            title = removeSortCharacters(title);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (subtitle != null) {</b>
+<b class="nc">&nbsp;            subtitle = removeSortCharacters(subtitle);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (bibliographicGenre.startsWith(&quot;As&quot;)) {</b>
+<b class="nc">&nbsp;            entryType = BibEntry.DEFAULT_TYPE;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (source.contains(&quot;ISBN&quot;)) {</b>
+<b class="nc">&nbsp;                entryType = StandardEntryType.InCollection;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (source.contains(&quot;ZDB-ID&quot;)) {</b>
+<b class="nc">&nbsp;                entryType = StandardEntryType.Article;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (bibliographicGenre.isEmpty()) {</b>
+<b class="nc">&nbsp;            entryType = BibEntry.DEFAULT_TYPE;</b>
+<b class="nc">&nbsp;        } else if (bibliographicGenre.startsWith(&quot;O&quot;)) {</b>
+&nbsp;            // Oa is standalone so we assume we have a book
+<b class="nc">&nbsp;            if (bibliographicGenre.startsWith(&quot;Oa&quot;) &amp;&amp; isbn != null) {</b>
+<b class="nc">&nbsp;                entryType = StandardEntryType.Book;</b>
+&nbsp;            }
+&nbsp;            // 0b is journal
+<b class="nc">&nbsp;            if (bibliographicGenre.startsWith(&quot;Ob&quot;)) {</b>
+<b class="nc">&nbsp;                entryType = StandardEntryType.Article;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Wahrscheinlichkeit, dass ZDB-ID
+&nbsp;         * vorhanden ist, ist größer als ISBN bei
+&nbsp;         * Buchbeiträgen. Daher bei As?-Sätzen am besten immer
+&nbsp;         * dann @incollection annehmen, wenn weder ISBN noch
+&nbsp;         * ZDB-ID vorhanden sind.
+&nbsp;         */
+<b class="nc">&nbsp;        BibEntry result = new BibEntry(entryType);</b>
+&nbsp;
+&nbsp;        // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
+<b class="nc">&nbsp;        if (author != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.AUTHOR, author);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (editor != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.EDITOR, editor);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (title != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.TITLE, title);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!StringUtil.isNullOrEmpty(subtitle)) {</b>
+&nbsp;            // ensure that first letter is an upper case letter
+&nbsp;            // there could be the edge case that the string is only one character long, therefore, this special treatment
+&nbsp;            // this is Apache commons lang StringUtils.capitalize (https://commons.apache.org/proper/commons-lang/javadocs/api-release/org/apache/commons/lang3/StringUtils.html#capitalize%28java.lang.String%29), but we don&#39;t want to add an additional dependency  (&#39;org.apache.commons:commons-lang3:3.4&#39;)
+<b class="nc">&nbsp;            StringBuilder newSubtitle = new StringBuilder(</b>
+<b class="nc">&nbsp;                    Character.toString(Character.toUpperCase(subtitle.charAt(0))));</b>
+<b class="nc">&nbsp;            if (subtitle.length() &gt; 1) {</b>
+<b class="nc">&nbsp;                newSubtitle.append(subtitle.substring(1));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            result.setField(StandardField.SUBTITLE, newSubtitle.toString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (publisher != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.PUBLISHER, publisher);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (year != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.YEAR, year);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (address != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.ADDRESS, address);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (series != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.SERIES, series);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (edition != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.EDITION, edition);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (isbn != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.ISBN, isbn);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (issn != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.ISSN, issn);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (number != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.NUMBER, number);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (pagetotal != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.PAGETOTAL, pagetotal);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (pages != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.PAGES, pages);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (volume != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.VOLUME, volume);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (journal != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.JOURNAL, journal);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (ppn != null) {</b>
+<b class="nc">&nbsp;            result.setField(new UnknownField(&quot;ppn_GVK&quot;), ppn);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (url != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.URL, url);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (note != null) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.NOTE, note);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (&quot;article&quot;.equals(entryType.getName()) &amp;&amp; (journal != null)) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.JOURNAL, journal);</b>
+<b class="nc">&nbsp;        } else if (&quot;incollection&quot;.equals(entryType.getName()) &amp;&amp; (booktitle != null)) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.BOOKTITLE, booktitle);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getSubfield(String a, Element datafield) {
+<b class="nc">&nbsp;        List&lt;Element&gt; subfields = getChildren(&quot;subfield&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Element subfield : subfields) {</b>
+<b class="nc">&nbsp;            if (subfield.getAttribute(&quot;code&quot;).equalsIgnoreCase(a)) {</b>
+<b class="nc">&nbsp;                return subfield.getTextContent();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Element getChild(String name, Element e) {
+<b class="nc">&nbsp;        if (e == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        NodeList children = e.getChildNodes();</b>
+&nbsp;
+<b class="nc">&nbsp;        int j = children.getLength();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; j; i++) {</b>
+<b class="nc">&nbsp;            Node test = children.item(i);</b>
+<b class="nc">&nbsp;            if (test.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc">&nbsp;                Element entry = (Element) test;</b>
+<b class="nc">&nbsp;                if (entry.getTagName().equals(name)) {</b>
+<b class="nc">&nbsp;                    return entry;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Element&gt; getChildren(String name, Element e) {
+<b class="nc">&nbsp;        List&lt;Element&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        NodeList children = e.getChildNodes();</b>
+&nbsp;
+<b class="nc">&nbsp;        int j = children.getLength();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; j; i++) {</b>
+<b class="nc">&nbsp;            Node test = children.item(i);</b>
+<b class="nc">&nbsp;            if (test.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc">&nbsp;                Element entry = (Element) test;</b>
+<b class="nc">&nbsp;                if (entry.getTagName().equals(name)) {</b>
+<b class="nc">&nbsp;                    result.add(entry);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String removeSortCharacters(String input) {
+<b class="nc">&nbsp;        return input.replaceAll(&quot;\\@&quot;, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

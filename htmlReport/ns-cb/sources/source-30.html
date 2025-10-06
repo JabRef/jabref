@@ -1,0 +1,338 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringerNatureWebFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringerNatureWebFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringerNatureWebFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.Month;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import com.google.common.base.Strings;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// Fetches data from Springer Nature
+&nbsp;///
+&nbsp;/// See &lt;https://dev.springernature.com/docs/api-endpoints/meta-api/?source=jabref&gt; for more information
+&nbsp;public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
+&nbsp;    public static final String FETCHER_NAME = &quot;Springer&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SpringerNatureWebFetcher.class);</b>
+&nbsp;
+&nbsp;    private static final String API_URL = &quot;https://api.springernature.com/meta/v2/json&quot;;
+&nbsp;    // Springer query using the parameter &#39;q=doi:10.1007/s11276-008-0131-4s=1&#39; will respond faster
+&nbsp;    private static final String TEST_URL_WITHOUT_API_KEY = &quot;https://api.springernature.com/meta/v2/json?q=doi:10.1007/s11276-008-0131-4s=1&amp;p=1&amp;api_key=&quot;;
+&nbsp;
+&nbsp;    private final ImporterPreferences importerPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public SpringerNatureWebFetcher(ImporterPreferences importerPreferences) {</b>
+<b class="nc">&nbsp;        this.importerPreferences = importerPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert a JSONObject obtained from &lt;a href=&quot;https://dev.springernature.com/docs/api-endpoints/metadata-api/?source=jabref&quot;&gt;the Metadata API&lt;/a&gt; to a BibEntry
+&nbsp;     *
+&nbsp;     * @param springerJsonEntry the JSONObject from search results
+&nbsp;     * @return the converted BibEntry
+&nbsp;     */
+&nbsp;    public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
+&nbsp;        // Fields that are directly accessible at the top level Json object
+<b class="nc">&nbsp;        Field[] singleFieldStrings = {StandardField.ISSN, StandardField.VOLUME, StandardField.ABSTRACT, StandardField.DOI, StandardField.TITLE, StandardField.NUMBER,</b>
+&nbsp;                StandardField.PUBLISHER};
+&nbsp;
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry();</b>
+&nbsp;        Field nametype;
+&nbsp;
+&nbsp;        // Guess publication type
+<b class="nc">&nbsp;        String isbn = springerJsonEntry.optString(&quot;isbn&quot;);</b>
+<b class="nc">&nbsp;        if (Strings.isNullOrEmpty(isbn)) {</b>
+&nbsp;            // Probably article
+<b class="nc">&nbsp;            entry.setType(StandardEntryType.Article);</b>
+<b class="nc">&nbsp;            nametype = StandardField.JOURNAL;</b>
+&nbsp;        } else {
+&nbsp;            // Probably book chapter or from proceeding, go for book chapter
+<b class="nc">&nbsp;            entry.setType(StandardEntryType.InCollection);</b>
+<b class="nc">&nbsp;            nametype = StandardField.BOOKTITLE;</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.ISBN, isbn);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Authors
+<b class="nc">&nbsp;        if (springerJsonEntry.has(&quot;creators&quot;)) {</b>
+<b class="nc">&nbsp;            JSONArray authors = springerJsonEntry.getJSONArray(&quot;creators&quot;);</b>
+<b class="nc">&nbsp;            List&lt;String&gt; authorList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; authors.length(); i++) {</b>
+<b class="nc">&nbsp;                if (authors.getJSONObject(i).has(&quot;creator&quot;)) {</b>
+<b class="nc">&nbsp;                    authorList.add(authors.getJSONObject(i).getString(&quot;creator&quot;));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Empty author name.&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            entry.setField(StandardField.AUTHOR, String.join(&quot; and &quot;, authorList));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.info(&quot;No author found.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Direct accessible fields
+<b class="nc">&nbsp;        for (Field field : singleFieldStrings) {</b>
+<b class="nc">&nbsp;            if (springerJsonEntry.has(field.getName())) {</b>
+<b class="nc">&nbsp;                String text = springerJsonEntry.getString(field.getName());</b>
+<b class="nc">&nbsp;                if (!text.isEmpty()) {</b>
+<b class="nc">&nbsp;                    entry.setField(field, text);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Page numbers
+<b class="nc">&nbsp;        if (springerJsonEntry.has(&quot;startingPage&quot;) &amp;&amp; !springerJsonEntry.getString(&quot;startingPage&quot;).isEmpty()) {</b>
+<b class="nc">&nbsp;            if (springerJsonEntry.has(&quot;endingPage&quot;) &amp;&amp; !springerJsonEntry.getString(&quot;endingPage&quot;).isEmpty()) {</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.PAGES,</b>
+<b class="nc">&nbsp;                        springerJsonEntry.getString(&quot;startingPage&quot;) + &quot;--&quot; + springerJsonEntry.getString(&quot;endingPage&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                entry.setField(StandardField.PAGES, springerJsonEntry.getString(&quot;startingPage&quot;));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Journal
+<b class="nc">&nbsp;        if (springerJsonEntry.has(&quot;publicationName&quot;)) {</b>
+<b class="nc">&nbsp;            entry.setField(nametype, springerJsonEntry.getString(&quot;publicationName&quot;));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Online file
+<b class="nc">&nbsp;        if (springerJsonEntry.has(&quot;url&quot;)) {</b>
+<b class="nc">&nbsp;            JSONArray urls = springerJsonEntry.optJSONArray(&quot;url&quot;);</b>
+<b class="nc">&nbsp;            if (urls == null) {</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.URL, springerJsonEntry.optString(&quot;url&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                urls.forEach(data -&gt; {</b>
+<b class="nc">&nbsp;                    JSONObject url = (JSONObject) data;</b>
+<b class="nc">&nbsp;                    if (&quot;pdf&quot;.equalsIgnoreCase(url.optString(&quot;format&quot;))) {</b>
+&nbsp;                        try {
+<b class="nc">&nbsp;                            entry.addFile(new LinkedFile(URLUtil.create(url.optString(&quot;value&quot;)), &quot;PDF&quot;));</b>
+&nbsp;                        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;                            LOGGER.info(&quot;Malformed URL: {}&quot;, url.optString(&quot;value&quot;));</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                });
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Date
+<b class="nc">&nbsp;        if (springerJsonEntry.has(&quot;publicationDate&quot;)) {</b>
+<b class="nc">&nbsp;            String date = springerJsonEntry.getString(&quot;publicationDate&quot;);</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.DATE, date); // For biblatex</b>
+<b class="nc">&nbsp;            String[] dateparts = date.split(&quot;-&quot;);</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.YEAR, dateparts[0]);</b>
+<b class="nc">&nbsp;            Optional&lt;Month&gt; month = Month.getMonthByNumber(Integer.parseInt(dateparts[1]));</b>
+<b class="nc">&nbsp;            month.ifPresent(entry::setMonth);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Clean up abstract (often starting with Abstract)
+<b class="nc">&nbsp;        entry.getField(StandardField.ABSTRACT).ifPresent(abstractContents -&gt; {</b>
+<b class="nc">&nbsp;            if (abstractContents.startsWith(&quot;Abstract&quot;)) {</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.ABSTRACT, abstractContents.substring(8));</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return FETCHER_NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_SPRINGER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTestUrl() {
+<b class="nc">&nbsp;        return TEST_URL_WITHOUT_API_KEY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the query URL
+&nbsp;     *
+&nbsp;     * @param queryNode  the search query
+&nbsp;     * @param pageNumber the number of the page indexed from 0
+&nbsp;     * @return URL
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(API_URL);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;q&quot;, new SpringerQueryTransformer().transformSearchQuery(queryNode).orElse(&quot;&quot;)); // Search query</b>
+<b class="nc">&nbsp;        importerPreferences.getApiKey(getName()).ifPresent(key -&gt; uriBuilder.addParameter(&quot;api_key&quot;, key)); // API key</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;s&quot;, String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;p&quot;, String.valueOf(getPageSize())); // Page size</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String constructComplexQueryString(ComplexSearchQuery complexSearchQuery) {
+<b class="nc">&nbsp;        List&lt;String&gt; searchTerms = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        complexSearchQuery.getAuthors().forEach(author -&gt; searchTerms.add(&quot;name:&quot; + author));</b>
+<b class="nc">&nbsp;        complexSearchQuery.getTitlePhrases().forEach(title -&gt; searchTerms.add(&quot;title:&quot; + title));</b>
+<b class="nc">&nbsp;        complexSearchQuery.getJournal().ifPresent(journal -&gt; searchTerms.add(&quot;journal:&quot; + journal));</b>
+&nbsp;        // Since Springer API does not support year range search, we ignore formYear and toYear and use &quot;singleYear&quot; only
+<b class="nc">&nbsp;        complexSearchQuery.getSingleYear().ifPresent(year -&gt; searchTerms.add(&quot;date:&quot; + year + &quot;*&quot;));</b>
+<b class="nc">&nbsp;        searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());</b>
+<b class="nc">&nbsp;        return String.join(&quot; AND &quot;, searchTerms);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return inputStream -&gt; {</b>
+<b class="nc">&nbsp;            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));</b>
+<b class="nc">&nbsp;            JSONObject jsonObject = new JSONObject(response);</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; entries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            if (jsonObject.has(&quot;records&quot;)) {</b>
+<b class="nc">&nbsp;                JSONArray results = jsonObject.getJSONArray(&quot;records&quot;);</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; results.length(); i++) {</b>
+<b class="nc">&nbsp;                    JSONObject jsonEntry = results.getJSONObject(i);</b>
+<b class="nc">&nbsp;                    BibEntry entry = parseSpringerJSONtoBibtex(jsonEntry);</b>
+<b class="nc">&nbsp;                    entries.add(entry);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return entries;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

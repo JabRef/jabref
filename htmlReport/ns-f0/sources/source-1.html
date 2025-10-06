@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RemoteListenerServer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.remote.server</a>
+</div>
+
+<h1>Coverage Summary for Class: RemoteListenerServer (org.jabref.logic.remote.server)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoteListenerServer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RemoteListenerServer$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.remote.server;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.ServerSocket;
+&nbsp;import java.net.Socket;
+&nbsp;import java.net.SocketException;
+&nbsp;
+&nbsp;import javafx.util.Pair;
+&nbsp;
+&nbsp;import org.jabref.logic.remote.Protocol;
+&nbsp;import org.jabref.logic.remote.RemoteMessage;
+&nbsp;import org.jabref.logic.remote.RemotePreferences;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class RemoteListenerServer implements Runnable {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServer.class);</b>
+&nbsp;
+&nbsp;    private static final int BACKLOG = 1;
+&nbsp;
+&nbsp;    private static final int TIMEOUT = 1000;
+&nbsp;
+&nbsp;    private final RemoteMessageHandler messageHandler;
+&nbsp;    private final ServerSocket serverSocket;
+&nbsp;
+<b class="nc">&nbsp;    public RemoteListenerServer(RemoteMessageHandler messageHandler, int port) throws IOException {</b>
+<b class="nc">&nbsp;        this.serverSocket = new ServerSocket(port, BACKLOG, RemotePreferences.getIpAddress());</b>
+<b class="nc">&nbsp;        this.messageHandler = messageHandler;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void run() {
+&nbsp;        try {
+<b class="nc">&nbsp;            while (!Thread.interrupted()) {</b>
+<b class="nc">&nbsp;                try (Socket socket = serverSocket.accept()) {</b>
+<b class="nc">&nbsp;                    socket.setSoTimeout(TIMEOUT);</b>
+<b class="nc">&nbsp;                    try (Protocol protocol = new Protocol(socket)) {</b>
+<b class="nc">&nbsp;                        Pair&lt;RemoteMessage, Object&gt; input = protocol.receiveMessage();</b>
+<b class="nc">&nbsp;                        handleMessage(protocol, input.getKey(), input.getValue());</b>
+&nbsp;                    }
+&nbsp;                } catch (SocketException ex) {
+&nbsp;                    return;
+&nbsp;                } catch (IOException e) {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;RemoteListenerServer crashed&quot;, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } finally {
+<b class="nc">&nbsp;            closeServerSocket();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleMessage(Protocol protocol, RemoteMessage type, Object argument) throws IOException {
+<b class="nc">&nbsp;        switch (type) {</b>
+&nbsp;            case PING:
+<b class="nc">&nbsp;                protocol.sendMessage(RemoteMessage.PONG, Protocol.IDENTIFIER);</b>
+&nbsp;                break;
+&nbsp;            case SEND_COMMAND_LINE_ARGUMENTS:
+<b class="nc">&nbsp;                if (argument instanceof String[] strings) {</b>
+<b class="nc">&nbsp;                    messageHandler.handleCommandLineArguments(strings);</b>
+<b class="nc">&nbsp;                    protocol.sendMessage(RemoteMessage.OK);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new IOException(&quot;Argument for &#39;SEND_COMMAND_LINE_ARGUMENTS&#39; is not of type String[]. Got &quot; + argument);</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            case FOCUS:
+<b class="nc">&nbsp;                messageHandler.handleFocus();</b>
+<b class="nc">&nbsp;                protocol.sendMessage(RemoteMessage.OK);</b>
+&nbsp;                break;
+&nbsp;            default:
+<b class="nc">&nbsp;                throw new IOException(&quot;Unhandled message to server &quot; + type);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void closeServerSocket() {
+&nbsp;        try {
+<b class="nc">&nbsp;            serverSocket.close();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Unable to close server socket&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

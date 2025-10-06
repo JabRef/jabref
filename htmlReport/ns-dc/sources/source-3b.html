@@ -1,0 +1,461 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RTFChars</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: RTFChars (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RTFChars</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/383)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/179)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.logic.layout.StringInt;
+&nbsp;import org.jabref.logic.util.strings.RtfCharMap;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Transform a LaTeX-String to RTF.
+&nbsp; * &lt;p&gt;
+&nbsp; * This method will:
+&nbsp; * &lt;p&gt;
+&nbsp; * 1.) Remove LaTeX-Command sequences.
+&nbsp; * &lt;p&gt;
+&nbsp; * 2.) Replace LaTeX-Special chars with RTF equivalents.
+&nbsp; * &lt;p&gt;
+&nbsp; * 3.) Replace emph and textit and textbf with their RTF replacements.
+&nbsp; * &lt;p&gt;
+&nbsp; * 4.) Take special care to save all unicode characters correctly.
+&nbsp; * &lt;p&gt;
+&nbsp; * 5.) Replace --- by \emdash and -- by \endash.
+&nbsp; */
+<b class="nc">&nbsp;public class RTFChars implements LayoutFormatter {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(RTFChars.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final RtfCharMap RTF_CHARS = new RtfCharMap();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String field) {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        StringBuilder currentCommand = null;</b>
+<b class="nc">&nbsp;        boolean escaped = false;</b>
+<b class="nc">&nbsp;        boolean incommand = false;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; field.length(); i++) {</b>
+<b class="nc">&nbsp;            char c = field.charAt(i);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (escaped &amp;&amp; (c == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                sb.append(&#39;\\&#39;);</b>
+<b class="nc">&nbsp;                escaped = false;</b>
+<b class="nc">&nbsp;            } else if (c == &#39;\\&#39;) {</b>
+<b class="nc">&nbsp;                escaped = true;</b>
+<b class="nc">&nbsp;                incommand = true;</b>
+<b class="nc">&nbsp;                currentCommand = new StringBuilder();</b>
+<b class="nc">&nbsp;            } else if (!incommand &amp;&amp; ((c == &#39;{&#39;) || (c == &#39;}&#39;))) {</b>
+&nbsp;                // Swallow the brace.
+<b class="nc">&nbsp;            } else if (Character.isLetter(c)</b>
+<b class="nc">&nbsp;                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {</b>
+<b class="nc">&nbsp;                escaped = false;</b>
+<b class="nc">&nbsp;                if (incommand) {</b>
+&nbsp;                    // Else we are in a command, and should not keep the letter.
+<b class="nc">&nbsp;                    currentCommand.append(c);</b>
+&nbsp;                    testCharCom:
+<b class="nc">&nbsp;                    if ((currentCommand.length() == 1)</b>
+<b class="nc">&nbsp;                            &amp;&amp; StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {</b>
+&nbsp;                        // This indicates that we are in a command of the type
+&nbsp;                        // \^o or \~{n}
+<b class="nc">&nbsp;                        if (i &gt;= (field.length() - 1)) {</b>
+&nbsp;                            break testCharCom;
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        String command = currentCommand.toString();</b>
+<b class="nc">&nbsp;                        i++;</b>
+<b class="nc">&nbsp;                        c = field.charAt(i);</b>
+&nbsp;                        String combody;
+<b class="nc">&nbsp;                        if (c == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                            StringInt part = getPart(field, i, true);</b>
+<b class="nc">&nbsp;                            i += part.i;</b>
+<b class="nc">&nbsp;                            combody = part.s;</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            combody = field.substring(i, i + 1);</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        String result = RTF_CHARS.get(command + combody);</b>
+&nbsp;
+<b class="nc">&nbsp;                        if (result != null) {</b>
+<b class="nc">&nbsp;                            sb.append(result);</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        incommand = false;</b>
+<b class="nc">&nbsp;                        escaped = false;</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    sb.append(c);</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                testContent:
+<b class="nc">&nbsp;                if (!incommand || (!Character.isWhitespace(c) &amp;&amp; (c != &#39;{&#39;) &amp;&amp; (c != &#39;}&#39;))) {</b>
+<b class="nc">&nbsp;                    sb.append(c);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    assert incommand;</b>
+&nbsp;
+&nbsp;                    // First test for braces that may be part of a LaTeX command:
+<b class="nc">&nbsp;                    if ((c == &#39;{&#39;) &amp;&amp; (currentCommand.isEmpty())) {</b>
+&nbsp;                        // We have seen something like \{, which is probably the start
+&nbsp;                        // of a command like \{aa}. Swallow the brace.
+&nbsp;                        continue;
+<b class="nc">&nbsp;                    } else if ((c == &#39;}&#39;) &amp;&amp; (!currentCommand.isEmpty())) {</b>
+&nbsp;                        // Seems to be the end of a command like \{aa}. Look it up:
+<b class="nc">&nbsp;                        String command = currentCommand.toString();</b>
+<b class="nc">&nbsp;                        String result = RTF_CHARS.get(command);</b>
+<b class="nc">&nbsp;                        if (result != null) {</b>
+<b class="nc">&nbsp;                            sb.append(result);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        incommand = false;</b>
+<b class="nc">&nbsp;                        escaped = false;</b>
+&nbsp;                        continue;
+&nbsp;                    }
+&nbsp;
+&nbsp;                    // Then look for italics etc.,
+&nbsp;                    // but first check if we are already at the end of the string.
+<b class="nc">&nbsp;                    if (i &gt;= (field.length() - 1)) {</b>
+&nbsp;                        break testContent;
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (((c == &#39;{&#39;) || (c == &#39; &#39;)) &amp;&amp; (!currentCommand.isEmpty())) {</b>
+<b class="nc">&nbsp;                        String command = currentCommand.toString();</b>
+&nbsp;                        // Then test if we are dealing with a italics or bold
+&nbsp;                        // command. If so, handle.
+<b class="nc">&nbsp;                        if (&quot;em&quot;.equals(command) || &quot;emph&quot;.equals(command) || &quot;textit&quot;.equals(command)</b>
+<b class="nc">&nbsp;                                || &quot;it&quot;.equals(command)) {</b>
+<b class="nc">&nbsp;                            StringInt part = getPart(field, i, c == &#39;{&#39;);</b>
+<b class="nc">&nbsp;                            i += part.i;</b>
+<b class="nc">&nbsp;                            sb.append(&quot;{\\i &quot;).append(part.s).append(&#39;}&#39;);</b>
+<b class="nc">&nbsp;                        } else if (&quot;textbf&quot;.equals(command) || &quot;bf&quot;.equals(command)) {</b>
+<b class="nc">&nbsp;                            StringInt part = getPart(field, i, c == &#39;{&#39;);</b>
+<b class="nc">&nbsp;                            i += part.i;</b>
+<b class="nc">&nbsp;                            sb.append(&quot;{\\b &quot;).append(part.s).append(&#39;}&#39;);</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            LOGGER.info(&quot;Unknown command {}&quot;, command);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        if (c == &#39; &#39;) {</b>
+&nbsp;                            // command was separated with the content by &#39; &#39;
+&nbsp;                            // We have to add the space a
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        sb.append(c);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                incommand = false;</b>
+<b class="nc">&nbsp;                escaped = false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        char[] chars = sb.toString().toCharArray();</b>
+<b class="nc">&nbsp;        sb = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (char c : chars) {</b>
+<b class="nc">&nbsp;            if (c &lt; 128) {</b>
+<b class="nc">&nbsp;                sb.append(c);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                sb.append(&quot;\\u&quot;).append((long) c).append(transformSpecialCharacter(c));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return sb.toString().replace(&quot;---&quot;, &quot;{\\emdash}&quot;).replace(&quot;--&quot;, &quot;{\\endash}&quot;).replace(&quot;``&quot;, &quot;{\\ldblquote}&quot;)</b>
+<b class="nc">&nbsp;                 .replace(&quot;&#39;&#39;&quot;, &quot;{\\rdblquote}&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param text                  the text to extract the part from
+&nbsp;     * @param i                     the position to start
+&nbsp;     * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
+&nbsp;     * @return a tuple of number of added characters and the extracted part
+&nbsp;     */
+&nbsp;    private StringInt getPart(String text, int i, boolean commandNestedInBraces) {
+&nbsp;        char c;
+<b class="nc">&nbsp;        int count = 0;</b>
+<b class="nc">&nbsp;        int icount = i;</b>
+<b class="nc">&nbsp;        StringBuilder part = new StringBuilder();</b>
+&nbsp;        loop:
+<b class="nc">&nbsp;        while ((count &gt;= 0) &amp;&amp; (icount &lt; text.length())) {</b>
+<b class="nc">&nbsp;            icount++;</b>
+<b class="nc">&nbsp;            c = text.charAt(icount);</b>
+<b class="nc">&nbsp;            switch (c) {</b>
+&nbsp;                case &#39;}&#39;:
+<b class="nc">&nbsp;                    count--;</b>
+&nbsp;                    break;
+&nbsp;                case &#39;{&#39;:
+<b class="nc">&nbsp;                    count++;</b>
+&nbsp;                    break;
+&nbsp;                case &#39; &#39;:
+<b class="nc">&nbsp;                    if (!commandNestedInBraces) {</b>
+&nbsp;                        // in any case, a space terminates the loop
+&nbsp;                        break loop;
+&nbsp;                    }
+&nbsp;                    break;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+<b class="nc">&nbsp;            part.append(c);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String res = part.toString();</b>
+&nbsp;        // the wrong &quot;}&quot; at the end is removed by &quot;format(res)&quot;
+<b class="nc">&nbsp;        return new StringInt(format(res), part.length());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method transforms the unicode of a special character into its base character: 233 (é) - &gt; e
+&nbsp;     *
+&nbsp;     * @param c long
+&nbsp;     * @return returns the basic character of the given unicode
+&nbsp;     */
+&nbsp;    private String transformSpecialCharacter(long c) {
+<b class="nc">&nbsp;        if (((192 &lt;= c) &amp;&amp; (c &lt;= 197)) || (c == 256) || (c == 258) || (c == 260)) {</b>
+<b class="nc">&nbsp;            return &quot;A&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((224 &lt;= c) &amp;&amp; (c &lt;= 229)) || (c == 257) || (c == 259) || (c == 261)) {</b>
+<b class="nc">&nbsp;            return &quot;a&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((199 == c) || (262 == c) || (264 == c) || (266 == c) || (268 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;C&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((231 == c) || (263 == c) || (265 == c) || (267 == c) || (269 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;c&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((208 == c) || (272 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;D&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((240 == c) || (273 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;d&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((200 &lt;= c) &amp;&amp; (c &lt;= 203)) || (274 == c) || (276 == c) || (278 == c) || (280 == c) || (282 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;E&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((232 &lt;= c) &amp;&amp; (c &lt;= 235)) || (275 == c) || (277 == c) || (279 == c) || (281 == c) || (283 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;e&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((284 == c) || (286 == c)) || (288 == c) || (290 == c) || (330 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;G&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((285 == c) || (287 == c) || (289 == c) || (291 == c) || (331 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;g&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((292 == c) || (294 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;H&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((293 == c) || (295 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;h&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((204 &lt;= c) &amp;&amp; (c &lt;= 207)) || (296 == c) || (298 == c) || (300 == c) || (302 == c) || (304 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;I&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((236 &lt;= c) &amp;&amp; (c &lt;= 239)) || (297 == c) || (299 == c) || (301 == c) || (303 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;i&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (308 == c) {</b>
+<b class="nc">&nbsp;            return &quot;J&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (309 == c) {</b>
+<b class="nc">&nbsp;            return &quot;j&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (310 == c) {</b>
+<b class="nc">&nbsp;            return &quot;K&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (311 == c) {</b>
+<b class="nc">&nbsp;            return &quot;k&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((313 == c) || (315 == c) || (319 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;L&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((314 == c) || (316 == c) || (320 == c) || (322 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;l&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((209 == c) || (323 == c) || (325 == c) || (327 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;N&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((241 == c) || (324 == c) || (326 == c) || (328 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;n&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((210 &lt;= c) &amp;&amp; (c &lt;= 214)) || (c == 216) || (332 == c) || (334 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;O&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((242 &lt;= c) &amp;&amp; (c &lt;= 248) &amp;&amp; (247 != c)) || (333 == c) || (335 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;o&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((340 == c) || (342 == c) || (344 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;R&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((341 == c) || (343 == c) || (345 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;r&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((346 == c) || (348 == c) || (350 == c) || (352 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;S&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((347 == c) || (349 == c) || (351 == c) || (353 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;s&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((354 == c) || (356 == c) || (358 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;T&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((355 == c) || (359 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;t&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((217 &lt;= c) &amp;&amp; (c &lt;= 220)) || (360 == c) || (362 == c) || (364 == c) || (366 == c) || (370 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;U&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (((249 &lt;= c) &amp;&amp; (c &lt;= 251)) || (361 == c) || (363 == c) || (365 == c) || (367 == c) || (371 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;u&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (372 == c) {</b>
+<b class="nc">&nbsp;            return &quot;W&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (373 == c) {</b>
+<b class="nc">&nbsp;            return &quot;w&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((374 == c) || (376 == c) || (221 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;Y&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((375 == c) || (255 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;y&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((377 == c) || (379 == c) || (381 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;Z&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((378 == c) || (380 == c) || (382 == c)) {</b>
+<b class="nc">&nbsp;            return &quot;z&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (198 == c) {</b>
+<b class="nc">&nbsp;            return &quot;AE&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (230 == c) {</b>
+<b class="nc">&nbsp;            return &quot;ae&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (338 == c) {</b>
+<b class="nc">&nbsp;            return &quot;OE&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (339 == c) {</b>
+<b class="nc">&nbsp;            return &quot;oe&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (222 == c) {</b>
+<b class="nc">&nbsp;            return &quot;TH&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (223 == c) {</b>
+<b class="nc">&nbsp;            return &quot;ss&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (161 == c) {</b>
+<b class="nc">&nbsp;            return &quot;!&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;?&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

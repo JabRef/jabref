@@ -1,0 +1,250 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitCommitDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.git</a>
+</div>
+
+<h1>Coverage Summary for Class: GitCommitDialogViewModel (org.jabref.gui.git)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitCommitDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.git;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.git.GitHandler;
+&nbsp;import org.jabref.logic.git.status.GitStatusChecker;
+&nbsp;import org.jabref.logic.git.status.GitStatusSnapshot;
+&nbsp;import org.jabref.logic.git.util.GitHandlerRegistry;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;import org.eclipse.jgit.api.errors.GitAPIException;
+&nbsp;
+&nbsp;public class GitCommitDialogViewModel extends AbstractViewModel {
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final GitHandlerRegistry gitHandlerRegistry;
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty commitMessage = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty amend = new SimpleBooleanProperty(false);</b>
+&nbsp;
+&nbsp;    private final Validator commitMessageValidator;
+&nbsp;
+&nbsp;    public GitCommitDialogViewModel(
+&nbsp;            StateManager stateManager,
+&nbsp;            DialogService dialogService,
+&nbsp;            TaskExecutor taskExecutor,
+<b class="nc">&nbsp;            GitHandlerRegistry gitHandlerRegistry) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.gitHandlerRegistry = gitHandlerRegistry;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.commitMessageValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                commitMessage,
+<b class="nc">&nbsp;                message -&gt; message != null &amp;&amp; !message.trim().isEmpty(),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Commit message cannot be empty&quot;))</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public void commit(Runnable onSuccess) {
+<b class="nc">&nbsp;        commitTask()</b>
+<b class="nc">&nbsp;                .onSuccess(_ -&gt; {</b>
+<b class="nc">&nbsp;                    dialogService.notify(Localization.lang(&quot;Committed successfully&quot;));</b>
+<b class="nc">&nbsp;                    onSuccess.run();</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onFailure(ex -&gt;</b>
+<b class="nc">&nbsp;                        dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                                Localization.lang(&quot;Git Commit Failed&quot;),</b>
+<b class="nc">&nbsp;                                ex.getMessage(),</b>
+&nbsp;                                ex
+&nbsp;                        )
+&nbsp;                )
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BackgroundTask&lt;Void&gt; commitTask() {
+<b class="nc">&nbsp;        return BackgroundTask.wrap(() -&gt; {</b>
+<b class="nc">&nbsp;            doCommit();</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doCommit() throws JabRefException, GitAPIException, IOException {
+<b class="nc">&nbsp;        Optional&lt;BibDatabaseContext&gt; activeDatabaseOpt = stateManager.getActiveDatabase();</b>
+<b class="nc">&nbsp;        if (activeDatabaseOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(Localization.lang(&quot;No library open&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BibDatabaseContext dbContext = activeDatabaseOpt.get();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; bibFilePathOpt = dbContext.getDatabasePath();</b>
+<b class="nc">&nbsp;        if (bibFilePathOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(Localization.lang(&quot;No library file path. Please save the library to a file first.&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Path bibFilePath = bibFilePathOpt.get();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);</b>
+<b class="nc">&nbsp;        if (repoRootOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(Localization.lang(&quot;Commit aborted: Path is not inside a Git repository.&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GitHandler gitHandler = gitHandlerRegistry.get(repoRootOpt.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);</b>
+<b class="nc">&nbsp;        if (!status.tracking()) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(Localization.lang(&quot;Commit aborted: The file is not under Git version control.&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (status.conflict()) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(Localization.lang(&quot;Commit aborted: Local repository has unresolved merge conflicts.&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String message = commitMessage.get();</b>
+<b class="nc">&nbsp;        if (message == null || message.isBlank()) {</b>
+<b class="nc">&nbsp;            message = Localization.lang(&quot;Update references&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean committed = gitHandler.createCommitOnCurrentBranch(message, amend.get());</b>
+&nbsp;        // TODO: Replace control-flow-by-exception with a proper control structure
+<b class="nc">&nbsp;        if (!committed) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(Localization.lang(&quot;Nothing to commit.&quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty commitMessageProperty() {
+<b class="nc">&nbsp;        return commitMessage;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty amendProperty() {
+<b class="nc">&nbsp;        return amend;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus commitMessageValidation() {
+<b class="nc">&nbsp;        return commitMessageValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

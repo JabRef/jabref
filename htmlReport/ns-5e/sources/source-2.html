@@ -1,0 +1,767 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AiTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.ai</a>
+</div>
+
+<h1>Coverage Summary for Class: AiTabViewModel (org.jabref.gui.preferences.ai)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AiTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/265)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AiTabViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/266)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.ai;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.ReadOnlyListProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.logic.ai.AiDefaultPreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.ai.templates.AiTemplate;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.LocalizedNumbers;
+&nbsp;import org.jabref.logic.util.OptionalObjectProperty;
+&nbsp;import org.jabref.model.ai.AiProvider;
+&nbsp;import org.jabref.model.ai.EmbeddingModel;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;
+&nbsp;public class AiTabViewModel implements PreferenceTabViewModel {
+&nbsp;    private final Locale oldLocale;
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty enableAi = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty autoGenerateEmbeddings = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty disableAutoGenerateEmbeddings = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty autoGenerateSummaries = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty disableAutoGenerateSummaries = new SimpleBooleanProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;AiProvider&gt; aiProvidersList =</b>
+<b class="nc">&nbsp;            new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList(AiProvider.values()));</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;AiProvider&gt; selectedAiProvider = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;String&gt; chatModelsList =</b>
+<b class="nc">&nbsp;            new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty currentChatModel = new SimpleStringProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty openAiChatModel = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty mistralAiChatModel = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty geminiChatModel = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty huggingFaceChatModel = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty gpt4AllChatModel = new SimpleStringProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty currentApiKey = new SimpleStringProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty openAiApiKey = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty mistralAiApiKey = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty geminiAiApiKey = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty huggingFaceApiKey = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty gpt4AllApiKey = new SimpleStringProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;EmbeddingModel&gt; embeddingModelsList =</b>
+<b class="nc">&nbsp;            new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList(EmbeddingModel.values()));</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;EmbeddingModel&gt; selectedEmbeddingModel = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty currentApiBaseUrl = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(true); // {@link HuggingFaceChatModel} and {@link GoogleAiGeminiChatModel} doesn&#39;t support setting API base URL</b>
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty openAiApiBaseUrl = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty mistralAiApiBaseUrl = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty geminiApiBaseUrl = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty huggingFaceApiBaseUrl = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty gpt4AllApiBaseUrl = new SimpleStringProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;AiTemplate, StringProperty&gt; templateSources = Map.of(</b>
+&nbsp;            AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(),
+&nbsp;            AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(),
+&nbsp;            AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, new SimpleStringProperty(),
+&nbsp;            AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, new SimpleStringProperty(),
+&nbsp;            AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(),
+&nbsp;            AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(),
+&nbsp;            AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(),
+&nbsp;            AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty()
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    private final OptionalObjectProperty&lt;AiTemplate&gt; selectedTemplate = OptionalObjectProperty.empty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty temperature = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final IntegerProperty contextWindowSize = new SimpleIntegerProperty();</b>
+<b class="nc">&nbsp;    private final IntegerProperty documentSplitterChunkSize = new SimpleIntegerProperty();</b>
+<b class="nc">&nbsp;    private final IntegerProperty documentSplitterOverlapSize = new SimpleIntegerProperty();</b>
+<b class="nc">&nbsp;    private final IntegerProperty ragMaxResultsCount = new SimpleIntegerProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty ragMinScore = new SimpleStringProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty disableBasicSettings = new SimpleBooleanProperty(true);</b>
+<b class="nc">&nbsp;    private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);</b>
+&nbsp;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;
+&nbsp;    private final Validator apiKeyValidator;
+&nbsp;    private final Validator chatModelValidator;
+&nbsp;    private final Validator apiBaseUrlValidator;
+&nbsp;    private final Validator embeddingModelValidator;
+&nbsp;    private final Validator temperatureTypeValidator;
+&nbsp;    private final Validator temperatureRangeValidator;
+&nbsp;    private final Validator contextWindowSizeValidator;
+&nbsp;    private final Validator documentSplitterChunkSizeValidator;
+&nbsp;    private final Validator documentSplitterOverlapSizeValidator;
+&nbsp;    private final Validator ragMaxResultsCountValidator;
+&nbsp;    private final Validator ragMinScoreTypeValidator;
+&nbsp;    private final Validator ragMinScoreRangeValidator;
+&nbsp;
+<b class="nc">&nbsp;    public AiTabViewModel(CliPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.oldLocale = Locale.getDefault();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.aiPreferences = preferences.getAiPreferences();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.enableAi.addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            disableBasicSettings.set(!newValue);</b>
+<b class="nc">&nbsp;            disableExpertSettings.set(!newValue || !customizeExpertSettings.get());</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        this.customizeExpertSettings.addListener((_, _, newValue) -&gt;</b>
+<b class="nc">&nbsp;                disableExpertSettings.set(!newValue || !enableAi.get())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        this.selectedAiProvider.addListener((_, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; models = AiDefaultPreferences.getAvailableModels(newValue);</b>
+&nbsp;
+<b class="nc">&nbsp;            disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);</b>
+&nbsp;
+&nbsp;            // When we setAll on Hugging Face, models are empty, and currentChatModel become null.
+&nbsp;            // It becomes null because currentChatModel is bound to combobox, and this combobox becomes empty.
+&nbsp;            // For some reason, custom edited value in the combobox will be erased, so we need to store the old value.
+<b class="nc">&nbsp;            String oldChatModel = currentChatModel.get();</b>
+<b class="nc">&nbsp;            chatModelsList.setAll(models);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (oldValue != null) {</b>
+<b class="nc">&nbsp;                switch (oldValue) {</b>
+&nbsp;                    case OPEN_AI -&gt; {
+<b class="nc">&nbsp;                        openAiChatModel.set(oldChatModel);</b>
+<b class="nc">&nbsp;                        openAiApiKey.set(currentApiKey.get());</b>
+<b class="nc">&nbsp;                        openAiApiBaseUrl.set(currentApiBaseUrl.get());</b>
+&nbsp;                    }
+&nbsp;                    case MISTRAL_AI -&gt; {
+<b class="nc">&nbsp;                        mistralAiChatModel.set(oldChatModel);</b>
+<b class="nc">&nbsp;                        mistralAiApiKey.set(currentApiKey.get());</b>
+<b class="nc">&nbsp;                        mistralAiApiBaseUrl.set(currentApiBaseUrl.get());</b>
+&nbsp;                    }
+&nbsp;                    case GEMINI -&gt; {
+<b class="nc">&nbsp;                        geminiChatModel.set(oldChatModel);</b>
+<b class="nc">&nbsp;                        geminiAiApiKey.set(currentApiKey.get());</b>
+<b class="nc">&nbsp;                        geminiApiBaseUrl.set(currentApiBaseUrl.get());</b>
+&nbsp;                    }
+&nbsp;                    case HUGGING_FACE -&gt; {
+<b class="nc">&nbsp;                        huggingFaceChatModel.set(oldChatModel);</b>
+<b class="nc">&nbsp;                        huggingFaceApiKey.set(currentApiKey.get());</b>
+<b class="nc">&nbsp;                        huggingFaceApiBaseUrl.set(currentApiBaseUrl.get());</b>
+&nbsp;                    }
+&nbsp;                    case GPT4ALL -&gt; {
+<b class="nc">&nbsp;                        gpt4AllChatModel.set(oldChatModel);</b>
+<b class="nc">&nbsp;                        gpt4AllApiKey.set(currentApiKey.get());</b>
+<b class="nc">&nbsp;                        gpt4AllApiBaseUrl.set(currentApiBaseUrl.get());</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            switch (newValue) {</b>
+&nbsp;                case OPEN_AI -&gt; {
+<b class="nc">&nbsp;                    currentChatModel.set(openAiChatModel.get());</b>
+<b class="nc">&nbsp;                    currentApiKey.set(openAiApiKey.get());</b>
+<b class="nc">&nbsp;                    currentApiBaseUrl.set(openAiApiBaseUrl.get());</b>
+&nbsp;                }
+&nbsp;                case MISTRAL_AI -&gt; {
+<b class="nc">&nbsp;                    currentChatModel.set(mistralAiChatModel.get());</b>
+<b class="nc">&nbsp;                    currentApiKey.set(mistralAiApiKey.get());</b>
+<b class="nc">&nbsp;                    currentApiBaseUrl.set(mistralAiApiBaseUrl.get());</b>
+&nbsp;                }
+&nbsp;                case GEMINI -&gt; {
+<b class="nc">&nbsp;                    currentChatModel.set(geminiChatModel.get());</b>
+<b class="nc">&nbsp;                    currentApiKey.set(geminiAiApiKey.get());</b>
+<b class="nc">&nbsp;                    currentApiBaseUrl.set(geminiApiBaseUrl.get());</b>
+&nbsp;                }
+&nbsp;                case HUGGING_FACE -&gt; {
+<b class="nc">&nbsp;                    currentChatModel.set(huggingFaceChatModel.get());</b>
+<b class="nc">&nbsp;                    currentApiKey.set(huggingFaceApiKey.get());</b>
+<b class="nc">&nbsp;                    currentApiBaseUrl.set(huggingFaceApiBaseUrl.get());</b>
+&nbsp;                }
+&nbsp;                case GPT4ALL -&gt; {
+<b class="nc">&nbsp;                    currentChatModel.set(gpt4AllChatModel.get());</b>
+<b class="nc">&nbsp;                    currentApiKey.set(gpt4AllApiKey.get());</b>
+<b class="nc">&nbsp;                    currentApiBaseUrl.set(gpt4AllApiBaseUrl.get());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        this.currentChatModel.addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (newValue == null) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            switch (selectedAiProvider.get()) {</b>
+&nbsp;                case OPEN_AI -&gt;
+<b class="nc">&nbsp;                        openAiChatModel.set(newValue);</b>
+&nbsp;                case MISTRAL_AI -&gt;
+<b class="nc">&nbsp;                        mistralAiChatModel.set(newValue);</b>
+&nbsp;                case GEMINI -&gt;
+<b class="nc">&nbsp;                        geminiChatModel.set(newValue);</b>
+&nbsp;                case HUGGING_FACE -&gt;
+<b class="nc">&nbsp;                        huggingFaceChatModel.set(newValue);</b>
+&nbsp;                case GPT4ALL -&gt;
+<b class="nc">&nbsp;                        gpt4AllChatModel.set(newValue);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), newValue));</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        this.currentApiKey.addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            switch (selectedAiProvider.get()) {</b>
+&nbsp;                case OPEN_AI -&gt;
+<b class="nc">&nbsp;                        openAiApiKey.set(newValue);</b>
+&nbsp;                case MISTRAL_AI -&gt;
+<b class="nc">&nbsp;                        mistralAiApiKey.set(newValue);</b>
+&nbsp;                case GEMINI -&gt;
+<b class="nc">&nbsp;                        geminiAiApiKey.set(newValue);</b>
+&nbsp;                case HUGGING_FACE -&gt;
+<b class="nc">&nbsp;                        huggingFaceApiKey.set(newValue);</b>
+&nbsp;                case GPT4ALL -&gt;
+<b class="nc">&nbsp;                        gpt4AllApiKey.set(newValue);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        this.currentApiBaseUrl.addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            switch (selectedAiProvider.get()) {</b>
+&nbsp;                case OPEN_AI -&gt;
+<b class="nc">&nbsp;                        openAiApiBaseUrl.set(newValue);</b>
+&nbsp;                case MISTRAL_AI -&gt;
+<b class="nc">&nbsp;                        mistralAiApiBaseUrl.set(newValue);</b>
+&nbsp;                case GEMINI -&gt;
+<b class="nc">&nbsp;                        geminiApiBaseUrl.set(newValue);</b>
+&nbsp;                case HUGGING_FACE -&gt;
+<b class="nc">&nbsp;                        huggingFaceApiBaseUrl.set(newValue);</b>
+&nbsp;                case GPT4ALL -&gt;
+<b class="nc">&nbsp;                        gpt4AllApiBaseUrl.set(newValue);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        this.apiKeyValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                currentApiKey,
+<b class="nc">&nbsp;                token -&gt; !StringUtil.isBlank(token),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;An API key has to be provided&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.chatModelValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                currentChatModel,
+<b class="nc">&nbsp;                chatModel -&gt; !StringUtil.isBlank(chatModel),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Chat model has to be provided&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.apiBaseUrlValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                currentApiBaseUrl,
+<b class="nc">&nbsp;                token -&gt; !StringUtil.isBlank(token),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;API base URL has to be provided&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.embeddingModelValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                selectedEmbeddingModel,
+&nbsp;                Objects::nonNull,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Embedding model has to be provided&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.temperatureTypeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                temperature,
+<b class="nc">&nbsp;                temp -&gt; LocalizedNumbers.stringToDouble(temp).isPresent(),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Temperature must be a number&quot;)));</b>
+&nbsp;
+&nbsp;        // Source: https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature
+<b class="nc">&nbsp;        this.temperatureRangeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                temperature,
+<b class="nc">&nbsp;                temp -&gt; LocalizedNumbers.stringToDouble(temp).map(t -&gt; t &gt;= 0 &amp;&amp; t &lt;= 2).orElse(false),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Temperature must be between 0 and 2&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.contextWindowSizeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                contextWindowSize,
+<b class="nc">&nbsp;                size -&gt; size.intValue() &gt; 0,</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Context window size must be greater than 0&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.documentSplitterChunkSizeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                documentSplitterChunkSize,
+<b class="nc">&nbsp;                size -&gt; size.intValue() &gt; 0,</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Document splitter chunk size must be greater than 0&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                documentSplitterOverlapSize,
+<b class="nc">&nbsp;                size -&gt; size.intValue() &gt; 0 &amp;&amp; size.intValue() &lt; documentSplitterChunkSize.get(),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Document splitter overlap size must be greater than 0 and less than chunk size&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.ragMaxResultsCountValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                ragMaxResultsCount,
+<b class="nc">&nbsp;                count -&gt; count.intValue() &gt; 0,</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;RAG max results count must be greater than 0&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.ragMinScoreTypeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                ragMinScore,
+<b class="nc">&nbsp;                minScore -&gt; LocalizedNumbers.stringToDouble(minScore).isPresent(),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;RAG minimum score must be a number&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.ragMinScoreRangeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                ragMinScore,
+<b class="nc">&nbsp;                minScore -&gt; LocalizedNumbers.stringToDouble(minScore).map(s -&gt; s &gt; 0 &amp;&amp; s &lt; 1).orElse(false),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;RAG minimum score must be greater than 0 and less than 1&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        openAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.OPEN_AI));</b>
+<b class="nc">&nbsp;        mistralAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));</b>
+<b class="nc">&nbsp;        geminiAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.GEMINI));</b>
+<b class="nc">&nbsp;        huggingFaceApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));</b>
+<b class="nc">&nbsp;        gpt4AllApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.GPT4ALL));</b>
+&nbsp;
+<b class="nc">&nbsp;        openAiApiBaseUrl.setValue(aiPreferences.getOpenAiApiBaseUrl());</b>
+<b class="nc">&nbsp;        mistralAiApiBaseUrl.setValue(aiPreferences.getMistralAiApiBaseUrl());</b>
+<b class="nc">&nbsp;        geminiApiBaseUrl.setValue(aiPreferences.getGeminiApiBaseUrl());</b>
+<b class="nc">&nbsp;        huggingFaceApiBaseUrl.setValue(aiPreferences.getHuggingFaceApiBaseUrl());</b>
+<b class="nc">&nbsp;        gpt4AllApiBaseUrl.setValue(aiPreferences.getGpt4AllApiBaseUrl());</b>
+&nbsp;
+<b class="nc">&nbsp;        openAiChatModel.setValue(aiPreferences.getOpenAiChatModel());</b>
+<b class="nc">&nbsp;        mistralAiChatModel.setValue(aiPreferences.getMistralAiChatModel());</b>
+<b class="nc">&nbsp;        geminiChatModel.setValue(aiPreferences.getGeminiChatModel());</b>
+<b class="nc">&nbsp;        huggingFaceChatModel.setValue(aiPreferences.getHuggingFaceChatModel());</b>
+<b class="nc">&nbsp;        gpt4AllChatModel.setValue(aiPreferences.getGpt4AllChatModel());</b>
+&nbsp;
+<b class="nc">&nbsp;        enableAi.setValue(aiPreferences.getEnableAi());</b>
+<b class="nc">&nbsp;        autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());</b>
+<b class="nc">&nbsp;        autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());</b>
+&nbsp;
+<b class="nc">&nbsp;        selectedAiProvider.setValue(aiPreferences.getAiProvider());</b>
+&nbsp;
+<b class="nc">&nbsp;        customizeExpertSettings.setValue(aiPreferences.getCustomizeExpertSettings());</b>
+&nbsp;
+<b class="nc">&nbsp;        selectedEmbeddingModel.setValue(aiPreferences.getEmbeddingModel());</b>
+&nbsp;
+<b class="nc">&nbsp;        Arrays.stream(AiTemplate.values()).forEach(template -&gt;</b>
+<b class="nc">&nbsp;                templateSources.get(template).set(aiPreferences.getTemplate(template)));</b>
+&nbsp;
+<b class="nc">&nbsp;        temperature.setValue(LocalizedNumbers.doubleToString(aiPreferences.getTemperature()));</b>
+<b class="nc">&nbsp;        contextWindowSize.setValue(aiPreferences.getContextWindowSize());</b>
+<b class="nc">&nbsp;        documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());</b>
+<b class="nc">&nbsp;        documentSplitterOverlapSize.setValue(aiPreferences.getDocumentSplitterOverlapSize());</b>
+<b class="nc">&nbsp;        ragMaxResultsCount.setValue(aiPreferences.getRagMaxResultsCount());</b>
+<b class="nc">&nbsp;        ragMinScore.setValue(LocalizedNumbers.doubleToString(aiPreferences.getRagMinScore()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        aiPreferences.setEnableAi(enableAi.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.setAiProvider(selectedAiProvider.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.setOpenAiChatModel(openAiChatModel.get() == null ? &quot;&quot; : openAiChatModel.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setMistralAiChatModel(mistralAiChatModel.get() == null ? &quot;&quot; : mistralAiChatModel.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setGeminiChatModel(geminiChatModel.get() == null ? &quot;&quot; : geminiChatModel.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get() == null ? &quot;&quot; : huggingFaceChatModel.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setGpt4AllChatModel(gpt4AllChatModel.get() == null ? &quot;&quot; : gpt4AllChatModel.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.storeAiApiKeyInKeyring(AiProvider.OPEN_AI, openAiApiKey.get() == null ? &quot;&quot; : openAiApiKey.get());</b>
+<b class="nc">&nbsp;        aiPreferences.storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI, mistralAiApiKey.get() == null ? &quot;&quot; : mistralAiApiKey.get());</b>
+<b class="nc">&nbsp;        aiPreferences.storeAiApiKeyInKeyring(AiProvider.GEMINI, geminiAiApiKey.get() == null ? &quot;&quot; : geminiAiApiKey.get());</b>
+<b class="nc">&nbsp;        aiPreferences.storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, huggingFaceApiKey.get() == null ? &quot;&quot; : huggingFaceApiKey.get());</b>
+<b class="nc">&nbsp;        aiPreferences.storeAiApiKeyInKeyring(AiProvider.GPT4ALL, gpt4AllApiKey.get() == null ? &quot;&quot; : gpt4AllApiKey.get());</b>
+&nbsp;        // We notify in all cases without a real check if something was changed
+<b class="nc">&nbsp;        aiPreferences.apiKeyUpdated();</b>
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.setOpenAiApiBaseUrl(openAiApiBaseUrl.get() == null ? &quot;&quot; : openAiApiBaseUrl.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setMistralAiApiBaseUrl(mistralAiApiBaseUrl.get() == null ? &quot;&quot; : mistralAiApiBaseUrl.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setGeminiApiBaseUrl(geminiApiBaseUrl.get() == null ? &quot;&quot; : geminiApiBaseUrl.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get() == null ? &quot;&quot; : huggingFaceApiBaseUrl.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setGpt4AllApiBaseUrl(gpt4AllApiBaseUrl.get() == null ? &quot;&quot; : gpt4AllApiBaseUrl.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        Arrays.stream(AiTemplate.values()).forEach(template -&gt;</b>
+<b class="nc">&nbsp;                aiPreferences.setTemplate(template, templateSources.get(template).get()));</b>
+&nbsp;
+&nbsp;        // We already check the correctness of temperature and RAG minimum score in validators, so we don&#39;t need to check it here.
+<b class="nc">&nbsp;        aiPreferences.setTemperature(LocalizedNumbers.stringToDouble(oldLocale, temperature.get()).get());</b>
+<b class="nc">&nbsp;        aiPreferences.setContextWindowSize(contextWindowSize.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());</b>
+<b class="nc">&nbsp;        aiPreferences.setRagMinScore(LocalizedNumbers.stringToDouble(oldLocale, ragMinScore.get()).get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetExpertSettings() {
+<b class="nc">&nbsp;        String resetApiBaseUrl = selectedAiProvider.get().getApiUrl();</b>
+<b class="nc">&nbsp;        currentApiBaseUrl.set(resetApiBaseUrl);</b>
+&nbsp;
+<b class="nc">&nbsp;        contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), currentChatModel.get()));</b>
+&nbsp;
+<b class="nc">&nbsp;        temperature.set(LocalizedNumbers.doubleToString(AiDefaultPreferences.TEMPERATURE));</b>
+<b class="nc">&nbsp;        documentSplitterChunkSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);</b>
+<b class="nc">&nbsp;        documentSplitterOverlapSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);</b>
+<b class="nc">&nbsp;        ragMaxResultsCount.set(AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);</b>
+<b class="nc">&nbsp;        ragMinScore.set(LocalizedNumbers.doubleToString(AiDefaultPreferences.RAG_MIN_SCORE));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetTemplates() {
+<b class="nc">&nbsp;        Arrays.stream(AiTemplate.values()).forEach(template -&gt;</b>
+<b class="nc">&nbsp;                templateSources.get(template).set(AiDefaultPreferences.TEMPLATES.get(template)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetCurrentTemplate() {
+<b class="nc">&nbsp;        selectedTemplateProperty().get().ifPresent(template -&gt; {</b>
+<b class="nc">&nbsp;            String defaultTemplate = AiDefaultPreferences.TEMPLATES.get(template);</b>
+<b class="nc">&nbsp;            templateSources.get(template).set(defaultTemplate);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean validateSettings() {
+<b class="nc">&nbsp;        if (enableAi.get()) {</b>
+<b class="nc">&nbsp;            if (customizeExpertSettings.get()) {</b>
+<b class="nc">&nbsp;                return validateBasicSettings() &amp;&amp; validateExpertSettings();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return validateBasicSettings();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean validateBasicSettings() {
+<b class="nc">&nbsp;        List&lt;Validator&gt; validators = List.of(</b>
+&nbsp;                chatModelValidator
+&nbsp;                // apiKeyValidator -- skipped, it will generate warning, but the preferences should be able to save.
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean validateExpertSettings() {
+<b class="nc">&nbsp;        List&lt;Validator&gt; validators = List.of(</b>
+&nbsp;                apiBaseUrlValidator,
+&nbsp;                embeddingModelValidator,
+&nbsp;                temperatureTypeValidator,
+&nbsp;                temperatureRangeValidator,
+&nbsp;                contextWindowSizeValidator,
+&nbsp;                documentSplitterChunkSizeValidator,
+&nbsp;                documentSplitterOverlapSizeValidator,
+&nbsp;                ragMaxResultsCountValidator,
+&nbsp;                ragMinScoreTypeValidator,
+&nbsp;                ragMinScoreRangeValidator
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty enableAi() {
+<b class="nc">&nbsp;        return enableAi;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty autoGenerateEmbeddings() {
+<b class="nc">&nbsp;        return autoGenerateEmbeddings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty disableAutoGenerateEmbeddings() {
+<b class="nc">&nbsp;        return disableAutoGenerateEmbeddings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty autoGenerateSummaries() {
+<b class="nc">&nbsp;        return autoGenerateSummaries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty disableAutoGenerateSummaries() {
+<b class="nc">&nbsp;        return disableAutoGenerateSummaries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyListProperty&lt;AiProvider&gt; aiProvidersProperty() {
+<b class="nc">&nbsp;        return aiProvidersList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;AiProvider&gt; selectedAiProviderProperty() {
+<b class="nc">&nbsp;        return selectedAiProvider;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyListProperty&lt;String&gt; chatModelsProperty() {
+<b class="nc">&nbsp;        return chatModelsList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty selectedChatModelProperty() {
+<b class="nc">&nbsp;        return currentChatModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty apiKeyProperty() {
+<b class="nc">&nbsp;        return currentApiKey;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty customizeExpertSettingsProperty() {
+<b class="nc">&nbsp;        return customizeExpertSettings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyListProperty&lt;EmbeddingModel&gt; embeddingModelsProperty() {
+<b class="nc">&nbsp;        return embeddingModelsList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;EmbeddingModel&gt; selectedEmbeddingModelProperty() {
+<b class="nc">&nbsp;        return selectedEmbeddingModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty apiBaseUrlProperty() {
+<b class="nc">&nbsp;        return currentApiBaseUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty disableApiBaseUrlProperty() {
+<b class="nc">&nbsp;        return disableApiBaseUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;AiTemplate, StringProperty&gt; getTemplateSources() {
+<b class="nc">&nbsp;        return templateSources;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OptionalObjectProperty&lt;AiTemplate&gt; selectedTemplateProperty() {
+<b class="nc">&nbsp;        return selectedTemplate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty temperatureProperty() {
+<b class="nc">&nbsp;        return temperature;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty contextWindowSizeProperty() {
+<b class="nc">&nbsp;        return contextWindowSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty documentSplitterChunkSizeProperty() {
+<b class="nc">&nbsp;        return documentSplitterChunkSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty documentSplitterOverlapSizeProperty() {
+<b class="nc">&nbsp;        return documentSplitterOverlapSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty ragMaxResultsCountProperty() {
+<b class="nc">&nbsp;        return ragMaxResultsCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty ragMinScoreProperty() {
+<b class="nc">&nbsp;        return ragMinScore;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty disableBasicSettingsProperty() {
+<b class="nc">&nbsp;        return disableBasicSettings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty disableExpertSettingsProperty() {
+<b class="nc">&nbsp;        return disableExpertSettings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getApiTokenValidationStatus() {
+<b class="nc">&nbsp;        return apiKeyValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getChatModelValidationStatus() {
+<b class="nc">&nbsp;        return chatModelValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getApiBaseUrlValidationStatus() {
+<b class="nc">&nbsp;        return apiBaseUrlValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getEmbeddingModelValidationStatus() {
+<b class="nc">&nbsp;        return embeddingModelValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getTemperatureTypeValidationStatus() {
+<b class="nc">&nbsp;        return temperatureTypeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getTemperatureRangeValidationStatus() {
+<b class="nc">&nbsp;        return temperatureRangeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getMessageWindowSizeValidationStatus() {
+<b class="nc">&nbsp;        return contextWindowSizeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getDocumentSplitterChunkSizeValidationStatus() {
+<b class="nc">&nbsp;        return documentSplitterChunkSizeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getDocumentSplitterOverlapSizeValidationStatus() {
+<b class="nc">&nbsp;        return documentSplitterOverlapSizeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getRagMaxResultsCountValidationStatus() {
+<b class="nc">&nbsp;        return ragMaxResultsCountValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getRagMinScoreTypeValidationStatus() {
+<b class="nc">&nbsp;        return ragMinScoreTypeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus getRagMinScoreRangeValidationStatus() {
+<b class="nc">&nbsp;        return ragMinScoreRangeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

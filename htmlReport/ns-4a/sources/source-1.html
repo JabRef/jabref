@@ -1,0 +1,277 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GeneralPropertiesView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.libraryproperties.general</a>
+</div>
+
+<h1>Coverage Summary for Class: GeneralPropertiesView (org.jabref.gui.libraryproperties.general)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GeneralPropertiesView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.libraryproperties.general;
+&nbsp;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.JabRefIconView;
+&nbsp;import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;import static org.jabref.gui.icon.IconTheme.JabRefIcons.ABSOLUTE_PATH;
+&nbsp;import static org.jabref.gui.icon.IconTheme.JabRefIcons.RELATIVE_PATH;
+&nbsp;
+&nbsp;public class GeneralPropertiesView extends AbstractPropertiesTabView&lt;GeneralPropertiesViewModel&gt; {
+&nbsp;    @FXML private ComboBox&lt;Charset&gt; encoding;
+&nbsp;    @FXML private ComboBox&lt;BibDatabaseMode&gt; databaseMode;
+&nbsp;    @FXML private TextField librarySpecificFileDirectory;
+&nbsp;    @FXML private TextField userSpecificFileDirectory;
+&nbsp;    @FXML private TextField latexFileDirectory;
+&nbsp;    @FXML private Button libSpecificFileDirSwitchId;
+&nbsp;    @FXML private Button userSpecificFileDirSwitchId;
+&nbsp;    @FXML private Button laTexSpecificFileDirSwitchId;
+&nbsp;    @FXML private JabRefIconView libSpecificFileDirSwitchIcon;
+&nbsp;    @FXML private JabRefIconView userSpecificFileDirSwitchIcon;
+&nbsp;    @FXML private JabRefIconView laTexSpecificFileDirSwitchIcon;
+&nbsp;    @FXML private Tooltip libSpecificFileDirSwitchTooltip;
+&nbsp;    @FXML private Tooltip userSpecificFileDirSwitchTooltip;
+&nbsp;    @FXML private Tooltip laTexSpecificFileDirSwitchTooltip;
+&nbsp;    @FXML private Tooltip userSpecificFileDirectoryTooltip;
+&nbsp;    @FXML private Tooltip latexFileDirectoryTooltip;
+&nbsp;    @FXML private Tooltip librarySpecificFileDirectoryTooltip;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer librarySpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();</b>
+<b class="nc">&nbsp;    private final ControlsFxVisualizer userSpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();</b>
+<b class="nc">&nbsp;    private final ControlsFxVisualizer latexFileDirectoryValidationVisualizer = new ControlsFxVisualizer();</b>
+<b class="nc">&nbsp;    private final String switchToRelativeText = Localization.lang(&quot;Switch to relative path: converts the path to a relative path.&quot;);</b>
+<b class="nc">&nbsp;    private final String switchToAbsoluteText = Localization.lang(&quot;Switch to absolute path: converts the path to an absolute path.&quot;);</b>
+&nbsp;
+&nbsp;    @Inject private CliPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public GeneralPropertiesView(BibDatabaseContext databaseContext) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;General&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;Charset&gt;()</b>
+<b class="nc">&nbsp;                .withText(Charset::displayName)</b>
+<b class="nc">&nbsp;                .install(encoding);</b>
+<b class="nc">&nbsp;        encoding.disableProperty().bind(viewModel.encodingDisableProperty());</b>
+<b class="nc">&nbsp;        encoding.itemsProperty().bind(viewModel.encodingsProperty());</b>
+<b class="nc">&nbsp;        encoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;BibDatabaseMode&gt;()</b>
+<b class="nc">&nbsp;                .withText(BibDatabaseMode::getFormattedName)</b>
+<b class="nc">&nbsp;                .install(databaseMode);</b>
+<b class="nc">&nbsp;        databaseMode.itemsProperty().bind(viewModel.databaseModesProperty());</b>
+<b class="nc">&nbsp;        databaseMode.valueProperty().bindBidirectional(viewModel.selectedDatabaseModeProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        librarySpecificFileDirectoryTooltip.setText(Localization.lang(&quot;Library-specific file directory&quot;));</b>
+<b class="nc">&nbsp;        librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());</b>
+<b class="nc">&nbsp;        latexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        userSpecificFileDirectoryTooltip.setText(Localization.lang(&quot;User-specific file directory: %0&quot;, preferences.getFilePreferences().getUserAndHost()));</b>
+<b class="nc">&nbsp;        userSpecificFileDirectory.setTooltip(userSpecificFileDirectoryTooltip);</b>
+&nbsp;
+<b class="nc">&nbsp;        librarySpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());</b>
+<b class="nc">&nbsp;        userSpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());</b>
+<b class="nc">&nbsp;        latexFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());</b>
+&nbsp;
+<b class="nc">&nbsp;        libSpecificFileDirSwitchId.setDisable(this.databaseContext.getDatabasePath().isEmpty());</b>
+<b class="nc">&nbsp;        userSpecificFileDirSwitchId.setDisable(this.databaseContext.getDatabasePath().isEmpty());</b>
+<b class="nc">&nbsp;        laTexSpecificFileDirSwitchId.setDisable(this.databaseContext.getDatabasePath().isEmpty());</b>
+&nbsp;
+<b class="nc">&nbsp;        librarySpecificFileDirectory.textProperty().addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            boolean isAbsolute = Path.of(newValue).isAbsolute();</b>
+<b class="nc">&nbsp;            libSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);</b>
+<b class="nc">&nbsp;            libSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);</b>
+<b class="nc">&nbsp;            librarySpecificFileDirectoryTooltip.setText(newValue.trim().isEmpty() ?</b>
+<b class="nc">&nbsp;                                                        Localization.lang(&quot;Library-specific file directory&quot;) : Localization.lang(&quot;Library-specific file directory: %0&quot;, newValue));</b>
+&nbsp;        });
+<b class="nc">&nbsp;        userSpecificFileDirectory.textProperty().addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            boolean isAbsolute = Path.of(newValue).isAbsolute();</b>
+<b class="nc">&nbsp;            userSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);</b>
+<b class="nc">&nbsp;            userSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        latexFileDirectory.textProperty().addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            boolean isAbsolute = Path.of(newValue).isAbsolute();</b>
+<b class="nc">&nbsp;            laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);</b>
+<b class="nc">&nbsp;            laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);</b>
+<b class="nc">&nbsp;            latexFileDirectoryTooltip.setText(newValue.trim().isEmpty()</b>
+<b class="nc">&nbsp;                                              ? Localization.lang(&quot;LaTeX file directory&quot;) : Localization.lang(&quot;LaTeX file directory: %0&quot;, newValue));</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);</b>
+<b class="nc">&nbsp;            userSpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.userSpecificFileDirectoryStatus(), userSpecificFileDirectory);</b>
+<b class="nc">&nbsp;            latexFileDirectoryValidationVisualizer.initVisualization(viewModel.laTexFileDirectoryStatus(), latexFileDirectory);</b>
+&nbsp;
+<b class="nc">&nbsp;            librarySpecificFileDirectory.requestFocus();</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void browseLibrarySpecificFileDirectory() {
+<b class="nc">&nbsp;        viewModel.browseLibrarySpecificDir();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void browseUserSpecificFileDirectory() {
+<b class="nc">&nbsp;        viewModel.browseUserDir();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void browseLatexFileDirectory() {
+<b class="nc">&nbsp;        viewModel.browseLatexDir();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void libSpecificFileDirPathSwitch() {
+<b class="nc">&nbsp;        viewModel.togglePath(viewModel.librarySpecificDirectoryProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void userSpecificFileDirPathSwitch() {
+<b class="nc">&nbsp;        viewModel.togglePath(viewModel.userSpecificFileDirectoryProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void laTexSpecificFileDirPathSwitch() {
+<b class="nc">&nbsp;        viewModel.togglePath(viewModel.laTexFileDirectoryProperty());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

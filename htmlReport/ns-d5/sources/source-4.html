@@ -1,0 +1,293 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RuleBasedPlainCitationParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.plaincitation</a>
+</div>
+
+<h1>Coverage Summary for Class: RuleBasedPlainCitationParser (org.jabref.logic.importer.plaincitation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RuleBasedPlainCitationParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.plaincitation;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Calendar;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;/**
+&nbsp; * Parse a plain citation using regex rules.
+&nbsp; * &lt;p&gt;
+&nbsp; * TODO: This class is similar to {@link org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter}, we need to unify them.
+&nbsp; */
+<b class="nc">&nbsp;public class RuleBasedPlainCitationParser implements PlainCitationParser {</b>
+&nbsp;    private static final String AUTHOR_TAG = &quot;[author_tag]&quot;;
+&nbsp;    private static final String URL_TAG = &quot;[url_tag]&quot;;
+&nbsp;    private static final String YEAR_TAG = &quot;[year_tag]&quot;;
+&nbsp;    private static final String PAGES_TAG = &quot;[pages_tag]&quot;;
+&nbsp;
+&nbsp;    private static final String INITIALS_GROUP = &quot;INITIALS&quot;;
+&nbsp;    private static final String LASTNAME_GROUP = &quot;LASTNAME&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern URL_PATTERN = Pattern.compile(</b>
+&nbsp;            &quot;(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)&quot; +
+&nbsp;                    &quot;(([\\w\\-]+\\.)+?([\\w\\-.~]+\\/?)*&quot; +
+&nbsp;                    &quot;[\\p{Alnum}.,%_=?&amp;#\\-+()\\[\\]\\*$~@!:/{};&#39;]*)&quot;,
+&nbsp;            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern YEAR_PATTERN = Pattern.compile(</b>
+&nbsp;            &quot;\\d{4}&quot;,
+&nbsp;            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern AUTHOR_PATTERN = Pattern.compile(</b>
+&nbsp;            &quot;(?&lt;&quot; + LASTNAME_GROUP + &quot;&gt;\\p{Lu}\\w+),?\\s(?&lt;&quot; + INITIALS_GROUP + &quot;&gt;(\\p{Lu}\\.\\s){1,2})&quot; +
+&nbsp;                    &quot;\\s*(and|,|\\.)*&quot;,
+&nbsp;            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern AUTHOR_PATTERN_2 = Pattern.compile(</b>
+&nbsp;            &quot;(?&lt;&quot; + INITIALS_GROUP + &quot;&gt;(\\p{Lu}\\.\\s){1,2})(?&lt;&quot; + LASTNAME_GROUP + &quot;&gt;\\p{Lu}\\w+)&quot; +
+&nbsp;                    &quot;\\s*(and|,|\\.)*&quot;,
+&nbsp;            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern PAGES_PATTERN = Pattern.compile(</b>
+&nbsp;            &quot;(p.)?\\s?\\d+(-\\d+)?&quot;,
+&nbsp;            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;String&gt; urls = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final List&lt;String&gt; authors = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    private String year = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private String pages = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private String title = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private boolean isArticle = true;</b>
+<b class="nc">&nbsp;    private String journalOrPublisher = &quot;&quot;;</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;BibEntry&gt; parsePlainCitation(String text) throws FetcherException {
+<b class="nc">&nbsp;        String inputWithoutUrls = findUrls(text);</b>
+<b class="nc">&nbsp;        String inputWithoutAuthors = findAuthors(inputWithoutUrls);</b>
+<b class="nc">&nbsp;        String inputWithoutYear = findYear(inputWithoutAuthors);</b>
+<b class="nc">&nbsp;        String inputWithoutPages = findPages(inputWithoutYear);</b>
+<b class="nc">&nbsp;        String nonParsed = findParts(inputWithoutPages);</b>
+<b class="nc">&nbsp;        return generateEntity(nonParsed);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;BibEntry&gt; generateEntity(String input) {
+<b class="nc">&nbsp;        EntryType type = isArticle ? StandardEntryType.Article : StandardEntryType.Book;</b>
+<b class="nc">&nbsp;        BibEntry extractedEntity = new BibEntry(type);</b>
+<b class="nc">&nbsp;        extractedEntity.setField(StandardField.AUTHOR, String.join(&quot; and &quot;, authors));</b>
+<b class="nc">&nbsp;        extractedEntity.setField(StandardField.URL, String.join(&quot;, &quot;, urls));</b>
+<b class="nc">&nbsp;        extractedEntity.setField(StandardField.YEAR, year);</b>
+<b class="nc">&nbsp;        extractedEntity.setField(StandardField.PAGES, pages);</b>
+<b class="nc">&nbsp;        extractedEntity.setField(StandardField.TITLE, title);</b>
+<b class="nc">&nbsp;        if (isArticle) {</b>
+<b class="nc">&nbsp;            extractedEntity.setField(StandardField.JOURNAL, journalOrPublisher);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            extractedEntity.setField(StandardField.PUBLISHER, journalOrPublisher);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        extractedEntity.setField(StandardField.COMMENT, input);</b>
+<b class="nc">&nbsp;        return Optional.of(extractedEntity);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String findUrls(String input) {
+<b class="nc">&nbsp;        Matcher matcher = URL_PATTERN.matcher(input);</b>
+<b class="nc">&nbsp;        while (matcher.find()) {</b>
+<b class="nc">&nbsp;            urls.add(input.substring(matcher.start(1), matcher.end()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return fixSpaces(matcher.replaceAll(URL_TAG));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String findYear(String input) {
+<b class="nc">&nbsp;        Matcher matcher = YEAR_PATTERN.matcher(input);</b>
+<b class="nc">&nbsp;        while (matcher.find()) {</b>
+<b class="nc">&nbsp;            String yearCandidate = input.substring(matcher.start(), matcher.end());</b>
+<b class="nc">&nbsp;            int intYearCandidate = Integer.parseInt(yearCandidate);</b>
+<b class="nc">&nbsp;            if ((intYearCandidate &gt; 1700) &amp;&amp; (intYearCandidate &lt;= Calendar.getInstance().get(Calendar.YEAR))) {</b>
+<b class="nc">&nbsp;                year = yearCandidate;</b>
+<b class="nc">&nbsp;                return fixSpaces(input.replace(year, YEAR_TAG));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return input;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String findAuthors(String input) {
+<b class="nc">&nbsp;        String currentInput = findAuthorsByPattern(input, AUTHOR_PATTERN);</b>
+<b class="nc">&nbsp;        return findAuthorsByPattern(currentInput, AUTHOR_PATTERN_2);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String findAuthorsByPattern(String input, Pattern pattern) {
+<b class="nc">&nbsp;        Matcher matcher = pattern.matcher(input);</b>
+<b class="nc">&nbsp;        while (matcher.find()) {</b>
+<b class="nc">&nbsp;            authors.add(GenerateAuthor(matcher.group(LASTNAME_GROUP), matcher.group(INITIALS_GROUP)));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return fixSpaces(matcher.replaceAll(AUTHOR_TAG));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String GenerateAuthor(String lastName, String initials) {
+<b class="nc">&nbsp;        return lastName + &quot;, &quot; + initials;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String findPages(String input) {
+<b class="nc">&nbsp;        Matcher matcher = PAGES_PATTERN.matcher(input);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            pages = input.substring(matcher.start(), matcher.end());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return fixSpaces(matcher.replaceFirst(PAGES_TAG));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String fixSpaces(String input) {
+<b class="nc">&nbsp;        return input.replaceAll(&quot;[,.!?;:]&quot;, &quot;$0 &quot;)</b>
+<b class="nc">&nbsp;                    .replaceAll(&quot;\\p{Lt}&quot;, &quot; $0&quot;)</b>
+<b class="nc">&nbsp;                    .replaceAll(&quot;\\s+&quot;, &quot; &quot;).trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String findParts(String input) {
+<b class="nc">&nbsp;        ArrayList&lt;String&gt; lastParts = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        int afterAuthorsIndex = input.lastIndexOf(AUTHOR_TAG);</b>
+<b class="nc">&nbsp;        if (afterAuthorsIndex == -1) {</b>
+<b class="nc">&nbsp;            return input;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            afterAuthorsIndex += AUTHOR_TAG.length();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        int delimiterIndex = input.lastIndexOf(&quot;//&quot;);</b>
+<b class="nc">&nbsp;        if (delimiterIndex != -1) {</b>
+<b class="nc">&nbsp;            lastParts.add(input.substring(afterAuthorsIndex, delimiterIndex)</b>
+<b class="nc">&nbsp;                               .replace(YEAR_TAG, &quot;&quot;)</b>
+<b class="nc">&nbsp;                               .replace(PAGES_TAG, &quot;&quot;));</b>
+<b class="nc">&nbsp;            lastParts.addAll(Arrays.asList(input.substring(delimiterIndex + 2).split(&quot;,|\\.&quot;)));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            lastParts.addAll(Arrays.asList(input.substring(afterAuthorsIndex).split(&quot;,|\\.&quot;)));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        int nonDigitParts = 0;</b>
+<b class="nc">&nbsp;        for (String part : lastParts) {</b>
+<b class="nc">&nbsp;            if (part.matches(&quot;.*\\d.*&quot;)) {</b>
+&nbsp;                break;
+&nbsp;            }
+<b class="nc">&nbsp;            nonDigitParts++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (nonDigitParts &gt; 0) {</b>
+<b class="nc">&nbsp;            title = lastParts.getFirst();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (nonDigitParts &gt; 1) {</b>
+<b class="nc">&nbsp;            journalOrPublisher = lastParts.get(1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (nonDigitParts &gt; 2) {</b>
+<b class="nc">&nbsp;            isArticle = false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return fixSpaces(input);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

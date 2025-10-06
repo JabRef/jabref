@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NewLibraryFromPdfAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: NewLibraryFromPdfAction (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NewLibraryFromPdfAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Similar to {@link ExtractReferencesAction}. This action creates a new library, the other action &quot;just&quot; appends to the current library
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; *   &lt;li&gt;Mode choice A: online or offline&lt;/li&gt;
+&nbsp; *   &lt;li&gt;Mode choice B: complete entry or single file (the latter is not implemented)&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; */
+&nbsp;public abstract class NewLibraryFromPdfAction extends SimpleCommand {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction.class);</b>
+&nbsp;
+&nbsp;    protected final CliPreferences preferences;
+&nbsp;
+&nbsp;    private final LibraryTabContainer libraryTabContainer;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public NewLibraryFromPdfAction(
+&nbsp;            LibraryTabContainer libraryTabContainer,
+&nbsp;            StateManager stateManager,
+&nbsp;            DialogService dialogService,
+&nbsp;            CliPreferences preferences,
+<b class="nc">&nbsp;            TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.libraryTabContainer = libraryTabContainer;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        final FileDialogConfiguration.Builder builder = new FileDialogConfiguration.Builder();</b>
+<b class="nc">&nbsp;        builder.withDefaultExtension(StandardFileType.PDF);</b>
+&nbsp;        // Sensible default for the directory to start browsing is the directory of the currently opened library. The pdf storage dir seems not to be feasible, because extracting references from a PDF itself can be done by the context menu of the respective entry.
+<b class="nc">&nbsp;        stateManager.getActiveDatabase()</b>
+<b class="nc">&nbsp;                    .flatMap(BibDatabaseContext::getDatabasePath)</b>
+<b class="nc">&nbsp;                    .ifPresent(path -&gt; builder.withInitialDirectory(path.getParent()));</b>
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = builder.build();</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Opening file dialog with configuration: {}&quot;, fileDialogConfiguration);</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.trace(&quot;Selected file: {}&quot;, path);</b>
+<b class="nc">&nbsp;            Callable&lt;ParserResult&gt; parserResultCallable = getParserResultCallable(path);</b>
+<b class="nc">&nbsp;            BackgroundTask.wrap(parserResultCallable)</b>
+<b class="nc">&nbsp;                          .withInitialMessage(Localization.lang(&quot;Processing PDF(s)&quot;))</b>
+<b class="nc">&nbsp;                          .onFailure(dialogService::showErrorDialogAndWait)</b>
+<b class="nc">&nbsp;                          .onSuccess(result -&gt; {</b>
+<b class="nc">&nbsp;                              LOGGER.trace(&quot;Finished processing PDF(s): {}&quot;, result);</b>
+<b class="nc">&nbsp;                              libraryTabContainer.addTab(result.getDatabaseContext(), true);</b>
+&nbsp;                          })
+<b class="nc">&nbsp;                          .executeWith(taskExecutor);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract Callable&lt;ParserResult&gt; getParserResultCallable(Path path);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

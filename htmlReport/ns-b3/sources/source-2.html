@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibEntryHashSetSerializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citation.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: BibEntryHashSetSerializer (org.jabref.logic.citation.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibEntryHashSetSerializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citation.repository;
+&nbsp;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.IntStream;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import org.h2.mvstore.WriteBuffer;
+&nbsp;import org.h2.mvstore.type.BasicDataType;
+&nbsp;
+&nbsp;class BibEntryHashSetSerializer extends BasicDataType&lt;LinkedHashSet&lt;BibEntry&gt;&gt; {
+&nbsp;
+&nbsp;    private final BasicDataType&lt;BibEntry&gt; bibEntryDataType;
+&nbsp;
+<b class="nc">&nbsp;    BibEntryHashSetSerializer(BibEntryTypesManager entryTypesManager, ImportFormatPreferences importFormatPreferences, FieldPreferences fieldPreferences) {</b>
+<b class="nc">&nbsp;        this.bibEntryDataType = new BibEntrySerializer(entryTypesManager, importFormatPreferences, fieldPreferences);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    BibEntryHashSetSerializer(BasicDataType&lt;BibEntry&gt; bibEntryDataType) {</b>
+<b class="nc">&nbsp;        this.bibEntryDataType = bibEntryDataType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getMemory(LinkedHashSet&lt;BibEntry&gt; bibEntries) {
+&nbsp;        // Memory size is the sum of all aggregated bibEntries&#39; memory size plus 4 bytes.
+&nbsp;        // Those 4 bytes are used to store the length of the collection itself.
+<b class="nc">&nbsp;        return bibEntries</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(this.bibEntryDataType::getMemory)</b>
+<b class="nc">&nbsp;                .reduce(0, Integer::sum) + 4;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void write(WriteBuffer buff, LinkedHashSet&lt;BibEntry&gt; bibEntries) {
+<b class="nc">&nbsp;        buff.putInt(bibEntries.size());</b>
+<b class="nc">&nbsp;        bibEntries.forEach(entry -&gt; this.bibEntryDataType.write(buff, entry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public LinkedHashSet&lt;BibEntry&gt; read(ByteBuffer buff) {
+<b class="nc">&nbsp;        return IntStream.range(0, buff.getInt())</b>
+<b class="nc">&nbsp;                        .mapToObj(it -&gt; this.bibEntryDataType.read(buff))</b>
+<b class="nc">&nbsp;                        .filter(entry -&gt; !entry.isEmpty())</b>
+<b class="nc">&nbsp;                        .collect(Collectors.toCollection(LinkedHashSet::new));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    public LinkedHashSet&lt;BibEntry&gt;[] createStorage(int size) {
+<b class="nc">&nbsp;        return (LinkedHashSet&lt;BibEntry&gt;[]) new LinkedHashSet[size];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isMemoryEstimationAllowed() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

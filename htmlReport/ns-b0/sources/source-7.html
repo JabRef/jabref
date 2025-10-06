@@ -1,0 +1,230 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstPreviewLayout</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst</a>
+</div>
+
+<h1>Coverage Summary for Class: BstPreviewLayout (org.jabref.logic.bst)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BstPreviewLayout</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bst;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+&nbsp;import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+&nbsp;import org.jabref.logic.layout.format.RemoveTilde;
+&nbsp;import org.jabref.logic.preview.PreviewLayout;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public final class BstPreviewLayout implements PreviewLayout {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BstPreviewLayout.class);</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private String source;
+&nbsp;    private BstVM bstVM;
+&nbsp;    private String error;
+&nbsp;
+<b class="nc">&nbsp;    public BstPreviewLayout(Path path) {</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            this.source = String.join(&quot;\n&quot;, Files.readAllLines(path));</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error reading file&quot;, e);</b>
+<b class="nc">&nbsp;            this.source = &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        name = path.getFileName().toString();</b>
+<b class="nc">&nbsp;        if (!Files.exists(path)) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;File {} not found&quot;, path.toAbsolutePath());</b>
+<b class="nc">&nbsp;            error = Localization.lang(&quot;Error opening file &#39;%0&#39;&quot;, path.toString());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            bstVM = new BstVM(path);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not read {}.&quot;, path.toAbsolutePath(), e);</b>
+<b class="nc">&nbsp;            error = Localization.lang(&quot;Error opening file &#39;%0&#39;&quot;, path.toString());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String generatePreview(BibEntry originalEntry, BibDatabaseContext databaseContext) {
+<b class="nc">&nbsp;        if (error != null) {</b>
+<b class="nc">&nbsp;            return error;</b>
+&nbsp;        }
+&nbsp;        // ensure that the entry is of BibTeX format (and do not modify the original entry)
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry(originalEntry);</b>
+<b class="nc">&nbsp;        new ConvertToBibtexCleanup().cleanup(entry);</b>
+<b class="nc">&nbsp;        String result = bstVM.render(List.of(entry));</b>
+&nbsp;        // Remove all comments
+<b class="nc">&nbsp;        result = result.replaceAll(&quot;%.*&quot;, &quot;&quot;);</b>
+&nbsp;        // Remove all LaTeX comments
+&nbsp;        // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
+<b class="nc">&nbsp;        result = result.replace(&quot;\\begin{thebibliography}{1}&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        result = result.replace(&quot;\\end{thebibliography}&quot;, &quot;&quot;);</b>
+&nbsp;        // The RemoveLatexCommandsFormatter keeps the word inside the latex command, but we want to remove that completely
+<b class="nc">&nbsp;        result = result.replaceAll(&quot;\\\\bibitem[{].*[}]&quot;, &quot;&quot;);</b>
+&nbsp;        // We want to replace \newblock by a space instead of completely removing it
+<b class="nc">&nbsp;        result = result.replace(&quot;\\newblock&quot;, &quot; &quot;);</b>
+&nbsp;        // remove all latex commands statements - assumption: command in a separate line
+<b class="nc">&nbsp;        result = result.replaceAll(&quot;(?m)^\\\\.*$&quot;, &quot;&quot;);</b>
+&nbsp;        // remove some IEEEtran.bst output (resulting from a multiline \providecommand)
+<b class="nc">&nbsp;        result = result.replace(&quot;#2}}&quot;, &quot;&quot;);</b>
+&nbsp;        // Have quotes right - and more
+<b class="nc">&nbsp;        result = new LatexToUnicodeFormatter().format(result);</b>
+<b class="nc">&nbsp;        result = result.replace(&quot;``&quot;, &quot;\&quot;&quot;);</b>
+<b class="nc">&nbsp;        result = result.replace(&quot;&#39;&#39;&quot;, &quot;\&quot;&quot;);</b>
+&nbsp;        // Final cleanup
+<b class="nc">&nbsp;        result = new RemoveNewlinesFormatter().format(result);</b>
+<b class="nc">&nbsp;        result = new RemoveLatexCommandsFormatter().format(result);</b>
+<b class="nc">&nbsp;        result = new RemoveTilde().format(result);</b>
+<b class="nc">&nbsp;        result = result.trim().replaceAll(&quot;  +&quot;, &quot; &quot;);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getShortTitle() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getText() {
+<b class="nc">&nbsp;        return source;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given style file is a BST file by checking the extension
+&nbsp;     */
+&nbsp;    public static boolean isBstStyleFile(String styleFile) {
+<b class="nc">&nbsp;        return StandardFileType.BST.getExtensions().stream().anyMatch(styleFile::endsWith);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

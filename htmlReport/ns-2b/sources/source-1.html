@@ -1,0 +1,211 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CopyOrMoveFieldContentTabView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.edit.automaticfiededitor.copyormovecontent</a>
+</div>
+
+<h1>Coverage Summary for Class: CopyOrMoveFieldContentTabView (org.jabref.gui.edit.automaticfiededitor.copyormovecontent)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CopyOrMoveFieldContentTabView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.edit.automaticfiededitor.copyormovecontent;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;
+&nbsp;import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
+&nbsp;
+&nbsp;public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
+&nbsp;    public Button copyContentButton;
+&nbsp;    @FXML
+&nbsp;    private Button moveContentButton;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private Button swapContentButton;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private ComboBox&lt;Field&gt; fromFieldComboBox;
+&nbsp;    @FXML
+&nbsp;    private ComboBox&lt;Field&gt; toFieldComboBox;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private CheckBox overwriteFieldContentCheckBox;
+&nbsp;
+&nbsp;    private CopyOrMoveFieldContentTabViewModel viewModel;
+&nbsp;    private final List&lt;BibEntry&gt; selectedEntries;
+&nbsp;    private final BibDatabase database;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;    public CopyOrMoveFieldContentTabView(BibDatabase database, StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.selectedEntries = new ArrayList&lt;&gt;(stateManager.getSelectedEntries());</b>
+<b class="nc">&nbsp;        this.database = database;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        viewModel = new CopyOrMoveFieldContentTabViewModel(selectedEntries, database, stateManager);</b>
+<b class="nc">&nbsp;        initializeFromAndToComboBox();</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        moveContentButton.disableProperty().bind(viewModel.canMoveProperty().not());</b>
+<b class="nc">&nbsp;        swapContentButton.disableProperty().bind(viewModel.canSwapProperty().not());</b>
+<b class="nc">&nbsp;        copyContentButton.disableProperty().bind(viewModel.toFieldValidationStatus().validProperty().not());</b>
+<b class="nc">&nbsp;        overwriteFieldContentCheckBox.disableProperty().bind(viewModel.toFieldValidationStatus().validProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; visualizer.initVisualization(viewModel.toFieldValidationStatus(), toFieldComboBox, true));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeFromAndToComboBox() {
+<b class="nc">&nbsp;        fromFieldComboBox.getItems().setAll(viewModel.getAllFields());</b>
+<b class="nc">&nbsp;        toFieldComboBox.getItems().setAll(viewModel.getAllFields());</b>
+&nbsp;
+<b class="nc">&nbsp;        fromFieldComboBox.setConverter(FIELD_STRING_CONVERTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        toFieldComboBox.setConverter(FIELD_STRING_CONVERTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        fromFieldComboBox.valueProperty().bindBidirectional(viewModel.fromFieldProperty());</b>
+<b class="nc">&nbsp;        toFieldComboBox.valueProperty().bindBidirectional(viewModel.toFieldProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(fromFieldComboBox.getEditor().textProperty(), observable -&gt; fromFieldComboBox.commitValue());</b>
+<b class="nc">&nbsp;        EasyBind.listen(toFieldComboBox.getEditor().textProperty(), observable -&gt; toFieldComboBox.commitValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Copy or Move content&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void copyContent() {
+<b class="nc">&nbsp;        viewModel.copyValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void moveContent() {
+<b class="nc">&nbsp;        viewModel.moveValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void swapContent() {
+<b class="nc">&nbsp;        viewModel.swapValues();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,267 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedFilesSearcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.search.retrieval</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedFilesSearcher (org.jabref.logic.search.retrieval)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedFilesSearcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.search.retrieval;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.search.LuceneIndexer;
+&nbsp;import org.jabref.logic.search.query.SearchQueryConversion;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.search.LinkedFilesConstants;
+&nbsp;import org.jabref.model.search.SearchFlags;
+&nbsp;import org.jabref.model.search.query.SearchQuery;
+&nbsp;import org.jabref.model.search.query.SearchResult;
+&nbsp;import org.jabref.model.search.query.SearchResults;
+&nbsp;
+&nbsp;import org.apache.lucene.document.Document;
+&nbsp;import org.apache.lucene.index.StoredFields;
+&nbsp;import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+&nbsp;import org.apache.lucene.queryparser.classic.ParseException;
+&nbsp;import org.apache.lucene.queryparser.classic.QueryParser;
+&nbsp;import org.apache.lucene.search.IndexSearcher;
+&nbsp;import org.apache.lucene.search.Query;
+&nbsp;import org.apache.lucene.search.ScoreDoc;
+&nbsp;import org.apache.lucene.search.SearcherManager;
+&nbsp;import org.apache.lucene.search.TopDocs;
+&nbsp;import org.apache.lucene.search.highlight.Highlighter;
+&nbsp;import org.apache.lucene.search.highlight.QueryScorer;
+&nbsp;import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public final class LinkedFilesSearcher {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesSearcher.class);</b>
+&nbsp;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final SearcherManager searcherManager;
+&nbsp;    private final MultiFieldQueryParser parser;
+&nbsp;
+<b class="nc">&nbsp;    public LinkedFilesSearcher(BibDatabaseContext databaseContext, LuceneIndexer linkedFilesIndexer, FilePreferences filePreferences) {</b>
+<b class="nc">&nbsp;        this.searcherManager = linkedFilesIndexer.getSearcherManager();</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        this.parser = new MultiFieldQueryParser(LinkedFilesConstants.PDF_FIELDS.toArray(new String[0]), LinkedFilesConstants.LINKED_FILES_ANALYZER);</b>
+<b class="nc">&nbsp;        parser.setDefaultOperator(QueryParser.Operator.AND);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SearchResults search(SearchQuery searchQuery) {
+<b class="nc">&nbsp;        if (!searchQuery.isValid()) {</b>
+<b class="nc">&nbsp;            return new SearchResults();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Query&gt; luceneQuery = getLuceneQuery(searchQuery);</b>
+<b class="nc">&nbsp;        if (luceneQuery.isEmpty()) {</b>
+<b class="nc">&nbsp;            return new SearchResults();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        EnumSet&lt;SearchFlags&gt; searchFlags = searchQuery.getSearchFlags();</b>
+<b class="nc">&nbsp;        boolean shouldSearchInLinkedFiles = searchFlags.contains(SearchFlags.FULLTEXT) &amp;&amp; filePreferences.shouldFulltextIndexLinkedFiles();</b>
+<b class="nc">&nbsp;        if (!shouldSearchInLinkedFiles) {</b>
+<b class="nc">&nbsp;            return new SearchResults();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Searching in linked files with query: {}&quot;, luceneQuery.get());</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            IndexSearcher linkedFilesIndexSearcher = acquireIndexSearcher(searcherManager);</b>
+<b class="nc">&nbsp;            SearchResults searchResults = search(linkedFilesIndexSearcher, luceneQuery.get());</b>
+<b class="nc">&nbsp;            releaseIndexSearcher(searcherManager, linkedFilesIndexSearcher);</b>
+<b class="nc">&nbsp;            return searchResults;</b>
+&nbsp;        } catch (IOException | IndexSearcher.TooManyClauses e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error during linked files search execution&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new SearchResults();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;Query&gt; getLuceneQuery(SearchQuery searchQuery) {
+<b class="nc">&nbsp;        String query = SearchQueryConversion.searchToLucene(searchQuery);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return Optional.of(parser.parse(query));</b>
+&nbsp;        } catch (ParseException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error during query parsing&quot;, e);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private SearchResults search(IndexSearcher indexSearcher, Query searchQuery) throws IOException {
+<b class="nc">&nbsp;        TopDocs topDocs = indexSearcher.search(searchQuery, Integer.MAX_VALUE);</b>
+<b class="nc">&nbsp;        StoredFields storedFields = indexSearcher.storedFields();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Found {} matching documents&quot;, topDocs.totalHits.value());</b>
+<b class="nc">&nbsp;        return getSearchResults(topDocs, storedFields, searchQuery);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SearchResults getSearchResults(TopDocs topDocs, StoredFields storedFields, Query searchQuery) throws IOException {
+<b class="nc">&nbsp;        SearchResults searchResults = new SearchResults();</b>
+<b class="nc">&nbsp;        long startTime = System.currentTimeMillis();</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; linkedFilesMap = getLinkedFilesMap();</b>
+<b class="nc">&nbsp;        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(&quot;&lt;b&gt;&quot;, &quot;&lt;/b&gt;&quot;), new QueryScorer(searchQuery));</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ScoreDoc scoreDoc : topDocs.scoreDocs) {</b>
+<b class="nc">&nbsp;            Document document = storedFields.document(scoreDoc.doc);</b>
+<b class="nc">&nbsp;            String fileLink = getFieldContents(document, LinkedFilesConstants.PATH);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!fileLink.isEmpty()) {</b>
+<b class="nc">&nbsp;                List&lt;String&gt; entriesWithFile = linkedFilesMap.get(fileLink);</b>
+<b class="nc">&nbsp;                if (entriesWithFile != null &amp;&amp; !entriesWithFile.isEmpty()) {</b>
+<b class="nc">&nbsp;                    SearchResult searchResult = new SearchResult(</b>
+&nbsp;                            fileLink,
+<b class="nc">&nbsp;                            getFieldContents(document, LinkedFilesConstants.CONTENT),</b>
+<b class="nc">&nbsp;                            getFieldContents(document, LinkedFilesConstants.ANNOTATIONS),</b>
+<b class="nc">&nbsp;                            Integer.parseInt(getFieldContents(document, LinkedFilesConstants.PAGE_NUMBER)),</b>
+&nbsp;                            highlighter);
+<b class="nc">&nbsp;                    searchResults.addSearchResult(entriesWithFile, searchResult);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Getting linked files results took {} ms&quot;, System.currentTimeMillis() - startTime);</b>
+<b class="nc">&nbsp;        return searchResults;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, List&lt;String&gt;&gt; getLinkedFilesMap() {
+&nbsp;        // fileLink to List of entry IDs
+<b class="nc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; linkedFilesMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (BibEntry bibEntry : databaseContext.getEntries()) {</b>
+<b class="nc">&nbsp;            for (LinkedFile linkedFile : bibEntry.getFiles()) {</b>
+<b class="nc">&nbsp;                linkedFilesMap.computeIfAbsent(linkedFile.getLink(), k -&gt; new ArrayList&lt;&gt;()).add(bibEntry.getId());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return linkedFilesMap;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getFieldContents(Document document, LinkedFilesConstants field) {
+<b class="nc">&nbsp;        return Optional.ofNullable(document.get(field.toString())).orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static IndexSearcher acquireIndexSearcher(SearcherManager searcherManager) throws IOException {
+<b class="nc">&nbsp;        searcherManager.maybeRefreshBlocking();</b>
+<b class="nc">&nbsp;        return searcherManager.acquire();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void releaseIndexSearcher(SearcherManager searcherManager, IndexSearcher indexSearcher) throws IOException {
+<b class="nc">&nbsp;        searcherManager.release(indexSearcher);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

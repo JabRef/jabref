@@ -1,0 +1,361 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExternalFileTypes</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiletype</a>
+</div>
+
+<h1>Coverage Summary for Class: ExternalFileTypes (org.jabref.gui.externalfiletype)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExternalFileTypes</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiletype;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.logic.bibtex.FileFieldWriter;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;// Do not make this class final, as it otherwise can&#39;t be mocked for tests
+&nbsp;public class ExternalFileTypes {
+&nbsp;
+&nbsp;    // This String is used in the encoded list in prefs of external file type
+&nbsp;    // modifications, in order to indicate a removed default file type:
+&nbsp;    private static final String FILE_TYPE_REMOVED_FLAG = &quot;REMOVED&quot;;
+<b class="nc">&nbsp;    private static final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;</b>
+&nbsp;
+&nbsp;    private ExternalFileTypes() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;ExternalFileType&gt; getDefaultExternalFileTypes() {
+<b class="nc">&nbsp;        return Arrays.asList(StandardExternalFileType.values());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Look up the external file type registered with this name, if any.
+&nbsp;     *
+&nbsp;     * @param name The file type name.
+&nbsp;     * @return The ExternalFileType registered, or null if none.
+&nbsp;     */
+&nbsp;    public static Optional&lt;ExternalFileType&gt; getExternalFileTypeByName(String name, ExternalApplicationsPreferences externalApplicationsPreferences) {
+<b class="nc">&nbsp;        Optional&lt;ExternalFileType&gt; externalFileType = externalApplicationsPreferences.getExternalFileTypes().stream().filter(type -&gt; type.getName().equals(name)).findFirst();</b>
+<b class="nc">&nbsp;        if (externalFileType.isPresent()) {</b>
+<b class="nc">&nbsp;            return externalFileType;</b>
+&nbsp;        }
+&nbsp;        // Return an instance that signifies an unknown file type:
+<b class="nc">&nbsp;        return Optional.of(new UnknownExternalFileType(name));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Look up the external file type registered for this extension, if any.
+&nbsp;     *
+&nbsp;     * @param extension The file extension.
+&nbsp;     * @return The ExternalFileType registered, or null if none.
+&nbsp;     */
+&nbsp;    public static Optional&lt;ExternalFileType&gt; getExternalFileTypeByExt(String extension, ExternalApplicationsPreferences externalApplicationsPreferences) {
+<b class="nc">&nbsp;        String extensionCleaned = extension.replace(&quot;.&quot;, &quot;&quot;).replace(&quot;*&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        return externalApplicationsPreferences.getExternalFileTypes().stream().filter(type -&gt; type.getExtension().equalsIgnoreCase(extensionCleaned)).findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if there is an external file type registered for this extension.
+&nbsp;     *
+&nbsp;     * @param extension The file extension.
+&nbsp;     * @return true if an ExternalFileType with the extension exists, false otherwise
+&nbsp;     */
+&nbsp;    public static boolean isExternalFileTypeByExt(String extension, ExternalApplicationsPreferences externalApplicationsPreferences) {
+<b class="nc">&nbsp;        return externalApplicationsPreferences.getExternalFileTypes().stream().anyMatch(type -&gt; type.getExtension().equalsIgnoreCase(extension));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Look up the external file type registered for this filename, if any.
+&nbsp;     *
+&nbsp;     * @param filename The name of the file whose type to look up.
+&nbsp;     * @return The ExternalFileType registered, or null if none.
+&nbsp;     */
+&nbsp;    public static Optional&lt;ExternalFileType&gt; getExternalFileTypeForName(String filename, ExternalApplicationsPreferences externalApplicationsPreferences) {
+<b class="nc">&nbsp;        int longestFound = -1;</b>
+<b class="nc">&nbsp;        ExternalFileType foundType = null;</b>
+<b class="nc">&nbsp;        for (ExternalFileType type : externalApplicationsPreferences.getExternalFileTypes()) {</b>
+<b class="nc">&nbsp;            if (!type.getExtension().isEmpty() &amp;&amp; filename.toLowerCase(Locale.ROOT).endsWith(type.getExtension().toLowerCase(Locale.ROOT))</b>
+<b class="nc">&nbsp;                    &amp;&amp; (type.getExtension().length() &gt; longestFound)) {</b>
+<b class="nc">&nbsp;                longestFound = type.getExtension().length();</b>
+<b class="nc">&nbsp;                foundType = type;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.ofNullable(foundType);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Look up the external file type registered for this MIME type, if any.
+&nbsp;     *
+&nbsp;     * @param mimeType The MIME type.
+&nbsp;     * @return The ExternalFileType registered, or null if none. For the mime type &quot;text/html&quot;, a valid file type is
+&nbsp;     * guaranteed to be returned.
+&nbsp;     */
+&nbsp;    public static Optional&lt;ExternalFileType&gt; getExternalFileTypeByMimeType(String mimeType, ExternalApplicationsPreferences externalApplicationsPreferences) {
+&nbsp;        // Ignores parameters according to link: (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
+<b class="nc">&nbsp;        if (mimeType.indexOf(&#39;;&#39;) != -1) {</b>
+<b class="nc">&nbsp;            mimeType = mimeType.substring(0, mimeType.indexOf(&#39;;&#39;)).trim();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (ExternalFileType type : externalApplicationsPreferences.getExternalFileTypes()) {</b>
+<b class="nc">&nbsp;            if (type.getMimeType().equalsIgnoreCase(mimeType)) {</b>
+<b class="nc">&nbsp;                return Optional.of(type);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (&quot;text/html&quot;.equalsIgnoreCase(mimeType)) {</b>
+<b class="nc">&nbsp;            return Optional.of(HTML_FALLBACK_TYPE);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;ExternalFileType&gt; getExternalFileTypeByFile(Path file, ExternalApplicationsPreferences externalApplicationsPreferences) {
+<b class="nc">&nbsp;        final String filePath = file.toString();</b>
+<b class="nc">&nbsp;        final Optional&lt;String&gt; extension = FileUtil.getFileExtension(filePath);</b>
+<b class="nc">&nbsp;        return extension.flatMap(ext -&gt; getExternalFileTypeByExt(ext, externalApplicationsPreferences));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;ExternalFileType&gt; getExternalFileTypeByLinkedFile(LinkedFile linkedFile, boolean deduceUnknownType, ExternalApplicationsPreferences externalApplicationsPreferences) {
+<b class="nc">&nbsp;        Optional&lt;ExternalFileType&gt; type = getExternalFileTypeByName(linkedFile.getFileType(), externalApplicationsPreferences);</b>
+<b class="nc">&nbsp;        boolean isUnknownType = type.isEmpty() || (type.get() instanceof UnknownExternalFileType);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isUnknownType &amp;&amp; deduceUnknownType) {</b>
+&nbsp;            // No file type was recognized. Try to find a usable file type based on mime type:
+<b class="nc">&nbsp;            Optional&lt;ExternalFileType&gt; mimeType = getExternalFileTypeByMimeType(linkedFile.getFileType(), externalApplicationsPreferences);</b>
+<b class="nc">&nbsp;            if (mimeType.isPresent()) {</b>
+<b class="nc">&nbsp;                return mimeType;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // No type could be found from mime type. Try based on the extension:
+<b class="nc">&nbsp;            return FileUtil.getFileExtension(linkedFile.getLink())</b>
+<b class="nc">&nbsp;                           .flatMap(extension -&gt; getExternalFileTypeByExt(extension, externalApplicationsPreferences));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return type;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return A StringList of customized and removed file types compared to the default list of external file types for storing
+&nbsp;     */
+&nbsp;    public static String toStringList(Collection&lt;ExternalFileType&gt; fileTypes) {
+&nbsp;        // First find a list of the default types:
+<b class="nc">&nbsp;        List&lt;ExternalFileType&gt; defTypes = new ArrayList&lt;&gt;(getDefaultExternalFileTypes());</b>
+&nbsp;        // Make a list of types that are unchanged:
+<b class="nc">&nbsp;        List&lt;ExternalFileType&gt; unchanged = new ArrayList&lt;&gt;();</b>
+&nbsp;        // Create a result list
+<b class="nc">&nbsp;        List&lt;ExternalFileType&gt; results = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ExternalFileType type : fileTypes) {</b>
+<b class="nc">&nbsp;            results.add(type);</b>
+&nbsp;            // See if we can find a type with matching extension in the default type list:
+<b class="nc">&nbsp;            ExternalFileType found = null;</b>
+<b class="nc">&nbsp;            for (ExternalFileType defType : defTypes) {</b>
+<b class="nc">&nbsp;                if (defType.getExtension().equals(type.getExtension())) {</b>
+<b class="nc">&nbsp;                    found = defType;</b>
+&nbsp;                    break;
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            if (found != null) {</b>
+&nbsp;                // Found it! Check if it is an exact match, or if it has been customized:
+<b class="nc">&nbsp;                if (found.equals(type)) {</b>
+<b class="nc">&nbsp;                    unchanged.add(type);</b>
+&nbsp;                } else {
+&nbsp;                    // It was modified. Remove its entry from the defaults list, since
+&nbsp;                    // the type hasn&#39;t been removed:
+<b class="nc">&nbsp;                    defTypes.remove(found);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Go through unchanged types. Remove them from the ones that should be stored,
+&nbsp;        // and from the list of defaults, since we don&#39;t need to mention these in prefs:
+<b class="nc">&nbsp;        for (ExternalFileType type : unchanged) {</b>
+<b class="nc">&nbsp;            defTypes.remove(type);</b>
+<b class="nc">&nbsp;            results.remove(type);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Now set up the array to write to prefs, containing all new types, all modified
+&nbsp;        // types, and a flag denoting each default type that has been removed:
+<b class="nc">&nbsp;        String[][] array = new String[results.size() + defTypes.size()][];</b>
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        for (ExternalFileType type : results) {</b>
+<b class="nc">&nbsp;            array[i] = type.toStringArray();</b>
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (ExternalFileType type : defTypes) {</b>
+<b class="nc">&nbsp;            array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};</b>
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return FileFieldWriter.encodeStringArray(array);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set up the list of external file types, either from default values, or from values recorded in PreferencesService.
+&nbsp;     */
+&nbsp;    public static Set&lt;ExternalFileType&gt; fromString(String storedFileTypes) {
+&nbsp;        // First get a list of the default file types as a starting point:
+<b class="nc">&nbsp;        Set&lt;ExternalFileType&gt; types = new HashSet&lt;&gt;(getDefaultExternalFileTypes());</b>
+&nbsp;
+&nbsp;        // If no changes have been stored, simply use the defaults:
+<b class="nc">&nbsp;        if (StringUtil.isBlank(storedFileTypes)) {</b>
+<b class="nc">&nbsp;            return types;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Read the prefs information for file types:
+<b class="nc">&nbsp;        String[][] vals = StringUtil.decodeStringDoubleArray(storedFileTypes);</b>
+<b class="nc">&nbsp;        for (String[] val : vals) {</b>
+<b class="nc">&nbsp;            if ((val.length == 2) &amp;&amp; FILE_TYPE_REMOVED_FLAG.equals(val[1])) {</b>
+&nbsp;                // This entry indicates that a default entry type should be removed:
+<b class="nc">&nbsp;                ExternalFileType toRemove = null;</b>
+<b class="nc">&nbsp;                for (ExternalFileType type : types) {</b>
+<b class="nc">&nbsp;                    if (type.getName().equals(val[0])) {</b>
+<b class="nc">&nbsp;                        toRemove = type;</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                // If we found it, remove it from the type list:
+<b class="nc">&nbsp;                if (toRemove != null) {</b>
+<b class="nc">&nbsp;                    types.remove(toRemove);</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // A new or modified entry type. Construct it from the string array:
+<b class="nc">&nbsp;                ExternalFileType type = CustomExternalFileType.buildFromArgs(val);</b>
+&nbsp;                // Check if there is a default type with the same extension. If so, this is a
+&nbsp;                // modification of that type, so remove the default one:
+<b class="nc">&nbsp;                ExternalFileType toRemove = null;</b>
+<b class="nc">&nbsp;                for (ExternalFileType defType : types) {</b>
+<b class="nc">&nbsp;                    if (type.getExtension().equals(defType.getExtension())) {</b>
+<b class="nc">&nbsp;                        toRemove = defType;</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                // If we found it, remove it from the type list:
+<b class="nc">&nbsp;                if (toRemove != null) {</b>
+<b class="nc">&nbsp;                    types.remove(toRemove);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // Then add the new one:
+<b class="nc">&nbsp;                types.add(type);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return types;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

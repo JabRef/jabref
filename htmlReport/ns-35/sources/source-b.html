@@ -1,0 +1,301 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FieldEditorFX</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: FieldEditorFX (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FieldEditorFX</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FieldEditorFX$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.TextInputControl;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.undo.RedoAction;
+&nbsp;import org.jabref.gui.undo.UndoAction;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import com.github.difflib.DiffUtils;
+&nbsp;import com.github.difflib.patch.AbstractDelta;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public interface FieldEditorFX {
+&nbsp;
+&nbsp;    void bindToEntry(BibEntry entry);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @implNote Decided to add undoAction and redoAction as parameter instead of passing a tabSupplier, {@link org.jabref.gui.DialogService} and {@link org.jabref.gui.StateManager} to the method.
+&nbsp;     */
+&nbsp;    default void establishBinding(TextInputControl textInputControl, StringProperty viewModelTextProperty, KeyBindingRepository keyBindingRepository, UndoAction undoAction, RedoAction redoAction) {
+<b class="nc">&nbsp;        Logger logger = LoggerFactory.getLogger(FieldEditorFX.class);</b>
+&nbsp;
+&nbsp;        // We need to use the &quot;global&quot; UndoManager instead of JavaFX TextInputControls&#39;s native undo/redo handling.
+&nbsp;        // This also prevents NPEs. See https://github.com/JabRef/jabref/issues/11420 for details.
+<b class="nc">&nbsp;        textInputControl.addEventFilter(KeyEvent.ANY, e -&gt; {</b>
+&nbsp;            // Fix based on https://stackoverflow.com/a/37575818/873282
+<b class="nc">&nbsp;            if (e.getEventType() == KeyEvent.KEY_PRESSED // if not checked, it will be fired twice: once for key pressed and once for key released</b>
+<b class="nc">&nbsp;                    &amp;&amp; e.isShortcutDown()) {</b>
+<b class="nc">&nbsp;                if (keyBindingRepository.matches(e, KeyBinding.UNDO)) {</b>
+<b class="nc">&nbsp;                    undoAction.execute();</b>
+<b class="nc">&nbsp;                    e.consume();</b>
+<b class="nc">&nbsp;                } else if (keyBindingRepository.matches(e, KeyBinding.REDO)) {</b>
+<b class="nc">&nbsp;                    redoAction.execute();</b>
+<b class="nc">&nbsp;                    e.consume();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+&nbsp;        // We need some more sophisticated handling to avoid cursor jumping
+&nbsp;        // https://github.com/JabRef/jabref/issues/5904
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModelTextProperty, newText -&gt; {</b>
+&nbsp;            // This might be triggered by save actions from a background thread, so we need to check if we are in the FX thread
+<b class="nc">&nbsp;            if (Platform.isFxApplicationThread()) {</b>
+<b class="nc">&nbsp;                setTextAndUpdateCaretPosition(textInputControl, newText, logger);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                UiTaskExecutor.runInJavaFXThread(() -&gt; setTextAndUpdateCaretPosition(textInputControl, newText, logger));</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        EasyBind.subscribe(textInputControl.textProperty(), viewModelTextProperty::set);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setTextAndUpdateCaretPosition(TextInputControl textInputControl, String newText, Logger logger) {
+<b class="nc">&nbsp;        int lastCaretPosition = textInputControl.getCaretPosition();</b>
+<b class="nc">&nbsp;        logger.trace(&quot;Caret at position {}&quot;, lastCaretPosition);</b>
+<b class="nc">&nbsp;        String oldText = textInputControl.getText();</b>
+<b class="nc">&nbsp;        textInputControl.setText(newText);</b>
+<b class="nc">&nbsp;        logger.trace(&quot;listener triggered: &#39;{}&#39; -&gt; &#39;{}&#39;&quot;, oldText, newText);</b>
+<b class="nc">&nbsp;        if (oldText == null) {</b>
+<b class="nc">&nbsp;            logger.trace(&quot;Empty field&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (newText == null) {</b>
+<b class="nc">&nbsp;            logger.trace(&quot;Field cleared&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (oldText.equals(newText)) {</b>
+<b class="nc">&nbsp;            logger.trace(&quot;No change, returned.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        logger.trace(&quot;Trying to adapt...&quot;);</b>
+&nbsp;        // This is a special case when the text is set to a new value
+&nbsp;        // In this case, we want to adjust the caret position
+<b class="nc">&nbsp;        List&lt;String&gt; oldValueCharacters = Arrays.asList(oldText.split(&quot;&quot;));</b>
+<b class="nc">&nbsp;        List&lt;String&gt; newValueCharacters = Arrays.asList(newText.split(&quot;&quot;));</b>
+<b class="nc">&nbsp;        List&lt;AbstractDelta&lt;String&gt;&gt; deltaList = DiffUtils.diff(oldValueCharacters, newValueCharacters).getDeltas();</b>
+<b class="nc">&nbsp;        logger.trace(&quot;Deltas: {}&quot;, deltaList);</b>
+<b class="nc">&nbsp;        AbstractDelta&lt;String&gt; lastDelta = null;</b>
+<b class="nc">&nbsp;        for (AbstractDelta&lt;String&gt; delta : deltaList) {</b>
+<b class="nc">&nbsp;            if (delta.getSource().getPosition() &gt; lastCaretPosition) {</b>
+&nbsp;                break;
+&nbsp;            }
+<b class="nc">&nbsp;            lastDelta = delta;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (lastDelta == null) {</b>
+&nbsp;            // Change happened after current caret position
+&nbsp;            // Thus, simply restore the old position
+<b class="nc">&nbsp;            textInputControl.positionCaret(lastCaretPosition);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            logger.trace(&quot;Last Delta: {}&quot;, lastDelta);</b>
+<b class="nc">&nbsp;            logger.trace(&quot;Last Delta source: {}&quot;, lastDelta.getSource());</b>
+<b class="nc">&nbsp;            logger.trace(&quot;Last Delta target: {}&quot;, lastDelta.getTarget());</b>
+<b class="nc">&nbsp;            int offset = lastDelta.getTarget().getPosition() - lastDelta.getSource().getPosition();</b>
+<b class="nc">&nbsp;            logger.trace(&quot;Offset before patching: {}&quot;, offset);</b>
+&nbsp;
+<b class="nc">&nbsp;            switch (lastDelta.getType()) {</b>
+&nbsp;                case DELETE:
+<b class="nc">&nbsp;                    offset -= lastDelta.getSource().size();</b>
+&nbsp;                    break;
+&nbsp;                case INSERT:
+<b class="nc">&nbsp;                    offset += lastDelta.getTarget().size();</b>
+&nbsp;                    break;
+&nbsp;                case CHANGE:
+<b class="nc">&nbsp;                    offset += lastDelta.getTarget().size() - lastDelta.getSource().size();</b>
+&nbsp;                    break;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+<b class="nc">&nbsp;            logger.trace(&quot;Offset after patching: {}&quot;, offset);</b>
+&nbsp;
+<b class="nc">&nbsp;            int newCaretPosition = lastCaretPosition + offset;</b>
+<b class="nc">&nbsp;            textInputControl.positionCaret(newCaretPosition);</b>
+<b class="nc">&nbsp;            logger.trace(&quot;newCaretPosition: {}&quot;, newCaretPosition);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    Parent getNode();
+&nbsp;
+&nbsp;    default void focus() {
+<b class="nc">&nbsp;        getNode().getChildrenUnmodifiable()</b>
+<b class="nc">&nbsp;                 .stream()</b>
+<b class="nc">&nbsp;                 .findFirst()</b>
+<b class="nc">&nbsp;                 .orElse(getNode())</b>
+<b class="nc">&nbsp;                 .requestFocus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns relative size of the field editor in terms of display space.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * A value of 1 means that the editor gets exactly as much space as all other regular editors.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * A value of 2 means that the editor gets twice as much space as regular editors.
+&nbsp;     *
+&nbsp;     * @return the relative weight of the editor in terms of display space
+&nbsp;     */
+&nbsp;    default double getWeight() {
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

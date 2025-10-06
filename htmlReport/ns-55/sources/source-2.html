@@ -1,0 +1,336 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FieldRowView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.threewaymerge</a>
+</div>
+
+<h1>Coverage Summary for Class: FieldRowView (org.jabref.gui.mergeentries.threewaymerge)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FieldRowView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/82)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.threewaymerge;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ReadOnlyStringProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.scene.control.ToggleGroup;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.FieldRowViewModel.Selection;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.cell.FieldNameCell;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.cell.FieldValueCell;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.cell.MergedFieldCell;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.cell.sidebuttons.ToggleMergeUnmergeButton;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighlighter;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.UnifiedDiffHighlighter;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.toolbar.ThreeWayMergeToolbar;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.fxmisc.richtext.StyleClassedTextArea;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A controller class to control left, right and merged field values
+&nbsp; */
+&nbsp;public class FieldRowView {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FieldRowView.class);</b>
+&nbsp;
+&nbsp;    protected final FieldRowViewModel viewModel;
+&nbsp;
+<b class="nc">&nbsp;    protected final BooleanProperty shouldShowDiffs = new SimpleBooleanProperty(true);</b>
+&nbsp;    private final FieldNameCell fieldNameCell;
+&nbsp;    private final FieldValueCell leftValueCell;
+&nbsp;    private final FieldValueCell rightValueCell;
+&nbsp;    private final MergedFieldCell mergedValueCell;
+&nbsp;
+<b class="nc">&nbsp;    private final ToggleGroup toggleGroup = new ToggleGroup();</b>
+&nbsp;
+&nbsp;    private GridPane parent;
+&nbsp;
+<b class="nc">&nbsp;    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, GuiPreferences preferences, int rowIndex) {</b>
+<b class="nc">&nbsp;        viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);</b>
+&nbsp;
+<b class="nc">&nbsp;        fieldNameCell = new FieldNameCell(FieldTextMapper.getDisplayName(field), rowIndex);</b>
+<b class="nc">&nbsp;        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferences);</b>
+<b class="nc">&nbsp;        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferences);</b>
+<b class="nc">&nbsp;        mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);</b>
+&nbsp;
+&nbsp;        // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
+&nbsp;        // This won&#39;t be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
+<b class="nc">&nbsp;        leftValueCell.parentProperty().addListener(e -&gt; {</b>
+<b class="nc">&nbsp;            if (leftValueCell.getParent() instanceof GridPane grid) {</b>
+<b class="nc">&nbsp;                parent = grid;</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        if (FieldMergerFactory.canMerge(field)) {</b>
+<b class="nc">&nbsp;            ToggleMergeUnmergeButton toggleMergeUnmergeButton = new ToggleMergeUnmergeButton(field);</b>
+<b class="nc">&nbsp;            toggleMergeUnmergeButton.setCanMerge(!viewModel.hasEqualLeftAndRightValues());</b>
+<b class="nc">&nbsp;            fieldNameCell.addSideButton(toggleMergeUnmergeButton);</b>
+&nbsp;
+<b class="nc">&nbsp;            EasyBind.listen(toggleMergeUnmergeButton.fieldStateProperty(), (observableValue, old, fieldState) -&gt; {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Field merge state is {} for field {}&quot;, fieldState, field);</b>
+<b class="nc">&nbsp;                if (fieldState == ToggleMergeUnmergeButton.FieldState.MERGED) {</b>
+<b class="nc">&nbsp;                    viewModel.mergeFields();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    viewModel.unmergeFields();</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);</b>
+&nbsp;
+<b class="nc">&nbsp;        mergedValueCell.textProperty().bindBidirectional(viewModel.mergedFieldValueProperty());</b>
+<b class="nc">&nbsp;        leftValueCell.textProperty().bindBidirectional(viewModel.leftFieldValueProperty());</b>
+<b class="nc">&nbsp;        rightValueCell.textProperty().bindBidirectional(viewModel.rightFieldValueProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.selectionProperty(), selection -&gt; {</b>
+<b class="nc">&nbsp;            if (selection == Selection.LEFT) {</b>
+<b class="nc">&nbsp;                toggleGroup.selectToggle(leftValueCell);</b>
+<b class="nc">&nbsp;            } else if (selection == Selection.RIGHT) {</b>
+<b class="nc">&nbsp;                toggleGroup.selectToggle(rightValueCell);</b>
+<b class="nc">&nbsp;            } else if (selection == Selection.NONE) {</b>
+<b class="nc">&nbsp;                toggleGroup.selectToggle(null);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(toggleGroup.selectedToggleProperty(), selectedToggle -&gt; {</b>
+<b class="nc">&nbsp;            if (selectedToggle == leftValueCell) {</b>
+<b class="nc">&nbsp;                selectLeftValue();</b>
+<b class="nc">&nbsp;            } else if (selectedToggle == rightValueCell) {</b>
+<b class="nc">&nbsp;                selectRightValue();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                selectNone();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+&nbsp;        // Hide rightValueCell and extend leftValueCell to 2 columns when fields are merged
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.isFieldsMergedProperty(), isFieldsMerged -&gt; {</b>
+<b class="nc">&nbsp;            if (isFieldsMerged) {</b>
+<b class="nc">&nbsp;                rightValueCell.setVisible(false);</b>
+<b class="nc">&nbsp;                GridPane.setColumnSpan(leftValueCell, 2);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                rightValueCell.setVisible(true);</b>
+<b class="nc">&nbsp;                GridPane.setColumnSpan(leftValueCell, 1);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(viewModel.hasEqualLeftAndRightBinding(), (obs, old, isEqual) -&gt; {</b>
+<b class="nc">&nbsp;            if (isEqual) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Left and right values are equal, LEFT==RIGHT=={}&quot;, viewModel.getLeftFieldValue());</b>
+<b class="nc">&nbsp;                hideDiff();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectLeftValue() {
+<b class="nc">&nbsp;        viewModel.selectLeftValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectRightValue() {
+<b class="nc">&nbsp;        viewModel.selectRightValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectNone() {
+<b class="nc">&nbsp;        viewModel.selectNone();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getMergedValue() {
+<b class="nc">&nbsp;        return mergedValueProperty().getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringProperty mergedValueProperty() {
+<b class="nc">&nbsp;        return viewModel.mergedFieldValueProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FieldNameCell getFieldNameCell() {
+<b class="nc">&nbsp;        return fieldNameCell;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FieldValueCell getLeftValueCell() {
+<b class="nc">&nbsp;        return leftValueCell;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FieldValueCell getRightValueCell() {
+<b class="nc">&nbsp;        return rightValueCell;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MergedFieldCell getMergedValueCell() {
+<b class="nc">&nbsp;        return mergedValueCell;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void showDiff(ShowDiffConfig diffConfig) {
+<b class="nc">&nbsp;        if (!rightValueCell.isVisible() || StringUtil.isNullOrEmpty(viewModel.getLeftFieldValue()) || StringUtil.isNullOrEmpty(viewModel.getRightFieldValue())) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Showing diffs...&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        StyleClassedTextArea leftLabel = leftValueCell.getStyleClassedLabel();</b>
+<b class="nc">&nbsp;        StyleClassedTextArea rightLabel = rightValueCell.getStyleClassedLabel();</b>
+&nbsp;        // Clearing old diff styles based on previous diffConfig
+<b class="nc">&nbsp;        hideDiff();</b>
+<b class="nc">&nbsp;        if (shouldShowDiffs.get()) {</b>
+<b class="nc">&nbsp;            if (diffConfig.diffView() == ThreeWayMergeToolbar.DiffView.UNIFIED) {</b>
+<b class="nc">&nbsp;                new UnifiedDiffHighlighter(leftLabel, rightLabel, diffConfig.diffHighlightingMethod()).highlight();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                new SplitDiffHighlighter(leftLabel, rightLabel, diffConfig.diffHighlightingMethod()).highlight();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void hide() {
+<b class="nc">&nbsp;        if (parent != null) {</b>
+<b class="nc">&nbsp;            parent.getChildren().removeAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void show() {
+<b class="nc">&nbsp;        if (parent != null) {</b>
+<b class="nc">&nbsp;            if (!parent.getChildren().contains(leftValueCell)) {</b>
+<b class="nc">&nbsp;                parent.getChildren().addAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void hideDiff() {
+<b class="nc">&nbsp;        if (!rightValueCell.isVisible()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Hiding diffs...&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        int leftValueLength = getLeftValueCell().getStyleClassedLabel().getLength();</b>
+<b class="nc">&nbsp;        getLeftValueCell().getStyleClassedLabel().clearStyle(0, leftValueLength);</b>
+<b class="nc">&nbsp;        getLeftValueCell().getStyleClassedLabel().replaceText(viewModel.getLeftFieldValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();</b>
+<b class="nc">&nbsp;        getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);</b>
+<b class="nc">&nbsp;        getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasEqualLeftAndRightValues() {
+<b class="nc">&nbsp;        return viewModel.hasEqualLeftAndRightValues();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void autoSelectBetterValue() {
+<b class="nc">&nbsp;        viewModel.autoSelectBetterValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;FieldRowView [shouldShowDiffs=&quot; + shouldShowDiffs.get() + &quot;, fieldNameCell=&quot; + fieldNameCell + &quot;, leftValueCell=&quot; + leftValueCell + &quot;, rightValueCell=&quot; + rightValueCell + &quot;, mergedValueCell=&quot; + mergedValueCell + &quot;]&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

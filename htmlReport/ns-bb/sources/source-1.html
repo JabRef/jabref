@@ -1,0 +1,283 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Formatters</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter</a>
+</div>
+
+<h1>Coverage Summary for Class: Formatters (org.jabref.logic.formatter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Formatters</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.ConvertMSCCodesFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeIssn;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.CamelFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.CamelNFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.ShortTitleFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.VeryShortTitleFormatter;
+&nbsp;import org.jabref.logic.formatter.minifier.MinifyNameListFormatter;
+&nbsp;import org.jabref.logic.formatter.minifier.TruncateFormatter;
+&nbsp;import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+&nbsp;import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+&nbsp;
+&nbsp;public class Formatters {
+<b class="nc">&nbsp;    private static final Pattern TRUNCATE_PATTERN = Pattern.compile(&quot;\\Atruncate\\d+\\z&quot;);</b>
+&nbsp;
+&nbsp;    private static Map&lt;String, Formatter&gt; keyToFormatterMap;
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        keyToFormatterMap = getAll().stream().collect(Collectors.toMap(Formatter::getKey, f -&gt; f));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Formatters() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Formatter&gt; getConverters() {
+<b class="nc">&nbsp;        return Arrays.asList(</b>
+&nbsp;                new HtmlToLatexFormatter(),
+&nbsp;                new HtmlToUnicodeFormatter(),
+&nbsp;                new LatexToUnicodeFormatter(),
+&nbsp;                new UnicodeToLatexFormatter(),
+&nbsp;                new ConvertMSCCodesFormatter()
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Formatter&gt; getCaseChangers() {
+<b class="nc">&nbsp;        return Arrays.asList(</b>
+&nbsp;                new CapitalizeFormatter(),
+&nbsp;                new LowerCaseFormatter(),
+&nbsp;                new SentenceCaseFormatter(),
+&nbsp;                new TitleCaseFormatter(),
+&nbsp;                new UpperCaseFormatter()
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Formatter&gt; getOthers() {
+<b class="nc">&nbsp;        return Arrays.asList(</b>
+&nbsp;                new ClearFormatter(),
+&nbsp;                new CleanupUrlFormatter(),
+&nbsp;                new LatexCleanupFormatter(),
+&nbsp;                new MinifyNameListFormatter(),
+&nbsp;                new NormalizeDateFormatter(),
+&nbsp;                new NormalizeIssn(),
+&nbsp;                new NormalizeMonthFormatter(),
+&nbsp;                new NormalizeNamesFormatter(),
+&nbsp;                new NormalizePagesFormatter(),
+&nbsp;                new NormalizeUnicodeFormatter(),
+&nbsp;                new OrdinalsToSuperscriptFormatter(),
+&nbsp;                new RemoveEnclosingBracesFormatter(),
+&nbsp;                new RemoveWordEnclosingAndOuterEnclosingBracesFormatter(),
+&nbsp;                new UnitsToLatexFormatter(),
+&nbsp;                new EscapeUnderscoresFormatter(),
+&nbsp;                new EscapeAmpersandsFormatter(),
+&nbsp;                new EscapeDollarSignFormatter(),
+&nbsp;                new ShortenDOIFormatter(),
+&nbsp;                new ReplaceUnicodeLigaturesFormatter(),
+&nbsp;                new UnprotectTermsFormatter()
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Formatter&gt; getTitleChangers() {
+<b class="nc">&nbsp;        return Arrays.asList(</b>
+&nbsp;                new VeryShortTitleFormatter(),
+&nbsp;                new ShortTitleFormatter(),
+&nbsp;                new CamelFormatter()
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Formatter&gt; getAll() {
+<b class="nc">&nbsp;        List&lt;Formatter&gt; all = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        all.addAll(getConverters());</b>
+<b class="nc">&nbsp;        all.addAll(getCaseChangers());</b>
+<b class="nc">&nbsp;        all.addAll(getOthers());</b>
+<b class="nc">&nbsp;        all.addAll(getTitleChangers());</b>
+<b class="nc">&nbsp;        return all;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;Formatter&gt; getFormatterForKey(String name) {
+<b class="nc">&nbsp;        Objects.requireNonNull(name);</b>
+<b class="nc">&nbsp;        return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;Formatter&gt; getFormatterForModifier(String modifier) {
+<b class="nc">&nbsp;        Objects.requireNonNull(modifier);</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (modifier) {</b>
+&nbsp;            case &quot;lower&quot;:
+<b class="nc">&nbsp;                return Optional.of(new LowerCaseFormatter());</b>
+&nbsp;            case &quot;upper&quot;:
+<b class="nc">&nbsp;                return Optional.of(new UpperCaseFormatter());</b>
+&nbsp;            case &quot;capitalize&quot;:
+<b class="nc">&nbsp;                return Optional.of(new CapitalizeFormatter());</b>
+&nbsp;            case &quot;titlecase&quot;:
+<b class="nc">&nbsp;                return Optional.of(new TitleCaseFormatter());</b>
+&nbsp;            case &quot;sentencecase&quot;:
+<b class="nc">&nbsp;                return Optional.of(new SentenceCaseFormatter());</b>
+&nbsp;            case &quot;veryshorttitle&quot;:
+<b class="nc">&nbsp;                return Optional.of(new VeryShortTitleFormatter());</b>
+&nbsp;            case &quot;shorttitle&quot;:
+<b class="nc">&nbsp;                return Optional.of(new ShortTitleFormatter());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (modifier.contains(&quot;camel&quot;)) {</b>
+<b class="nc">&nbsp;            modifier = modifier.replace(&quot;camel&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;            if (modifier.isEmpty()) {</b>
+<b class="nc">&nbsp;                return Optional.of(new CamelFormatter());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                int length = Integer.parseInt(modifier);</b>
+<b class="nc">&nbsp;                return Optional.of(new CamelNFormatter(length));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (modifier.startsWith(RegexFormatter.KEY)) {</b>
+<b class="nc">&nbsp;            String regex = modifier.substring(RegexFormatter.KEY.length());</b>
+<b class="nc">&nbsp;            return Optional.of(new RegexFormatter(regex));</b>
+<b class="nc">&nbsp;        } else if (TRUNCATE_PATTERN.matcher(modifier).matches()) {</b>
+<b class="nc">&nbsp;            int truncateAfter = Integer.parseInt(modifier.substring(8));</b>
+<b class="nc">&nbsp;            return Optional.of(new TruncateFormatter(truncateAfter));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return getFormatterForKey(modifier);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

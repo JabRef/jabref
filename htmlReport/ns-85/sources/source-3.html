@@ -1,0 +1,407 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WalkthroughHighlighter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough</a>
+</div>
+
+<h1>Coverage Summary for Class: WalkthroughHighlighter (org.jabref.gui.walkthrough)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WalkthroughHighlighter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WalkthroughHighlighter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WalkthroughHighlighter$EffectState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/94)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.stage.Window;
+&nbsp;
+&nbsp;import org.jabref.gui.walkthrough.declarative.WindowResolver;
+&nbsp;import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
+&nbsp;import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
+&nbsp;import org.jabref.gui.walkthrough.effects.FullScreenDarken;
+&nbsp;import org.jabref.gui.walkthrough.effects.Ping;
+&nbsp;import org.jabref.gui.walkthrough.effects.Spotlight;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+<b class="nc">&nbsp;public class WalkthroughHighlighter {</b>
+<b class="nc">&nbsp;    private final Map&lt;Window, Spotlight&gt; backdropHighlights = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;Window, Ping&gt; pulseIndicators = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;Window, FullScreenDarken&gt; fullScreenDarkens = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;Window, EffectState&gt; currentEffects = new HashMap&lt;&gt;();</b>
+&nbsp;    private @Nullable Runnable onBackgroundClickHandler;
+&nbsp;
+&nbsp;    /// Applies the specified highlight configuration.
+&nbsp;    ///
+&nbsp;    /// @param config         The highlight configuration to apply. Default to
+&nbsp;    ///                                             BackdropHighlight on the primary windows if null.
+&nbsp;    /// @param scene          The primary scene to apply the highlight to.
+&nbsp;    /// @param fallbackTarget The fallback target node to use if no highlight
+&nbsp;    ///                                             configuration is provided.
+&nbsp;    public void applyHighlight(@Nullable WalkthroughEffect config, @NonNull Scene scene, @Nullable Node fallbackTarget) {
+<b class="nc">&nbsp;        Map&lt;Window, EffectState&gt; newEffects = computeNewEffects(config, scene, fallbackTarget);</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;Window, EffectState&gt; toUpdate = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        Map&lt;Window, EffectState&gt; toCreate = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        Map&lt;Window, EffectState&gt; toRemove = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        diffEffects(currentEffects, newEffects, toUpdate, toCreate, toRemove);</b>
+&nbsp;
+<b class="nc">&nbsp;        toRemove.forEach((window, _) -&gt; detach(window));</b>
+&nbsp;
+<b class="nc">&nbsp;        toUpdate.forEach(this::updateExistingEffect);</b>
+&nbsp;
+<b class="nc">&nbsp;        toCreate.forEach((window, newState) -&gt; applyEffect(window, newState.effect, newState.targetNode));</b>
+&nbsp;
+<b class="nc">&nbsp;        currentEffects.clear();</b>
+<b class="nc">&nbsp;        currentEffects.putAll(newEffects);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Sets a handler to be called when the user clicks on backdrop or darkened areas.
+&nbsp;    ///
+&nbsp;    /// @param handler The handler to call when the background is clicked. If null, no
+&nbsp;    ///                               action will be taken on background clicks. Usually used to
+&nbsp;    ///                               support quit walkthrough on clicking the effects.
+&nbsp;    public void setOnBackgroundClick(@Nullable Runnable handler) {
+<b class="nc">&nbsp;        this.onBackgroundClickHandler = handler;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Detaches the specified window from all effects. Restore the scene graph on this
+&nbsp;    /// window to the state before any effects were applied.
+&nbsp;    public void detach(@NonNull Window window) {
+<b class="nc">&nbsp;        backdropHighlights.computeIfPresent(window, (_, highlight) -&gt; {</b>
+<b class="nc">&nbsp;            highlight.detach();</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+<b class="nc">&nbsp;        pulseIndicators.computeIfPresent(window, (_, indicator) -&gt; {</b>
+<b class="nc">&nbsp;            indicator.detach();</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+<b class="nc">&nbsp;        fullScreenDarkens.computeIfPresent(window, (_, darken) -&gt; {</b>
+<b class="nc">&nbsp;            darken.detach();</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        currentEffects.remove(window);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Detaches all effects from all windows. See [WalkthroughHighlighter#detach].
+&nbsp;    public void detachAll() {
+<b class="nc">&nbsp;        backdropHighlights.values().forEach(Spotlight::detach);</b>
+<b class="nc">&nbsp;        backdropHighlights.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        pulseIndicators.values().forEach(Ping::detach);</b>
+<b class="nc">&nbsp;        pulseIndicators.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        fullScreenDarkens.values().forEach(FullScreenDarken::detach);</b>
+<b class="nc">&nbsp;        fullScreenDarkens.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        currentEffects.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;Window, EffectState&gt; computeNewEffects(@Nullable WalkthroughEffect config, @NonNull Scene fallbackWindow, @Nullable Node fallbackTarget) {
+<b class="nc">&nbsp;        Map&lt;Window, EffectState&gt; newEffects = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (config == null) {</b>
+<b class="nc">&nbsp;            if (fallbackTarget != null) {</b>
+<b class="nc">&nbsp;                newEffects.put(fallbackWindow.getWindow(),</b>
+&nbsp;                        new EffectState(HighlightEffect.SPOT_LIGHT, fallbackTarget));
+&nbsp;            }
+<b class="nc">&nbsp;            return newEffects;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (config.windowEffects().isEmpty() &amp;&amp; config.fallbackEffect().isPresent()) {</b>
+<b class="nc">&nbsp;            newEffects.put(fallbackWindow.getWindow(),</b>
+<b class="nc">&nbsp;                    new EffectState(config.fallbackEffect().get(), fallbackTarget));</b>
+<b class="nc">&nbsp;            return newEffects;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        config.windowEffects().forEach(effect -&gt; {</b>
+<b class="nc">&nbsp;            Window window = effect.windowResolver().flatMap(WindowResolver::resolve).orElse(fallbackWindow.getWindow());</b>
+<b class="nc">&nbsp;            Node targetNode = effect</b>
+<b class="nc">&nbsp;                    .targetNodeResolver()</b>
+<b class="nc">&nbsp;                    .flatMap(resolver -&gt; resolver.resolve(window.getScene() != null ? window.getScene() : fallbackWindow))</b>
+<b class="nc">&nbsp;                    .orElse(fallbackTarget);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (targetNode != null || effect.effect() == HighlightEffect.FULL_SCREEN_DARKEN) {</b>
+<b class="nc">&nbsp;                newEffects.put(window, new EffectState(effect.effect(), targetNode));</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        return newEffects;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void diffEffects(Map&lt;Window, EffectState&gt; current,
+&nbsp;                             Map&lt;Window, EffectState&gt; desired,
+&nbsp;                             Map&lt;Window, EffectState&gt; toUpdate,
+&nbsp;                             Map&lt;Window, EffectState&gt; toCreate,
+&nbsp;                             Map&lt;Window, EffectState&gt; toRemove) {
+<b class="nc">&nbsp;        current.forEach((window, currentState) -&gt; {</b>
+<b class="nc">&nbsp;            EffectState desiredState = desired.get(window);</b>
+<b class="nc">&nbsp;            if (desiredState == null) {</b>
+<b class="nc">&nbsp;                toRemove.put(window, currentState);</b>
+<b class="nc">&nbsp;            } else if (currentState.canTransitionTo(desiredState)) {</b>
+<b class="nc">&nbsp;                toUpdate.put(window, desiredState);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                toRemove.put(window, currentState);</b>
+<b class="nc">&nbsp;                toCreate.put(window, desiredState);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        desired.forEach((window, desiredState) -&gt; {</b>
+<b class="nc">&nbsp;            if (!current.containsKey(window)) {</b>
+<b class="nc">&nbsp;                toCreate.put(window, desiredState);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateExistingEffect(@NonNull Window window, @NonNull EffectState newState) {
+<b class="nc">&nbsp;        switch (newState.effect) {</b>
+&nbsp;            case SPOT_LIGHT -&gt; {
+<b class="nc">&nbsp;                Spotlight backdrop = backdropHighlights.get(window);</b>
+<b class="nc">&nbsp;                if (backdrop != null &amp;&amp; newState.targetNode != null) {</b>
+<b class="nc">&nbsp;                    backdrop.transitionTo(newState.targetNode);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            case PING -&gt; {
+<b class="nc">&nbsp;                Ping ping = pulseIndicators.get(window);</b>
+<b class="nc">&nbsp;                if (ping != null &amp;&amp; newState.targetNode != null) {</b>
+<b class="nc">&nbsp;                    ping.transitionTo(newState.targetNode);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            case FULL_SCREEN_DARKEN -&gt; {
+&nbsp;                // FullScreenDarken doesn&#39;t need updates as it has no target node
+&nbsp;            }
+&nbsp;            case NONE -&gt;
+<b class="nc">&nbsp;                    detach(window);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void applyEffect(@NonNull Window window, @NonNull HighlightEffect effect, @Nullable Node targetNode) {
+<b class="nc">&nbsp;        switch (effect) {</b>
+&nbsp;            case SPOT_LIGHT -&gt; {
+<b class="nc">&nbsp;                if (targetNode != null) {</b>
+<b class="nc">&nbsp;                    applyBackdropHighlight(window, targetNode);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            case PING -&gt; {
+<b class="nc">&nbsp;                if (targetNode != null) {</b>
+<b class="nc">&nbsp;                    applyPulseAnimation(window, targetNode);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            case FULL_SCREEN_DARKEN -&gt;
+<b class="nc">&nbsp;                    applyFullScreenDarken(window);</b>
+&nbsp;            case NONE -&gt;
+<b class="nc">&nbsp;                    detach(window);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void applyBackdropHighlight(@NonNull Window window, @NonNull Node targetNode) {
+<b class="nc">&nbsp;        WalkthroughPane pane = WalkthroughPane.getInstance(window);</b>
+<b class="nc">&nbsp;        Spotlight backdrop = getOrCreateBackdropHighlight(window, pane);</b>
+<b class="nc">&nbsp;        backdrop.setOnClick(onBackgroundClickHandler);</b>
+<b class="nc">&nbsp;        backdrop.attach(targetNode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void applyPulseAnimation(@NonNull Window window, @NonNull Node targetNode) {
+<b class="nc">&nbsp;        WalkthroughPane pane = WalkthroughPane.getInstance(window);</b>
+<b class="nc">&nbsp;        Ping ping = getOrCreatePulseIndicator(window, pane);</b>
+<b class="nc">&nbsp;        ping.attach(targetNode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void applyFullScreenDarken(@NonNull Window window) {
+<b class="nc">&nbsp;        WalkthroughPane pane = WalkthroughPane.getInstance(window);</b>
+<b class="nc">&nbsp;        FullScreenDarken fullDarken = getOrCreateFullScreenDarken(window, pane);</b>
+<b class="nc">&nbsp;        fullDarken.setOnClick(onBackgroundClickHandler);</b>
+<b class="nc">&nbsp;        fullDarken.attach();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Spotlight getOrCreateBackdropHighlight(@NonNull Window window, @NonNull WalkthroughPane pane) {
+<b class="nc">&nbsp;        return backdropHighlights.computeIfAbsent(window, _ -&gt; new Spotlight(pane));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Ping getOrCreatePulseIndicator(@NonNull Window window, @NonNull WalkthroughPane pane) {
+<b class="nc">&nbsp;        return pulseIndicators.computeIfAbsent(window, _ -&gt; new Ping(pane));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FullScreenDarken getOrCreateFullScreenDarken(@NonNull Window window, @NonNull WalkthroughPane pane) {
+<b class="nc">&nbsp;        return fullScreenDarkens.computeIfAbsent(window, _ -&gt; new FullScreenDarken(pane));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record EffectState(HighlightEffect effect, @Nullable Node targetNode) {</b>
+&nbsp;        boolean canTransitionTo(EffectState other) {
+<b class="nc">&nbsp;            return effect == other.effect;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

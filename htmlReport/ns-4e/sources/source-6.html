@@ -1,0 +1,300 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedFileEditDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.linkedfile</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedFileEditDialogViewModel (org.jabref.gui.linkedfile)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedFileEditDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.linkedfile;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.logic.util.io.FileNameCleaner;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class LinkedFileEditDialogViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileEditDialogViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile(&quot;[a-z]+://.*&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty link = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty description = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty sourceUrl = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;ExternalFileType&gt; allExternalFileTypes = new SimpleListProperty&lt;&gt;(FXCollections.emptyObservableList());</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;ExternalFileType&gt; selectedExternalFileType = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;    private final ObservableOptionalValue&lt;ExternalFileType&gt; monadicSelectedExternalFileType;
+&nbsp;    private final BibDatabaseContext database;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;
+&nbsp;    public LinkedFileEditDialogViewModel(LinkedFile linkedFile,
+&nbsp;                                         BibDatabaseContext database,
+&nbsp;                                         DialogService dialogService,
+&nbsp;                                         ExternalApplicationsPreferences externalApplicationsPreferences,
+<b class="nc">&nbsp;                                         FilePreferences filePreferences) {</b>
+<b class="nc">&nbsp;        this.database = database;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        this.externalApplicationsPreferences = externalApplicationsPreferences;</b>
+<b class="nc">&nbsp;        allExternalFileTypes.set(FXCollections.observableArrayList(externalApplicationsPreferences.getExternalFileTypes()));</b>
+&nbsp;
+<b class="nc">&nbsp;        monadicSelectedExternalFileType = EasyBind.wrapNullable(selectedExternalFileType);</b>
+<b class="nc">&nbsp;        setValues(linkedFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setExternalFileTypeByExtension(String link) {
+<b class="nc">&nbsp;        if (!link.isEmpty()) {</b>
+&nbsp;            // Check if this looks like a remote link:
+<b class="nc">&nbsp;            if (REMOTE_LINK_PATTERN.matcher(link).matches()) {</b>
+<b class="nc">&nbsp;                ExternalFileTypes.getExternalFileTypeByExt(&quot;html&quot;, externalApplicationsPreferences)</b>
+<b class="nc">&nbsp;                                 .ifPresent(selectedExternalFileType::setValue);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Try to guess the file type:
+<b class="nc">&nbsp;            String theLink = link.trim();</b>
+<b class="nc">&nbsp;            ExternalFileTypes.getExternalFileTypeForName(theLink, externalApplicationsPreferences)</b>
+<b class="nc">&nbsp;                             .ifPresent(selectedExternalFileType::setValue);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openBrowseDialog() {
+<b class="nc">&nbsp;        String fileText = link.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; file = FileUtil.find(database, fileText, filePreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        Path workingDir = file.orElse(filePreferences.getWorkingDirectory());</b>
+<b class="nc">&nbsp;        String fileName = Path.of(fileText).getFileName().toString();</b>
+&nbsp;
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .withInitialDirectory(workingDir)</b>
+<b class="nc">&nbsp;                .withInitialFileName(fileName)</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::checkForBadFileNameAndAdd);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    void checkForBadFileNameAndAdd(Path fileToAdd) {
+<b class="nc">&nbsp;        if (FileUtil.detectBadFileName(fileToAdd.toString())) {</b>
+<b class="nc">&nbsp;            String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang(&quot;File \&quot;%0\&quot; cannot be added!&quot;, fileToAdd.getFileName()),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Illegal characters in the file name detected.\nFile will be renamed to \&quot;%0\&quot; and added.&quot;, newFilename),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Rename and add&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;            if (correctButtonPressed) {</b>
+<b class="nc">&nbsp;                Path correctPath = fileToAdd.resolveSibling(newFilename);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    Files.move(fileToAdd, correctPath);</b>
+<b class="nc">&nbsp;                    link.set(relativize(correctPath));</b>
+<b class="nc">&nbsp;                    filePreferences.setWorkingDirectory(correctPath);</b>
+<b class="nc">&nbsp;                    setExternalFileTypeByExtension(link.getValueSafe());</b>
+&nbsp;                } catch (IOException ex) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Error moving file&quot;, ex);</b>
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(ex);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            link.set(relativize(fileToAdd));</b>
+<b class="nc">&nbsp;            filePreferences.setWorkingDirectory(fileToAdd);</b>
+<b class="nc">&nbsp;            setExternalFileTypeByExtension(link.getValueSafe());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setValues(LinkedFile linkedFile) {
+<b class="nc">&nbsp;        description.set(linkedFile.getDescription());</b>
+<b class="nc">&nbsp;        sourceUrl.set(linkedFile.getSourceUrl());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (linkedFile.isOnlineLink()) {</b>
+<b class="nc">&nbsp;            link.setValue(linkedFile.getLink()); // Might be an URL</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            link.setValue(relativize(Path.of(linkedFile.getLink())));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // See what is a reasonable selection for the type combobox:
+<b class="nc">&nbsp;        Optional&lt;ExternalFileType&gt; fileType = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, externalApplicationsPreferences);</b>
+<b class="nc">&nbsp;        if (fileType.isPresent() &amp;&amp; !(fileType.get() instanceof UnknownExternalFileType)) {</b>
+<b class="nc">&nbsp;            selectedExternalFileType.setValue(fileType.get());</b>
+<b class="nc">&nbsp;        } else if ((linkedFile.getLink() != null) &amp;&amp; (!linkedFile.getLink().isEmpty())) {</b>
+<b class="nc">&nbsp;            setExternalFileTypeByExtension(linkedFile.getLink());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty linkProperty() {
+<b class="nc">&nbsp;        return link;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty descriptionProperty() {
+<b class="nc">&nbsp;        return description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty sourceUrlProperty() {
+<b class="nc">&nbsp;        return sourceUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;ExternalFileType&gt; externalFileTypeProperty() {
+<b class="nc">&nbsp;        return allExternalFileTypes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;ExternalFileType&gt; selectedExternalFileTypeProperty() {
+<b class="nc">&nbsp;        return selectedExternalFileType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedFile getNewLinkedFile() {
+<b class="nc">&nbsp;        String fileType = monadicSelectedExternalFileType.getValue().map(ExternalFileType::toString).orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (LinkedFile.isOnlineLink(link.getValue())) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return new LinkedFile(description.getValue(), URLUtil.create(link.getValue()), fileType, sourceUrl.getValue());</b>
+&nbsp;            } catch (MalformedURLException e) {
+<b class="nc">&nbsp;                return new LinkedFile(description.getValue(), link.getValue(), fileType, sourceUrl.getValue());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return new LinkedFile(description.getValue(), Path.of(link.getValue()), fileType, sourceUrl.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String relativize(Path filePath) {
+<b class="nc">&nbsp;        return FileUtil.relativize(filePath, database, filePreferences).toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,142 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MergeReviewIntoCommentConfirmationDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.importer.actions</a>
+</div>
+
+<h1>Coverage Summary for Class: MergeReviewIntoCommentConfirmationDialog (org.jabref.gui.importer.actions)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MergeReviewIntoCommentConfirmationDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.importer.actions;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;public class MergeReviewIntoCommentConfirmationDialog {
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+<b class="nc">&nbsp;    public MergeReviewIntoCommentConfirmationDialog(DialogService dialogService) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean askUserForMerge(List&lt;BibEntry&gt; conflicts) {
+<b class="nc">&nbsp;        String bibKeys = conflicts</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(BibEntry::getCitationKey)</b>
+<b class="nc">&nbsp;                .filter(Optional::isPresent)</b>
+<b class="nc">&nbsp;                .map(Optional::get)</b>
+<b class="nc">&nbsp;                .collect(Collectors.joining(&quot;,\n&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        String content = bibKeys + &quot; &quot; +</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;has/have both a &#39;Comment&#39; and a &#39;Review&#39; field.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Since the &#39;Review&#39; field was deprecated in JabRef 4.2, these two fields are about to be merged into the &#39;Comment&#39; field.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;The conflicting fields of these entries will be merged into the &#39;Comment&#39; field.&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Review Field Migration&quot;),</b>
+&nbsp;                content,
+<b class="nc">&nbsp;                Localization.lang(&quot;Merge fields&quot;)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,404 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BiblioscapeImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: BiblioscapeImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BiblioscapeImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/150)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/188)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;/**
+&nbsp; * Imports a Biblioscape Tag File. The format is described on
+&nbsp; * http://www.biblioscape.com/download/Biblioscape8.pdf Several
+&nbsp; * Biblioscape field types are ignored. Others are only included in the BibTeX
+&nbsp; * field &quot;comment&quot;.
+&nbsp; */
+<b class="nc">&nbsp;public class BiblioscapeImporter extends Importer {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;biblioscape&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;Biblioscape&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StandardFileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.TXT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Imports a Biblioscape Tag File.\nSeveral Biblioscape field types are ignored. Others are only included in the BibTeX field \&quot;comment\&quot;.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader reader) {
+<b class="nc">&nbsp;        Objects.requireNonNull(reader);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; bibItems = new ArrayList&lt;&gt;();</b>
+&nbsp;        String line;
+<b class="nc">&nbsp;        Map&lt;Field, String&gt; hm = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        Map&lt;String, StringBuilder&gt; lines = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        StringBuilder previousLine = null;</b>
+<b class="nc">&nbsp;        while ((line = reader.readLine()) != null) {</b>
+<b class="nc">&nbsp;            if (line.isEmpty()) {</b>
+&nbsp;                continue; // ignore empty lines, e.g. at file
+&nbsp;            }
+&nbsp;            // end
+&nbsp;            // entry delimiter -&gt; item complete
+<b class="nc">&nbsp;            if (&quot;------&quot;.equals(line)) {</b>
+<b class="nc">&nbsp;                String[] type = new String[2];</b>
+<b class="nc">&nbsp;                String[] pages = new String[2];</b>
+<b class="nc">&nbsp;                String country = null;</b>
+<b class="nc">&nbsp;                String address = null;</b>
+<b class="nc">&nbsp;                String titleST = null;</b>
+<b class="nc">&nbsp;                String titleTI = null;</b>
+<b class="nc">&nbsp;                List&lt;String&gt; comments = new ArrayList&lt;&gt;();</b>
+&nbsp;                // add item
+<b class="nc">&nbsp;                for (Map.Entry&lt;String, StringBuilder&gt; entry : lines.entrySet()) {</b>
+<b class="nc">&nbsp;                    if (&quot;AU&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.AUTHOR, entry.getValue()</b>
+<b class="nc">&nbsp;                                                          .toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;TI&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        titleTI = entry.getValue()</b>
+<b class="nc">&nbsp;                                       .toString();</b>
+<b class="nc">&nbsp;                    } else if (&quot;ST&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        titleST = entry.getValue()</b>
+<b class="nc">&nbsp;                                       .toString();</b>
+<b class="nc">&nbsp;                    } else if (&quot;YP&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.YEAR, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;VL&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.VOLUME, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;NB&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.NUMBER, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;PS&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        pages[0] = entry.getValue()</b>
+<b class="nc">&nbsp;                                        .toString();</b>
+<b class="nc">&nbsp;                    } else if (&quot;PE&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        pages[1] = entry.getValue()</b>
+<b class="nc">&nbsp;                                        .toString();</b>
+<b class="nc">&nbsp;                    } else if (&quot;KW&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.KEYWORDS, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;RT&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        type[0] = entry.getValue()</b>
+<b class="nc">&nbsp;                                       .toString();</b>
+<b class="nc">&nbsp;                    } else if (&quot;SB&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments.add(&quot;Subject: &quot;</b>
+<b class="nc">&nbsp;                                + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;SA&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments</b>
+<b class="nc">&nbsp;                                .add(&quot;Secondary Authors: &quot; + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;NT&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.NOTE, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;PB&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.PUBLISHER, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;TA&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments</b>
+<b class="nc">&nbsp;                                .add(&quot;Tertiary Authors: &quot; + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;TT&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments</b>
+<b class="nc">&nbsp;                                .add(&quot;Tertiary Title: &quot; + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;ED&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.EDITION, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;TW&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        type[1] = entry.getValue()</b>
+<b class="nc">&nbsp;                                       .toString();</b>
+<b class="nc">&nbsp;                    } else if (&quot;QA&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments</b>
+<b class="nc">&nbsp;                                .add(&quot;Quaternary Authors: &quot; + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;QT&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments</b>
+<b class="nc">&nbsp;                                .add(&quot;Quaternary Title: &quot; + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;IS&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.ISBN, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;AB&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.ABSTRACT, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;AD&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        address = entry.getValue()</b>
+<b class="nc">&nbsp;                                       .toString();</b>
+<b class="nc">&nbsp;                    } else if (&quot;LG&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.LANGUAGE, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;CO&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        country = entry.getValue()</b>
+<b class="nc">&nbsp;                                       .toString();</b>
+<b class="nc">&nbsp;                    } else if (&quot;UR&quot;.equals(entry.getKey()) || &quot;AT&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        String s = entry.getValue().toString().trim();</b>
+<b class="nc">&nbsp;                        hm.put(s.startsWith(&quot;http://&quot;) || s.startsWith(&quot;ftp://&quot;) ? StandardField.URL</b>
+<b class="nc">&nbsp;                                                                                 : StandardField.PDF, entry.getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;C1&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments.add(&quot;Custom1: &quot;</b>
+<b class="nc">&nbsp;                                + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;C2&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments.add(&quot;Custom2: &quot;</b>
+<b class="nc">&nbsp;                                + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;C3&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments.add(&quot;Custom3: &quot;</b>
+<b class="nc">&nbsp;                                + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;C4&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments.add(&quot;Custom4: &quot;</b>
+<b class="nc">&nbsp;                                + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;C5&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments.add(&quot;Custom5: &quot;</b>
+<b class="nc">&nbsp;                                + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;C6&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments.add(&quot;Custom6: &quot;</b>
+<b class="nc">&nbsp;                                + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;DE&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.ANNOTE, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+<b class="nc">&nbsp;                    } else if (&quot;CA&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments.add(&quot;Categories: &quot;</b>
+<b class="nc">&nbsp;                                + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;TH&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        comments.add(&quot;Short Title: &quot;</b>
+<b class="nc">&nbsp;                                + entry.getValue());</b>
+<b class="nc">&nbsp;                    } else if (&quot;SE&quot;.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.CHAPTER, entry</b>
+<b class="nc">&nbsp;                                .getValue().toString());</b>
+&nbsp;                        // else if (entry.getKey().equals(&quot;AC&quot;))
+&nbsp;                        //   hm.put(&quot;&quot;,entry.getValue().toString());
+&nbsp;                        // else if (entry.getKey().equals(&quot;LP&quot;))
+&nbsp;                        //   hm.put(&quot;&quot;,entry.getValue().toString());
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                EntryType bibtexType = BibEntry.DEFAULT_TYPE;</b>
+&nbsp;                // to find type, first check TW, then RT
+<b class="nc">&nbsp;                for (int i = 1; (i &gt;= 0) &amp;&amp; BibEntry.DEFAULT_TYPE.equals(bibtexType); --i) {</b>
+<b class="nc">&nbsp;                    if (type[i] == null) {</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    type[i] = type[i].toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;                    if (type[i].contains(&quot;article&quot;)) {</b>
+<b class="nc">&nbsp;                        bibtexType = StandardEntryType.Article;</b>
+<b class="nc">&nbsp;                    } else if (type[i].contains(&quot;journal&quot;)) {</b>
+<b class="nc">&nbsp;                        bibtexType = StandardEntryType.Article;</b>
+<b class="nc">&nbsp;                    } else if (type[i].contains(&quot;book section&quot;)) {</b>
+<b class="nc">&nbsp;                        bibtexType = StandardEntryType.InBook;</b>
+<b class="nc">&nbsp;                    } else if (type[i].contains(&quot;book&quot;)) {</b>
+<b class="nc">&nbsp;                        bibtexType = StandardEntryType.Book;</b>
+<b class="nc">&nbsp;                    } else if (type[i].contains(&quot;conference&quot;)) {</b>
+<b class="nc">&nbsp;                        bibtexType = StandardEntryType.InProceedings;</b>
+<b class="nc">&nbsp;                    } else if (type[i].contains(&quot;proceedings&quot;)) {</b>
+<b class="nc">&nbsp;                        bibtexType = StandardEntryType.InProceedings;</b>
+<b class="nc">&nbsp;                    } else if (type[i].contains(&quot;report&quot;)) {</b>
+<b class="nc">&nbsp;                        bibtexType = StandardEntryType.TechReport;</b>
+<b class="nc">&nbsp;                    } else if (type[i].contains(&quot;thesis&quot;)</b>
+<b class="nc">&nbsp;                            &amp;&amp; type[i].contains(&quot;master&quot;)) {</b>
+<b class="nc">&nbsp;                        bibtexType = StandardEntryType.MastersThesis;</b>
+<b class="nc">&nbsp;                    } else if (type[i].contains(&quot;thesis&quot;)) {</b>
+<b class="nc">&nbsp;                        bibtexType = StandardEntryType.PhdThesis;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+&nbsp;                // depending on bibtexType, decide where to place the titleRT and
+&nbsp;                // titleTI
+<b class="nc">&nbsp;                if (bibtexType.equals(StandardEntryType.Article)) {</b>
+<b class="nc">&nbsp;                    if (titleST != null) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.JOURNAL, titleST);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (titleTI != null) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.TITLE, titleTI);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } else if (bibtexType.equals(StandardEntryType.InBook)) {</b>
+<b class="nc">&nbsp;                    if (titleST != null) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.BOOKTITLE, titleST);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (titleTI != null) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.TITLE, titleTI);</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    if (titleST != null) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.BOOKTITLE, titleST);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (titleTI != null) {</b>
+<b class="nc">&nbsp;                        hm.put(StandardField.TITLE, titleTI);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+&nbsp;                // concatenate pages
+<b class="nc">&nbsp;                if ((pages[0] != null) || (pages[1] != null)) {</b>
+<b class="nc">&nbsp;                    hm.put(StandardField.PAGES, (pages[0] == null ? &quot;&quot; : pages[0]) + (pages[1] == null ? &quot;&quot; : &quot;--&quot; + pages[1]));</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // concatenate address and country
+<b class="nc">&nbsp;                if (address != null) {</b>
+<b class="nc">&nbsp;                    hm.put(StandardField.ADDRESS, address + (country == null ? &quot;&quot; : &quot;, &quot; + country));</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (!comments.isEmpty()) { // set comment if present</b>
+<b class="nc">&nbsp;                    hm.put(StandardField.COMMENT, String.join(&quot;;&quot;, comments));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                BibEntry b = new BibEntry(bibtexType);</b>
+<b class="nc">&nbsp;                b.setField(hm);</b>
+<b class="nc">&nbsp;                bibItems.add(b);</b>
+&nbsp;
+<b class="nc">&nbsp;                hm.clear();</b>
+<b class="nc">&nbsp;                lines.clear();</b>
+<b class="nc">&nbsp;                previousLine = null;</b>
+&nbsp;
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;            // new key
+<b class="nc">&nbsp;            if (line.startsWith(&quot;--&quot;) &amp;&amp; (line.length() &gt;= 7)</b>
+<b class="nc">&nbsp;                    &amp;&amp; &quot;-- &quot;.equals(line.substring(4, 7))) {</b>
+<b class="nc">&nbsp;                previousLine = new StringBuilder(line.substring(7));</b>
+<b class="nc">&nbsp;                lines.put(line.substring(2, 4), previousLine);</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;            // continuation (folding) of previous line
+<b class="nc">&nbsp;            if (previousLine == null) {</b>
+<b class="nc">&nbsp;                return new ParserResult();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            previousLine.append(line.trim());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new ParserResult(bibItems);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

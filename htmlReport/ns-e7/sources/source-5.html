@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TextExtractor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.pdf</a>
+</div>
+
+<h1>Coverage Summary for Class: TextExtractor (org.jabref.logic.pdf)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TextExtractor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.pdf;
+&nbsp;
+&nbsp;import java.awt.geom.Rectangle2D;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseAwt;
+&nbsp;
+&nbsp;import org.apache.pdfbox.cos.COSArray;
+&nbsp;import org.apache.pdfbox.cos.COSFloat;
+&nbsp;import org.apache.pdfbox.cos.COSInteger;
+&nbsp;import org.apache.pdfbox.pdmodel.PDPage;
+&nbsp;import org.apache.pdfbox.pdmodel.common.PDRectangle;
+&nbsp;import org.apache.pdfbox.text.PDFTextStripperByArea;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extracts the text of marked annotations using bounding boxes.
+&nbsp; */
+&nbsp;@AllowedToUseAwt(&quot;org.apache.pdfbox.text.PDFTextStripperByArea.addRegion uses AWT&#39;s Rectangle to indicate a region&quot;)
+&nbsp;public final class TextExtractor {
+&nbsp;
+&nbsp;    private final COSArray boundingBoxes;
+&nbsp;    private final PDPage page;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param page          the page the annotation is on, must not be null
+&nbsp;     * @param boundingBoxes the raw annotation, must not be null
+&nbsp;     */
+<b class="nc">&nbsp;    public TextExtractor(PDPage page, COSArray boundingBoxes) {</b>
+<b class="nc">&nbsp;        this.page = Objects.requireNonNull(page);</b>
+<b class="nc">&nbsp;        this.boundingBoxes = Objects.requireNonNull(boundingBoxes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extracts the text of a marked annotation such as highlights, underlines, strikeouts etc.
+&nbsp;     *
+&nbsp;     * @return The text of the annotation
+&nbsp;     * @throws IOException If the PDFTextStripperByArea fails to initialize.
+&nbsp;     */
+&nbsp;    public String extractMarkedText() throws IOException {
+&nbsp;        // Text has to be extracted by the rectangle calculated from the marking
+<b class="nc">&nbsp;        PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();</b>
+<b class="nc">&nbsp;        String markedText = &quot;&quot;;</b>
+&nbsp;
+&nbsp;        // Iterates over the array of segments. Each segment consists of 8 points forming a bounding box.
+<b class="nc">&nbsp;        int totalSegments = boundingBoxes.size() / 8;</b>
+<b class="nc">&nbsp;        for (int currentSegment = 1, segmentPointer = 0; currentSegment &lt;= totalSegments; currentSegment++, segmentPointer += 8) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                stripperByArea.addRegion(&quot;markedRegion&quot;, calculateSegmentBoundingBox(boundingBoxes, segmentPointer));</b>
+<b class="nc">&nbsp;                stripperByArea.extractRegions(page);</b>
+&nbsp;
+<b class="nc">&nbsp;                markedText = markedText.concat(stripperByArea.getTextForRegion(&quot;markedRegion&quot;));</b>
+&nbsp;            } catch (IllegalArgumentException e) {
+<b class="nc">&nbsp;                throw new IOException(&quot;Cannot read annotation coordinates!&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return markedText.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Rectangle2D calculateSegmentBoundingBox(COSArray quadsArray, int segmentPointer) {
+&nbsp;        // Extract coordinate values
+<b class="nc">&nbsp;        float upperLeftX = toFloat(quadsArray.get(segmentPointer));</b>
+<b class="nc">&nbsp;        float upperLeftY = toFloat(quadsArray.get(segmentPointer + 1));</b>
+<b class="nc">&nbsp;        float upperRightX = toFloat(quadsArray.get(segmentPointer + 2));</b>
+<b class="nc">&nbsp;        float upperRightY = toFloat(quadsArray.get(segmentPointer + 3));</b>
+<b class="nc">&nbsp;        float lowerLeftX = toFloat(quadsArray.get(segmentPointer + 4));</b>
+<b class="nc">&nbsp;        float lowerLeftY = toFloat(quadsArray.get(segmentPointer + 5));</b>
+&nbsp;
+&nbsp;        // Post-processing of the raw coordinates.
+<b class="nc">&nbsp;        PDRectangle pageSize = page.getMediaBox();</b>
+<b class="nc">&nbsp;        float ulx = upperLeftX - 1; // It is magic.</b>
+<b class="nc">&nbsp;        float uly = pageSize.getHeight() - upperLeftY;</b>
+<b class="nc">&nbsp;        float width = upperRightX - lowerLeftX;</b>
+<b class="nc">&nbsp;        float height = upperRightY - lowerLeftY;</b>
+&nbsp;
+<b class="nc">&nbsp;        return new Rectangle2D.Float(ulx, uly, width, height);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private float toFloat(Object cosNumber) {
+<b class="nc">&nbsp;        if (cosNumber instanceof COSFloat float1) {</b>
+<b class="nc">&nbsp;            return float1.floatValue();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cosNumber instanceof COSInteger integer) {</b>
+<b class="nc">&nbsp;            return integer.floatValue();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new IllegalArgumentException(&quot;The number type of the annotation is not supported!&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

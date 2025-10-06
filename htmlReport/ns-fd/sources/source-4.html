@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DatabaseFileLookup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: DatabaseFileLookup (org.jabref.logic.util.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DatabaseFileLookup</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.io;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;/**
+&nbsp; * Search class for files. &lt;br&gt;
+&nbsp; * &lt;br&gt;
+&nbsp; * This class provides some functionality to search in a {@link BibDatabase} for files. &lt;br&gt;
+&nbsp; */
+&nbsp;public class DatabaseFileLookup {
+&nbsp;
+<b class="nc">&nbsp;    private final Set&lt;Path&gt; fileCache = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final List&lt;Path&gt; possibleFilePaths;
+&nbsp;
+&nbsp;    private final Path pathOfDatabase;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
+&nbsp;     */
+<b class="nc">&nbsp;    public DatabaseFileLookup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(databaseContext);</b>
+<b class="nc">&nbsp;        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectories(filePreferences))</b>
+<b class="nc">&nbsp;                                    .orElse(new ArrayList&lt;&gt;());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : databaseContext.getDatabase().getEntries()) {</b>
+<b class="nc">&nbsp;            fileCache.addAll(parseFileField(entry));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.pathOfDatabase = databaseContext.getDatabasePath().orElse(Path.of(&quot;&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns whether the File &lt;code&gt;file&lt;/code&gt; is present in the database
+&nbsp;     * as an attached File to an {@link BibEntry}. &lt;br&gt;
+&nbsp;     * &lt;br&gt;
+&nbsp;     * To do this, the field specified by the key &lt;b&gt;file&lt;/b&gt; will be searched
+&nbsp;     * for the provided file for every {@link BibEntry} in the database. &lt;br&gt;
+&nbsp;     * &lt;br&gt;
+&nbsp;     * For the matching, the absolute file paths will be used.
+&nbsp;     *
+&nbsp;     * @param pathname A {@link File} Object.
+&nbsp;     * @return &lt;code&gt;true&lt;/code&gt;, if the file Object is stored in at least one
+&nbsp;     * entry in the database, otherwise &lt;code&gt;false&lt;/code&gt;.
+&nbsp;     */
+&nbsp;    public boolean lookupDatabase(Path pathname) {
+<b class="nc">&nbsp;        return fileCache.contains(pathname);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Path&gt; parseFileField(BibEntry entry) {
+<b class="nc">&nbsp;        Objects.requireNonNull(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        return entry.getFiles().stream()</b>
+<b class="nc">&nbsp;                    .filter(file -&gt; !file.isOnlineLink()) // Do not query external file links (huge performance leak)</b>
+<b class="nc">&nbsp;                    .map(file -&gt; file.findIn(possibleFilePaths))</b>
+<b class="nc">&nbsp;                    .filter(Optional::isPresent)</b>
+<b class="nc">&nbsp;                    .map(Optional::get)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return &quot;&quot; if the path does not exist
+&nbsp;     */
+&nbsp;    public Path getPathOfDatabase() {
+<b class="nc">&nbsp;        return pathOfDatabase;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

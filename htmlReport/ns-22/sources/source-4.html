@@ -1,0 +1,250 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationKeyPatternsPanelViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.commonfxcontrols</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationKeyPatternsPanelViewModel (org.jabref.gui.commonfxcontrols)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationKeyPatternsPanelViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CitationKeyPatternsPanelViewModel$DefaultEntryType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.commonfxcontrols;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;
+&nbsp;public class CitationKeyPatternsPanelViewModel {
+&nbsp;
+&nbsp;    public static final String ENTRY_TYPE_DEFAULT_NAME = &quot;default&quot;;
+&nbsp;
+<b class="nc">&nbsp;    public static Comparator&lt;CitationKeyPatternsPanelItemModel&gt; defaultOnTopComparator = (o1, o2) -&gt; {</b>
+<b class="nc">&nbsp;        String itemOneName = o1.getEntryType().getName();</b>
+<b class="nc">&nbsp;        String itemTwoName = o2.getEntryType().getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (itemOneName.equals(itemTwoName)) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+<b class="nc">&nbsp;        } else if (ENTRY_TYPE_DEFAULT_NAME.equals(itemOneName)) {</b>
+<b class="nc">&nbsp;            return -1;</b>
+<b class="nc">&nbsp;        } else if (ENTRY_TYPE_DEFAULT_NAME.equals(itemTwoName)) {</b>
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    };
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;CitationKeyPatternsPanelItemModel&gt; patternListProperty = new SimpleListProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;CitationKeyPatternsPanelItemModel&gt; defaultItemProperty = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final CitationKeyPatternPreferences keyPatternPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public CitationKeyPatternsPanelViewModel(CitationKeyPatternPreferences keyPatternPreferences) {</b>
+<b class="nc">&nbsp;        this.keyPatternPreferences = keyPatternPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setValues(Collection&lt;BibEntryType&gt; entryTypeList, AbstractCitationKeyPatterns initialKeyPattern) {
+&nbsp;        String defaultPattern;
+<b class="nc">&nbsp;        if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {</b>
+<b class="nc">&nbsp;            defaultPattern = &quot;&quot;;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            defaultPattern = initialKeyPattern.getDefaultValue().stringRepresentation();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        defaultItemProperty.setValue(new CitationKeyPatternsPanelItemModel(new DefaultEntryType(), defaultPattern));</b>
+<b class="nc">&nbsp;        patternListProperty.setValue(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;        patternListProperty.add(defaultItemProperty.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        entryTypeList.stream()</b>
+<b class="nc">&nbsp;                     .map(BibEntryType::getType)</b>
+<b class="nc">&nbsp;                     .forEach(entryType -&gt; {</b>
+&nbsp;                         String pattern;
+<b class="nc">&nbsp;                         if (initialKeyPattern.isDefaultValue(entryType)) {</b>
+<b class="nc">&nbsp;                             pattern = &quot;&quot;;</b>
+&nbsp;                         } else {
+<b class="nc">&nbsp;                             pattern = initialKeyPattern.getPatterns().get(entryType).stringRepresentation();</b>
+&nbsp;                         }
+<b class="nc">&nbsp;                         patternListProperty.add(new CitationKeyPatternsPanelItemModel(entryType, pattern));</b>
+&nbsp;                     });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setItemToDefaultPattern(CitationKeyPatternsPanelItemModel item) {
+<b class="nc">&nbsp;        item.setPattern(keyPatternPreferences.getDefaultPattern());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetAll() {
+<b class="nc">&nbsp;        patternListProperty.forEach(item -&gt; item.setPattern(&quot;&quot;));</b>
+<b class="nc">&nbsp;        defaultItemProperty.getValue().setPattern(keyPatternPreferences.getDefaultPattern());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;CitationKeyPatternsPanelItemModel&gt; patternListProperty() {
+<b class="nc">&nbsp;        return patternListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;CitationKeyPatternsPanelItemModel&gt; defaultKeyPatternProperty() {
+<b class="nc">&nbsp;        return defaultItemProperty;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static class DefaultEntryType implements EntryType {</b>
+&nbsp;        @Override
+&nbsp;        public String getName() {
+<b class="nc">&nbsp;            return ENTRY_TYPE_DEFAULT_NAME;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Localization.lang(&quot;Default pattern&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

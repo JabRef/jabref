@@ -1,0 +1,294 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileDialogConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: FileDialogConfiguration (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileDialogConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FileDialogConfiguration$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import javafx.stage.FileChooser;
+&nbsp;
+&nbsp;import org.jabref.logic.util.FileType;
+&nbsp;
+&nbsp;public class FileDialogConfiguration {
+&nbsp;
+&nbsp;    private final List&lt;FileChooser.ExtensionFilter&gt; extensionFilters;
+&nbsp;    private final Path initialDirectory;
+&nbsp;    private final FileChooser.ExtensionFilter defaultExtension;
+&nbsp;    private final String initialFileName;
+&nbsp;    private FileChooser.ExtensionFilter selectedExtensionFilter;
+&nbsp;
+&nbsp;    private FileDialogConfiguration(Path initialDirectory, List&lt;FileChooser.ExtensionFilter&gt; extensionFilters,
+<b class="nc">&nbsp;                                    FileChooser.ExtensionFilter defaultExtension, String initialFileName) {</b>
+<b class="nc">&nbsp;        this.initialDirectory = initialDirectory;</b>
+<b class="nc">&nbsp;        this.extensionFilters = Objects.requireNonNull(extensionFilters);</b>
+<b class="nc">&nbsp;        this.defaultExtension = defaultExtension;</b>
+<b class="nc">&nbsp;        this.initialFileName = initialFileName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Path&gt; getInitialDirectory() {
+<b class="nc">&nbsp;        return Optional.ofNullable(initialDirectory);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FileChooser.ExtensionFilter getDefaultExtension() {
+<b class="nc">&nbsp;        return defaultExtension;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getInitialFileName() {
+<b class="nc">&nbsp;        return initialFileName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;FileChooser.ExtensionFilter&gt; getExtensionFilters() {
+<b class="nc">&nbsp;        return extensionFilters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FileChooser.ExtensionFilter getSelectedExtensionFilter() {
+<b class="nc">&nbsp;        return selectedExtensionFilter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectedExtensionFilter(FileChooser.ExtensionFilter selectedExtensionFilter) {
+<b class="nc">&nbsp;        this.selectedExtensionFilter = selectedExtensionFilter;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static class Builder {</b>
+&nbsp;
+<b class="nc">&nbsp;        private final List&lt;FileChooser.ExtensionFilter&gt; extensionFilters = new ArrayList&lt;&gt;();</b>
+&nbsp;        private Path initialDirectory;
+&nbsp;        private FileChooser.ExtensionFilter defaultExtension;
+&nbsp;        private String initialFileName;
+&nbsp;
+&nbsp;        public FileDialogConfiguration build() {
+<b class="nc">&nbsp;            return new FileDialogConfiguration(initialDirectory, extensionFilters, defaultExtension, initialFileName);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder withInitialDirectory(Path directory) {
+<b class="nc">&nbsp;            if (directory == null) { // It could be that somehow the path is null, for example if it got deleted in the meantime</b>
+<b class="nc">&nbsp;                initialDirectory = null;</b>
+&nbsp;            } else { // Dir must be a folder, not a file
+<b class="nc">&nbsp;                if (!Files.isDirectory(directory)) {</b>
+<b class="nc">&nbsp;                    directory = directory.getParent();</b>
+&nbsp;                }
+&nbsp;                // The lines above work also if the dir does not exist at all!
+&nbsp;                // NULL is accepted by the filechooser as no inital path
+&nbsp;                // Explicit null check, if somehow the parent is null, as Files.exists throws an NPE otherwise
+<b class="nc">&nbsp;                if ((directory != null) &amp;&amp; !Files.exists(directory)) {</b>
+<b class="nc">&nbsp;                    directory = null;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                initialDirectory = directory;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder withInitialDirectory(String directory) {
+<b class="nc">&nbsp;            if (directory != null) {</b>
+<b class="nc">&nbsp;                withInitialDirectory(Path.of(directory));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                initialDirectory = null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder withInitialFileName(String initialFileName) {
+<b class="nc">&nbsp;            this.initialFileName = initialFileName;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder withDefaultExtension(FileChooser.ExtensionFilter extensionFilter) {
+<b class="nc">&nbsp;            defaultExtension = extensionFilter;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder withDefaultExtension(FileType fileType) {
+<b class="nc">&nbsp;            defaultExtension = FileFilterConverter.toExtensionFilter(fileType);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder withDefaultExtension(String description, FileType fileType) {
+<b class="nc">&nbsp;            defaultExtension = FileFilterConverter.toExtensionFilter(description, fileType);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder withDefaultExtension(String fileTypeDescription) {
+<b class="nc">&nbsp;            extensionFilters.stream()</b>
+<b class="nc">&nbsp;                            .filter(type -&gt; type.getDescription().equalsIgnoreCase(fileTypeDescription))</b>
+<b class="nc">&nbsp;                            .findFirst()</b>
+<b class="nc">&nbsp;                            .ifPresent(extensionFilter -&gt; defaultExtension = extensionFilter);</b>
+&nbsp;
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder addExtensionFilter(FileChooser.ExtensionFilter filter) {
+<b class="nc">&nbsp;            extensionFilters.add(filter);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder addExtensionFilter(List&lt;FileChooser.ExtensionFilter&gt; filters) {
+<b class="nc">&nbsp;            extensionFilters.addAll(filters);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder addExtensionFilter(FileType... fileTypes) {
+<b class="nc">&nbsp;            Stream.of(fileTypes)</b>
+<b class="nc">&nbsp;                  .map(FileFilterConverter::toExtensionFilter)</b>
+<b class="nc">&nbsp;                  .forEachOrdered(this::addExtensionFilter);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder addExtensionFilter(String description, FileType fileType) {
+<b class="nc">&nbsp;            extensionFilters.add(FileFilterConverter.toExtensionFilter(description, fileType));</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

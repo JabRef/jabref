@@ -1,0 +1,324 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > KeywordList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: KeywordList (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">KeywordList</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.7%
+  </span>
+  <span class="absValue">
+    (3/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.6%
+  </span>
+  <span class="absValue">
+    (1/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.9%
+  </span>
+  <span class="absValue">
+    (5/63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a list of keyword chains.
+&nbsp; * For example, &quot;Type &gt; A, Type &gt; B, Something else&quot;.
+&nbsp; */
+&nbsp;public class KeywordList implements Iterable&lt;Keyword&gt; {
+&nbsp;
+&nbsp;    private final List&lt;Keyword&gt; keywordChains;
+&nbsp;
+<b class="fc">&nbsp;    public KeywordList() {</b>
+<b class="fc">&nbsp;        keywordChains = new ArrayList&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public KeywordList(Collection&lt;Keyword&gt; keywordChains) {</b>
+<b class="nc">&nbsp;        this.keywordChains = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        keywordChains.forEach(this::add);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeywordList(List&lt;String&gt; keywordChains) {
+<b class="nc">&nbsp;        this(keywordChains.stream().map(Keyword::new).collect(Collectors.toList()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeywordList(String... keywordChains) {
+<b class="nc">&nbsp;        this(Arrays.stream(keywordChains).map(Keyword::new).collect(Collectors.toList()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeywordList(Keyword... keywordChains) {
+<b class="nc">&nbsp;        this(Arrays.asList(keywordChains));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static KeywordList parse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(keywordString)) {</b>
+<b class="nc">&nbsp;            return new KeywordList();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Objects.requireNonNull(delimiter);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(hierarchicalDelimiter);</b>
+&nbsp;
+<b class="nc">&nbsp;        KeywordList keywordList = new KeywordList();</b>
+&nbsp;
+<b class="nc">&nbsp;        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());</b>
+<b class="nc">&nbsp;        while (tok.hasMoreTokens()) {</b>
+<b class="nc">&nbsp;            String chain = tok.nextToken();</b>
+<b class="nc">&nbsp;            Keyword chainRoot = Keyword.ofHierarchical(chain);</b>
+<b class="nc">&nbsp;            keywordList.add(chainRoot);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return keywordList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
+&nbsp;     *
+&nbsp;     * @param keywordString a String of keywordChains
+&nbsp;     * @param delimiter     The delimiter used for separating the keywords
+&nbsp;     * @return an parsed list containing the keywordChains
+&nbsp;     */
+&nbsp;    public static KeywordList parse(String keywordString, Character delimiter) {
+<b class="nc">&nbsp;        return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String serialize(List&lt;Keyword&gt; keywords, Character delimiter) {
+<b class="nc">&nbsp;        return keywords.stream().map(Keyword::get).collect(Collectors.joining(delimiter.toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
+<b class="nc">&nbsp;        KeywordList keywordListA = parse(keywordStringA, delimiter);</b>
+<b class="nc">&nbsp;        KeywordList keywordListB = parse(keywordStringB, delimiter);</b>
+<b class="nc">&nbsp;        List&lt;Keyword&gt; distinctKeywords = Stream.concat(keywordListA.stream(), keywordListB.stream()).distinct().toList();</b>
+<b class="nc">&nbsp;        return new KeywordList(distinctKeywords);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeywordList createClone() {
+<b class="nc">&nbsp;        return new KeywordList(this.keywordChains);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void replaceAll(KeywordList keywordsToReplace, Keyword newValue) {
+<b class="nc">&nbsp;        Objects.requireNonNull(newValue);</b>
+&nbsp;
+&nbsp;        // Remove keywordChains which should be replaced
+<b class="nc">&nbsp;        int foundPosition = -1; // remember position of the last found keyword</b>
+<b class="nc">&nbsp;        for (Keyword specialFieldKeyword : keywordsToReplace) {</b>
+<b class="nc">&nbsp;            int pos = keywordChains.indexOf(specialFieldKeyword);</b>
+<b class="nc">&nbsp;            if (pos &gt;= 0) {</b>
+<b class="nc">&nbsp;                foundPosition = pos;</b>
+<b class="nc">&nbsp;                keywordChains.remove(pos);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Add new keyword at right position
+<b class="nc">&nbsp;        if (foundPosition == -1) {</b>
+<b class="nc">&nbsp;            add(newValue);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            keywordChains.add(foundPosition, newValue);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeAll(KeywordList keywordsToRemove) {
+<b class="nc">&nbsp;        keywordChains.removeAll(keywordsToRemove.keywordChains);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean add(Keyword keyword) {
+<b class="pc">&nbsp;        if (contains(keyword)) {</b>
+<b class="nc">&nbsp;            return false; // Don&#39;t add duplicate keywordChains</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return keywordChains.add(keyword);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Keywords are separated by the given delimiter and an additional space, i.e. &quot;one, two&quot;.
+&nbsp;     */
+&nbsp;    public String getAsString(Character delimiter) {
+<b class="nc">&nbsp;        return keywordChains.stream().map(Keyword::toString).collect(Collectors.joining(delimiter + &quot; &quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void add(String keywordsString) {
+<b class="nc">&nbsp;        add(new Keyword(keywordsString));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Iterator&lt;Keyword&gt; iterator() {
+<b class="nc">&nbsp;        return keywordChains.iterator();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int size() {
+<b class="nc">&nbsp;        return keywordChains.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        return keywordChains.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean contains(Keyword o) {
+<b class="fc">&nbsp;        return keywordChains.contains(o);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean contains(String keywordString) {
+<b class="nc">&nbsp;        return contains(new Keyword(keywordString));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean remove(Keyword o) {
+<b class="nc">&nbsp;        return keywordChains.remove(o);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean remove(String keywordsString) {
+<b class="nc">&nbsp;        return keywordChains.remove(new Keyword(keywordsString));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addAll(KeywordList keywordsToAdd) {
+<b class="nc">&nbsp;        keywordChains.addAll(keywordsToAdd.keywordChains);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void retainAll(KeywordList keywordToRetain) {
+<b class="nc">&nbsp;        keywordChains.retainAll(keywordToRetain.keywordChains);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clear() {
+<b class="nc">&nbsp;        keywordChains.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Keyword get(int index) {
+<b class="nc">&nbsp;        return keywordChains.get(index);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Stream&lt;Keyword&gt; stream() {
+<b class="nc">&nbsp;        return keywordChains.stream();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return getAsString(&#39;,&#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;String&gt; toStringList() {
+<b class="nc">&nbsp;        return keywordChains.stream().map(Keyword::toString).collect(Collectors.toSet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        KeywordList keywords1 = (KeywordList) o;</b>
+<b class="nc">&nbsp;        return Objects.equals(new HashSet&lt;&gt;(keywordChains), new HashSet&lt;&gt;(keywords1.keywordChains));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(keywordChains);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

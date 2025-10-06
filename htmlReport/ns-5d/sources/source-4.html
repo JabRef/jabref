@@ -1,0 +1,148 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreferenceTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences</a>
+</div>
+
+<h1>Coverage Summary for Class: PreferenceTabViewModel (org.jabref.gui.preferences)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreferenceTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public interface PreferenceTabViewModel {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is called when the dialog is opened, or if it is made
+&nbsp;     * visible after being hidden. The tab should update all its values.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is the ONLY PLACE to set values for the fields in the tab. It
+&nbsp;     * is ILLEGAL to set values only at construction time, because the dialog
+&nbsp;     * will be reused and updated.
+&nbsp;     */
+&nbsp;    void setValues();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is called before the {@link #storeSettings()} method,
+&nbsp;     * to check if there are illegal settings in the tab, or if is ready
+&nbsp;     * to be closed.
+&nbsp;     * If the tab is *not* ready, it should display a message to the user
+&nbsp;     * informing about the illegal setting.
+&nbsp;     */
+&nbsp;    default boolean validateSettings() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is called when the user presses OK in the
+&nbsp;     * Preferences dialog. Implementing classes must make sure all
+&nbsp;     * settings presented get stored in PreferencesService.
+&nbsp;     */
+&nbsp;    void storeSettings();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method should be called after storing the preferences, to
+&nbsp;     * collect the properties, which require a restart of JabRef to load
+&nbsp;     *
+&nbsp;     * @return The messages for the changed properties (e.g. &quot;Changed language: English&quot;)
+&nbsp;     */
+&nbsp;    default List&lt;String&gt; getRestartWarnings() {
+<b class="nc">&nbsp;        return List.of();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

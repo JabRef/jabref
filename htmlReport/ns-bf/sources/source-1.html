@@ -1,0 +1,690 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.git</a>
+</div>
+
+<h1>Coverage Summary for Class: GitHandler (org.jabref.logic.git)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/213)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GitHandler$MergeGuard</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/226)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.git;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.eclipse.jgit.api.FetchCommand;
+&nbsp;import org.eclipse.jgit.api.Git;
+&nbsp;import org.eclipse.jgit.api.PullCommand;
+&nbsp;import org.eclipse.jgit.api.PushCommand;
+&nbsp;import org.eclipse.jgit.api.RmCommand;
+&nbsp;import org.eclipse.jgit.api.Status;
+&nbsp;import org.eclipse.jgit.api.errors.GitAPIException;
+&nbsp;import org.eclipse.jgit.api.errors.TransportException;
+&nbsp;import org.eclipse.jgit.errors.NoRemoteRepositoryException;
+&nbsp;import org.eclipse.jgit.lib.Ref;
+&nbsp;import org.eclipse.jgit.lib.Repository;
+&nbsp;import org.eclipse.jgit.lib.RepositoryState;
+&nbsp;import org.eclipse.jgit.lib.StoredConfig;
+&nbsp;import org.eclipse.jgit.merge.MergeStrategy;
+&nbsp;import org.eclipse.jgit.revwalk.RevCommit;
+&nbsp;import org.eclipse.jgit.transport.CredentialsProvider;
+&nbsp;import org.eclipse.jgit.transport.RefSpec;
+&nbsp;import org.eclipse.jgit.transport.URIish;
+&nbsp;import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class handles the updating of the local and remote git repository that is located at the repository path
+&nbsp; * This provides an easy-to-use interface to manage a git repository
+&nbsp; */
+&nbsp;public class GitHandler {
+<b class="nc">&nbsp;    static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);</b>
+&nbsp;    final Path repositoryPath;
+&nbsp;    final File repositoryPathAsFile;
+&nbsp;    private CredentialsProvider credentialsProvider;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize the handler for the given repository
+&nbsp;     *
+&nbsp;     * @param repositoryPath The root of the initialized git repository
+&nbsp;     */
+<b class="nc">&nbsp;    public GitHandler(Path repositoryPath) {</b>
+<b class="nc">&nbsp;        this.repositoryPath = repositoryPath;</b>
+<b class="nc">&nbsp;        this.repositoryPathAsFile = this.repositoryPath.toFile();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initIfNeeded() {
+<b class="nc">&nbsp;        if (isGitRepository()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            try (Git git = Git.init()</b>
+<b class="nc">&nbsp;                              .setDirectory(repositoryPathAsFile)</b>
+<b class="nc">&nbsp;                              .setInitialBranch(&quot;main&quot;)</b>
+<b class="nc">&nbsp;                              .call()) {</b>
+&nbsp;                // &quot;git&quot; object is not used later, but we need to close it after initialization
+&nbsp;            }
+<b class="nc">&nbsp;            setupGitIgnore();</b>
+<b class="nc">&nbsp;            String initialCommit = &quot;Initial commit&quot;;</b>
+<b class="nc">&nbsp;            if (!createCommitOnCurrentBranch(initialCommit, false)) {</b>
+&nbsp;                // Maybe, setupGitIgnore failed and did not add something
+&nbsp;                // Then, we create an empty commit
+<b class="nc">&nbsp;                try (Git git = Git.open(repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;                    git.commit()</b>
+<b class="nc">&nbsp;                       .setAllowEmpty(true)</b>
+<b class="nc">&nbsp;                       .setMessage(initialCommit)</b>
+<b class="nc">&nbsp;                       .call();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (GitAPIException | IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Git repository initialization failed at {}&quot;, repositoryPath, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;CredentialsProvider&gt; resolveCredentials() {
+<b class="nc">&nbsp;        if (credentialsProvider != null) {</b>
+<b class="nc">&nbsp;            return Optional.of(credentialsProvider);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // TODO: This should be removed - only GitPasswordPreferences should be used
+&nbsp;        //       Not implemented in August, 2025, because implications to SLR component not clear.
+<b class="nc">&nbsp;        String user = Optional.ofNullable(System.getenv(&quot;GIT_EMAIL&quot;)).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        String password = Optional.ofNullable(System.getenv(&quot;GIT_PW&quot;)).orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (user.isBlank() || password.isBlank()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.credentialsProvider = new UsernamePasswordCredentialsProvider(user, password);</b>
+<b class="nc">&nbsp;        return Optional.of(this.credentialsProvider);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO: GitHandlerRegistry should get passed GitPasswordPreferences (or similar), pass this to GitHandler instance, which uses it here#
+&nbsp;    //       As a result, this method will be gone
+&nbsp;    public void setCredentials(String username, String pat) {
+<b class="nc">&nbsp;        if (username == null) {</b>
+<b class="nc">&nbsp;            username = &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (pat == null) {</b>
+<b class="nc">&nbsp;            pat = &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.credentialsProvider = new UsernamePasswordCredentialsProvider(username, pat);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;String&gt; currentRemoteUrl(Repository repo) {
+&nbsp;        try {
+<b class="nc">&nbsp;            StoredConfig config = repo.getConfig();</b>
+<b class="nc">&nbsp;            String branch = repo.getBranch();</b>
+&nbsp;
+<b class="nc">&nbsp;            String remote = config.getString(&quot;branch&quot;, branch, &quot;remote&quot;);</b>
+<b class="nc">&nbsp;            if (remote == null) {</b>
+<b class="nc">&nbsp;                Set&lt;String&gt; remotes = config.getSubsections(&quot;remote&quot;);</b>
+<b class="nc">&nbsp;                if (remotes.contains(&quot;origin&quot;)) {</b>
+<b class="nc">&nbsp;                    remote = &quot;origin&quot;;</b>
+<b class="nc">&nbsp;                } else if (!remotes.isEmpty()) {</b>
+<b class="nc">&nbsp;                    remote = remotes.iterator().next();</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            if (remote == null) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String url = config.getString(&quot;remote&quot;, remote, &quot;url&quot;);</b>
+<b class="nc">&nbsp;            if (StringUtil.isBlank(url)) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Optional.of(url);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean requiresCredentialsForUrl(String url) {
+&nbsp;        try {
+<b class="nc">&nbsp;            URIish uri = new URIish(url);</b>
+<b class="nc">&nbsp;            String scheme = uri.getScheme();</b>
+<b class="nc">&nbsp;            if (scheme == null) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return &quot;https&quot;.equalsIgnoreCase(scheme);</b>
+&nbsp;        } catch (URISyntaxException e) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    void setupGitIgnore() {
+<b class="nc">&nbsp;        Path gitignore = Path.of(repositoryPath.toString(), &quot;.gitignore&quot;);</b>
+<b class="nc">&nbsp;        if (!Files.exists(gitignore)) {</b>
+<b class="nc">&nbsp;            try (InputStream inputStream = this.getClass().getResourceAsStream(&quot;git.gitignore&quot;)) {</b>
+<b class="nc">&nbsp;                Files.copy(inputStream, gitignore);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Error occurred during copying of the gitignore file into the git repository.&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the given path points to a directory that is a git repository (contains a .git folder)
+&nbsp;     */
+&nbsp;    boolean isGitRepository() {
+&nbsp;        // For some reason the solution from https://www.eclipse.org/lists/jgit-dev/msg01892.html does not work
+&nbsp;        // This solution is quite simple but might not work in special cases, for us it should suffice.
+<b class="nc">&nbsp;        return Files.exists(Path.of(repositoryPath.toString(), &quot;.git&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checkout the branch with the specified name, if it does not exist create it
+&nbsp;     *
+&nbsp;     * @param branchToCheckout Name of the branch to check out
+&nbsp;     */
+&nbsp;    public void checkoutBranch(String branchToCheckout) throws IOException, GitAPIException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            Optional&lt;Ref&gt; branch = getRefForBranch(branchToCheckout);</b>
+<b class="nc">&nbsp;            git.checkout()</b>
+&nbsp;               // If the branch does not exist, create it
+<b class="nc">&nbsp;               .setCreateBranch(branch.isEmpty())</b>
+<b class="nc">&nbsp;               .setName(branchToCheckout)</b>
+<b class="nc">&nbsp;               .call();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the reference of the specified branch
+&nbsp;     * If it does not exist returns an empty optional
+&nbsp;     */
+&nbsp;    Optional&lt;Ref&gt; getRefForBranch(String branchName) throws GitAPIException, IOException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            return git.branchList()</b>
+<b class="nc">&nbsp;                      .call()</b>
+<b class="nc">&nbsp;                      .stream()</b>
+<b class="nc">&nbsp;                      .filter(ref -&gt; ref.getName().equals(&quot;refs/heads/&quot; + branchName))</b>
+<b class="nc">&nbsp;                      .findAny();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a commit on the currently checked out branch
+&nbsp;     *
+&nbsp;     * @param amend Whether to amend to the last commit (true), or not (false)
+&nbsp;     * @return Returns true if a new commit was created. This is the case if the repository was not clean on method invocation
+&nbsp;     */
+&nbsp;    public boolean createCommitOnCurrentBranch(String commitMessage, boolean amend) throws IOException, GitAPIException {
+<b class="nc">&nbsp;        boolean commitCreated = false;</b>
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            Status status = git.status().call();</b>
+<b class="nc">&nbsp;            boolean dirty = !status.isClean();</b>
+<b class="nc">&nbsp;            RepositoryState state = git.getRepository().getRepositoryState();</b>
+<b class="nc">&nbsp;            boolean inMerging = (state == RepositoryState.MERGING) || (state == RepositoryState.MERGING_RESOLVED);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (dirty) {</b>
+<b class="nc">&nbsp;                commitCreated = true;</b>
+&nbsp;                // Add new and changed files to index
+<b class="nc">&nbsp;                git.add()</b>
+<b class="nc">&nbsp;                   .addFilepattern(&quot;.&quot;)</b>
+<b class="nc">&nbsp;                   .call();</b>
+&nbsp;                // Add all removed files to index
+<b class="nc">&nbsp;                if (!status.getMissing().isEmpty()) {</b>
+<b class="nc">&nbsp;                    RmCommand removeCommand = git.rm()</b>
+<b class="nc">&nbsp;                                                 .setCached(true);</b>
+<b class="nc">&nbsp;                    status.getMissing().forEach(removeCommand::addFilepattern);</b>
+<b class="nc">&nbsp;                    removeCommand.call();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                git.commit()</b>
+<b class="nc">&nbsp;                   .setAmend(amend)</b>
+<b class="nc">&nbsp;                   .setAllowEmpty(false)</b>
+<b class="nc">&nbsp;                   .setMessage(commitMessage)</b>
+<b class="nc">&nbsp;                   .call();</b>
+<b class="nc">&nbsp;            } else if (inMerging) {</b>
+&nbsp;                // No content changes, but merge must be completed (create parent commit)
+<b class="nc">&nbsp;                commitCreated = true;</b>
+<b class="nc">&nbsp;                git.commit()</b>
+<b class="nc">&nbsp;                   .setAmend(amend)</b>
+<b class="nc">&nbsp;                   .setAllowEmpty(true)</b>
+<b class="nc">&nbsp;                   .setMessage(commitMessage)</b>
+<b class="nc">&nbsp;                   .call();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return commitCreated;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Merges the source branch into the target branch
+&nbsp;     *
+&nbsp;     * @param targetBranch the name of the branch that is merged into
+&nbsp;     * @param sourceBranch the name of the branch that gets merged
+&nbsp;     */
+&nbsp;    public void mergeBranches(String targetBranch, String sourceBranch, MergeStrategy mergeStrategy) throws IOException, GitAPIException {
+<b class="nc">&nbsp;        String currentBranch = this.getCurrentlyCheckedOutBranch();</b>
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            Optional&lt;Ref&gt; sourceBranchRef = getRefForBranch(sourceBranch);</b>
+<b class="nc">&nbsp;            if (sourceBranchRef.isEmpty()) {</b>
+&nbsp;                // Do nothing
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            this.checkoutBranch(targetBranch);</b>
+<b class="nc">&nbsp;            git.merge()</b>
+<b class="nc">&nbsp;               .include(sourceBranchRef.get())</b>
+<b class="nc">&nbsp;               .setStrategy(mergeStrategy)</b>
+<b class="nc">&nbsp;               .setMessage(&quot;Merge search branch into working branch.&quot;)</b>
+<b class="nc">&nbsp;               .call();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.checkoutBranch(currentBranch);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pushes all commits made to the branch that is tracked by the currently checked out branch.
+&nbsp;     * If pushing to remote fails, it fails silently.
+&nbsp;     */
+&nbsp;    public void pushCommitsToRemoteRepository() throws IOException, GitAPIException, JabRefException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; urlOpt = currentRemoteUrl(git.getRepository());</b>
+<b class="nc">&nbsp;            Optional&lt;CredentialsProvider&gt; credsOpt = resolveCredentials();</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);</b>
+<b class="nc">&nbsp;            if (needCreds &amp;&amp; credsOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Missing Git credentials (username and Personal Access Token).&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            PushCommand pushCommand = git.push();</b>
+<b class="nc">&nbsp;            if (credsOpt.isPresent()) {</b>
+<b class="nc">&nbsp;                pushCommand.setCredentialsProvider(credsOpt.get());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            pushCommand.call();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void pushCurrentBranchCreatingUpstream() throws IOException, GitAPIException, JabRefException {
+<b class="nc">&nbsp;        try (Git git = open()) {</b>
+<b class="nc">&nbsp;            Repository repo = git.getRepository();</b>
+<b class="nc">&nbsp;            StoredConfig config = repo.getConfig();</b>
+<b class="nc">&nbsp;            String remoteUrl = config.getString(&quot;remote&quot;, &quot;origin&quot;, &quot;url&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;CredentialsProvider&gt; credsOpt = resolveCredentials();</b>
+<b class="nc">&nbsp;            boolean needCreds = (remoteUrl != null) &amp;&amp; requiresCredentialsForUrl(remoteUrl);</b>
+<b class="nc">&nbsp;            if (needCreds &amp;&amp; credsOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Missing Git credentials (username and Personal Access Token).&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String branch = repo.getBranch();</b>
+&nbsp;
+<b class="nc">&nbsp;            PushCommand pushCommand = git.push()</b>
+<b class="nc">&nbsp;                                         .setRemote(&quot;origin&quot;)</b>
+<b class="nc">&nbsp;                                         .setRefSpecs(new RefSpec(&quot;refs/heads/&quot; + branch + &quot;:refs/heads/&quot; + branch));</b>
+&nbsp;
+<b class="nc">&nbsp;            if (credsOpt.isPresent()) {</b>
+<b class="nc">&nbsp;                pushCommand.setCredentialsProvider(credsOpt.get());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            pushCommand.call();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Pulls from the current branch’s upstream.
+&nbsp;    /// If no remote is configured, silently performs local merge.
+&nbsp;    /// This ensures SLR repositories without remotes still initialize correctly.
+&nbsp;    public void pullOnCurrentBranch() throws IOException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            Optional&lt;CredentialsProvider&gt; credsOpt = resolveCredentials();</b>
+<b class="nc">&nbsp;            PullCommand pullCommand = git.pull();</b>
+<b class="nc">&nbsp;            if (credsOpt.isPresent()) {</b>
+<b class="nc">&nbsp;                pullCommand.setCredentialsProvider(credsOpt.get());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            pullCommand.call();</b>
+&nbsp;        } catch (GitAPIException e) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;Failed to push&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCurrentlyCheckedOutBranch() throws IOException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            return git.getRepository().getBranch();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void fetchOnCurrentBranch() throws IOException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; urlOpt = currentRemoteUrl(git.getRepository());</b>
+<b class="nc">&nbsp;            Optional&lt;CredentialsProvider&gt; credsOpt = resolveCredentials();</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);</b>
+<b class="nc">&nbsp;            if (needCreds &amp;&amp; credsOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Missing Git credentials (username and Personal Access Token).&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            FetchCommand fetchCommand = git.fetch();</b>
+<b class="nc">&nbsp;            if (credsOpt.isPresent()) {</b>
+<b class="nc">&nbsp;                fetchCommand.setCredentialsProvider(credsOpt.get());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            fetchCommand.call();</b>
+&nbsp;        } catch (TransportException e) {
+<b class="nc">&nbsp;            Throwable throwable = e;</b>
+<b class="nc">&nbsp;            while (throwable != null) {</b>
+<b class="nc">&nbsp;                if (throwable instanceof NoRemoteRepositoryException) {</b>
+<b class="nc">&nbsp;                    throw new IOException(&quot;No repository found at the configured remote. Please check the URL or your token settings.&quot;, e);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                throwable = throwable.getCause();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String message = e.getMessage();</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Failed to fetch from remote: &quot; + (message == null ? &quot;unknown transport error&quot; : message), e);</b>
+&nbsp;        } catch (GitAPIException e) {
+<b class="nc">&nbsp;            throw new IOException(&quot;Failed to fetch from remote: &quot; + e.getMessage(), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Try to locate the Git repository root by walking up the directory tree starting from the given path.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If a directory containing a .git folder is found, return that path.
+&nbsp;     *
+&nbsp;     * @param anyPathInsideRepo the file or directory path that is assumed to be located inside a Git repository
+&nbsp;     * @return an optional containing the path to the Git repository root if found
+&nbsp;     */
+&nbsp;    public static Optional&lt;Path&gt; findRepositoryRoot(Path anyPathInsideRepo) {
+<b class="nc">&nbsp;        Path current = anyPathInsideRepo.toAbsolutePath();</b>
+<b class="nc">&nbsp;        while (current != null) {</b>
+<b class="nc">&nbsp;            if (Files.exists(current.resolve(&quot;.git&quot;))) {</b>
+<b class="nc">&nbsp;                return Optional.of(current);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            current = current.getParent();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;GitHandler&gt; fromAnyPath(Path anyPathInsideRepo) {
+<b class="nc">&nbsp;        return findRepositoryRoot(anyPathInsideRepo).map(GitHandler::new);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public File getRepositoryPathAsFile() {
+<b class="nc">&nbsp;        return repositoryPathAsFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Git open() throws IOException {
+<b class="nc">&nbsp;        return Git.open(this.repositoryPathAsFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasRemote(String remoteName) {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            return git.getRepository().getConfig()</b>
+<b class="nc">&nbsp;                      .getSubsections(&quot;remote&quot;)</b>
+<b class="nc">&nbsp;                      .contains(remoteName);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Failed to check remote configuration&quot;, e);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Pre-stage a merge (two parents) but do NOT commit yet.
+&nbsp;    /// Equivalent to: `git merge -s ours --no-commit &lt;remote&gt;`
+&nbsp;    /// Puts the repo into MERGING state, sets MERGE_HEAD=remote; working tree becomes &quot;ours&quot;.
+&nbsp;    public void beginOursMergeNoCommit(RevCommit remote) throws IOException, GitAPIException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            git.merge()</b>
+<b class="nc">&nbsp;               .include(remote)</b>
+<b class="nc">&nbsp;               .setStrategy(org.eclipse.jgit.merge.MergeStrategy.OURS)</b>
+<b class="nc">&nbsp;               .setFastForward(org.eclipse.jgit.api.MergeCommand.FastForwardMode.NO_FF)</b>
+<b class="nc">&nbsp;               .setCommit(false)</b>
+<b class="nc">&nbsp;               .call();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Fast-forward only to &lt;remote&gt; (when local is strictly behind).
+&nbsp;    /// Equivalent to: `git merge --ff-only &lt;remote&gt;`
+&nbsp;    public void fastForwardTo(RevCommit remote) throws IOException, GitAPIException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            git.merge()</b>
+<b class="nc">&nbsp;               .include(remote)</b>
+<b class="nc">&nbsp;               .setFastForward(org.eclipse.jgit.api.MergeCommand.FastForwardMode.FF_ONLY)</b>
+<b class="nc">&nbsp;               .setCommit(true)</b>
+<b class="nc">&nbsp;               .call();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Abort a pre-commit semantic merge in a minimal/safe way:
+&nbsp;    /// 1) Clear merge state files (MERGE_HEAD / MERGE_MSG, etc.). Since there is no direct equivalent for git merge --abort in JGit.
+&nbsp;    /// 2) Restore ONLY the given file back to HEAD (both index + working tree).
+&nbsp;    ///
+&nbsp;    /// NOTE: Callers should ensure the working tree was clean before starting,
+&nbsp;    /// otherwise this can overwrite the user&#39;s uncommitted changes for that file.
+&nbsp;    public void abortSemanticMerge(Path absoluteFilePath, boolean allowHardReset) throws IOException, GitAPIException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            Repository repo = git.getRepository();</b>
+&nbsp;
+&nbsp;            // Only act if a branch is actually in a merge state
+<b class="nc">&nbsp;            RepositoryState state = repo.getRepositoryState();</b>
+<b class="nc">&nbsp;            boolean inMerging = (state == RepositoryState.MERGING) || (state == RepositoryState.MERGING_RESOLVED);</b>
+<b class="nc">&nbsp;            if (!inMerging) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+&nbsp;            // 1) Clear merge state files + possible REVERT/CHERRY_PICK state
+<b class="nc">&nbsp;            repo.writeMergeCommitMsg(null);</b>
+<b class="nc">&nbsp;            repo.writeMergeHeads(null);</b>
+<b class="nc">&nbsp;            repo.writeRevertHead(null);</b>
+<b class="nc">&nbsp;            repo.writeCherryPickHead(null);</b>
+&nbsp;
+&nbsp;            // 2) Targeted rollback: only restore the file we touched back to HEAD
+<b class="nc">&nbsp;            Path workTree = repo.getWorkTree().toPath().toRealPath();</b>
+<b class="nc">&nbsp;            Path targetAbs = absoluteFilePath.toRealPath();</b>
+<b class="nc">&nbsp;            if (!targetAbs.startsWith(workTree)) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            String rel = workTree.relativize(targetAbs).toString().replace(&#39;\\&#39;, &#39;/&#39;);</b>
+&nbsp;
+&nbsp;            // 2.1 Reset the file in the index to HEAD (Equivalent to: `git reset -- &lt;path&gt;`)
+<b class="nc">&nbsp;            git.reset()</b>
+<b class="nc">&nbsp;               .addPath(rel)</b>
+<b class="nc">&nbsp;               .call();</b>
+&nbsp;
+&nbsp;            // 2.2 Restore the file in the working tree from HEAD (Equivalent to: `git checkout -- &lt;path&gt;`)
+<b class="nc">&nbsp;            git.checkout()</b>
+<b class="nc">&nbsp;               .setStartPoint(&quot;HEAD&quot;)</b>
+<b class="nc">&nbsp;               .addPath(rel)</b>
+<b class="nc">&nbsp;               .call();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Start a &quot;semantic-merge merge-state&quot; and return a guard:
+&nbsp;    public MergeGuard beginSemanticMergeGuard(RevCommit remote, Path bibFilePath) throws IOException, GitAPIException {
+<b class="nc">&nbsp;        beginOursMergeNoCommit(remote);</b>
+<b class="nc">&nbsp;        return new MergeGuard(this, bibFilePath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static final class MergeGuard implements AutoCloseable {
+&nbsp;        private final GitHandler handler;
+&nbsp;        private final Path bibFilePath;
+<b class="nc">&nbsp;        private final AtomicBoolean active = new AtomicBoolean(true);</b>
+<b class="nc">&nbsp;        private volatile boolean committed = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        private MergeGuard(GitHandler handler, Path bibFilePath) {</b>
+<b class="nc">&nbsp;            this.handler = handler;</b>
+<b class="nc">&nbsp;            this.bibFilePath = bibFilePath;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Finalize: create the commit (in MERGING this becomes a merge commit with two parents).
+&nbsp;        public void commit(String message) throws IOException, GitAPIException {
+<b class="nc">&nbsp;            if (!active.get()) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            handler.createCommitOnCurrentBranch(message, false);</b>
+<b class="nc">&nbsp;            committed = true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // If not committed and still active, best-effort rollback:
+&nbsp;        // only this .bib file + clear MERGE_*; never throw from close().
+&nbsp;        @Override
+&nbsp;        public void close() {
+<b class="nc">&nbsp;            if (!active.compareAndSet(true, false)) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            if (committed) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;            try {
+<b class="nc">&nbsp;                handler.abortSemanticMerge(bibFilePath, false);</b>
+&nbsp;            } catch (IOException | GitAPIException e) {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Abort semantic merge failed (best-effort cleanup). path={}&quot;, bibFilePath, e);</b>
+&nbsp;            } catch (RuntimeException e) {
+&nbsp;                // Deliberately catching RuntimeException here because this is a best-effort cleanup in AutoCloseable.close().
+&nbsp;                // have to NOT throw from close() to avoid masking the primary failure/result of pull/merge.
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Unexpected runtime exception during cleanup; rethrowing. path={}&quot;, bibFilePath, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

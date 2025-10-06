@@ -1,0 +1,623 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreviewTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.preview</a>
+</div>
+
+<h1>Coverage Summary for Class: PreviewTabViewModel (org.jabref.gui.preferences.preview)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreviewTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/227)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.preview;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.transformation.FilteredList;
+&nbsp;import javafx.scene.control.MultipleSelectionModel;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.DragAndDropDataFormats;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.gui.preview.PreviewPreferences;
+&nbsp;import org.jabref.gui.util.CustomLocalDragboard;
+&nbsp;import org.jabref.gui.util.NoSelectionModel;
+&nbsp;import org.jabref.logic.bst.BstPreviewLayout;
+&nbsp;import org.jabref.logic.citationstyle.CSLStyleLoader;
+&nbsp;import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.TextBasedPreviewLayout;
+&nbsp;import org.jabref.logic.preview.PreviewLayout;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;import org.fxmisc.richtext.model.StyleSpans;
+&nbsp;import org.fxmisc.richtext.model.StyleSpansBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class is Preferences -&gt; Entry Preview tab model
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link PreviewTab} is the controller of Entry Preview tab
+&nbsp; * &lt;/p&gt;
+&nbsp; *
+&nbsp; * @see PreviewTab
+&nbsp; */
+&nbsp;public class PreviewTabViewModel implements PreferenceTabViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty showAsExtraTabProperty = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty showPreviewInEntryTableTooltip = new SimpleBooleanProperty(false);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;PreviewLayout&gt; availableListProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;MultipleSelectionModel&lt;PreviewLayout&gt;&gt; availableSelectionModelProperty = new SimpleObjectProperty&lt;&gt;(new NoSelectionModel&lt;&gt;());</b>
+<b class="nc">&nbsp;    private final FilteredList&lt;PreviewLayout&gt; filteredAvailableLayouts = new FilteredList&lt;&gt;(this.availableListProperty());</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;PreviewLayout&gt; chosenListProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;MultipleSelectionModel&lt;PreviewLayout&gt;&gt; chosenSelectionModelProperty = new SimpleObjectProperty&lt;&gt;(new NoSelectionModel&lt;&gt;());</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;Path&gt; bstStylesPaths = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;PreviewLayout&gt; selectedLayoutProperty = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final StringProperty sourceTextProperty = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final PreviewPreferences previewPreferences;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    private final Validator chosenListValidator;
+&nbsp;
+&nbsp;    private final CustomLocalDragboard localDragboard;
+<b class="nc">&nbsp;    private ListProperty&lt;PreviewLayout&gt; dragSourceList = null;</b>
+<b class="nc">&nbsp;    private ObjectProperty&lt;MultipleSelectionModel&lt;PreviewLayout&gt;&gt; dragSourceSelectionModel = null;</b>
+&nbsp;
+&nbsp;    public PreviewTabViewModel(DialogService dialogService,
+&nbsp;                               PreviewPreferences previewPreferences,
+&nbsp;                               TaskExecutor taskExecutor,
+<b class="nc">&nbsp;                               StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.localDragboard = stateManager.getLocalDragboard();</b>
+<b class="nc">&nbsp;        this.previewPreferences = previewPreferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        sourceTextProperty.addListener((observable, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {</b>
+<b class="nc">&nbsp;                layout.setText(sourceTextProperty.getValue());</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        chosenListValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                chosenListProperty,
+<b class="nc">&nbsp;                input -&gt; !chosenListProperty.getValue().isEmpty(),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(&quot;%s &gt; %s %n %n %s&quot;.formatted(</b>
+<b class="nc">&nbsp;                                Localization.lang(&quot;Entry preview&quot;),</b>
+<b class="nc">&nbsp;                                Localization.lang(&quot;Selected&quot;),</b>
+<b class="nc">&nbsp;                                Localization.lang(&quot;Selected Layouts can not be empty&quot;)</b>
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        showAsExtraTabProperty.set(previewPreferences.shouldShowPreviewAsExtraTab());</b>
+<b class="nc">&nbsp;        showPreviewInEntryTableTooltip.set(previewPreferences.shouldShowPreviewEntryTableTooltip());</b>
+<b class="nc">&nbsp;        chosenListProperty().getValue().clear();</b>
+<b class="nc">&nbsp;        chosenListProperty.getValue().addAll(previewPreferences.getLayoutCycle());</b>
+&nbsp;
+<b class="nc">&nbsp;        availableListProperty.clear();</b>
+<b class="nc">&nbsp;        if (chosenListProperty.stream().noneMatch(TextBasedPreviewLayout.class::isInstance)) {</b>
+<b class="nc">&nbsp;            availableListProperty.getValue().add(previewPreferences.getCustomPreviewLayout());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        BackgroundTask.wrap(CSLStyleLoader::getStyles)</b>
+<b class="nc">&nbsp;                      .onSuccess(styles -&gt; styles.stream()</b>
+<b class="nc">&nbsp;                                                 .map(style -&gt; new CitationStylePreviewLayout(style, entryTypesManager))</b>
+<b class="nc">&nbsp;                                                 .filter(style -&gt; chosenListProperty.getValue().filtered(item -&gt;</b>
+<b class="nc">&nbsp;                                                         item.getName().equals(style.getName())).isEmpty())</b>
+<b class="nc">&nbsp;                                                 .sorted(Comparator.comparing(PreviewLayout::getName))</b>
+<b class="nc">&nbsp;                                                 .forEach(availableListProperty::add))</b>
+<b class="nc">&nbsp;                      .onFailure(ex -&gt; {</b>
+<b class="nc">&nbsp;                          LOGGER.error(&quot;Something went wrong while adding the discovered CitationStyles to the list.&quot;, ex);</b>
+<b class="nc">&nbsp;                          dialogService.showErrorDialogAndWait(Localization.lang(&quot;Error adding discovered CitationStyles&quot;), ex);</b>
+&nbsp;                      })
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+<b class="nc">&nbsp;        bstStylesPaths.clear();</b>
+<b class="nc">&nbsp;        bstStylesPaths.addAll(previewPreferences.getBstPreviewLayoutPaths());</b>
+<b class="nc">&nbsp;        bstStylesPaths.forEach(path -&gt; {</b>
+<b class="nc">&nbsp;            BstPreviewLayout layout = new BstPreviewLayout(path);</b>
+<b class="nc">&nbsp;            availableListProperty.add(layout);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPreviewLayout(PreviewLayout selectedLayout) {
+<b class="nc">&nbsp;        if (selectedLayout == null) {</b>
+<b class="nc">&nbsp;            selectedIsEditableProperty.setValue(false);</b>
+<b class="nc">&nbsp;            selectedLayoutProperty.setValue(null);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            selectedLayoutProperty.setValue(selectedLayout);</b>
+&nbsp;        } catch (StringIndexOutOfBoundsException exception) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Parsing error.&quot;, exception);</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Parsing error&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Parsing error&quot;) + &quot;: &quot; + Localization.lang(&quot;illegal backslash expression&quot;), exception);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean isEditingAllowed = selectedLayout instanceof TextBasedPreviewLayout;</b>
+<b class="nc">&nbsp;        setContentForPreview(selectedLayout.getText(), isEditingAllowed);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setContentForPreview(String text, boolean editable) {
+<b class="nc">&nbsp;        sourceTextProperty.setValue(text);</b>
+<b class="nc">&nbsp;        selectedIsEditableProperty.setValue(editable);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void refreshPreview() {
+<b class="nc">&nbsp;        setPreviewLayout(null);</b>
+<b class="nc">&nbsp;        setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private PreviewLayout findLayoutByName(String name) {
+<b class="nc">&nbsp;        return availableListProperty.getValue().stream().filter(layout -&gt; layout.getName().equals(name))</b>
+<b class="nc">&nbsp;                                    .findAny()</b>
+<b class="nc">&nbsp;                                    .orElse(chosenListProperty.getValue().stream().filter(layout -&gt; layout.getName().equals(name))</b>
+<b class="nc">&nbsp;                                                              .findAny()</b>
+<b class="nc">&nbsp;                                                              .orElse(null));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Store the changes of preference-preview settings.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        if (chosenListProperty.isEmpty()) {</b>
+<b class="nc">&nbsp;            chosenListProperty.add(previewPreferences.getCustomPreviewLayout());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        PreviewLayout customLayout = findLayoutByName(TextBasedPreviewLayout.NAME);</b>
+<b class="nc">&nbsp;        if (customLayout == null) {</b>
+<b class="nc">&nbsp;            customLayout = previewPreferences.getCustomPreviewLayout();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        previewPreferences.getLayoutCycle().clear();</b>
+<b class="nc">&nbsp;        previewPreferences.getLayoutCycle().addAll(chosenListProperty);</b>
+<b class="nc">&nbsp;        previewPreferences.setShowPreviewAsExtraTab(showAsExtraTabProperty.getValue());</b>
+<b class="nc">&nbsp;        previewPreferences.setShowPreviewEntryTableTooltip(showPreviewInEntryTableTooltip.getValue());</b>
+<b class="nc">&nbsp;        previewPreferences.setCustomPreviewLayout((TextBasedPreviewLayout) customLayout);</b>
+<b class="nc">&nbsp;        previewPreferences.setBstPreviewLayoutPaths(bstStylesPaths);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {</b>
+<b class="nc">&nbsp;            previewPreferences.setLayoutCyclePosition(chosenListProperty.getValue().indexOf(</b>
+<b class="nc">&nbsp;                    chosenSelectionModelProperty.getValue().getSelectedItems().getFirst()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus chosenListValidationStatus() {
+<b class="nc">&nbsp;        return chosenListValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean validateSettings() {
+<b class="nc">&nbsp;        ValidationStatus validationStatus = chosenListValidationStatus();</b>
+<b class="nc">&nbsp;        if (!validationStatus.isValid()) {</b>
+<b class="nc">&nbsp;            if (validationStatus.getHighestMessage().isPresent()) {</b>
+<b class="nc">&nbsp;                validationStatus.getHighestMessage().ifPresent(message -&gt;</b>
+<b class="nc">&nbsp;                        dialogService.showErrorDialogAndWait(message.getMessage()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addToChosen() {
+<b class="nc">&nbsp;        List&lt;PreviewLayout&gt; selected = new ArrayList&lt;&gt;(availableSelectionModelProperty.getValue().getSelectedItems());</b>
+<b class="nc">&nbsp;        availableSelectionModelProperty.getValue().clearSelection();</b>
+<b class="nc">&nbsp;        availableListProperty.removeAll(selected);</b>
+<b class="nc">&nbsp;        chosenListProperty.addAll(selected);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeFromChosen() {
+<b class="nc">&nbsp;        List&lt;PreviewLayout&gt; selected = new ArrayList&lt;&gt;(chosenSelectionModelProperty.getValue().getSelectedItems());</b>
+<b class="nc">&nbsp;        chosenSelectionModelProperty.getValue().clearSelection();</b>
+<b class="nc">&nbsp;        chosenListProperty.removeAll(selected);</b>
+<b class="nc">&nbsp;        availableListProperty.addAll(selected);</b>
+<b class="nc">&nbsp;        availableListProperty.sort((a, b) -&gt; a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectedInChosenUp() {
+<b class="nc">&nbsp;        if (chosenSelectionModelProperty.getValue().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Integer&gt; selected = new ArrayList&lt;&gt;(chosenSelectionModelProperty.getValue().getSelectedIndices());</b>
+<b class="nc">&nbsp;        List&lt;Integer&gt; newIndices = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        chosenSelectionModelProperty.getValue().clearSelection();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int oldIndex : selected) {</b>
+<b class="nc">&nbsp;            boolean alreadyTaken = newIndices.contains(oldIndex - 1);</b>
+<b class="nc">&nbsp;            int newIndex = (oldIndex &gt; 0) &amp;&amp; !alreadyTaken ? oldIndex - 1 : oldIndex;</b>
+<b class="nc">&nbsp;            chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));</b>
+<b class="nc">&nbsp;            newIndices.add(newIndex);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        newIndices.forEach(index -&gt; chosenSelectionModelProperty.getValue().select(index));</b>
+<b class="nc">&nbsp;        chosenSelectionModelProperty.getValue().select(newIndices.getFirst());</b>
+<b class="nc">&nbsp;        refreshPreview();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectedInChosenDown() {
+<b class="nc">&nbsp;        if (chosenSelectionModelProperty.getValue().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Integer&gt; selected = new ArrayList&lt;&gt;(chosenSelectionModelProperty.getValue().getSelectedIndices());</b>
+<b class="nc">&nbsp;        List&lt;Integer&gt; newIndices = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        chosenSelectionModelProperty.getValue().clearSelection();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = selected.size() - 1; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;            int oldIndex = selected.get(i);</b>
+<b class="nc">&nbsp;            boolean alreadyTaken = newIndices.contains(oldIndex + 1);</b>
+<b class="nc">&nbsp;            int newIndex = (oldIndex &lt; (chosenListProperty.size() - 1)) &amp;&amp; !alreadyTaken ? oldIndex + 1 : oldIndex;</b>
+<b class="nc">&nbsp;            chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));</b>
+<b class="nc">&nbsp;            newIndices.add(newIndex);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        newIndices.forEach(index -&gt; chosenSelectionModelProperty.getValue().select(index));</b>
+<b class="nc">&nbsp;        chosenSelectionModelProperty.getValue().select(newIndices.getFirst());</b>
+<b class="nc">&nbsp;        refreshPreview();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetDefaultLayout() {
+<b class="nc">&nbsp;        PreviewLayout defaultLayout = findLayoutByName(TextBasedPreviewLayout.NAME);</b>
+<b class="nc">&nbsp;        if (defaultLayout instanceof TextBasedPreviewLayout layout) {</b>
+<b class="nc">&nbsp;            layout.setText(previewPreferences.getDefaultCustomPreviewLayout());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        refreshPreview();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github:
+&nbsp;     * &lt;a href=&quot;https://github.com/cmartins&quot;&gt;@cemartins&lt;/a&gt;)
+&nbsp;     * &lt;p&gt;
+&nbsp;     * License: &lt;a href=&quot;https://github.com/FXMisc/RichTextFX/blob/master/LICENSE&quot;&gt;BSD-2-Clause&lt;/a&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * See also
+&nbsp;     * &lt;a href=&quot;https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor&quot;&gt;https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor&lt;/a&gt;
+&nbsp;     *
+&nbsp;     * @param text to parse and highlight
+&nbsp;     * @return highlighted span for codeArea
+&nbsp;     */
+&nbsp;    public StyleSpans&lt;Collection&lt;String&gt;&gt; computeHighlighting(String text) {
+<b class="nc">&nbsp;        final Pattern XML_TAG = Pattern.compile(&quot;(?&lt;ELEMENT&gt;(&lt;/?\\h*)(\\w+)([^&lt;&gt;]*)(\\h*/?&gt;))&quot;</b>
+&nbsp;                + &quot;|(?&lt;COMMENT&gt;&lt;!--[^&lt;&gt;]+--&gt;)&quot;);
+<b class="nc">&nbsp;        final Pattern ATTRIBUTES = Pattern.compile(&quot;(\\w+\\h*)(=)(\\h*\&quot;[^\&quot;]+\&quot;)&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        final int GROUP_OPEN_BRACKET = 2;</b>
+<b class="nc">&nbsp;        final int GROUP_ELEMENT_NAME = 3;</b>
+<b class="nc">&nbsp;        final int GROUP_ATTRIBUTES_SECTION = 4;</b>
+<b class="nc">&nbsp;        final int GROUP_CLOSE_BRACKET = 5;</b>
+<b class="nc">&nbsp;        final int GROUP_ATTRIBUTE_NAME = 1;</b>
+<b class="nc">&nbsp;        final int GROUP_EQUAL_SYMBOL = 2;</b>
+<b class="nc">&nbsp;        final int GROUP_ATTRIBUTE_VALUE = 3;</b>
+&nbsp;
+<b class="nc">&nbsp;        Matcher matcher = XML_TAG.matcher(text);</b>
+<b class="nc">&nbsp;        int lastKeywordEnd = 0;</b>
+<b class="nc">&nbsp;        StyleSpansBuilder&lt;Collection&lt;String&gt;&gt; spansBuilder = new StyleSpansBuilder&lt;&gt;();</b>
+<b class="nc">&nbsp;        while (matcher.find()) {</b>
+<b class="nc">&nbsp;            spansBuilder.add(List.of(), matcher.start() - lastKeywordEnd);</b>
+<b class="nc">&nbsp;            if (matcher.group(&quot;COMMENT&quot;) != null) {</b>
+<b class="nc">&nbsp;                spansBuilder.add(Set.of(&quot;comment&quot;), matcher.end() - matcher.start());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (matcher.group(&quot;ELEMENT&quot;) != null) {</b>
+<b class="nc">&nbsp;                    String attributesText = matcher.group(GROUP_ATTRIBUTES_SECTION);</b>
+&nbsp;
+<b class="nc">&nbsp;                    spansBuilder.add(Set.of(&quot;tagmark&quot;), matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));</b>
+<b class="nc">&nbsp;                    spansBuilder.add(Set.of(&quot;anytag&quot;), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (!attributesText.isEmpty()) {</b>
+<b class="nc">&nbsp;                        lastKeywordEnd = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;                        Matcher attributesMatcher = ATTRIBUTES.matcher(attributesText);</b>
+<b class="nc">&nbsp;                        while (attributesMatcher.find()) {</b>
+<b class="nc">&nbsp;                            spansBuilder.add(List.of(), attributesMatcher.start() - lastKeywordEnd);</b>
+<b class="nc">&nbsp;                            spansBuilder.add(Set.of(&quot;attribute&quot;), attributesMatcher.end(GROUP_ATTRIBUTE_NAME) - attributesMatcher.start(GROUP_ATTRIBUTE_NAME));</b>
+<b class="nc">&nbsp;                            spansBuilder.add(Set.of(&quot;tagmark&quot;), attributesMatcher.end(GROUP_EQUAL_SYMBOL) - attributesMatcher.end(GROUP_ATTRIBUTE_NAME));</b>
+<b class="nc">&nbsp;                            spansBuilder.add(Set.of(&quot;avalue&quot;), attributesMatcher.end(GROUP_ATTRIBUTE_VALUE) - attributesMatcher.end(GROUP_EQUAL_SYMBOL));</b>
+<b class="nc">&nbsp;                            lastKeywordEnd = attributesMatcher.end();</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        if (attributesText.length() &gt; lastKeywordEnd) {</b>
+<b class="nc">&nbsp;                            spansBuilder.add(List.of(), attributesText.length() - lastKeywordEnd);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    lastKeywordEnd = matcher.end(GROUP_ATTRIBUTES_SECTION);</b>
+&nbsp;
+<b class="nc">&nbsp;                    spansBuilder.add(Set.of(&quot;tagmark&quot;), matcher.end(GROUP_CLOSE_BRACKET) - lastKeywordEnd);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            lastKeywordEnd = matcher.end();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        spansBuilder.add(List.of(), text.length() - lastKeywordEnd);</b>
+<b class="nc">&nbsp;        return spansBuilder.create();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void dragOver(DragEvent event) {
+<b class="nc">&nbsp;        if (event.getDragboard().hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {</b>
+<b class="nc">&nbsp;            event.acceptTransferModes(TransferMode.MOVE);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void dragDetected(ListProperty&lt;PreviewLayout&gt; sourceList, ObjectProperty&lt;MultipleSelectionModel&lt;PreviewLayout&gt;&gt; sourceSelectionModel, List&lt;PreviewLayout&gt; selectedLayouts, Dragboard dragboard) {
+<b class="nc">&nbsp;        ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;        content.put(DragAndDropDataFormats.PREVIEWLAYOUTS, &quot;&quot;);</b>
+<b class="nc">&nbsp;        dragboard.setContent(content);</b>
+<b class="nc">&nbsp;        localDragboard.putPreviewLayouts(selectedLayouts);</b>
+<b class="nc">&nbsp;        dragSourceList = sourceList;</b>
+<b class="nc">&nbsp;        dragSourceSelectionModel = sourceSelectionModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is called, when the user drops some PreviewLayouts either in the availableListView or in the empty space of chosenListView
+&nbsp;     *
+&nbsp;     * @param targetList either availableListView or chosenListView
+&nbsp;     */
+&nbsp;
+&nbsp;    public boolean dragDropped(ListProperty&lt;PreviewLayout&gt; targetList, Dragboard dragboard) {
+<b class="nc">&nbsp;        boolean success = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {</b>
+<b class="nc">&nbsp;            List&lt;PreviewLayout&gt; draggedLayouts = localDragboard.getPreviewLayouts();</b>
+<b class="nc">&nbsp;            if (!draggedLayouts.isEmpty()) {</b>
+<b class="nc">&nbsp;                dragSourceSelectionModel.getValue().clearSelection();</b>
+<b class="nc">&nbsp;                dragSourceList.getValue().removeAll(draggedLayouts);</b>
+<b class="nc">&nbsp;                targetList.getValue().addAll(draggedLayouts);</b>
+<b class="nc">&nbsp;                success = true;</b>
+&nbsp;
+<b class="nc">&nbsp;                if (targetList == availableListProperty) {</b>
+<b class="nc">&nbsp;                    targetList.getValue().sort((a, b) -&gt; a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is called, when the user drops some PreviewLayouts on another cell in chosenListView to sort them
+&nbsp;     *
+&nbsp;     * @param targetLayout the Layout, the user drops a layout on
+&nbsp;     */
+&nbsp;
+&nbsp;    public boolean dragDroppedInChosenCell(PreviewLayout targetLayout, Dragboard dragboard) {
+<b class="nc">&nbsp;        boolean success = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {</b>
+<b class="nc">&nbsp;            List&lt;PreviewLayout&gt; draggedSelectedLayouts = new ArrayList&lt;&gt;(localDragboard.getPreviewLayouts());</b>
+<b class="nc">&nbsp;            if (!draggedSelectedLayouts.isEmpty()) {</b>
+<b class="nc">&nbsp;                chosenSelectionModelProperty.getValue().clearSelection();</b>
+<b class="nc">&nbsp;                int targetId = chosenListProperty.getValue().indexOf(targetLayout);</b>
+&nbsp;
+&nbsp;                // see https://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
+<b class="nc">&nbsp;                int onSelectedDelta = 0;</b>
+<b class="nc">&nbsp;                while (draggedSelectedLayouts.contains(targetLayout)) {</b>
+<b class="nc">&nbsp;                    onSelectedDelta = 1;</b>
+<b class="nc">&nbsp;                    targetId--;</b>
+<b class="nc">&nbsp;                    if (targetId &lt; 0) {</b>
+<b class="nc">&nbsp;                        targetId = 0;</b>
+<b class="nc">&nbsp;                        targetLayout = null;</b>
+&nbsp;                        break;
+&nbsp;                    }
+<b class="nc">&nbsp;                    targetLayout = chosenListProperty.getValue().get(targetId);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                dragSourceSelectionModel.getValue().clearSelection();</b>
+<b class="nc">&nbsp;                dragSourceList.getValue().removeAll(draggedSelectedLayouts);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (targetLayout != null) {</b>
+<b class="nc">&nbsp;                    targetId = chosenListProperty.getValue().indexOf(targetLayout) + onSelectedDelta;</b>
+<b class="nc">&nbsp;                } else if (targetId != 0) {</b>
+<b class="nc">&nbsp;                    targetId = chosenListProperty.getValue().size();</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                chosenListProperty.getValue().addAll(targetId, draggedSelectedLayouts);</b>
+&nbsp;
+<b class="nc">&nbsp;                draggedSelectedLayouts.forEach(layout -&gt; chosenSelectionModelProperty.getValue().select(layout));</b>
+&nbsp;
+<b class="nc">&nbsp;                success = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty showAsExtraTabProperty() {
+<b class="nc">&nbsp;        return showAsExtraTabProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty showPreviewInEntryTableTooltip() {
+<b class="nc">&nbsp;        return showPreviewInEntryTableTooltip;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;PreviewLayout&gt; availableListProperty() {
+<b class="nc">&nbsp;        return availableListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FilteredList&lt;PreviewLayout&gt; getFilteredAvailableLayouts() {
+<b class="nc">&nbsp;        return this.filteredAvailableLayouts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAvailableFilter(String searchTerm) {
+<b class="nc">&nbsp;        this.filteredAvailableLayouts.setPredicate(</b>
+<b class="nc">&nbsp;                preview -&gt; searchTerm.isEmpty()</b>
+<b class="nc">&nbsp;                        || preview.containsCaseIndependent(searchTerm));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;MultipleSelectionModel&lt;PreviewLayout&gt;&gt; availableSelectionModelProperty() {
+<b class="nc">&nbsp;        return availableSelectionModelProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;PreviewLayout&gt; chosenListProperty() {
+<b class="nc">&nbsp;        return chosenListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;MultipleSelectionModel&lt;PreviewLayout&gt;&gt; chosenSelectionModelProperty() {
+<b class="nc">&nbsp;        return chosenSelectionModelProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty selectedIsEditableProperty() {
+<b class="nc">&nbsp;        return selectedIsEditableProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;PreviewLayout&gt; selectedLayoutProperty() {
+<b class="nc">&nbsp;        return selectedLayoutProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty sourceTextProperty() {
+<b class="nc">&nbsp;        return sourceTextProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addBstStyle(Path bstFile) {
+<b class="nc">&nbsp;        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(bstFile);</b>
+<b class="nc">&nbsp;        bstStylesPaths.add(bstFile);</b>
+<b class="nc">&nbsp;        availableListProperty().add(bstPreviewLayout);</b>
+<b class="nc">&nbsp;        chosenListProperty().add(bstPreviewLayout);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

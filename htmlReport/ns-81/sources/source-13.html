@@ -1,0 +1,229 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileFilterConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: FileFilterConverter (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileFilterConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.io.FileFilter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.DirectoryStream.Filter;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.stage.FileChooser;
+&nbsp;
+&nbsp;import org.jabref.logic.exporter.Exporter;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.FileType;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;public class FileFilterConverter {
+&nbsp;
+<b class="nc">&nbsp;    public static FileChooser.ExtensionFilter ANY_FILE = new FileChooser.ExtensionFilter(Localization.lang(&quot;Any file&quot;), &quot;*.*&quot;);</b>
+&nbsp;
+&nbsp;    private FileFilterConverter() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static FileChooser.ExtensionFilter toExtensionFilter(FileType fileType) {
+<b class="nc">&nbsp;        String fileList = String.join(&quot;, &quot;, fileType.getExtensionsWithAsteriskAndDot());</b>
+<b class="nc">&nbsp;        String description = Localization.lang(&quot;%0 file (%1)&quot;, fileType.getName(), fileList);</b>
+<b class="nc">&nbsp;        return new FileChooser.ExtensionFilter(description, fileType.getExtensionsWithAsteriskAndDot());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static FileChooser.ExtensionFilter toExtensionFilter(String description, FileType fileType) {
+<b class="nc">&nbsp;        return new FileChooser.ExtensionFilter(description, fileType.getExtensionsWithAsteriskAndDot());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the appropriate file extension filter based on the given file.
+&nbsp;     * If the file is recognized as a BibTeX file, it returns a BibTeX-specific extension filter.
+&nbsp;     * Otherwise, it returns a generic filter.
+&nbsp;     *
+&nbsp;     * @param file The file to check.
+&nbsp;     * @return The corresponding Extension Filter for the file type.
+&nbsp;     */
+&nbsp;    public static FileChooser.ExtensionFilter determineExtensionFilter(Path file) {
+<b class="nc">&nbsp;        if (FileUtil.isBibFile(file)) {</b>
+<b class="nc">&nbsp;            return toExtensionFilter(&quot;BibTeX&quot;, StandardFileType.BIBTEX_DB);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return FileFilterConverter.ANY_FILE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;Importer&gt; getImporter(FileChooser.ExtensionFilter extensionFilter, Collection&lt;Importer&gt; importers) {
+<b class="nc">&nbsp;        return importers.stream().filter(importer -&gt; importer.getName().equals(extensionFilter.getDescription())).findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;Exporter&gt; getExporter(FileChooser.ExtensionFilter extensionFilter, Collection&lt;Exporter&gt; exporters) {
+<b class="nc">&nbsp;        return exporters.stream().filter(exporter -&gt; exporter.getName().equals(extensionFilter.getDescription())).findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static FileChooser.ExtensionFilter forAllImporters(SortedSet&lt;Importer&gt; importers) {
+<b class="nc">&nbsp;        List&lt;FileType&gt; fileTypes = importers.stream().map(Importer::getFileType).toList();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; flatExtensions = fileTypes.stream()</b>
+<b class="nc">&nbsp;                                               .flatMap(type -&gt; type.getExtensionsWithAsteriskAndDot().stream())</b>
+<b class="nc">&nbsp;                                               .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        return new FileChooser.ExtensionFilter(Localization.lang(&quot;Available import formats&quot;), flatExtensions);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;FileChooser.ExtensionFilter&gt; importerToExtensionFilter(Collection&lt;Importer&gt; importers) {
+<b class="nc">&nbsp;        return importers.stream()</b>
+<b class="nc">&nbsp;                        .map(importer -&gt; toExtensionFilter(importer.getName(), importer.getFileType()))</b>
+<b class="nc">&nbsp;                        .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;FileChooser.ExtensionFilter&gt; exporterToExtensionFilter(Collection&lt;Exporter&gt; exporters) {
+<b class="nc">&nbsp;        return exporters.stream()</b>
+<b class="nc">&nbsp;                        .map(exporter -&gt; toExtensionFilter(exporter.getName(), exporter.getFileType()))</b>
+<b class="nc">&nbsp;                        .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static FileFilter toFileFilter(FileChooser.ExtensionFilter extensionFilter) {
+<b class="nc">&nbsp;        return toFileFilter(extensionFilter.getExtensions());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static FileFilter toFileFilter(List&lt;String&gt; extensions) {
+<b class="nc">&nbsp;        Filter&lt;Path&gt; filter = toDirFilter(extensions);</b>
+<b class="nc">&nbsp;        return file -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return filter.accept(file.toPath());</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Filter&lt;Path&gt; toDirFilter(List&lt;String&gt; extensions) {
+<b class="nc">&nbsp;        List&lt;String&gt; extensionsCleaned = extensions.stream()</b>
+<b class="nc">&nbsp;                                                   .map(extension -&gt; extension.replace(&quot;.&quot;, &quot;&quot;).replace(&quot;*&quot;, &quot;&quot;))</b>
+<b class="nc">&nbsp;                                                   .filter(StringUtil::isNotBlank)</b>
+<b class="nc">&nbsp;                                                   .toList();</b>
+<b class="nc">&nbsp;        if (extensionsCleaned.isEmpty()) {</b>
+&nbsp;            // Except every file
+<b class="nc">&nbsp;            return _ -&gt; true;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return path -&gt; FileUtil.getFileExtension(path)</b>
+<b class="nc">&nbsp;                                   .map(extensionsCleaned::contains)</b>
+<b class="nc">&nbsp;                                   .orElse(false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

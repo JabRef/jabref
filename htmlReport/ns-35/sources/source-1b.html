@@ -1,0 +1,491 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedFilesEditor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedFilesEditor (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedFilesEditor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/137)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LinkedFilesEditor$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/138)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.OverrunStyle;
+&nbsp;import javafx.scene.control.ProgressBar;
+&nbsp;import javafx.scene.control.ProgressIndicator;
+&nbsp;import javafx.scene.control.SelectionMode;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;import javafx.scene.input.MouseButton;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.DragAndDropDataFormats;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.fieldeditors.contextmenu.ContextAction;
+&nbsp;import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory;
+&nbsp;import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.MultiContextCommandFactory;
+&nbsp;import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.SingleContextCommandFactory;
+&nbsp;import org.jabref.gui.fieldeditors.contextmenu.MultiContextAction;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIconView;
+&nbsp;import org.jabref.gui.importer.GrobidUseDialogHelper;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.linkedfile.DeleteFileAction;
+&nbsp;import org.jabref.gui.linkedfile.LinkedFileEditDialog;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class LinkedFilesEditor extends HBox implements FieldEditorFX {
+&nbsp;
+&nbsp;    @FXML private ListView&lt;LinkedFileViewModel&gt; listView;
+&nbsp;    @FXML private JabRefIconView fulltextFetcher;
+&nbsp;    @FXML private ProgressIndicator progressIndicator;
+&nbsp;
+&nbsp;    private final Field field;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final SuggestionProvider&lt;?&gt; suggestionProvider;
+&nbsp;    private final FieldCheckers fieldCheckers;
+&nbsp;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private GuiPreferences preferences;
+&nbsp;    @Inject private BibEntryTypesManager bibEntryTypesManager;
+&nbsp;    @Inject private JournalAbbreviationRepository abbreviationRepository;
+&nbsp;    @Inject private TaskExecutor taskExecutor;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;
+&nbsp;    private LinkedFilesEditorViewModel viewModel;
+&nbsp;
+<b class="nc">&nbsp;    private ObservableOptionalValue&lt;BibEntry&gt; bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty&lt;&gt;());</b>
+&nbsp;    private final UiThreadObservableList&lt;LinkedFileViewModel&gt; decoratedModelList;
+&nbsp;
+<b class="nc">&nbsp;    private ContextMenu activeContextMenu = null;</b>
+&nbsp;    private ContextMenuFactory contextMenuFactory;
+&nbsp;
+&nbsp;    public LinkedFilesEditor(Field field,
+&nbsp;                             BibDatabaseContext databaseContext,
+&nbsp;                             SuggestionProvider&lt;?&gt; suggestionProvider,
+<b class="nc">&nbsp;                             FieldCheckers fieldCheckers) {</b>
+<b class="nc">&nbsp;        this.field = field;</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.suggestionProvider = suggestionProvider;</b>
+<b class="nc">&nbsp;        this.fieldCheckers = fieldCheckers;</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;
+<b class="nc">&nbsp;        decoratedModelList = new UiThreadObservableList&lt;&gt;(viewModel.filesProperty());</b>
+<b class="nc">&nbsp;        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new LinkedFilesEditorViewModel(</b>
+&nbsp;                field,
+&nbsp;                suggestionProvider,
+&nbsp;                dialogService,
+&nbsp;                databaseContext,
+&nbsp;                taskExecutor,
+&nbsp;                fieldCheckers,
+&nbsp;                preferences,
+&nbsp;                undoManager);
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;LinkedFileViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)</b>
+<b class="nc">&nbsp;                .withGraphic(this::createFileDisplay)</b>
+<b class="nc">&nbsp;                .withOnMouseClickedEvent(this::handleItemMouseClick)</b>
+<b class="nc">&nbsp;                .setOnDragDetected(this::handleOnDragDetected)</b>
+<b class="nc">&nbsp;                .setOnDragDropped(this::handleOnDragDropped)</b>
+<b class="nc">&nbsp;                .setOnDragOver(this::handleOnDragOver)</b>
+<b class="nc">&nbsp;                .withValidation(LinkedFileViewModel::fileExistsValidationStatus)</b>
+<b class="nc">&nbsp;                .install(listView);</b>
+<b class="nc">&nbsp;        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);</b>
+&nbsp;
+<b class="nc">&nbsp;        fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());</b>
+<b class="nc">&nbsp;        progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        setUpKeyBindings();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
+<b class="nc">&nbsp;        if ((event.getGestureSource() != originalItem) &amp;&amp; event.getDragboard().hasContent(DragAndDropDataFormats.LINKED_FILE)) {</b>
+<b class="nc">&nbsp;            event.acceptTransferModes(TransferMode.MOVE);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragDetected(@SuppressWarnings(&quot;unused&quot;) LinkedFileViewModel linkedFile, MouseEvent event) {
+<b class="nc">&nbsp;        LinkedFile selectedItem = listView.getSelectionModel().getSelectedItem().getFile();</b>
+<b class="nc">&nbsp;        if (selectedItem != null) {</b>
+<b class="nc">&nbsp;            ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;            Dragboard dragboard = listView.startDragAndDrop(TransferMode.MOVE);</b>
+&nbsp;            // We have to use the model class here, as the content of the dragboard must be serializable
+<b class="nc">&nbsp;            content.put(DragAndDropDataFormats.LINKED_FILE, selectedItem);</b>
+<b class="nc">&nbsp;            dragboard.setContent(content);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragDropped(LinkedFileViewModel originalItem, DragEvent event) {
+<b class="nc">&nbsp;        Dragboard dragboard = event.getDragboard();</b>
+<b class="nc">&nbsp;        boolean success = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        ObservableList&lt;LinkedFileViewModel&gt; items = listView.itemsProperty().get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (dragboard.hasContent(DragAndDropDataFormats.LINKED_FILE)) {</b>
+<b class="nc">&nbsp;            LinkedFile linkedFile = (LinkedFile) dragboard.getContent(DragAndDropDataFormats.LINKED_FILE);</b>
+<b class="nc">&nbsp;            LinkedFileViewModel transferredItem = null;</b>
+<b class="nc">&nbsp;            int draggedIdx = 0;</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; items.size(); i++) {</b>
+<b class="nc">&nbsp;                if (items.get(i).getFile().equals(linkedFile)) {</b>
+<b class="nc">&nbsp;                    draggedIdx = i;</b>
+<b class="nc">&nbsp;                    transferredItem = items.get(i);</b>
+&nbsp;                    break;
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            int thisIdx = items.indexOf(originalItem);</b>
+<b class="nc">&nbsp;            items.set(draggedIdx, originalItem);</b>
+<b class="nc">&nbsp;            items.set(thisIdx, transferredItem);</b>
+<b class="nc">&nbsp;            success = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        event.setDropCompleted(success);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node createFileDisplay(LinkedFileViewModel linkedFile) {
+<b class="nc">&nbsp;        PseudoClass opacity = PseudoClass.getPseudoClass(&quot;opacity&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Node icon = linkedFile.getTypeIcon().getGraphicNode();</b>
+<b class="nc">&nbsp;        icon.setOnMouseClicked(event -&gt; linkedFile.open());</b>
+&nbsp;
+<b class="nc">&nbsp;        Text link = new Text();</b>
+<b class="nc">&nbsp;        link.textProperty().bind(linkedFile.linkProperty());</b>
+<b class="nc">&nbsp;        link.getStyleClass().setAll(&quot;file-row-text&quot;);</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(linkedFile.isAutomaticallyFoundProperty(), found -&gt; link.pseudoClassStateChanged(opacity, found));</b>
+&nbsp;
+<b class="nc">&nbsp;        Text desc = new Text();</b>
+<b class="nc">&nbsp;        desc.textProperty().bind(linkedFile.descriptionProperty());</b>
+<b class="nc">&nbsp;        desc.getStyleClass().setAll(&quot;file-row-text&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        ProgressBar progressIndicator = new ProgressBar();</b>
+<b class="nc">&nbsp;        progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());</b>
+<b class="nc">&nbsp;        progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        Label label = new Label();</b>
+<b class="nc">&nbsp;        label.graphicProperty().bind(linkedFile.typeIconProperty());</b>
+<b class="nc">&nbsp;        label.textProperty().bind(linkedFile.linkProperty());</b>
+<b class="nc">&nbsp;        label.getStyleClass().setAll(&quot;file-row-text&quot;);</b>
+<b class="nc">&nbsp;        label.textOverrunProperty().setValue(OverrunStyle.LEADING_ELLIPSIS);</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(linkedFile.isAutomaticallyFoundProperty(), found -&gt; label.pseudoClassStateChanged(opacity, found));</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox info = new HBox(8);</b>
+<b class="nc">&nbsp;        HBox.setHgrow(info, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        info.setStyle(&quot;-fx-padding: 0.5em 0 0.5em 0;&quot;); // To align with buttons below which also have 0.5em padding</b>
+<b class="nc">&nbsp;        info.getChildren().setAll(label, progressIndicator);</b>
+&nbsp;
+<b class="nc">&nbsp;        Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();</b>
+<b class="nc">&nbsp;        acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang(&quot;This file was found automatically. Do you want to link it to this entry?&quot;)));</b>
+<b class="nc">&nbsp;        acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());</b>
+<b class="nc">&nbsp;        acceptAutoLinkedFile.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());</b>
+<b class="nc">&nbsp;        acceptAutoLinkedFile.setOnAction(event -&gt; linkedFile.acceptAsLinked());</b>
+<b class="nc">&nbsp;        acceptAutoLinkedFile.getStyleClass().setAll(&quot;icon-button&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Button writeMetadataToPdf = IconTheme.JabRefIcons.PDF_METADATA_WRITE.asButton();</b>
+<b class="nc">&nbsp;        writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang(&quot;Write BibTeX to PDF (XMP and embedded)&quot;)));</b>
+<b class="nc">&nbsp;        writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());</b>
+<b class="nc">&nbsp;        writeMetadataToPdf.getStyleClass().setAll(&quot;icon-button&quot;);</b>
+<b class="nc">&nbsp;        WriteMetadataToSinglePdfAction writeMetadataToSinglePdfAction = new WriteMetadataToSinglePdfAction(</b>
+<b class="nc">&nbsp;                linkedFile.getFile(),</b>
+<b class="nc">&nbsp;                bibEntry.getValueOrElse(new BibEntry()),</b>
+<b class="nc">&nbsp;                databaseContext, dialogService, preferences.getFieldPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getFilePreferences(), preferences.getXmpPreferences(), abbreviationRepository, bibEntryTypesManager,</b>
+&nbsp;                taskExecutor
+&nbsp;        );
+<b class="nc">&nbsp;        writeMetadataToPdf.disableProperty().bind(writeMetadataToSinglePdfAction.executableProperty().not());</b>
+<b class="nc">&nbsp;        writeMetadataToPdf.setOnAction(event -&gt; writeMetadataToSinglePdfAction.execute());</b>
+&nbsp;
+<b class="nc">&nbsp;        Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();</b>
+<b class="nc">&nbsp;        parsePdfMetadata.setTooltip(new Tooltip(Localization.lang(&quot;Parse Metadata from PDF.&quot;)));</b>
+<b class="nc">&nbsp;        parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());</b>
+<b class="nc">&nbsp;        parsePdfMetadata.setOnAction(event -&gt; {</b>
+<b class="nc">&nbsp;            GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());</b>
+<b class="nc">&nbsp;            linkedFile.parsePdfMetadataAndShowMergeDialog();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        parsePdfMetadata.getStyleClass().setAll(&quot;icon-button&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox container = new HBox(2);</b>
+<b class="nc">&nbsp;        container.setPrefHeight(Double.NEGATIVE_INFINITY);</b>
+<b class="nc">&nbsp;        container.maxWidthProperty().bind(listView.widthProperty().subtract(20d));</b>
+<b class="nc">&nbsp;        container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);</b>
+&nbsp;
+<b class="nc">&nbsp;        return container;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setUpKeyBindings() {
+<b class="nc">&nbsp;        listView.addEventFilter(KeyEvent.KEY_PRESSED, event -&gt; {</b>
+<b class="nc">&nbsp;            Optional&lt;KeyBinding&gt; keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);</b>
+<b class="nc">&nbsp;            if (keyBinding.isPresent()) {</b>
+<b class="nc">&nbsp;                switch (keyBinding.get()) {</b>
+&nbsp;                    case DELETE_ENTRY:
+<b class="nc">&nbsp;                        deleteAttachedFilesWithConfirmation();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    default:
+&nbsp;                        // Pass other keys to children
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void deleteAttachedFilesWithConfirmation() {
+<b class="nc">&nbsp;        new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext,</b>
+<b class="nc">&nbsp;                viewModel, listView.getSelectionModel().getSelectedItems()).execute();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedFilesEditorViewModel getViewModel() {
+<b class="nc">&nbsp;        return viewModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty&lt;&gt;(entry));</b>
+<b class="nc">&nbsp;        viewModel.bindToEntry(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parent getNode() {
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void addNewFile() {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).filter(file -&gt; !file.isEmpty()).ifPresent(newLinkedFile -&gt; viewModel.addNewLinkedFile(newLinkedFile));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void fetchFulltext() {
+<b class="nc">&nbsp;        viewModel.fetchFulltext();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void addFromURL() {
+<b class="nc">&nbsp;        viewModel.addFromURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
+<b class="nc">&nbsp;        if (event.getButton() == MouseButton.PRIMARY &amp;&amp; (event.getClickCount() == 2)) {</b>
+<b class="nc">&nbsp;            linkedFile.open(); // Double-click: open file</b>
+<b class="nc">&nbsp;        } else if (activeContextMenu != null &amp;&amp; event.getButton() == MouseButton.PRIMARY) {</b>
+<b class="nc">&nbsp;            activeContextMenu.hide(); // Hide context menu if left-click</b>
+<b class="nc">&nbsp;            activeContextMenu = null;</b>
+<b class="nc">&nbsp;        } else if (event.getButton() == MouseButton.SECONDARY) {</b>
+<b class="nc">&nbsp;            if (activeContextMenu != null) {</b>
+<b class="nc">&nbsp;                activeContextMenu.hide(); // Hide any existing context menu</b>
+<b class="nc">&nbsp;                activeContextMenu = null;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            SingleContextCommandFactory contextCommandFactory = (action, file) -&gt;</b>
+<b class="nc">&nbsp;                    new ContextAction(action, file, databaseContext, bibEntry, preferences, viewModel);</b>
+&nbsp;
+<b class="nc">&nbsp;            MultiContextCommandFactory multiContextCommandFactory = (action, files) -&gt;</b>
+<b class="nc">&nbsp;                    new MultiContextAction(action, files, databaseContext, bibEntry, preferences, viewModel);</b>
+&nbsp;
+<b class="nc">&nbsp;            contextMenuFactory = new ContextMenuFactory(</b>
+&nbsp;                    dialogService,
+&nbsp;                    preferences,
+&nbsp;                    databaseContext,
+&nbsp;                    bibEntry,
+&nbsp;                    viewModel,
+&nbsp;                    contextCommandFactory,
+&nbsp;                    multiContextCommandFactory
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            ContextMenu contextMenu = contextMenuFactory.createForSelection(listView.getSelectionModel().getSelectedItems());</b>
+<b class="nc">&nbsp;            contextMenu.show(listView, event.getScreenX(), event.getScreenY());</b>
+<b class="nc">&nbsp;            activeContextMenu = contextMenu;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public double getWeight() {
+<b class="nc">&nbsp;        return 3;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

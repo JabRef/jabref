@@ -1,0 +1,284 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ScienceDirect</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: ScienceDirect (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ScienceDirect</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FulltextFetcher;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;
+&nbsp;import kong.unirest.core.HttpResponse;
+&nbsp;import kong.unirest.core.JsonNode;
+&nbsp;import kong.unirest.core.Unirest;
+&nbsp;import kong.unirest.core.UnirestException;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.jsoup.Jsoup;
+&nbsp;import org.jsoup.nodes.Document;
+&nbsp;import org.jsoup.nodes.Node;
+&nbsp;import org.jsoup.select.Elements;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * FulltextFetcher implementation that attempts to find a PDF URL at &lt;a href=&quot;https://www.sciencedirect.com/&quot;&gt;ScienceDirect&lt;/a&gt;.
+&nbsp; * See &lt;a href=&quot;https://dev.elsevier.com/&quot;&gt;https://dev.elsevier.com/&lt;/a&gt;.
+&nbsp; */
+&nbsp;public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
+&nbsp;    public static final String FETCHER_NAME = &quot;ScienceDirect&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);</b>
+&nbsp;
+&nbsp;    private static final String API_URL = &quot;https://api.elsevier.com/content/article/doi/&quot;;
+&nbsp;
+&nbsp;    private final ImporterPreferences importerPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public ScienceDirect(ImporterPreferences importerPreferences) {</b>
+<b class="nc">&nbsp;        this.importerPreferences = importerPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URL&gt; findFullText(BibEntry entry) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;DOI&gt; doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);</b>
+<b class="nc">&nbsp;        if (doi.isEmpty()) {</b>
+&nbsp;            // Full text fetching works only if a DOI is present
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String urlFromDoi = getUrlByDoi(doi.get().asString());</b>
+<b class="nc">&nbsp;        if (urlFromDoi.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;        // Scrape the web page as desktop client (not as mobile client!)
+<b class="nc">&nbsp;        Document html = Jsoup.connect(urlFromDoi)</b>
+<b class="nc">&nbsp;                             .userAgent(URLDownload.USER_AGENT)</b>
+<b class="nc">&nbsp;                             .referrer(&quot;https://www.google.com&quot;)</b>
+<b class="nc">&nbsp;                             .ignoreHttpErrors(true)</b>
+<b class="nc">&nbsp;                             .get();</b>
+&nbsp;
+&nbsp;        // Retrieve PDF link from meta data (most recent)
+<b class="nc">&nbsp;        Elements metaLinks = html.getElementsByAttributeValue(&quot;name&quot;, &quot;citation_pdf_url&quot;);</b>
+<b class="nc">&nbsp;        if (!metaLinks.isEmpty()) {</b>
+<b class="nc">&nbsp;            String link = metaLinks.first().attr(&quot;content&quot;);</b>
+<b class="nc">&nbsp;            return Optional.of(URLUtil.create(link));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // We use the ScienceDirect web page which contains the article (presented using HTML).
+&nbsp;        // This page contains the link to the PDF in some JavaScript code embedded in the web page.
+&nbsp;        // Example page: https://www.sciencedirect.com/science/article/pii/S1674775515001079
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;JSONObject&gt; pdfDownloadOptional = html</b>
+<b class="nc">&nbsp;                .getElementsByAttributeValue(&quot;type&quot;, &quot;application/json&quot;)</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .flatMap(element -&gt; element.getElementsByTag(&quot;script&quot;).stream())</b>
+&nbsp;                // The first DOM child of the script element is the script itself (represented as HTML text)
+<b class="nc">&nbsp;                .map(element -&gt; element.childNode(0))</b>
+<b class="nc">&nbsp;                .map(Node::toString)</b>
+<b class="nc">&nbsp;                .map(JSONObject::new)</b>
+<b class="nc">&nbsp;                .filter(json -&gt; json.has(&quot;article&quot;))</b>
+<b class="nc">&nbsp;                .map(json -&gt; json.getJSONObject(&quot;article&quot;))</b>
+<b class="nc">&nbsp;                .filter(json -&gt; json.has(&quot;pdfDownload&quot;))</b>
+<b class="nc">&nbsp;                .map(json -&gt; json.getJSONObject(&quot;pdfDownload&quot;))</b>
+<b class="nc">&nbsp;                .findAny();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (pdfDownloadOptional.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;No &#39;pdfDownload&#39; key found in JSON information&quot;);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        JSONObject pdfDownload = pdfDownloadOptional.get();</b>
+&nbsp;
+&nbsp;        String fullLinkToPdf;
+<b class="nc">&nbsp;        if (pdfDownload.has(&quot;linkToPdf&quot;)) {</b>
+<b class="nc">&nbsp;            String linkToPdf = pdfDownload.getString(&quot;linkToPdf&quot;);</b>
+<b class="nc">&nbsp;            URL url = URLUtil.create(urlFromDoi);</b>
+<b class="nc">&nbsp;            fullLinkToPdf = &quot;%s://%s%s&quot;.formatted(url.getProtocol(), url.getAuthority(), linkToPdf);</b>
+<b class="nc">&nbsp;        } else if (pdfDownload.has(&quot;urlMetadata&quot;)) {</b>
+<b class="nc">&nbsp;            JSONObject urlMetadata = pdfDownload.getJSONObject(&quot;urlMetadata&quot;);</b>
+<b class="nc">&nbsp;            JSONObject queryParamsObject = urlMetadata.getJSONObject(&quot;queryParams&quot;);</b>
+<b class="nc">&nbsp;            String queryParameters = queryParamsObject.keySet().stream()</b>
+<b class="nc">&nbsp;                                                      .map(key -&gt; &quot;%s=%s&quot;.formatted(key, queryParamsObject.getString(key)))</b>
+<b class="nc">&nbsp;                                                      .collect(Collectors.joining(&quot;&amp;&quot;));</b>
+<b class="nc">&nbsp;            fullLinkToPdf = &quot;https://www.sciencedirect.com/%s/%s%s?%s&quot;.formatted(</b>
+<b class="nc">&nbsp;                    urlMetadata.getString(&quot;path&quot;),</b>
+<b class="nc">&nbsp;                    urlMetadata.getString(&quot;pii&quot;),</b>
+<b class="nc">&nbsp;                    urlMetadata.getString(&quot;pdfExtension&quot;),</b>
+&nbsp;                    queryParameters);
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;No suitable data in JSON information&quot;);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.info(&quot;Fulltext PDF found at ScienceDirect at {}.&quot;, fullLinkToPdf);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return Optional.of(URLUtil.create(fullLinkToPdf));</b>
+&nbsp;        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;malformed URL&quot;, e);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TrustLevel getTrustLevel() {
+<b class="nc">&nbsp;        return TrustLevel.PUBLISHER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getUrlByDoi(String doi) throws UnirestException {
+<b class="nc">&nbsp;        String sciLink = &quot;&quot;;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            String request = API_URL + doi;</b>
+<b class="nc">&nbsp;            HttpResponse&lt;JsonNode&gt; jsonResponse = Unirest.get(request)</b>
+<b class="nc">&nbsp;                                                         .header(&quot;X-ELS-APIKey&quot;, importerPreferences.getApiKey(getName()).orElse(&quot;&quot;))</b>
+<b class="nc">&nbsp;                                                         .queryString(&quot;httpAccept&quot;, &quot;application/json&quot;)</b>
+<b class="nc">&nbsp;                                                         .asJson();</b>
+&nbsp;
+<b class="nc">&nbsp;            JSONObject json = jsonResponse.getBody().getObject();</b>
+<b class="nc">&nbsp;            JSONArray links = json.getJSONObject(&quot;full-text-retrieval-response&quot;)</b>
+<b class="nc">&nbsp;                                  .getJSONObject(&quot;coredata&quot;)</b>
+<b class="nc">&nbsp;                                  .getJSONArray(&quot;link&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (int i = 0; i &lt; links.length(); i++) {</b>
+<b class="nc">&nbsp;                JSONObject link = links.getJSONObject(i);</b>
+<b class="nc">&nbsp;                if (&quot;scidir&quot;.equals(link.getString(&quot;@rel&quot;))) {</b>
+<b class="nc">&nbsp;                    sciLink = link.getString(&quot;@href&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return sciLink;</b>
+&nbsp;        } catch (JSONException e) {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;No ScienceDirect link found in API request&quot;, e);</b>
+<b class="nc">&nbsp;            return sciLink;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return FETCHER_NAME;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

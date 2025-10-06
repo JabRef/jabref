@@ -1,0 +1,664 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OOFrontend</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.frontend</a>
+</div>
+
+<h1>Coverage Summary for Class: OOFrontend (org.jabref.logic.openoffice.frontend)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OOFrontend</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/129)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OOFrontend$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/130)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.frontend;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.openoffice.backend.Backend52;
+&nbsp;import org.jabref.model.openoffice.CitationEntry;
+&nbsp;import org.jabref.model.openoffice.ootext.OOText;
+&nbsp;import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
+&nbsp;import org.jabref.model.openoffice.rangesort.RangeOverlap;
+&nbsp;import org.jabref.model.openoffice.rangesort.RangeOverlapBetween;
+&nbsp;import org.jabref.model.openoffice.rangesort.RangeOverlapWithin;
+&nbsp;import org.jabref.model.openoffice.rangesort.RangeSort;
+&nbsp;import org.jabref.model.openoffice.rangesort.RangeSortEntry;
+&nbsp;import org.jabref.model.openoffice.rangesort.RangeSortVisual;
+&nbsp;import org.jabref.model.openoffice.rangesort.RangeSortable;
+&nbsp;import org.jabref.model.openoffice.style.CitationGroup;
+&nbsp;import org.jabref.model.openoffice.style.CitationGroupId;
+&nbsp;import org.jabref.model.openoffice.style.CitationGroups;
+&nbsp;import org.jabref.model.openoffice.style.CitationType;
+&nbsp;import org.jabref.model.openoffice.style.OODataModel;
+&nbsp;import org.jabref.model.openoffice.uno.CreationException;
+&nbsp;import org.jabref.model.openoffice.uno.NoDocumentException;
+&nbsp;import org.jabref.model.openoffice.uno.UnoCursor;
+&nbsp;import org.jabref.model.openoffice.uno.UnoTextRange;
+&nbsp;import org.jabref.model.openoffice.util.OOListUtil;
+&nbsp;import org.jabref.model.openoffice.util.OOVoidResult;
+&nbsp;
+&nbsp;import com.sun.star.beans.IllegalTypeException;
+&nbsp;import com.sun.star.beans.NotRemoveableException;
+&nbsp;import com.sun.star.beans.PropertyVetoException;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.sun.star.text.XTextCursor;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;
+&nbsp;public class OOFrontend {
+&nbsp;
+&nbsp;    public final Backend52 backend;
+&nbsp;    public final CitationGroups citationGroups;
+&nbsp;
+&nbsp;    public OOFrontend(XTextDocument doc)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+<b class="nc">&nbsp;            WrappedTargetException {</b>
+&nbsp;
+&nbsp;        // TODO: dataModel should come from looking at the document and preferences.
+<b class="nc">&nbsp;        this.backend = new Backend52();</b>
+&nbsp;
+&nbsp;        // Get the citationGroupNames
+<b class="nc">&nbsp;        List&lt;String&gt; citationGroupNames = this.backend.getJabRefReferenceMarkNames(doc);</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;CitationGroupId, CitationGroup&gt; citationGroups =</b>
+<b class="nc">&nbsp;                readCitationGroupsFromDocument(this.backend, doc, citationGroupNames);</b>
+<b class="nc">&nbsp;        this.citationGroups = new CitationGroups(citationGroups);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OODataModel getDataModel() {
+<b class="nc">&nbsp;        return backend.dataModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; healthReport(XTextDocument doc)
+&nbsp;            throws
+&nbsp;            NoDocumentException {
+<b class="nc">&nbsp;        return backend.healthReport(doc);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;CitationGroupId, CitationGroup&gt;
+&nbsp;    readCitationGroupsFromDocument(Backend52 backend,
+&nbsp;                                   XTextDocument doc,
+&nbsp;                                   List&lt;String&gt; citationGroupNames)
+&nbsp;            throws
+&nbsp;            WrappedTargetException,
+&nbsp;            NoDocumentException {
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;CitationGroupId, CitationGroup&gt; citationGroups = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (String name : citationGroupNames) {</b>
+<b class="nc">&nbsp;            CitationGroup group = backend.readCitationGroupFromDocumentOrThrow(doc, name);</b>
+<b class="nc">&nbsp;            citationGroups.put(group.groupId, group);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return citationGroups;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a list of {@code RangeSortable&lt;CitationGroup&gt;} values for our {@code CitationGroup} values. Originally designed to be passed to {@code visualSort}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The elements of the returned list are actually of type {@code RangeSortEntry&lt;CitationGroup&gt;}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The result is sorted within {@code XTextRange.getText()} partitions of the citation groups according to their {@code XTextRange} (before mapping to footnote marks).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In the result, RangeSortable.getIndexInPosition() contains unique indexes within the original partition (not after mapFootnotesToFootnoteMarks).
+&nbsp;     *
+&nbsp;     * @param mapFootnotesToFootnoteMarks If true, replace ranges in footnotes with the range of the corresponding footnote mark. This is used for numbering the citations.
+&nbsp;     */
+&nbsp;    private List&lt;RangeSortable&lt;CitationGroup&gt;&gt; createVisualSortInput(XTextDocument doc,
+&nbsp;                                                                     boolean mapFootnotesToFootnoteMarks)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeSortEntry&lt;CitationGroup&gt;&gt; sortables = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {</b>
+<b class="nc">&nbsp;            XTextRange range = this</b>
+<b class="nc">&nbsp;                    .getMarkRange(doc, group)</b>
+<b class="nc">&nbsp;                    .orElseThrow(IllegalStateException::new);</b>
+<b class="nc">&nbsp;            sortables.add(new RangeSortEntry&lt;&gt;(range, 0, group));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         *  At this point we are almost ready to return sortables.
+&nbsp;         *
+&nbsp;         *  But we may want to number citations in a footnote as if it appeared where the footnote
+&nbsp;         *  mark is.
+&nbsp;         *
+&nbsp;         *  The following code replaces ranges within footnotes with the range for the corresponding
+&nbsp;         *  footnote mark.
+&nbsp;         *
+&nbsp;         *  This brings further ambiguity if we have multiple citation groups within the same
+&nbsp;         *  footnote: for the comparison they become indistinguishable. Numbering between them is
+&nbsp;         *  not controlled. Also combineCiteMarkers will see them in the wrong order (if we use this
+&nbsp;         *  comparison), and will not be able to merge. To avoid these, we sort textually within
+&nbsp;         *  each .getText() partition and add indexInPosition accordingly.
+&nbsp;         *
+&nbsp;         */
+&nbsp;
+&nbsp;        // Sort within partitions
+<b class="nc">&nbsp;        RangeSort.RangePartitions&lt;RangeSortEntry&lt;CitationGroup&gt;&gt; partitions =</b>
+<b class="nc">&nbsp;                RangeSort.partitionAndSortRanges(sortables);</b>
+&nbsp;
+&nbsp;        // build final list
+<b class="nc">&nbsp;        List&lt;RangeSortEntry&lt;CitationGroup&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (List&lt;RangeSortEntry&lt;CitationGroup&gt;&gt; partition : partitions.getPartitions()) {</b>
+<b class="nc">&nbsp;            int indexInPartition = 0;</b>
+<b class="nc">&nbsp;            for (RangeSortEntry&lt;CitationGroup&gt; sortable : partition) {</b>
+<b class="nc">&nbsp;                sortable.setIndexInPosition(indexInPartition++);</b>
+<b class="nc">&nbsp;                if (mapFootnotesToFootnoteMarks) {</b>
+<b class="nc">&nbsp;                    Optional&lt;XTextRange&gt; footnoteMarkRange =</b>
+<b class="nc">&nbsp;                            UnoTextRange.getFootnoteMarkRange(sortable.getRange());</b>
+&nbsp;                    // Adjust range if we are inside a footnote:
+<b class="nc">&nbsp;                    footnoteMarkRange.ifPresent(sortable::setRange);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                result.add(sortable);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param mapFootnotesToFootnoteMarks If true, sort reference marks in footnotes as if they appeared at the corresponding footnote mark.
+&nbsp;     * @return citation groups sorted by their visual positions. Limitation: for two column layout visual (top-down, left-right) order does not match the expected (textual) order.
+&nbsp;     */
+&nbsp;    private List&lt;CitationGroup&gt; getVisuallySortedCitationGroups(XTextDocument doc,
+&nbsp;                                                                boolean mapFootnotesToFootnoteMarks,
+&nbsp;                                                                FunctionalTextViewCursor fcursor)
+&nbsp;            throws
+&nbsp;            WrappedTargetException,
+&nbsp;            NoDocumentException {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeSortable&lt;CitationGroup&gt;&gt; sortables = createVisualSortInput(doc, mapFootnotesToFootnoteMarks);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeSortable&lt;CitationGroup&gt;&gt; sorted = RangeSortVisual.visualSort(sortables, doc, fcursor);</b>
+&nbsp;
+<b class="nc">&nbsp;        return sorted.stream()</b>
+<b class="nc">&nbsp;                     .map(RangeSortable::getContent)</b>
+<b class="nc">&nbsp;                     .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return citation groups in visual order within (but not across) XText partitions.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is (1) sufficient for combineCiteMarkers which looks for consecutive XTextRanges within each XText, (2) not confused by multicolumn layout or multipage display.
+&nbsp;     */
+&nbsp;    public List&lt;CitationGroup&gt;
+&nbsp;    getCitationGroupsSortedWithinPartitions(XTextDocument doc, boolean mapFootnotesToFootnoteMarks)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+&nbsp;        // This is like getVisuallySortedCitationGroups,
+&nbsp;        // but we skip the visualSort part.
+<b class="nc">&nbsp;        List&lt;RangeSortable&lt;CitationGroup&gt;&gt; sortables =</b>
+<b class="nc">&nbsp;                createVisualSortInput(doc, mapFootnotesToFootnoteMarks);</b>
+&nbsp;
+<b class="nc">&nbsp;        return sortables.stream().map(RangeSortable::getContent).collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a citation group for the given citation keys, at the end of position.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * On return {@code position} is collapsed, and is after the inserted space, or at the end of the reference mark.
+&nbsp;     *
+&nbsp;     * @param citationKeys     In storage order
+&nbsp;     * @param pageInfos        In storage order
+&nbsp;     * @param position         Collapsed to its end.
+&nbsp;     * @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of characters from the original position.
+&nbsp;     */
+&nbsp;    public CitationGroup createCitationGroup(XTextDocument doc,
+&nbsp;                                             List&lt;String&gt; citationKeys,
+&nbsp;                                             List&lt;Optional&lt;OOText&gt;&gt; pageInfos,
+&nbsp;                                             CitationType citationType,
+&nbsp;                                             XTextCursor position,
+&nbsp;                                             boolean insertSpaceAfter)
+&nbsp;            throws
+&nbsp;            CreationException,
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException,
+&nbsp;            NotRemoveableException,
+&nbsp;            PropertyVetoException,
+&nbsp;            IllegalTypeException {
+&nbsp;
+<b class="nc">&nbsp;        Objects.requireNonNull(pageInfos);</b>
+<b class="nc">&nbsp;        if (pageInfos.size() != citationKeys.size()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;pageInfos.size != citationKeys.size&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        CitationGroup group = backend.createCitationGroup(doc,</b>
+&nbsp;                citationKeys,
+&nbsp;                pageInfos,
+&nbsp;                citationType,
+&nbsp;                position,
+&nbsp;                insertSpaceAfter);
+&nbsp;
+<b class="nc">&nbsp;        this.citationGroups.afterCreateCitationGroup(group);</b>
+<b class="nc">&nbsp;        return group;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remove {@code group} both from the document and notify {@code citationGroups}
+&nbsp;     */
+&nbsp;    public void removeCitationGroup(CitationGroup group, XTextDocument doc)
+&nbsp;            throws
+&nbsp;            WrappedTargetException,
+&nbsp;            NoDocumentException,
+&nbsp;            NotRemoveableException {
+&nbsp;
+<b class="nc">&nbsp;        backend.removeCitationGroup(group, doc);</b>
+<b class="nc">&nbsp;        this.citationGroups.afterRemoveCitationGroup(group);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeCitationGroups(List&lt;CitationGroup&gt; citationGroups, XTextDocument doc)
+&nbsp;            throws
+&nbsp;            WrappedTargetException,
+&nbsp;            NoDocumentException,
+&nbsp;            NotRemoveableException {
+&nbsp;
+<b class="nc">&nbsp;        for (CitationGroup group : citationGroups) {</b>
+<b class="nc">&nbsp;            removeCitationGroup(group, doc);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * ranges controlled by citation groups should not overlap with each other.
+&nbsp;     *
+&nbsp;     * @return Optional.empty() if the reference mark is missing.
+&nbsp;     */
+&nbsp;    public Optional&lt;XTextRange&gt; getMarkRange(XTextDocument doc, CitationGroup group)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+<b class="nc">&nbsp;        return backend.getMarkRange(group, doc);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public XTextCursor getFillCursorForCitationGroup(XTextDocument doc, CitationGroup group)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException,
+&nbsp;            CreationException {
+<b class="nc">&nbsp;        return backend.getFillCursorForCitationGroup(group, doc);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remove brackets added by getFillCursorForCitationGroup.
+&nbsp;     */
+&nbsp;    public void cleanFillCursorForCitationGroup(XTextDocument doc, CitationGroup group)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+<b class="nc">&nbsp;        backend.cleanFillCursorForCitationGroup(group, doc);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return A RangeForOverlapCheck for each citation group. result.size() == nRefMarks
+&nbsp;     */
+&nbsp;    public List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; citationRanges(XTextDocument doc)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; result =</b>
+<b class="nc">&nbsp;                new ArrayList&lt;&gt;(citationGroups.numberOfCitationGroups());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {</b>
+<b class="nc">&nbsp;            XTextRange range = this.getMarkRange(doc, group).orElseThrow(IllegalStateException::new);</b>
+<b class="nc">&nbsp;            String description = group.groupId.citationGroupIdAsString();</b>
+<b class="nc">&nbsp;            result.add(new RangeForOverlapCheck&lt;&gt;(range,</b>
+&nbsp;                    group.groupId,
+&nbsp;                    RangeForOverlapCheck.REFERENCE_MARK_KIND,
+&nbsp;                    description));
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; bibliographyRanges(XTextDocument doc)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;XTextRange&gt; range = UpdateBibliography.getBibliographyRange(doc);</b>
+<b class="nc">&nbsp;        if (range.isPresent()) {</b>
+<b class="nc">&nbsp;            String description = &quot;bibliography&quot;;</b>
+<b class="nc">&nbsp;            result.add(new RangeForOverlapCheck&lt;&gt;(range.get(),</b>
+&nbsp;                    new CitationGroupId(&quot;bibliography&quot;),
+&nbsp;                    RangeForOverlapCheck.BIBLIOGRAPHY_MARK_KIND,
+&nbsp;                    description));
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; viewCursorRanges(XTextDocument doc) {
+<b class="nc">&nbsp;        List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;XTextRange&gt; range = UnoCursor.getViewCursor(doc).map(e -&gt; e);</b>
+<b class="nc">&nbsp;        if (range.isPresent()) {</b>
+<b class="nc">&nbsp;            String description = &quot;cursor&quot;;</b>
+<b class="nc">&nbsp;            result.add(new RangeForOverlapCheck&lt;&gt;(range.get(),</b>
+&nbsp;                    new CitationGroupId(&quot;cursor&quot;),
+&nbsp;                    RangeForOverlapCheck.CURSOR_MARK_KIND,
+&nbsp;                    description));
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return A range for each footnote mark where the footnote contains at least one citation group. Purpose: We do not want markers of footnotes containing reference marks to overlap with reference marks. Overwriting these footnote marks might kill our reference marks in the footnote.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note: Here we directly communicate to the document, not through the backend. This is because mapping ranges to footnote marks does not depend on how do we mark or structure those ranges.
+&nbsp;     */
+&nbsp;    public List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt;
+&nbsp;    footnoteMarkRanges(XTextDocument doc, List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; citationRanges) {
+&nbsp;        // We partition by XText and use a single range from
+&nbsp;        // each partition to get at the corresponding footnotemark range.
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        RangeSort.RangePartitions&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; partitions =</b>
+<b class="nc">&nbsp;                RangeSort.partitionRanges(citationRanges);</b>
+&nbsp;
+&nbsp;        // Each partition corresponds to an XText, and each footnote has a single XText.
+&nbsp;        // (This latter ignores the possibility of XTextContents inserted into footnotes.)
+&nbsp;        // Also: different footnotes cannot share a footnotemark range, we are not creating duplicates.
+<b class="nc">&nbsp;        for (List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; partition : partitions.getPartitions()) {</b>
+<b class="nc">&nbsp;            if (partition.isEmpty()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            RangeForOverlapCheck&lt;CitationGroupId&gt; citationRange = partition.getFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;XTextRange&gt; footnoteMarkRange = UnoTextRange.getFootnoteMarkRange(citationRange.range);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (footnoteMarkRange.isEmpty()) {</b>
+&nbsp;                // not in footnote
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            result.add(new RangeForOverlapCheck&lt;&gt;(footnoteMarkRange.get(),</b>
+&nbsp;                    citationRange.idWithinKind,
+&nbsp;                    RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
+<b class="nc">&nbsp;                    &quot;FootnoteMark for &quot; + citationRange.format()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static String rangeOverlapsToMessage(List&lt;RangeOverlap&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt;&gt; overlaps) {
+<b class="nc">&nbsp;        if (overlaps.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;(*no overlaps*)&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder msg = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (RangeOverlap&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; overlap : overlaps) {</b>
+<b class="nc">&nbsp;            String listOfRanges = overlap.valuesForOverlappingRanges.stream()</b>
+<b class="nc">&nbsp;                                                                    .map(v -&gt; &quot;&#39;%s&#39;&quot;.formatted(v.format()))</b>
+<b class="nc">&nbsp;                                                                    .collect(Collectors.joining(&quot;, &quot;));</b>
+<b class="nc">&nbsp;            msg.append(</b>
+<b class="nc">&nbsp;                    switch (overlap.kind) {</b>
+&nbsp;                        case EQUAL_RANGE -&gt;
+<b class="nc">&nbsp;                                Localization.lang(&quot;Found identical ranges&quot;);</b>
+&nbsp;                        case OVERLAP -&gt;
+<b class="nc">&nbsp;                                Localization.lang(&quot;Found overlapping ranges&quot;);</b>
+&nbsp;                        case TOUCH -&gt;
+<b class="nc">&nbsp;                                Localization.lang(&quot;Found touching ranges&quot;);</b>
+&nbsp;                    });
+<b class="nc">&nbsp;            msg.append(&quot;: &quot;);</b>
+<b class="nc">&nbsp;            msg.append(listOfRanges);</b>
+<b class="nc">&nbsp;            msg.append(&quot;\n&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return msg.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check for any overlap between userRanges and protected ranges.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Assume userRanges is small (usually 1 elements for checking the cursor)
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Returns on first problem found.
+&nbsp;     */
+&nbsp;    public OOVoidResult&lt;JabRefException&gt;
+&nbsp;    checkRangeOverlapsWithCursor(XTextDocument doc,
+&nbsp;                                 List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; userRanges,
+&nbsp;                                 boolean requireSeparation)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; citationRanges = citationRanges(doc);</b>
+<b class="nc">&nbsp;        List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; ranges = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // ranges.addAll(userRanges);
+<b class="nc">&nbsp;        ranges.addAll(bibliographyRanges(doc));</b>
+<b class="nc">&nbsp;        ranges.addAll(citationRanges);</b>
+<b class="nc">&nbsp;        ranges.addAll(footnoteMarkRanges(doc, citationRanges));</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeOverlap&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt;&gt; overlaps =</b>
+<b class="nc">&nbsp;                RangeOverlapBetween.findFirst(doc,</b>
+&nbsp;                        userRanges,
+&nbsp;                        ranges,
+&nbsp;                        requireSeparation);
+&nbsp;
+<b class="nc">&nbsp;        if (overlaps.isEmpty()) {</b>
+<b class="nc">&nbsp;            return OOVoidResult.ok();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return OOVoidResult.error(new JabRefException(&quot;Found overlapping or touching ranges&quot;,</b>
+<b class="nc">&nbsp;                rangeOverlapsToMessage(overlaps)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param requireSeparation Report range pairs that only share a boundary.
+&nbsp;     * @param reportAtMost      Limit number of overlaps reported (0 for no limit)
+&nbsp;     */
+&nbsp;    public OOVoidResult&lt;JabRefException&gt; checkRangeOverlaps(XTextDocument doc,
+&nbsp;                                                            List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; userRanges,
+&nbsp;                                                            boolean requireSeparation,
+&nbsp;                                                            int reportAtMost)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; citationRanges = citationRanges(doc);</b>
+<b class="nc">&nbsp;        List&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt; ranges = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        ranges.addAll(userRanges);</b>
+<b class="nc">&nbsp;        ranges.addAll(bibliographyRanges(doc));</b>
+<b class="nc">&nbsp;        ranges.addAll(citationRanges);</b>
+<b class="nc">&nbsp;        ranges.addAll(footnoteMarkRanges(doc, citationRanges));</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RangeOverlap&lt;RangeForOverlapCheck&lt;CitationGroupId&gt;&gt;&gt; overlaps =</b>
+<b class="nc">&nbsp;                RangeOverlapWithin.findOverlappingRanges(doc, ranges, requireSeparation, reportAtMost);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (overlaps.isEmpty()) {</b>
+<b class="nc">&nbsp;            return OOVoidResult.ok();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return OOVoidResult.error(new JabRefException(&quot;Found overlapping or touching ranges&quot;,</b>
+<b class="nc">&nbsp;                rangeOverlapsToMessage(overlaps)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * GUI: Get a list of CitationEntry objects corresponding to citations in the document.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Called from: ManageCitationsDialogViewModel constructor.
+&nbsp;     *
+&nbsp;     * @return A list with entries corresponding to citations in the text, in arbitrary order (same order as from getJabRefReferenceMarkNames). Note: visual or alphabetic order could be more manageable for the user. We could provide these here, but switching between them needs change on GUI (adding a toggle or selector).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note: CitationEntry implements Comparable, where compareTo() and equals() are based on refMarkName.  The order used in the &quot;Manage citations&quot; dialog does not seem to use that.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The 1st is labeled &quot;Citation&quot; (show citation in bold, and some context around it).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The columns can be sorted by clicking on the column title.  For the &quot;Citation&quot; column, the sorting is based on the content, (the context before the citation), not on the citation itself.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In the &quot;Extra information ...&quot; column some visual indication of the editable part could be helpful.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Wish: selecting an entry (or a button in the line) in the GUI could move the cursor in the document to the entry.
+&nbsp;     */
+&nbsp;    public List&lt;CitationEntry&gt; getCitationEntries(XTextDocument doc)
+&nbsp;            throws
+&nbsp;            WrappedTargetException,
+&nbsp;            NoDocumentException {
+<b class="nc">&nbsp;        return this.backend.getCitationEntries(doc, citationGroups);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void applyCitationEntries(XTextDocument doc, List&lt;CitationEntry&gt; citationEntries)
+&nbsp;            throws
+&nbsp;            PropertyVetoException,
+&nbsp;            IllegalTypeException,
+&nbsp;            IllegalArgumentException,
+&nbsp;            WrappedTargetException {
+<b class="nc">&nbsp;        this.backend.applyCitationEntries(doc, citationEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void imposeGlobalOrder(XTextDocument doc, FunctionalTextViewCursor fcursor)
+&nbsp;            throws
+&nbsp;            WrappedTargetException,
+&nbsp;            NoDocumentException {
+&nbsp;
+<b class="nc">&nbsp;        boolean mapFootnotesToFootnoteMarks = true;</b>
+<b class="nc">&nbsp;        List&lt;CitationGroup&gt; sortedCitationGroups =</b>
+<b class="nc">&nbsp;                getVisuallySortedCitationGroups(doc, mapFootnotesToFootnoteMarks, fcursor);</b>
+<b class="nc">&nbsp;        List&lt;CitationGroupId&gt; sortedCitationGroupIds = OOListUtil.map(sortedCitationGroups, group -&gt; group.groupId);</b>
+<b class="nc">&nbsp;        citationGroups.setGlobalOrder(sortedCitationGroupIds);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

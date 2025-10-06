@@ -1,0 +1,458 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultLinkedFilesIndexer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.search.indexing</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultLinkedFilesIndexer (org.jabref.logic.search.indexing)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultLinkedFilesIndexer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/155)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.search.indexing;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.util.Pair;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.importer.util.FileFieldParser;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.search.LuceneIndexer;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.HeadlessExecutorService;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.search.LinkedFilesConstants;
+&nbsp;
+&nbsp;import org.apache.commons.io.FileUtils;
+&nbsp;import org.apache.lucene.document.Document;
+&nbsp;import org.apache.lucene.index.IndexWriter;
+&nbsp;import org.apache.lucene.index.IndexWriterConfig;
+&nbsp;import org.apache.lucene.index.IndexableField;
+&nbsp;import org.apache.lucene.index.StoredFields;
+&nbsp;import org.apache.lucene.index.Term;
+&nbsp;import org.apache.lucene.search.IndexSearcher;
+&nbsp;import org.apache.lucene.search.ScoreDoc;
+&nbsp;import org.apache.lucene.search.SearcherManager;
+&nbsp;import org.apache.lucene.search.TermQuery;
+&nbsp;import org.apache.lucene.search.TopDocs;
+&nbsp;import org.apache.lucene.store.Directory;
+&nbsp;import org.apache.lucene.store.FSDirectory;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class DefaultLinkedFilesIndexer implements LuceneIndexer {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLinkedFilesIndexer.class);</b>
+<b class="nc">&nbsp;    private static final DocumentReader DOCUMENT_READER = new DocumentReader();</b>
+<b class="nc">&nbsp;    private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;</b>
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final String libraryName;
+&nbsp;    private final Directory indexDirectory;
+&nbsp;    private final IndexWriter indexWriter;
+&nbsp;    private final SearcherManager searcherManager;
+&nbsp;    private Path indexDirectoryPath;
+&nbsp;    private Map&lt;String, Long&gt; indexedFiles;
+&nbsp;
+<b class="nc">&nbsp;    public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        this.libraryName = databaseContext.getDatabasePath().map(path -&gt; path.getFileName().toString()).orElse(&quot;untitled&quot;);</b>
+<b class="nc">&nbsp;        this.indexedFiles = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        indexDirectoryPath = databaseContext.getFulltextIndexPath();</b>
+<b class="nc">&nbsp;        IndexWriterConfig config = new IndexWriterConfig(LinkedFilesConstants.LINKED_FILES_ANALYZER);</b>
+<b class="nc">&nbsp;        if (&quot;unsaved&quot;.equals(indexDirectoryPath.getFileName().toString())) {</b>
+<b class="nc">&nbsp;            config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);</b>
+<b class="nc">&nbsp;            indexDirectoryPath = indexDirectoryPath.resolveSibling(&quot;unsaved&quot; + NUMBER_OF_UNSAVED_LIBRARIES++);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.indexDirectory = FSDirectory.open(indexDirectoryPath);</b>
+<b class="nc">&nbsp;        this.indexWriter = new IndexWriter(indexDirectory, config);</b>
+<b class="nc">&nbsp;        this.searcherManager = new SearcherManager(indexWriter, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void updateOnStart(BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        indexedFiles = getLinkedFilesFromIndex();</b>
+<b class="nc">&nbsp;        Map&lt;String, Pair&lt;Long, Path&gt;&gt; currentFiles = getLinkedFilesFromEntries(databaseContext.getEntries());</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;String&gt; filesToRemove = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, Long&gt; entry : indexedFiles.entrySet()) {</b>
+<b class="nc">&nbsp;            String fileLink = entry.getKey();</b>
+<b class="nc">&nbsp;            long modification = entry.getValue();</b>
+<b class="nc">&nbsp;            if (!currentFiles.containsKey(fileLink)) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;File {} has been removed from the library. Will be removed from the index&quot;, fileLink);</b>
+<b class="nc">&nbsp;                filesToRemove.add(fileLink);</b>
+<b class="nc">&nbsp;            } else if (currentFiles.get(fileLink).getKey() &gt; modification) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;File {} has been modified since last indexing. Will be removed from the index.&quot;, fileLink);</b>
+<b class="nc">&nbsp;                filesToRemove.add(fileLink);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        removeFromIndex(filesToRemove);</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, Pair&lt;Long, Path&gt;&gt; filesToAdd = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, Pair&lt;Long, Path&gt;&gt; entry : currentFiles.entrySet()) {</b>
+<b class="nc">&nbsp;            String fileLink = entry.getKey();</b>
+<b class="nc">&nbsp;            if (!indexedFiles.containsKey(fileLink)) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;File {} has been added to the library. Will be added to the index.&quot;, fileLink);</b>
+<b class="nc">&nbsp;                filesToAdd.put(fileLink, entry.getValue());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        addToIndex(filesToAdd, task);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addToIndex(Collection&lt;BibEntry&gt; entries, BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        addToIndex(getLinkedFilesFromEntries(entries), task);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addToIndex(Set&lt;LinkedFile&gt; linkedFiles, BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        Map&lt;String, Pair&lt;Long, Path&gt;&gt; filesToAdd = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (LinkedFile linkedFile : linkedFiles) {</b>
+<b class="nc">&nbsp;            Pair&lt;Long, Path&gt; fileInfo = getLinkedFileInfo(linkedFile);</b>
+<b class="nc">&nbsp;            if (fileInfo != null) {</b>
+<b class="nc">&nbsp;                filesToAdd.put(linkedFile.getLink(), fileInfo);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        addToIndex(filesToAdd, task);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addToIndex(Map&lt;String, Pair&lt;Long, Path&gt;&gt; linkedFiles, BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        for (String fileLink : linkedFiles.keySet()) {</b>
+<b class="nc">&nbsp;            if (indexedFiles.containsKey(fileLink)) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;File {} is already indexed.&quot;, fileLink);</b>
+<b class="nc">&nbsp;                linkedFiles.remove(fileLink);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (linkedFiles.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Adding {} files to index&quot;, linkedFiles.size());</b>
+<b class="nc">&nbsp;        int i = 1;</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, Pair&lt;Long, Path&gt;&gt; entry : linkedFiles.entrySet()) {</b>
+<b class="nc">&nbsp;            if (task.isCancelled()) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Adding files to index canceled&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            addToIndex(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());</b>
+<b class="nc">&nbsp;            task.setTitle(Localization.lang(&quot;Indexing files for %1 | %2 of %0 file(s) indexed.&quot;, linkedFiles.size(), libraryName, i));</b>
+<b class="nc">&nbsp;            task.updateProgress(i, linkedFiles.size());</b>
+<b class="nc">&nbsp;            task.updateMessage(Localization.lang(&quot;Indexing %0&quot;, FileUtil.shortenFileName(entry.getValue().getValue().getFileName().toString(), 68)));</b>
+<b class="nc">&nbsp;            task.showToUser(true);</b>
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Added {} files to index&quot;, linkedFiles.size());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addToIndex(String fileLink, long modifiedTime, Path resolvedPath) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Adding file {} to the index.&quot;, fileLink);</b>
+<b class="nc">&nbsp;        List&lt;Document&gt; pages = DOCUMENT_READER.readPdfContents(fileLink, resolvedPath);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            indexWriter.addDocuments(pages);</b>
+<b class="nc">&nbsp;            indexedFiles.put(fileLink, modifiedTime);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not add the document {} to the index.&quot;, fileLink, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void removeFromIndex(Collection&lt;BibEntry&gt; entries, BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        Map&lt;String, Pair&lt;Long, Path&gt;&gt; linkedFiles = getLinkedFilesFromEntries(entries);</b>
+<b class="nc">&nbsp;        removeUnlinkedFiles(entries, linkedFiles.keySet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeUnlinkedFiles(Collection&lt;BibEntry&gt; entriesToRemove, Collection&lt;String&gt; linkedFiles) {
+<b class="nc">&nbsp;        Map&lt;String, Set&lt;BibEntry&gt;&gt; currentFiles = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (BibEntry entry : databaseContext.getEntries()) {</b>
+<b class="nc">&nbsp;            for (LinkedFile linkedFile : entry.getFiles()) {</b>
+<b class="nc">&nbsp;                currentFiles.computeIfAbsent(linkedFile.getLink(), _ -&gt; new HashSet&lt;&gt;()).add(entry);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;String&gt; filesToRemove = linkedFiles.stream()</b>
+<b class="nc">&nbsp;                                               .filter(link -&gt; {</b>
+<b class="nc">&nbsp;                                                   Set&lt;BibEntry&gt; entriesLinkedToFile = currentFiles.get(link);</b>
+<b class="nc">&nbsp;                                                   if (entriesLinkedToFile != null) {</b>
+<b class="nc">&nbsp;                                                       entriesLinkedToFile.removeAll(entriesToRemove);</b>
+<b class="nc">&nbsp;                                                       return entriesLinkedToFile.isEmpty();</b>
+&nbsp;                                                   }
+<b class="nc">&nbsp;                                                   return true;</b>
+&nbsp;                                               })
+<b class="nc">&nbsp;                                               .collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;        removeFromIndex(filesToRemove);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeFromIndex(Set&lt;String&gt; links) {
+<b class="nc">&nbsp;        for (String fileLink : links) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Removing file {} from index.&quot;, fileLink);</b>
+<b class="nc">&nbsp;                indexWriter.deleteDocuments(new Term(LinkedFilesConstants.PATH.toString(), fileLink));</b>
+<b class="nc">&nbsp;                indexedFiles.remove(fileLink);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not remove linked file {} from index.&quot;, fileLink, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void updateEntry(BibEntry entry, String oldValue, String newValue, BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        Set&lt;LinkedFile&gt; oldFiles = new HashSet&lt;&gt;(FileFieldParser.parse(oldValue));</b>
+<b class="nc">&nbsp;        Set&lt;LinkedFile&gt; newFiles = new HashSet&lt;&gt;(FileFieldParser.parse(newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;LinkedFile&gt; toRemove = new HashSet&lt;&gt;(oldFiles);</b>
+<b class="nc">&nbsp;        toRemove.removeAll(newFiles);</b>
+<b class="nc">&nbsp;        removeUnlinkedFiles(List.of(entry), toRemove.stream().map(LinkedFile::getLink).collect(Collectors.toSet()));</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;LinkedFile&gt; toAdd = new HashSet&lt;&gt;(newFiles);</b>
+<b class="nc">&nbsp;        toAdd.removeAll(oldFiles);</b>
+<b class="nc">&nbsp;        addToIndex(toAdd, task);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void removeAllFromIndex() {
+&nbsp;        try {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Removing all linked files from index.&quot;);</b>
+<b class="nc">&nbsp;            indexWriter.deleteAll();</b>
+<b class="nc">&nbsp;            indexedFiles.clear();</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Removed all linked files&quot;);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error removing all linked files from index&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void rebuildIndex(BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        removeAllFromIndex();</b>
+<b class="nc">&nbsp;        addToIndex(getLinkedFilesFromEntries(databaseContext.getEntries()), task);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, Long&gt; getLinkedFilesFromIndex() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Getting all linked files from index.&quot;);</b>
+<b class="nc">&nbsp;        Map&lt;String, Long&gt; linkedFiles = new HashMap&lt;&gt;();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            TermQuery query = new TermQuery(new Term(LinkedFilesConstants.PAGE_NUMBER.toString(), &quot;1&quot;));</b>
+<b class="nc">&nbsp;            searcherManager.maybeRefresh();</b>
+<b class="nc">&nbsp;            IndexSearcher searcher = searcherManager.acquire();</b>
+<b class="nc">&nbsp;            StoredFields storedFields = searcher.storedFields();</b>
+<b class="nc">&nbsp;            TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);</b>
+<b class="nc">&nbsp;            for (ScoreDoc scoreDoc : allDocs.scoreDocs) {</b>
+<b class="nc">&nbsp;                Document doc = storedFields.document(scoreDoc.doc);</b>
+<b class="nc">&nbsp;                IndexableField pathField = doc.getField(LinkedFilesConstants.PATH.toString());</b>
+<b class="nc">&nbsp;                IndexableField modifiedField = doc.getField(LinkedFilesConstants.MODIFIED.toString());</b>
+<b class="nc">&nbsp;                if (pathField != null &amp;&amp; modifiedField != null) {</b>
+<b class="nc">&nbsp;                    linkedFiles.put(pathField.stringValue(), Long.valueOf(modifiedField.stringValue()));</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            searcherManager.release(searcher);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error getting linked files from index&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return linkedFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, Pair&lt;Long, Path&gt;&gt; getLinkedFilesFromEntries(Collection&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        Map&lt;String, Pair&lt;Long, Path&gt;&gt; linkedFiles = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            for (LinkedFile linkedFile : entry.getFiles()) {</b>
+<b class="nc">&nbsp;                Pair&lt;Long, Path&gt; fileInfo = getLinkedFileInfo(linkedFile);</b>
+<b class="nc">&nbsp;                if (fileInfo != null) {</b>
+<b class="nc">&nbsp;                    linkedFiles.put(linkedFile.getLink(), fileInfo);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return linkedFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Pair&lt;Long, Path&gt; getLinkedFileInfo(LinkedFile linkedFile) {
+<b class="nc">&nbsp;        if (linkedFile.isOnlineLink() || !StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Linked file {} is not a local PDF file. The file will not be indexed.&quot;, linkedFile.getLink());</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Optional&lt;Path&gt; resolvedPath = linkedFile.findIn(databaseContext, filePreferences);</b>
+<b class="nc">&nbsp;        if (resolvedPath.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Could not resolve path of linked file {}. The file will not be indexed.&quot;, linkedFile.getLink());</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            long fsModifiedTime = Files.getLastModifiedTime(resolvedPath.get()).to(TimeUnit.SECONDS);</b>
+<b class="nc">&nbsp;            return new Pair&lt;&gt;(fsModifiedTime, resolvedPath.get());</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not check the modification time of file {}.&quot;, linkedFile.getLink(), e);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void optimizeIndex() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Optimizing index&quot;);</b>
+<b class="nc">&nbsp;        if (indexWriter.hasDeletions()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Forcing merge deletes&quot;);</b>
+<b class="nc">&nbsp;                indexWriter.forceMergeDeletes(true);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not force merge deletes.&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Forcing merge segments to 1 segment&quot;);</b>
+<b class="nc">&nbsp;            indexWriter.forceMerge(1, true);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not force merge segments.&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SearcherManager getSearcherManager() {
+<b class="nc">&nbsp;        return searcherManager;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        HeadlessExecutorService.INSTANCE.execute(this::closeIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void closeAndWait() {
+<b class="nc">&nbsp;        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void closeIndex() {
+&nbsp;        try {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Closing linked files index&quot;);</b>
+<b class="nc">&nbsp;            searcherManager.close();</b>
+<b class="nc">&nbsp;            optimizeIndex();</b>
+<b class="nc">&nbsp;            indexWriter.close();</b>
+<b class="nc">&nbsp;            indexDirectory.close();</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Linked files index closed&quot;);</b>
+<b class="nc">&nbsp;            if (&quot;unsaved&quot;.equals(databaseContext.getFulltextIndexPath().getFileName().toString())) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Deleting unsaved index directory&quot;);</b>
+<b class="nc">&nbsp;                FileUtils.deleteDirectory(indexDirectoryPath.toFile());</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error while closing linked files index&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

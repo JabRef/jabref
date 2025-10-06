@@ -1,0 +1,549 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Date</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: Date (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Date</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/142)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.Year;
+&nbsp;import java.time.YearMonth;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.time.format.DateTimeFormatterBuilder;
+&nbsp;import java.time.format.DateTimeParseException;
+&nbsp;import java.time.temporal.ChronoField;
+&nbsp;import java.time.temporal.TemporalAccessor;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class Date {
+&nbsp;
+&nbsp;    public static final String DATE_REGEX;
+<b class="nc">&nbsp;    private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern(&quot;uuuu[-MM][-dd]&quot;);</b>
+&nbsp;    private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(Date.class);</b>
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        List&lt;String&gt; formatStrings = Arrays.asList(</b>
+&nbsp;                &quot;uuuu-MM-dd&#39;T&#39;HH:mm[:ss][xxx][xx][X]&quot;,  // covers 2018-10-03T07:24:14+03:00
+&nbsp;                &quot;uuuu-MM-dd&#39;T&#39;HH:m[:ss][xxx][xx][X]&quot;,   // covers 2018-10-03T17:2
+&nbsp;                &quot;uuuu-MM-dd&#39;T&#39;H:mm[:ss][xxx][xx][X]&quot;,   // covers 2018-10-03T7:24
+&nbsp;                &quot;uuuu-MM-dd&#39;T&#39;H:m[:ss][xxx][xx][X]&quot;,    // covers 2018-10-03T7:7
+&nbsp;                &quot;uuuu-MM-dd&#39;T&#39;HH[:ss][xxx][xx][X]&quot;,     // covers 2018-10-03T07
+&nbsp;                &quot;uuuu-MM-dd&#39;T&#39;H[:ss][xxx][xx][X]&quot;,      // covers 2018-10-03T7
+&nbsp;                &quot;uuuu-M-d&quot;,                             // covers 2009-1-15
+&nbsp;                &quot;uuuu-M&quot;,                               // covers 2009-11
+&nbsp;                &quot;uuuu/M&quot;,                               // covers 2020/10
+&nbsp;                &quot;d-M-uuuu&quot;,                             // covers 15-1-2012
+&nbsp;                &quot;M-uuuu&quot;,                               // covers 1-2012
+&nbsp;                &quot;M/uuuu&quot;,                               // covers 9/2015 and 09/2015
+&nbsp;                &quot;M/uu&quot;,                                 // covers 9/15
+&nbsp;                &quot;MMMM d, uuuu&quot;,                         // covers September 1, 2015
+&nbsp;                &quot;MMMM, uuuu&quot;,                           // covers September, 2015
+&nbsp;                &quot;MMMM  uuuu&quot;,                           // covers September 2015
+&nbsp;                &quot;d.M.uuuu&quot;,                             // covers 15.1.2015
+&nbsp;                &quot;uuuu.M.d&quot;,                             // covers 2015.1.15
+&nbsp;                &quot;uuuu&quot;,                                 // covers 2015
+&nbsp;                &quot;MMM, uuuu&quot;,                            // covers Jan, 2020
+&nbsp;                &quot;MMM. uuuu&quot;,                            // covers Oct. 2020
+&nbsp;                &quot;MMM uuuu&quot;,                             // covers Jan 2020
+&nbsp;                &quot;uuuu.MM.d&quot;,                            // covers 2015.10.15
+&nbsp;                &quot;d MMMM u/d MMMM u&quot;,                    // covers 20 January 2015/20 February 2015
+&nbsp;                &quot;d MMMM u&quot;,                             // covers 20 January 2015
+&nbsp;                &quot;d MMMM u / d MMMM u&quot;,
+&nbsp;                &quot;u&#39;-&#39;&quot;,                                 // covers 2015-
+&nbsp;                &quot;u&#39;?&#39;&quot;,                                 // covers 2023?
+&nbsp;                &quot;u G&quot;,                                  // covers 1 BC and 1 AD
+&nbsp;                &quot;uuuu G&quot;,                               // covers 0030 BC and 0005 AD
+&nbsp;                &quot;u G/u G&quot;,                              // covers 30 BC/5 AD
+&nbsp;                &quot;uuuu G/uuuu G&quot;,                        // covers 0030 BC/0005 AD
+&nbsp;                &quot;uuuu-MM G/uuuu-MM G&quot;                   // covers 0030-01 BC/0005-02 AD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SIMPLE_DATE_FORMATS = formatStrings.stream()</b>
+<b class="nc">&nbsp;                                           .map(DateTimeFormatter::ofPattern)</b>
+<b class="nc">&nbsp;                                           .reduce(new DateTimeFormatterBuilder(),</b>
+&nbsp;                                                   DateTimeFormatterBuilder::appendOptional,
+<b class="nc">&nbsp;                                                   (builder, formatterBuilder) -&gt; builder.append(formatterBuilder.toFormatter()))</b>
+<b class="nc">&nbsp;                                           .toFormatter(Locale.US);</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * There is also {@link org.jabref.model.entry.Date#parse(java.lang.String)}.
+&nbsp;         * The regex of that method cannot be used as we parse single dates here and that method parses:
+&nbsp;         * i) date ranges
+&nbsp;         * ii) two dates separated by &#39;/&#39;
+&nbsp;         * Additionally, parse method requires the reviewed String to hold only a date.
+&nbsp;         */
+<b class="nc">&nbsp;        DATE_REGEX = &quot;\\d{4}-\\d{1,2}-\\d{1,2}&quot; + // covers YYYY-MM-DD, YYYY-M-DD, YYYY-MM-D, YYYY-M-D</b>
+&nbsp;                &quot;|\\d{4}\\.\\d{1,2}\\.\\d{1,2}|&quot; + // covers YYYY.MM.DD, YYYY.M.DD, YYYY.MM.D, YYYY.M.D
+&nbsp;                &quot;(January|February|March|April|May|June|July|August|September|&quot; +
+&nbsp;                &quot;October|November|December) \\d{1,2}, \\d{4}&quot;; // covers Month DD, YYYY &amp; Month D, YYYY
+&nbsp;    }
+&nbsp;
+&nbsp;    private final TemporalAccessor date;
+&nbsp;    private final TemporalAccessor endDate;
+&nbsp;    private final Season season;
+&nbsp;
+&nbsp;    public Date(int year, int month, int dayOfMonth) {
+<b class="nc">&nbsp;        this(LocalDate.of(year, month, dayOfMonth));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Date(int year, int month) {
+<b class="nc">&nbsp;        this(YearMonth.of(year, month));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Date(int year) {
+<b class="nc">&nbsp;        this(Year.of(year));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public Date(TemporalAccessor date) {</b>
+<b class="nc">&nbsp;        this.date = date;</b>
+<b class="nc">&nbsp;        endDate = null;</b>
+<b class="nc">&nbsp;        season = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a Date from date and endDate.
+&nbsp;     *
+&nbsp;     * @param date    the start date
+&nbsp;     * @param endDate the start date
+&nbsp;     */
+<b class="nc">&nbsp;    public Date(TemporalAccessor date, TemporalAccessor endDate) {</b>
+<b class="nc">&nbsp;        this.date = date;</b>
+<b class="nc">&nbsp;        this.endDate = endDate;</b>
+<b class="nc">&nbsp;        this.season = null;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public Date(TemporalAccessor date, Season season) {</b>
+<b class="nc">&nbsp;        this.date = date;</b>
+<b class="nc">&nbsp;        this.season = season;</b>
+<b class="nc">&nbsp;        this.endDate = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a Date from date and endDate.
+&nbsp;     *
+&nbsp;     * @param dateString the string to extract the date information
+&nbsp;     * @throws DateTimeParseException if dataString is mal-formatted
+&nbsp;     */
+&nbsp;    public static Optional&lt;Date&gt; parse(String dateString) {
+<b class="nc">&nbsp;        Objects.requireNonNull(dateString);</b>
+&nbsp;
+<b class="nc">&nbsp;        dateString = dateString.strip();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (dateString.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // if dateString has range format, treat as date range
+<b class="nc">&nbsp;        if (dateString.matches(</b>
+&nbsp;                &quot;\\d{4}/\\d{4}|&quot; + // uuuu/uuuu
+&nbsp;                        &quot;\\d{4}-\\d{2}/\\d{4}-\\d{2}|&quot; + // uuuu-mm/uuuu-mm
+&nbsp;                        &quot;\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}|&quot; + // uuuu-mm-dd/uuuu-mm-dd
+&nbsp;                        &quot;(?i)(January|February|March|April|May|June|July|August|September|October|November|December)&quot; +
+&nbsp;                        &quot;( |\\-)(\\d{1,4})/(January|February|March|April|May|June|July|August|September|October|November&quot; +
+&nbsp;                        &quot;|December)( |\\-)(\\d{1,4})(?i-)|&quot; + // January 2015/January 2015
+&nbsp;                        &quot;(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)&quot; +
+&nbsp;                        &quot;( |\\-)(\\d{1,4})/(\\d{1,2})( )&quot; +
+&nbsp;                        &quot;(January|February|March|April|May|June|July|August|September|October|November|December)&quot; +
+&nbsp;                        &quot;( |\\-)(\\d{1,4})(?i-)&quot; // 20 January 2015/20 January 2015
+&nbsp;        )) {
+&nbsp;            try {
+<b class="nc">&nbsp;                String[] strDates = dateString.split(&quot;/&quot;);</b>
+<b class="nc">&nbsp;                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0].strip());</b>
+<b class="nc">&nbsp;                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());</b>
+<b class="nc">&nbsp;                return Optional.of(new Date(parsedDate, parsedEndDate));</b>
+&nbsp;            } catch (DateTimeParseException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Invalid Date format for range&quot;, e);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (dateString.matches(</b>
+&nbsp;                &quot;\\d{4} / \\d{4}|&quot; + // uuuu / uuuu
+&nbsp;                        &quot;\\d{4}-\\d{2} / \\d{4}-\\d{2}|&quot; + // uuuu-mm / uuuu-mm
+&nbsp;                        &quot;\\d{4}-\\d{2}-\\d{2} / \\d{4}-\\d{2}-\\d{2}|&quot; + // uuuu-mm-dd / uuuu-mm-dd
+&nbsp;                        &quot;(?i)(January|February|March|April|May|June|July|August|September|October|November|December)&quot; +
+&nbsp;                        &quot;( |\\-)(\\d{1,4}) / (January|February|March|April|May|June|July|August|September|October|November&quot; +
+&nbsp;                        &quot;|December)( |\\-)(\\d{1,4})(?i-)|&quot; + // January 2015/January 2015
+&nbsp;                        &quot;(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)&quot; +
+&nbsp;                        &quot;( |\\-)(\\d{1,4}) / (\\d{1,2})( )&quot; +
+&nbsp;                        &quot;(January|February|March|April|May|June|July|August|September|October|November|December)&quot; +
+&nbsp;                        &quot;( |\\-)(\\d{1,4})(?i-)&quot; // 20 January 2015/20 January 2015
+&nbsp;        )) {
+&nbsp;            try {
+<b class="nc">&nbsp;                String[] strDates = dateString.split(&quot; / &quot;);</b>
+<b class="nc">&nbsp;                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0].strip());</b>
+<b class="nc">&nbsp;                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());</b>
+<b class="nc">&nbsp;                return Optional.of(new Date(parsedDate, parsedEndDate));</b>
+&nbsp;            } catch (DateTimeParseException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Invalid Date format range&quot;, e);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (dateString.matches(</b>
+&nbsp;                &quot;\\d{1,4} BC/\\d{1,4} AD|&quot; + // 30 BC/5 AD and 0030 BC/0005 AD
+&nbsp;                        &quot;\\d{1,4} BC/\\d{1,4} BC|&quot; + // 30 BC/10 BC and 0030 BC/0010 BC
+&nbsp;                        &quot;\\d{1,4} AD/\\d{1,4} AD|&quot; + // 5 AD/10 AD and 0005 AD/0010 AD
+&nbsp;                        &quot;\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} AD|&quot; + // 5 AD/10 AD and 0005 AD/0010 AD
+&nbsp;                        &quot;\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} BC|&quot; + // 5 AD/10 AD and 0005 AD/0010 AD
+&nbsp;                        &quot;\\d{1,4}-\\d{1,2} AD/\\d{1,4}-\\d{1,2} AD&quot; // 5 AD/10 AD and 0005 AD/0010 AD
+&nbsp;        )) {
+&nbsp;            try {
+<b class="nc">&nbsp;                String[] strDates = dateString.split(&quot;/&quot;);</b>
+<b class="nc">&nbsp;                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);</b>
+<b class="nc">&nbsp;                TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);</b>
+<b class="nc">&nbsp;                return Optional.of(new Date(parsedDate, parsedEndDate));</b>
+&nbsp;            } catch (DateTimeParseException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Invalid Date format range&quot;, e);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (dateString.matches(</b>
+&nbsp;                &quot;\\d{1,4} BC / \\d{1,4} AD|&quot; + // 30 BC / 5 AD and 0030 BC / 0005 AD
+&nbsp;                        &quot;\\d{1,4} BC / \\d{1,4} BC|&quot; + // 30 BC / 10 BC and 0030 BC / 0010 BC
+&nbsp;                        &quot;\\d{1,4} AD / \\d{1,4} AD|&quot; + // 5 AD / 10 AD and 0005 AD / 0010 AD
+&nbsp;                        &quot;\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} AD|&quot; + // 5 AD/10 AD and 0005 AD/0010 AD
+&nbsp;                        &quot;\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} BC|&quot; + // 5 AD/10 AD and 0005 AD/0010 AD
+&nbsp;                        &quot;\\d{1,4}-\\d{1,2} AD / \\d{1,4}-\\d{1,2} AD&quot; // 5 AD/10 AD and 0005 AD/0010 AD
+&nbsp;        )) {
+&nbsp;            try {
+<b class="nc">&nbsp;                String[] strDates = dateString.split(&quot; / &quot;);</b>
+<b class="nc">&nbsp;                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);</b>
+<b class="nc">&nbsp;                TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);</b>
+<b class="nc">&nbsp;                return Optional.of(new Date(parsedDate, parsedEndDate));</b>
+&nbsp;            } catch (DateTimeParseException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Invalid Date format range&quot;, e);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // if dateString is single year
+<b class="nc">&nbsp;        if (dateString.matches(&quot;\\d{4}-|\\d{4}\\?&quot;)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                String year = dateString.substring(0, dateString.length() - 1);</b>
+<b class="nc">&nbsp;                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(year);</b>
+<b class="nc">&nbsp;                return Optional.of(new Date(parsedDate));</b>
+&nbsp;            } catch (DateTimeParseException e) {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Invalid Date format&quot;, e);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // handle the new date formats with era indicators
+<b class="nc">&nbsp;        if (dateString.matches(</b>
+&nbsp;                &quot;\\d{1,4} BC|&quot; + // covers 1 BC
+&nbsp;                        &quot;\\d{1,4} AD|&quot; + // covers 1 BC
+&nbsp;                        &quot;\\d{1,4}-\\d{1,2} BC|&quot; +  // covers 0030-01 BC
+&nbsp;                        &quot;\\d{1,4}-\\d{1,2} AD&quot; // covers 0005-01 AD
+&nbsp;        )) {
+&nbsp;            try {
+&nbsp;                // Parse the date with era indicator
+<b class="nc">&nbsp;                TemporalAccessor date = parseDateWithEraIndicator(dateString);</b>
+<b class="nc">&nbsp;                return Optional.of(new Date(date));</b>
+&nbsp;            } catch (DateTimeParseException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Invalid Date format with era indicator&quot;, e);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;        // handle date whose month is represented as a season.
+<b class="nc">&nbsp;        if (dateString.matches(</b>
+&nbsp;                &quot;^(\\d{1,4})-(\\d{1,2})$&quot; // covers 2025-21
+&nbsp;        )) {
+&nbsp;            try {
+&nbsp;                // parse the date with season
+<b class="nc">&nbsp;                Optional&lt;Date&gt; optional = parseDateWithSeason(dateString);</b>
+<b class="nc">&nbsp;                if (optional.isPresent()) {</b>
+<b class="nc">&nbsp;                    return optional;</b>
+&nbsp;                }
+&nbsp;                // else, just pass
+&nbsp;            } catch (DateTimeParseException e) {
+&nbsp;                // neither month nor season.
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Invalid Date format&quot;, e);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);</b>
+<b class="nc">&nbsp;            return Optional.of(new Date(parsedDate));</b>
+&nbsp;        } catch (DateTimeParseException e) {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Invalid Date format&quot;, e);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;Date&gt; parse(Optional&lt;String&gt; yearValue,
+&nbsp;                                       Optional&lt;String&gt; monthValue,
+&nbsp;                                       Optional&lt;String&gt; dayValue) {
+<b class="nc">&nbsp;        Optional&lt;Year&gt; year = yearValue.flatMap(Date::convertToInt).map(Year::of);</b>
+<b class="nc">&nbsp;        Optional&lt;Month&gt; month = monthValue.flatMap(Month::parse);</b>
+<b class="nc">&nbsp;        Optional&lt;Integer&gt; day = dayValue.flatMap(Date::convertToInt);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (year.isPresent()) {</b>
+&nbsp;            TemporalAccessor date;
+<b class="nc">&nbsp;            if (month.isPresent()) {</b>
+<b class="nc">&nbsp;                if (day.isPresent()) {</b>
+<b class="nc">&nbsp;                    date = LocalDate.of(year.get().getValue(), month.get().getNumber(), day.get());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    date = YearMonth.of(year.get().getValue(), month.get().getNumber());</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                date = year.get();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return Optional.of(new Date(date));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;Integer&gt; convertToInt(String value) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return Optional.of(Integer.valueOf(value));</b>
+&nbsp;        } catch (NumberFormatException ex) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a date with a string with era indicator.
+&nbsp;     *
+&nbsp;     * @param dateString the string which contain era indicator to extract the date information
+&nbsp;     * @return the date information with TemporalAccessor type
+&nbsp;     */
+&nbsp;    private static TemporalAccessor parseDateWithEraIndicator(String dateString) {
+<b class="nc">&nbsp;        String yearString = dateString.strip().substring(0, dateString.length() - 2);</b>
+&nbsp;
+<b class="nc">&nbsp;        String[] parts = yearString.split(&quot;-&quot;);</b>
+<b class="nc">&nbsp;        int year = Integer.parseInt(parts[0].strip());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (dateString.endsWith(&quot;BC&quot;)) {</b>
+<b class="nc">&nbsp;            year = 1 - year;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (parts.length &gt; 1) {</b>
+<b class="nc">&nbsp;            int month = Integer.parseInt(parts[1].strip());</b>
+<b class="nc">&nbsp;            return YearMonth.of(year, month);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Year.of(year);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a date whose month is represented as a season.
+&nbsp;     *
+&nbsp;     * @param dateString the string which contain season to extract the date information
+&nbsp;     * @return the date information with TemporalAccessor type
+&nbsp;     */
+&nbsp;    private static Optional&lt;Date&gt; parseDateWithSeason(String dateString) {
+<b class="nc">&nbsp;        String[] parts = dateString.split(&quot;-&quot;);</b>
+<b class="nc">&nbsp;        int monthOrSeason = Integer.parseInt(parts[1].strip());</b>
+&nbsp;        // Is month, don&#39;t parse it here.
+<b class="nc">&nbsp;        if (monthOrSeason &gt;= 1 &amp;&amp; monthOrSeason &lt;= 12) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;        // check month is season
+<b class="nc">&nbsp;        Optional&lt;Season&gt; optional = Season.getSeasonByNumber(monthOrSeason);</b>
+<b class="nc">&nbsp;        if (optional.isPresent()) {</b>
+<b class="nc">&nbsp;            int year = Integer.parseInt(parts[0].strip());</b>
+&nbsp;            // use month as season
+<b class="nc">&nbsp;            return Optional.of(new Date(Year.of(year), optional.get()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new DateTimeParseException(&quot;Invalid Date format for season&quot;, dateString, parts[0].length());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getNormalized() {
+<b class="nc">&nbsp;        return NORMALIZED_DATE_FORMATTER.format(date);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Integer&gt; getYear() {
+<b class="nc">&nbsp;        return get(ChronoField.YEAR);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Integer&gt; get(ChronoField field) {
+<b class="nc">&nbsp;        if (date.isSupported(field)) {</b>
+<b class="nc">&nbsp;            return Optional.of(date.get(field));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Month&gt; getMonth() {
+<b class="nc">&nbsp;        return get(ChronoField.MONTH_OF_YEAR).flatMap(Month::getMonthByNumber);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Season&gt; getSeason() {
+<b class="nc">&nbsp;        return Optional.ofNullable(season);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Integer&gt; getDay() {
+<b class="nc">&nbsp;        return get(ChronoField.DAY_OF_MONTH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public TemporalAccessor toTemporalAccessor() {
+<b class="nc">&nbsp;        return date;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Date date1 = (Date) o;</b>
+&nbsp;
+<b class="nc">&nbsp;        return Objects.equals(getYear(), date1.getYear()) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(getMonth(), date1.getMonth()) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(getSeason(), date1.getSeason()) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(getDay(), date1.getDay()) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(get(ChronoField.HOUR_OF_DAY), date1.get(ChronoField.HOUR_OF_DAY)) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(get(ChronoField.MINUTE_OF_HOUR), date1.get(ChronoField.MINUTE_OF_HOUR)) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(get(ChronoField.SECOND_OF_DAY), date1.get(ChronoField.SECOND_OF_DAY)) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(get(ChronoField.OFFSET_SECONDS), date1.get(ChronoField.OFFSET_SECONDS));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        String formattedDate = date.toString();</b>
+&nbsp;        // If there is a season, then only the year and month fields will have values,
+&nbsp;        // and the month corresponds to the season.
+&nbsp;        // Here is no need to check the second, hour, and month, day fields.
+<b class="nc">&nbsp;        if (season != null) {</b>
+&nbsp;            // The Date standard library does not have any API for handling seasons,
+&nbsp;            // so here is no compact form.
+<b class="nc">&nbsp;            return &quot;Date{&quot; +</b>
+&nbsp;                    &quot;date=&quot; + formattedDate + &quot;, &quot; +
+<b class="nc">&nbsp;                    &quot;season=&quot; + season.getName() +</b>
+&nbsp;                    &#39;}&#39;;
+&nbsp;        }
+<b class="nc">&nbsp;        if (date.isSupported(ChronoField.OFFSET_SECONDS)) {</b>
+<b class="nc">&nbsp;            formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date);</b>
+<b class="nc">&nbsp;        } else if (date.isSupported(ChronoField.HOUR_OF_DAY)) {</b>
+<b class="nc">&nbsp;            formattedDate = DateTimeFormatter.ISO_DATE_TIME.format(date);</b>
+<b class="nc">&nbsp;        } else if (date.isSupported(ChronoField.MONTH_OF_YEAR) &amp;&amp; date.isSupported(ChronoField.DAY_OF_MONTH)) {</b>
+<b class="nc">&nbsp;            formattedDate = DateTimeFormatter.ISO_DATE.format(date);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;Date{&quot; +</b>
+&nbsp;                &quot;date=&quot; + formattedDate +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(getYear(), getMonth(), getSeason(), getDay(), get(ChronoField.HOUR_OF_DAY), get(ChronoField.MINUTE_OF_HOUR), get(ChronoField.OFFSET_SECONDS));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

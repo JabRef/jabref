@@ -1,0 +1,1140 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JStyle</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.style</a>
+</div>
+
+<h1>Coverage Summary for Class: JStyle (org.jabref.logic.openoffice.style)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JStyle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/249)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JStyle$BibStyleMode</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/93)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/256)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.style;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.Reader;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseClassGetResource;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.layout.Layout;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.logic.layout.LayoutFormatterPreferences;
+&nbsp;import org.jabref.logic.layout.LayoutHelper;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.OrFields;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.EntryTypeFactory;
+&nbsp;import org.jabref.model.openoffice.ootext.OOFormat;
+&nbsp;import org.jabref.model.openoffice.ootext.OOText;
+&nbsp;import org.jabref.model.openoffice.style.CitationMarkerEntry;
+&nbsp;import org.jabref.model.openoffice.style.CitationMarkerNormEntry;
+&nbsp;import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
+&nbsp;import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
+&nbsp;import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class embodies a bibliography formatting for OpenOffice, which is composed
+&nbsp; * of the following elements:
+&nbsp; * &lt;p&gt;
+&nbsp; * 1) Each OO BIB entry type must have a formatting. A formatting is an array of elements, each
+&nbsp; * of which is either a piece of constant text, an entry field value, or a tab. Each element has
+&nbsp; * a character format associated with it.
+&nbsp; * &lt;p&gt;
+&nbsp; * 2) Many field values (e.g. author) need to be formatted before input to OpenOffice. The style
+&nbsp; * has the responsibility of formatting all field values. Formatting is handled by 0-n
+&nbsp; * JabRef LayoutFormatter classes.
+&nbsp; * &lt;p&gt;
+&nbsp; * 3) If the entries are not numbered, a citation marker must be produced for each entry. This
+&nbsp; * operation is performed for each JabRef BibEntry.
+&nbsp; */
+&nbsp;@AllowedToUseClassGetResource(&quot;Required for jstyle loading&quot;)
+&nbsp;public class JStyle implements Comparable&lt;JStyle&gt;, OOStyle {
+&nbsp;
+&nbsp;    public static final String ITALIC_ET_AL = &quot;ItalicEtAl&quot;;
+&nbsp;    public static final String MULTI_CITE_CHRONOLOGICAL = &quot;MultiCiteChronological&quot;;
+&nbsp;    public static final String MINIMUM_GROUPING_COUNT = &quot;MinimumGroupingCount&quot;;
+&nbsp;    public static final String ET_AL_STRING = &quot;EtAlString&quot;;
+&nbsp;    public static final String MAX_AUTHORS_FIRST = &quot;MaxAuthorsFirst&quot;;
+&nbsp;    public static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = &quot;ReferenceHeaderParagraphFormat&quot;;
+&nbsp;    public static final String REFERENCE_PARAGRAPH_FORMAT = &quot;ReferenceParagraphFormat&quot;;
+&nbsp;
+&nbsp;    public static final String TITLE = &quot;Title&quot;;
+&nbsp;    public static final String UNDEFINED_CITATION_MARKER = &quot;??&quot;;
+<b class="nc">&nbsp;    private static final Pattern NUM_PATTERN = Pattern.compile(&quot;-?\\d+&quot;);</b>
+&nbsp;    private static final String LAYOUT_MRK = &quot;LAYOUT&quot;;
+&nbsp;    private static final String PROPERTIES_MARK = &quot;PROPERTIES&quot;;
+&nbsp;    private static final String CITATION_MARK = &quot;CITATION&quot;;
+&nbsp;    private static final String NAME_MARK = &quot;NAME&quot;;
+&nbsp;    private static final String JOURNALS_MARK = &quot;JOURNALS&quot;;
+&nbsp;    private static final String DEFAULT_MARK = &quot;default&quot;;
+&nbsp;    private static final String BRACKET_AFTER_IN_LIST = &quot;BracketAfterInList&quot;;
+&nbsp;    private static final String BRACKET_BEFORE_IN_LIST = &quot;BracketBeforeInList&quot;;
+&nbsp;    private static final String UNIQUEFIER_SEPARATOR = &quot;UniquefierSeparator&quot;;
+&nbsp;    private static final String CITATION_KEY_CITATIONS = &quot;BibTeXKeyCitations&quot;;
+&nbsp;    private static final String SUBSCRIPT_CITATIONS = &quot;SubscriptCitations&quot;;
+&nbsp;    private static final String SUPERSCRIPT_CITATIONS = &quot;SuperscriptCitations&quot;;
+&nbsp;    private static final String BOLD_CITATIONS = &quot;BoldCitations&quot;;
+&nbsp;    private static final String ITALIC_CITATIONS = &quot;ItalicCitations&quot;;
+&nbsp;    private static final String CITATION_CHARACTER_FORMAT = &quot;CitationCharacterFormat&quot;;
+&nbsp;    private static final String FORMAT_CITATIONS = &quot;FormatCitations&quot;;
+&nbsp;    private static final String GROUPED_NUMBERS_SEPARATOR = &quot;GroupedNumbersSeparator&quot;;
+&nbsp;
+&nbsp;    // These two can do what ItalicCitations, BoldCitations,
+&nbsp;    // SuperscriptCitations and SubscriptCitations were supposed to do,
+&nbsp;    // as well as underline smallcaps and strikeout.
+&nbsp;    private static final String CITATION_GROUP_MARKUP_BEFORE = &quot;CitationGroupMarkupBefore&quot;;
+&nbsp;    private static final String CITATION_GROUP_MARKUP_AFTER = &quot;CitationGroupMarkupAfter&quot;;
+&nbsp;
+&nbsp;    private static final String AUTHORS_PART_MARKUP_BEFORE = &quot;AuthorsPartMarkupBefore&quot;;
+&nbsp;    private static final String AUTHORS_PART_MARKUP_AFTER = &quot;AuthorsPartMarkupAfter&quot;;
+&nbsp;
+&nbsp;    private static final String AUTHOR_NAMES_LIST_MARKUP_BEFORE = &quot;AuthorNamesListMarkupBefore&quot;;
+&nbsp;    private static final String AUTHOR_NAMES_LIST_MARKUP_AFTER = &quot;AuthorNamesListMarkupAfter&quot;;
+&nbsp;
+&nbsp;    private static final String AUTHOR_NAME_MARKUP_BEFORE = &quot;AuthorNameMarkupBefore&quot;;
+&nbsp;    private static final String AUTHOR_NAME_MARKUP_AFTER = &quot;AuthorNameMarkupAfter&quot;;
+&nbsp;
+&nbsp;    private static final String PAGE_INFO_SEPARATOR = &quot;PageInfoSeparator&quot;;
+&nbsp;    private static final String CITATION_SEPARATOR = &quot;CitationSeparator&quot;;
+&nbsp;    private static final String IN_TEXT_YEAR_SEPARATOR = &quot;InTextYearSeparator&quot;;
+&nbsp;    private static final String MAX_AUTHORS = &quot;MaxAuthors&quot;;
+&nbsp;    private static final String YEAR_FIELD = &quot;YearField&quot;;
+&nbsp;    private static final String AUTHOR_FIELD = &quot;AuthorField&quot;;
+&nbsp;    private static final String BRACKET_AFTER = &quot;BracketAfter&quot;;
+&nbsp;    private static final String BRACKET_BEFORE = &quot;BracketBefore&quot;;
+&nbsp;    private static final String SPACE_BEFORE = &quot;SpaceBefore&quot;;
+&nbsp;    private static final String IS_NUMBER_ENTRIES = &quot;IsNumberEntries&quot;;
+&nbsp;    private static final String IS_SORT_BY_POSITION = &quot;IsSortByPosition&quot;;
+&nbsp;    private static final String SORT_ALGORITHM = &quot;SortAlgorithm&quot;;
+&nbsp;    private static final String OXFORD_COMMA = &quot;OxfordComma&quot;;
+&nbsp;    private static final String YEAR_SEPARATOR = &quot;YearSeparator&quot;;
+&nbsp;    private static final String AUTHOR_LAST_SEPARATOR_IN_TEXT = &quot;AuthorLastSeparatorInText&quot;;
+&nbsp;    private static final String AUTHOR_LAST_SEPARATOR = &quot;AuthorLastSeparator&quot;;
+&nbsp;
+&nbsp;    private static final String AUTHOR_SEPARATOR = &quot;AuthorSeparator&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern QUOTED = Pattern.compile(&quot;\&quot;.*\&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JStyle.class);</b>
+<b class="nc">&nbsp;    private final SortedSet&lt;String&gt; journals = new TreeSet&lt;&gt;();</b>
+&nbsp;    // Formatter to be run on fields before they are used as part of citation marker:
+<b class="nc">&nbsp;    private final LayoutFormatter fieldFormatter = new OOPreFormatter();</b>
+&nbsp;    // reference layout mapped from entry type:
+<b class="nc">&nbsp;    private final Map&lt;EntryType, Layout&gt; bibLayout = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, Object&gt; properties = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, Object&gt; citProperties = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Flag indicating whether this style is loaded from internal resources (true)
+&nbsp;     * or from an external file (false).
+&nbsp;     */
+&nbsp;    private boolean fromResource;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Path used to identify the style file.
+&nbsp;     * For internal resources: contains the resource path (e.g., &quot;resource/openoffice/default_authoryear.jstyle&quot;)
+&nbsp;     * For external files: contains the absolute file path.
+&nbsp;     */
+&nbsp;    private final String path;
+&nbsp;
+&nbsp;    private final LayoutFormatterPreferences layoutPreferences;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+<b class="nc">&nbsp;    private String name = &quot;&quot;;</b>
+&nbsp;    private Layout defaultBibLayout;
+&nbsp;    private boolean valid;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reference to the style file on the filesystem.
+&nbsp;     * For internal resources: points to the path but cannot be directly accessed.
+&nbsp;     * For external files: points to the actual file that can be read directly.
+&nbsp;     */
+&nbsp;    private final Path styleFile;
+&nbsp;
+<b class="nc">&nbsp;    private long styleFileModificationTime = Long.MIN_VALUE;</b>
+&nbsp;    private String localCopy;
+&nbsp;    private boolean isDefaultLayoutPresent;
+&nbsp;
+<b class="nc">&nbsp;    public JStyle(Path styleFile, LayoutFormatterPreferences layoutPreferences, JournalAbbreviationRepository abbreviationRepository) throws IOException {</b>
+<b class="nc">&nbsp;        this.layoutPreferences = Objects.requireNonNull(layoutPreferences);</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        this.styleFile = Objects.requireNonNull(styleFile);</b>
+<b class="nc">&nbsp;        setDefaultProperties();</b>
+<b class="nc">&nbsp;        reload();</b>
+<b class="nc">&nbsp;        fromResource = false;</b>
+<b class="nc">&nbsp;        path = styleFile.toAbsolutePath().toString();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public JStyle(String resourcePath, LayoutFormatterPreferences layoutPreferences, JournalAbbreviationRepository abbreviationRepository) throws IOException {</b>
+<b class="nc">&nbsp;        this.layoutPreferences = Objects.requireNonNull(layoutPreferences);</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+&nbsp;
+<b class="nc">&nbsp;        Objects.requireNonNull(resourcePath);</b>
+<b class="nc">&nbsp;        setDefaultProperties();</b>
+&nbsp;        // we need to distinguish if it&#39;s a style from the local resources or a file on disk
+<b class="nc">&nbsp;        InputStream stream = JStyle.class.getResourceAsStream(resourcePath);</b>
+<b class="nc">&nbsp;        styleFile = Path.of(resourcePath).toAbsolutePath();</b>
+<b class="nc">&nbsp;        fromResource = true;</b>
+<b class="nc">&nbsp;        if (stream == null) {</b>
+<b class="nc">&nbsp;            stream = Files.newInputStream(styleFile);</b>
+<b class="nc">&nbsp;            fromResource = false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        initialize(stream);</b>
+<b class="nc">&nbsp;        path = resourcePath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Layout getDefaultBibLayout() {
+<b class="nc">&nbsp;        return defaultBibLayout;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setDefaultProperties() {
+&nbsp;        // Set default property values:
+<b class="nc">&nbsp;        properties.put(TITLE, &quot;Bibliography&quot;);</b>
+<b class="nc">&nbsp;        properties.put(SORT_ALGORITHM, &quot;alphanumeric&quot;);</b>
+<b class="nc">&nbsp;        properties.put(IS_SORT_BY_POSITION, Boolean.FALSE);</b>
+<b class="nc">&nbsp;        properties.put(IS_NUMBER_ENTRIES, Boolean.FALSE);</b>
+<b class="nc">&nbsp;        properties.put(BRACKET_BEFORE, &quot;[&quot;);</b>
+<b class="nc">&nbsp;        properties.put(BRACKET_AFTER, &quot;]&quot;);</b>
+<b class="nc">&nbsp;        properties.put(REFERENCE_PARAGRAPH_FORMAT, &quot;Standard&quot;);</b>
+<b class="nc">&nbsp;        properties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, &quot;Heading 1&quot;);</b>
+&nbsp;
+&nbsp;        // Set default properties for the citation marker:
+<b class="nc">&nbsp;        citProperties.put(AUTHOR_FIELD, FieldFactory.serializeOrFields(StandardField.AUTHOR, StandardField.EDITOR));</b>
+&nbsp;
+<b class="nc">&nbsp;        citProperties.put(CITATION_GROUP_MARKUP_BEFORE, &quot;&quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(CITATION_GROUP_MARKUP_AFTER, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        citProperties.put(AUTHORS_PART_MARKUP_BEFORE, &quot;&quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(AUTHORS_PART_MARKUP_AFTER, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        citProperties.put(AUTHOR_NAMES_LIST_MARKUP_BEFORE, &quot;&quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(AUTHOR_NAMES_LIST_MARKUP_AFTER, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        citProperties.put(AUTHOR_NAME_MARKUP_BEFORE, &quot;&quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(AUTHOR_NAME_MARKUP_AFTER, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        citProperties.put(YEAR_FIELD, StandardField.YEAR.getName());</b>
+<b class="nc">&nbsp;        citProperties.put(MAX_AUTHORS, 3);</b>
+<b class="nc">&nbsp;        citProperties.put(MAX_AUTHORS_FIRST, -1);</b>
+<b class="nc">&nbsp;        citProperties.put(AUTHOR_SEPARATOR, &quot;, &quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(AUTHOR_LAST_SEPARATOR, &quot; &amp; &quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(AUTHOR_LAST_SEPARATOR_IN_TEXT, null);</b>
+<b class="nc">&nbsp;        citProperties.put(ET_AL_STRING, &quot; et al.&quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(YEAR_SEPARATOR, &quot;, &quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(IN_TEXT_YEAR_SEPARATOR, &quot; &quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(BRACKET_BEFORE, &quot;(&quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(BRACKET_AFTER, &quot;)&quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(SPACE_BEFORE, Boolean.TRUE);</b>
+<b class="nc">&nbsp;        citProperties.put(CITATION_SEPARATOR, &quot;; &quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(PAGE_INFO_SEPARATOR, &quot;; &quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(GROUPED_NUMBERS_SEPARATOR, &quot;-&quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(MINIMUM_GROUPING_COUNT, 3);</b>
+<b class="nc">&nbsp;        citProperties.put(FORMAT_CITATIONS, Boolean.FALSE);</b>
+<b class="nc">&nbsp;        citProperties.put(CITATION_CHARACTER_FORMAT, &quot;Standard&quot;);</b>
+<b class="nc">&nbsp;        citProperties.put(ITALIC_CITATIONS, Boolean.FALSE);</b>
+<b class="nc">&nbsp;        citProperties.put(BOLD_CITATIONS, Boolean.FALSE);</b>
+<b class="nc">&nbsp;        citProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);</b>
+<b class="nc">&nbsp;        citProperties.put(SUBSCRIPT_CITATIONS, Boolean.FALSE);</b>
+<b class="nc">&nbsp;        citProperties.put(MULTI_CITE_CHRONOLOGICAL, Boolean.TRUE);</b>
+<b class="nc">&nbsp;        citProperties.put(CITATION_KEY_CITATIONS, Boolean.FALSE);</b>
+<b class="nc">&nbsp;        citProperties.put(ITALIC_ET_AL, Boolean.FALSE);</b>
+<b class="nc">&nbsp;        citProperties.put(OXFORD_COMMA, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getPath() {
+<b class="nc">&nbsp;        return path;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Path getFile() {
+<b class="nc">&nbsp;        return styleFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;String&gt; getJournals() {
+<b class="nc">&nbsp;        return Collections.unmodifiableSet(journals);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initialize(InputStream stream) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(stream);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {</b>
+<b class="nc">&nbsp;            readFormatFile(reader);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If this style was initialized from a file on disk, reload the style
+&nbsp;     * if the file has been modified since it was read.
+&nbsp;     *
+&nbsp;     * @throws IOException in case of errors
+&nbsp;     */
+&nbsp;    public void ensureUpToDate() throws IOException {
+<b class="nc">&nbsp;        if (!isUpToDate()) {</b>
+<b class="nc">&nbsp;            reload();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If this style was initialized from a file on disk, reload the style
+&nbsp;     * information.
+&nbsp;     *
+&nbsp;     * @throws IOException in case of error
+&nbsp;     */
+&nbsp;    private void reload() throws IOException {
+<b class="nc">&nbsp;        if (styleFile != null) {</b>
+<b class="nc">&nbsp;            if (fromResource) {</b>
+&nbsp;                // implies internal styles, we need to use Class.getResourceAsStream with the path
+&nbsp;                // instead of accessing the styleFile directly, as resource paths work differently
+<b class="nc">&nbsp;                try (InputStream stream = JStyle.class.getResourceAsStream(path)) {</b>
+<b class="nc">&nbsp;                    if (stream != null) {</b>
+<b class="nc">&nbsp;                        initialize(stream);</b>
+<b class="nc">&nbsp;                        this.styleFileModificationTime = System.currentTimeMillis();</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // for external files, we can directly access the file on disk
+<b class="nc">&nbsp;            this.styleFileModificationTime = Files.getLastModifiedTime(styleFile).toMillis();</b>
+<b class="nc">&nbsp;            try (InputStream stream = Files.newInputStream(styleFile)) {</b>
+<b class="nc">&nbsp;                initialize(stream);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If this style was initialized from a file on disk, check whether the file
+&nbsp;     * is unmodified since initialization.
+&nbsp;     *
+&nbsp;     * @return true if the file has not been modified, false otherwise.
+&nbsp;     */
+&nbsp;    private boolean isUpToDate() {
+<b class="nc">&nbsp;        if (styleFile == null) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } else {
+&nbsp;            try {
+<b class="nc">&nbsp;                return Files.getLastModifiedTime(styleFile).toMillis() == this.styleFileModificationTime;</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void readFormatFile(Reader input) throws IOException {
+&nbsp;
+&nbsp;        // First read all the contents of the file:
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+&nbsp;        int chr;
+<b class="nc">&nbsp;        while ((chr = input.read()) != -1) {</b>
+<b class="nc">&nbsp;            stringBuilder.append((char) chr);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Store a local copy for viewing
+<b class="nc">&nbsp;        localCopy = stringBuilder.toString();</b>
+&nbsp;
+&nbsp;        // Break into separate lines:
+<b class="nc">&nbsp;        String[] lines = stringBuilder.toString().split(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;        BibStyleMode mode = BibStyleMode.NONE;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String line1 : lines) {</b>
+<b class="nc">&nbsp;            String line = line1;</b>
+<b class="nc">&nbsp;            if (!line.isEmpty() &amp;&amp; (line.charAt(line.length() - 1) == &#39;\r&#39;)) {</b>
+<b class="nc">&nbsp;                line = line.substring(0, line.length() - 1);</b>
+&nbsp;            }
+&nbsp;            // Check for empty line or comment:
+<b class="nc">&nbsp;            if (line.trim().isEmpty() || (line.charAt(0) == &#39;#&#39;)) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;            // Check if we should change mode:
+<b class="nc">&nbsp;            switch (line) {</b>
+&nbsp;                case NAME_MARK:
+<b class="nc">&nbsp;                    mode = BibStyleMode.NAME;</b>
+&nbsp;                    continue;
+&nbsp;                case LAYOUT_MRK:
+<b class="nc">&nbsp;                    mode = BibStyleMode.LAYOUT;</b>
+&nbsp;                    continue;
+&nbsp;                case PROPERTIES_MARK:
+<b class="nc">&nbsp;                    mode = BibStyleMode.PROPERTIES;</b>
+&nbsp;                    continue;
+&nbsp;                case CITATION_MARK:
+<b class="nc">&nbsp;                    mode = BibStyleMode.CITATION;</b>
+&nbsp;                    continue;
+&nbsp;                case JOURNALS_MARK:
+<b class="nc">&nbsp;                    mode = BibStyleMode.JOURNALS;</b>
+&nbsp;                    continue;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            switch (mode) {</b>
+&nbsp;                case NAME:
+<b class="nc">&nbsp;                    if (!line.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;                        name = line.trim();</b>
+&nbsp;                    }
+&nbsp;                    break;
+&nbsp;                case LAYOUT:
+<b class="nc">&nbsp;                    handleStructureLine(line);</b>
+&nbsp;                    break;
+&nbsp;                case PROPERTIES:
+<b class="nc">&nbsp;                    handlePropertiesLine(line, properties);</b>
+&nbsp;                    break;
+&nbsp;                case CITATION:
+<b class="nc">&nbsp;                    handlePropertiesLine(line, citProperties);</b>
+&nbsp;                    break;
+&nbsp;                case JOURNALS:
+<b class="nc">&nbsp;                    handleJournalsLine(line);</b>
+&nbsp;                    break;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;        // Set validity boolean based on whether we found anything interesting
+&nbsp;        // in the file:
+<b class="nc">&nbsp;        if ((mode != BibStyleMode.NONE) &amp;&amp; isDefaultLayoutPresent) {</b>
+<b class="nc">&nbsp;            valid = true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * After initializing this style from a file, this method can be used to check
+&nbsp;     * whether the file appeared to be a proper style file.
+&nbsp;     *
+&nbsp;     * @return true if the file could be parsed as a style file, false otherwise.
+&nbsp;     */
+&nbsp;    public boolean isValid() {
+<b class="nc">&nbsp;        return valid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse a line providing bibliography structure information for an entry type.
+&nbsp;     *
+&nbsp;     * @param line The string containing the structure description.
+&nbsp;     */
+&nbsp;    private void handleStructureLine(String line) {
+<b class="nc">&nbsp;        int index = line.indexOf(&#39;=&#39;);</b>
+<b class="nc">&nbsp;        if ((index &gt; 0) &amp;&amp; (index &lt; (line.length() - 1))) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                final String typeName = line.substring(0, index);</b>
+<b class="nc">&nbsp;                final String formatString = line.substring(index + 1);</b>
+<b class="nc">&nbsp;                Layout layout = new LayoutHelper(Reader.of(formatString), layoutPreferences, abbreviationRepository).getLayoutFromText();</b>
+<b class="nc">&nbsp;                EntryType type = EntryTypeFactory.parse(typeName);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!isDefaultLayoutPresent &amp;&amp; JStyle.DEFAULT_MARK.equals(typeName)) {</b>
+<b class="nc">&nbsp;                    isDefaultLayoutPresent = true;</b>
+<b class="nc">&nbsp;                    defaultBibLayout = layout;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    bibLayout.put(type, layout);</b>
+&nbsp;                }
+&nbsp;            } catch (IOException ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Cannot parse bibliography structure&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse a line providing a property name and value.
+&nbsp;     *
+&nbsp;     * @param line The line containing the formatter names.
+&nbsp;     */
+&nbsp;    private void handlePropertiesLine(String line, Map&lt;String, Object&gt; map) {
+<b class="nc">&nbsp;        int index = line.indexOf(&#39;=&#39;);</b>
+<b class="nc">&nbsp;        if ((index &gt; 0) &amp;&amp; (index &lt;= (line.length() - 1))) {</b>
+<b class="nc">&nbsp;            String propertyName = line.substring(0, index).trim();</b>
+<b class="nc">&nbsp;            String value = line.substring(index + 1);</b>
+<b class="nc">&nbsp;            if ((value.trim().length() &gt; 1) &amp;&amp; QUOTED.matcher(value.trim()).matches()) {</b>
+<b class="nc">&nbsp;                value = value.trim().substring(1, value.trim().length() - 1);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Object toSet = value;</b>
+<b class="nc">&nbsp;            if (NUM_PATTERN.matcher(value.trim()).matches()) {</b>
+<b class="nc">&nbsp;                toSet = Integer.parseInt(value.trim());</b>
+<b class="nc">&nbsp;            } else if (&quot;true&quot;.equalsIgnoreCase(value.trim())) {</b>
+<b class="nc">&nbsp;                toSet = Boolean.TRUE;</b>
+<b class="nc">&nbsp;            } else if (&quot;false&quot;.equalsIgnoreCase(value.trim())) {</b>
+<b class="nc">&nbsp;                toSet = Boolean.FALSE;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            map.put(propertyName, toSet);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse a line providing a journal name for which this style is valid.
+&nbsp;     */
+&nbsp;    private void handleJournalsLine(String line) {
+<b class="nc">&nbsp;        if (!line.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            journals.add(line.trim());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Layout getReferenceFormat(EntryType type) {
+<b class="nc">&nbsp;        Layout layout = bibLayout.get(type);</b>
+<b class="nc">&nbsp;        if (layout == null) {</b>
+<b class="nc">&nbsp;            return defaultBibLayout;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return layout;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method for checking the property for whether we use number citations or
+&nbsp;     * author-year citations.
+&nbsp;     *
+&nbsp;     * @return true if we use numbered citations, false otherwise.
+&nbsp;     */
+&nbsp;    public boolean isNumberEntries() {
+<b class="nc">&nbsp;        return (Boolean) getProperty(IS_NUMBER_ENTRIES);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method for checking the property for whether we sort the bibliography
+&nbsp;     * according to their order of appearance in the text.
+&nbsp;     *
+&nbsp;     * @return true to sort by appearance, false to sort alphabetically.
+&nbsp;     */
+&nbsp;    public boolean isSortByPosition() {
+<b class="nc">&nbsp;        return (Boolean) getProperty(IS_SORT_BY_POSITION);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method for checking whether citation markers should be italicized.
+&nbsp;     * Will only be relevant if isFormatCitations() returns true.
+&nbsp;     *
+&nbsp;     * @return true to indicate that citations should be in italics.
+&nbsp;     */
+&nbsp;    public boolean isItalicCitations() {
+<b class="nc">&nbsp;        return (Boolean) citProperties.get(ITALIC_CITATIONS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method for checking whether citation markers should be bold.
+&nbsp;     * Will only be relevant if isFormatCitations() returns true.
+&nbsp;     *
+&nbsp;     * @return true to indicate that citations should be in bold.
+&nbsp;     */
+&nbsp;    public boolean isBoldCitations() {
+<b class="nc">&nbsp;        return (Boolean) citProperties.get(BOLD_CITATIONS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method for checking whether citation markers formatted
+&nbsp;     * according to the results of the isItalicCitations() and
+&nbsp;     * isBoldCitations() methods.
+&nbsp;     *
+&nbsp;     * @return true to indicate that citations should be in italics.
+&nbsp;     */
+&nbsp;    public boolean isFormatCitations() {
+<b class="nc">&nbsp;        return (Boolean) citProperties.get(FORMAT_CITATIONS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean spaceBeforeCitation() {
+<b class="nc">&nbsp;        return (Boolean) citProperties.get(SPACE_BEFORE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isCitationKeyCiteMarkers() {
+<b class="nc">&nbsp;        return (Boolean) citProperties.get(CITATION_KEY_CITATIONS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get boolean property.
+&nbsp;     *
+&nbsp;     * @param key The property key
+&nbsp;     * @return the value
+&nbsp;     */
+&nbsp;    public boolean getBooleanCitProperty(String key) {
+<b class="nc">&nbsp;        return (Boolean) citProperties.get(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getIntCitProperty(String key) {
+<b class="nc">&nbsp;        return (Integer) citProperties.get(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getStringCitProperty(String key) {
+<b class="nc">&nbsp;        return (String) citProperties.get(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCitationCharacterFormat() {
+<b class="nc">&nbsp;        return getStringCitProperty(CITATION_CHARACTER_FORMAT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a style property.
+&nbsp;     *
+&nbsp;     * @param propName The property name.
+&nbsp;     * @return The property value, or null if it doesn&#39;t exist.
+&nbsp;     */
+&nbsp;    public Object getProperty(String propName) {
+<b class="nc">&nbsp;        return properties.get(propName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicate if it is an internal style
+&nbsp;     *
+&nbsp;     * @return True if an internal style
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean isInternalStyle() {
+<b class="nc">&nbsp;        return fromResource;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLocalCopy() {
+<b class="nc">&nbsp;        return localCopy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int compareTo(JStyle other) {
+<b class="nc">&nbsp;        return getName().compareTo(other.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object object) {
+<b class="nc">&nbsp;        if (this == object) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (object instanceof JStyle otherStyle) {</b>
+<b class="nc">&nbsp;            return Objects.equals(path, otherStyle.path)</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(name, otherStyle.name)</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(citProperties, otherStyle.citProperties)</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(properties, otherStyle.properties);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(path, name, citProperties, properties);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    enum BibStyleMode {</b>
+<b class="nc">&nbsp;        NONE,</b>
+<b class="nc">&nbsp;        LAYOUT,</b>
+<b class="nc">&nbsp;        PROPERTIES,</b>
+<b class="nc">&nbsp;        CITATION,</b>
+<b class="nc">&nbsp;        NAME,</b>
+<b class="nc">&nbsp;        JOURNALS</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The String to represent authors that are not mentioned,
+&nbsp;     * e.g. &quot; et al.&quot;
+&nbsp;     */
+&nbsp;    public String getEtAlString() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.ET_AL_STRING);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The String to add between author names except the last two:
+&nbsp;     * &quot;[Smith{, }Jones and Brown]&quot;
+&nbsp;     */
+&nbsp;    protected String getAuthorSeparator() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.AUTHOR_SEPARATOR);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The String to put after the second to last author in case
+&nbsp;     * of three or more authors: (A, B{,} and C)
+&nbsp;     */
+&nbsp;    protected String getOxfordComma() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.OXFORD_COMMA);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Title for the bibliography.
+&nbsp;     */
+&nbsp;    public OOText getReferenceHeaderText() {
+<b class="nc">&nbsp;        return OOText.fromString(getStringProperty(JStyle.TITLE));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Name of paragraph format (within OO/LO) to be used for
+&nbsp;     * the title of the bibliography.
+&nbsp;     */
+&nbsp;    public String getReferenceHeaderParagraphFormat() {
+<b class="nc">&nbsp;        return getStringProperty(JStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Name of paragraph format (within OO/LO) to be used for
+&nbsp;     * the entries in the bibliography.
+&nbsp;     */
+&nbsp;    public String getReferenceParagraphFormat() {
+<b class="nc">&nbsp;        return getStringProperty(JStyle.REFERENCE_PARAGRAPH_FORMAT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected LayoutFormatter getFieldFormatter() {
+<b class="nc">&nbsp;        return fieldFormatter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Map&lt;EntryType, Layout&gt; getBibLayout() {
+<b class="nc">&nbsp;        return bibLayout;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Map&lt;String, Object&gt; getProperties() {
+<b class="nc">&nbsp;        return properties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Map&lt;String, Object&gt; getCitProperties() {
+<b class="nc">&nbsp;        return citProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void addJournal(String journalName) {
+<b class="nc">&nbsp;        journals.add(journalName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void setLocalCopy(String contentsOfJstyleFile) {
+<b class="nc">&nbsp;        localCopy = contentsOfJstyleFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void setName(String nameOfTheStyle) {
+<b class="nc">&nbsp;        name = nameOfTheStyle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected boolean getIsDefaultLayoutPresent() {
+<b class="nc">&nbsp;        return isDefaultLayoutPresent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void setIsDefaultLayoutPresent(boolean isPresent) {
+<b class="nc">&nbsp;        isDefaultLayoutPresent = isPresent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void setValid(boolean isValid) {
+<b class="nc">&nbsp;        valid = isValid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected LayoutFormatterPreferences getLayoutPreferences() {
+<b class="nc">&nbsp;        return layoutPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void setDefaultBibLayout(Layout layout) {
+<b class="nc">&nbsp;        defaultBibLayout = layout;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Format a number-based citation marker for the given entries.
+&nbsp;     *
+&nbsp;     * @return The text for the citation.
+&nbsp;     */
+&nbsp;    public OOText getNumCitationMarker2(List&lt;CitationMarkerNumericEntry&gt; entries) {
+<b class="nc">&nbsp;        final int minGroupingCount = this.getMinimumGroupingCount();</b>
+<b class="nc">&nbsp;        return JStyleGetNumCitationMarker.getNumCitationMarker2(this,</b>
+&nbsp;                entries,
+&nbsp;                minGroupingCount);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For some tests we need to override minGroupingCount.
+&nbsp;     */
+&nbsp;    public OOText getNumCitationMarker2(List&lt;CitationMarkerNumericEntry&gt; entries,
+&nbsp;                                        int minGroupingCount) {
+<b class="nc">&nbsp;        return JStyleGetNumCitationMarker.getNumCitationMarker2(this,</b>
+&nbsp;                entries,
+&nbsp;                minGroupingCount);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Format a number-based bibliography label for the given number.
+&nbsp;     */
+&nbsp;    public OOText getNumCitationMarkerForBibliography(CitationMarkerNumericBibEntry entry) {
+<b class="nc">&nbsp;        return JStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
+<b class="nc">&nbsp;        return JStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Format the marker for the in-text citation according to this
+&nbsp;     * BIB style. Uniquefier letters are added as provided by the
+&nbsp;     * citationMarkerEntries argument. If successive entries within
+&nbsp;     * the citation are uniquefied from each other, this method will
+&nbsp;     * perform a grouping of these entries.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If successive entries within the citation are uniquefied from
+&nbsp;     * each other, this method will perform a grouping of these
+&nbsp;     * entries.
+&nbsp;     *
+&nbsp;     * @param citationMarkerEntries           The list of entries providing the
+&nbsp;     *                                        data.
+&nbsp;     * @param inParenthesis                   Signals whether a parenthesized citation
+&nbsp;     *                                        or an in-text citation is wanted.
+&nbsp;     * @param nonUniqueCitationMarkerHandling THROWS : Should throw if finds that uniqueLetters
+&nbsp;     *                                        provided do not make the entries unique.
+&nbsp;     *                                        &lt;p&gt;
+&nbsp;     *                                        FORGIVEN : is needed to allow preliminary markers
+&nbsp;     *                                        for freshly inserted citations without
+&nbsp;     *                                        going throw the uniquefication process.
+&nbsp;     * @return The formatted citation. The result does not include
+&nbsp;     * the standard wrappers:
+&nbsp;     * OOFormat.setLocaleNone() and OOFormat.setCharStyle().
+&nbsp;     * These are added by decorateCitationMarker()
+&nbsp;     */
+&nbsp;    public OOText createCitationMarker(List&lt;CitationMarkerEntry&gt; citationMarkerEntries,
+&nbsp;                                       boolean inParenthesis,
+&nbsp;                                       NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
+<b class="nc">&nbsp;        return JStyleGetCitationMarker.createCitationMarker(this,</b>
+&nbsp;                citationMarkerEntries,
+&nbsp;                inParenthesis,
+&nbsp;                nonUniqueCitationMarkerHandling);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add setLocaleNone and optionally setCharStyle(CitationCharacterFormat) around
+&nbsp;     * citationText.  Called in fillCitationMarkInCursor, so these are
+&nbsp;     * also applied to &quot;Unresolved()&quot; entries and numeric styles.
+&nbsp;     */
+&nbsp;    public OOText decorateCitationMarker(OOText citationText) {
+<b class="nc">&nbsp;        JStyle style = this;</b>
+<b class="nc">&nbsp;        OOText citationText2 = OOFormat.setLocaleNone(citationText);</b>
+<b class="nc">&nbsp;        if (style.isFormatCitations()) {</b>
+<b class="nc">&nbsp;            String charStyle = style.getCitationCharacterFormat();</b>
+<b class="nc">&nbsp;            citationText2 = OOFormat.setCharStyle(citationText2, charStyle);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return citationText2;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     *
+&nbsp;     *  Property getters
+&nbsp;     *
+&nbsp;     */
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Minimal number of consecutive citation numbers needed to start
+&nbsp;     * replacing with an range like &quot;10-13&quot;.
+&nbsp;     */
+&nbsp;    public int getMinimumGroupingCount() {
+<b class="nc">&nbsp;        return getIntCitProperty(JStyle.MINIMUM_GROUPING_COUNT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used in number ranges like &quot;10-13&quot; in numbered citations.
+&nbsp;     */
+&nbsp;    public String getGroupedNumbersSeparator() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.GROUPED_NUMBERS_SEPARATOR);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getStringProperty(String propName) {
+<b class="nc">&nbsp;        return (String) properties.get(propName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Should citation markers be italicized?
+&nbsp;     */
+&nbsp;    public String getCitationGroupMarkupBefore() {
+<b class="nc">&nbsp;        return getStringCitProperty(CITATION_GROUP_MARKUP_BEFORE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCitationGroupMarkupAfter() {
+<b class="nc">&nbsp;        return getStringCitProperty(CITATION_GROUP_MARKUP_AFTER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Author list, including &quot; et al.&quot;
+&nbsp;     */
+&nbsp;    public String getAuthorsPartMarkupBefore() {
+<b class="nc">&nbsp;        return getStringCitProperty(AUTHORS_PART_MARKUP_BEFORE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAuthorsPartMarkupAfter() {
+<b class="nc">&nbsp;        return getStringCitProperty(AUTHORS_PART_MARKUP_AFTER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Author list, excluding &quot; et al.&quot;
+&nbsp;     */
+&nbsp;    public String getAuthorNamesListMarkupBefore() {
+<b class="nc">&nbsp;        return getStringCitProperty(AUTHOR_NAMES_LIST_MARKUP_BEFORE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAuthorNamesListMarkupAfter() {
+<b class="nc">&nbsp;        return getStringCitProperty(AUTHOR_NAMES_LIST_MARKUP_AFTER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Author names. Excludes Author separators
+&nbsp;     */
+&nbsp;    public String getAuthorNameMarkupBefore() {
+<b class="nc">&nbsp;        return getStringCitProperty(AUTHOR_NAME_MARKUP_BEFORE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAuthorNameMarkupAfter() {
+<b class="nc">&nbsp;        return getStringCitProperty(AUTHOR_NAME_MARKUP_AFTER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getMultiCiteChronological() {
+&nbsp;        // &quot;MultiCiteChronological&quot;
+<b class="nc">&nbsp;        return this.getBooleanCitProperty(JStyle.MULTI_CITE_CHRONOLOGICAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Probably obsolete, now we can use &quot; &lt;i&gt;et al.&lt;/i&gt;&quot; instead in EtAlString
+&nbsp;    public boolean getItalicEtAl() {
+&nbsp;        // &quot;ItalicEtAl&quot;
+<b class="nc">&nbsp;        return this.getBooleanCitProperty(JStyle.ITALIC_ET_AL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return Names of fields containing authors: the first
+&nbsp;     * non-empty field will be used.
+&nbsp;     */
+&nbsp;    protected OrFields getAuthorFieldNames() {
+<b class="nc">&nbsp;        String authorFieldNamesString = this.getStringCitProperty(JStyle.AUTHOR_FIELD);</b>
+<b class="nc">&nbsp;        return FieldFactory.parseOrFields(authorFieldNamesString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return Field containing year, with fallback fields.
+&nbsp;     */
+&nbsp;    protected OrFields getYearFieldNames() {
+<b class="nc">&nbsp;        String yearFieldNamesString = this.getStringCitProperty(JStyle.YEAR_FIELD);</b>
+<b class="nc">&nbsp;        return FieldFactory.parseOrFields(yearFieldNamesString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* The String to add between the two last author names, e.g. &quot; &amp; &quot;. */
+&nbsp;    protected String getAuthorLastSeparator() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.AUTHOR_LAST_SEPARATOR);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* As getAuthorLastSeparator, for in-text citation. */
+&nbsp;    protected String getAuthorLastSeparatorInTextWithFallBack() {
+<b class="nc">&nbsp;        String preferred = getStringCitProperty(JStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT);</b>
+<b class="nc">&nbsp;        String fallback = getStringCitProperty(JStyle.AUTHOR_LAST_SEPARATOR);</b>
+<b class="nc">&nbsp;        return Objects.requireNonNullElse(preferred, fallback);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String getPageInfoSeparator() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.PAGE_INFO_SEPARATOR);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String getUniquefierSeparator() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.UNIQUEFIER_SEPARATOR);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String getCitationSeparator() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.CITATION_SEPARATOR);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String getYearSeparator() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.YEAR_SEPARATOR);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String getYearSeparatorInText() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.IN_TEXT_YEAR_SEPARATOR);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The maximum number of authors to write out in full without
+&nbsp;     * using &quot;et al.&quot; Set to -1 to always write out all authors.
+&nbsp;     */
+&nbsp;    protected int getMaxAuthors() {
+<b class="nc">&nbsp;        return getIntCitProperty(JStyle.MAX_AUTHORS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getMaxAuthorsFirst() {
+<b class="nc">&nbsp;        return getIntCitProperty(JStyle.MAX_AUTHORS_FIRST);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Opening parenthesis before citation (or year, for in-text)
+&nbsp;     */
+&nbsp;    protected String getBracketBefore() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.BRACKET_BEFORE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Closing parenthesis after citation
+&nbsp;     */
+&nbsp;    protected String getBracketAfter() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.BRACKET_AFTER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Opening parenthesis before citation marker in the bibliography.
+&nbsp;     */
+&nbsp;    private String getBracketBeforeInList() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.BRACKET_BEFORE_IN_LIST);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getBracketBeforeInListWithFallBack() {
+<b class="nc">&nbsp;        return Objects.requireNonNullElse(getBracketBeforeInList(), getBracketBefore());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Closing parenthesis after citation marker in the bibliography
+&nbsp;     */
+&nbsp;    private String getBracketAfterInList() {
+<b class="nc">&nbsp;        return getStringCitProperty(JStyle.BRACKET_AFTER_IN_LIST);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    String getBracketAfterInListWithFallBack() {
+<b class="nc">&nbsp;        return Objects.requireNonNullElse(getBracketAfterInList(), getBracketAfter());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OOText getFormattedBibliographyTitle() {
+<b class="nc">&nbsp;        JStyle style = this;</b>
+<b class="nc">&nbsp;        OOText title = style.getReferenceHeaderText();</b>
+<b class="nc">&nbsp;        String parStyle = style.getReferenceHeaderParagraphFormat();</b>
+<b class="nc">&nbsp;        return parStyle == null</b>
+<b class="nc">&nbsp;               ? OOFormat.paragraph(title)</b>
+<b class="nc">&nbsp;               : OOFormat.paragraph(title, parStyle);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

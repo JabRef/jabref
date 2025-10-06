@@ -1,0 +1,161 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BaseWindow</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: BaseWindow (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BaseWindow</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.layout.Pane;
+&nbsp;import javafx.stage.Modality;
+&nbsp;import javafx.stage.Stage;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;
+&nbsp;/**
+&nbsp; * A base class for non-modal windows of JabRef.
+&nbsp; * &lt;p&gt;
+&nbsp; * You can create a new instance of this class and set the title in the constructor. After that you can call
+&nbsp; * {@link org.jabref.gui.DialogService#showCustomWindow(BaseWindow)} in order to show the window. All the JabRef styles
+&nbsp; * will be applied.
+&nbsp; * &lt;p&gt;
+&nbsp; * See {@link org.jabref.gui.ai.components.aichat.AiChatWindow} for example.
+&nbsp; */
+&nbsp;public class BaseWindow extends Stage {
+<b class="nc">&nbsp;    public BaseWindow() {</b>
+<b class="nc">&nbsp;        this.initModality(Modality.NONE);</b>
+<b class="nc">&nbsp;        this.getIcons().add(IconTheme.getJabRefImage());</b>
+&nbsp;
+<b class="nc">&nbsp;        setScene(new Scene(new Pane()));</b>
+&nbsp;
+<b class="nc">&nbsp;        sceneProperty().addListener((obs, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            newValue.setOnKeyPressed(event -&gt; {</b>
+<b class="nc">&nbsp;                KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);</b>
+<b class="nc">&nbsp;                if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {</b>
+&nbsp;                    close();
+<b class="nc">&nbsp;                    onCloseRequestProperty().get().handle(null);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void applyStylesheets(ObservableList&lt;String&gt; stylesheets) {
+<b class="nc">&nbsp;        this.getScene().getStylesheets().setAll(stylesheets);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

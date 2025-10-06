@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ParseLatexDialogView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.texparser</a>
+</div>
+
+<h1>Coverage Summary for Class: ParseLatexDialogView (org.jabref.gui.texparser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParseLatexDialogView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.texparser;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.CheckBoxTreeItem;
+&nbsp;import javafx.scene.control.ProgressIndicator;
+&nbsp;import javafx.scene.control.SelectionMode;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.ControlHelper;
+&nbsp;import org.jabref.gui.util.FileNodeViewModel;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.gui.util.RecursiveTreeItem;
+&nbsp;import org.jabref.gui.util.ViewModelTreeCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.controlsfx.control.CheckTreeView;
+&nbsp;
+&nbsp;public class ParseLatexDialogView extends BaseDialog&lt;Void&gt; {
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final ControlsFxVisualizer validationVisualizer;
+&nbsp;    @FXML private TextField latexDirectoryField;
+&nbsp;    @FXML private Button browseButton;
+&nbsp;    @FXML private Button searchButton;
+&nbsp;    @FXML private ProgressIndicator progressIndicator;
+&nbsp;    @FXML private CheckTreeView&lt;FileNodeViewModel&gt; fileTreeView;
+&nbsp;    @FXML private Button selectAllButton;
+&nbsp;    @FXML private Button unselectAllButton;
+&nbsp;    @FXML private ButtonType parseButtonType;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private TaskExecutor taskExecutor;
+&nbsp;    @Inject private CliPreferences preferences;
+&nbsp;    @Inject private FileUpdateMonitor fileMonitor;
+&nbsp;    private ParseLatexDialogViewModel viewModel;
+&nbsp;
+<b class="nc">&nbsp;    public ParseLatexDialogView(BibDatabaseContext databaseContext) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.validationVisualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;        setTitle(Localization.lang(&quot;Search for citations in LaTeX files...&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this).load().setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        ControlHelper.setAction(parseButtonType, getDialogPane(), event -&gt; viewModel.parseButtonClicked());</b>
+<b class="nc">&nbsp;        Button parseButton = (Button) getDialogPane().lookupButton(parseButtonType);</b>
+<b class="nc">&nbsp;        parseButton.disableProperty().bind(viewModel.noFilesFoundProperty().or(</b>
+<b class="nc">&nbsp;                Bindings.isEmpty(viewModel.getCheckedFileList())));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        viewModel = new ParseLatexDialogViewModel(databaseContext, dialogService, taskExecutor, preferences, fileMonitor);</b>
+&nbsp;
+<b class="nc">&nbsp;        fileTreeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);</b>
+<b class="nc">&nbsp;        fileTreeView.showRootProperty().bindBidirectional(viewModel.successfulSearchProperty());</b>
+<b class="nc">&nbsp;        fileTreeView.rootProperty().bind(EasyBind.map(viewModel.rootProperty(), fileNode -&gt;</b>
+<b class="nc">&nbsp;                new RecursiveTreeItem&lt;&gt;(fileNode, FileNodeViewModel::getChildren)));</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelTreeCellFactory&lt;FileNodeViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withText(FileNodeViewModel::getDisplayText)</b>
+<b class="nc">&nbsp;                .install(fileTreeView);</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(fileTreeView.rootProperty(), root -&gt; {</b>
+<b class="nc">&nbsp;            ((CheckBoxTreeItem&lt;FileNodeViewModel&gt;) root).setSelected(true);</b>
+<b class="nc">&nbsp;            root.setExpanded(true);</b>
+<b class="nc">&nbsp;            EasyBind.bindContent(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        latexDirectoryField.textProperty().bindBidirectional(viewModel.latexFileDirectoryProperty());</b>
+<b class="nc">&nbsp;        validationVisualizer.setDecoration(new IconValidationDecorator());</b>
+<b class="nc">&nbsp;        validationVisualizer.initVisualization(viewModel.latexDirectoryValidation(), latexDirectoryField);</b>
+<b class="nc">&nbsp;        browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());</b>
+<b class="nc">&nbsp;        searchButton.disableProperty().bind(viewModel.latexDirectoryValidation().validProperty().not());</b>
+<b class="nc">&nbsp;        selectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());</b>
+<b class="nc">&nbsp;        unselectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());</b>
+<b class="nc">&nbsp;        progressIndicator.visibleProperty().bindBidirectional(viewModel.searchInProgressProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void browseButtonClicked() {
+<b class="nc">&nbsp;        viewModel.browseButtonClicked();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void searchButtonClicked() {
+<b class="nc">&nbsp;        viewModel.searchButtonClicked();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void selectAll() {
+<b class="nc">&nbsp;        fileTreeView.getCheckModel().checkAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void unselectAll() {
+<b class="nc">&nbsp;        fileTreeView.getCheckModel().clearChecks();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

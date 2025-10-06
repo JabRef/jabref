@@ -1,0 +1,306 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Spotlight</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.effects</a>
+</div>
+
+<h1>Coverage Summary for Class: Spotlight (org.jabref.gui.walkthrough.effects)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Spotlight</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.effects;
+&nbsp;
+&nbsp;import javafx.animation.Interpolator;
+&nbsp;import javafx.animation.KeyFrame;
+&nbsp;import javafx.animation.KeyValue;
+&nbsp;import javafx.animation.Timeline;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.geometry.Bounds;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.layout.Pane;
+&nbsp;import javafx.scene.shape.Rectangle;
+&nbsp;import javafx.scene.shape.Shape;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+&nbsp;public final class Spotlight extends BaseWindowEffect {
+<b class="nc">&nbsp;    private static final Duration TRANSITION_DURATION = Duration.millis(300);</b>
+&nbsp;
+&nbsp;    private @Nullable Node node;
+&nbsp;    private Rectangle backdrop;
+&nbsp;    private Rectangle hole;
+&nbsp;    private volatile @Nullable Shape overlayShape;
+&nbsp;    private @Nullable Runnable onClickHandler;
+&nbsp;    private @Nullable Timeline transitionAnimation;
+&nbsp;
+&nbsp;    public Spotlight(@NonNull Pane pane) {
+<b class="nc">&nbsp;        super(pane);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void attach(@NonNull Node node) {
+<b class="nc">&nbsp;        if (this.node != null) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Spotlight is already attached to a node. Detach it first.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        backdrop = new Rectangle();</b>
+<b class="nc">&nbsp;        hole = new Rectangle();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.node = node;</b>
+<b class="nc">&nbsp;        setupPaneListeners();</b>
+<b class="nc">&nbsp;        setupListeners(node);</b>
+<b class="nc">&nbsp;        updateLayout();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void transitionTo(@NonNull Node newNode) {
+<b class="nc">&nbsp;        Shape overlayShape = this.overlayShape;</b>
+<b class="nc">&nbsp;        if (overlayShape == null || !overlayShape.isVisible()) {</b>
+<b class="nc">&nbsp;            attach(newNode);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (transitionAnimation != null) {</b>
+<b class="nc">&nbsp;            transitionAnimation.stop();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Bounds oldBounds = hole.getBoundsInParent();</b>
+<b class="nc">&nbsp;        Bounds newBoundsInScene = newNode.localToScene(newNode.getBoundsInLocal());</b>
+<b class="nc">&nbsp;        Bounds newBoundsInPane = pane.sceneToLocal(newBoundsInScene);</b>
+&nbsp;
+<b class="nc">&nbsp;        hole.setX(oldBounds.getMinX());</b>
+<b class="nc">&nbsp;        hole.setY(oldBounds.getMinY());</b>
+<b class="nc">&nbsp;        hole.setWidth(oldBounds.getWidth());</b>
+<b class="nc">&nbsp;        hole.setHeight(oldBounds.getHeight());</b>
+&nbsp;
+<b class="nc">&nbsp;        transitionAnimation = new Timeline(</b>
+&nbsp;                new KeyFrame(TRANSITION_DURATION,
+<b class="nc">&nbsp;                        new KeyValue(hole.xProperty(), newBoundsInPane.getMinX(), Interpolator.EASE_BOTH),</b>
+<b class="nc">&nbsp;                        new KeyValue(hole.yProperty(), newBoundsInPane.getMinY(), Interpolator.EASE_BOTH),</b>
+<b class="nc">&nbsp;                        new KeyValue(hole.widthProperty(), newBoundsInPane.getWidth(), Interpolator.EASE_BOTH),</b>
+<b class="nc">&nbsp;                        new KeyValue(hole.heightProperty(), newBoundsInPane.getHeight(), Interpolator.EASE_BOTH)</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        InvalidationListener updater = _ -&gt; updateOverlayShape();</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(hole.xProperty(), updater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(hole.yProperty(), updater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(hole.widthProperty(), updater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(hole.heightProperty(), updater));</b>
+&nbsp;
+<b class="nc">&nbsp;        transitionAnimation.setOnFinished(_ -&gt; {</b>
+<b class="nc">&nbsp;            if (this.node != null) {</b>
+<b class="nc">&nbsp;                cleanupListeners();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.node = newNode;</b>
+<b class="nc">&nbsp;            setupListeners(this.node);</b>
+<b class="nc">&nbsp;            updateLayout();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        transitionAnimation.play();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOnClick(@Nullable Runnable onClickHandler) {
+<b class="nc">&nbsp;        this.onClickHandler = onClickHandler;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void detach() {
+<b class="nc">&nbsp;        super.detach();</b>
+<b class="nc">&nbsp;        if (node == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Spotlight is not attached to any node.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (transitionAnimation != null) {</b>
+<b class="nc">&nbsp;            transitionAnimation.stop();</b>
+<b class="nc">&nbsp;            transitionAnimation = null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Shape overlayShape = this.overlayShape;</b>
+<b class="nc">&nbsp;        if (overlayShape != null &amp;&amp; overlayShape.getParent() instanceof Pane parentPane) {</b>
+<b class="nc">&nbsp;            parentPane.getChildren().remove(overlayShape);</b>
+<b class="nc">&nbsp;            this.overlayShape = null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.node = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void updateLayout() {
+<b class="nc">&nbsp;        if (WalkthroughUtils.cannotPositionNode(node)) {</b>
+<b class="nc">&nbsp;            if (overlayShape == null) {</b>
+&nbsp;                // The callee must guarantee the node to be attached is at least visible
+&nbsp;                // in the scene to begin with. If such exception is thrown, it indicates
+&nbsp;                // a bug in the caller side. Consider adjusting WalkthroughResolver.
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;Failed to attach the node.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            hideEffect();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Bounds bounds = node.localToScene(node.getBoundsInLocal());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bounds == null || bounds.getWidth() &lt;= 0 || bounds.getHeight() &lt;= 0) {</b>
+<b class="nc">&nbsp;            hideEffect();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        backdrop.setX(0);</b>
+<b class="nc">&nbsp;        backdrop.setY(0);</b>
+<b class="nc">&nbsp;        backdrop.setWidth(pane.getWidth());</b>
+<b class="nc">&nbsp;        backdrop.setHeight(pane.getHeight());</b>
+&nbsp;
+<b class="nc">&nbsp;        Bounds nodeBoundsInRootPane = pane.sceneToLocal(bounds);</b>
+<b class="nc">&nbsp;        hole.setX(nodeBoundsInRootPane.getMinX());</b>
+<b class="nc">&nbsp;        hole.setY(nodeBoundsInRootPane.getMinY());</b>
+<b class="nc">&nbsp;        hole.setWidth(nodeBoundsInRootPane.getWidth());</b>
+<b class="nc">&nbsp;        hole.setHeight(nodeBoundsInRootPane.getHeight());</b>
+&nbsp;
+<b class="nc">&nbsp;        updateOverlayShape();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void hideEffect() {
+<b class="nc">&nbsp;        Shape overlayShape = this.overlayShape;</b>
+<b class="nc">&nbsp;        if (overlayShape != null) {</b>
+<b class="nc">&nbsp;            overlayShape.setVisible(false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateOverlayShape() {
+&nbsp;        int oldIndex;
+<b class="nc">&nbsp;        if (overlayShape == null || !pane.getChildren().contains(overlayShape)) {</b>
+<b class="nc">&nbsp;            oldIndex = pane.getChildren().size();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            oldIndex = this.pane.getChildren().indexOf(overlayShape);</b>
+<b class="nc">&nbsp;            this.pane.getChildren().remove(oldIndex);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Shape overlayShape = Shape.subtract(backdrop, hole);</b>
+<b class="nc">&nbsp;        overlayShape.getStyleClass().add(&quot;walkthrough-spotlight&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (onClickHandler != null) {</b>
+<b class="nc">&nbsp;            overlayShape.setOnMouseClicked(this::handleClick);</b>
+<b class="nc">&nbsp;            overlayShape.setMouseTransparent(false);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            overlayShape.setMouseTransparent(true);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.overlayShape = overlayShape;</b>
+<b class="nc">&nbsp;        this.pane.getChildren().add(oldIndex, this.overlayShape);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleClick(MouseEvent event) {
+<b class="nc">&nbsp;        if (onClickHandler != null) {</b>
+<b class="nc">&nbsp;            onClickHandler.run();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

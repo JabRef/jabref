@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpecialFieldAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.specialfields</a>
+</div>
+
+<h1>Coverage Summary for Class: SpecialFieldAction (org.jabref.gui.specialfields)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpecialFieldAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.specialfields;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableFieldChange;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.UpdateField;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.SpecialField;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class SpecialFieldAction extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SpecialFieldAction.class);</b>
+&nbsp;    private final Supplier&lt;LibraryTab&gt; tabSupplier;
+&nbsp;    private final SpecialField specialField;
+&nbsp;    private final String value;
+&nbsp;    private final boolean nullFieldIfValueIsTheSame;
+&nbsp;    private final String undoText;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
+&nbsp;     */
+&nbsp;    public SpecialFieldAction(Supplier&lt;LibraryTab&gt; tabSupplier,
+&nbsp;                              SpecialField specialField,
+&nbsp;                              String value,
+&nbsp;                              boolean nullFieldIfValueIsTheSame,
+&nbsp;                              String undoText,
+&nbsp;                              DialogService dialogService,
+&nbsp;                              CliPreferences preferences,
+&nbsp;                              UndoManager undoManager,
+<b class="nc">&nbsp;                              StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.tabSupplier = tabSupplier;</b>
+<b class="nc">&nbsp;        this.specialField = specialField;</b>
+<b class="nc">&nbsp;        this.value = value;</b>
+<b class="nc">&nbsp;        this.nullFieldIfValueIsTheSame = nullFieldIfValueIsTheSame;</b>
+<b class="nc">&nbsp;        this.undoText = undoText;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; bes = stateManager.getSelectedEntries();</b>
+<b class="nc">&nbsp;            if ((bes == null) || bes.isEmpty()) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(undoText);</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; besCopy = new ArrayList&lt;&gt;(bes);</b>
+<b class="nc">&nbsp;            for (BibEntry bibEntry : besCopy) {</b>
+&nbsp;                // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
+<b class="nc">&nbsp;                Optional&lt;FieldChange&gt; change = UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame);</b>
+&nbsp;
+<b class="nc">&nbsp;                change.ifPresent(fieldChange -&gt; compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            compoundEdit.end();</b>
+<b class="nc">&nbsp;            if (compoundEdit.hasEdits()) {</b>
+<b class="nc">&nbsp;                undoManager.addEdit(compoundEdit);</b>
+<b class="nc">&nbsp;                tabSupplier.get().markBaseChanged();</b>
+&nbsp;                String outText;
+<b class="nc">&nbsp;                if (nullFieldIfValueIsTheSame || value == null) {</b>
+<b class="nc">&nbsp;                    outText = getTextDone(specialField, Integer.toString(bes.size()));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    outText = getTextDone(specialField, value, Integer.toString(bes.size()));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                dialogService.notify(outText);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // if user does not change anything with his action, we do not do anything either, even no output message
+&nbsp;        } catch (Throwable ex) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Problem setting special fields&quot;, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getTextDone(SpecialField field, String... params) {
+<b class="nc">&nbsp;        Objects.requireNonNull(params);</b>
+&nbsp;
+<b class="nc">&nbsp;        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, preferences, undoManager);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (field.isSingleValueField() &amp;&amp; (params.length == 1) &amp;&amp; (params[0] != null)) {</b>
+&nbsp;            // Single value fields can be toggled only
+<b class="nc">&nbsp;            return Localization.lang(&quot;Toggled &#39;%0&#39; for %1 entries&quot;, viewModel.getLocalization(), params[0]);</b>
+<b class="nc">&nbsp;        } else if (!field.isSingleValueField() &amp;&amp; (params.length == 2) &amp;&amp; (params[0] != null) &amp;&amp; (params[1] != null)) {</b>
+&nbsp;            // setting a multi value special field - the set value is displayed, too
+<b class="nc">&nbsp;            return Localization.lang(&quot;Set &#39;%0&#39; to &#39;%1&#39; for %2 entries&quot;, viewModel.getLocalization(), params[0], params[1]);</b>
+<b class="nc">&nbsp;        } else if (!field.isSingleValueField() &amp;&amp; (params.length == 1) &amp;&amp; (params[0] != null)) {</b>
+&nbsp;            // clearing a multi value specialfield
+<b class="nc">&nbsp;            return Localization.lang(&quot;Cleared &#39;%0&#39; for %1 entries&quot;, viewModel.getLocalization(), params[0]);</b>
+&nbsp;        } else {
+&nbsp;            // invalid usage
+<b class="nc">&nbsp;            LOGGER.info(&quot;Creation of special field status change message failed: illegal argument combination.&quot;);</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

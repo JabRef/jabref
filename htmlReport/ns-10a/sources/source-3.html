@@ -1,0 +1,520 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BiblatexEntryTypeDefinitions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.types</a>
+</div>
+
+<h1>Coverage Summary for Class: BiblatexEntryTypeDefinitions (org.jabref.model.entry.types)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BiblatexEntryTypeDefinitions</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.5%
+  </span>
+  <span class="absValue">
+    (210/211)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.types;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypeBuilder;
+&nbsp;import org.jabref.model.entry.field.OrFields;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class defines entry types for biblatex support.
+&nbsp; * It is based on the &lt;a href=&quot;https://texdoc.org/serve/biblatex.pdf/0&quot;&gt;biblatex documentation&lt;/a&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The definitions for BibTeX are done at {@link BibtexEntryTypeDefinitions}
+&nbsp; */
+<b class="nc">&nbsp;public class BiblatexEntryTypeDefinitions {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType ARTICLE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Article)</b>
+<b class="fc">&nbsp;            .withRequiredFields(</b>
+&nbsp;                    StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNALTITLE, StandardField.DATE)
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.EDITOR, StandardField.SERIES, StandardField.VOLUME, StandardField.NUMBER,
+&nbsp;                    StandardField.EID, StandardField.ISSUE, StandardField.PAGES, StandardField.NOTE, StandardField.ISSN, StandardField.DOI,
+&nbsp;                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
+<b class="fc">&nbsp;            .withDetailFields(</b>
+&nbsp;                    StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR,
+&nbsp;                    StandardField.TITLEADDON, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
+&nbsp;                    StandardField.JOURNALSUBTITLE, StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.LANGUAGE,
+&nbsp;                    StandardField.ORIGLANGUAGE, StandardField.VERSION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType BOOK = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Book)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.EDITOR,</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
+&nbsp;                    StandardField.MAINTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER, StandardField.ISBN,
+&nbsp;                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,</b>
+&nbsp;                    StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION,
+&nbsp;                    StandardField.FOREWORD, StandardField.AFTERWORD,
+&nbsp;                    StandardField.LANGUAGE,
+&nbsp;                    StandardField.ORIGLANGUAGE, StandardField.PART, StandardField.VOLUMES,
+&nbsp;                    StandardField.SERIES, StandardField.NUMBER, StandardField.NOTE, StandardField.LOCATION,
+&nbsp;                    StandardField.ADDENDUM,
+&nbsp;                    StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType MVBOOK = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.MvBook)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.EDITION,</b>
+&nbsp;                    StandardField.PUBLISHER, StandardField.ISBN, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,</b>
+&nbsp;                    StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION,
+&nbsp;                    StandardField.FOREWORD, StandardField.AFTERWORD,
+&nbsp;                    StandardField.LANGUAGE, StandardField.ORIGLANGUAGE, StandardField.VOLUMES, StandardField.SERIES,
+&nbsp;                    StandardField.NUMBER, StandardField.NOTE, StandardField.LOCATION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType INBOOK = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.InBook)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.BOOKAUTHOR, StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON,
+&nbsp;                    StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
+&nbsp;                    StandardField.BOOKTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER,
+&nbsp;                    StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITORA, StandardField.EDITORB,</b>
+&nbsp;                    StandardField.EDITORC, StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR,
+&nbsp;                    StandardField.INTRODUCTION, StandardField.FOREWORD, StandardField.AFTERWORD,
+&nbsp;                    StandardField.LANGUAGE, StandardField.ORIGLANGUAGE,
+&nbsp;                    StandardField.PART, StandardField.VOLUMES, StandardField.SERIES,
+&nbsp;                    StandardField.NUMBER, StandardField.NOTE, StandardField.LOCATION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType BOOKINBOOK = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.BookInBook)</b>
+<b class="fc">&nbsp;            .withRequiredFields(INBOOK.getRequiredFields())</b>
+<b class="fc">&nbsp;            .withImportantFields(INBOOK.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(INBOOK.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType SUPPBOOK = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.SuppBook)</b>
+<b class="fc">&nbsp;            .withImportantFields(INBOOK.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(INBOOK.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .withRequiredFields(INBOOK.getRequiredFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType BOOKLET = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Booklet)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED,</b>
+&nbsp;                    StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
+&nbsp;                    StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE,</b>
+&nbsp;                    StandardField.TYPE, StandardField.NOTE, StandardField.LOCATION,
+&nbsp;                    StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType COLLECTION = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Collection)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.EDITOR, StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.TRANSLATOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE,
+&nbsp;                    StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.VOLUME, StandardField.EDITION,
+&nbsp;                    StandardField.PUBLISHER, StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI,
+&nbsp;                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,</b>
+&nbsp;                    StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION, StandardField.FOREWORD,
+&nbsp;                    StandardField.AFTERWORD,
+&nbsp;                    StandardField.LANGUAGE, StandardField.ORIGLANGUAGE,
+&nbsp;                    StandardField.PART, StandardField.VOLUMES, StandardField.SERIES,
+&nbsp;                    StandardField.NUMBER, StandardField.NOTE, StandardField.LOCATION,
+&nbsp;                    StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType MVCOLLECTION = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.MvCollection)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.EDITOR, StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.TRANSLATOR, StandardField.SUBTITLE, StandardField.TITLEADDON,</b>
+&nbsp;                    StandardField.EDITION, StandardField.PUBLISHER, StandardField.ISBN, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,</b>
+&nbsp;                    StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION, StandardField.FOREWORD,
+&nbsp;                    StandardField.AFTERWORD, StandardField.LANGUAGE,
+&nbsp;                    StandardField.ORIGLANGUAGE, StandardField.VOLUMES, StandardField.SERIES, StandardField.NUMBER,
+&nbsp;                    StandardField.NOTE, StandardField.LOCATION, StandardField.PAGETOTAL,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType INCOLLECTION = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.InCollection)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.TRANSLATOR, StandardField.SUBTITLE, StandardField.TITLEADDON,</b>
+&nbsp;                    StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
+&nbsp;                    StandardField.BOOKTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER,
+&nbsp;                    StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITOR, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,</b>
+&nbsp;                    StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION,
+&nbsp;                    StandardField.FOREWORD, StandardField.AFTERWORD,
+&nbsp;                    StandardField.LANGUAGE, StandardField.ORIGLANGUAGE,
+&nbsp;                    StandardField.PART, StandardField.VOLUMES, StandardField.SERIES, StandardField.NUMBER,
+&nbsp;                    StandardField.NOTE, StandardField.LOCATION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType SUPPCOLLECTION = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.SuppCollection)</b>
+<b class="fc">&nbsp;            .withRequiredFields(INCOLLECTION.getRequiredFields())</b>
+<b class="fc">&nbsp;            .withImportantFields(INCOLLECTION.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(INCOLLECTION.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType MANUAL = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Manual)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.EDITION, StandardField.PUBLISHER,</b>
+&nbsp;                    StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE,</b>
+&nbsp;                    StandardField.TYPE, StandardField.SERIES, StandardField.NUMBER, StandardField.VERSION, StandardField.NOTE,
+&nbsp;                    StandardField.ORGANIZATION, StandardField.LOCATION,
+&nbsp;                    StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType MISC = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Misc)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
+&nbsp;                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE,</b>
+&nbsp;                    StandardField.TYPE, StandardField.VERSION, StandardField.NOTE, StandardField.ORGANIZATION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType ONLINE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Online)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE, StandardField.URL)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE, StandardField.VERSION,</b>
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType PATENT = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(IEEETranEntryType.Patent)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.NUMBER, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.HOLDER,</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
+&nbsp;                    StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.TYPE,</b>
+&nbsp;                    StandardField.VERSION, StandardField.LOCATION, StandardField.NOTE, StandardField.ADDENDUM,
+&nbsp;                    StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType PERIODICAL = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(IEEETranEntryType.Periodical)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.EDITOR, StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.ISSN, StandardField.DOI,
+&nbsp;                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,</b>
+&nbsp;                    StandardField.LANGUAGE, StandardField.SERIES,
+&nbsp;                    StandardField.VOLUME, StandardField.NUMBER, StandardField.ISSUE, StandardField.NOTE,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType SUPPPERIODICAL = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.SuppPeriodical)</b>
+<b class="fc">&nbsp;            .withRequiredFields(ARTICLE.getRequiredFields())</b>
+<b class="fc">&nbsp;            .withImportantFields(ARTICLE.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(ARTICLE.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType PROCEEDINGS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Proceedings)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
+&nbsp;                    StandardField.MAINTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER, StandardField.ISBN,
+&nbsp;                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITOR, StandardField.EVENTTITLEADDON,</b>
+&nbsp;                    StandardField.EVENTDATE, StandardField.VENUE, StandardField.LANGUAGE, StandardField.PART,
+&nbsp;                    StandardField.VOLUMES, StandardField.SERIES, StandardField.NUMBER, StandardField.NOTE, StandardField.ORGANIZATION,
+&nbsp;                    StandardField.LOCATION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType MVPROCEEDINGS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.MvProceedings)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
+&nbsp;                    StandardField.MAINTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER, StandardField.ISBN,
+&nbsp;                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITOR,</b>
+&nbsp;                    StandardField.EVENTTITLEADDON, StandardField.EVENTDATE, StandardField.VENUE, StandardField.LANGUAGE,
+&nbsp;                    StandardField.VOLUMES, StandardField.SERIES, StandardField.NUMBER, StandardField.NOTE, StandardField.ORGANIZATION,
+&nbsp;                    StandardField.LOCATION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType INPROCEEDINGS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.InProceedings)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE,</b>
+&nbsp;                    StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
+&nbsp;                    StandardField.BOOKTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER,
+&nbsp;                    StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.EDITOR,</b>
+&nbsp;                    StandardField.EVENTTITLEADDON, StandardField.EVENTDATE, StandardField.VENUE,
+&nbsp;                    StandardField.LANGUAGE, StandardField.PART, StandardField.VOLUMES, StandardField.SERIES,
+&nbsp;                    StandardField.NUMBER, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.LOCATION,
+&nbsp;                    StandardField.ADDENDUM,
+&nbsp;                    StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType REFERENCE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Reference)</b>
+<b class="fc">&nbsp;            .withRequiredFields(COLLECTION.getRequiredFields())</b>
+<b class="fc">&nbsp;            .withImportantFields(COLLECTION.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(COLLECTION.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType MVREFERENCE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.MvReference)</b>
+<b class="fc">&nbsp;            .withRequiredFields(MVCOLLECTION.getRequiredFields())</b>
+<b class="fc">&nbsp;            .withImportantFields(MVCOLLECTION.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(MVCOLLECTION.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType INREFERENCE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.InReference)</b>
+<b class="fc">&nbsp;            .withRequiredFields(INCOLLECTION.getRequiredFields())</b>
+<b class="fc">&nbsp;            .withImportantFields(INCOLLECTION.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(INCOLLECTION.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType REPORT = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Report)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.TYPE, StandardField.INSTITUTION, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.NUMBER, StandardField.ISRN,
+&nbsp;                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE,</b>
+&nbsp;                    StandardField.VERSION, StandardField.NOTE, StandardField.LOCATION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType SET = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Set)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.ENTRYSET, StandardField.CROSSREF)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType THESIS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Thesis)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.TYPE, StandardField.INSTITUTION, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.CHAPTER,</b>
+&nbsp;                    StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
+&nbsp;                    StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE, StandardField.NOTE,</b>
+&nbsp;                    StandardField.LOCATION, StandardField.ISBN,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType UNPUBLISHED = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Unpublished)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED,</b>
+&nbsp;                    StandardField.PUBSTATE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE,</b>
+&nbsp;                    StandardField.NOTE, StandardField.LOCATION, StandardField.ADDENDUM, StandardField.EVENTTITLE,
+&nbsp;                    StandardField.EVENTDATE, StandardField.VENUE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType CONFERENCE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Conference)</b>
+<b class="fc">&nbsp;            .withRequiredFields(INPROCEEDINGS.getRequiredFields())</b>
+<b class="fc">&nbsp;            .withImportantFields(INPROCEEDINGS.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(INPROCEEDINGS.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType ELECTRONIC = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(IEEETranEntryType.Electronic)</b>
+<b class="fc">&nbsp;            .withRequiredFields(ONLINE.getRequiredFields())</b>
+<b class="fc">&nbsp;            .withImportantFields(ONLINE.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(ONLINE.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType MASTERSTHESIS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.MastersThesis)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.INSTITUTION, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE,</b>
+&nbsp;                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE, StandardField.NOTE,</b>
+&nbsp;                    StandardField.LOCATION, StandardField.ISBN,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType PHDTHESIS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.PhdThesis)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.INSTITUTION, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE,</b>
+&nbsp;                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE, StandardField.NOTE,</b>
+&nbsp;                    StandardField.LOCATION, StandardField.ISBN,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType TECHREPORT = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.TechReport)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.INSTITUTION, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE, StandardField.NUMBER, StandardField.ISRN,
+&nbsp;                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+&nbsp;                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE,</b>
+&nbsp;                    StandardField.VERSION, StandardField.NOTE, StandardField.LOCATION,
+&nbsp;                    StandardField.ADDENDUM,
+&nbsp;                    StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType WWW = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.WWW)</b>
+<b class="fc">&nbsp;            .withRequiredFields(ONLINE.getRequiredFields())</b>
+<b class="fc">&nbsp;            .withImportantFields(ONLINE.getImportantOptionalFields())</b>
+<b class="fc">&nbsp;            .withDetailFields(ONLINE.getDetailOptionalFields())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType SOFTWARE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Software)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
+&nbsp;                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE,</b>
+&nbsp;                    StandardField.TYPE, StandardField.VERSION, StandardField.NOTE, StandardField.ORGANIZATION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final BibEntryType DATASET = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Dataset)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)</b>
+<b class="fc">&nbsp;            .withImportantFields(</b>
+&nbsp;                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
+&nbsp;                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+<b class="fc">&nbsp;            .withDetailFields(StandardField.LANGUAGE, StandardField.EDITION,</b>
+&nbsp;                    StandardField.TYPE, StandardField.VERSION, StandardField.NOTE, StandardField.ORGANIZATION,
+&nbsp;                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final List&lt;BibEntryType&gt; ALL = Arrays.asList(ARTICLE, BOOK, MVBOOK, INBOOK, BOOKINBOOK, SUPPBOOK,</b>
+&nbsp;            BOOKLET, COLLECTION, MVCOLLECTION, INCOLLECTION, SUPPCOLLECTION, MANUAL, MISC, ONLINE, PATENT, PERIODICAL,
+&nbsp;            SUPPPERIODICAL, PROCEEDINGS, MVPROCEEDINGS, INPROCEEDINGS, REFERENCE, MVREFERENCE, INREFERENCE, REPORT, SET,
+&nbsp;            THESIS, UNPUBLISHED, CONFERENCE, ELECTRONIC, MASTERSTHESIS, PHDTHESIS, TECHREPORT, WWW, SOFTWARE, DATASET);
+&nbsp;
+<b class="fc">&nbsp;    public static final List&lt;BibEntryType&gt; RECOMMENDED = Arrays.asList(ARTICLE, BOOK, INPROCEEDINGS, REPORT, MISC);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

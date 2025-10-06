@@ -1,0 +1,303 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultAuxParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.auxparser</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultAuxParser (org.jabref.logic.auxparser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultAuxParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.auxparser;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * LaTeX Aux to BibTeX Parser
+&nbsp; * &lt;p&gt;
+&nbsp; * Extracts a subset of BibTeX entries from a BibDatabase that are included in an AUX file. Also supports nested AUX
+&nbsp; * files (latex \\include).
+&nbsp; * &lt;p&gt;
+&nbsp; * There exists no specification of the AUX file. Every package, class or document can write to the AUX file. The AUX
+&nbsp; * file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
+&nbsp; * &lt;p&gt;
+&nbsp; * BibTeX citation: \citation{x,y,z} Biblatex citation: \abx@aux@cite{x,y,z} Nested AUX files: \@input{x}
+&nbsp; */
+&nbsp;public class DefaultAuxParser implements AuxParser {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAuxParser.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern CITE_PATTERN = Pattern.compile(&quot;\\\\(citation|abx@aux@cite)(\\{\\d+\\})?\\{(?&lt;citationkey&gt;.+)\\}&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern INPUT_PATTERN = Pattern.compile(&quot;\\\\@input\\{(.+)\\}&quot;);</b>
+&nbsp;
+&nbsp;    private final BibDatabase masterDatabase;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a database based on the given AUX file and BibTeX database
+&nbsp;     *
+&nbsp;     * @param database BibTeX database
+&nbsp;     */
+<b class="nc">&nbsp;    public DefaultAuxParser(BibDatabase database) {</b>
+<b class="nc">&nbsp;        masterDatabase = database;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AuxParserResult parse(Path auxFile) {
+<b class="nc">&nbsp;        AuxParserResult result = new AuxParserResult(masterDatabase);</b>
+&nbsp;
+&nbsp;        // nested AUX files
+<b class="nc">&nbsp;        List&lt;Path&gt; fileList = new ArrayList&lt;&gt;(1);</b>
+<b class="nc">&nbsp;        fileList.add(auxFile);</b>
+&nbsp;
+<b class="nc">&nbsp;        int fileIndex = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (fileIndex &lt; fileList.size()) {</b>
+<b class="nc">&nbsp;            Path file = fileList.get(fileIndex);</b>
+&nbsp;
+<b class="nc">&nbsp;            try (BufferedReader br = Files.newBufferedReader(file)) {</b>
+&nbsp;                String line;
+&nbsp;
+<b class="nc">&nbsp;                while ((line = br.readLine()) != null) {</b>
+<b class="nc">&nbsp;                    matchCitation(result, line);</b>
+<b class="nc">&nbsp;                    matchNestedAux(auxFile, result, fileList, line);</b>
+&nbsp;                }
+&nbsp;            } catch (FileNotFoundException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Cannot locate input file&quot;, e);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Problem opening file&quot;, e);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            fileIndex++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        resolveTags(result);</b>
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void matchNestedAux(Path baseAuxFile, AuxParserResult result, List&lt;Path&gt; fileList, String line) {
+<b class="nc">&nbsp;        Matcher inputMatch = INPUT_PATTERN.matcher(line);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (inputMatch.find()) {</b>
+<b class="nc">&nbsp;            String inputString = inputMatch.group(1);</b>
+&nbsp;
+&nbsp;            Path inputFile;
+<b class="nc">&nbsp;            Path rootPath = baseAuxFile.getParent();</b>
+<b class="nc">&nbsp;            if (rootPath != null) {</b>
+<b class="nc">&nbsp;                inputFile = rootPath.resolve(inputString);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                inputFile = Path.of(inputString);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!fileList.contains(inputFile)) {</b>
+<b class="nc">&nbsp;                fileList.add(inputFile);</b>
+<b class="nc">&nbsp;                result.increaseNestedAuxFilesCounter();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void matchCitation(AuxParserResult result, String line) {
+<b class="nc">&nbsp;        Matcher citeMatch = CITE_PATTERN.matcher(line);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (citeMatch.find()) {</b>
+<b class="nc">&nbsp;            String keyString = citeMatch.group(&quot;citationkey&quot;);</b>
+<b class="nc">&nbsp;            String[] keys = keyString.split(&quot;,&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (String key : keys) {</b>
+<b class="nc">&nbsp;                result.getUniqueKeys().add(key.trim());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the AUX file.
+&nbsp;     *
+&nbsp;     * @param result AUX file
+&nbsp;     */
+&nbsp;    private void resolveTags(AuxParserResult result) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entriesToInsert = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String key : result.getUniqueKeys()) {</b>
+<b class="nc">&nbsp;            if (result.getGeneratedBibDatabase().getEntryByCitationKey(key).isEmpty()) {</b>
+<b class="nc">&nbsp;                Optional&lt;BibEntry&gt; entry = masterDatabase.getEntryByCitationKey(key);</b>
+<b class="nc">&nbsp;                if (entry.isPresent()) {</b>
+<b class="nc">&nbsp;                    entriesToInsert.add(entry.get());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    result.getUnresolvedKeys().add(key);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        insertEntries(entriesToInsert, result);</b>
+<b class="nc">&nbsp;        resolveCrossReferences(entriesToInsert, result);</b>
+&nbsp;
+&nbsp;        // Copy database definitions
+<b class="nc">&nbsp;        if (result.getGeneratedBibDatabase().hasEntries()) {</b>
+<b class="nc">&nbsp;            result.getGeneratedBibDatabase().copyPreamble(masterDatabase);</b>
+<b class="nc">&nbsp;            result.insertStrings(masterDatabase.getUsedStrings(result.getGeneratedBibDatabase().getEntries()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves and adds CrossRef entries to insert them in addition to the original entries
+&nbsp;     *
+&nbsp;     * @param entries Entries to check for CrossRefs
+&nbsp;     * @param result  AUX file
+&nbsp;     */
+&nbsp;    private void resolveCrossReferences(List&lt;BibEntry&gt; entries, AuxParserResult result) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entriesToInsert = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            entry.getField(StandardField.CROSSREF).ifPresent(crossref -&gt; {</b>
+<b class="nc">&nbsp;                if (result.getGeneratedBibDatabase().getEntryByCitationKey(crossref).isEmpty()) {</b>
+<b class="nc">&nbsp;                    Optional&lt;BibEntry&gt; refEntry = masterDatabase.getEntryByCitationKey(crossref);</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (refEntry.isPresent()) {</b>
+<b class="nc">&nbsp;                        if (!entriesToInsert.contains(refEntry.get())) {</b>
+<b class="nc">&nbsp;                            entriesToInsert.add(refEntry.get());</b>
+<b class="nc">&nbsp;                            result.increaseCrossRefEntriesCounter();</b>
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        result.getUnresolvedKeys().add(crossref);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+<b class="nc">&nbsp;        insertEntries(entriesToInsert, result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Insert a clone of each given entry. The clones are each given a new unique ID.
+&nbsp;     *
+&nbsp;     * @param entries Entries to be cloned
+&nbsp;     * @param result  the parser result (representing the AUX file)
+&nbsp;     */
+&nbsp;    private void insertEntries(List&lt;BibEntry&gt; entries, AuxParserResult result) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; clonedEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            BibEntry bibEntryToAdd = new BibEntry(entry);</b>
+&nbsp;            // ensure proper &quot;rendering&quot; of the BibTeX code
+<b class="nc">&nbsp;            bibEntryToAdd.setChanged(true);</b>
+<b class="nc">&nbsp;            clonedEntries.add(bibEntryToAdd);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        result.getGeneratedBibDatabase().insertEntries(clonedEntries);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

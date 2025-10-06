@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FromAuxDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.auximport</a>
+</div>
+
+<h1>Coverage Summary for Class: FromAuxDialog (org.jabref.gui.auximport)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FromAuxDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.auximport;
+&nbsp;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.TextArea;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;/**
+&nbsp; * A wizard dialog for generating a new sub database from existing TeX AUX file
+&nbsp; */
+&nbsp;public class FromAuxDialog extends BaseDialog&lt;Void&gt; {
+&nbsp;    @FXML private ButtonType generateButtonType;
+&nbsp;    @FXML private TextField auxFileField;
+&nbsp;    @FXML private ListView&lt;String&gt; notFoundList;
+&nbsp;    @FXML private TextArea statusInfos;
+&nbsp;    @FXML private ComboBox&lt;BibDatabaseContext&gt; libraryListView;
+&nbsp;
+&nbsp;    @Inject private CliPreferences preferences;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private FromAuxDialogViewModel viewModel;
+&nbsp;
+<b class="nc">&nbsp;    public FromAuxDialog(LibraryTabContainer tabContainer) {</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;AUX file import&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        Button generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);</b>
+<b class="nc">&nbsp;        generateButton.disableProperty().bind(viewModel.parseFailedProperty());</b>
+<b class="nc">&nbsp;        generateButton.defaultButtonProperty().bind(generateButton.disableProperty().not());</b>
+<b class="nc">&nbsp;        setResultConverter(button -&gt; {</b>
+<b class="nc">&nbsp;            if (button == generateButtonType) {</b>
+<b class="nc">&nbsp;                viewModel.addResultToTabContainer();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        viewModel = new FromAuxDialogViewModel(tabContainer, dialogService, preferences, stateManager);</b>
+&nbsp;
+<b class="nc">&nbsp;        auxFileField.textProperty().bindBidirectional(viewModel.auxFileProperty());</b>
+<b class="nc">&nbsp;        statusInfos.textProperty().bindBidirectional(viewModel.statusTextProperty());</b>
+<b class="nc">&nbsp;        notFoundList.itemsProperty().bind(viewModel.notFoundList());</b>
+&nbsp;
+<b class="nc">&nbsp;        libraryListView.setEditable(false);</b>
+<b class="nc">&nbsp;        libraryListView.itemsProperty().bind(viewModel.librariesProperty());</b>
+<b class="nc">&nbsp;        libraryListView.valueProperty().bindBidirectional(viewModel.selectedLibraryProperty());</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;BibDatabaseContext&gt;()</b>
+<b class="nc">&nbsp;                .withText(viewModel::getDatabaseName)</b>
+<b class="nc">&nbsp;                .install(libraryListView);</b>
+<b class="nc">&nbsp;        EasyBind.listen(libraryListView.getSelectionModel().selectedItemProperty(), (obs, oldValue, newValue) -&gt; parseActionPerformed());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void parseActionPerformed() {
+<b class="nc">&nbsp;        viewModel.parse();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void browseButtonClicked() {
+<b class="nc">&nbsp;        viewModel.browse();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

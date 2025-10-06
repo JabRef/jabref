@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ISSN</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.identifier</a>
+</div>
+
+<h1>Coverage Summary for Class: ISSN (org.jabref.model.entry.identifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ISSN</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.identifier;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;public class ISSN implements Identifier {
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern ISSN_PATTERN = Pattern.compile(&quot;^\\d{4}-\\d{3}[\\dxX]$&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern ISSN_PATTERN_NODASH = Pattern.compile(&quot;^(\\d{4})(\\d{3}[\\dxX])$&quot;);</b>
+&nbsp;
+&nbsp;    private final String issnString;
+&nbsp;
+<b class="nc">&nbsp;    public ISSN(String issnString) {</b>
+<b class="nc">&nbsp;        this.issnString = Objects.requireNonNull(issnString).trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isValidFormat() {
+<b class="nc">&nbsp;        Matcher issnMatcher = ISSN_PATTERN.matcher(issnString);</b>
+<b class="nc">&nbsp;        return issnMatcher.matches();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isCanBeCleaned() {
+<b class="nc">&nbsp;        Matcher issnNoDashMatcher = ISSN_PATTERN_NODASH.matcher(issnString);</b>
+<b class="nc">&nbsp;        return issnNoDashMatcher.matches();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCleanedISSN() {
+<b class="nc">&nbsp;        Matcher issnNoDashMatcher = ISSN_PATTERN_NODASH.matcher(issnString);</b>
+<b class="nc">&nbsp;        if (issnNoDashMatcher.find()) {</b>
+<b class="nc">&nbsp;            return issnNoDashMatcher.replaceFirst(&quot;$1-$2&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return issnString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isValidChecksum() {
+&nbsp;        // Check that the control digit is correct, see e.g. https://en.wikipedia.org/wiki/International_Standard_Serial_Number
+<b class="nc">&nbsp;        int sum = 0;</b>
+<b class="nc">&nbsp;        for (int pos = 0; pos &lt;= 7; pos++) {</b>
+<b class="nc">&nbsp;            char c = issnString.charAt(pos);</b>
+<b class="nc">&nbsp;            if (pos != 4) {</b>
+<b class="nc">&nbsp;                sum += (c - &#39;0&#39;) * ((8 - pos) + (pos &gt; 4 ? 1 : 0));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        char control = issnString.charAt(8);</b>
+<b class="nc">&nbsp;        if ((control == &#39;x&#39;) || (control == &#39;X&#39;)) {</b>
+<b class="nc">&nbsp;            control = &#39;9&#39; + 1;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return ((((sum % 11) + control) - &#39;0&#39;) == 11) || ((sum % 11) == 0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String asString() {
+<b class="nc">&nbsp;        return issnString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Field getDefaultField() {
+<b class="nc">&nbsp;        return StandardField.ISSN;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URI&gt; getExternalURI() {
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

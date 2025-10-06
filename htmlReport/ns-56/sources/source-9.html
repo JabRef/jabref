@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ThreeWayMergeCellViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.threewaymerge.cell</a>
+</div>
+
+<h1>Coverage Summary for Class: ThreeWayMergeCellViewModel (org.jabref.gui.mergeentries.threewaymerge.cell)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ThreeWayMergeCellViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.threewaymerge.cell;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;import static org.jabref.gui.mergeentries.threewaymerge.cell.ThreeWayMergeCell.HEADER_ROW;
+&nbsp;
+&nbsp;public class ThreeWayMergeCellViewModel {
+<b class="nc">&nbsp;    private final StringProperty text = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty odd = new SimpleBooleanProperty(ThreeWayMergeCell.class, &quot;odd&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty even = new SimpleBooleanProperty(ThreeWayMergeCell.class, &quot;even&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    public ThreeWayMergeCellViewModel(String text, int rowIndex) {</b>
+<b class="nc">&nbsp;        setText(text);</b>
+<b class="nc">&nbsp;        if (rowIndex != HEADER_ROW) {</b>
+<b class="nc">&nbsp;            if (rowIndex % 2 == 1) {</b>
+<b class="nc">&nbsp;                odd.setValue(true);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                even.setValue(true);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(odd, isOdd -&gt; setEven(!isOdd));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(even, isEven -&gt; setOdd(!isEven));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getText() {
+<b class="nc">&nbsp;        return text.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty textProperty() {
+<b class="nc">&nbsp;        return text;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setText(String text) {
+<b class="nc">&nbsp;        this.text.set(text);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isOdd() {
+<b class="nc">&nbsp;        return odd.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty oddProperty() {
+<b class="nc">&nbsp;        return odd;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOdd(boolean odd) {
+<b class="nc">&nbsp;        this.odd.set(odd);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isEven() {
+<b class="nc">&nbsp;        return even.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty evenProperty() {
+<b class="nc">&nbsp;        return even;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEven(boolean even) {
+<b class="nc">&nbsp;        this.even.set(even);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

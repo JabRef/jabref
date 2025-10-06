@@ -1,0 +1,287 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MergingIdBasedFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: MergingIdBasedFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MergingIdBasedFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MergingIdBasedFetcher$FetcherResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.IdBasedFetcher;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.WebFetchers;
+&nbsp;import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// Fetches and merges bibliographic information from external sources into existing BibEntry objects.
+&nbsp;/// Supports multiple identifier types (DOI, ISBN, Eprint) and attempts fetching in a defined order
+&nbsp;/// until successful.
+&nbsp;/// The merging only adds new fields from the fetched entry and does not modify existing fields
+&nbsp;/// in the library entry.
+&nbsp;public class MergingIdBasedFetcher {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MergingIdBasedFetcher.class);</b>
+<b class="nc">&nbsp;    private static final List&lt;StandardField&gt; SUPPORTED_FIELDS =</b>
+<b class="nc">&nbsp;            List.of(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT);</b>
+<b class="nc">&nbsp;    private static final NonSpaceWhitespaceRemover REMOVE_WHITESPACE_FORMATTER = new NonSpaceWhitespaceRemover();</b>
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public MergingIdBasedFetcher(ImportFormatPreferences importFormatPreferences) {</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = importFormatPreferences;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record FetcherResult(</b>
+&nbsp;            BibEntry entryFromLibrary,
+&nbsp;            BibEntry mergedEntry,
+&nbsp;            boolean hasChanges,
+&nbsp;            Set&lt;Field&gt; updatedFields
+&nbsp;    ) {
+<b class="nc">&nbsp;        public FetcherResult {</b>
+<b class="nc">&nbsp;            updatedFields = Set.copyOf(updatedFields);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FetcherResult&gt; fetchEntry(BibEntry entryFromLibrary) {
+<b class="nc">&nbsp;        if (entryFromLibrary == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        logEntryProcessing(entryFromLibrary);</b>
+<b class="nc">&nbsp;        return findFirstValidFetch(entryFromLibrary);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void logEntryProcessing(BibEntry entry) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Processing library entry: {}&quot;,</b>
+<b class="nc">&nbsp;                entry.getCitationKey().orElse(&quot;[no key]&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        SUPPORTED_FIELDS.forEach(field -&gt;</b>
+<b class="nc">&nbsp;                entry.getField(field).ifPresent(value -&gt;</b>
+<b class="nc">&nbsp;                        LOGGER.debug(&quot;Entry has {} identifier: {}&quot;, field, value)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;FetcherResult&gt; findFirstValidFetch(BibEntry entry) {
+<b class="nc">&nbsp;        return SUPPORTED_FIELDS.stream()</b>
+<b class="nc">&nbsp;                               .map(field -&gt; fetchWithField(entry, field))</b>
+<b class="nc">&nbsp;                               .flatMap(Optional::stream)</b>
+<b class="nc">&nbsp;                               .findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;FetcherResult&gt; fetchWithField(BibEntry entry, Field field) {
+<b class="nc">&nbsp;        return entry.getField(field)</b>
+<b class="nc">&nbsp;                    .flatMap(identifier -&gt; fetchWithIdentifier(field, identifier, entry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;FetcherResult&gt; fetchWithIdentifier(Field field, String identifier,
+&nbsp;                                                        BibEntry entryFromLibrary) {
+<b class="nc">&nbsp;        return WebFetchers.getIdBasedFetcherForField(field, importFormatPreferences)</b>
+<b class="nc">&nbsp;                          .flatMap(fetcher -&gt; executeFetch(fetcher, field, identifier, entryFromLibrary));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;FetcherResult&gt; executeFetch(IdBasedFetcher fetcher, Field field,
+&nbsp;                                                 String identifier, BibEntry entryFromLibrary) {
+&nbsp;        try {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Fetching with {}: {}&quot;,</b>
+<b class="nc">&nbsp;                    fetcher.getClass().getSimpleName(), identifier);</b>
+<b class="nc">&nbsp;            return fetcher.performSearchById(identifier)</b>
+<b class="nc">&nbsp;                          .map(fetchedEntry -&gt; mergeBibEntries(entryFromLibrary, fetchedEntry));</b>
+&nbsp;        } catch (FetcherException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Fetch failed for {} with identifier: {}&quot;,</b>
+&nbsp;                    field, identifier, e);
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private FetcherResult mergeBibEntries(BibEntry entryFromLibrary,
+&nbsp;                                          BibEntry fetchedEntry) {
+<b class="nc">&nbsp;        BibEntry mergedEntry = new BibEntry(entryFromLibrary.getType());</b>
+&nbsp;
+<b class="nc">&nbsp;        entryFromLibrary.getFields().forEach(field -&gt;</b>
+<b class="nc">&nbsp;                entryFromLibrary.getField(field)</b>
+<b class="nc">&nbsp;                                .ifPresent(value -&gt; mergedEntry.setField(field, value)));</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;Field&gt; updatedFields = updateFieldsFromSource(fetchedEntry, mergedEntry);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new FetcherResult(entryFromLibrary, mergedEntry,</b>
+<b class="nc">&nbsp;                !updatedFields.isEmpty(), updatedFields);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Set&lt;Field&gt; updateFieldsFromSource(BibEntry sourceEntry,
+&nbsp;                                              BibEntry targetEntry) {
+<b class="nc">&nbsp;        return sourceEntry.getFields().stream()</b>
+<b class="nc">&nbsp;                          .filter(field -&gt; shouldUpdateField(field, sourceEntry, targetEntry))</b>
+<b class="nc">&nbsp;                          .peek(field -&gt; updateField(field, sourceEntry, targetEntry))</b>
+<b class="nc">&nbsp;                          .collect(Collectors.toSet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean shouldUpdateField(Field field, BibEntry sourceEntry, BibEntry targetEntry) {
+<b class="nc">&nbsp;        String sourceValue = sourceEntry.getField(field)</b>
+<b class="nc">&nbsp;                                        .map(REMOVE_WHITESPACE_FORMATTER::format)</b>
+<b class="nc">&nbsp;                                        .orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        String targetValue = targetEntry.getField(field)</b>
+<b class="nc">&nbsp;                                        .map(REMOVE_WHITESPACE_FORMATTER::format)</b>
+<b class="nc">&nbsp;                                        .orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        return !sourceValue.equals(targetValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateField(Field field, BibEntry sourceEntry,
+&nbsp;                             BibEntry targetEntry) {
+<b class="nc">&nbsp;        sourceEntry.getField(field).ifPresent(value -&gt; {</b>
+<b class="nc">&nbsp;            targetEntry.setField(field, value);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Updated field {}: &#39;{}&#39;&quot;, field, value);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

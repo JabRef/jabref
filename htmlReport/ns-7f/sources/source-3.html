@@ -1,0 +1,250 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StyleSheetFile</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.theme</a>
+</div>
+
+<h1>Coverage Summary for Class: StyleSheetFile (org.jabref.gui.theme)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StyleSheetFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.theme;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.atomic.AtomicReference;
+&nbsp;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;
+&nbsp;import com.google.common.base.Strings;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;final class StyleSheetFile extends StyleSheet {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A size limit above which Theme will not attempt to keep a data-embedded URL in memory for the CSS.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * It&#39;s tolerable for CSS to exceed this limit; the functional benefit of the encoded CSS is in some edge
+&nbsp;     * case error handling. Specifically, having a reference to a data-embedded URL means that the Preview Viewer
+&nbsp;     * isn&#39;t impacted if the source CSS file is removed while the application is running.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the CSS is over this limit, then the user won&#39;t see any functional impact, as long as the file exists. Only if
+&nbsp;     * it becomes unavailable, might there be some impact. First, the Preview Viewer when created might not be themed.
+&nbsp;     * Second, there is a very small chance of uncaught exceptions. Theme makes a best effort to avoid this:
+&nbsp;     * it checks for CSS file existence before passing it to the Preview Viewer for theming. Still, as file existence
+&nbsp;     * checks are immediately out of date, it can&#39;t be perfectly ruled out.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * At the time of writing this comment:
+&nbsp;     *
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;src/main/java/org/jabref/gui/Base.css is 33k&lt;/li&gt;
+&nbsp;     * &lt;li&gt;src/main/java/org/jabref/gui/Dark.css is 4k&lt;/li&gt;
+&nbsp;     * &lt;li&gt;The dark custom theme in the Jabref documentation is 2k, see
+&nbsp;     * &lt;a href=&quot;https://docs.jabref.org/advanced/custom-themes&quot;&gt;Custom themes&lt;/a&gt;&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * So realistic custom themes will fit comfortably within 48k, even if they are modified copies of the base theme.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that Base-64 encoding will increase the memory footprint of the URL by a third.
+&nbsp;     */
+&nbsp;    static final int MAX_IN_MEMORY_CSS_LENGTH = 48000;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheetFile.class);</b>
+&nbsp;
+&nbsp;    private final URL url;
+&nbsp;    private final Path path;
+&nbsp;
+<b class="nc">&nbsp;    private final AtomicReference&lt;String&gt; dataUrl = new AtomicReference&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    StyleSheetFile(URL url) {</b>
+<b class="nc">&nbsp;        this.url = url;</b>
+<b class="nc">&nbsp;        this.path = Path.of(URLUtil.createUri(url.toExternalForm()));</b>
+<b class="nc">&nbsp;        reload();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    Path getWatchPath() {
+<b class="nc">&nbsp;        return path;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void reload() {
+<b class="nc">&nbsp;        getDataUrl(url).ifPresentOrElse(dataUrl::set, () -&gt; dataUrl.set(&quot;&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getSceneStylesheet() {
+<b class="nc">&nbsp;        if (!Files.exists(path)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Cannot load additional css {} because the file does not exist.&quot;, path);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Files.isDirectory(path)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Failed to loadCannot load additional css {} because it is a directory.&quot;, path);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method allows callers to obtain the theme&#39;s additional stylesheet.
+&nbsp;     *
+&nbsp;     * @return the stylesheet location if there is an additional stylesheet present and available. The
+&nbsp;     * location will be a local URL. Typically, it will be a {@code &#39;data:&#39;} URL where the CSS is embedded. However, for
+&nbsp;     * large themes it can be {@code &#39;file:&#39;}.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String getWebEngineStylesheet() {
+<b class="nc">&nbsp;        if (Strings.isNullOrEmpty(dataUrl.get())) {</b>
+<b class="nc">&nbsp;            reload();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Strings.isNullOrEmpty(dataUrl.get())) {</b>
+<b class="nc">&nbsp;            URL stylesheet = getSceneStylesheet();</b>
+<b class="nc">&nbsp;            return stylesheet == null ? &quot;&quot; : stylesheet.toExternalForm();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return dataUrl.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Optional&lt;String&gt; getDataUrl(URL url) {
+&nbsp;        try {
+<b class="nc">&nbsp;            URLConnection conn = url.openConnection();</b>
+<b class="nc">&nbsp;            conn.connect();</b>
+&nbsp;
+<b class="nc">&nbsp;            try (InputStream inputStream = conn.getInputStream()) {</b>
+<b class="nc">&nbsp;                byte[] data = inputStream.readNBytes(MAX_IN_MEMORY_CSS_LENGTH);</b>
+<b class="nc">&nbsp;                if (data.length &lt; MAX_IN_MEMORY_CSS_LENGTH) {</b>
+<b class="nc">&nbsp;                    String embeddedDataUrl = DATA_URL_PREFIX + Base64.getEncoder().encodeToString(data);</b>
+<b class="nc">&nbsp;                    LOGGER.trace(&quot;Embedded css in data URL of length {}&quot;, embeddedDataUrl.length());</b>
+<b class="nc">&nbsp;                    return Optional.of(embeddedDataUrl);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.trace(&quot;Not embedding css in data URL as the length is &gt;= {}&quot;, MAX_IN_MEMORY_CSS_LENGTH);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not load css url {}&quot;, url, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;StyleSheet{&quot; + getSceneStylesheet() + &quot;}&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

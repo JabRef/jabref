@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PagedSearchBasedFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: PagedSearchBasedFetcher (org.jabref.logic.importer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PagedSearchBasedFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.search.query.SearchQueryVisitor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.paging.Page;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;import org.jabref.model.search.query.SearchQuery;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.misc.ParseCancellationException;
+&nbsp;
+&nbsp;public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param queryNode  first search node
+&nbsp;     * @param pageNumber requested site number indexed from 0
+&nbsp;     * @return Page with search results
+&nbsp;     */
+&nbsp;    Page&lt;BibEntry&gt; performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param searchQuery query string that can be parsed into a lucene query
+&nbsp;     * @param pageNumber  requested site number indexed from 0
+&nbsp;     * @return Page with search results
+&nbsp;     */
+&nbsp;    default Page&lt;BibEntry&gt; performSearchPaged(String searchQuery, int pageNumber) throws FetcherException {
+<b class="nc">&nbsp;        if (searchQuery.isBlank()) {</b>
+<b class="nc">&nbsp;            return new Page&lt;&gt;(searchQuery, pageNumber, List.of());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        SearchQuery searchQueryObject = new SearchQuery(searchQuery);</b>
+<b class="nc">&nbsp;        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return this.performSearchPaged(visitor.visitStart(searchQueryObject.getContext()), pageNumber);</b>
+&nbsp;        } catch (ParseCancellationException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;A syntax error occurred during parsing of the query&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return default pageSize
+&nbsp;     */
+&nbsp;    default int getPageSize() {
+<b class="nc">&nbsp;        return 20;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is used to send complex queries using fielded search.
+&nbsp;     *
+&nbsp;     * @param queryNode the first search node
+&nbsp;     * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    default List&lt;BibEntry&gt; performSearch(BaseQueryNode queryNode) throws FetcherException {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(performSearchPaged(queryNode, 0).getContent());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

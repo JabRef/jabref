@@ -1,0 +1,523 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JabRefFrameViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.frame</a>
+</div>
+
+<h1>Coverage Summary for Class: JabRefFrameViewModel (org.jabref.gui.frame)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JabRefFrameViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/179)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.frame;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.CompletableFuture;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.value.ChangeListener;
+&nbsp;import javafx.beans.value.ObservableBooleanValue;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;
+&nbsp;import org.jabref.cli.CliImportHelper;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.importer.ImportEntriesDialog;
+&nbsp;import org.jabref.gui.importer.actions.OpenDatabaseAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.UiCommand;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.importer.ImportCleanup;
+&nbsp;import org.jabref.logic.importer.OpenDatabase;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import org.jooq.lambda.Unchecked;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class JabRefFrameViewModel implements UiMessageHandler {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);</b>
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final Supplier&lt;OpenDatabaseAction&gt; openDatabaseAction;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public JabRefFrameViewModel(GuiPreferences preferences,
+&nbsp;                                AiService aiService,
+&nbsp;                                StateManager stateManager,
+&nbsp;                                DialogService dialogService,
+&nbsp;                                LibraryTabContainer tabContainer,
+&nbsp;                                Supplier&lt;OpenDatabaseAction&gt; openDatabaseAction,
+&nbsp;                                BibEntryTypesManager entryTypesManager,
+&nbsp;                                FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                                UndoManager undoManager,
+&nbsp;                                ClipBoardManager clipBoardManager,
+<b class="nc">&nbsp;                                TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.openDatabaseAction = openDatabaseAction;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.clipBoardManager = clipBoardManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void storeLastOpenedFiles(List&lt;Path&gt; filenames, Path focusedDatabase) {
+<b class="nc">&nbsp;        if (preferences.getWorkspacePreferences().shouldOpenLastEdited()) {</b>
+&nbsp;            // Here we store the names of all current files. If there is no current file, we remove any
+&nbsp;            // previously stored filename.
+<b class="nc">&nbsp;            if (filenames.isEmpty()) {</b>
+<b class="nc">&nbsp;                preferences.getLastFilesOpenedPreferences().getLastFilesOpened().clear();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                preferences.getLastFilesOpenedPreferences().setLastFilesOpened(filenames);</b>
+<b class="nc">&nbsp;                preferences.getLastFilesOpenedPreferences().setLastFocusedFile(focusedDatabase);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Quit JabRef
+&nbsp;     *
+&nbsp;     * @return true if the user chose to quit; false otherwise
+&nbsp;     */
+&nbsp;    public boolean close() {
+&nbsp;        // Ask if the user really wants to close, if there are still background tasks running
+&nbsp;        // The background tasks may make changes themselves that need saving.
+<b class="nc">&nbsp;        if (stateManager.getAnyTasksThatWillNotBeRecoveredRunning().getValue()) {</b>
+<b class="nc">&nbsp;            Optional&lt;ButtonType&gt; shouldClose = dialogService.showBackgroundProgressDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Please wait...&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Waiting for background tasks to finish. Quit anyway?&quot;),</b>
+&nbsp;                    stateManager);
+<b class="nc">&nbsp;            if (!(shouldClose.isPresent() &amp;&amp; (shouldClose.get() == ButtonType.YES))) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Read the opened and focused databases before closing them
+<b class="nc">&nbsp;        List&lt;Path&gt; openedLibraries = tabContainer.getLibraryTabs().stream()</b>
+<b class="nc">&nbsp;                                                 .map(LibraryTab::getBibDatabaseContext)</b>
+<b class="nc">&nbsp;                                                 .map(BibDatabaseContext::getDatabasePath)</b>
+<b class="nc">&nbsp;                                                 .flatMap(Optional::stream)</b>
+<b class="nc">&nbsp;                                                 .toList();</b>
+<b class="nc">&nbsp;        Path focusedLibraries = Optional.ofNullable(tabContainer.getCurrentLibraryTab())</b>
+<b class="nc">&nbsp;                                        .map(LibraryTab::getBibDatabaseContext)</b>
+<b class="nc">&nbsp;                                        .flatMap(BibDatabaseContext::getDatabasePath)</b>
+<b class="nc">&nbsp;                                        .orElse(null);</b>
+&nbsp;
+&nbsp;        // Then ask if the user really wants to close, if the library has not been saved since last save.
+<b class="nc">&nbsp;        if (!tabContainer.closeTabs(tabContainer.getLibraryTabs())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries</b>
+&nbsp;
+<b class="nc">&nbsp;        ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);</b>
+<b class="nc">&nbsp;        processingLibraryDialog.showAndWait(tabContainer.getLibraryTabs());</b>
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles commands submitted by the command line or by the remote host to be executed in the ui
+&nbsp;     * Needs to run in a certain order. E.g. databases have to be loaded before selecting an entry.
+&nbsp;     *
+&nbsp;     * @param uiCommands to be handled
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void handleUiCommands(List&lt;UiCommand&gt; uiCommands) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Handling UI commands {}&quot;, uiCommands);</b>
+<b class="nc">&nbsp;        if (uiCommands.isEmpty()) {</b>
+<b class="nc">&nbsp;            checkForBibInUpperDir();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        assert !uiCommands.isEmpty();</b>
+&nbsp;
+&nbsp;        // Handle blank workspace
+<b class="nc">&nbsp;        boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);</b>
+&nbsp;
+&nbsp;        // Handle OpenDatabases
+<b class="nc">&nbsp;        if (!blank) {</b>
+<b class="nc">&nbsp;            uiCommands.stream()</b>
+<b class="nc">&nbsp;                      .filter(UiCommand.OpenLibraries.class::isInstance)</b>
+<b class="nc">&nbsp;                      .map(UiCommand.OpenLibraries.class::cast)</b>
+<b class="nc">&nbsp;                      .forEach(command -&gt; openDatabaseAction.get().openFiles(command.toImport()));</b>
+&nbsp;
+<b class="nc">&nbsp;            uiCommands.stream()</b>
+<b class="nc">&nbsp;                      .filter(UiCommand.AppendToCurrentLibrary.class::isInstance)</b>
+<b class="nc">&nbsp;                      .map(UiCommand.AppendToCurrentLibrary.class::cast)</b>
+<b class="nc">&nbsp;                      .map(UiCommand.AppendToCurrentLibrary::toAppend)</b>
+<b class="nc">&nbsp;                      .filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;                      .findAny().ifPresent(toAppend -&gt; {</b>
+<b class="nc">&nbsp;                          LOGGER.debug(&quot;Append to current library {} requested&quot;, toAppend);</b>
+<b class="nc">&nbsp;                          waitForLoadingFinished(() -&gt; appendToCurrentLibrary(toAppend));</b>
+&nbsp;                      });
+&nbsp;
+<b class="nc">&nbsp;            uiCommands.stream().filter(UiCommand.AppendFileOrUrlToCurrentLibrary.class::isInstance)</b>
+<b class="nc">&nbsp;                      .map(UiCommand.AppendFileOrUrlToCurrentLibrary.class::cast)</b>
+<b class="nc">&nbsp;                      .findAny().ifPresent(importFile -&gt; importFromFileAndOpen(importFile.location()));</b>
+&nbsp;
+<b class="nc">&nbsp;            uiCommands.stream().filter(UiCommand.AppendBibTeXToCurrentLibrary.class::isInstance)</b>
+<b class="nc">&nbsp;                      .map(UiCommand.AppendBibTeXToCurrentLibrary.class::cast)</b>
+<b class="nc">&nbsp;                      .findAny().ifPresent(importBibTex -&gt; importBibtexStringAndOpen(importBibTex.bibtex()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Handle jumpToEntry
+&nbsp;        // Needs to go last, because it requires all libraries opened
+<b class="nc">&nbsp;        uiCommands.stream()</b>
+<b class="nc">&nbsp;                  .filter(UiCommand.JumpToEntryKey.class::isInstance)</b>
+<b class="nc">&nbsp;                  .map(UiCommand.JumpToEntryKey.class::cast)</b>
+<b class="nc">&nbsp;                  .map(UiCommand.JumpToEntryKey::citationKey)</b>
+<b class="nc">&nbsp;                  .filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;                  .findAny().ifPresent(entryKey -&gt; {</b>
+<b class="nc">&nbsp;                      LOGGER.debug(&quot;Jump to entry {} requested&quot;, entryKey);</b>
+&nbsp;                      // tabs must be present and contents async loaded for an entry to be selected
+<b class="nc">&nbsp;                      waitForLoadingFinished(() -&gt; jumpToEntry(entryKey));</b>
+&nbsp;                  });
+&nbsp;    }
+&nbsp;
+&nbsp;    /// @deprecated used by the browser extension only
+&nbsp;    private void importBibtexStringAndOpen(String importStr) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;ImportBibtex {} requested&quot;, importStr);</b>
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; {</b>
+<b class="nc">&nbsp;                          BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());</b>
+<b class="nc">&nbsp;                          List&lt;BibEntry&gt; entries = parser.parseEntries(importStr);</b>
+<b class="nc">&nbsp;                          return new ParserResult(entries);</b>
+<b class="nc">&nbsp;                      }).onSuccess(this::addParserResult)</b>
+<b class="nc">&nbsp;                      .onFailure(e -&gt; LOGGER.error(&quot;Unable to parse provided bibtex {}&quot;, importStr, e))</b>
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// @deprecated used by the browser extension only
+&nbsp;    private void importFromFileAndOpen(String location) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Import file {} requested&quot;, location);</b>
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; CliImportHelper.importFile(location, preferences, false))</b>
+<b class="nc">&nbsp;                      .onSuccess(result -&gt; result.ifPresent(this::addParserResult))</b>
+<b class="nc">&nbsp;                      .onFailure(t -&gt; LOGGER.error(&quot;Unable to import file {} &quot;, location, t))</b>
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void checkForBibInUpperDir() {
+&nbsp;        // &quot;Open last edited databases&quot; happened before this call
+&nbsp;        // Moreover, there is not any CLI command (especially, not opening any new tab)
+&nbsp;        // Thus, we check if there are any tabs open.
+<b class="nc">&nbsp;        if (tabContainer.getLibraryTabs().isEmpty()) {</b>
+<b class="nc">&nbsp;            firstBibFile().ifPresent(firstBibFile -&gt; openDatabaseAction.get().openFile(firstBibFile));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Use case: User starts `JabRef.bat` or `JabRef.exe`. JabRef should open a &quot;close by&quot; bib file.
+&nbsp;    /// By &quot;close by&quot; a `.bib` file in the current folder or one level up of `JabRef.exe`is meant.
+&nbsp;    ///
+&nbsp;    /// Paths:
+&nbsp;    ///   - `...\{example-dir}\JabRef\JabRef.exe` (Windows)
+&nbsp;    ///   - `.../{example-dir}/JabRef/bin/JabRef` (Linux)
+&nbsp;    ///   - `...\{example-dir}\JabRef\runtime\bin\JabRef.bat` (Windows)
+&nbsp;    ///
+&nbsp;    /// In the example, `...\{example-dir}\example.bib` should be found.
+&nbsp;    ///
+&nbsp;    /// We do NOT go up another level (i.e., everything in `...` is not found)
+&nbsp;    private Optional&lt;Path&gt; firstBibFile() {
+<b class="nc">&nbsp;        Path absolutePath = Path.of(&quot;.&quot;).toAbsolutePath();</b>
+<b class="nc">&nbsp;        if (OS.LINUX &amp;&amp; absolutePath.startsWith(&quot;/usr&quot;)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (OS.OS_X &amp;&amp; absolutePath.startsWith(&quot;/Applications&quot;)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (OS.WINDOWS &amp;&amp; absolutePath.startsWith(&quot;C:\\Program Files&quot;)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean isJabRefExe = Files.exists(Path.of(&quot;JabRef.exe&quot;));</b>
+<b class="nc">&nbsp;        boolean isJabRefBat = Files.exists(Path.of(&quot;JabRef.bat&quot;));</b>
+<b class="nc">&nbsp;        boolean isJabRef = Files.exists(Path.of(&quot;JabRef&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        ArrayList&lt;Path&gt; dirsToCheck = new ArrayList&lt;&gt;(2);</b>
+<b class="nc">&nbsp;        dirsToCheck.add(Path.of(&quot;&quot;));</b>
+<b class="nc">&nbsp;        if (isJabRefExe) {</b>
+<b class="nc">&nbsp;            dirsToCheck.add(Path.of(&quot;../&quot;));       // directory above `JabRef.exe` directory</b>
+<b class="nc">&nbsp;        } else if (isJabRefBat) {</b>
+<b class="nc">&nbsp;            dirsToCheck.add(Path.of(&quot;../../../&quot;)); // directory above `runtime\bin\JabRef.bat`</b>
+<b class="nc">&nbsp;        } else if (isJabRef) {</b>
+<b class="nc">&nbsp;            dirsToCheck.add(Path.of(&quot;../..(/&quot;));   // directory above `bin/JabRef` directory</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // We want to check dirsToCheck only, not all subdirs (due to unnecessary disk i/o)
+&nbsp;        try {
+<b class="nc">&nbsp;            return dirsToCheck.stream()</b>
+<b class="nc">&nbsp;                              .map(Path::toAbsolutePath)</b>
+<b class="nc">&nbsp;                              .flatMap(Unchecked.function(Files::list))</b>
+<b class="nc">&nbsp;                              .filter(path -&gt; FileUtil.getFileExtension(path).equals(Optional.of(&quot;bib&quot;)))</b>
+<b class="nc">&nbsp;                              .findFirst();</b>
+&nbsp;        } catch (UncheckedIOException ex) {
+&nbsp;            // Could be access denied exception - when this is started from the application directory
+&nbsp;            // Therefore log level &quot;debug&quot;
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Could not check for existing bib file {}&quot;, dirsToCheck, ex);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void appendToCurrentLibrary(List&lt;Path&gt; libraries) {
+<b class="nc">&nbsp;        List&lt;ParserResult&gt; parserResults = new ArrayList&lt;&gt;();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            for (Path file : libraries) {</b>
+<b class="nc">&nbsp;                parserResults.add(OpenDatabase.loadDatabase(</b>
+&nbsp;                        file,
+<b class="nc">&nbsp;                        preferences.getImportFormatPreferences(),</b>
+&nbsp;                        fileUpdateMonitor));
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not open bib file {}&quot;, libraries, e);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Remove invalid databases
+<b class="nc">&nbsp;        List&lt;ParserResult&gt; invalidDatabases = parserResults.stream()</b>
+<b class="nc">&nbsp;                                                           .filter(ParserResult::isInvalid)</b>
+<b class="nc">&nbsp;                                                           .toList();</b>
+<b class="nc">&nbsp;        final List&lt;ParserResult&gt; failed = new ArrayList&lt;&gt;(invalidDatabases);</b>
+<b class="nc">&nbsp;        parserResults.removeAll(invalidDatabases);</b>
+&nbsp;
+&nbsp;        // Add parserResult to the currently opened tab
+<b class="nc">&nbsp;        for (ParserResult parserResult : parserResults) {</b>
+<b class="nc">&nbsp;            addParserResult(parserResult);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (ParserResult parserResult : failed) {</b>
+<b class="nc">&nbsp;            String message = Localization.lang(&quot;Error opening file &#39;%0&#39;&quot;,</b>
+<b class="nc">&nbsp;                    parserResult.getPath().map(Path::toString).orElse(&quot;(File name unknown)&quot;)) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                    parserResult.getErrorMessage();</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Error opening file&quot;), message);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addParserResult(ParserResult parserResult) {
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Adding the entries to the open tab.&quot;);</b>
+<b class="nc">&nbsp;        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();</b>
+&nbsp;
+<b class="nc">&nbsp;        BackgroundTask&lt;ParserResult&gt; task = BackgroundTask.wrap(() -&gt; parserResult);</b>
+<b class="nc">&nbsp;        ImportCleanup cleanup = ImportCleanup.targeting(libraryTab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());</b>
+<b class="nc">&nbsp;        cleanup.doPostCleanup(parserResult.getDatabase().getEntries());</b>
+<b class="nc">&nbsp;        ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);</b>
+&nbsp;
+<b class="nc">&nbsp;        dialog.setTitle(Localization.lang(&quot;Import&quot;));</b>
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(dialog);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void waitForLoadingFinished(Runnable runnable) {
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Waiting for all tabs being loaded&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        CompletableFuture&lt;Void&gt; future = new CompletableFuture&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ObservableBooleanValue&gt; loadings = tabContainer.getLibraryTabs().stream()</b>
+<b class="nc">&nbsp;                                                            .map(LibraryTab::getLoading)</b>
+<b class="nc">&nbsp;                                                            .collect(Collectors.toList());</b>
+&nbsp;
+&nbsp;        // Create a listener for each observable
+<b class="nc">&nbsp;        ChangeListener&lt;Boolean&gt; listener = (observable, _, _) -&gt; {</b>
+&nbsp;            // Instanceof implicitly checks for null value
+<b class="nc">&nbsp;            if (observable instanceof ObservableBooleanValue observableBoolean) {</b>
+<b class="nc">&nbsp;                loadings.remove(observableBoolean);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (LOGGER.isTraceEnabled()) {</b>
+<b class="nc">&nbsp;                LOGGER.trace(&quot;Count of loading tabs: {}&quot;, loadings.size());</b>
+<b class="nc">&nbsp;                LOGGER.trace(&quot;Count of loading tabs really true: {}&quot;, loadings.stream().filter(ObservableBooleanValue::get).count());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            for (ObservableBooleanValue obs : loadings) {</b>
+<b class="nc">&nbsp;                if (obs.get()) {</b>
+&nbsp;                    // Exit the listener if any of the observables is still true
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+&nbsp;            // All observables are false, complete the future
+<b class="nc">&nbsp;            LOGGER.trace(&quot;Future completed&quot;);</b>
+<b class="nc">&nbsp;            future.complete(null);</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        for (ObservableBooleanValue obs : loadings) {</b>
+<b class="nc">&nbsp;            obs.addListener(listener);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Fire once&quot;);</b>
+&nbsp;        // Due to concurrency, it might be that the observables are already false, so we trigger one evaluation
+<b class="nc">&nbsp;        listener.changed(null, null, false);</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Waiting for state changes...&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        future.thenRun(() -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;All tabs loaded. Jumping to entry.&quot;);</b>
+<b class="nc">&nbsp;            for (ObservableBooleanValue obs : loadings) {</b>
+<b class="nc">&nbsp;                obs.removeListener(listener);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            runnable.run();</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void jumpToEntry(String entryKey) {
+&nbsp;        // check current library tab first
+<b class="nc">&nbsp;        LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();</b>
+<b class="nc">&nbsp;        List&lt;LibraryTab&gt; sortedTabs = tabContainer.getLibraryTabs().stream()</b>
+<b class="nc">&nbsp;                                                  .sorted(Comparator.comparing(tab -&gt; tab != currentLibraryTab))</b>
+<b class="nc">&nbsp;                                                  .toList();</b>
+<b class="nc">&nbsp;        for (LibraryTab libraryTab : sortedTabs) {</b>
+<b class="nc">&nbsp;            Optional&lt;BibEntry&gt; bibEntry = libraryTab.getDatabase()</b>
+<b class="nc">&nbsp;                                                    .getEntries().stream()</b>
+<b class="nc">&nbsp;                                                    .filter(entry -&gt; entry.getCitationKey().orElse(&quot;&quot;)</b>
+<b class="nc">&nbsp;                                                                          .equals(entryKey))</b>
+<b class="nc">&nbsp;                                                    .findAny();</b>
+<b class="nc">&nbsp;            if (bibEntry.isPresent()) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Found entry {} in library tab {}&quot;, entryKey, libraryTab);</b>
+<b class="nc">&nbsp;                libraryTab.clearAndSelect(bibEntry.get());</b>
+<b class="nc">&nbsp;                tabContainer.showLibraryTab(libraryTab);</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.trace(&quot;End of loop&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (stateManager.getSelectedEntries().isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Citation key &#39;%0&#39; to select not found in open libraries.&quot;, entryKey));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

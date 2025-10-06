@@ -1,0 +1,145 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntriesEvent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.event</a>
+</div>
+
+<h1>Coverage Summary for Class: EntriesEvent (org.jabref.model.entry.event)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntriesEvent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.event;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;/**
+&nbsp; * This abstract class pretends a minimal set of attributes and methods which an entries event should have.
+&nbsp; */
+&nbsp;public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
+&nbsp;
+&nbsp;    private final List&lt;BibEntry&gt; bibEntries;
+&nbsp;    private final EntriesEventSource location;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param bibEntries List of BibEntry objects which are involved in this event
+&nbsp;     */
+&nbsp;    public EntriesEvent(List&lt;BibEntry&gt; bibEntries) {
+<b class="nc">&nbsp;        this(bibEntries, EntriesEventSource.LOCAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param bibEntries List of BibEntry objects which are involved in this event
+&nbsp;     * @param location   Location affected by this event
+&nbsp;     */
+&nbsp;    public EntriesEvent(List&lt;BibEntry&gt; bibEntries, EntriesEventSource location) {
+<b class="nc">&nbsp;        super();</b>
+<b class="nc">&nbsp;        this.bibEntries = Objects.requireNonNull(bibEntries);</b>
+<b class="nc">&nbsp;        this.location = Objects.requireNonNull(location);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BibEntry&gt; getBibEntries() {
+<b class="nc">&nbsp;        return this.bibEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public EntriesEventSource getEntriesEventSource() {
+<b class="nc">&nbsp;        return this.location;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

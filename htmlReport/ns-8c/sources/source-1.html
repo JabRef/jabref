@@ -1,0 +1,419 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WalkthroughResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: WalkthroughResolver (org.jabref.gui.walkthrough.utils)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WalkthroughResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WalkthroughResolver$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WalkthroughResolver$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WalkthroughResolver$WalkthroughResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.utils;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.beans.Observable;
+&nbsp;import javafx.beans.value.ChangeListener;
+&nbsp;import javafx.beans.value.ObservableValue;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.stage.Window;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.util.DelayedExecution;
+&nbsp;import org.jabref.gui.util.RecursiveChildrenListener;
+&nbsp;import org.jabref.gui.walkthrough.declarative.NodeResolver;
+&nbsp;import org.jabref.gui.walkthrough.declarative.WindowResolver;
+&nbsp;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class WalkthroughResolver {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughResolver.class);</b>
+<b class="nc">&nbsp;    private static final Duration RESOLVE_TIMEOUT = Duration.millis(2_500);</b>
+<b class="nc">&nbsp;    private static final Duration NODE_IDLE_TIMEOUT = Duration.millis(250);</b>
+&nbsp;
+&nbsp;    private final WindowResolver windowResolver;
+&nbsp;    private final @Nullable NodeResolver nodeResolver;
+&nbsp;    private final Consumer&lt;WalkthroughResult&gt; onCompletion;
+&nbsp;
+&nbsp;    private @Nullable Runnable windowListenerCleanup;
+&nbsp;    private @Nullable ChangeListener&lt;Scene&gt; sceneListener;
+&nbsp;    private @Nullable RecursiveChildrenListener recursiveChildrenListener;
+&nbsp;    private WalkthroughUtils.@Nullable DebouncedInvalidationListener debouncedNodeFinder;
+&nbsp;
+&nbsp;    private @Nullable DelayedExecution timeout;
+&nbsp;    private @Nullable DelayedExecution nodeIdleTimeout;
+&nbsp;
+&nbsp;    /// Creates a [WalkthroughResolver] that attempts to identify the window and the
+&nbsp;    /// node from the
+&nbsp;    /// [org.jabref.gui.walkthrough.declarative.step.VisibleComponent#windowResolver()]
+&nbsp;    /// and
+&nbsp;    /// [org.jabref.gui.walkthrough.declarative.step.VisibleComponent#nodeResolver()]
+&nbsp;    /// and supplies [WalkthroughResult] to a specified [#onCompletion] consumer.
+&nbsp;    ///
+&nbsp;    /// @implNote 1. The entire resolve process finishes within 2.5 seconds or when the
+&nbsp;    /// nodes are all shown, whichever comes first.
+&nbsp;    /// 2. The resolver first tries to resolve the window, then resolves the node from
+&nbsp;    /// the scene on the window using an event-based approach. Specifically:
+&nbsp;    ///    1. Re-resolution of window is triggered upon creation or deletion of a
+&nbsp;    /// window.
+&nbsp;    ///    2. If a scene is not immediately present in the window,
+&nbsp;    /// [Window#sceneProperty()] is listened to until a scene is present.
+&nbsp;    ///    3. Re-resolution of node is triggered upon any children list change in the
+&nbsp;    /// scenegraph, or [com.sun.javafx.scene.TreeShowingProperty] change of any node in
+&nbsp;    /// the scene graph.
+&nbsp;    /// 3. [#onCompletion] is guaranteed to be called regardless of whether resolution
+&nbsp;    /// is successful on a JavaFX thread upon [#startResolution()].
+&nbsp;    ///
+&nbsp;    /// You may NOT use this class to resolve more than once. In such case,
+&nbsp;    /// [#onCompletion] will never be called.
+&nbsp;    public WalkthroughResolver(WindowResolver windowResolver,
+&nbsp;                               @Nullable NodeResolver nodeResolver,
+<b class="nc">&nbsp;                               Consumer&lt;WalkthroughResult&gt; onCompletion) {</b>
+<b class="nc">&nbsp;        this.windowResolver = windowResolver;</b>
+<b class="nc">&nbsp;        this.nodeResolver = nodeResolver;</b>
+<b class="nc">&nbsp;        this.onCompletion = onCompletion;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void startResolution() {
+<b class="nc">&nbsp;        timeout = new DelayedExecution(RESOLVE_TIMEOUT, () -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Walkthrough resolution timed out.&quot;);</b>
+<b class="nc">&nbsp;            finish(new WalkthroughResult(null, null));</b>
+&nbsp;        });
+<b class="nc">&nbsp;        timeout.start();</b>
+&nbsp;
+<b class="nc">&nbsp;        windowResolver.resolve().ifPresentOrElse(</b>
+&nbsp;                this::handleWindowResolved,
+<b class="nc">&nbsp;                () -&gt; listenForWindow(windowResolver)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void listenForWindow(WindowResolver resolver) {
+<b class="nc">&nbsp;        this.windowListenerCleanup = WalkthroughUtils.onWindowChangedUntil(() -&gt; {</b>
+<b class="nc">&nbsp;            Optional&lt;Window&gt; window = resolver.resolve();</b>
+<b class="nc">&nbsp;            if (window.isPresent()) {</b>
+<b class="nc">&nbsp;                Platform.runLater(() -&gt; handleWindowResolved(window.get())); // Make sure window listener detaches first.</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleWindowResolved(Window window) {
+<b class="nc">&nbsp;        if (nodeResolver == null) {</b>
+<b class="nc">&nbsp;            finish(new WalkthroughResult(window, null));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Scene scene = window.getScene();</b>
+<b class="nc">&nbsp;        if (scene != null) {</b>
+<b class="nc">&nbsp;            handleSceneResolved(window, scene, nodeResolver);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            listenForScene(window, nodeResolver);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void listenForScene(Window window, NodeResolver resolver) {
+<b class="nc">&nbsp;        sceneListener = new ChangeListener&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public void changed(ObservableValue&lt;? extends Scene&gt; observable, Scene oldScene, Scene newScene) {
+<b class="nc">&nbsp;                if (newScene != null) {</b>
+<b class="nc">&nbsp;                    window.sceneProperty().removeListener(this);</b>
+<b class="nc">&nbsp;                    sceneListener = null;</b>
+<b class="nc">&nbsp;                    handleSceneResolved(window, newScene, resolver);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        window.sceneProperty().addListener(sceneListener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleSceneResolved(Window window, Scene scene, NodeResolver resolver) {
+<b class="nc">&nbsp;        resolver.resolve(scene).ifPresentOrElse(</b>
+<b class="nc">&nbsp;                node -&gt; finish(new WalkthroughResult(window, node)),</b>
+<b class="nc">&nbsp;                () -&gt; listenForNodeInScene(window, scene, resolver)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void listenForNodeInScene(Window window, Scene scene, NodeResolver resolver) {
+<b class="nc">&nbsp;        debouncedNodeFinder = WalkthroughUtils.debounced(new InvalidationListener() {</b>
+<b class="nc">&nbsp;            private @Nullable Node node = null;</b>
+<b class="nc">&nbsp;            private boolean handled = false;</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void invalidated(Observable observable) {
+<b class="nc">&nbsp;                if (handled) {</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                Optional&lt;Node&gt; node = resolver.resolve(scene);</b>
+<b class="nc">&nbsp;                if (node.isEmpty()) {</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;                if (this.node == node.get()) {</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;                this.node = node.get();</b>
+<b class="nc">&nbsp;                if (nodeIdleTimeout != null) {</b>
+<b class="nc">&nbsp;                    nodeIdleTimeout.cancel();</b>
+&nbsp;                }
+&nbsp;                // If a new node is resolved after listening, wait for a short period of time to see if it stays the same.
+<b class="nc">&nbsp;                LOGGER.info(&quot;Node resolved, waiting for it to stay the same: {}&quot;, node.get());</b>
+<b class="nc">&nbsp;                nodeIdleTimeout = new DelayedExecution(NODE_IDLE_TIMEOUT, () -&gt; {</b>
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Node idle timeout. The node has stayed the same: {}&quot;, node.get());</b>
+<b class="nc">&nbsp;                    handled = true;</b>
+<b class="nc">&nbsp;                    detachChildrenListener();</b>
+<b class="nc">&nbsp;                    finish(new WalkthroughResult(window, this.node));</b>
+&nbsp;                });
+<b class="nc">&nbsp;                nodeIdleTimeout.start();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        recursiveChildrenListener = new RecursiveChildrenListener(debouncedNodeFinder);</b>
+<b class="nc">&nbsp;        recursiveChildrenListener.attachToScene(scene);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void finish(WalkthroughResult result) {
+<b class="nc">&nbsp;        cancel();</b>
+<b class="nc">&nbsp;        onCompletion.accept(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cancel() {
+<b class="nc">&nbsp;        if (timeout != null) {</b>
+<b class="nc">&nbsp;            timeout.cancel();</b>
+<b class="nc">&nbsp;            timeout = null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (nodeIdleTimeout != null) {</b>
+<b class="nc">&nbsp;            nodeIdleTimeout.cancel();</b>
+<b class="nc">&nbsp;            nodeIdleTimeout = null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        sceneListener = null;</b>
+<b class="nc">&nbsp;        if (windowListenerCleanup != null) {</b>
+<b class="nc">&nbsp;            windowListenerCleanup.run();</b>
+<b class="nc">&nbsp;            windowListenerCleanup = null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (debouncedNodeFinder != null) {</b>
+<b class="nc">&nbsp;            debouncedNodeFinder.cancel();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        detachChildrenListener();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void detachChildrenListener() {
+<b class="nc">&nbsp;        if (recursiveChildrenListener != null) {</b>
+<b class="nc">&nbsp;            recursiveChildrenListener.detach();</b>
+<b class="nc">&nbsp;            recursiveChildrenListener = null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record WalkthroughResult(Window windowValue, Node nodeValue) {</b>
+&nbsp;        public Optional&lt;Window&gt; window() {
+<b class="nc">&nbsp;            return Optional.ofNullable(windowValue);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Optional&lt;Node&gt; node() {
+<b class="nc">&nbsp;            return Optional.ofNullable(nodeValue);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean wasSuccessful() {
+<b class="nc">&nbsp;            return window().isPresent();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,242 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileNameUniqueness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: FileNameUniqueness (org.jabref.logic.util.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileNameUniqueness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.io;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class FileNameUniqueness {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FileNameUniqueness.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern DUPLICATE_MARK_PATTERN = Pattern.compile(&quot;(.*) \\(\\d+\\)&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a file name such that it does not match any existing files in targetDirectory
+&nbsp;     *
+&nbsp;     * @param targetDirectory The directory in which filename should be unique
+&nbsp;     * @param fileName        Suggested name for the file
+&nbsp;     * @return a file name such that it does not match any existing files in targetDirectory
+&nbsp;     */
+&nbsp;    public static String getNonOverWritingFileName(Path targetDirectory, String fileName) {
+<b class="nc">&nbsp;        return generateUniqueFileName(targetDirectory, fileName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a unique filename in the target directory while taking into account existing files that may be already
+&nbsp;     * linked to the same bibliography entry.
+&nbsp;     *
+&nbsp;     * @param proposedName The proposed name for the file without any patchers for &quot;(1)&quot; etc.
+&nbsp;     */
+&nbsp;    public static String generateUniqueFileName(Path targetDirectory, String proposedName) {
+<b class="nc">&nbsp;        String fileNameWithoutExtension = FileUtil.getBaseName(proposedName);</b>
+&nbsp;
+&nbsp;        // the suffix include the &#39;.&#39; , if extension is present Eg: &quot;.pdf&quot;
+<b class="nc">&nbsp;        String extensionSuffix = FileUtil.getFileExtension(proposedName).map(ext -&gt; &quot;.&quot; + ext).orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        int counter = 1;</b>
+<b class="nc">&nbsp;        String newFileName = proposedName;</b>
+<b class="nc">&nbsp;        while (Files.exists(targetDirectory.resolve(newFileName))) {</b>
+<b class="nc">&nbsp;            newFileName = fileNameWithoutExtension +</b>
+&nbsp;                    &quot; (&quot; + counter + &quot;)&quot; +
+&nbsp;                    extensionSuffix;
+<b class="nc">&nbsp;            counter++;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return newFileName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This function decide whether the newly downloaded file has the same content with other files
+&nbsp;     * It returns ture when the content is duplicate, while returns false if it is not
+&nbsp;     *
+&nbsp;     * @param directory         The directory which saves the files (.pdf, for example)
+&nbsp;     * @param fileName          Suggest name for the newly downloaded file
+&nbsp;     * @param messageOnDeletion To display the error and success message
+&nbsp;     * @return true when the content of the newly downloaded file is same as the file with &quot;similar&quot; name,
+&nbsp;     * false when there is no &quot;similar&quot; file name or the content is different from that of files with &quot;similar&quot; name
+&nbsp;     * @throws IOException Fail when the file is not exist or something wrong when reading the file
+&nbsp;     */
+&nbsp;    public static boolean isDuplicatedFile(@NonNull Path directory, @NonNull Path fileName, @NonNull Consumer&lt;String&gt; messageOnDeletion) throws IOException {
+<b class="nc">&nbsp;        String extensionSuffix = FileUtil.getFileExtension(fileName).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        extensionSuffix = extensionSuffix.isEmpty() ? extensionSuffix : &quot;.&quot; + extensionSuffix;</b>
+<b class="nc">&nbsp;        String newFilename = FileUtil.getBaseName(fileName) + extensionSuffix;</b>
+&nbsp;
+<b class="nc">&nbsp;        String fileNameWithoutDuplicated = eraseDuplicateMarks(FileUtil.getBaseName(fileName));</b>
+<b class="nc">&nbsp;        String originalFileName = fileNameWithoutDuplicated + extensionSuffix;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (newFilename.equals(originalFileName)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Path originalFile = directory.resolve(originalFileName);</b>
+<b class="nc">&nbsp;        Path duplicateFile = directory.resolve(fileName);</b>
+<b class="nc">&nbsp;        int counter = 1;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (Files.exists(originalFile)) {</b>
+<b class="nc">&nbsp;            if (com.google.common.io.Files.equal(originalFile.toFile(), duplicateFile.toFile())) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    Files.delete(duplicateFile);</b>
+<b class="nc">&nbsp;                    messageOnDeletion.accept(Localization.lang(&quot;File &#39;%1&#39; is a duplicate of &#39;%0&#39;. Keeping &#39;%0&#39;&quot;, originalFileName, fileName));</b>
+&nbsp;                } catch (IOException e) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;File &#39;{}&#39; is a duplicate of &#39;{}&#39;. Could not delete &#39;{}&#39;.&quot;, fileName, originalFileName, fileName);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            originalFileName = fileNameWithoutDuplicated +</b>
+&nbsp;                    &quot; (&quot; + counter + &quot;)&quot;
+&nbsp;                    + extensionSuffix;
+<b class="nc">&nbsp;            counter++;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (newFilename.equals(originalFileName)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            originalFile = directory.resolve(originalFileName);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is the opposite function of getNonOverWritingFileName
+&nbsp;     * It will recover the file name to origin if it has duplicate mark such as &quot; (1)&quot;
+&nbsp;     * change the String whose format is &quot;xxxxxx (number)&quot; into &quot;xxxxxx&quot;, while return the same String when it does not match the format
+&nbsp;     * This is the opposite function of getNonOverWritingFileName
+&nbsp;     *
+&nbsp;     * @param fileName Suggested name for the file without extensionSuffix, if it has duplicate file name with other file, it will end with something like &quot; (1)&quot;
+&nbsp;     * @return Suggested name for the file without extensionSuffix and duplicate marks such as &quot; (1)&quot;
+&nbsp;     */
+&nbsp;    public static String eraseDuplicateMarks(String fileName) {
+<b class="nc">&nbsp;        Matcher m = DUPLICATE_MARK_PATTERN.matcher(fileName);</b>
+<b class="nc">&nbsp;        return m.find() ? fileName.substring(0, fileName.lastIndexOf(&#39;(&#39;) - 1) : fileName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Path eraseDuplicateMarks(Path filePath) {
+<b class="nc">&nbsp;        String extensionSuffix = FileUtil.getFileExtension(filePath).map(ext -&gt; &quot;.&quot; + ext).orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return filePath.resolveSibling(eraseDuplicateMarks(FileUtil.getBaseName(filePath)) + extensionSuffix);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

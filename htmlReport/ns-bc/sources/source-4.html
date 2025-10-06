@@ -1,0 +1,227 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConvertMSCCodesFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.bibtexfields</a>
+</div>
+
+<h1>Coverage Summary for Class: ConvertMSCCodesFormatter (org.jabref.logic.formatter.bibtexfields)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConvertMSCCodesFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (4/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (2/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.4%
+  </span>
+  <span class="absValue">
+    (11/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.bibtexfields;
+&nbsp;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.logic.preferences.JabRefCliPreferences;
+&nbsp;import org.jabref.logic.shared.exception.MscCodeLoadingException;
+&nbsp;import org.jabref.logic.util.MscCodeUtils;
+&nbsp;import org.jabref.model.entry.BibEntryPreferences;
+&nbsp;import org.jabref.model.entry.Keyword;
+&nbsp;import org.jabref.model.entry.KeywordList;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.google.common.collect.BiMap;
+&nbsp;import com.google.common.collect.HashBiMap;
+&nbsp;import org.eclipse.jgit.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="fc">&nbsp;public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatter {</b>
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ConvertMSCCodesFormatter.class);</b>
+&nbsp;    private static final BiMap&lt;String, String&gt; MSCMAP;
+&nbsp;    private static boolean conversionPossible;
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        MSCMAP = initializeMap();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static HashBiMap&lt;String, String&gt; initializeMap() {
+<b class="fc">&nbsp;        HashBiMap&lt;String, String&gt; tempMap = HashBiMap.create();</b>
+&nbsp;
+<b class="fc">&nbsp;        URL resourceUrl = ConvertMSCCodesFormatter.class.getClassLoader().getResource(&quot;msc_codes.json&quot;);</b>
+&nbsp;
+&nbsp;        // Check for valid mapping of msc codes
+<b class="pc">&nbsp;        if (resourceUrl == null) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Resource not found: msc_codes.json&quot;);</b>
+<b class="nc">&nbsp;            conversionPossible = false;</b>
+<b class="nc">&nbsp;            return tempMap;</b>
+&nbsp;        } else {
+&nbsp;            try {
+<b class="fc">&nbsp;                tempMap = MscCodeUtils.loadMscCodesFromJson(resourceUrl).get();</b>
+<b class="pc">&nbsp;                if (!tempMap.isEmpty()) {</b>
+<b class="fc">&nbsp;                    conversionPossible = true;</b>
+<b class="fc">&nbsp;                    return tempMap;</b>
+&nbsp;                }
+&nbsp;            } catch (MscCodeLoadingException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Error loading MSC codes:&quot;, e);</b>
+<b class="nc">&nbsp;                conversionPossible = false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return tempMap;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public String format(String text) {
+<b class="nc">&nbsp;        if (text.isEmpty() || !conversionPossible) {</b>
+<b class="nc">&nbsp;            return text;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Using Injector to avoid widespread refactoring for constructor injection.
+&nbsp;        // Class that calls formatters (FieldFormatterCleanups.java) has many usages that would need updates.
+<b class="nc">&nbsp;        JabRefCliPreferences cliPreferences = Injector.instantiateModelOrService(JabRefCliPreferences.class);</b>
+&nbsp;
+&nbsp;        // get preferences for BibEntry
+<b class="nc">&nbsp;        BibEntryPreferences bibPreferences = cliPreferences.getBibEntryPreferences();</b>
+<b class="nc">&nbsp;        Character dlim = bibPreferences.getKeywordSeparator();</b>
+<b class="nc">&nbsp;        Character hdlim = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;</b>
+&nbsp;
+&nbsp;        // create KeywordList to tokenize
+<b class="nc">&nbsp;        KeywordList keyList = KeywordList.parse(text, dlim, hdlim);</b>
+<b class="nc">&nbsp;        Iterator&lt;Keyword&gt; list = keyList.iterator();</b>
+<b class="nc">&nbsp;        List&lt;Keyword&gt; modifiedList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        while (list.hasNext()) {</b>
+&nbsp;            // check if key in map and add value to result string
+&nbsp;            // non-code keyword is present leave as-is
+<b class="nc">&nbsp;            Keyword item = list.next();</b>
+<b class="nc">&nbsp;            String code = item.toString().trim(); // remove whitespace</b>
+<b class="nc">&nbsp;            String convertedText = MSCMAP.getOrDefault(code, code);</b>
+&nbsp;
+<b class="nc">&nbsp;            modifiedList.add(new Keyword(convertedText));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return KeywordList.serialize(modifiedList, dlim);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Convert MSC Keyword codes to their respective descriptions.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;MSC Codes to Descriptions&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKey() {
+<b class="fc">&nbsp;        return &quot;MSC_codes_to_descriptions&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExampleInput() {
+<b class="nc">&nbsp;        return &quot;06E30&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

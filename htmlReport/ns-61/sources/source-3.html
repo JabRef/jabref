@@ -1,0 +1,328 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CustomEntryTypesTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.customentrytypes</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomEntryTypesTabViewModel (org.jabref.gui.preferences.customentrytypes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CustomEntryTypesTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.customentrytypes;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.Observable;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.BibField;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.FieldPriority;
+&nbsp;import org.jabref.model.entry.field.FieldProperty;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;import org.jabref.model.entry.field.OrFields;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.UnknownEntryType;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;
+&nbsp;public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private final ObservableList&lt;Field&gt; fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey());</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;EntryTypeViewModel&gt; selectedEntryType = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final StringProperty entryTypeToAdd = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Field&gt; newFieldToAdd = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;EntryTypeViewModel&gt; entryTypesWithFields = FXCollections.observableArrayList(extractor -&gt; new Observable[] {extractor.entryType(), extractor.fields()});</b>
+<b class="nc">&nbsp;    private final List&lt;BibEntryType&gt; entryTypesToDelete = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final BibDatabaseMode bibDatabaseMode;
+&nbsp;
+&nbsp;    private final Validator entryTypeValidator;
+&nbsp;    private final Validator fieldValidator;
+<b class="nc">&nbsp;    private final Set&lt;Field&gt; multiLineFields = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    Predicate&lt;Field&gt; isMultiline = field -&gt; this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);</b>
+&nbsp;
+&nbsp;    public CustomEntryTypesTabViewModel(BibDatabaseMode mode,
+&nbsp;                                        BibEntryTypesManager entryTypesManager,
+&nbsp;                                        DialogService dialogService,
+<b class="nc">&nbsp;                                        CliPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.bibDatabaseMode = mode;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.multiLineFields.addAll(preferences.getFieldPreferences().getNonWrappableFields());</b>
+&nbsp;
+<b class="nc">&nbsp;        entryTypeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                entryTypeToAdd,
+&nbsp;                StringUtil::isNotBlank,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Entry type cannot be empty. Please enter a name.&quot;)));</b>
+<b class="nc">&nbsp;        fieldValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                newFieldToAdd,
+<b class="nc">&nbsp;                input -&gt; (input != null) &amp;&amp; StringUtil.isNotBlank(FieldTextMapper.getDisplayName(input)),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Field cannot be empty. Please enter a name.&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        if (!this.entryTypesWithFields.isEmpty()) {</b>
+<b class="nc">&nbsp;            this.entryTypesWithFields.clear();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Collection&lt;BibEntryType&gt; allTypes = entryTypesManager.getAllTypes(bibDatabaseMode);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntryType entryType : allTypes) {</b>
+&nbsp;            EntryTypeViewModel viewModel;
+<b class="nc">&nbsp;            if (entryTypesManager.isCustomType(entryType, bibDatabaseMode)) {</b>
+<b class="nc">&nbsp;                viewModel = new CustomEntryTypeViewModel(entryType, isMultiline);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                viewModel = new EntryTypeViewModel(entryType, isMultiline);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.entryTypesWithFields.add(viewModel);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        Set&lt;Field&gt; multilineFields = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {</b>
+<b class="nc">&nbsp;            List&lt;FieldViewModel&gt; allFields = typeViewModel.fields();</b>
+&nbsp;
+<b class="nc">&nbsp;            BibEntryType type = typeViewModel.entryType().getValue();</b>
+<b class="nc">&nbsp;            EntryType newPlainType = type.getType();</b>
+&nbsp;
+&nbsp;            // Collect multilineFields for storage in preferences later
+<b class="nc">&nbsp;            multilineFields.addAll(allFields.stream()</b>
+<b class="nc">&nbsp;                                            .filter(FieldViewModel::isMultiline)</b>
+<b class="nc">&nbsp;                                            .map(model -&gt; model.toField(newPlainType))</b>
+<b class="nc">&nbsp;                                            .toList());</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;OrFields&gt; required = allFields.stream()</b>
+<b class="nc">&nbsp;                                               .filter(FieldViewModel::isRequired)</b>
+<b class="nc">&nbsp;                                               .map(model -&gt; model.toField(newPlainType))</b>
+<b class="nc">&nbsp;                                               .map(OrFields::new)</b>
+<b class="nc">&nbsp;                                               .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;BibField&gt; fields = allFields.stream().map(model -&gt; model.toBibField(newPlainType)).collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;            BibEntryType newType = new BibEntryType(newPlainType, fields, required);</b>
+&nbsp;
+<b class="nc">&nbsp;            entryTypesManager.update(newType, bibDatabaseMode);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntryType entryType : entryTypesToDelete) {</b>
+<b class="nc">&nbsp;            entryTypesManager.removeCustomOrModifiedEntryType(entryType, bibDatabaseMode);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        preferences.getFieldPreferences().setNonWrappableFields(multilineFields);</b>
+<b class="nc">&nbsp;        preferences.storeCustomEntryTypesRepository(entryTypesManager);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public EntryTypeViewModel addNewCustomEntryType() {
+<b class="nc">&nbsp;        EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());</b>
+<b class="nc">&nbsp;        BibEntryType type = new BibEntryType(newentryType, new ArrayList&lt;&gt;(), List.of());</b>
+<b class="nc">&nbsp;        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);</b>
+<b class="nc">&nbsp;        this.entryTypesWithFields.add(viewModel);</b>
+<b class="nc">&nbsp;        this.entryTypeToAdd.setValue(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return viewModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeEntryType(EntryTypeViewModel focusedItem) {
+<b class="nc">&nbsp;        entryTypesWithFields.remove(focusedItem);</b>
+<b class="nc">&nbsp;        entryTypesToDelete.add(focusedItem.entryType().getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addNewField() {
+<b class="nc">&nbsp;        Field field = newFieldToAdd.getValue();</b>
+<b class="nc">&nbsp;        boolean fieldExists = displayNameExists(FieldTextMapper.getDisplayName(field));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fieldExists) {</b>
+<b class="nc">&nbsp;            dialogService.showWarningDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Duplicate fields&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Warning: You added field \&quot;%0\&quot; twice. Only one will be kept.&quot;, FieldTextMapper.getDisplayName(field)));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.selectedEntryType.getValue().addField(new FieldViewModel(</b>
+&nbsp;                    field,
+&nbsp;                    FieldViewModel.Mandatory.REQUIRED,
+&nbsp;                    FieldPriority.IMPORTANT,
+&nbsp;                    false));
+&nbsp;        }
+<b class="nc">&nbsp;        newFieldToAddProperty().setValue(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean displayNameExists(String displayName) {
+<b class="nc">&nbsp;        ObservableList&lt;FieldViewModel&gt; entryFields = this.selectedEntryType.getValue().fields();</b>
+<b class="nc">&nbsp;        return entryFields.stream().anyMatch(fieldViewModel -&gt;</b>
+<b class="nc">&nbsp;                fieldViewModel.displayNameProperty().getValue().equals(displayName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeField(FieldViewModel focusedItem) {
+<b class="nc">&nbsp;        selectedEntryType.getValue().removeField(focusedItem);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetAllCustomEntryTypes() {
+<b class="nc">&nbsp;        entryTypesManager.clearAllCustomEntryTypes(bibDatabaseMode);</b>
+<b class="nc">&nbsp;        preferences.storeCustomEntryTypesRepository(entryTypesManager);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;EntryTypeViewModel&gt; selectedEntryTypeProperty() {
+<b class="nc">&nbsp;        return this.selectedEntryType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty entryTypeToAddProperty() {
+<b class="nc">&nbsp;        return this.entryTypeToAdd;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Field&gt; newFieldToAddProperty() {
+<b class="nc">&nbsp;        return this.newFieldToAdd;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;EntryTypeViewModel&gt; entryTypes() {
+<b class="nc">&nbsp;        return this.entryTypesWithFields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;Field&gt; fieldsForAdding() {
+<b class="nc">&nbsp;        return this.fieldsForAdding;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus entryTypeValidationStatus() {
+<b class="nc">&nbsp;        return entryTypeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus fieldValidationStatus() {
+<b class="nc">&nbsp;        return fieldValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

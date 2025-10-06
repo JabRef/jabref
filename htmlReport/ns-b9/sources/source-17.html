@@ -1,0 +1,480 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TemplateExporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: TemplateExporter (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TemplateExporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/97)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.Reader;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationLoader;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.layout.Layout;
+&nbsp;import org.jabref.logic.layout.LayoutFormatterPreferences;
+&nbsp;import org.jabref.logic.layout.LayoutHelper;
+&nbsp;import org.jabref.logic.layout.format.Number;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.FileType;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.metadata.SaveOrder;
+&nbsp;import org.jabref.model.metadata.SelfContainedSaveOrder;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for export formats based on templates.
+&nbsp; */
+&nbsp;public class TemplateExporter extends Exporter {
+&nbsp;
+&nbsp;    private static final String BLANK_LINE_PATTERN = &quot;\\r\\n|\\n&quot;;
+&nbsp;    private static final String LAYOUT_PREFIX = &quot;/resource/layout/&quot;;
+&nbsp;    private static final String LAYOUT_EXTENSION = &quot;.layout&quot;;
+&nbsp;    private static final String FORMATTERS_EXTENSION = &quot;.formatters&quot;;
+&nbsp;    private static final String BEGIN_INFIX = &quot;.begin&quot;;
+&nbsp;    private static final String END_INFIX = &quot;.end&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);</b>
+&nbsp;
+&nbsp;    private final String lfFileName;
+&nbsp;    private final String directory;
+&nbsp;    private final LayoutFormatterPreferences layoutPreferences;
+&nbsp;    private final SelfContainedSaveOrder saveOrder;
+&nbsp;    private boolean customExport;
+&nbsp;    private BlankLineBehaviour blankLineBehaviour;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
+&nbsp;     *
+&nbsp;     * @param displayName Name to display to the user.
+&nbsp;     * @param consoleName Name to call this format in the console.
+&nbsp;     * @param lfFileName  Name of the main layout file.
+&nbsp;     * @param directory   Directory in which to find the layout file.
+&nbsp;     * @param extension   Should contain the . (for instance .txt).
+&nbsp;     */
+&nbsp;    public TemplateExporter(String displayName,
+&nbsp;                            String consoleName,
+&nbsp;                            String lfFileName,
+&nbsp;                            String directory,
+&nbsp;                            FileType extension) {
+<b class="nc">&nbsp;        this(displayName, consoleName, lfFileName, directory, extension, null, null, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
+&nbsp;     *
+&nbsp;     * @param name       to display to the user and to call this format in the console.
+&nbsp;     * @param lfFileName Name of the main layout file.
+&nbsp;     * @param extension  May or may not contain the . (for instance .txt).
+&nbsp;     */
+&nbsp;    public TemplateExporter(String name,
+&nbsp;                            String lfFileName,
+&nbsp;                            String extension,
+&nbsp;                            LayoutFormatterPreferences layoutPreferences,
+&nbsp;                            SelfContainedSaveOrder saveOrder) {
+<b class="nc">&nbsp;        this(name,</b>
+&nbsp;                name,
+&nbsp;                lfFileName,
+&nbsp;                null,
+<b class="nc">&nbsp;                StandardFileType.fromExtensions(extension),</b>
+&nbsp;                layoutPreferences,
+&nbsp;                saveOrder);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
+&nbsp;     *
+&nbsp;     * @param displayName Name to display to the user.
+&nbsp;     * @param consoleName Name to call this format in the console.
+&nbsp;     * @param lfFileName  Name of the main layout file.
+&nbsp;     * @param directory   Directory in which to find the layout file.
+&nbsp;     * @param extension   Should contain the . (for instance .txt).
+&nbsp;     */
+&nbsp;    public TemplateExporter(String displayName,
+&nbsp;                            String consoleName,
+&nbsp;                            String lfFileName,
+&nbsp;                            String directory,
+&nbsp;                            FileType extension,
+&nbsp;                            LayoutFormatterPreferences layoutPreferences,
+&nbsp;                            SelfContainedSaveOrder saveOrder) {
+<b class="nc">&nbsp;        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
+&nbsp;     *
+&nbsp;     * @param displayName        Name to display to the user.
+&nbsp;     * @param consoleName        Name to call this format in the console.
+&nbsp;     * @param lfFileName         Name of the main layout file.
+&nbsp;     * @param directory          Directory in which to find the layout file.
+&nbsp;     * @param extension          Should contain the . (for instance .txt).
+&nbsp;     * @param layoutPreferences  Preferences for layout
+&nbsp;     * @param blankLineBehaviour how to behave regarding blank lines.
+&nbsp;     */
+&nbsp;    public TemplateExporter(String displayName,
+&nbsp;                            String consoleName,
+&nbsp;                            String lfFileName,
+&nbsp;                            String directory,
+&nbsp;                            FileType extension,
+&nbsp;                            LayoutFormatterPreferences layoutPreferences,
+&nbsp;                            SelfContainedSaveOrder saveOrder,
+&nbsp;                            BlankLineBehaviour blankLineBehaviour) {
+<b class="nc">&nbsp;        super(consoleName, displayName, extension);</b>
+<b class="nc">&nbsp;        if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {</b>
+<b class="nc">&nbsp;            this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.lfFileName = lfFileName;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.directory = directory;</b>
+<b class="nc">&nbsp;        this.layoutPreferences = layoutPreferences;</b>
+<b class="nc">&nbsp;        this.saveOrder = saveOrder == null ? SaveOrder.getDefaultSaveOrder() : saveOrder;</b>
+<b class="nc">&nbsp;        this.blankLineBehaviour = blankLineBehaviour;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicate whether this is a custom export.
+&nbsp;     * A custom export looks for its layout files using a normal file path,
+&nbsp;     * while a built-in export looks in the classpath.
+&nbsp;     *
+&nbsp;     * @param custom true to indicate a custom export format.
+&nbsp;     */
+&nbsp;    public void setCustomExport(boolean custom) {
+<b class="nc">&nbsp;        this.customExport = custom;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method should return a reader from which the given layout file can be read.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Subclasses of TemplateExporter are free to override and provide their own implementation.
+&nbsp;     *
+&nbsp;     * @param filename the filename
+&nbsp;     * @return a newly created reader
+&nbsp;     * @throws IOException if the reader could not be created (e.g., file is not found)
+&nbsp;     */
+&nbsp;    private Reader getReader(String filename) throws IOException {
+&nbsp;        // If this is a custom export, just use the given filename:
+&nbsp;        String dir;
+<b class="nc">&nbsp;        if (customExport) {</b>
+<b class="nc">&nbsp;            dir = &quot;&quot;;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dir = LAYOUT_PREFIX + (directory == null ? &quot;&quot; : directory + &#39;/&#39;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Attempt to get a Reader for the file path given, either by
+&nbsp;        // loading it as a resource (from within JAR), or as a normal file. If
+&nbsp;        // unsuccessful (e.g. file not found), an IOException is thrown.
+&nbsp;
+<b class="nc">&nbsp;        String name = dir + filename;</b>
+&nbsp;
+<b class="nc">&nbsp;        Path path = Path.of(name);</b>
+<b class="nc">&nbsp;        if (Files.exists(path)) {</b>
+<b class="nc">&nbsp;            return Files.newBufferedReader(path, StandardCharsets.UTF_8);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        InputStream inputStream = TemplateExporter.class.getResourceAsStream(name);</b>
+<b class="nc">&nbsp;        if (inputStream == null) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Cannot find layout file: &#39;&quot; + name + &quot;&#39;.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void export(BibDatabaseContext databaseContext, Path file, List&lt;BibEntry&gt; entries) throws IOException {
+<b class="nc">&nbsp;        export(databaseContext, file, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void export(final BibDatabaseContext databaseContext,
+&nbsp;                       final Path file,
+&nbsp;                       List&lt;BibEntry&gt; entries,
+&nbsp;                       List&lt;Path&gt; fileDirForDatabase,
+&nbsp;                       JournalAbbreviationRepository abbreviationRepository) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(databaseContext);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        Charset encodingToUse = StandardCharsets.UTF_8;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        try (AtomicFileWriter ps = new AtomicFileWriter(file, encodingToUse)) {</b>
+<b class="nc">&nbsp;            Layout beginLayout = null;</b>
+&nbsp;
+&nbsp;            // Check if this export filter has bundled name formatters:
+&nbsp;            // Add these to the preferences, so all layouts have access to the custom name formatters:
+<b class="nc">&nbsp;            readFormatterFile();</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;String&gt; missingFormatters = new ArrayList&lt;&gt;(1);</b>
+&nbsp;
+&nbsp;            // Print header
+<b class="nc">&nbsp;            try (Reader reader = getReader(lfFileName + BEGIN_INFIX + LAYOUT_EXTENSION)) {</b>
+<b class="nc">&nbsp;                LayoutHelper layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);</b>
+<b class="nc">&nbsp;                beginLayout = layoutHelper.getLayoutFromText();</b>
+&nbsp;            } catch (IOException ex) {
+&nbsp;                // If an exception was cast, export filter doesn&#39;t have a begin
+&nbsp;                // file.
+&nbsp;            }
+&nbsp;            // Write the header
+<b class="nc">&nbsp;            if (beginLayout != null) {</b>
+<b class="nc">&nbsp;                ps.write(beginLayout.doLayout(databaseContext, encodingToUse));</b>
+<b class="nc">&nbsp;                missingFormatters.addAll(beginLayout.getMissingFormatters());</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            /*
+&nbsp;             * Write database entries; entries will be sorted as they appear on the
+&nbsp;             * screen, or sorted by author, depending on Preferences.
+&nbsp;             */
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; sorted = BibDatabaseWriter.getSortedEntries(entries, saveOrder);</b>
+&nbsp;
+&nbsp;            // Load default layout
+&nbsp;            Layout defLayout;
+&nbsp;            LayoutHelper layoutHelper;
+<b class="nc">&nbsp;            try (Reader reader = getReader(lfFileName + LAYOUT_EXTENSION)) {</b>
+<b class="nc">&nbsp;                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);</b>
+<b class="nc">&nbsp;                defLayout = layoutHelper.getLayoutFromText();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (defLayout != null) {</b>
+<b class="nc">&nbsp;                missingFormatters.addAll(defLayout.getMissingFormatters());</b>
+<b class="nc">&nbsp;                if (!missingFormatters.isEmpty()) {</b>
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Missing formatters found: {}&quot;, missingFormatters);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            Map&lt;EntryType, Layout&gt; layouts = new HashMap&lt;&gt;();</b>
+&nbsp;            Layout layout;
+&nbsp;
+<b class="nc">&nbsp;            Number.serialExportNumber = 0;</b>
+<b class="nc">&nbsp;            for (BibEntry entry : sorted) {</b>
+<b class="nc">&nbsp;                Number.serialExportNumber++; // Increment entry counter.</b>
+&nbsp;                // Get the layout
+<b class="nc">&nbsp;                EntryType type = entry.getType();</b>
+<b class="nc">&nbsp;                if (layouts.containsKey(type)) {</b>
+<b class="nc">&nbsp;                    layout = layouts.get(type);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    try (Reader reader = getReader(lfFileName + &#39;.&#39; + type.getName() + LAYOUT_EXTENSION)) {</b>
+&nbsp;                        // We try to get a type-specific layout for this entry.
+<b class="nc">&nbsp;                        layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);</b>
+<b class="nc">&nbsp;                        layout = layoutHelper.getLayoutFromText();</b>
+<b class="nc">&nbsp;                        layouts.put(type, layout);</b>
+<b class="nc">&nbsp;                        if (layout != null) {</b>
+<b class="nc">&nbsp;                            missingFormatters.addAll(layout.getMissingFormatters());</b>
+&nbsp;                        }
+&nbsp;                    } catch (IOException ex) {
+&nbsp;                        // The exception indicates that no type-specific layout
+&nbsp;                        // exists, so we
+&nbsp;                        // go with the default one.
+<b class="nc">&nbsp;                        layout = defLayout;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+&nbsp;                // Write the entry
+<b class="nc">&nbsp;                if (layout != null) {</b>
+<b class="nc">&nbsp;                    if (blankLineBehaviour == BlankLineBehaviour.DELETE_BLANKS) {</b>
+<b class="nc">&nbsp;                        String[] lines = layout.doLayout(entry, databaseContext.getDatabase()).split(BLANK_LINE_PATTERN);</b>
+<b class="nc">&nbsp;                        for (String line : lines) {</b>
+<b class="nc">&nbsp;                            if (!line.isBlank() &amp;&amp; !line.isEmpty()) {</b>
+<b class="nc">&nbsp;                                ps.write(line + OS.NEWLINE);</b>
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        ps.write(layout.doLayout(entry, databaseContext.getDatabase()));</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // Print footer
+<b class="nc">&nbsp;            Layout endLayout = null;</b>
+<b class="nc">&nbsp;            try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {</b>
+<b class="nc">&nbsp;                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);</b>
+<b class="nc">&nbsp;                endLayout = layoutHelper.getLayoutFromText();</b>
+&nbsp;            } catch (IOException ex) {
+&nbsp;                // If an exception was thrown, export filter doesn&#39;t have an end
+&nbsp;                // file.
+&nbsp;            }
+&nbsp;
+&nbsp;            // Write footer
+<b class="nc">&nbsp;            if (endLayout != null) {</b>
+<b class="nc">&nbsp;                ps.write(endLayout.doLayout(databaseContext, encodingToUse));</b>
+<b class="nc">&nbsp;                missingFormatters.addAll(endLayout.getMissingFormatters());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            layoutPreferences.clearCustomExportNameFormatters();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!missingFormatters.isEmpty() &amp;&amp; LOGGER.isWarnEnabled()) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Formatters {} not found&quot;, String.join(&quot;, &quot;, missingFormatters));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * See if there is a name formatter file bundled with this export format.
+&nbsp;     * If so, read all the name formatters so they can be used by the filter layouts.
+&nbsp;     */
+&nbsp;    private void readFormatterFile() {
+<b class="nc">&nbsp;        Path formatterFile = Path.of(lfFileName + FORMATTERS_EXTENSION);</b>
+<b class="nc">&nbsp;        if (Files.exists(formatterFile)) {</b>
+<b class="nc">&nbsp;            try (Reader in = Files.newBufferedReader(formatterFile, StandardCharsets.UTF_8)) {</b>
+&nbsp;                // Ok, we found and opened the file. Read all contents:
+<b class="nc">&nbsp;                StringBuilder sb = new StringBuilder();</b>
+&nbsp;                int c;
+<b class="nc">&nbsp;                while ((c = in.read()) != -1) {</b>
+<b class="nc">&nbsp;                    sb.append((char) c);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                String[] lines = sb.toString().split(&quot;\n&quot;);</b>
+&nbsp;                // Go through each line:
+<b class="nc">&nbsp;                for (String line1 : lines) {</b>
+<b class="nc">&nbsp;                    String line = line1.trim();</b>
+&nbsp;                    // Do not deal with empty lines:
+<b class="nc">&nbsp;                    if (line.isEmpty()) {</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    int index = line.indexOf(&#39;:&#39;); // TODO: any need to accept escaped colons here?</b>
+<b class="nc">&nbsp;                    if ((index &gt; 0) &amp;&amp; ((index + 1) &lt; line.length())) {</b>
+<b class="nc">&nbsp;                        String formatterName = line.substring(0, index);</b>
+<b class="nc">&nbsp;                        String contents = line.substring(index + 1);</b>
+<b class="nc">&nbsp;                        layoutPreferences.putCustomExportNameFormatter(formatterName, contents);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } catch (IOException ex) {
+&nbsp;                // TODO: show error message here?
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Problem opening formatter file.&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLayoutFileName() {
+<b class="nc">&nbsp;        return lfFileName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLayoutFileNameWithExtension() {
+<b class="nc">&nbsp;        return lfFileName + LAYOUT_EXTENSION;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -8,12 +8,12 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +49,7 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, Par
     Optional<T> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries) throws FetcherException;
 
     @Override
-    default Optional<T> findIdentifier(BibEntry entry) throws FetcherException {
-        Objects.requireNonNull(entry);
-
+    default Optional<T> findIdentifier(@NonNull BibEntry entry) throws FetcherException {
         URL urlForEntry;
         try {
             urlForEntry = getURLForEntry(entry);

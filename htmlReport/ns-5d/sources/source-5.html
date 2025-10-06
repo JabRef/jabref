@@ -1,0 +1,268 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreferencesDialogView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences</a>
+</div>
+
+<h1>Coverage Summary for Class: PreferencesDialogView (org.jabref.gui.preferences)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreferencesDialogView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.control.ToggleButton;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.ControlHelper;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.controlsfx.control.textfield.CustomTextField;
+&nbsp;
+&nbsp;/**
+&nbsp; * Preferences dialog. Contains a TabbedPane, and tabs will be defined in separate classes. Tabs MUST implement the
+&nbsp; * PreferencesTab interface, since this dialog will call the storeSettings() method of all tabs when the user presses
+&nbsp; * ok.
+&nbsp; */
+&nbsp;public class PreferencesDialogView extends BaseDialog&lt;PreferencesDialogViewModel&gt; {
+&nbsp;
+<b class="nc">&nbsp;    public static final String DIALOG_TITLE = Localization.lang(&quot;JabRef preferences&quot;);</b>
+&nbsp;    @FXML private CustomTextField searchBox;
+&nbsp;    @FXML private ListView&lt;PreferencesTab&gt; preferenceTabList;
+&nbsp;    @FXML private ScrollPane preferencesContainer;
+&nbsp;    @FXML private ButtonType saveButton;
+&nbsp;    @FXML private ToggleButton memoryStickMode;
+&nbsp;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private GuiPreferences preferences;
+&nbsp;
+&nbsp;    private PreferencesDialogViewModel viewModel;
+&nbsp;    private final Class&lt;? extends PreferencesTab&gt; preferencesTabToSelectClass;
+&nbsp;
+<b class="nc">&nbsp;    public PreferencesDialogView(Class&lt;? extends PreferencesTab&gt; preferencesTabToSelectClass) {</b>
+<b class="nc">&nbsp;        this.setTitle(DIALOG_TITLE);</b>
+<b class="nc">&nbsp;        this.preferencesTabToSelectClass = preferencesTabToSelectClass;</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        ControlHelper.setAction(saveButton, getDialogPane(), event -&gt; savePreferencesAndCloseDialog());</b>
+&nbsp;
+&nbsp;        // Stop the default button from firing when the user hits enter within the search box
+<b class="nc">&nbsp;        searchBox.setOnKeyPressed(event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getCode() == KeyCode.ENTER) {</b>
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public PreferencesDialogViewModel getViewModel() {
+<b class="nc">&nbsp;        return viewModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        viewModel = new PreferencesDialogViewModel(dialogService, preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());</b>
+&nbsp;
+&nbsp;        // The list view does not respect the listener for the dialog and needs its own
+<b class="nc">&nbsp;        preferenceTabList.setOnKeyReleased(key -&gt; {</b>
+<b class="nc">&nbsp;            if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {</b>
+<b class="nc">&nbsp;                this.closeDialog();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());</b>
+<b class="nc">&nbsp;        preferenceTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());</b>
+<b class="nc">&nbsp;        searchBox.textProperty().addListener((observable, previousText, newText) -&gt; {</b>
+<b class="nc">&nbsp;            searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));</b>
+<b class="nc">&nbsp;            preferenceTabList.getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;            preferenceTabList.getSelectionModel().selectFirst();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        searchBox.setPromptText(Localization.lang(&quot;Search...&quot;));</b>
+<b class="nc">&nbsp;        searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -&gt; {</b>
+<b class="nc">&nbsp;            if (tab instanceof AbstractPreferenceTabView&lt;?&gt; preferencesTab) {</b>
+<b class="nc">&nbsp;                preferencesContainer.setContent(preferencesTab.getBuilder());</b>
+<b class="nc">&nbsp;                preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));</b>
+<b class="nc">&nbsp;                preferencesTab.getStyleClass().add(&quot;preferencesTab&quot;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                preferencesContainer.setContent(null);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        if (this.preferencesTabToSelectClass != null) {</b>
+<b class="nc">&nbsp;            Optional&lt;PreferencesTab&gt; tabToSelectIfExist = preferenceTabList.getItems()</b>
+<b class="nc">&nbsp;                                                                           .stream()</b>
+<b class="nc">&nbsp;                                                                           .filter(prefTab -&gt; prefTab.getClass().equals(preferencesTabToSelectClass))</b>
+<b class="nc">&nbsp;                                                                           .findFirst();</b>
+<b class="nc">&nbsp;            tabToSelectIfExist.ifPresent(preferencesTab -&gt; preferenceTabList.getSelectionModel().select(preferencesTab));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            preferenceTabList.getSelectionModel().selectFirst();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;PreferencesTab&gt;()</b>
+<b class="nc">&nbsp;                .withText(PreferencesTab::getTabName)</b>
+<b class="nc">&nbsp;                .install(preferenceTabList);</b>
+&nbsp;
+<b class="nc">&nbsp;        memoryStickMode.selectedProperty().bindBidirectional(viewModel.getMemoryStickProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.setValues();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void closeDialog() {
+&nbsp;        close();
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void savePreferencesAndCloseDialog() {
+<b class="nc">&nbsp;        if (viewModel.validSettings()) {</b>
+<b class="nc">&nbsp;            viewModel.storeAllSettings();</b>
+<b class="nc">&nbsp;            closeDialog();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void exportPreferences() {
+<b class="nc">&nbsp;        viewModel.exportPreferences();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void importPreferences() {
+<b class="nc">&nbsp;        viewModel.importPreferences();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void showAllPreferences() {
+<b class="nc">&nbsp;        viewModel.showPreferences();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void resetPreferences() {
+<b class="nc">&nbsp;        viewModel.resetPreferences();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

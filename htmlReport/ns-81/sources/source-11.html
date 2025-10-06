@@ -1,0 +1,444 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FieldsUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: FieldsUtil (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FieldsUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/111)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/119)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FieldsUtil$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FieldsUtil$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/113)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/126)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.util.StringConverter;
+&nbsp;
+&nbsp;import org.jabref.gui.specialfields.SpecialFieldViewModel;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;import org.jabref.model.entry.field.IEEEField;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.SpecialField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;
+<b class="nc">&nbsp;public class FieldsUtil {</b>
+&nbsp;
+<b class="nc">&nbsp;    public static final StringConverter&lt;Field&gt; FIELD_STRING_CONVERTER = new StringConverter&lt;&gt;() {</b>
+&nbsp;        @Override
+&nbsp;        public String toString(Field field) {
+<b class="nc">&nbsp;            if (field != null) {</b>
+<b class="nc">&nbsp;                return FieldTextMapper.getDisplayName(field);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return &quot;&quot;;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Field fromString(String string) {
+<b class="nc">&nbsp;            return FieldFactory.parseField(string);</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    public static String getNameWithType(Field field, CliPreferences preferences, UndoManager undoManager) {
+<b class="nc">&nbsp;        return switch (field) {</b>
+<b class="nc">&nbsp;            case SpecialField specialField -&gt;</b>
+<b class="nc">&nbsp;                    new SpecialFieldViewModel(specialField, preferences, undoManager).getLocalization()</b>
+<b class="nc">&nbsp;                            + &quot; (&quot; + Localization.lang(&quot;Special&quot;) + &quot;)&quot;;</b>
+&nbsp;            case IEEEField _ -&gt;
+<b class="nc">&nbsp;                    FieldTextMapper.getDisplayName(field) + &quot; (&quot; + Localization.lang(&quot;IEEE&quot;) + &quot;)&quot;;</b>
+&nbsp;            case InternalField _ -&gt;
+<b class="nc">&nbsp;                    FieldTextMapper.getDisplayName(field) + &quot; (&quot; + Localization.lang(&quot;Internal&quot;) + &quot;)&quot;;</b>
+&nbsp;            case UnknownField _ -&gt;
+<b class="nc">&nbsp;                    FieldTextMapper.getDisplayName(field) + &quot; (&quot; + Localization.lang(&quot;Custom&quot;) + &quot;)&quot;;</b>
+&nbsp;            case null -&gt;
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Field must not be null&quot;);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    FieldTextMapper.getDisplayName(field);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getDescription(Field field) {
+<b class="nc">&nbsp;        if (field.isStandardField()) {</b>
+<b class="nc">&nbsp;            StandardField standardField = (StandardField) field;</b>
+<b class="nc">&nbsp;            switch (standardField) {</b>
+&nbsp;                case ABSTRACT:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;This field is intended for recording abstracts, to be printed by a special bibliography style.&quot;);</b>
+&nbsp;                case ADDENDUM:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Miscellaneous bibliographic data usually printed at the end of the entry.&quot;);</b>
+&nbsp;                case AFTERWORD:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Author(s) of an afterword to the work.&quot;);</b>
+&nbsp;                case ANNOTATION:
+&nbsp;                case ANNOTE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;This field may be useful when implementing a style for annotated bibliographies.&quot;);</b>
+&nbsp;                case ANNOTATOR:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Author(s) of annotations to the work.&quot;);</b>
+&nbsp;                case AUTHOR:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Author(s) of the work.&quot;);</b>
+&nbsp;                case BOOKSUBTITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Subtitle related to the \&quot;Booktitle\&quot;.&quot;);</b>
+&nbsp;                case BOOKTITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Title of the main publication this work is part of.&quot;);</b>
+&nbsp;                case BOOKTITLEADDON:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Annex to the \&quot;Booktitle\&quot;, to be printed in a different font.&quot;);</b>
+&nbsp;                case CHAPTER:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Chapter or section or any other unit of a work.&quot;);</b>
+&nbsp;                case COMMENT:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Comment to this entry.&quot;);</b>
+&nbsp;                case COMMENTATOR:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Author(s) of a commentary to the work.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Note that this field is intended for commented editions which have a commentator in addition to the author. If the work is a stand-alone commentary, the commentator should be given in the author field.&quot;);</b>
+&nbsp;                case DATE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Publication date of the work.&quot;);</b>
+&nbsp;                case DOI:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Digital Object Identifier of the work.&quot;);</b>
+&nbsp;                case EDITION:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Edition of a printed publication.&quot;);</b>
+&nbsp;                case EDITOR:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Editor(s) of the work or the main publication, depending on the type of the entry.&quot;);</b>
+&nbsp;                case EDITORA:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Secondary editor performing a different editorial role, such as compiling, redacting, etc.&quot;);</b>
+&nbsp;                case EDITORB:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Another secondary editor performing a different role.&quot;);</b>
+&nbsp;                case EDITORC:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Another secondary editor performing a different role.&quot;);</b>
+&nbsp;                case EDITORTYPE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Type of editorial role performed by the \&quot;Editor\&quot;.&quot;);</b>
+&nbsp;                case EDITORATYPE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Type of editorial role performed by the \&quot;Editora\&quot;.&quot;);</b>
+&nbsp;                case EDITORBTYPE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Type of editorial role performed by the \&quot;Editorb\&quot;.&quot;);</b>
+&nbsp;                case EDITORCTYPE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Type of editorial role performed by the \&quot;Editorc\&quot;.&quot;);</b>
+&nbsp;                case EID:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Electronic identifier of a work.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;This field may replace the pages field for journals deviating from the classic pagination scheme of printed journals by only enumerating articles or papers and not pages.&quot;);</b>
+&nbsp;                case EPRINT:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Electronic identifier of an online publication.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;This is roughly comparable to a DOI but specific to a certain archive, repository, service, or system.&quot;);</b>
+&nbsp;                case EPRINTCLASS:
+&nbsp;                case PRIMARYCLASS:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Additional information related to the resource indicated by the eprint field.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;This could be a section of an archive, a path indicating a service, a classification of some sort.&quot;);</b>
+&nbsp;                case EPRINTTYPE:
+&nbsp;                case ARCHIVEPREFIX:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Type of the eprint identifier, e.g., the name of the archive, repository, service, or system the eprint field refers to.&quot;);</b>
+&nbsp;                case EVENTDATE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Date of a conference, a symposium, or some other event.&quot;);</b>
+&nbsp;                case EVENTTITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Title of a conference, a symposium, or some other event.&quot;) + &quot;\n&quot;</b>
+<b class="nc">&nbsp;                            + Localization.lang(&quot;Note that this field holds the plain title of the event. Things like \&quot;Proceedings of the Fifth XYZ Conference\&quot; go into the titleaddon or booktitleaddon field.&quot;);</b>
+&nbsp;                case EVENTTITLEADDON:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Annex to the eventtitle field.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Can be used for known event acronyms.&quot;);</b>
+&nbsp;                case FILE:
+&nbsp;                case PDF:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Link(s) to a local PDF or other document of the work.&quot;);</b>
+&nbsp;                case FOREWORD:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Author(s) of a foreword to the work.&quot;);</b>
+&nbsp;                case HOWPUBLISHED:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Publication notice for unusual publications which do not fit into any of the common categories.&quot;);</b>
+&nbsp;                case INSTITUTION:
+&nbsp;                case SCHOOL:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Name of a university or some other institution.&quot;);</b>
+&nbsp;                case INTRODUCTION:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Author(s) of an introduction to the work.&quot;);</b>
+&nbsp;                case ISBN:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;International Standard Book Number of a book.&quot;);</b>
+&nbsp;                case ISRN:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;International Standard Technical Report Number of a technical report.&quot;);</b>
+&nbsp;                case ISSN:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;International Standard Serial Number of a periodical.&quot;);</b>
+&nbsp;                case ISSUE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Issue of a journal.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;This field is intended for journals whose individual issues are identified by a designation such as \&quot;Spring\&quot; or \&quot;Summer\&quot; rather than the month or a number. Integer ranges and short designators are better written to the number field.&quot;);</b>
+&nbsp;                case ISSUESUBTITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Subtitle of a specific issue of a journal or other periodical.&quot;);</b>
+&nbsp;                case ISSUETITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Title of a specific issue of a journal or other periodical.&quot;);</b>
+&nbsp;                case JOURNALSUBTITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Subtitle of a journal, a newspaper, or some other periodical.&quot;);</b>
+&nbsp;                case JOURNALTITLE:
+&nbsp;                case JOURNAL:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Name of a journal, a newspaper, or some other periodical.&quot;);</b>
+&nbsp;                case LABEL:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Designation to be used by the citation style as a substitute for the regular label if any data required to generate the regular label is missing.&quot;);</b>
+&nbsp;                case LANGUAGE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Language(s) of the work. Languages may be specified literally or as localisation keys.&quot;);</b>
+&nbsp;                case LIBRARY:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Information such as a library name and a call number.&quot;);</b>
+&nbsp;                case LOCATION:
+&nbsp;                case ADDRESS:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Place(s) of publication, i. e., the location of the publisher or institution, depending on the entry type.&quot;);</b>
+&nbsp;                case MAINSUBTITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Subtitle related to the \&quot;Maintitle\&quot;.&quot;);</b>
+&nbsp;                case MAINTITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Main title of a multi-volume book, such as \&quot;Collected Works\&quot;.&quot;);</b>
+&nbsp;                case MAINTITLEADDON:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Annex to the \&quot;Maintitle\&quot;, to be printed in a different font.&quot;);</b>
+&nbsp;                case MONTH:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Publication month.&quot;);</b>
+&nbsp;                case NAMEADDON:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Addon to be printed immediately after the author name in the bibliography.&quot;);</b>
+&nbsp;                case NOTE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Miscellaneous bibliographic data which does not fit into any other field.&quot;);</b>
+&nbsp;                case NUMBER:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Number of a journal or the volume/number of a book in a series.&quot;);</b>
+&nbsp;                case ORGANIZATION:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Organization(s) that published a manual or an online resource, or sponsored a conference.&quot;);</b>
+&nbsp;                case ORIGDATE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;If the work is a translation, a reprint, or something similar, the publication date of the original edition.&quot;);</b>
+&nbsp;                case ORIGLANGUAGE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;If the work is a translation, the language(s) of the original work.&quot;);</b>
+&nbsp;                case PAGES:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;One or more page numbers or page ranges.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;If the work is published as part of another one, such as an article in a journal or a collection, this field holds the relevant page range in that other work. It may also be used to limit the reference to a specific part of a work (a chapter in a book, for example). For papers in electronic journals with anon-classical pagination setup the eid field may be more suitable.&quot;);</b>
+&nbsp;                case PAGETOTAL:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Total number of pages of the work.&quot;);</b>
+&nbsp;                case PAGINATION:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Pagination of the work. The key should be given in the singular form.&quot;);</b>
+&nbsp;                case PART:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Number of a partial volume. This field applies to books only, not to journals. It may be used when a logical volume consists of two or more physical ones.&quot;);</b>
+&nbsp;                case PUBLISHER:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Name(s) of the publisher(s).&quot;);</b>
+&nbsp;                case PUBSTATE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Publication state of the work, e.g., \&quot;in press\&quot;.&quot;);</b>
+&nbsp;                case SERIES:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Name of a publication series, such as \&quot;Studies in...\&quot;, or the number of a journal series.&quot;);</b>
+&nbsp;                case SHORTTITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Title in an abridged form.&quot;);</b>
+&nbsp;                case SUBTITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Subtitle of the work.&quot;);</b>
+&nbsp;                case TITLE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Title of the work.&quot;);</b>
+&nbsp;                case TITLEADDON:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Annex to the \&quot;Title\&quot;, to be printed in a different font.&quot;);</b>
+&nbsp;                case TRANSLATOR:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Translator(s) of the \&quot;Title\&quot; or \&quot;Booktitle\&quot;, depending on the entry type. If the translator is identical to the \&quot;Editor\&quot;, the standard styles will automatically concatenate these fields in the bibliography.&quot;);</b>
+&nbsp;                case TYPE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Type of a \&quot;Manual\&quot;, \&quot;Patent\&quot;, \&quot;Report\&quot;, or \&quot;Thesis\&quot;.&quot;);</b>
+&nbsp;                case URL:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;URL of an online publication.&quot;);</b>
+&nbsp;                case URLDATE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Access date of the address specified in the url field.&quot;);</b>
+&nbsp;                case VENUE:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Location of a conference, a symposium, or some other event.&quot;);</b>
+&nbsp;                case VERSION:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Revision number of a piece of software, a manual, etc.&quot;);</b>
+&nbsp;                case VOLUME:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Volume of a multi-volume book or a periodical.&quot;);</b>
+&nbsp;                case VOLUMES:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Total number of volumes of a multi-volume work.&quot;);</b>
+&nbsp;                case YEAR:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Year of publication.&quot;);</b>
+&nbsp;                case CROSSREF:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;This field holds an entry key for the cross-referencing feature. Child entries with a \&quot;Crossref\&quot; field inherit data from the parent entry specified in the \&quot;Crossref\&quot; field.&quot;);</b>
+&nbsp;                case GENDER:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Gender of the author or gender of the editor, if there is no author.&quot;);</b>
+&nbsp;                case KEYWORDS:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Separated list of keywords.&quot;);</b>
+&nbsp;                case RELATED:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Citation keys of other entries which have a relationship to this entry.&quot;);</b>
+&nbsp;                case XREF:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;This field is an alternative cross-referencing mechanism. It differs from \&quot;Crossref\&quot; in that the child entry will not inherit any data from the parent entry specified in the \&quot;Xref\&quot; field.&quot;);</b>
+&nbsp;                case GROUPS:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Name(s) of the (manual) groups the entry belongs to.&quot;);</b>
+&nbsp;                case OWNER:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Owner/creator of this entry.&quot;);</b>
+&nbsp;                case TIMESTAMP:
+<b class="nc">&nbsp;                    return Localization.lang(&quot;Timestamp of this entry, when it has been created or last modified.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (field instanceof InternalField internalField) {</b>
+<b class="nc">&nbsp;            if (internalField == InternalField.KEY_FIELD) {</b>
+<b class="nc">&nbsp;                return Localization.lang(&quot;Key by which the work may be cited.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (field instanceof SpecialField specialField) {</b>
+<b class="nc">&nbsp;            return switch (specialField) {</b>
+&nbsp;                case PRINTED -&gt;
+<b class="nc">&nbsp;                        Localization.lang(&quot;User-specific printed flag, in case the entry has been printed.&quot;);</b>
+&nbsp;                case PRIORITY -&gt;
+<b class="nc">&nbsp;                        Localization.lang(&quot;User-specific priority.&quot;);</b>
+&nbsp;                case QUALITY -&gt;
+<b class="nc">&nbsp;                        Localization.lang(&quot;User-specific quality flag, in case its quality is assured.&quot;);</b>
+&nbsp;                case RANKING -&gt;
+<b class="nc">&nbsp;                        Localization.lang(&quot;User-specific ranking.&quot;);</b>
+&nbsp;                case READ_STATUS -&gt;
+<b class="nc">&nbsp;                        Localization.lang(&quot;User-specific read status.&quot;);</b>
+&nbsp;                case RELEVANCE -&gt;
+<b class="nc">&nbsp;                        Localization.lang(&quot;User-specific relevance flag, in case the entry is relevant.&quot;);</b>
+&nbsp;            };
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

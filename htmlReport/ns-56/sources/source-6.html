@@ -1,0 +1,150 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MergedFieldCell</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.threewaymerge.cell</a>
+</div>
+
+<h1>Coverage Summary for Class: MergedFieldCell (org.jabref.gui.mergeentries.threewaymerge.cell)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MergedFieldCell</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.threewaymerge.cell;
+&nbsp;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.input.ScrollEvent;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;
+&nbsp;import org.fxmisc.richtext.StyleClassedTextArea;
+&nbsp;
+&nbsp;public class MergedFieldCell extends ThreeWayMergeCell {
+&nbsp;    private static final String DEFAULT_STYLE_CLASS = &quot;merged-field&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private final StyleClassedTextArea textArea = new StyleClassedTextArea();</b>
+&nbsp;
+&nbsp;    public MergedFieldCell(String text, int rowIndex) {
+<b class="nc">&nbsp;        super(text, rowIndex);</b>
+<b class="nc">&nbsp;        initialize();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        getStyleClass().add(DEFAULT_STYLE_CLASS);</b>
+<b class="nc">&nbsp;        initializeTextArea();</b>
+<b class="nc">&nbsp;        getChildren().add(textArea);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeTextArea() {
+<b class="nc">&nbsp;        BindingsHelper.bindBidirectional(textArea.textProperty(),</b>
+<b class="nc">&nbsp;                textProperty(),</b>
+<b class="nc">&nbsp;                textArea::replaceText,</b>
+<b class="nc">&nbsp;                textProperty()::setValue);</b>
+&nbsp;
+<b class="nc">&nbsp;        setAlignment(Pos.CENTER);</b>
+<b class="nc">&nbsp;        textArea.setWrapText(true);</b>
+<b class="nc">&nbsp;        textArea.setAutoHeight(true);</b>
+<b class="nc">&nbsp;        textArea.setPadding(new Insets(8));</b>
+<b class="nc">&nbsp;        HBox.setHgrow(textArea, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        textArea.addEventFilter(ScrollEvent.SCROLL, e -&gt; {</b>
+<b class="nc">&nbsp;            e.consume();</b>
+<b class="nc">&nbsp;            MergedFieldCell.this.fireEvent(e.copyFor(e.getSource(), MergedFieldCell.this));</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

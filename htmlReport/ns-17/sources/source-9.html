@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DatabaseChangesResolverDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab</a>
+</div>
+
+<h1>Coverage Summary for Class: DatabaseChangesResolverDialog (org.jabref.gui.collab)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DatabaseChangesResolverDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.SelectionMode;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;import javafx.scene.layout.BorderPane;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.PreviewViewer;
+&nbsp;import org.jabref.gui.theme.ThemeManager;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class DatabaseChangesResolverDialog extends BaseDialog&lt;Boolean&gt; {
+<b class="nc">&nbsp;    private final static Logger LOGGER = LoggerFactory.getLogger(DatabaseChangesResolverDialog.class);</b>
+&nbsp;    /**
+&nbsp;     * Reconstructing the details view to preview an {@link DatabaseChange} every time it&#39;s selected is a heavy operation.
+&nbsp;     * It is also useless because changes are static and if the change data is static then the view doesn&#39;t have to change
+&nbsp;     * either. This cache is used to ensure that we only create the detail view instance once for each {@link DatabaseChange}.
+&nbsp;     */
+<b class="nc">&nbsp;    private final Map&lt;DatabaseChange, DatabaseChangeDetailsView&gt; DETAILS_VIEW_CACHE = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private TableView&lt;DatabaseChange&gt; changesTableView;
+&nbsp;    @FXML
+&nbsp;    private TableColumn&lt;DatabaseChange, String&gt; changeName;
+&nbsp;    @FXML
+&nbsp;    private Button askUserToResolveChangeButton;
+&nbsp;    @FXML
+&nbsp;    private BorderPane changeInfoPane;
+&nbsp;
+&nbsp;    private final List&lt;DatabaseChange&gt; changes;
+&nbsp;    private final BibDatabaseContext database;
+&nbsp;
+&nbsp;    private ExternalChangesResolverViewModel viewModel;
+&nbsp;
+&nbsp;    private boolean areAllChangesAccepted;
+&nbsp;    private boolean areAllChangesDenied;
+&nbsp;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private GuiPreferences preferences;
+&nbsp;    @Inject private ThemeManager themeManager;
+&nbsp;    @Inject private BibEntryTypesManager entryTypesManager;
+&nbsp;    @Inject private TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A dialog going through given &lt;code&gt;changes&lt;/code&gt;, which are diffs to the provided &lt;code&gt;database&lt;/code&gt;.
+&nbsp;     * Each accepted change is written to the provided &lt;code&gt;database&lt;/code&gt;.
+&nbsp;     *
+&nbsp;     * @param changes  The list of changes
+&nbsp;     * @param database The database to apply the changes to
+&nbsp;     */
+<b class="nc">&nbsp;    public DatabaseChangesResolverDialog(List&lt;DatabaseChange&gt; changes, BibDatabaseContext database, String dialogTitle) {</b>
+<b class="nc">&nbsp;        this.changes = changes;</b>
+<b class="nc">&nbsp;        this.database = database;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setTitle(dialogTitle);</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setResultConverter(button -&gt; {</b>
+<b class="nc">&nbsp;            if (viewModel.areAllChangesResolved()) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;External changes are resolved successfully&quot;);</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.info(&quot;External changes aren&#39;t resolved&quot;);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean areAllChangesAccepted() {
+<b class="nc">&nbsp;        return areAllChangesAccepted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean areAllChangesDenied() {
+<b class="nc">&nbsp;        return areAllChangesDenied;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);</b>
+<b class="nc">&nbsp;        previewViewer.setDatabaseContext(database);</b>
+<b class="nc">&nbsp;        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, themeManager, preferences, entryTypesManager, previewViewer, taskExecutor);</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel = new ExternalChangesResolverViewModel(changes, undoManager);</b>
+&nbsp;
+<b class="nc">&nbsp;        changeName.setCellValueFactory(data -&gt; new SimpleStringProperty(data.getValue().getName()));</b>
+<b class="nc">&nbsp;        askUserToResolveChangeButton.disableProperty().bind(viewModel.canAskUserToResolveChangeProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        changesTableView.setItems(viewModel.getVisibleChanges());</b>
+&nbsp;        // Think twice before setting this to MULTIPLE...
+<b class="nc">&nbsp;        changesTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);</b>
+<b class="nc">&nbsp;        changesTableView.getSelectionModel().selectFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.selectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.selectedChangeProperty(), selectedChange -&gt; {</b>
+<b class="nc">&nbsp;            if (selectedChange != null) {</b>
+<b class="nc">&nbsp;                DatabaseChangeDetailsView detailsView = DETAILS_VIEW_CACHE.computeIfAbsent(selectedChange, databaseChangeDetailsViewFactory::create);</b>
+<b class="nc">&nbsp;                changeInfoPane.setCenter(detailsView);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.areAllChangesResolvedProperty(), isResolved -&gt; {</b>
+<b class="nc">&nbsp;            if (isResolved) {</b>
+<b class="nc">&nbsp;                areAllChangesAccepted = viewModel.areAllChangesAccepted();</b>
+<b class="nc">&nbsp;                areAllChangesDenied = viewModel.areAllChangesDenied();</b>
+&nbsp;                close();
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void denyChanges() {
+<b class="nc">&nbsp;        viewModel.denyChange();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void acceptChanges() {
+<b class="nc">&nbsp;        viewModel.acceptChange();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void askUserToResolveChange() {
+<b class="nc">&nbsp;        viewModel.getSelectedChange().flatMap(DatabaseChange::getExternalChangeResolver)</b>
+<b class="nc">&nbsp;                 .flatMap(DatabaseChangeResolver::askUserToResolveChange).ifPresent(viewModel::acceptMergedChange);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

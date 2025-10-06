@@ -1,0 +1,429 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MainTableDataModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: MainTableDataModel (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MainTableDataModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/85)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MainTableDataModel$SearchIndexListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/108)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.collections.transformation.FilteredList;
+&nbsp;import javafx.collections.transformation.SortedList;
+&nbsp;
+&nbsp;import org.jabref.gui.groups.GroupViewMode;
+&nbsp;import org.jabref.gui.groups.GroupsPreferences;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.search.MatchCategory;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.gui.util.FilteredListProxy;
+&nbsp;import org.jabref.logic.search.IndexManager;
+&nbsp;import org.jabref.logic.search.SearchPreferences;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.OptionalObjectProperty;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.search.SearchDisplayMode;
+&nbsp;import org.jabref.model.search.SearchFlags;
+&nbsp;import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
+&nbsp;import org.jabref.model.search.event.IndexStartedEvent;
+&nbsp;import org.jabref.model.search.matchers.MatcherSet;
+&nbsp;import org.jabref.model.search.matchers.MatcherSets;
+&nbsp;import org.jabref.model.search.query.SearchQuery;
+&nbsp;import org.jabref.model.search.query.SearchResults;
+&nbsp;
+&nbsp;import com.google.common.eventbus.Subscribe;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.Subscription;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
+&nbsp;
+&nbsp;public class MainTableDataModel {
+<b class="nc">&nbsp;    private final Logger LOGGER = LoggerFactory.getLogger(MainTableDataModel.class);</b>
+&nbsp;
+&nbsp;    private final ObservableList&lt;BibEntryTableViewModel&gt; entriesViewModel;
+&nbsp;    private final FilteredList&lt;BibEntryTableViewModel&gt; entriesFiltered;
+&nbsp;    private final SortedList&lt;BibEntryTableViewModel&gt; entriesFilteredAndSorted;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;MainTableFieldValueFormatter&gt; fieldValueFormatter = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;    private final GroupsPreferences groupsPreferences;
+&nbsp;    private final SearchPreferences searchPreferences;
+&nbsp;    private final NameDisplayPreferences nameDisplayPreferences;
+&nbsp;    private final BibDatabaseContext bibDatabaseContext;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final Subscription searchQuerySubscription;
+&nbsp;    private final Subscription searchDisplayModeSubscription;
+&nbsp;    private final Subscription selectedGroupsSubscription;
+&nbsp;    private final Subscription groupViewModeSubscription;
+&nbsp;    private final SearchIndexListener indexUpdatedListener;
+&nbsp;    private final OptionalObjectProperty&lt;SearchQuery&gt; searchQueryProperty;
+&nbsp;    @Nullable private final IndexManager indexManager;
+&nbsp;
+&nbsp;    private Optional&lt;MatcherSet&gt; groupsMatcher;
+&nbsp;
+&nbsp;    public MainTableDataModel(BibDatabaseContext context,
+&nbsp;                              GuiPreferences preferences,
+&nbsp;                              TaskExecutor taskExecutor,
+&nbsp;                              @Nullable IndexManager indexManager,
+&nbsp;                              ListProperty&lt;GroupTreeNode&gt; selectedGroupsProperty,
+&nbsp;                              OptionalObjectProperty&lt;SearchQuery&gt; searchQueryProperty,
+<b class="nc">&nbsp;                              IntegerProperty resultSizeProperty) {</b>
+<b class="nc">&nbsp;        this.groupsPreferences = preferences.getGroupsPreferences();</b>
+<b class="nc">&nbsp;        this.searchPreferences = preferences.getSearchPreferences();</b>
+<b class="nc">&nbsp;        this.nameDisplayPreferences = preferences.getNameDisplayPreferences();</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.indexManager = indexManager;</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext = context;</b>
+<b class="nc">&nbsp;        this.searchQueryProperty = searchQueryProperty;</b>
+<b class="nc">&nbsp;        this.indexUpdatedListener = new SearchIndexListener();</b>
+<b class="nc">&nbsp;        this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);</b>
+<b class="nc">&nbsp;        resetFieldFormatter();</b>
+&nbsp;
+<b class="nc">&nbsp;        ObservableList&lt;BibEntry&gt; allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());</b>
+<b class="nc">&nbsp;        entriesViewModel = EasyBind.mapBacked(allEntries, entry -&gt; new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);</b>
+<b class="nc">&nbsp;        entriesFiltered = new FilteredList&lt;&gt;(entriesViewModel, BibEntryTableViewModel::isVisible);</b>
+&nbsp;
+<b class="nc">&nbsp;        searchQuerySubscription = EasyBind.listen(searchQueryProperty, (observable, oldValue, newValue) -&gt; updateSearchMatches(newValue));</b>
+<b class="nc">&nbsp;        searchDisplayModeSubscription = EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (observable, oldValue, newValue) -&gt; updateSearchDisplayMode(newValue));</b>
+<b class="nc">&nbsp;        selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (observable, oldValue, newValue) -&gt; updateGroupMatches(newValue));</b>
+<b class="nc">&nbsp;        groupViewModeSubscription = EasyBind.listen(preferences.getGroupsPreferences().groupViewModeProperty(), observable -&gt; updateGroupMatches(selectedGroupsProperty.get()));</b>
+&nbsp;
+<b class="nc">&nbsp;        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -&gt; entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS).get())));</b>
+&nbsp;        // We need to wrap the list since otherwise sorting in the table does not work
+<b class="nc">&nbsp;        entriesFilteredAndSorted = new SortedList&lt;&gt;(entriesFiltered);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateSearchMatches(Optional&lt;SearchQuery&gt; query) {
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; {</b>
+<b class="nc">&nbsp;            if (query.isPresent()) {</b>
+<b class="nc">&nbsp;                setSearchMatches(indexManager.search(query.get()));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                clearSearchMatches();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }).onSuccess(result -&gt; FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Refresh the current search
+&nbsp;    ///
+&nbsp;    /// We need to call this when the database is switched during a fulltext search since
+&nbsp;    /// the listener on the searchQueryProperty will not fire if the query doesn&#39;t change
+&nbsp;    /// (this causes searchResults in FullTextResultsTab to be empty)
+&nbsp;    /// [issue 13241](https://github.com/JabRef/jabref/issues/13241)
+&nbsp;    public void refreshSearchMatches() {
+<b class="nc">&nbsp;        searchQueryProperty.getValue().ifPresent(searchQuery -&gt; {</b>
+<b class="nc">&nbsp;            searchQuery.getSearchFlags().remove(SearchFlags.FULLTEXT);</b>
+&nbsp;            // There is no need to re-add the flag since the UI is unchanged and the flag will be automatically re-added.
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setSearchMatches(SearchResults results) {
+<b class="nc">&nbsp;        boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;</b>
+<b class="nc">&nbsp;        entriesViewModel.forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;            entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));</b>
+<b class="nc">&nbsp;            updateEntrySearchMatch(entry, results.isMatched(entry.getEntry()), isFloatingMode);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearSearchMatches() {
+<b class="nc">&nbsp;        boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;</b>
+<b class="nc">&nbsp;        entriesViewModel.forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;            entry.isMatchedBySearch().set(true);</b>
+<b class="nc">&nbsp;            entry.hasFullTextResultsProperty().set(false);</b>
+<b class="nc">&nbsp;            updateEntrySearchMatch(entry, true, isFloatingMode);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void updateEntrySearchMatch(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
+<b class="nc">&nbsp;        entry.isMatchedBySearch().set(isMatched);</b>
+<b class="nc">&nbsp;        entry.updateMatchCategory();</b>
+<b class="nc">&nbsp;        setEntrySearchVisibility(entry, isMatched, isFloatingMode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void setEntrySearchVisibility(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
+<b class="nc">&nbsp;        if (isMatched) {</b>
+<b class="nc">&nbsp;            entry.isVisibleBySearch().set(true);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            entry.isVisibleBySearch().set(isFloatingMode);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateSearchDisplayMode(SearchDisplayMode mode) {
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; {</b>
+<b class="nc">&nbsp;            boolean isFloatingMode = mode == SearchDisplayMode.FLOAT;</b>
+<b class="nc">&nbsp;            entriesViewModel.forEach(entry -&gt; setEntrySearchVisibility(entry, entry.isMatchedBySearch().get(), isFloatingMode));</b>
+<b class="nc">&nbsp;        }).onSuccess(result -&gt; FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateGroupMatches(ObservableList&lt;GroupTreeNode&gt; groups) {
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; {</b>
+<b class="nc">&nbsp;            groupsMatcher = createGroupMatcher(groups, groupsPreferences);</b>
+<b class="nc">&nbsp;            boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);</b>
+<b class="nc">&nbsp;            boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);</b>
+<b class="nc">&nbsp;            entriesViewModel.forEach(entry -&gt; updateEntryGroupMatch(entry, groupsMatcher, isInvertMode, isFloatingMode));</b>
+<b class="nc">&nbsp;        }).onSuccess(result -&gt; FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateEntryGroupMatch(BibEntryTableViewModel entry, Optional&lt;MatcherSet&gt; groupsMatcher, boolean isInvertMode, boolean isFloatingMode) {
+<b class="nc">&nbsp;        boolean isMatched = groupsMatcher.map(matcher -&gt; matcher.isMatch(entry.getEntry()) ^ isInvertMode)</b>
+<b class="nc">&nbsp;                                         .orElse(true);</b>
+<b class="nc">&nbsp;        entry.isMatchedByGroup().set(isMatched);</b>
+<b class="nc">&nbsp;        entry.updateMatchCategory();</b>
+<b class="nc">&nbsp;        if (isMatched) {</b>
+<b class="nc">&nbsp;            entry.isVisibleByGroup().set(true);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            entry.isVisibleByGroup().set(isFloatingMode);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;MatcherSet&gt; createGroupMatcher(List&lt;GroupTreeNode&gt; selectedGroups, GroupsPreferences groupsPreferences) {
+<b class="nc">&nbsp;        if ((selectedGroups == null) || selectedGroups.isEmpty()) {</b>
+&nbsp;            // No selected group, show all entries
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final MatcherSet searchRules = MatcherSets.build(</b>
+<b class="nc">&nbsp;                groupsPreferences.getGroupViewMode().contains(GroupViewMode.INTERSECTION)</b>
+<b class="nc">&nbsp;                ? MatcherSets.MatcherType.AND</b>
+<b class="nc">&nbsp;                : MatcherSets.MatcherType.OR);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (GroupTreeNode node : selectedGroups) {</b>
+<b class="nc">&nbsp;            searchRules.addRule(node.getSearchMatcher());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(searchRules);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void unbind() {
+<b class="nc">&nbsp;        searchQuerySubscription.unsubscribe();</b>
+<b class="nc">&nbsp;        searchDisplayModeSubscription.unsubscribe();</b>
+<b class="nc">&nbsp;        selectedGroupsSubscription.unsubscribe();</b>
+<b class="nc">&nbsp;        groupViewModeSubscription.unsubscribe();</b>
+&nbsp;
+<b class="nc">&nbsp;        bibDatabaseContext.getDatabase().unregisterListener(indexUpdatedListener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SortedList&lt;BibEntryTableViewModel&gt; getEntriesFilteredAndSorted() {
+<b class="nc">&nbsp;        return entriesFilteredAndSorted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;BibEntryTableViewModel&gt; getViewModelByIndex(int index) {
+<b class="nc">&nbsp;        if (index &lt; 0 || index &gt;= entriesViewModel.size()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Tried to access out of bounds index {} in entriesViewModel&quot;, index);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(entriesViewModel.get(index));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;BibEntryTableViewModel&gt; getViewModelByCitationKey(String citationKey) {
+<b class="nc">&nbsp;        return entriesViewModel.stream()</b>
+<b class="nc">&nbsp;                               .filter(viewModel -&gt; citationKey.equals(viewModel.getEntry().getCitationKey().orElse(&quot;&quot;)))</b>
+<b class="nc">&nbsp;                               .findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetFieldFormatter() {
+<b class="nc">&nbsp;        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    class SearchIndexListener {</b>
+&nbsp;        @Subscribe
+&nbsp;        public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
+<b class="nc">&nbsp;            indexAddedOrUpdatedEvent.entries().forEach(entry -&gt; BackgroundTask.wrap(() -&gt; {</b>
+<b class="nc">&nbsp;                int index = bibDatabaseContext.getDatabase().indexOf(entry);</b>
+<b class="nc">&nbsp;                if (index &gt;= 0) {</b>
+<b class="nc">&nbsp;                    BibEntryTableViewModel viewModel = entriesViewModel.get(index);</b>
+<b class="nc">&nbsp;                    boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;</b>
+&nbsp;                    boolean isMatched;
+<b class="nc">&nbsp;                    if (searchQueryProperty.get().isPresent()) {</b>
+<b class="nc">&nbsp;                        SearchQuery searchQuery = searchQueryProperty.get().get();</b>
+<b class="nc">&nbsp;                        String newSearchExpression = &quot;(&quot; + ENTRY_ID + &quot;= &quot; + entry.getId() + &quot;) AND (&quot; + searchQuery.getSearchExpression() + &quot;)&quot;;</b>
+<b class="nc">&nbsp;                        SearchQuery entryQuery = new SearchQuery(newSearchExpression, searchQuery.getSearchFlags());</b>
+<b class="nc">&nbsp;                        SearchResults results = indexManager.search(entryQuery);</b>
+&nbsp;
+<b class="nc">&nbsp;                        isMatched = results.isMatched(entry);</b>
+<b class="nc">&nbsp;                        viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        isMatched = true;</b>
+<b class="nc">&nbsp;                        viewModel.hasFullTextResultsProperty().set(false);</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    updateEntrySearchMatch(viewModel, isMatched, isFloatingMode);</b>
+<b class="nc">&nbsp;                    updateEntryGroupMatch(viewModel, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return index;</b>
+<b class="nc">&nbsp;            }).onSuccess(index -&gt; {</b>
+<b class="nc">&nbsp;                if (index &gt;= 0) {</b>
+<b class="nc">&nbsp;                    FilteredListProxy.refilterListReflection(entriesFiltered, index, index + 1);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }).executeWith(taskExecutor));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(IndexStartedEvent indexStartedEvent) {
+<b class="nc">&nbsp;            updateSearchMatches(searchQueryProperty.get());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,466 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DownloadLinkedFileAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.linkedfile</a>
+</div>
+
+<h1>Coverage Summary for Class: DownloadLinkedFileAction (org.jabref.gui.linkedfile)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DownloadLinkedFileAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/104)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DownloadLinkedFileAction$FileDownloadTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/115)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.linkedfile;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.net.ssl.SSLHandshakeException;
+&nbsp;
+&nbsp;import javafx.beans.property.DoubleProperty;
+&nbsp;import javafx.beans.property.ReadOnlyDoubleProperty;
+&nbsp;import javafx.beans.property.SimpleDoubleProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileType;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.externalfiletype.StandardExternalFileType;
+&nbsp;import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.URLUtil;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.externalfiles.LinkedFileHandler;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.net.ProgressInputStream;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileNameUniqueness;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import kong.unirest.core.UnirestException;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class DownloadLinkedFileAction extends SimpleCommand {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadLinkedFileAction.class);</b>
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final BibEntry entry;
+&nbsp;    private final LinkedFile linkedFile;
+&nbsp;    private final String suggestedName;
+&nbsp;    private final String downloadUrl;
+&nbsp;    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final boolean keepHtmlLink;
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;
+<b class="nc">&nbsp;    private final DoubleProperty downloadProgress = new SimpleDoubleProperty();</b>
+&nbsp;    private final LinkedFileHandler linkedFileHandler;
+&nbsp;
+&nbsp;    public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
+&nbsp;                                    BibEntry entry,
+&nbsp;                                    LinkedFile linkedFile,
+&nbsp;                                    String downloadUrl,
+&nbsp;                                    DialogService dialogService,
+&nbsp;                                    ExternalApplicationsPreferences externalApplicationsPreferences,
+&nbsp;                                    FilePreferences filePreferences,
+&nbsp;                                    TaskExecutor taskExecutor,
+&nbsp;                                    String suggestedName,
+<b class="nc">&nbsp;                                    boolean keepHtmlLink) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        this.linkedFile = linkedFile;</b>
+<b class="nc">&nbsp;        this.suggestedName = suggestedName;</b>
+<b class="nc">&nbsp;        this.downloadUrl = downloadUrl;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.externalApplicationsPreferences = externalApplicationsPreferences;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.keepHtmlLink = keepHtmlLink;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Downloads the given linked file to the first existing file directory. It keeps HTML files as URLs.
+&nbsp;     */
+&nbsp;    public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
+&nbsp;                                    BibEntry entry,
+&nbsp;                                    LinkedFile linkedFile,
+&nbsp;                                    String downloadUrl,
+&nbsp;                                    DialogService dialogService,
+&nbsp;                                    ExternalApplicationsPreferences externalApplicationsPreferences,
+&nbsp;                                    FilePreferences filePreferences,
+&nbsp;                                    TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        this(databaseContext,</b>
+&nbsp;                entry,
+&nbsp;                linkedFile,
+&nbsp;                downloadUrl,
+&nbsp;                dialogService,
+&nbsp;                externalApplicationsPreferences,
+&nbsp;                filePreferences,
+&nbsp;                taskExecutor,
+&nbsp;                &quot;&quot;,
+&nbsp;                true);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        LOGGER.info(&quot;Downloading file from {}&quot;, downloadUrl);</b>
+<b class="nc">&nbsp;        if (downloadUrl.isEmpty() || !LinkedFile.isOnlineLink(downloadUrl)) {</b>
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;In order to download the file, the url has to be an online link&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);</b>
+<b class="nc">&nbsp;        if (targetDirectory.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;File directory not available while downloading {}. Storing as URL in file field.&quot;, downloadUrl);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            URLDownload urlDownload = new URLDownload(downloadUrl);</b>
+<b class="nc">&nbsp;            if (!checkSSLHandshake(urlDownload)) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            doDownload(targetDirectory.get(), urlDownload);</b>
+&nbsp;        } catch (MalformedURLException exception) {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Invalid URL&quot;), exception);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doDownload(Path targetDirectory, URLDownload urlDownload) {
+<b class="nc">&nbsp;        BackgroundTask&lt;Path&gt; downloadTask = prepareDownloadTask(targetDirectory, urlDownload);</b>
+<b class="nc">&nbsp;        downloadProgress.bind(downloadTask.workDonePercentageProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        downloadTask.titleProperty().set(Localization.lang(&quot;Downloading&quot;));</b>
+<b class="nc">&nbsp;        entry.getCitationKey().ifPresentOrElse(</b>
+<b class="nc">&nbsp;                citationkey -&gt; downloadTask.messageProperty().set(Localization.lang(&quot;Fulltext for %0&quot;, citationkey)),</b>
+<b class="nc">&nbsp;                () -&gt; downloadTask.messageProperty().set(Localization.lang(&quot;Fulltext for a new entry&quot;)));</b>
+<b class="nc">&nbsp;        downloadTask.showToUser(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        downloadTask.onFailure(ex -&gt; onFailure(urlDownload, ex));</b>
+<b class="nc">&nbsp;        downloadTask.onSuccess(destination -&gt; onSuccess(targetDirectory, destination));</b>
+&nbsp;
+<b class="nc">&nbsp;        taskExecutor.execute(downloadTask);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param targetDirectory The directory to store the file into. Is an absolute path.
+&nbsp;     */
+&nbsp;    private void onSuccess(Path targetDirectory, Path downloadedFile) {
+<b class="nc">&nbsp;        assert targetDirectory.isAbsolute();</b>
+&nbsp;
+&nbsp;        boolean isDuplicate;
+&nbsp;        boolean isHtml;
+&nbsp;        try {
+<b class="nc">&nbsp;            isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory, downloadedFile.getFileName(), dialogService::notify);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;FileNameUniqueness.isDuplicatedFile failed&quot;, e);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isDuplicate) {</b>
+&nbsp;            // We do not add duplicate files.
+&nbsp;            // The downloaded file was deleted in {@link org.jabref.logic.util.io.FileNameUniqueness.isDuplicatedFile]}
+<b class="nc">&nbsp;            LOGGER.info(&quot;File {} already exists in target directory {}.&quot;, downloadedFile.getFileName(), targetDirectory);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
+<b class="nc">&nbsp;        LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(</b>
+&nbsp;                downloadedFile,
+<b class="nc">&nbsp;                databaseContext.getFileDirectories(filePreferences),</b>
+&nbsp;                externalApplicationsPreferences);
+<b class="nc">&nbsp;        if (newLinkedFile.getDescription().isEmpty() &amp;&amp; !linkedFile.getDescription().isEmpty()) {</b>
+<b class="nc">&nbsp;            newLinkedFile.setDescription(linkedFile.getDescription());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (linkedFile.getSourceUrl().isEmpty() &amp;&amp; LinkedFile.isOnlineLink(linkedFile.getLink()) &amp;&amp; filePreferences.shouldKeepDownloadUrl()) {</b>
+<b class="nc">&nbsp;            newLinkedFile.setSourceURL(linkedFile.getLink());</b>
+<b class="nc">&nbsp;        } else if (filePreferences.shouldKeepDownloadUrl()) {</b>
+<b class="nc">&nbsp;            newLinkedFile.setSourceURL(linkedFile.getSourceUrl());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        isHtml = newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName());</b>
+<b class="nc">&nbsp;        if (isHtml) {</b>
+<b class="nc">&nbsp;            if (this.keepHtmlLink) {</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Download &#39;%0&#39; was a HTML file. Keeping URL.&quot;, downloadUrl));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Download &#39;%0&#39; was a HTML file. Removed.&quot;, downloadUrl));</b>
+<b class="nc">&nbsp;                List&lt;LinkedFile&gt; newFiles = new ArrayList&lt;&gt;(entry.getFiles());</b>
+<b class="nc">&nbsp;                newFiles.remove(linkedFile);</b>
+<b class="nc">&nbsp;                entry.setFiles(newFiles);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    Files.delete(downloadedFile);</b>
+&nbsp;                } catch (IOException e) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Could not delete downloaded file {}.&quot;, downloadedFile, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onFailure(URLDownload urlDownload, Exception ex) {
+<b class="nc">&nbsp;        LOGGER.error(&quot;Error downloading from URL: {}&quot;, urlDownload, ex);</b>
+<b class="nc">&nbsp;        if (ex instanceof FetcherException fetcherException) {</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(fetcherException);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            String fetcherExceptionMessage = ex.getLocalizedMessage();</b>
+<b class="nc">&nbsp;            String failedTitle = Localization.lang(&quot;Failed to download from URL&quot;);</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(failedTitle, Localization.lang(&quot;Please check the URL and try again.\nURL: %0\nDetails: %1&quot;, urlDownload.getSource(), fetcherExceptionMessage));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean checkSSLHandshake(URLDownload urlDownload) {
+&nbsp;        try {
+<b class="nc">&nbsp;            urlDownload.canBeReached();</b>
+&nbsp;        } catch (UnirestException ex) {
+<b class="nc">&nbsp;            if (ex.getCause() instanceof SSLHandshakeException) {</b>
+<b class="nc">&nbsp;                if (dialogService.showConfirmationDialogAndWait(Localization.lang(&quot;Download file&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Unable to find valid certification path to requested target(%0), download anyway?&quot;,</b>
+<b class="nc">&nbsp;                                urlDownload.getSource().toString()))) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    dialogService.notify(Localization.lang(&quot;Download operation canceled.&quot;));</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Error while checking if the file can be downloaded&quot;, ex);</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Error downloading&quot;));</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BackgroundTask&lt;Path&gt; prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
+<b class="nc">&nbsp;        return BackgroundTask</b>
+<b class="nc">&nbsp;                .wrap(() -&gt; {</b>
+&nbsp;                    String suggestedName;
+<b class="nc">&nbsp;                    if (this.suggestedName.isEmpty()) {</b>
+<b class="nc">&nbsp;                        Optional&lt;ExternalFileType&gt; suggestedType = inferFileType(urlDownload);</b>
+<b class="nc">&nbsp;                        ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);</b>
+<b class="nc">&nbsp;                        suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        suggestedName = this.suggestedName;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileDirectoryPattern());</b>
+<b class="nc">&nbsp;                    suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);</b>
+&nbsp;
+<b class="nc">&nbsp;                    return targetDirectory.resolve(fulltextDir).resolve(suggestedName);</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .then(destination -&gt; new FileDownloadTask(urlDownload.getSource(), destination))</b>
+<b class="nc">&nbsp;                .onFailure(ex -&gt; LOGGER.error(&quot;Error in download&quot;, ex))</b>
+<b class="nc">&nbsp;                .onFinished(() -&gt; {</b>
+<b class="nc">&nbsp;                    downloadProgress.unbind();</b>
+<b class="nc">&nbsp;                    downloadProgress.set(1);</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;ExternalFileType&gt; inferFileType(URLDownload urlDownload) {
+<b class="nc">&nbsp;        Optional&lt;ExternalFileType&gt; suggestedType = inferFileTypeFromMimeType(urlDownload);</b>
+&nbsp;
+&nbsp;        // If we did not find a file type from the MIME type, try based on extension:
+<b class="nc">&nbsp;        if (suggestedType.isEmpty()) {</b>
+<b class="nc">&nbsp;            suggestedType = inferFileTypeFromURL(urlDownload.getSource().toExternalForm());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return suggestedType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;ExternalFileType&gt; inferFileTypeFromMimeType(URLDownload urlDownload) {
+<b class="nc">&nbsp;        return urlDownload.getMimeType()</b>
+<b class="nc">&nbsp;                          .flatMap(mimeType -&gt; {</b>
+<b class="nc">&nbsp;                              LOGGER.debug(&quot;MIME Type suggested: {}&quot;, mimeType);</b>
+<b class="nc">&nbsp;                              return ExternalFileTypes.getExternalFileTypeByMimeType(mimeType, externalApplicationsPreferences);</b>
+&nbsp;                          });
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;ExternalFileType&gt; inferFileTypeFromURL(String url) {
+<b class="nc">&nbsp;        return URLUtil.getSuffix(url, externalApplicationsPreferences)</b>
+<b class="nc">&nbsp;                      .flatMap(extension -&gt; ExternalFileTypes.getExternalFileTypeByExt(extension, externalApplicationsPreferences));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyDoubleProperty downloadProgress() {
+<b class="nc">&nbsp;        return downloadProgress;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class FileDownloadTask extends BackgroundTask&lt;Path&gt; {
+&nbsp;        private final URL source;
+&nbsp;        private final Path destination;
+&nbsp;
+<b class="nc">&nbsp;        public FileDownloadTask(URL source, Path destination) {</b>
+<b class="nc">&nbsp;            this.source = source;</b>
+<b class="nc">&nbsp;            this.destination = destination;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Path call() throws FetcherException, IOException {
+<b class="nc">&nbsp;            URLDownload download = new URLDownload(source);</b>
+<b class="nc">&nbsp;            try (ProgressInputStream inputStream = download.asInputStream()) {</b>
+<b class="nc">&nbsp;                EasyBind.subscribe(</b>
+<b class="nc">&nbsp;                        inputStream.totalNumBytesReadProperty(),</b>
+<b class="nc">&nbsp;                        bytesRead -&gt; updateProgress(bytesRead.longValue(), inputStream.getMaxNumBytes()));</b>
+&nbsp;                // Make sure directory exists since otherwise copy fails
+<b class="nc">&nbsp;                Files.createDirectories(destination.getParent());</b>
+<b class="nc">&nbsp;                Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return destination;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

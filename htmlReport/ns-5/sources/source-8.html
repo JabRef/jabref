@@ -1,0 +1,657 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JabRefGUI</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: JabRefGUI (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JabRefGUI</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    52.9%
+  </span>
+  <span class="absValue">
+    (18/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.3%
+  </span>
+  <span class="absValue">
+    (1/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.7%
+  </span>
+  <span class="absValue">
+    (105/235)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.application.Application;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.geometry.Rectangle2D;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;import javafx.stage.Screen;
+&nbsp;import javafx.stage.Stage;
+&nbsp;import javafx.stage.WindowEvent;
+&nbsp;
+&nbsp;import org.jabref.gui.frame.JabRefFrame;
+&nbsp;import org.jabref.gui.help.VersionWorker;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
+&nbsp;import org.jabref.gui.keyboard.TextInputKeyBindings;
+&nbsp;import org.jabref.gui.keyboard.WalkthroughKeyBindings;
+&nbsp;import org.jabref.gui.openoffice.OOBibBaseConnect;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.remote.CLIMessageHandler;
+&nbsp;import org.jabref.gui.theme.ThemeManager;
+&nbsp;import org.jabref.gui.undo.CountingUndoManager;
+&nbsp;import org.jabref.gui.util.DefaultFileUpdateMonitor;
+&nbsp;import org.jabref.gui.util.DirectoryMonitor;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.gui.util.WebViewStore;
+&nbsp;import org.jabref.http.manager.HttpServerManager;
+&nbsp;import org.jabref.languageserver.controller.LanguageServerController;
+&nbsp;import org.jabref.logic.UiCommand;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.citation.SearchCitationsRelationsService;
+&nbsp;import org.jabref.logic.git.util.GitHandlerRegistry;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationLoader;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.net.ProxyRegisterer;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+&nbsp;import org.jabref.logic.remote.RemotePreferences;
+&nbsp;import org.jabref.logic.remote.server.RemoteListenerServerManager;
+&nbsp;import org.jabref.logic.search.IndexManager;
+&nbsp;import org.jabref.logic.search.PostgreServer;
+&nbsp;import org.jabref.logic.util.BuildInfo;
+&nbsp;import org.jabref.logic.util.FallbackExceptionHandler;
+&nbsp;import org.jabref.logic.util.HeadlessExecutorService;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import kong.unirest.core.Unirest;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the outer stage and the scene of the JabRef window.
+&nbsp; */
+<b class="fc">&nbsp;public class JabRefGUI extends Application {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);</b>
+&nbsp;
+&nbsp;    private static List&lt;UiCommand&gt; uiCommands;
+&nbsp;    private static GuiPreferences preferences;
+&nbsp;
+&nbsp;    // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
+&nbsp;    private static AiService aiService;
+&nbsp;    // CitationsAndRelationsSearchService is here configured for a local machine and so to the GUI.
+&nbsp;    private static SearchCitationsRelationsService citationsAndRelationsSearchService;
+&nbsp;
+&nbsp;    private static FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private static StateManager stateManager;
+&nbsp;    private static ThemeManager themeManager;
+&nbsp;    private static CountingUndoManager countingUndoManager;
+&nbsp;    private static TaskExecutor taskExecutor;
+&nbsp;    private static ClipBoardManager clipBoardManager;
+&nbsp;    private static DialogService dialogService;
+&nbsp;    private static JabRefFrame mainFrame;
+&nbsp;    private static GitHandlerRegistry gitHandlerRegistry;
+&nbsp;
+&nbsp;    private static RemoteListenerServerManager remoteListenerServerManager;
+&nbsp;    private static HttpServerManager httpServerManager;
+&nbsp;    private static LanguageServerController languageServerController;
+&nbsp;
+&nbsp;    private Stage mainStage;
+&nbsp;
+&nbsp;    public static void setup(List&lt;UiCommand&gt; uiCommands,
+&nbsp;                             GuiPreferences preferences) {
+<b class="fc">&nbsp;        JabRefGUI.uiCommands = uiCommands;</b>
+<b class="fc">&nbsp;        JabRefGUI.preferences = preferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void start(Stage stage) {
+<b class="fc">&nbsp;        this.mainStage = stage;</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(Stage.class, mainStage);</b>
+&nbsp;
+<b class="fc">&nbsp;        FallbackExceptionHandler.installExceptionHandler((exception, thread) -&gt; UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(&quot;Uncaught exception occurred in &quot; + thread, exception);</b>
+&nbsp;        }));
+&nbsp;
+<b class="fc">&nbsp;        initialize();</b>
+&nbsp;
+<b class="nc">&nbsp;        JabRefGUI.mainFrame = new JabRefFrame(</b>
+&nbsp;                mainStage,
+&nbsp;                dialogService,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                preferences,
+&nbsp;                aiService,
+&nbsp;                stateManager,
+&nbsp;                countingUndoManager,
+<b class="nc">&nbsp;                Injector.instantiateModelOrService(BibEntryTypesManager.class),</b>
+&nbsp;                clipBoardManager,
+&nbsp;                taskExecutor,
+&nbsp;                gitHandlerRegistry);
+&nbsp;
+<b class="nc">&nbsp;        openWindow();</b>
+&nbsp;
+<b class="nc">&nbsp;        startBackgroundTasks();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!fileUpdateMonitor.isActive()) {</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Unable to monitor file changes. Please close files &quot; +</b>
+&nbsp;                            &quot;and processes and restart. You may encounter errors if you continue &quot; +
+&nbsp;                            &quot;with this session.&quot;));
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(preferences.getInternalPreferences().versionCheckEnabledProperty(), enabled -&gt; {</b>
+<b class="nc">&nbsp;            if (enabled) {</b>
+<b class="nc">&nbsp;                new VersionWorker(buildInfo.version,</b>
+&nbsp;                        dialogService,
+&nbsp;                        taskExecutor,
+&nbsp;                        preferences)
+<b class="nc">&nbsp;                        .checkForNewVersionDelayed();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        setupProxy();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="fc">&nbsp;        WebViewStore.init();</b>
+&nbsp;
+<b class="fc">&nbsp;        DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();</b>
+<b class="fc">&nbsp;        JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="fc">&nbsp;        HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, &quot;FileUpdateMonitor&quot;);</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);</b>
+&nbsp;
+<b class="fc">&nbsp;        DirectoryMonitor directoryMonitor = new DirectoryMonitor();</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);</b>
+&nbsp;
+<b class="fc">&nbsp;        gitHandlerRegistry = new GitHandlerRegistry();</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);</b>
+&nbsp;
+<b class="fc">&nbsp;        BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();</b>
+<b class="fc">&nbsp;        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));</b>
+&nbsp;
+<b class="fc">&nbsp;        IndexManager.clearOldSearchIndices();</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(RemoteListenerServerManager.class, JabRefGUI.remoteListenerServerManager);</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.httpServerManager = new HttpServerManager();</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository);</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.stateManager = new JabRefGuiStateManager();</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(StateManager.class, stateManager);</b>
+&nbsp;
+<b class="fc">&nbsp;        Injector.setModelOrService(KeyBindingRepository.class, preferences.getKeyBindingRepository());</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.themeManager = new ThemeManager(</b>
+<b class="fc">&nbsp;                preferences.getWorkspacePreferences(),</b>
+&nbsp;                fileUpdateMonitor
+&nbsp;        );
+<b class="fc">&nbsp;        Injector.setModelOrService(ThemeManager.class, themeManager);</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.countingUndoManager = new CountingUndoManager();</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(UndoManager.class, countingUndoManager);</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);</b>
+&nbsp;
+&nbsp;        // our Default task executor is the UITaskExecutor which can use the fx thread
+<b class="fc">&nbsp;        JabRefGUI.taskExecutor = new UiTaskExecutor();</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(TaskExecutor.class, taskExecutor);</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.dialogService = new JabRefDialogService(mainStage);</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(DialogService.class, dialogService);</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.clipBoardManager = new ClipBoardManager();</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.aiService = new AiService(</b>
+<b class="fc">&nbsp;                preferences.getAiPreferences(),</b>
+<b class="fc">&nbsp;                preferences.getFilePreferences(),</b>
+<b class="fc">&nbsp;                preferences.getCitationKeyPatternPreferences(),</b>
+&nbsp;                dialogService,
+&nbsp;                taskExecutor);
+<b class="nc">&nbsp;        Injector.setModelOrService(AiService.class, aiService);</b>
+&nbsp;
+<b class="nc">&nbsp;        JabRefGUI.citationsAndRelationsSearchService = new SearchCitationsRelationsService(</b>
+<b class="nc">&nbsp;                preferences.getImporterPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getImportFormatPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getFieldPreferences(),</b>
+&nbsp;                entryTypesManager
+&nbsp;        );
+<b class="nc">&nbsp;        Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupProxy() {
+<b class="nc">&nbsp;        if (!preferences.getProxyPreferences().shouldUseProxy()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!preferences.getProxyPreferences().shouldUseAuthentication()) {</b>
+<b class="nc">&nbsp;            ProxyRegisterer.register(preferences.getProxyPreferences());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        assert preferences.getProxyPreferences().shouldUseAuthentication();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (preferences.getProxyPreferences().shouldPersistPassword()</b>
+<b class="nc">&nbsp;                &amp;&amp; StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {</b>
+<b class="nc">&nbsp;            ProxyRegisterer.register(preferences.getProxyPreferences());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; password = dialogService.showPasswordDialogAndWait(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Proxy configuration&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Proxy requires password&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Password&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (password.isPresent()) {</b>
+<b class="nc">&nbsp;            preferences.getProxyPreferences().setPassword(password.get());</b>
+<b class="nc">&nbsp;            ProxyRegisterer.register(preferences.getProxyPreferences());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;No proxy password specified&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void openWindow() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Initializing frame&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        CoreGuiPreferences coreGuiPreferences = preferences.getGuiPreferences();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Reading from prefs: isMaximized {}&quot;, coreGuiPreferences.isWindowMaximised());</b>
+&nbsp;
+<b class="nc">&nbsp;        mainStage.setMinWidth(580);</b>
+<b class="nc">&nbsp;        mainStage.setMinHeight(330);</b>
+&nbsp;
+&nbsp;        // maximized target state is stored, because &quot;saveWindowState&quot; saves x and y only if not maximized
+<b class="nc">&nbsp;        boolean windowMaximised = coreGuiPreferences.isWindowMaximised();</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Screens: {}&quot;, Screen.getScreens());</b>
+<b class="nc">&nbsp;        debugLogWindowState(mainStage);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isWindowPositionInBounds()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;The JabRef window is inside screen bounds.&quot;);</b>
+<b class="nc">&nbsp;            mainStage.setX(coreGuiPreferences.getPositionX());</b>
+<b class="nc">&nbsp;            mainStage.setY(coreGuiPreferences.getPositionY());</b>
+<b class="nc">&nbsp;            mainStage.setWidth(coreGuiPreferences.getSizeX());</b>
+<b class="nc">&nbsp;            mainStage.setHeight(coreGuiPreferences.getSizeY());</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;NOT saving window positions&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.info(&quot;The JabRef window is outside of screen bounds. Position and size will be corrected to 1024x768. Primary screen will be used.&quot;);</b>
+<b class="nc">&nbsp;            Rectangle2D bounds = Screen.getPrimary().getBounds();</b>
+<b class="nc">&nbsp;            mainStage.setX(bounds.getMinX());</b>
+<b class="nc">&nbsp;            mainStage.setY(bounds.getMinY());</b>
+<b class="nc">&nbsp;            mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));</b>
+<b class="nc">&nbsp;            mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Saving window positions&quot;);</b>
+<b class="nc">&nbsp;            saveWindowState();</b>
+&nbsp;        }
+&nbsp;        // after calling &quot;saveWindowState&quot; the maximized state can be set
+<b class="nc">&nbsp;        mainStage.setMaximized(windowMaximised);</b>
+<b class="nc">&nbsp;        debugLogWindowState(mainStage);</b>
+&nbsp;
+<b class="nc">&nbsp;        Scene scene = new Scene(JabRefGUI.mainFrame);</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;installing CSS&quot;);</b>
+<b class="nc">&nbsp;        themeManager.installCss(scene);</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Handle TextEditor key bindings&quot;);</b>
+<b class="nc">&nbsp;        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -&gt; {</b>
+<b class="nc">&nbsp;            TextInputKeyBindings.call(scene, event, preferences.getKeyBindingRepository());</b>
+<b class="nc">&nbsp;            SelectableTextFlowKeyBindings.call(scene, event, preferences.getKeyBindingRepository());</b>
+<b class="nc">&nbsp;            WalkthroughKeyBindings.call(event, stateManager, preferences.getKeyBindingRepository());</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        mainStage.setTitle(JabRefFrame.FRAME_TITLE);</b>
+<b class="nc">&nbsp;        mainStage.getIcons().addAll(IconTheme.getLogoSetFX());</b>
+<b class="nc">&nbsp;        mainStage.setScene(scene);</b>
+<b class="nc">&nbsp;        mainStage.setOnShowing(this::onShowing);</b>
+<b class="nc">&nbsp;        mainStage.setOnCloseRequest(this::onCloseRequest);</b>
+<b class="nc">&nbsp;        mainStage.setOnHiding(this::onHiding);</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Showing mainStage&quot;);</b>
+<b class="nc">&nbsp;        mainStage.show();</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;frame initialized&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; mainFrame.handleUiCommands(uiCommands));</b>
+&nbsp;
+&nbsp;        // Lifecycle note: after this method, #onShowing will be called
+&nbsp;    }
+&nbsp;
+&nbsp;    public void onShowing(WindowEvent event) {
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            mainFrame.updateHorizontalDividerPosition();</b>
+<b class="nc">&nbsp;            mainFrame.updateVerticalDividerPosition();</b>
+&nbsp;        });
+&nbsp;
+&nbsp;        // Open last edited databases
+<b class="nc">&nbsp;        if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)</b>
+<b class="nc">&nbsp;                &amp;&amp; preferences.getWorkspacePreferences().shouldOpenLastEdited()) {</b>
+<b class="nc">&nbsp;            mainFrame.openLastEditedDatabases();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+&nbsp;            // We need to check at this point, because here, all libraries are loaded (e.g., load previously opened libraries) and all UI commands (e.g., load libraries, blank workspace, ...) are handled.
+<b class="nc">&nbsp;            if (stateManager.getOpenDatabases().isEmpty()) {</b>
+<b class="nc">&nbsp;                mainFrame.showWelcomeTab();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void onCloseRequest(WindowEvent event) {
+<b class="nc">&nbsp;        if (!mainFrame.close()) {</b>
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void onHiding(WindowEvent event) {
+<b class="nc">&nbsp;        saveWindowState();</b>
+<b class="nc">&nbsp;        preferences.flush();</b>
+<b class="nc">&nbsp;        Platform.exit();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void saveWindowState() {
+<b class="nc">&nbsp;        CoreGuiPreferences preferences = JabRefGUI.preferences.getGuiPreferences();</b>
+&nbsp;        // workaround for mac, maximize will always report true
+<b class="nc">&nbsp;        if (!mainStage.isMaximized() || OS.OS_X) {</b>
+<b class="nc">&nbsp;            preferences.setPositionX(mainStage.getX());</b>
+<b class="nc">&nbsp;            preferences.setPositionY(mainStage.getY());</b>
+<b class="nc">&nbsp;            preferences.setSizeX(mainStage.getWidth());</b>
+<b class="nc">&nbsp;            preferences.setSizeY(mainStage.getHeight());</b>
+&nbsp;        }
+&nbsp;        // maximize does not correctly work on OSX, reports true, although the window was resized!
+<b class="nc">&nbsp;        if (OS.OS_X) {</b>
+<b class="nc">&nbsp;            preferences.setWindowMaximised(false);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            preferences.setWindowMaximised(mainStage.isMaximized());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        debugLogWindowState(mainStage);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * prints the data from the screen (only in debug mode)
+&nbsp;     *
+&nbsp;     * @param mainStage JabRef&#39;s stage
+&nbsp;     */
+&nbsp;    private void debugLogWindowState(Stage mainStage) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;&quot;&quot;</b>
+&nbsp;                        screen data:
+&nbsp;                          mainStage.WINDOW_MAXIMISED: {}
+&nbsp;                          mainStage.POS_X: {}
+&nbsp;                          mainStage.POS_Y: {}
+&nbsp;                          mainStage.SIZE_X: {}
+&nbsp;                          mainStage.SIZE_Y: {}
+&nbsp;                        &quot;&quot;&quot;,
+<b class="nc">&nbsp;                mainStage.isMaximized(), mainStage.getX(), mainStage.getY(), mainStage.getWidth(), mainStage.getHeight());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tests if the window coordinates are inside any screen
+&nbsp;     */
+&nbsp;    private boolean isWindowPositionInBounds() {
+<b class="nc">&nbsp;        CoreGuiPreferences coreGuiPreferences = preferences.getGuiPreferences();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (LOGGER.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;            Screen.getScreens().forEach(screen -&gt; LOGGER.debug(&quot;Screen bounds: {}&quot;, screen.getBounds()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return lowerLeftIsInBounds(coreGuiPreferences) &amp;&amp; upperRightIsInBounds(coreGuiPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean lowerLeftIsInBounds(CoreGuiPreferences coreGuiPreferences) {
+&nbsp;        // Windows/PowerToys somehow removes 10 pixels to the left; they are re-added
+<b class="nc">&nbsp;        double leftX = coreGuiPreferences.getPositionX() + 10.0;</b>
+<b class="nc">&nbsp;        double bottomY = coreGuiPreferences.getPositionY() + coreGuiPreferences.getSizeY();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;left x: {}, bottom y: {}&quot;, leftX, bottomY);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean inBounds = Screen.getScreens().stream().anyMatch(screen -&gt; screen.getBounds().contains(leftX, bottomY));</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;lower left corner is in bounds: {}&quot;, inBounds);</b>
+<b class="nc">&nbsp;        return inBounds;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean upperRightIsInBounds(CoreGuiPreferences coreGuiPreferences) {
+&nbsp;        // The upper right corner is checked as there are most probably the window controls.
+&nbsp;        // Windows/PowerToys somehow adds 10 pixels to the right and top of the screen, they are removed
+<b class="nc">&nbsp;        double rightX = coreGuiPreferences.getPositionX() + coreGuiPreferences.getSizeX() - 10.0;</b>
+<b class="nc">&nbsp;        double topY = coreGuiPreferences.getPositionY();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;right x: {}, top y: {}&quot;, rightX, topY);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean inBounds = Screen.getScreens().stream().anyMatch(screen -&gt; screen.getBounds().contains(rightX, topY));</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;upper right corner is in bounds: {}&quot;, inBounds);</b>
+<b class="nc">&nbsp;        return inBounds;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Background tasks
+&nbsp;    public void startBackgroundTasks() {
+<b class="nc">&nbsp;        RemotePreferences remotePreferences = preferences.getRemotePreferences();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (remotePreferences.useRemoteServer()) {</b>
+<b class="nc">&nbsp;            remoteListenerServerManager.openAndStart(</b>
+&nbsp;                    new CLIMessageHandler(
+&nbsp;                            mainFrame,
+&nbsp;                            preferences),
+<b class="nc">&nbsp;                    remotePreferences.getPort());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (remotePreferences.enableHttpServer()) {</b>
+<b class="nc">&nbsp;            httpServerManager.start(stateManager, remotePreferences.getHttpServerUri());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (remotePreferences.enableLanguageServer()) {</b>
+<b class="nc">&nbsp;            languageServerController.start(remotePreferences.getLanguageServerPort());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void stop() {
+<b class="fc">&nbsp;        LOGGER.trace(&quot;Stopping JabRef GUI&quot;);</b>
+<b class="fc">&nbsp;        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {</b>
+<b class="fc">&nbsp;            LOGGER.trace(&quot;Stopping JabRef GUI using a virtual thread executor&quot;);</b>
+&nbsp;
+&nbsp;            // Shutdown everything in parallel to prevent causing non-shutdown of something in case of issues
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Closing citations and relations search service&quot;);</b>
+<b class="fc">&nbsp;                citationsAndRelationsSearchService.close();</b>
+<b class="nc">&nbsp;                LOGGER.trace(&quot;Citations and relations search service closed&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Closing AI service&quot;);</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    aiService.close();</b>
+&nbsp;                } catch (Exception e) {
+<b class="fc">&nbsp;                    LOGGER.error(&quot;Unable to close AI service&quot;, e);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                LOGGER.trace(&quot;AI service closed&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Closing OpenOffice connection&quot;);</b>
+<b class="fc">&nbsp;                OOBibBaseConnect.closeOfficeConnection();</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;OpenOffice connection closed&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Shutting down remote server manager&quot;);</b>
+<b class="fc">&nbsp;                remoteListenerServerManager.stop();</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;RemoteListenerServerManager shut down&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Shutting down http server manager&quot;);</b>
+<b class="fc">&nbsp;                httpServerManager.stop();</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;HttpServerManager shut down&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Shutting down language server controller&quot;);</b>
+<b class="fc">&nbsp;                languageServerController.stop();</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;LanguageServerController shut down&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Stopping background tasks&quot;);</b>
+<b class="fc">&nbsp;                Unirest.shutDown();</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Unirest shut down&quot;);</b>
+&nbsp;            });
+&nbsp;
+&nbsp;            // region All threading related shutdowns
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Shutting down taskExecutor&quot;);</b>
+<b class="pc">&nbsp;                if (taskExecutor != null) {</b>
+<b class="fc">&nbsp;                    taskExecutor.shutdown();</b>
+&nbsp;                }
+<b class="fc">&nbsp;                LOGGER.trace(&quot;TaskExecutor shut down&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Shutting down fileUpdateMonitor&quot;);</b>
+<b class="fc">&nbsp;                fileUpdateMonitor.shutdown();</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;FileUpdateMonitor shut down&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Shutting down directoryMonitor&quot;);</b>
+<b class="fc">&nbsp;                DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);</b>
+<b class="fc">&nbsp;                directoryMonitor.shutdown();</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;DirectoryMonitor shut down&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Shutting down postgreServer&quot;);</b>
+<b class="fc">&nbsp;                PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);</b>
+<b class="fc">&nbsp;                postgreServer.shutdown();</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;PostgreServer shut down&quot;);</b>
+&nbsp;            });
+&nbsp;
+<b class="fc">&nbsp;            executor.submit(() -&gt; {</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;Shutting down HeadlessExecutorService&quot;);</b>
+<b class="fc">&nbsp;                HeadlessExecutorService.INSTANCE.shutdownEverything();</b>
+<b class="fc">&nbsp;                LOGGER.trace(&quot;HeadlessExecutorService shut down&quot;);</b>
+&nbsp;            });
+&nbsp;            // endregion
+&nbsp;
+<b class="fc">&nbsp;            HeadlessExecutorService.gracefullyShutdown(&quot;HeadlessExecutorService&quot;, executor, 30);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        LOGGER.trace(&quot;Finished stop&quot;);</b>
+&nbsp;
+&nbsp;        // Just to be sure that we do not leave any threads running
+<b class="fc">&nbsp;        System.exit(0);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

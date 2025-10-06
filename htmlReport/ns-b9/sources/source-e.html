@@ -1,0 +1,304 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MetaDataSerializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: MetaDataSerializer (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MetaDataSerializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/89)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.StringJoiner;
+&nbsp;import java.util.TreeMap;
+&nbsp;
+&nbsp;import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+&nbsp;import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanups;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.field.BibField;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.metadata.ContentSelector;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * Reading is done at {@link org.jabref.logic.importer.util.MetaDataParser}
+&nbsp; */
+&nbsp;public class MetaDataSerializer {
+&nbsp;
+&nbsp;    private MetaDataSerializer() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes all data in the format &amp;lt;key, serialized data&gt;.
+&nbsp;     * Also serializes user-defined .blg file paths (if present).
+&nbsp;     */
+&nbsp;    public static Map&lt;String, String&gt; getSerializedStringMap(MetaData metaData,
+&nbsp;                                                             GlobalCitationKeyPatterns globalCiteKeyPatterns) {
+&nbsp;
+&nbsp;        // metadata-key, list of contents
+&nbsp;        //  - contents to be separated by OS.NEWLINE
+&nbsp;        //  - each meta data item is written as separate @Comment entry - see org.jabref.logic.exporter.BibtexDatabaseWriter.writeMetaDataItem
+<b class="nc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; stringyMetaData = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // First write all meta data except groups
+<b class="nc">&nbsp;        metaData.getSaveOrder().ifPresent(</b>
+<b class="nc">&nbsp;                saveOrderConfig -&gt; stringyMetaData.put(MetaData.SAVE_ORDER_CONFIG, saveOrderConfig.getAsStringList()));</b>
+<b class="nc">&nbsp;        metaData.getSaveActions().ifPresent(</b>
+<b class="nc">&nbsp;                saveActions -&gt; stringyMetaData.put(MetaData.SAVE_ACTIONS, getAsStringList(saveActions, OS.NEWLINE)));</b>
+<b class="nc">&nbsp;        if (metaData.isProtected()) {</b>
+<b class="nc">&nbsp;            stringyMetaData.put(MetaData.PROTECTED_FLAG_META, List.of(&quot;true&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        stringyMetaData.putAll(serializeCiteKeyPatterns(metaData, globalCiteKeyPatterns));</b>
+<b class="nc">&nbsp;        metaData.getMode().ifPresent(</b>
+<b class="nc">&nbsp;                mode -&gt; stringyMetaData.put(MetaData.DATABASE_TYPE, List.of(mode.getAsString())));</b>
+<b class="nc">&nbsp;        metaData.getLibrarySpecificFileDirectory().ifPresent(</b>
+<b class="nc">&nbsp;                path -&gt; stringyMetaData.put(MetaData.FILE_DIRECTORY, List.of(path.trim())));</b>
+<b class="nc">&nbsp;        metaData.getUserFileDirectories().forEach((user, path) -&gt; stringyMetaData</b>
+<b class="nc">&nbsp;                .put(MetaData.FILE_DIRECTORY + &#39;-&#39; + user, List.of(path.trim())));</b>
+<b class="nc">&nbsp;        metaData.getLatexFileDirectories().forEach((user, path) -&gt; stringyMetaData</b>
+<b class="nc">&nbsp;                .put(MetaData.FILE_DIRECTORY_LATEX + &#39;-&#39; + user, List.of(path.trim())));</b>
+<b class="nc">&nbsp;        metaData.getVersionDBStructure().ifPresent(</b>
+<b class="nc">&nbsp;                versionDBStructure -&gt; stringyMetaData.put(MetaData.VERSION_DB_STRUCT, List.of(versionDBStructure.trim())));</b>
+<b class="nc">&nbsp;        metaData.getBlgFilePaths().forEach((user, path) -&gt; stringyMetaData.put(MetaData.BLG_FILE_PATH + &quot;-&quot; + user, List.of(path.toString().trim())));</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ContentSelector selector : metaData.getContentSelectorsSorted()) {</b>
+<b class="nc">&nbsp;            stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, String&gt; serializedMetaData = serializeMetaData(stringyMetaData);</b>
+&nbsp;
+&nbsp;        // Write groups if present.
+&nbsp;        // Skip this if only the root node exists (which is always the AllEntriesGroup).
+<b class="nc">&nbsp;        metaData.getGroups().filter(root -&gt; root.getNumberOfChildren() &gt; 0).ifPresent(</b>
+<b class="nc">&nbsp;                root -&gt; serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root)));</b>
+&nbsp;
+<b class="nc">&nbsp;        metaData.getGroupSearchSyntaxVersion().ifPresent(</b>
+<b class="nc">&nbsp;                version -&gt; serializedMetaData.put(MetaData.GROUPS_SEARCH_SYNTAX_VERSION, version.toString()));</b>
+&nbsp;
+&nbsp;        // finally add all unknown meta data items to the serialization map
+<b class="nc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; unknownMetaData = metaData.getUnknownMetaData();</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, List&lt;String&gt;&gt; entry : unknownMetaData.entrySet()) {</b>
+&nbsp;            // The last &quot;MetaData.SEPARATOR_STRING&quot; adds compatibility to JabRef v5.9 and earlier
+<b class="nc">&nbsp;            StringJoiner value = new StringJoiner(MetaData.SEPARATOR_STRING + OS.NEWLINE, OS.NEWLINE, MetaData.SEPARATOR_STRING + OS.NEWLINE);</b>
+<b class="nc">&nbsp;            for (String line : entry.getValue()) {</b>
+<b class="nc">&nbsp;                value.add(line.replace(MetaData.SEPARATOR_STRING, &quot;\\&quot; + MetaData.SEPARATOR_STRING));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            serializedMetaData.put(entry.getKey(), value.toString());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return serializedMetaData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, String&gt; serializeMetaData(Map&lt;String, List&lt;String&gt;&gt; stringyMetaData) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; serializedMetaData = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, List&lt;String&gt;&gt; metaItem : stringyMetaData.entrySet()) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; itemList = metaItem.getValue();</b>
+<b class="nc">&nbsp;            if (itemList.isEmpty()) {</b>
+&nbsp;                // Only add non-empty values
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            boolean isSaveActions = MetaData.SAVE_ACTIONS.equals(metaItem.getKey());</b>
+&nbsp;            // The last &quot;MetaData.SEPARATOR_STRING&quot; adds compatibility to JabRef v5.9 and earlier
+<b class="nc">&nbsp;            StringJoiner joiner = new StringJoiner(MetaData.SEPARATOR_STRING, &quot;&quot;, MetaData.SEPARATOR_STRING);</b>
+<b class="nc">&nbsp;            boolean lastWasSaveActionsEnablement = false;</b>
+<b class="nc">&nbsp;            for (String dataItem : itemList) {</b>
+&nbsp;                String string;
+<b class="nc">&nbsp;                if (lastWasSaveActionsEnablement) {</b>
+<b class="nc">&nbsp;                    string = OS.NEWLINE;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    string = &quot;&quot;;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                string += StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER);</b>
+&nbsp;                // in case of save actions, add an additional newline after the enabled flag
+<b class="nc">&nbsp;                lastWasSaveActionsEnablement = isSaveActions</b>
+<b class="nc">&nbsp;                        &amp;&amp; (FieldFormatterCleanups.ENABLED.equals(dataItem)</b>
+<b class="nc">&nbsp;                        || FieldFormatterCleanups.DISABLED.equals(dataItem));</b>
+<b class="nc">&nbsp;                joiner.add(string);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String serializedItem = joiner.toString();</b>
+<b class="nc">&nbsp;            if (!serializedItem.isEmpty()) {</b>
+&nbsp;                // Only add non-empty values
+<b class="nc">&nbsp;                serializedMetaData.put(metaItem.getKey(), serializedItem);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return serializedMetaData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, List&lt;String&gt;&gt; serializeCiteKeyPatterns(MetaData metaData, GlobalCitationKeyPatterns globalCitationKeyPatterns) {
+<b class="nc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; stringyPattern = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        AbstractCitationKeyPatterns citationKeyPattern = metaData.getCiteKeyPatterns(globalCitationKeyPatterns);</b>
+<b class="nc">&nbsp;        for (EntryType key : citationKeyPattern.getAllKeys()) {</b>
+<b class="nc">&nbsp;            if (!citationKeyPattern.isDefaultValue(key)) {</b>
+<b class="nc">&nbsp;                List&lt;String&gt; data = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                data.add(citationKeyPattern.getValue(key).stringRepresentation());</b>
+<b class="nc">&nbsp;                String metaDataKey = MetaData.PREFIX_KEYPATTERN + key.getName();</b>
+<b class="nc">&nbsp;                stringyPattern.put(metaDataKey, data);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if ((citationKeyPattern.getDefaultValue() != null) &amp;&amp; !citationKeyPattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; data = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            data.add(citationKeyPattern.getDefaultValue().stringRepresentation());</b>
+<b class="nc">&nbsp;            stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return stringyPattern;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String serializeGroups(GroupTreeNode root) {
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;        stringBuilder.append(OS.NEWLINE);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String groupNode : new GroupSerializer().serializeTree(root)) {</b>
+<b class="nc">&nbsp;            stringBuilder.append(StringUtil.quote(groupNode, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER));</b>
+<b class="nc">&nbsp;            stringBuilder.append(MetaData.SEPARATOR_STRING);</b>
+<b class="nc">&nbsp;            stringBuilder.append(OS.NEWLINE);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return stringBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String serializeCustomEntryTypes(BibEntryType entryType) {
+<b class="nc">&nbsp;        return MetaData.ENTRYTYPE_FLAG +</b>
+<b class="nc">&nbsp;                entryType.getType().getName() +</b>
+&nbsp;                &quot;: req[&quot; +
+<b class="nc">&nbsp;                FieldFactory.serializeOrFieldsList(entryType.getRequiredFields()) +</b>
+&nbsp;                &quot;] opt[&quot; +
+<b class="nc">&nbsp;                FieldFactory.serializeFieldsList(</b>
+<b class="nc">&nbsp;                        entryType.getOptionalFields()</b>
+<b class="nc">&nbsp;                                 .stream()</b>
+<b class="nc">&nbsp;                                 .map(BibField::field)</b>
+<b class="nc">&nbsp;                                 .toList()) +</b>
+&nbsp;                &quot;]&quot;;
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;String&gt; getAsStringList(FieldFormatterCleanups fieldFormatterCleanups, String delimiter) {
+<b class="nc">&nbsp;        List&lt;String&gt; stringRepresentation = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fieldFormatterCleanups.isEnabled()) {</b>
+<b class="nc">&nbsp;            stringRepresentation.add(FieldFormatterCleanups.ENABLED);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            stringRepresentation.add(FieldFormatterCleanups.DISABLED);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String formatterString = FieldFormatterCleanups.getMetaDataString(</b>
+<b class="nc">&nbsp;                fieldFormatterCleanups.getConfiguredActions(), delimiter);</b>
+<b class="nc">&nbsp;        stringRepresentation.add(formatterString);</b>
+<b class="nc">&nbsp;        return stringRepresentation;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

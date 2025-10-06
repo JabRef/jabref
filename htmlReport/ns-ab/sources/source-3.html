@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MVStoreBase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.util</a>
+</div>
+
+<h1>Coverage Summary for Class: MVStoreBase (org.jabref.logic.ai.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MVStoreBase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.4%
+  </span>
+  <span class="absValue">
+    (8/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import org.jabref.logic.util.NotificationService;
+&nbsp;
+&nbsp;import org.h2.mvstore.MVStore;
+&nbsp;import org.h2.mvstore.MVStoreException;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public abstract class MVStoreBase implements AutoCloseable {
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBase.class);</b>
+&nbsp;
+&nbsp;    protected MVStore mvStore;
+&nbsp;
+<b class="fc">&nbsp;    public MVStoreBase(@Nullable Path path, NotificationService dialogService) {</b>
+<b class="fc">&nbsp;        Path mvStorePath = path;</b>
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            Files.createDirectories(path.getParent());</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(errorMessageForOpening(), e);</b>
+<b class="nc">&nbsp;            dialogService.notify(errorMessageForOpeningLocalized());</b>
+<b class="nc">&nbsp;            mvStorePath = null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            this.mvStore = new MVStore.Builder()</b>
+<b class="fc">&nbsp;                    .autoCommitDisabled()</b>
+<b class="pc">&nbsp;                    .fileName(mvStorePath == null ? null : mvStorePath.toString())</b>
+<b class="fc">&nbsp;                    .open();</b>
+&nbsp;        } catch (MVStoreException e) {
+<b class="nc">&nbsp;            this.mvStore = new MVStore.Builder()</b>
+<b class="nc">&nbsp;                    .autoCommitDisabled()</b>
+<b class="nc">&nbsp;                    .fileName(null) // creates an in memory store</b>
+<b class="nc">&nbsp;                    .open();</b>
+<b class="nc">&nbsp;            LOGGER.error(errorMessageForOpening(), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void commit() {
+<b class="nc">&nbsp;        mvStore.commit();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        mvStore.close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract String errorMessageForOpening();
+&nbsp;
+&nbsp;    protected abstract String errorMessageForOpeningLocalized();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,192 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PersistenceVisualStateTable</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: PersistenceVisualStateTable (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PersistenceVisualStateTable</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;
+&nbsp;import org.jabref.gui.maintable.columns.MainTableColumn;
+&nbsp;import org.jabref.logic.preferences.JabRefCliPreferences;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Keep track of changes made to the columns (reordering, resorting, resizing).
+&nbsp; */
+&nbsp;public class PersistenceVisualStateTable {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PersistenceVisualStateTable.class);</b>
+&nbsp;
+&nbsp;    protected final TableView&lt;BibEntryTableViewModel&gt; table;
+&nbsp;    protected final ColumnPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public PersistenceVisualStateTable(TableView&lt;BibEntryTableViewModel&gt; table, ColumnPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.table = table;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addListeners() {
+<b class="nc">&nbsp;        table.getColumns().addListener((InvalidationListener) obs -&gt; updateColumns());</b>
+<b class="nc">&nbsp;        table.getSortOrder().addListener((ListChangeListener&lt;? super TableColumn&lt;BibEntryTableViewModel, ?&gt;&gt;) obs -&gt; updateSortOrder());</b>
+&nbsp;
+&nbsp;        // As we store the ColumnModels of the MainTable, we need to add the listener to the ColumnModel properties,
+&nbsp;        // since the value is bound to the model after the listener to the column itself is called.
+&nbsp;
+<b class="nc">&nbsp;        table.getColumns().stream()</b>
+<b class="nc">&nbsp;             .map(col -&gt; ((MainTableColumn&lt;?&gt;) col).getModel())</b>
+<b class="nc">&nbsp;             .forEach(model -&gt; {</b>
+<b class="nc">&nbsp;                 model.widthProperty().addListener(obs -&gt; updateColumns());</b>
+<b class="nc">&nbsp;                 model.sortTypeProperty().addListener(obs -&gt; updateColumns());</b>
+&nbsp;             });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Stores shown columns, their width and their {@link TableColumn.SortType} in preferences.
+&nbsp;     * The conversion to the &quot;real&quot; string in the preferences is made at
+&nbsp;     * {@link JabRefCliPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
+&nbsp;     */
+&nbsp;    private void updateColumns() {
+<b class="nc">&nbsp;        List&lt;MainTableColumnModel&gt; list = toList(table.getColumns());</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Updating columns to {}&quot;, list);</b>
+<b class="nc">&nbsp;        preferences.setColumns(list);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Stores the SortOrder of the Table in the preferences. This includes {@link TableColumn.SortType}.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * Cannot be combined with updateColumns, because JavaFX would provide just an empty list for the sort order
+&nbsp;     * on other changes.
+&nbsp;     */
+&nbsp;    private void updateSortOrder() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Updating sort order&quot;);</b>
+<b class="nc">&nbsp;        preferences.setColumnSortOrder(toList(table.getSortOrder()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;MainTableColumnModel&gt; toList(List&lt;TableColumn&lt;BibEntryTableViewModel, ?&gt;&gt; columns) {
+<b class="nc">&nbsp;        return columns.stream()</b>
+<b class="nc">&nbsp;                      .filter(col -&gt; col instanceof MainTableColumn&lt;?&gt;)</b>
+<b class="nc">&nbsp;                      .map(column -&gt; ((MainTableColumn&lt;?&gt;) column).getModel())</b>
+<b class="nc">&nbsp;                      .filter(model -&gt; model.getType() != MainTableColumnModel.Type.MATCH_CATEGORY)</b>
+<b class="nc">&nbsp;                      .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

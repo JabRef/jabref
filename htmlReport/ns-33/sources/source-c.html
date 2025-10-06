@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitIgnoreFileFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: GitIgnoreFileFilter (org.jabref.gui.externalfiles)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitIgnoreFileFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiles;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.DirectoryStream;
+&nbsp;import java.nio.file.FileSystems;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.PathMatcher;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import static java.util.function.Predicate.not;
+&nbsp;
+&nbsp;public class GitIgnoreFileFilter implements DirectoryStream.Filter&lt;Path&gt; {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GitIgnoreFileFilter.class);</b>
+&nbsp;
+&nbsp;    private final Set&lt;PathMatcher&gt; gitIgnorePatterns;
+&nbsp;    private final Path baseDir;
+&nbsp;
+<b class="nc">&nbsp;    public GitIgnoreFileFilter(Path path) {</b>
+<b class="nc">&nbsp;        Path currentPath = path;</b>
+<b class="nc">&nbsp;        while ((currentPath != null) &amp;&amp; !Files.exists(currentPath.resolve(&quot;.gitignore&quot;))) {</b>
+<b class="nc">&nbsp;            currentPath = currentPath.getParent();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (currentPath == null) {</b>
+&nbsp;            // we did not find any gitignore, set baseDir to provided path and use default ignores
+<b class="nc">&nbsp;            this.baseDir = path;</b>
+<b class="nc">&nbsp;            gitIgnorePatterns = Set.of(&quot;.git&quot;, &quot;.DS_Store&quot;, &quot;desktop.ini&quot;, &quot;Thumbs.db&quot;).stream()</b>
+&nbsp;                                   // duplicate code as below
+<b class="nc">&nbsp;                                   .map(line -&gt; &quot;glob:&quot; + line)</b>
+<b class="nc">&nbsp;                                   .map(matcherString -&gt; FileSystems.getDefault().getPathMatcher(matcherString))</b>
+<b class="nc">&nbsp;                                   .collect(Collectors.toSet());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.baseDir = currentPath;</b>
+<b class="nc">&nbsp;            Path gitIgnore = currentPath.resolve(&quot;.gitignore&quot;);</b>
+&nbsp;            Set&lt;PathMatcher&gt; patterns;
+&nbsp;            try {
+<b class="nc">&nbsp;                patterns = Files.readAllLines(gitIgnore).stream()</b>
+<b class="nc">&nbsp;                                .map(String::trim)</b>
+<b class="nc">&nbsp;                                .filter(not(String::isEmpty))</b>
+<b class="nc">&nbsp;                                .filter(line -&gt; !line.startsWith(&quot;#&quot;))</b>
+&nbsp;                                // expand patterns so that leading &quot;**/&quot; also matches files in the base directory
+<b class="nc">&nbsp;                                .flatMap(line -&gt; {</b>
+<b class="nc">&nbsp;                                    if (line.startsWith(&quot;**/&quot;)) {</b>
+<b class="nc">&nbsp;                                        return Stream.of(line, line.substring(3));</b>
+&nbsp;                                    }
+<b class="nc">&nbsp;                                    return Stream.of(line);</b>
+&nbsp;                                })
+&nbsp;                                // convert to Java syntax for Glob patterns
+<b class="nc">&nbsp;                                .map(line -&gt; &quot;glob:&quot; + line)</b>
+<b class="nc">&nbsp;                                .map(matcherString -&gt; FileSystems.getDefault().getPathMatcher(matcherString))</b>
+<b class="nc">&nbsp;                                .collect(Collectors.toSet());</b>
+&nbsp;                // we want to ignore &quot;.gitignore&quot; itself
+<b class="nc">&nbsp;                patterns.add(FileSystems.getDefault().getPathMatcher(&quot;glob:.gitignore&quot;));</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.info(&quot;Could not read .gitignore from {}&quot;, gitIgnore, e);</b>
+<b class="nc">&nbsp;                patterns = Set.of();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            gitIgnorePatterns = patterns;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean accept(Path path) throws IOException {
+&nbsp;        // Match patterns relative to baseDir because .gitignore patterns are applied relative to their location
+<b class="nc">&nbsp;        Path relative = safeRelativize(baseDir, path);</b>
+&nbsp;        // We assume that git does not stop at a pattern, but tries all. We implement that behavior
+<b class="nc">&nbsp;        return gitIgnorePatterns.stream().noneMatch(filter -&gt;</b>
+&nbsp;                // for patterns like &quot;*.png&quot; or &quot;.gitignore&quot;
+<b class="nc">&nbsp;                filter.matches(relative.getFileName()) ||</b>
+&nbsp;                        // for patterns like &quot;ignore/*&quot; or &quot;**/*.png&quot;
+<b class="nc">&nbsp;                        filter.matches(relative));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Path safeRelativize(Path base, Path child) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return base.relativize(child);</b>
+&nbsp;        } catch (IllegalArgumentException e) {
+&nbsp;            // If paths are on different roots, fall back to just the file name for relative matching
+<b class="nc">&nbsp;            return child.getFileName();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

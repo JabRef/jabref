@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.style</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationGroup (org.jabref.model.openoffice.style)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.style;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.openoffice.ootext.OOText;
+&nbsp;import org.jabref.model.openoffice.util.OOListUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * A CitationGroup describes a group of citations.
+&nbsp; */
+&nbsp;public class CitationGroup {
+&nbsp;
+&nbsp;    public final OODataModel dataModel;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Identifies this citation group.
+&nbsp;     */
+&nbsp;    public final CitationGroupId groupId;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * The core data, stored in the document:
+&nbsp;     * The type of citation and citations in storage order.
+&nbsp;     */
+&nbsp;    public final CitationType citationType;
+&nbsp;    public final List&lt;Citation&gt; citationsInStorageOrder;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * A name of a reference mark to link to by formatCitedOnPages.
+&nbsp;     * May be initially empty, if backend does not use reference marks.
+&nbsp;     *
+&nbsp;     * produceCitationMarkers might want fill it to support cross-references to citation groups from
+&nbsp;     * the bibliography.
+&nbsp;     */
+&nbsp;    private Optional&lt;String&gt; referenceMarkNameForLinking;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Indices into citations: citations[localOrder[i]] provides ith citation according to the
+&nbsp;     * currently imposed local order for presentation.
+&nbsp;     *
+&nbsp;     * Initialized to (0..(nCitations-1)) in the constructor.
+&nbsp;     */
+&nbsp;    private List&lt;Integer&gt; localOrder;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * &quot;Cited on pages&quot; uses this to sort the cross-references.
+&nbsp;     */
+&nbsp;    private Optional&lt;Integer&gt; indexInGlobalOrder;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Citation marker.
+&nbsp;     */
+&nbsp;    private Optional&lt;OOText&gt; citationMarker;
+&nbsp;
+&nbsp;    public CitationGroup(OODataModel dataModel,
+&nbsp;                         CitationGroupId groupId,
+&nbsp;                         CitationType citationType,
+&nbsp;                         List&lt;Citation&gt; citationsInStorageOrder,
+<b class="nc">&nbsp;                         Optional&lt;String&gt; referenceMarkNameForLinking) {</b>
+<b class="nc">&nbsp;        this.dataModel = dataModel;</b>
+<b class="nc">&nbsp;        this.groupId = groupId;</b>
+<b class="nc">&nbsp;        this.citationType = citationType;</b>
+<b class="nc">&nbsp;        this.citationsInStorageOrder = Collections.unmodifiableList(citationsInStorageOrder);</b>
+<b class="nc">&nbsp;        this.localOrder = OOListUtil.makeIndices(citationsInStorageOrder.size());</b>
+<b class="nc">&nbsp;        this.referenceMarkNameForLinking = referenceMarkNameForLinking;</b>
+<b class="nc">&nbsp;        this.indexInGlobalOrder = Optional.empty();</b>
+<b class="nc">&nbsp;        this.citationMarker = Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int numberOfCitations() {
+<b class="nc">&nbsp;        return citationsInStorageOrder.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * localOrder
+&nbsp;     */
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sort citations for presentation within a CitationGroup.
+&nbsp;     */
+&nbsp;    void imposeLocalOrder(Comparator&lt;BibEntry&gt; entryComparator) {
+&nbsp;        // For JabRef52 the single pageInfo is always in the last-in-localorder citation.
+&nbsp;        // We adjust here accordingly by taking it out and adding it back after sorting.
+<b class="nc">&nbsp;        final int last = this.numberOfCitations() - 1;</b>
+<b class="nc">&nbsp;        Optional&lt;OOText&gt; lastPageInfo = Optional.empty();</b>
+<b class="nc">&nbsp;        if (dataModel == OODataModel.JabRef52) {</b>
+<b class="nc">&nbsp;            Citation lastCitation = getCitationsInLocalOrder().get(last);</b>
+<b class="nc">&nbsp;            lastPageInfo = lastCitation.getPageInfo();</b>
+<b class="nc">&nbsp;            lastCitation.setPageInfo(Optional.empty());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.localOrder = OOListUtil.order(citationsInStorageOrder,</b>
+&nbsp;                new CompareCitation(entryComparator, true));
+&nbsp;
+<b class="nc">&nbsp;        if (dataModel == OODataModel.JabRef52) {</b>
+<b class="nc">&nbsp;            getCitationsInLocalOrder().get(last).setPageInfo(lastPageInfo);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Integer&gt; getLocalOrder() {
+<b class="nc">&nbsp;        return Collections.unmodifiableList(localOrder);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * citations
+&nbsp;     */
+&nbsp;
+&nbsp;    public List&lt;Citation&gt; getCitationsInLocalOrder() {
+<b class="nc">&nbsp;        return OOListUtil.map(localOrder, citationsInStorageOrder::get);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * indexInGlobalOrder
+&nbsp;     */
+&nbsp;
+&nbsp;    public void setIndexInGlobalOrder(Optional&lt;Integer&gt; indexInGlobalOrder) {
+<b class="nc">&nbsp;        this.indexInGlobalOrder = indexInGlobalOrder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Integer&gt; getIndexInGlobalOrder() {
+<b class="nc">&nbsp;        return this.indexInGlobalOrder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * referenceMarkNameForLinking
+&nbsp;     */
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getReferenceMarkNameForLinking() {
+<b class="nc">&nbsp;        return referenceMarkNameForLinking;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setReferenceMarkNameForLinking(Optional&lt;String&gt; referenceMarkNameForLinking) {
+<b class="nc">&nbsp;        this.referenceMarkNameForLinking = referenceMarkNameForLinking;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * citationMarker
+&nbsp;     */
+&nbsp;
+&nbsp;    public void setCitationMarker(Optional&lt;OOText&gt; citationMarker) {
+<b class="nc">&nbsp;        this.citationMarker = citationMarker;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;OOText&gt; getCitationMarker() {
+<b class="nc">&nbsp;        return this.citationMarker;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

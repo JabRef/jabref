@@ -1,0 +1,157 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SavingPropertiesView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.libraryproperties.saving</a>
+</div>
+
+<h1>Coverage Summary for Class: SavingPropertiesView (org.jabref.gui.libraryproperties.saving)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SavingPropertiesView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.libraryproperties.saving;
+&nbsp;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;
+&nbsp;import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
+&nbsp;import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
+&nbsp;import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
+&nbsp;import org.jabref.gui.libraryproperties.PropertiesTab;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class SavingPropertiesView extends AbstractPropertiesTabView&lt;SavingPropertiesViewModel&gt; implements PropertiesTab {
+&nbsp;
+&nbsp;    @FXML private CheckBox protect;
+&nbsp;    @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
+&nbsp;    @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
+&nbsp;
+&nbsp;    @Inject private CliPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public SavingPropertiesView(BibDatabaseContext databaseContext) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Saving&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new SavingPropertiesViewModel(databaseContext, preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        protect.disableProperty().bind(viewModel.protectDisableProperty());</b>
+<b class="nc">&nbsp;        protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        saveOrderConfigPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());</b>
+<b class="nc">&nbsp;        saveOrderConfigPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());</b>
+<b class="nc">&nbsp;        saveOrderConfigPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());</b>
+<b class="nc">&nbsp;        saveOrderConfigPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());</b>
+<b class="nc">&nbsp;        saveOrderConfigPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        fieldFormatterCleanupsPanel.cleanupsDisableProperty().bindBidirectional(viewModel.cleanupsDisableProperty());</b>
+<b class="nc">&nbsp;        fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanupsProperty());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

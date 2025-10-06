@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibWarningToIntegrityMessageConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.biblog</a>
+</div>
+
+<h1>Coverage Summary for Class: BibWarningToIntegrityMessageConverter (org.jabref.logic.biblog)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibWarningToIntegrityMessageConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.biblog;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.integrity.IntegrityMessage;
+&nbsp;import org.jabref.model.biblog.BibWarning;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;
+&nbsp;/// Converts {@link BibWarning}s into {@link IntegrityMessage}s for integration with the existing integrity check UI.
+&nbsp;///
+&nbsp;/// Notes:
+&nbsp;/// - The current IntegrityMessage interface expects a {@link BibEntry} and a {@link Field},
+&nbsp;///   but .blg warnings come from a different source and may not include a field.
+&nbsp;/// - For now, we map missing fields to a placeholder (InternalField.KEY_FIELD) to make it compatible with the UI.
+&nbsp;/// - This is a minimal MVP solution to reuse the Integrity tab without changing the UI structure.
+&nbsp;///
+&nbsp;/// Future direction:
+&nbsp;/// - Consider defining a proper interface (e.g., IntegrityMessageWithField / WithoutField)
+&nbsp;///   to support warnings without fields cleanly.
+<b class="nc">&nbsp;public class BibWarningToIntegrityMessageConverter {</b>
+&nbsp;    public static List&lt;IntegrityMessage&gt; convert(
+&nbsp;            List&lt;BibWarning&gt; bibWarnings,
+&nbsp;            BibDatabaseContext context) {
+<b class="nc">&nbsp;        if (bibWarnings.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;IntegrityMessage&gt; messages = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (BibWarning bibWarning : bibWarnings) {</b>
+<b class="nc">&nbsp;            if (context.getDatabase().getEntryByCitationKey(bibWarning.entryKey()).isEmpty()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            BibEntry entry = context.getDatabase().getEntryByCitationKey(bibWarning.entryKey()).get();</b>
+&nbsp;
+<b class="nc">&nbsp;            Field field = bibWarning.getFieldName()</b>
+<b class="nc">&nbsp;                                    .map(FieldFactory::parseField)</b>
+<b class="nc">&nbsp;                                    .orElse(InternalField.KEY_FIELD);</b>
+&nbsp;
+<b class="nc">&nbsp;            IntegrityMessage message = new IntegrityMessage(</b>
+<b class="nc">&nbsp;                    bibWarning.message(),</b>
+&nbsp;                    entry,
+&nbsp;                    field);
+<b class="nc">&nbsp;            messages.add(message);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return messages;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

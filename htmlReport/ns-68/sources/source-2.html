@@ -1,0 +1,309 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EditExternalFileTypeViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.externalfiletypes</a>
+</div>
+
+<h1>Coverage Summary for Class: EditExternalFileTypeViewModel (org.jabref.gui.preferences.externalfiletypes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EditExternalFileTypeViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/75)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.externalfiletypes;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.Node;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;
+&nbsp;public class EditExternalFileTypeViewModel {
+&nbsp;    private final ExternalFileTypeItemViewModel fileTypeViewModel;
+<b class="nc">&nbsp;    private final StringProperty nameProperty = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty mimeTypeProperty = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty extensionProperty = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty selectedApplicationProperty = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty defaultApplicationSelectedProperty = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty customApplicationSelectedProperty = new SimpleBooleanProperty(false);</b>
+&nbsp;    private final ObservableList&lt;ExternalFileTypeItemViewModel&gt; fileTypes;
+&nbsp;    private final String originalExtension;
+&nbsp;    private final String originalName;
+&nbsp;    private final String originalMimeType;
+&nbsp;    private CompositeValidator extensionValidator;
+&nbsp;    private CompositeValidator nameValidator;
+&nbsp;    private CompositeValidator mimeTypeValidator;
+&nbsp;    private CompositeValidator validator;
+&nbsp;
+<b class="nc">&nbsp;    public EditExternalFileTypeViewModel(ExternalFileTypeItemViewModel fileTypeViewModel, ObservableList&lt;ExternalFileTypeItemViewModel&gt; fileTypes) {</b>
+<b class="nc">&nbsp;        this.fileTypeViewModel = fileTypeViewModel;</b>
+<b class="nc">&nbsp;        this.fileTypes = fileTypes;</b>
+<b class="nc">&nbsp;        this.originalExtension = fileTypeViewModel.extensionProperty().getValue();</b>
+<b class="nc">&nbsp;        this.originalName = fileTypeViewModel.nameProperty().getValue();</b>
+<b class="nc">&nbsp;        this.originalMimeType = fileTypeViewModel.mimetypeProperty().getValue();</b>
+<b class="nc">&nbsp;        extensionProperty.setValue(fileTypeViewModel.extensionProperty().getValue());</b>
+<b class="nc">&nbsp;        nameProperty.setValue(fileTypeViewModel.nameProperty().getValue());</b>
+<b class="nc">&nbsp;        mimeTypeProperty.setValue(fileTypeViewModel.mimetypeProperty().getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fileTypeViewModel.applicationProperty().getValue().isEmpty()) {</b>
+<b class="nc">&nbsp;            defaultApplicationSelectedProperty.setValue(true);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            customApplicationSelectedProperty.setValue(true);</b>
+<b class="nc">&nbsp;            selectedApplicationProperty.setValue(fileTypeViewModel.applicationProperty().getValue());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setupValidation();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupValidation() {
+<b class="nc">&nbsp;        validator = new CompositeValidator();</b>
+<b class="nc">&nbsp;        extensionValidator = new CompositeValidator();</b>
+&nbsp;
+<b class="nc">&nbsp;        Validator extensionisNotBlankValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                extensionProperty,
+&nbsp;                StringUtil::isNotBlank,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Please enter a name for the extension.&quot;))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        Validator sameExtensionValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                extensionProperty,
+&nbsp;                extension -&gt; {
+<b class="nc">&nbsp;                    for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {</b>
+<b class="nc">&nbsp;                        if (extension.equalsIgnoreCase(fileTypeItem.extensionProperty().get()) &amp;&amp; !extension.equalsIgnoreCase(originalExtension)) {</b>
+<b class="nc">&nbsp;                            return false;</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                },
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;There already exists an external file type with the same extension&quot;))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        extensionValidator.addValidators(sameExtensionValidator, extensionisNotBlankValidator);</b>
+&nbsp;
+<b class="nc">&nbsp;        nameValidator = new CompositeValidator();</b>
+<b class="nc">&nbsp;        Validator sameNameValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                nameProperty,
+&nbsp;                name -&gt; {
+<b class="nc">&nbsp;                    for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {</b>
+<b class="nc">&nbsp;                        if (name.equalsIgnoreCase(fileTypeItem.nameProperty().get()) &amp;&amp; !name.equalsIgnoreCase(originalName)) {</b>
+<b class="nc">&nbsp;                            return false;</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                },
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;There already exists an external file type with the same name&quot;))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Validator nameIsNotBlankValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                nameProperty,
+&nbsp;                StringUtil::isNotBlank,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Please enter a name.&quot;))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        nameValidator.addValidators(sameNameValidator, nameIsNotBlankValidator);</b>
+&nbsp;
+<b class="nc">&nbsp;        mimeTypeValidator = new CompositeValidator();</b>
+<b class="nc">&nbsp;        Validator mimeTypeIsNotBlankValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                mimeTypeProperty,
+&nbsp;                StringUtil::isNotBlank,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Please enter a name for the MIME type.&quot;))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Validator sameMimeTypeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                mimeTypeProperty,
+&nbsp;                mimeType -&gt; {
+<b class="nc">&nbsp;                    for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {</b>
+<b class="nc">&nbsp;                        if (mimeType.equalsIgnoreCase(fileTypeItem.mimetypeProperty().get()) &amp;&amp; !mimeType.equalsIgnoreCase(originalMimeType)) {</b>
+<b class="nc">&nbsp;                            return false;</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                },
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;There already exists an external file type with the same MIME type&quot;))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        mimeTypeValidator.addValidators(sameMimeTypeValidator, mimeTypeIsNotBlankValidator);</b>
+&nbsp;
+<b class="nc">&nbsp;        validator.addValidators(extensionValidator, sameExtensionValidator, nameValidator, sameNameValidator, mimeTypeValidator, sameMimeTypeValidator);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus validationStatus() {
+<b class="nc">&nbsp;        return validator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus extensionValidation() {
+<b class="nc">&nbsp;        return extensionValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus mimeTypeValidation() {
+<b class="nc">&nbsp;        return mimeTypeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus nameValidation() {
+<b class="nc">&nbsp;        return nameValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Node getIcon() {
+<b class="nc">&nbsp;        return fileTypeViewModel.iconProperty().getValue().getGraphicNode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty nameProperty() {
+<b class="nc">&nbsp;        return nameProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty extensionProperty() {
+<b class="nc">&nbsp;        return extensionProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty mimeTypeProperty() {
+<b class="nc">&nbsp;        return mimeTypeProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty selectedApplicationProperty() {
+<b class="nc">&nbsp;        return selectedApplicationProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty defaultApplicationSelectedProperty() {
+<b class="nc">&nbsp;        return defaultApplicationSelectedProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty customApplicationSelectedProperty() {
+<b class="nc">&nbsp;        return customApplicationSelectedProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty validExtensionTypeProperty() {
+<b class="nc">&nbsp;        return defaultApplicationSelectedProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        fileTypeViewModel.nameProperty().setValue(nameProperty.getValue().trim());</b>
+<b class="nc">&nbsp;        fileTypeViewModel.mimetypeProperty().setValue(mimeTypeProperty.getValue().trim());</b>
+&nbsp;
+<b class="nc">&nbsp;        String ext = extensionProperty.getValue().trim();</b>
+<b class="nc">&nbsp;        if (!ext.isEmpty() &amp;&amp; (ext.charAt(0) == &#39;.&#39;)) {</b>
+<b class="nc">&nbsp;            fileTypeViewModel.extensionProperty().setValue(ext.substring(1));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            fileTypeViewModel.extensionProperty().setValue(ext);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String application = selectedApplicationProperty.getValue().trim();</b>
+&nbsp;
+&nbsp;        // store application as empty if the &quot;Default&quot; option is selected, or if the application name is empty:
+<b class="nc">&nbsp;        if (defaultApplicationSelectedProperty.getValue() || application.isEmpty()) {</b>
+<b class="nc">&nbsp;            fileTypeViewModel.applicationProperty().setValue(&quot;&quot;);</b>
+<b class="nc">&nbsp;            selectedApplicationProperty.setValue(&quot;&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            fileTypeViewModel.applicationProperty().setValue(application);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

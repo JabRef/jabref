@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.git.preferences</a>
+</div>
+
+<h1>Coverage Summary for Class: GitPreferences (org.jabref.logic.git.preferences)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.git.preferences;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+&nbsp;public class GitPreferences {
+&nbsp;    private final StringProperty username;
+&nbsp;    private final StringProperty pat;
+&nbsp;    private final StringProperty repositoryUrl;
+&nbsp;    private final BooleanProperty rememberPat;
+&nbsp;
+&nbsp;    public GitPreferences(String username,
+&nbsp;                          String pat,
+&nbsp;                          String repositoryUrl,
+<b class="nc">&nbsp;                          boolean rememberPat) {</b>
+<b class="nc">&nbsp;        this.username = new SimpleStringProperty(username);</b>
+<b class="nc">&nbsp;        this.pat = new SimpleStringProperty(pat);</b>
+<b class="nc">&nbsp;        this.repositoryUrl = new SimpleStringProperty(repositoryUrl);</b>
+<b class="nc">&nbsp;        this.rememberPat = new SimpleBooleanProperty(rememberPat);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUsername(@NonNull String username) {
+<b class="nc">&nbsp;        this.username.set(username);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getUsername() {
+<b class="nc">&nbsp;        return username.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPat(@NonNull String pat) {
+<b class="nc">&nbsp;        this.pat.set(pat);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPat() {
+<b class="nc">&nbsp;        return pat.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRepositoryUrl() {
+<b class="nc">&nbsp;        return repositoryUrl.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setRepositoryUrl(@NonNull String repositoryUrl) {
+<b class="nc">&nbsp;        this.repositoryUrl.set(repositoryUrl);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getRememberPat() {
+<b class="nc">&nbsp;        return this.rememberPat.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setRememberPat(boolean remember) {
+<b class="nc">&nbsp;        this.rememberPat.set(remember);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty usernameProperty() {
+<b class="nc">&nbsp;        return username;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty patProperty() {
+<b class="nc">&nbsp;        return pat;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty repositoryUrlProperty() {
+<b class="nc">&nbsp;        return repositoryUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty rememberPatProperty() {
+<b class="nc">&nbsp;        return rememberPat;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

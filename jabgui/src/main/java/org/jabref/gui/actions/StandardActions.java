@@ -1,12 +1,13 @@
 package org.jabref.gui.actions;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 public enum StandardActions implements Action {
 
@@ -312,8 +313,8 @@ public enum StandardActions implements Action {
         return description;
     }
 
-    public Action withText(String text) {
-        this.text = Objects.requireNonNull(text);
+    public Action withText(@NonNull String text) {
+        this.text = text;
         return this;
     }
 }

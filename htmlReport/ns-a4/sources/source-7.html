@@ -1,0 +1,340 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MVStoreEmbeddingStore</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.ingestion</a>
+</div>
+
+<h1>Coverage Summary for Class: MVStoreEmbeddingStore (org.jabref.logic.ai.ingestion)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MVStoreEmbeddingStore</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.2%
+  </span>
+  <span class="absValue">
+    (1/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.7%
+  </span>
+  <span class="absValue">
+    (2/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MVStoreEmbeddingStore$EmbeddingRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    5.9%
+  </span>
+  <span class="absValue">
+    (1/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.5%
+  </span>
+  <span class="absValue">
+    (2/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.ingestion;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.PriorityQueue;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.IntStream;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.ai.util.MVStoreBase;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.NotificationService;
+&nbsp;
+&nbsp;import dev.langchain4j.data.document.Metadata;
+&nbsp;import dev.langchain4j.data.embedding.Embedding;
+&nbsp;import dev.langchain4j.data.segment.TextSegment;
+&nbsp;import dev.langchain4j.store.embedding.CosineSimilarity;
+&nbsp;import dev.langchain4j.store.embedding.EmbeddingMatch;
+&nbsp;import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
+&nbsp;import dev.langchain4j.store.embedding.EmbeddingSearchResult;
+&nbsp;import dev.langchain4j.store.embedding.EmbeddingStore;
+&nbsp;import dev.langchain4j.store.embedding.RelevanceScore;
+&nbsp;import dev.langchain4j.store.embedding.filter.Filter;
+&nbsp;import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
+&nbsp;import dev.langchain4j.store.embedding.filter.comparison.IsIn;
+&nbsp;import org.h2.mvstore.MVStore;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+&nbsp;import static java.util.Comparator.comparingDouble;
+&nbsp;import static org.jabref.logic.ai.ingestion.FileEmbeddingsManager.LINK_METADATA_KEY;
+&nbsp;
+&nbsp;/**
+&nbsp; * A custom implementation of langchain4j&#39;s {@link EmbeddingStore} that uses a {@link MVStore} as an embedded database.
+&nbsp; * &lt;p&gt;
+&nbsp; * Every embedding has 3 fields: float array (the embedding itself), file where it was generated from, and the embedded
+&nbsp; * string (the content).
+&nbsp; * &lt;p&gt;
+&nbsp; */
+&nbsp;public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore&lt;TextSegment&gt; {
+&nbsp;    // `file` field is nullable, because {@link Optional} can&#39;t be serialized.
+<b class="nc">&nbsp;    private record EmbeddingRecord(@Nullable String file, String content, float[] embeddingVector) implements Serializable {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final String EMBEDDINGS_MAP_NAME = &quot;embeddings&quot;;
+&nbsp;
+&nbsp;    private final Map&lt;String, EmbeddingRecord&gt; embeddingsMap;
+&nbsp;
+&nbsp;    public MVStoreEmbeddingStore(Path path, NotificationService dialogService) {
+<b class="fc">&nbsp;        super(path, dialogService);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.embeddingsMap = this.mvStore.openMap(EMBEDDINGS_MAP_NAME);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String add(Embedding embedding) {
+&nbsp;        // Every embedding must have a unique id (convention in langchain4j.
+&nbsp;        // Additionally, it is a key in the {@link Map}.
+&nbsp;        // Most of the code in this class was borrowed from {@link InMemoryEmbeddingStore}.
+<b class="nc">&nbsp;        String id = String.valueOf(UUID.randomUUID());</b>
+<b class="nc">&nbsp;        add(id, embedding);</b>
+<b class="nc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; addAll(List&lt;Embedding&gt; embeddings) {
+<b class="nc">&nbsp;        return embeddings.stream().map(this::add).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void add(String id, Embedding embedding) {
+&nbsp;        // It does not make much sense to store single embedding vector, but this is a requirement from langchain4j&#39;s
+&nbsp;        // {@link EmbeddingStore}.
+<b class="nc">&nbsp;        embeddingsMap.put(id, new EmbeddingRecord(null, &quot;&quot;, embedding.vector()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String add(Embedding embedding, TextSegment textSegment) {
+<b class="nc">&nbsp;        String id = String.valueOf(UUID.randomUUID());</b>
+<b class="nc">&nbsp;        String linkedFile = textSegment.metadata().getString(LINK_METADATA_KEY);</b>
+<b class="nc">&nbsp;        embeddingsMap.put(id, new EmbeddingRecord(linkedFile, textSegment.text(), embedding.vector()));</b>
+<b class="nc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; addAll(List&lt;Embedding&gt; embeddings, List&lt;TextSegment&gt; embedded) {
+<b class="nc">&nbsp;        return IntStream.range(0, embeddings.size()).mapToObj(i -&gt; add(embeddings.get(i), embedded.get(i))).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void remove(String id) {
+<b class="nc">&nbsp;        embeddingsMap.remove(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void removeAll(Filter filter) {
+<b class="nc">&nbsp;        List&lt;String&gt; idsToRemove = applyFilter(filter).toList();</b>
+<b class="nc">&nbsp;        idsToRemove.forEach(this::remove);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void removeAll() {
+<b class="nc">&nbsp;        embeddingsMap.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// The main function of finding most relevant text segments.
+&nbsp;    /// Note: the only filters supported are:
+&nbsp;    ///
+&nbsp;    /// - [IsIn] with key [FileEmbeddingsManager#LINK_METADATA_KEY]
+&nbsp;    /// - [IsEqualTo] with key [FileEmbeddingsManager#LINK_METADATA_KEY]
+&nbsp;    ///
+&nbsp;    /// @param request embedding search request
+&nbsp;    /// @return an [EmbeddingSearchResult], which contains most relevant text segments
+&nbsp;    @Override
+&nbsp;    public EmbeddingSearchResult&lt;TextSegment&gt; search(EmbeddingSearchRequest request) {
+&nbsp;        // Source: {@link InMemoryEmbeddingStore}.
+&nbsp;
+<b class="nc">&nbsp;        Comparator&lt;EmbeddingMatch&lt;TextSegment&gt;&gt; comparator = comparingDouble(EmbeddingMatch::score);</b>
+<b class="nc">&nbsp;        PriorityQueue&lt;EmbeddingMatch&lt;TextSegment&gt;&gt; matches = new PriorityQueue&lt;&gt;(comparator);</b>
+&nbsp;
+<b class="nc">&nbsp;        applyFilter(request.filter()).forEach(id -&gt; {</b>
+<b class="nc">&nbsp;            EmbeddingRecord eRecord = embeddingsMap.get(id);</b>
+&nbsp;
+<b class="nc">&nbsp;            double cosineSimilarity = CosineSimilarity.between(Embedding.from(eRecord.embeddingVector), request.queryEmbedding());</b>
+<b class="nc">&nbsp;            double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (score &gt;= request.minScore()) {</b>
+<b class="nc">&nbsp;                matches.add(</b>
+&nbsp;                        new EmbeddingMatch&lt;&gt;(
+<b class="nc">&nbsp;                                score,</b>
+&nbsp;                                id,
+<b class="nc">&nbsp;                                Embedding.from(eRecord.embeddingVector),</b>
+&nbsp;                                new TextSegment(
+&nbsp;                                        eRecord.content,
+&nbsp;                                        new Metadata(
+<b class="nc">&nbsp;                                                eRecord.file == null ? Map.of() : Map.of(LINK_METADATA_KEY, eRecord.file)))));</b>
+&nbsp;
+<b class="nc">&nbsp;                if (matches.size() &gt; request.maxResults()) {</b>
+<b class="nc">&nbsp;                    matches.poll();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        List&lt;EmbeddingMatch&lt;TextSegment&gt;&gt; result = new ArrayList&lt;&gt;(matches);</b>
+<b class="nc">&nbsp;        result.sort(comparator.reversed());</b>
+&nbsp;
+<b class="nc">&nbsp;        return new EmbeddingSearchResult&lt;&gt;(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void removeAll(Collection ids) {
+<b class="nc">&nbsp;        embeddingsMap.entrySet().removeIf(entry -&gt; ids.contains(entry.getKey()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Stream&lt;String&gt; applyFilter(@Nullable Filter filter) {
+<b class="nc">&nbsp;        return switch (filter) {</b>
+&nbsp;            case null -&gt;
+<b class="nc">&nbsp;                    embeddingsMap.keySet().stream();</b>
+&nbsp;
+<b class="nc">&nbsp;            case IsIn isInFilter when Objects.equals(isInFilter.key(), LINK_METADATA_KEY) -&gt;</b>
+<b class="nc">&nbsp;                    filterEntries(entry -&gt; isInFilter.comparisonValues().contains(entry.getValue().file));</b>
+&nbsp;
+<b class="nc">&nbsp;            case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), LINK_METADATA_KEY) -&gt;</b>
+<b class="nc">&nbsp;                    filterEntries(entry -&gt; isEqualToFilter.comparisonValue().equals(entry.getValue().file));</b>
+&nbsp;
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Wrong filter passed to MVStoreEmbeddingStore&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private Stream&lt;String&gt; filterEntries(Predicate&lt;Map.Entry&lt;String, EmbeddingRecord&gt;&gt; predicate) {
+<b class="nc">&nbsp;        return embeddingsMap.entrySet().stream().filter(predicate).map(Map.Entry::getKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String errorMessageForOpening() {
+<b class="nc">&nbsp;        return &quot;An error occurred while opening the embeddings cache file. Embeddings will not be stored in the next session.&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String errorMessageForOpeningLocalized() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;An error occurred while opening the embeddings cache file. Embeddings will not be stored in the next session.&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

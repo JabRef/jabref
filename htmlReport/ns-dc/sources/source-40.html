@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Replace</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: Replace (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Replace</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.AbstractParamLayoutFormatter;
+&nbsp;
+&nbsp;/// Formatter that does regexp replacement.
+&nbsp;/// To use this formatter, a two-part argument must be given. The parts are
+&nbsp;/// separated by a comma. To indicate the comma character, use an escape
+&nbsp;/// sequence: \,
+&nbsp;/// For inserting newlines and tabs in arguments, use \n and \t, respectively.
+&nbsp;/// The first part is the regular expression to search for. Remember that any commma
+&nbsp;/// character must be preceded by a backslash, and consequently a literal backslash must
+&nbsp;/// be written as a pair of backslashes. A description of Java regular expressions can be
+&nbsp;/// found at:
+&nbsp;///   http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
+&nbsp;/// The second part is the text to replace all matches with.
+&nbsp;/// For instance:
+&nbsp;///
+&nbsp;/// `\format[Replace(and,&amp;)]{\author}`
+&nbsp;///      will output the &quot;author&quot; field after replacing all occurences of &quot;and&quot;
+&nbsp;///      by &quot;&amp;&quot;
+&nbsp;///
+&nbsp;///  `\format[Replace(\s,_)]{\author}`
+&nbsp;///      will output the &quot;author&quot; field after replacing all whitespace
+&nbsp;///      by underscores.
+&nbsp;///
+&nbsp;///  `\format[Replace(\,,;)]{\author}`
+&nbsp;///      will output the &quot;author&quot; field after replacing all commas by semicolons.
+<b class="nc">&nbsp;public class Replace extends AbstractParamLayoutFormatter {</b>
+&nbsp;
+&nbsp;    private String regex;
+&nbsp;    private String replaceWith;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setArgument(String arg) {
+<b class="nc">&nbsp;        List&lt;String&gt; parts = AbstractParamLayoutFormatter.parseArgument(arg);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (parts.size() &lt; 2) {</b>
+&nbsp;            return; // TODO: too few arguments. Print an error message here?
+&nbsp;        }
+<b class="nc">&nbsp;        regex = parts.getFirst();</b>
+<b class="nc">&nbsp;        replaceWith = parts.get(1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String fieldText) {
+<b class="nc">&nbsp;        if ((fieldText == null) || (regex == null)) {</b>
+<b class="nc">&nbsp;            return fieldText; // TODO: argument missing or invalid. Print an error message here?</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return fieldText.replaceAll(regex, replaceWith);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

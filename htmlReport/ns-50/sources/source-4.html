@@ -1,0 +1,335 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExtractReferencesAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: ExtractReferencesAction (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExtractReferencesAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/79)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.StringJoiner;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.importer.ImportEntriesDialog;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
+&nbsp;import org.jabref.logic.importer.util.GrobidService;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+&nbsp;/**
+&nbsp; * SIDE EFFECT: Sets the &quot;cites&quot; field of the entry having the linked files
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; *   &lt;li&gt;Mode choice A: online or offline&lt;/li&gt;
+&nbsp; *   &lt;li&gt;Mode choice B: complete entry or single file (the latter is not implemented)&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The mode is selected by the preferences whether to use Grobid or not.
+&nbsp; */
+&nbsp;public class ExtractReferencesAction extends SimpleCommand {
+<b class="nc">&nbsp;    private final int FILES_LIMIT = 10;</b>
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final BibEntry entry;
+&nbsp;    private final LinkedFile linkedFile;
+&nbsp;
+&nbsp;    private final BibliographyFromPdfImporter bibliographyFromPdfImporter;
+&nbsp;
+&nbsp;    public ExtractReferencesAction(DialogService dialogService,
+&nbsp;                                   StateManager stateManager,
+&nbsp;                                   CliPreferences preferences) {
+<b class="nc">&nbsp;        this(dialogService, stateManager, preferences, null, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Can be used to bind the action on a context menu in the linked file view (future work)
+&nbsp;     *
+&nbsp;     * @param entry      the entry to handle (can be null)
+&nbsp;     * @param linkedFile the linked file (can be null)
+&nbsp;     */
+&nbsp;    private ExtractReferencesAction(@NonNull DialogService dialogService,
+&nbsp;                                    @NonNull StateManager stateManager,
+&nbsp;                                    @NonNull CliPreferences preferences,
+&nbsp;                                    @Nullable BibEntry entry,
+<b class="nc">&nbsp;                                    @Nullable LinkedFile linkedFile) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        this.linkedFile = linkedFile;</b>
+<b class="nc">&nbsp;        bibliographyFromPdfImporter = new BibliographyFromPdfImporter(preferences.getCitationKeyPatternPreferences());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (this.linkedFile == null) {</b>
+<b class="nc">&nbsp;            this.executable.bind(</b>
+<b class="nc">&nbsp;                    ActionHelper.needsEntriesSelected(stateManager)</b>
+<b class="nc">&nbsp;                                .and(ActionHelper.hasLinkedFileForSelectedEntries(stateManager))</b>
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.setExecutable(true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        extractReferences();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void extractReferences() {
+<b class="nc">&nbsp;        stateManager.getActiveDatabase().ifPresent(databaseContext -&gt; {</b>
+&nbsp;            List&lt;BibEntry&gt; selectedEntries;
+<b class="nc">&nbsp;            if (entry == null) {</b>
+<b class="nc">&nbsp;                selectedEntries = stateManager.getSelectedEntries();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                selectedEntries = List.of(entry);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            boolean online = this.preferences.getGrobidPreferences().isGrobidEnabled();</b>
+&nbsp;            Callable&lt;ParserResult&gt; parserResultCallable;
+<b class="nc">&nbsp;            if (online) {</b>
+<b class="nc">&nbsp;                Optional&lt;Callable&lt;ParserResult&gt;&gt; parserResultCallableOnline = getParserResultCallableOnline(databaseContext, selectedEntries);</b>
+<b class="nc">&nbsp;                if (parserResultCallableOnline.isEmpty()) {</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;                parserResultCallable = parserResultCallableOnline.get();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                parserResultCallable = getParserResultCallableOffline(databaseContext, selectedEntries);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            BackgroundTask&lt;ParserResult&gt; task = BackgroundTask.wrap(parserResultCallable)</b>
+<b class="nc">&nbsp;                                                              .withInitialMessage(Localization.lang(&quot;Processing PDF(s)&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;            task.onFailure(dialogService::showErrorDialogAndWait);</b>
+&nbsp;
+<b class="nc">&nbsp;            ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);</b>
+&nbsp;            String title;
+<b class="nc">&nbsp;            if (online) {</b>
+<b class="nc">&nbsp;                title = Localization.lang(&quot;Extract References (online)&quot;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                title = Localization.lang(&quot;Extract References (offline)&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            dialog.setTitle(title);</b>
+<b class="nc">&nbsp;            dialogService.showCustomDialogAndWait(dialog);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private @NonNull Callable&lt;ParserResult&gt; getParserResultCallableOffline(BibDatabaseContext databaseContext, List&lt;BibEntry&gt; selectedEntries) {
+<b class="nc">&nbsp;        return () -&gt; {</b>
+<b class="nc">&nbsp;            BibEntry currentEntry = selectedEntries.getFirst();</b>
+<b class="nc">&nbsp;            List&lt;Path&gt; fileList = FileUtil.getListOfLinkedFiles(selectedEntries, databaseContext.getFileDirectories(preferences.getFilePreferences()));</b>
+&nbsp;
+&nbsp;            // We need to have ParserResult handled at the importer, because it imports the meta data (library type, encoding, ...)
+<b class="nc">&nbsp;            ParserResult result = bibliographyFromPdfImporter.importDatabase(fileList.getFirst());</b>
+&nbsp;
+&nbsp;            // subsequent files are just appended to result
+<b class="nc">&nbsp;            Iterator&lt;Path&gt; fileListIterator = fileList.iterator();</b>
+<b class="nc">&nbsp;            fileListIterator.next(); // skip first file</b>
+<b class="nc">&nbsp;            extractReferences(fileListIterator, result, currentEntry);</b>
+&nbsp;
+&nbsp;            // handle subsequent entries
+<b class="nc">&nbsp;            Iterator&lt;BibEntry&gt; selectedEntriesIterator = selectedEntries.iterator();</b>
+<b class="nc">&nbsp;            selectedEntriesIterator.next(); // skip first entry</b>
+<b class="nc">&nbsp;            while (selectedEntriesIterator.hasNext()) {</b>
+<b class="nc">&nbsp;                currentEntry = selectedEntriesIterator.next();</b>
+<b class="nc">&nbsp;                fileList = FileUtil.getListOfLinkedFiles(List.of(currentEntry), databaseContext.getFileDirectories(preferences.getFilePreferences()));</b>
+<b class="nc">&nbsp;                fileListIterator = fileList.iterator();</b>
+<b class="nc">&nbsp;                extractReferences(fileListIterator, result, currentEntry);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private void extractReferences(Iterator&lt;Path&gt; fileListIterator, ParserResult result, BibEntry currentEntry) {
+<b class="nc">&nbsp;        while (fileListIterator.hasNext()) {</b>
+<b class="nc">&nbsp;            result.getDatabase().insertEntries(bibliographyFromPdfImporter.importDatabase(fileListIterator.next()).getDatabase().getEntries());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String cites = getCites(result.getDatabase().getEntries(), currentEntry);</b>
+<b class="nc">&nbsp;        currentEntry.setField(StandardField.CITES, cites);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the field content for the &quot;cites&quot; field. The field contains the citation keys of the imported entries.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * TODO: Move this part to logic somehow
+&nbsp;     *
+&nbsp;     * @param currentEntry used to create citation keys if the importer did not provide one from the imported entry
+&nbsp;     */
+&nbsp;    private static String getCites(List&lt;BibEntry&gt; entries, BibEntry currentEntry) {
+<b class="nc">&nbsp;        StringJoiner cites = new StringJoiner(&quot;,&quot;);</b>
+<b class="nc">&nbsp;        int count = 0;</b>
+<b class="nc">&nbsp;        for (BibEntry importedEntry : entries) {</b>
+<b class="nc">&nbsp;            count++;</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; citationKey = importedEntry.getCitationKey();</b>
+&nbsp;            String citationKeyToAdd;
+<b class="nc">&nbsp;            if (citationKey.isPresent()) {</b>
+<b class="nc">&nbsp;                citationKeyToAdd = citationKey.get();</b>
+&nbsp;            } else {
+&nbsp;                // No key present -&gt; generate one based on
+&nbsp;                //   the citation key of the entry holding the files and
+&nbsp;                //   the number of the current entry (extracted from the reference; fallback: current number of the entry (count variable))
+&nbsp;
+<b class="nc">&nbsp;                String sourceCitationKey = currentEntry.getCitationKey().orElse(&quot;unknown&quot;);</b>
+&nbsp;                String newCitationKey;
+&nbsp;                // Could happen if no author and no year is present
+&nbsp;                // We use the number of the comment field (because there is no other way to get the number reliable)
+<b class="nc">&nbsp;                Pattern pattern = Pattern.compile(&quot;^\\[(\\d+)\\]&quot;);</b>
+<b class="nc">&nbsp;                Matcher matcher = pattern.matcher(importedEntry.getField(StandardField.COMMENT).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;                if (matcher.hasMatch()) {</b>
+<b class="nc">&nbsp;                    newCitationKey = sourceCitationKey + &quot;-&quot; + matcher.group(1);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    newCitationKey = sourceCitationKey + &quot;-&quot; + count;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                importedEntry.setCitationKey(newCitationKey);</b>
+<b class="nc">&nbsp;                citationKeyToAdd = newCitationKey;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            cites.add(citationKeyToAdd);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return cites.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;Callable&lt;ParserResult&gt;&gt; getParserResultCallableOnline(BibDatabaseContext databaseContext, List&lt;BibEntry&gt; selectedEntries) {
+<b class="nc">&nbsp;        List&lt;Path&gt; fileList = FileUtil.getListOfLinkedFiles(selectedEntries, databaseContext.getFileDirectories(preferences.getFilePreferences()));</b>
+<b class="nc">&nbsp;        if (fileList.size() &gt; FILES_LIMIT) {</b>
+<b class="nc">&nbsp;            boolean continueOpening = dialogService.showConfirmationDialogAndWait(Localization.lang(&quot;Processing a large number of files&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;You are about to process %0 files. Continue?&quot;, fileList.size()),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Continue&quot;), Localization.lang(&quot;Cancel&quot;));</b>
+<b class="nc">&nbsp;            if (!continueOpening) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(() -&gt; new ParserResult(</b>
+<b class="nc">&nbsp;                new GrobidService(this.preferences.getGrobidPreferences()).processReferences(fileList, preferences.getImportFormatPreferences())</b>
+&nbsp;        ));
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

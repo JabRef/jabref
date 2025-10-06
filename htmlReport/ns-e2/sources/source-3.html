@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GetContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.backend</a>
+</div>
+
+<h1>Coverage Summary for Class: GetContext (org.jabref.logic.openoffice.backend)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GetContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.backend;
+&nbsp;
+&nbsp;import com.sun.star.text.XTextCursor;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility methods for processing OO Writer documents.
+&nbsp; */
+&nbsp;public class GetContext {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GetContext.class);</b>
+&nbsp;
+&nbsp;    private GetContext() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the text belonging to cursor with up to charBefore and charAfter characters of context.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The actual context may be smaller than requested.
+&nbsp;     *
+&nbsp;     * @param charBefore Number of characters requested.
+&nbsp;     * @param charAfter  Number of characters requested.
+&nbsp;     * @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold html tag.
+&nbsp;     */
+&nbsp;    public static String getCursorStringWithContext(XTextCursor cursor,
+&nbsp;                                                    int charBefore,
+&nbsp;                                                    int charAfter,
+&nbsp;                                                    boolean htmlMarkup) {
+&nbsp;
+<b class="nc">&nbsp;        String citPart = cursor.getString();</b>
+&nbsp;
+&nbsp;        // extend cursor range left
+<b class="nc">&nbsp;        int flex = 8;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; charBefore; i++) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                cursor.goLeft((short) 1, true);</b>
+&nbsp;                // If we are close to charBefore and see a space, then cut here. Might avoid cutting
+&nbsp;                // a word in half.
+<b class="nc">&nbsp;                if ((i &gt;= (charBefore - flex))</b>
+<b class="nc">&nbsp;                        &amp;&amp; Character.isWhitespace(cursor.getString().charAt(0))) {</b>
+&nbsp;                    break;
+&nbsp;                }
+&nbsp;            } catch (IndexOutOfBoundsException ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Problem going left&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int lengthWithBefore = cursor.getString().length();</b>
+<b class="nc">&nbsp;        int addedBefore = lengthWithBefore - citPart.length();</b>
+&nbsp;
+<b class="nc">&nbsp;        cursor.collapseToStart();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; (charAfter + lengthWithBefore); i++) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                cursor.goRight((short) 1, true);</b>
+<b class="nc">&nbsp;                if (i &gt;= ((charAfter + lengthWithBefore) - flex)) {</b>
+<b class="nc">&nbsp;                    String strNow = cursor.getString();</b>
+<b class="nc">&nbsp;                    if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } catch (IndexOutOfBoundsException ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Problem going right&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String result = cursor.getString();</b>
+<b class="nc">&nbsp;        if (htmlMarkup) {</b>
+<b class="nc">&nbsp;            result = result.substring(0, addedBefore)</b>
+&nbsp;                    + &quot;&lt;b&gt;&quot; + citPart + &quot;&lt;/b&gt;&quot;
+<b class="nc">&nbsp;                    + result.substring(lengthWithBefore);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result.trim();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

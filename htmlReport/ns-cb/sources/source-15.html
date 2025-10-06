@@ -1,0 +1,367 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DoiFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: DoiFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DoiFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.HttpURLConnection;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.net.URLEncoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.CompletableFuture;
+&nbsp;import java.util.concurrent.CompletionException;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.EntryBasedFetcher;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.IdBasedFetcher;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.importer.util.MediaTypes;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.util.OptionalUtil;
+&nbsp;
+&nbsp;import com.google.common.util.concurrent.RateLimiter;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
+&nbsp;
+&nbsp;    public static final String NAME = &quot;DOI&quot;;
+&nbsp;
+&nbsp;    private static final String APS_JOURNAL_ORG_DOI_ID = &quot;1103&quot;;
+&nbsp;    private static final String APS_SUFFIX = &quot;([\\w]+\\.)([\\w]+\\.)([\\w]+)&quot;;
+<b class="nc">&nbsp;    private static final Pattern APS_SUFFIX_PATTERN = Pattern.compile(APS_SUFFIX);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DoiFetcher.class);</b>
+&nbsp;
+&nbsp;    // 1000 request per 5 minutes. See https://support.datacite.org/docs/is-there-a-rate-limit-for-making-requests-against-the-datacite-apis
+<b class="nc">&nbsp;    private static final RateLimiter DATA_CITE_DCN_RATE_LIMITER = RateLimiter.create(3.33);</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * By default, it seems that CrossRef DOI Content Negotiation responses are returned by their API pools, more specifically the public one
+&nbsp;     * (by default). See https://www.crossref.org/documentation/retrieve-metadata/content-negotiation/
+&nbsp;     * Experimentally, the rating applied to this pool is defined by response headers &quot;X-Rate-Limit-Interval&quot; and &quot;X-Rate-Limit-Limit&quot;, which seems
+&nbsp;     * to default to 50 request / second. However, because of its dynamic nature, this rate could change between API calls, so we need to update it
+&nbsp;     * atomically when that happens (as multiple threads might access it at the same time)
+&nbsp;     */
+<b class="nc">&nbsp;    private static final RateLimiter CROSSREF_DCN_RATE_LIMITER = RateLimiter.create(50.0);</b>
+&nbsp;
+&nbsp;    private final ImportFormatPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public DoiFetcher(ImportFormatPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return DoiFetcher.NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_DOI);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doAPILimiting(String identifier) {
+&nbsp;        // Without a generic API Rate Limiter implemented on the project, use Guava&#39;s RateLimiter for avoiding
+&nbsp;        // API throttling when multiple threads are working, specially during DOI Content Negotiations
+<b class="nc">&nbsp;        Optional&lt;DOI&gt; doi = DOI.parse(identifier);</b>
+&nbsp;
+&nbsp;        try {
+&nbsp;            Optional&lt;String&gt; agency;
+<b class="nc">&nbsp;            if (doi.isPresent() &amp;&amp; (agency = getAgency(doi.get())).isPresent()) {</b>
+<b class="nc">&nbsp;                double waitingTime = 0.0;</b>
+<b class="nc">&nbsp;                if (&quot;datacite&quot;.equalsIgnoreCase(agency.get())) {</b>
+<b class="nc">&nbsp;                    waitingTime = DATA_CITE_DCN_RATE_LIMITER.acquire();</b>
+<b class="nc">&nbsp;                } else if (&quot;crossref&quot;.equalsIgnoreCase(agency.get())) {</b>
+<b class="nc">&nbsp;                    waitingTime = CROSSREF_DCN_RATE_LIMITER.acquire();</b>
+&nbsp;                } // mEDRA does not explicit an API rating
+&nbsp;
+<b class="nc">&nbsp;                LOGGER.trace(&quot;Thread {}, searching for DOI &#39;{}&#39;, waited {} because of API rate limiter&quot;,</b>
+<b class="nc">&nbsp;                        Thread.currentThread().threadId(), identifier, waitingTime);</b>
+&nbsp;            }
+&nbsp;        } catch (FetcherException | MalformedURLException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not limit DOI API access rate&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected CompletableFuture&lt;Optional&lt;BibEntry&gt;&gt; asyncPerformSearchById(String identifier) {
+<b class="nc">&nbsp;        doAPILimiting(identifier);</b>
+<b class="nc">&nbsp;        return CompletableFuture.supplyAsync(() -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return performSearchById(identifier);</b>
+&nbsp;            } catch (FetcherException e) {
+<b class="nc">&nbsp;                throw new CompletionException(e);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;BibEntry&gt; performSearchById(String identifier) throws FetcherException {
+<b class="nc">&nbsp;        Optional&lt;DOI&gt; doi = DOI.parse(identifier);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (doi.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new FetcherException(Localization.lang(&quot;Invalid DOI: &#39;%0&#39;.&quot;, identifier));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        URL doiURL;
+&nbsp;        try {
+<b class="nc">&nbsp;            doiURL = URLUtil.create(doi.get().getURIAsASCIIString());</b>
+&nbsp;        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Malformed URL&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+&nbsp;            Optional&lt;BibEntry&gt; fetchedEntry;
+&nbsp;
+&nbsp;            // mEDRA does not return a parsable bibtex string
+<b class="nc">&nbsp;            Optional&lt;String&gt; agency = getAgency(doi.get());</b>
+<b class="nc">&nbsp;            if (agency.isPresent() &amp;&amp; &quot;medra&quot;.equalsIgnoreCase(agency.get())) {</b>
+<b class="nc">&nbsp;                return new Medra().performSearchById(identifier);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // BibTeX data
+<b class="nc">&nbsp;            URLDownload download = getUrlDownload(doiURL);</b>
+<b class="nc">&nbsp;            download.addHeader(&quot;Accept&quot;, MediaTypes.APPLICATION_BIBTEX);</b>
+&nbsp;
+&nbsp;            String bibtexString;
+&nbsp;            URLConnection openConnection;
+&nbsp;
+<b class="nc">&nbsp;            openConnection = download.openConnection();</b>
+<b class="nc">&nbsp;            bibtexString = URLDownload.asString(openConnection).trim();</b>
+&nbsp;
+&nbsp;            // BibTeX entry
+<b class="nc">&nbsp;            fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);</b>
+<b class="nc">&nbsp;            fetchedEntry.ifPresent(this::doPostCleanup);</b>
+&nbsp;
+&nbsp;            // Crossref has a dynamic API rate limit
+<b class="nc">&nbsp;            if (agency.isPresent() &amp;&amp; &quot;crossref&quot;.equalsIgnoreCase(agency.get())) {</b>
+<b class="nc">&nbsp;                updateCrossrefAPIRate(openConnection);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Check if the entry is an APS journal and add the article id as the page count if page field is missing
+<b class="nc">&nbsp;            if (fetchedEntry.isPresent() &amp;&amp; fetchedEntry.get().hasField(StandardField.DOI)) {</b>
+<b class="nc">&nbsp;                BibEntry entry = fetchedEntry.get();</b>
+<b class="nc">&nbsp;                if (isAPSJournal(entry, entry.getField(StandardField.DOI).get()) &amp;&amp; !entry.hasField(StandardField.PAGES)) {</b>
+<b class="nc">&nbsp;                    setPageCountToArticleId(entry, entry.getField(StandardField.DOI).get());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (openConnection instanceof HttpURLConnection connection) {</b>
+<b class="nc">&nbsp;                connection.disconnect();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return fetchedEntry;</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            throw new FetcherException(doiURL, Localization.lang(&quot;Connection error&quot;), e);</b>
+&nbsp;        } catch (ParseException e) {
+<b class="nc">&nbsp;            throw new FetcherException(doiURL, &quot;Could not parse BibTeX entry&quot;, e);</b>
+&nbsp;        } catch (JSONException e) {
+<b class="nc">&nbsp;            throw new FetcherException(doiURL, &quot;Could not retrieve Registration Agency&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doPostCleanup(BibEntry entry) {
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter()).cleanup(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateCrossrefAPIRate(URLConnection existingConnection) {
+&nbsp;        try {
+&nbsp;            // Assuming this field is given in seconds
+<b class="nc">&nbsp;            String xRateLimitInterval = existingConnection.getHeaderField(&quot;X-Rate-Limit-Interval&quot;).replaceAll(&quot;[^\\.0123456789]&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;            String xRateLimit = existingConnection.getHeaderField(&quot;X-Rate-Limit-Limit&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            double newRate = Double.parseDouble(xRateLimit) / Double.parseDouble(xRateLimitInterval);</b>
+<b class="nc">&nbsp;            double oldRate = CROSSREF_DCN_RATE_LIMITER.getRate();</b>
+&nbsp;
+&nbsp;            // In theory, the actual update might rarely happen...
+<b class="nc">&nbsp;            if (Math.abs(newRate - oldRate) &gt;= 1.0) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Updated Crossref API rate limit from {} to {}&quot;, oldRate, newRate);</b>
+<b class="nc">&nbsp;                CROSSREF_DCN_RATE_LIMITER.setRate(newRate);</b>
+&nbsp;            }
+&nbsp;        } catch (NullPointerException | IllegalArgumentException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not deduce Crossref API&#39;s rate limit from response header. API might have changed&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; performSearch(BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;        Optional&lt;String&gt; doi = entry.getField(StandardField.DOI);</b>
+<b class="nc">&nbsp;        if (doi.isPresent()) {</b>
+<b class="nc">&nbsp;            return OptionalUtil.toList(performSearchById(doi.get()));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns registration agency. Optional.empty() if no agency is found.
+&nbsp;     *
+&nbsp;     * @param doi the DOI to be searched
+&nbsp;     */
+&nbsp;    public Optional&lt;String&gt; getAgency(DOI doi) throws FetcherException, MalformedURLException {
+<b class="nc">&nbsp;        Optional&lt;String&gt; agency = Optional.empty();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            URLDownload download = getUrlDownload(URLUtil.create(DOI.AGENCY_RESOLVER + &quot;/&quot; + URLEncoder.encode(doi.asString(),</b>
+&nbsp;                    StandardCharsets.UTF_8)));
+<b class="nc">&nbsp;            JSONObject response = new JSONArray(download.asString()).getJSONObject(0);</b>
+<b class="nc">&nbsp;            if (response != null) {</b>
+<b class="nc">&nbsp;                agency = Optional.ofNullable(response.optString(&quot;RA&quot;));</b>
+&nbsp;            }
+&nbsp;        } catch (JSONException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Cannot parse agency fetcher response to JSON&quot;);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return agency;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setPageCountToArticleId(BibEntry entry, String doiAsString) {
+<b class="nc">&nbsp;        String articleId = doiAsString.substring(doiAsString.lastIndexOf(&#39;.&#39;) + 1);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.PAGES, articleId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // checks if the entry is an APS journal by comparing the organization id and the suffix format
+&nbsp;    private boolean isAPSJournal(BibEntry entry, String doiAsString) {
+<b class="nc">&nbsp;        if (!entry.getType().equals(StandardEntryType.Article)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String suffix = doiAsString.substring(doiAsString.lastIndexOf(&#39;/&#39;) + 1);</b>
+<b class="nc">&nbsp;        String organizationId = doiAsString.substring(doiAsString.indexOf(&#39;.&#39;) + 1, doiAsString.indexOf(&#39;/&#39;));</b>
+<b class="nc">&nbsp;        return APS_JOURNAL_ORG_DOI_ID.equals(organizationId) &amp;&amp; APS_SUFFIX_PATTERN.matcher(suffix).matches();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

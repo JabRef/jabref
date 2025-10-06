@@ -1,0 +1,435 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DialogService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: DialogService (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DialogService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import javafx.concurrent.Task;
+&nbsp;import javafx.print.PrinterJob;
+&nbsp;import javafx.scene.control.Alert;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.ChoiceDialog;
+&nbsp;import javafx.scene.control.Dialog;
+&nbsp;import javafx.scene.control.DialogPane;
+&nbsp;import javafx.scene.control.TextInputDialog;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.util.StringConverter;
+&nbsp;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.BaseWindow;
+&nbsp;import org.jabref.gui.util.DirectoryDialogConfiguration;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.util.NotificationService;
+&nbsp;
+&nbsp;import org.controlsfx.control.textfield.CustomPasswordField;
+&nbsp;import org.controlsfx.dialog.ProgressDialog;
+&nbsp;
+&nbsp;/**
+&nbsp; * This interface provides methods to create dialogs and show them to the user.
+&nbsp; */
+&nbsp;public interface DialogService extends NotificationService {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
+&nbsp;     *
+&nbsp;     * @implNote The implementation should accept {@code null} for {@code defaultChoice}, but callers should use {@link #showChoiceDialogAndWait(String, String, String, Collection)}.
+&nbsp;     */
+&nbsp;    &lt;T&gt; Optional&lt;T&gt; showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection&lt;T&gt; choices);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display new {@link ChoiceDialog} of type T with a collection of possible choices
+&nbsp;     */
+&nbsp;    default &lt;T&gt; Optional&lt;T&gt; showChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection&lt;T&gt; choices) {
+<b class="nc">&nbsp;        return showChoiceDialogAndWait(title, content, okButtonLabel, null, choices);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    &lt;T&gt; Optional&lt;T&gt; showEditableChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection&lt;T&gt; choices, StringConverter&lt;T&gt; converter);
+&nbsp;
+&nbsp;    default &lt;T&gt; Optional&lt;T&gt; showEditableChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection&lt;T&gt; choices, StringConverter&lt;T&gt; converter) {
+<b class="nc">&nbsp;        return showEditableChoiceDialogAndWait(title, content, okButtonLabel, null, choices, converter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display new {@link TextInputDialog} with a text fields to enter data
+&nbsp;     */
+&nbsp;    Optional&lt;String&gt; showInputDialogAndWait(String title, String content);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display new {@link TextInputDialog} with a text field with a default value to enter data
+&nbsp;     */
+&nbsp;    Optional&lt;String&gt; showInputDialogWithDefaultAndWait(String title, String content, String defaultValue);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display a new information dialog.
+&nbsp;     * It will include a blue information icon on the left and
+&nbsp;     * a single OK Button. To create an information dialog with custom
+&nbsp;     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+&nbsp;     */
+&nbsp;    void showInformationDialogAndWait(String title, String content);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display a new information dialog.
+&nbsp;     * It will include a yellow warning icon on the left and
+&nbsp;     * a single OK Button. To create a warning dialog with custom
+&nbsp;     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+&nbsp;     */
+&nbsp;    void showWarningDialogAndWait(String title, String content);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display a new error dialog.
+&nbsp;     * It will include a red error icon on the left and
+&nbsp;     * a single OK Button. To create a error dialog with custom
+&nbsp;     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+&nbsp;     */
+&nbsp;    void showErrorDialogAndWait(String title, String content);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create and display error dialog displaying the given exception.
+&nbsp;     *
+&nbsp;     * @param message   the error message
+&nbsp;     * @param exception the exception causing the error
+&nbsp;     */
+&nbsp;    void showErrorDialogAndWait(String message, Throwable exception);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create and display error dialog displaying the given exception.
+&nbsp;     *
+&nbsp;     * @param exception the exception causing the error
+&nbsp;     */
+&nbsp;    void showErrorDialogAndWait(Exception exception);
+&nbsp;
+&nbsp;    void showErrorDialogAndWait(FetcherException fetcherException);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create and display error dialog displaying the given exception.
+&nbsp;     *
+&nbsp;     * @param exception the exception causing the error
+&nbsp;     */
+&nbsp;    void showErrorDialogAndWait(String title, String content, Throwable exception);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create and display error dialog displaying the given message.
+&nbsp;     *
+&nbsp;     * @param message the error message
+&nbsp;     */
+&nbsp;    void showErrorDialogAndWait(String message);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display a new confirmation dialog.
+&nbsp;     * It will include a blue question icon on the left and
+&nbsp;     * a OK and Cancel button. To create a confirmation dialog with custom
+&nbsp;     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+&nbsp;     *
+&nbsp;     * @return true if the use clicked &quot;OK&quot; otherwise false
+&nbsp;     */
+&nbsp;    boolean showConfirmationDialogAndWait(String title, String content);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create and display a new confirmation dialog.
+&nbsp;     * It will include a blue question icon on the left and
+&nbsp;     * a OK (with given label) and Cancel button. To create a confirmation dialog with custom
+&nbsp;     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+&nbsp;     *
+&nbsp;     * @return true if the use clicked &quot;OK&quot; otherwise false
+&nbsp;     */
+&nbsp;    boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create and display a new confirmation dialog.
+&nbsp;     * It will include a blue question icon on the left and
+&nbsp;     * a OK (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
+&nbsp;     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+&nbsp;     *
+&nbsp;     * @return true if the use clicked &quot;OK&quot; otherwise false
+&nbsp;     */
+&nbsp;    boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel, String cancelButtonLabel);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create and display a new confirmation dialog.
+&nbsp;     * It will include a blue question icon on the left and
+&nbsp;     * a YES (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
+&nbsp;     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+&nbsp;     * Moreover, the dialog contains a opt-out checkbox with the given text to support &quot;Do not ask again&quot;-behaviour.
+&nbsp;     *
+&nbsp;     * @return true if the use clicked &quot;YES&quot; otherwise false
+&nbsp;     */
+&nbsp;    boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
+&nbsp;                                                    String optOutMessage, Consumer&lt;Boolean&gt; optOutAction);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create and display a new confirmation dialog.
+&nbsp;     * It will include a blue question icon on the left and
+&nbsp;     * a YES (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
+&nbsp;     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+&nbsp;     * Moreover, the dialog contains a opt-out checkbox with the given text to support &quot;Do not ask again&quot;-behaviour.
+&nbsp;     *
+&nbsp;     * @return true if the use clicked &quot;YES&quot; otherwise false
+&nbsp;     */
+&nbsp;    boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
+&nbsp;                                                    String okButtonLabel, String cancelButtonLabel,
+&nbsp;                                                    String optOutMessage, Consumer&lt;Boolean&gt; optOutAction);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display new {@link CustomPasswordField} that doesn&#39;t show the text, and two buttons
+&nbsp;     * one cancel and one ok.
+&nbsp;     *
+&nbsp;     * @return the entered password if pressed &quot;OK&quot;, null otherwise
+&nbsp;     */
+&nbsp;    Optional&lt;String&gt; showPasswordDialogAndWait(String title, String header, String content);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shows a custom dialog without returning any results.
+&nbsp;     *
+&nbsp;     * @param dialog dialog to show
+&nbsp;     */
+&nbsp;    void showCustomDialog(BaseDialog&lt;?&gt; dialog);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shows a custom window.
+&nbsp;     *
+&nbsp;     * @param window window to show
+&nbsp;     */
+&nbsp;    void showCustomWindow(BaseWindow window);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display a new dialog of the specified
+&nbsp;     * {@link Alert.AlertType} but with user defined buttons as optional
+&nbsp;     * {@link ButtonType}s.
+&nbsp;     *
+&nbsp;     * @return Optional with the pressed Button as ButtonType
+&nbsp;     */
+&nbsp;    Optional&lt;ButtonType&gt; showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
+&nbsp;                                                       ButtonType... buttonTypes);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display a new dialog showing a custom {@link DialogPane}
+&nbsp;     * using custom {@link ButtonType}s, and attaches optional {@link Tooltip}s to the buttons.
+&nbsp;     * Useful for providing additional context to the user through tooltips
+&nbsp;     * without cluttering the main dialog content.
+&nbsp;     *
+&nbsp;     * @return Optional with the pressed Button as ButtonType
+&nbsp;     */
+&nbsp;
+&nbsp;    Optional&lt;ButtonType&gt; showCustomButtonDialogWithTooltipsAndWait(Alert.AlertType type,
+&nbsp;                                                                   String title,
+&nbsp;                                                                   String content,
+&nbsp;                                                                   Map&lt;ButtonType, String&gt; tooltips,
+&nbsp;                                                                   ButtonType... buttonTypes);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will create and display a new dialog showing a custom {@link DialogPane}
+&nbsp;     * and using custom {@link ButtonType}s.
+&nbsp;     *
+&nbsp;     * @return Optional with the pressed Button as ButtonType
+&nbsp;     */
+&nbsp;    Optional&lt;ButtonType&gt; showCustomDialogAndWait(String title, DialogPane contentPane, ButtonType... buttonTypes);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shows a custom dialog and returns the result.
+&nbsp;     *
+&nbsp;     * @param dialog dialog to show
+&nbsp;     * @param &lt;R&gt;    type of result
+&nbsp;     */
+&nbsp;    &lt;R&gt; Optional&lt;R&gt; showCustomDialogAndWait(Dialog&lt;R&gt; dialog);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs and shows a cancelable {@link ProgressDialog}.
+&nbsp;     * Clicking cancel will cancel the underlying service and close the dialog
+&nbsp;     *
+&nbsp;     * @param title   title of the dialog
+&nbsp;     * @param content message to show above the progress bar
+&nbsp;     * @param task    The {@link Task} which executes the work and for which to show the dialog
+&nbsp;     */
+&nbsp;    &lt;V&gt; void showProgressDialog(String title, String content, Task&lt;V&gt; task);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs and shows a cancelable {@link ProgressDialog}.
+&nbsp;     * Clicking cancel will cancel the underlying service and close the dialog,
+&nbsp;     * otherwise will wait for the task to finish.
+&nbsp;     *
+&nbsp;     * @param title   title of the dialog
+&nbsp;     * @param content message to show above the progress bar
+&nbsp;     * @param task    The {@link Task} which executes the work and for which to show the dialog
+&nbsp;     */
+&nbsp;    &lt;V&gt; void showProgressDialogAndWait(String title, String content, Task&lt;V&gt; task);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs and shows a dialog showing the progress of running background tasks.
+&nbsp;     * Clicking cancel will cancel the underlying service and close the dialog.
+&nbsp;     * The dialog will exit as soon as none of the background tasks are running
+&nbsp;     *
+&nbsp;     * @param title        title of the dialog
+&nbsp;     * @param content      message to show below the list of background tasks
+&nbsp;     * @param stateManager The {@link StateManager} which contains the background tasks
+&nbsp;     */
+&nbsp;    &lt;V&gt; Optional&lt;ButtonType&gt; showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shows a new file save dialog. The method doesn&#39;t return until the
+&nbsp;     * displayed file save dialog is dismissed. The return value specifies the
+&nbsp;     * file chosen by the user or an empty {@link Optional} if no selection has been made.
+&nbsp;     * After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
+&nbsp;     *
+&nbsp;     * @return the selected file or an empty {@link Optional} if no file has been selected
+&nbsp;     */
+&nbsp;    Optional&lt;Path&gt; showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shows a new file open dialog. The method doesn&#39;t return until the
+&nbsp;     * displayed open dialog is dismissed. The return value specifies
+&nbsp;     * the file chosen by the user or an empty {@link Optional} if no selection has been
+&nbsp;     * made.
+&nbsp;     * After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
+&nbsp;     *
+&nbsp;     * @return the selected file or an empty {@link Optional} if no file has been selected
+&nbsp;     */
+&nbsp;    Optional&lt;Path&gt; showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shows a new file open dialog. The method doesn&#39;t return until the
+&nbsp;     * displayed open dialog is dismissed. The return value specifies
+&nbsp;     * the files chosen by the user or an empty {@link List} if no selection has been
+&nbsp;     * made.
+&nbsp;     *
+&nbsp;     * @return the selected files or an empty {@link List} if no file has been selected
+&nbsp;     */
+&nbsp;    List&lt;Path&gt; showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shows a new directory selection dialog. The method doesn&#39;t return until the
+&nbsp;     * displayed open dialog is dismissed. The return value specifies
+&nbsp;     * the file chosen by the user or an empty {@link Optional} if no selection has been
+&nbsp;     * made.
+&nbsp;     *
+&nbsp;     * @return the selected directory or an empty {@link Optional} if no directory has been selected
+&nbsp;     */
+&nbsp;    Optional&lt;Path&gt; showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Displays a Print Dialog. Allow the user to update job state such as printer and settings. These changes will be
+&nbsp;     * available in the appropriate properties after the print dialog has returned. The print dialog is also used to
+&nbsp;     * confirm the user wants to proceed with printing.
+&nbsp;     *
+&nbsp;     * @param job the print job to customize
+&nbsp;     * @return false if the user opts to cancel printing
+&nbsp;     */
+&nbsp;    boolean showPrintDialog(PrinterJob job);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shows a new dialog that list all files contained in the given archive and which lets the user select one of these
+&nbsp;     * files. The method doesn&#39;t return until the displayed open dialog is dismissed. The return value specifies the
+&nbsp;     * file chosen by the user or an empty {@link Optional} if no selection has been made.
+&nbsp;     *
+&nbsp;     * @return the selected file or an empty {@link Optional} if no file has been selected
+&nbsp;     */
+&nbsp;    Optional&lt;Path&gt; showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,452 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EmbeddingModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.ai</a>
+</div>
+
+<h1>Coverage Summary for Class: EmbeddingModel (org.jabref.model.ai)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmbeddingModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.4%
+  </span>
+  <span class="absValue">
+    (314/319)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.ai;
+&nbsp;
+&nbsp;import org.apache.commons.io.FileUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * This enumeration was formed by &lt;a href=&quot;https://docs.djl.ai/master/docs/load_model.html#list-available-models-using-djl-command-line&quot;&gt;listing available embeddings model from Model Zoo of DJL&lt;/a&gt;
+&nbsp; * and by using a script that would rewrite the output in Java syntax + calculate size information by finding the models on Hugging Face.
+&nbsp; */
+<b class="fc">&nbsp;public enum EmbeddingModel {</b>
+<b class="fc">&nbsp;    ZEROHELL_TINYDPR_ACC_0_315_BS_307(&quot;zerohell/tinydpr-acc_0.315-bs_307&quot;, 45821255L),</b>
+<b class="fc">&nbsp;    OMARELSAYEED_SEARCH_MODEL_PRECHATS_AUGMENTED(&quot;omarelsayeed/Search_Model_PRECHATS_AUGMENTED&quot;, 47407976L),</b>
+<b class="fc">&nbsp;    DDOBOKKI_ELECTRA_SMALL_NLI_STS(&quot;ddobokki/electra-small-nli-sts&quot;, 55621715L),</b>
+<b class="fc">&nbsp;    DAEKEUN_ML_KOELECTRA_SMALL_V3_KORSTS(&quot;daekeun-ml/koelectra-small-v3-korsts&quot;, 57381425L),</b>
+<b class="fc">&nbsp;    JINAAI_JINA_EMBEDDING_T_EN_V1(&quot;jinaai/jina-embedding-t-en-v1&quot;, 58379473L),</b>
+<b class="fc">&nbsp;    CRAIG_PARAPHRASE_MINILM_L6_V2(&quot;Craig/paraphrase-MiniLM-L6-v2&quot;, 91599429L),</b>
+<b class="fc">&nbsp;    FLAX_SENTENCE_EMBEDDINGS_MULTI_QA_V1_MINILM_L6_CLS_DOT(&quot;flax-sentence-embeddings/multi-qa_v1-MiniLM-L6-cls_dot&quot;, 91634951L),</b>
+<b class="fc">&nbsp;    FLAX_SENTENCE_EMBEDDINGS_ALL_DATASETS_V4_MINILM_L6(&quot;flax-sentence-embeddings/all_datasets_v4_MiniLM-L6&quot;, 91649161L),</b>
+<b class="fc">&nbsp;    OBRIZUM_ALL_MINILM_L6_V2(&quot;obrizum/all-MiniLM-L6-v2&quot;, 91652211L),</b>
+<b class="fc">&nbsp;    TAVAKOLIH_ALL_MINILM_L6_V2_PUBMED_FULL(&quot;tavakolih/all-MiniLM-L6-v2-pubmed-full&quot;, 91838102L),</b>
+<b class="fc">&nbsp;    TEKRAJ_AVODAMED_SYNONYM_GENERATOR1(&quot;tekraj/avodamed-synonym-generator1&quot;, 91838145L),</b>
+<b class="fc">&nbsp;    RIOLITE_PRODUCTS_MATCHING_AUMET_FINE_TUNE_2023_08_22(&quot;RIOLITE/products_matching_aumet_fine_tune_2023-08-22&quot;, 91839291L),</b>
+<b class="fc">&nbsp;    JAIMEVERA1107_ALL_MINILM_L6_V2_SIMILARITY_ES(&quot;jaimevera1107/all-MiniLM-L6-v2-similarity-es&quot;, 91842465L),</b>
+<b class="fc">&nbsp;    NATEGRO_PARAMETER_MINI_LDS(&quot;nategro/parameter-mini-lds&quot;, 91843514L),</b>
+<b class="fc">&nbsp;    VALURANK_MINILM_L6_KEYWORD_EXTRACTION(&quot;valurank/MiniLM-L6-Keyword-Extraction&quot;, 91900285L),</b>
+<b class="fc">&nbsp;    COINTEGRATED_RUBERT_TINY(&quot;cointegrated/rubert-tiny&quot;, 96055211L),</b>
+<b class="fc">&nbsp;    SEZNAM_RETROMAE_SMALL_CS(&quot;Seznam/retromae-small-cs&quot;, 99167383L),</b>
+<b class="fc">&nbsp;    SEZNAM_SIMCSE_DIST_MPNET_CZENG_CS_EN(&quot;Seznam/simcse-dist-mpnet-czeng-cs-en&quot;, 99167904L),</b>
+<b class="fc">&nbsp;    SEZNAM_DIST_MPNET_PARACRAWL_CS_EN(&quot;Seznam/dist-mpnet-paracrawl-cs-en&quot;, 99168001L),</b>
+<b class="fc">&nbsp;    KORNWTP_CONGEN_WANGCHANBERT_SMALL(&quot;kornwtp/ConGen-WangchanBERT-Small&quot;, 116473324L),</b>
+<b class="fc">&nbsp;    MRP_SCT_DISTILLATION_BERT_SMALL(&quot;mrp/SCT_Distillation_BERT_Small&quot;, 117991002L),</b>
+<b class="fc">&nbsp;    INKOZIEV_SBERT_PQ(&quot;inkoziev/sbert_pq&quot;, 120308714L),</b>
+<b class="fc">&nbsp;    INKOZIEV_SBERT_SYNONYMY(&quot;inkoziev/sbert_synonymy&quot;, 120311223L),</b>
+<b class="fc">&nbsp;    THENLPER_GTE_SMALL_ZH(&quot;thenlper/gte-small-zh&quot;, 121472573L),</b>
+<b class="fc">&nbsp;    FLAX_SENTENCE_EMBEDDINGS_ALL_DATASETS_V3_MINILM_L12(&quot;flax-sentence-embeddings/all_datasets_v3_MiniLM-L12&quot;, 134243017L),</b>
+<b class="fc">&nbsp;    YUNYU_SENTENCE_TRANSFORMERS_E5_SMALL_V2(&quot;yunyu/sentence-transformers-e5-small-v2&quot;, 134456313L),</b>
+<b class="fc">&nbsp;    WITH_MADRID_WITH_E5_SMALL_V2(&quot;with-madrid/with-e5-small-v2&quot;, 134460325L),</b>
+<b class="fc">&nbsp;    THENLPER_GTE_SMALL(&quot;thenlper/gte-small&quot;, 134511905L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_ALBERT_BASE_V2(&quot;sentence-transformers/paraphrase-albert-base-v2&quot;, 142338665L),</b>
+<b class="fc">&nbsp;    TAYLORAI_BGE_MICRO(&quot;TaylorAI/bge-micro&quot;, 157041724L),</b>
+<b class="fc">&nbsp;    TAYLORAI_BGE_MICRO_V2(&quot;TaylorAI/bge-micro-v2&quot;, 157042922L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ALL_MINILM_L6_V1(&quot;sentence-transformers/all-MiniLM-L6-v1&quot;, 182496433L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_ALBERT_SMALL_V2(&quot;sentence-transformers/paraphrase-albert-small-v2&quot;, 189084665L),</b>
+<b class="fc">&nbsp;    INFGRAD_STELLA_BASE_ZH_V2(&quot;infgrad/stella-base-zh-v2&quot;, 205986861L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_MINILM_L3_V2(&quot;sentence-transformers/paraphrase-MiniLM-L3-v2&quot;, 209503582L),</b>
+<b class="fc">&nbsp;    INFGRAD_STELLA_BASE_EN_V2(&quot;infgrad/stella-base-en-v2&quot;, 220059382L),</b>
+<b class="fc">&nbsp;    COINTEGRATED_RUBERT_TINY2(&quot;cointegrated/rubert-tiny2&quot;, 238866335L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILBERT_BASE_TAS_B(&quot;sentence-transformers/msmarco-distilbert-base-tas-b&quot;, 266190339L),</b>
+<b class="fc">&nbsp;    SAKIL_SENTENCE_SIMILARITY_SEMANTIC_SEARCH(&quot;Sakil/sentence_similarity_semantic_search&quot;, 266463591L),</b>
+<b class="fc">&nbsp;    INTFLOAT_E5_SMALL_UNSUPERVISED(&quot;intfloat/e5-small-unsupervised&quot;, 267690846L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ALL_MINILM_L12_V1(&quot;sentence-transformers/all-MiniLM-L12-v1&quot;, 267711998L),</b>
+<b class="fc">&nbsp;    METARANK_CE_ESCI_MINILM_L12_V2(&quot;metarank/ce-esci-MiniLM-L12-v2&quot;, 268183428L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_MINILM_L6_V2(&quot;sentence-transformers/paraphrase-MiniLM-L6-v2&quot;, 273472933L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MULTI_QA_MINILM_L6_DOT_V1(&quot;sentence-transformers/multi-qa-MiniLM-L6-dot-v1&quot;, 273512223L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MULTI_QA_MINILM_L6_COS_V1(&quot;sentence-transformers/multi-qa-MiniLM-L6-cos-v1&quot;, 273514267L),</b>
+<b class="fc">&nbsp;    SEYEDALI_MULTILINGUAL_TEXT_SEMANTIC_SEARCH_SIAMESE_BERT_V1(&quot;SeyedAli/Multilingual-Text-Semantic-Search-Siamese-BERT-V1&quot;, 273514358L),</b>
+<b class="fc">&nbsp;    HUM_WORKS_LODESTONE_BASE_4096_V1(&quot;Hum-Works/lodestone-base-4096-v1&quot;, 276079125L),</b>
+<b class="fc">&nbsp;    TAYLORAI_GTE_TINY(&quot;TaylorAI/gte-tiny&quot;, 295507495L),</b>
+<b class="fc">&nbsp;    FLAX_SENTENCE_EMBEDDINGS_ST_CODESEARCH_DISTILROBERTA_BASE(&quot;flax-sentence-embeddings/st-codesearch-distilroberta-base&quot;, 331141227L),</b>
+<b class="fc">&nbsp;    EMBEDDING_DATA_DISTILROBERTA_BASE_SENTENCE_TRANSFORMER(&quot;embedding-data/distilroberta-base-sentence-transformer&quot;, 331882136L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_MINILM_L_6_V3(&quot;sentence-transformers/msmarco-MiniLM-L-6-v3&quot;, 364329689L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_MINILM_L6_COS_V5(&quot;sentence-transformers/msmarco-MiniLM-L6-cos-v5&quot;, 364331688L),</b>
+<b class="fc">&nbsp;    INTFLOAT_E5_SMALL(&quot;intfloat/e5-small&quot;, 400847215L),</b>
+<b class="fc">&nbsp;    BAAI_BGE_SMALL_EN_V1_5(&quot;BAAI/bge-small-en-v1.5&quot;, 401109346L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ALL_MINILM_L12_V2(&quot;sentence-transformers/all-MiniLM-L12-v2&quot;, 401240896L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_MINILM_L12_V2(&quot;sentence-transformers/paraphrase-MiniLM-L12-v2&quot;, 401412737L),</b>
+<b class="fc">&nbsp;    UER_SBERT_BASE_CHINESE_NLI(&quot;uer/sbert-base-chinese-nli&quot;, 409269989L),</b>
+<b class="fc">&nbsp;    GANYMEDENIL_TEXT2VEC_BASE_CHINESE(&quot;GanymedeNil/text2vec-base-chinese&quot;, 409692389L),</b>
+<b class="fc">&nbsp;    RYANLAI_SHIBING624_TEXT2VEC_BASE_CHINESE_FINE_TUNE_INSURANCE_DATA(&quot;ryanlai/shibing624_text2vec-base-chinese-fine-tune-insurance_data&quot;, 409693794L),</b>
+<b class="fc">&nbsp;    DMETASOUL_SBERT_CHINESE_GENERAL_V2(&quot;DMetaSoul/sbert-chinese-general-v2&quot;, 409704852L),</b>
+<b class="fc">&nbsp;    THENLPER_GTE_BASE_ZH(&quot;thenlper/gte-base-zh&quot;, 409713201L),</b>
+<b class="fc">&nbsp;    BAAI_BGE_BASE_ZH_V1_5(&quot;BAAI/bge-base-zh-v1.5&quot;, 409719134L),</b>
+<b class="fc">&nbsp;    DMETASOUL_SBERT_CHINESE_GENERAL_V1(&quot;DMetaSoul/sbert-chinese-general-v1&quot;, 410456811L),</b>
+<b class="fc">&nbsp;    KORNWTP_CONGEN_PARAPHRASE_MULTILINGUAL_MPNET_BASE_V2(&quot;kornwtp/ConGen-paraphrase-multilingual-mpnet-base-v2&quot;, 423346343L),</b>
+<b class="fc">&nbsp;    KAMALKRAJ_BIOSIMCSE_BIOLINKBERT_BASE(&quot;kamalkraj/BioSimCSE-BioLinkBERT-BASE&quot;, 433910574L),</b>
+<b class="fc">&nbsp;    ADITEYABARAL_SENTENCETRANSFORMER_BERT_BASE_CASED(&quot;aditeyabaral/sentencetransformer-bert-base-cased&quot;, 433978649L),</b>
+<b class="fc">&nbsp;    PRITAMDEKA_S_BIOBERT_SNLI_MULTINLI_STSB(&quot;pritamdeka/S-BioBert-snli-multinli-stsb&quot;, 433980263L),</b>
+<b class="fc">&nbsp;    PRITAMDEKA_BIOBERT_MNLI_SNLI_SCINLI_SCITAIL_MEDNLI_STSB(&quot;pritamdeka/BioBERT-mnli-snli-scinli-scitail-mednli-stsb&quot;, 434214702L),</b>
+<b class="fc">&nbsp;    RICARDO_FILHO_BERT_BASE_PORTUGUESE_CASED_NLI_ASSIN_2(&quot;ricardo-filho/bert-base-portuguese-cased-nli-assin-2&quot;, 436429150L),</b>
+<b class="fc">&nbsp;    ALFANEO_JURISBERT_BASE_PORTUGUESE_STS(&quot;alfaneo/jurisbert-base-portuguese-sts&quot;, 436521076L),</b>
+<b class="fc">&nbsp;    ANATEL_BERT_AUGMENTED_PT_ANATEL(&quot;anatel/bert-augmented-pt-anatel&quot;, 436668456L),</b>
+<b class="fc">&nbsp;    JEGORMEISTER_BERT_BASE_DUTCH_CASED_SNLI(&quot;jegormeister/bert-base-dutch-cased-snli&quot;, 437355818L),</b>
+<b class="fc">&nbsp;    TEXTGAIN_ALLNLI_GRONLP_BERT_BASE_DUTCH_CASED(&quot;textgain/allnli-GroNLP-bert-base-dutch-cased&quot;, 437582891L),</b>
+<b class="fc">&nbsp;    CASKCSG_COTMAE_BASE_MSMARCO_RETRIEVER(&quot;caskcsg/cotmae_base_msmarco_retriever&quot;, 438251940L),</b>
+<b class="fc">&nbsp;    PRITAMDEKA_S_PUBMEDBERT_MS_MARCO_SCIFACT(&quot;pritamdeka/S-PubMedBert-MS-MARCO-SCIFACT&quot;, 438704594L),</b>
+<b class="fc">&nbsp;    PRITAMDEKA_S_PUBMEDBERT_MS_MARCO(&quot;pritamdeka/S-PubMedBert-MS-MARCO&quot;, 438704806L),</b>
+<b class="fc">&nbsp;    PRITAMDEKA_S_BLUEBERT_SNLI_MULTINLI_STSB(&quot;pritamdeka/S-Bluebert-snli-multinli-stsb&quot;, 438716287L),</b>
+<b class="fc">&nbsp;    WHALELOOPS_PHRASE_BERT(&quot;whaleloops/phrase-bert&quot;, 438716681L),</b>
+<b class="fc">&nbsp;    MENADSA_S_PUBMEDBERT(&quot;menadsa/S-PubMedBERT&quot;, 438937759L),</b>
+<b class="fc">&nbsp;    NEUML_PUBMEDBERT_BASE_EMBEDDINGS(&quot;NeuML/pubmedbert-base-embeddings&quot;, 438938814L),</b>
+<b class="fc">&nbsp;    JOSELUHF11_SYMPTOM_ENCODER_V10(&quot;joseluhf11/symptom_encoder_v10&quot;, 438945770L),</b>
+<b class="fc">&nbsp;    INOKUFU_BERT_BASE_UNCASED_XNLI_STS_FINETUNED_EDUCATION(&quot;inokufu/bert-base-uncased-xnli-sts-finetuned-education&quot;, 438946856L),</b>
+<b class="fc">&nbsp;    TOOLBENCH_TOOLBENCH_IR_BERT_BASED_UNCASED(&quot;ToolBench/ToolBench_IR_bert_based_uncased&quot;, 438948860L),</b>
+<b class="fc">&nbsp;    SAP_AI_RESEARCH_MICSE(&quot;sap-ai-research/miCSE&quot;, 438951368L),</b>
+<b class="fc">&nbsp;    PRITAMDEKA_PUBMEDBERT_MNLI_SNLI_SCINLI_SCITAIL_MEDNLI_STSB(&quot;pritamdeka/PubMedBERT-mnli-snli-scinli-scitail-mednli-stsb&quot;, 438952446L),</b>
+<b class="fc">&nbsp;    DEAN_AI_LEGAL_HEBERT_FT(&quot;dean-ai/legal_heBERT_ft&quot;, 439070928L),</b>
+<b class="fc">&nbsp;    ESPEJELOMAR_SENTECE_EMBEDDINGS_BETO(&quot;espejelomar/sentece-embeddings-BETO&quot;, 440451936L),</b>
+<b class="fc">&nbsp;    RECOBO_CHEMICAL_BERT_UNCASED_TSDAE(&quot;recobo/chemical-bert-uncased-tsdae&quot;, 440455185L),</b>
+<b class="fc">&nbsp;    RECOBO_CHEMICAL_BERT_UNCASED_SIMCSE(&quot;recobo/chemical-bert-uncased-simcse&quot;, 440455189L),</b>
+<b class="fc">&nbsp;    EFEDERICI_SENTENCE_BERT_BASE(&quot;efederici/sentence-bert-base&quot;, 440758981L),</b>
+<b class="fc">&nbsp;    NICKPROCK_SENTENCE_BERT_BASE_ITALIAN_UNCASED(&quot;nickprock/sentence-bert-base-italian-uncased&quot;, 440763826L),</b>
+<b class="fc">&nbsp;    PM_AI_BI_ENCODER_MSMARCO_BERT_BASE_GERMAN(&quot;PM-AI/bi-encoder_msmarco_bert-base_german&quot;, 440766137L),</b>
+<b class="fc">&nbsp;    SONOISA_SENTENCE_BERT_BASE_JA_EN_MEAN_TOKENS(&quot;sonoisa/sentence-bert-base-ja-en-mean-tokens&quot;, 442802550L),</b>
+<b class="fc">&nbsp;    EMRECAN_BERT_BASE_TURKISH_CASED_MEAN_NLI_STSB_TR(&quot;emrecan/bert-base-turkish-cased-mean-nli-stsb-tr&quot;, 443305457L),</b>
+<b class="fc">&nbsp;    BESPIN_GLOBAL_KLUE_SENTENCE_ROBERTA_BASE_KORNLU(&quot;bespin-global/klue-sentence-roberta-base-kornlu&quot;, 443317038L),</b>
+<b class="fc">&nbsp;    COLORFULSCOOP_SBERT_BASE_JA(&quot;colorfulscoop/sbert-base-ja&quot;, 443364095L),</b>
+<b class="fc">&nbsp;    KDHYUN08_TAACO_STS(&quot;KDHyun08/TAACO_STS&quot;, 443555816L),</b>
+<b class="fc">&nbsp;    NYTK_SENTENCE_TRANSFORMERS_EXPERIMENTAL_HUBERT_HUNGARIAN(&quot;NYTK/sentence-transformers-experimental-hubert-hungarian&quot;, 443593876L),</b>
+<b class="fc">&nbsp;    DANGVANTUAN_SENTENCE_CAMEMBERT_BASE(&quot;dangvantuan/sentence-camembert-base&quot;, 444801167L),</b>
+<b class="fc">&nbsp;    CL_NAGOYA_SUP_SIMCSE_JA_BASE(&quot;cl-nagoya/sup-simcse-ja-base&quot;, 445137598L),</b>
+<b class="fc">&nbsp;    ANTOINELOUIS_CROSSENCODER_CAMEMBERT_BASE_MMARCOFR(&quot;antoinelouis/crossencoder-camembert-base-mmarcoFR&quot;, 445755626L),</b>
+<b class="fc">&nbsp;    EFEDERICI_CROSS_ENCODER_UMBERTO_STSB(&quot;efederici/cross-encoder-umberto-stsb&quot;, 445782000L),</b>
+<b class="fc">&nbsp;    PKSHATECH_SIMCSE_JA_BERT_BASE_CLCMLP(&quot;pkshatech/simcse-ja-bert-base-clcmlp&quot;, 447508201L),</b>
+<b class="fc">&nbsp;    DIMITRIZ_ST_GREEK_MEDIA_BERT_BASE_UNCASED(&quot;dimitriz/st-greek-media-bert-base-uncased&quot;, 453380207L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ALL_MINILM_L6_V2(&quot;sentence-transformers/all-MiniLM-L6-v2&quot;, 454845228L),</b>
+<b class="fc">&nbsp;    BONGSOO_KPF_SBERT_V1_1(&quot;bongsoo/kpf-sbert-v1.1&quot;, 457312561L),</b>
+<b class="fc">&nbsp;    SNUNLP_KR_SBERT_V40K_KLUENLI_AUGSTS(&quot;snunlp/KR-SBERT-V40K-klueNLI-augSTS&quot;, 468422009L),</b>
+<b class="fc">&nbsp;    JEGORMEISTER_ROBBERT_V2_DUTCH_BASE_MQA_FINETUNED(&quot;jegormeister/robbert-v2-dutch-base-mqa-finetuned&quot;, 469888693L),</b>
+<b class="fc">&nbsp;    M3HRDADFI_BERT_ZWNJ_WNLI_MEAN_TOKENS(&quot;m3hrdadfi/bert-zwnj-wnli-mean-tokens&quot;, 474471928L),</b>
+<b class="fc">&nbsp;    M3HRDADFI_ROBERTA_ZWNJ_WNLI_MEAN_TOKENS(&quot;m3hrdadfi/roberta-zwnj-wnli-mean-tokens&quot;, 477438912L),</b>
+<b class="fc">&nbsp;    ANTOINELOUIS_CROSSENCODER_MMINILMV2_L12_MMARCOFR(&quot;antoinelouis/crossencoder-mMiniLMv2-L12-mmarcoFR&quot;, 492751134L),</b>
+<b class="fc">&nbsp;    JMBRITO_PTBR_SIMILARITY_E5_SMALL(&quot;jmbrito/ptbr-similarity-e5-small&quot;, 492840150L),</b>
+<b class="fc">&nbsp;    EF_ZULLA_E5_MULTI_SML_TORCH(&quot;ef-zulla/e5-multi-sml-torch&quot;, 492995658L),</b>
+<b class="fc">&nbsp;    EFEDERICI_MULTILINGUAL_E5_SMALL_4096(&quot;efederici/multilingual-e5-small-4096&quot;, 494892908L),</b>
+<b class="fc">&nbsp;    TURKUNLP_SBERT_UNCASED_FINNISH_PARAPHRASE(&quot;TurkuNLP/sbert-uncased-finnish-paraphrase&quot;, 498561990L),</b>
+<b class="fc">&nbsp;    TURKUNLP_SBERT_CASED_FINNISH_PARAPHRASE(&quot;TurkuNLP/sbert-cased-finnish-paraphrase&quot;, 498571084L),</b>
+<b class="fc">&nbsp;    FIRQAAA_INDO_SENTENCE_BERT_BASE(&quot;firqaaa/indo-sentence-bert-base&quot;, 498781876L),</b>
+<b class="fc">&nbsp;    DATAIKUNLP_PARAPHRASE_MULTILINGUAL_MINILM_L12_V2(&quot;DataikuNLP/paraphrase-multilingual-MiniLM-L12-v2&quot;, 499614329L),</b>
+<b class="fc">&nbsp;    VOICELAB_SBERT_BASE_CASED_PL(&quot;Voicelab/sbert-base-cased-pl&quot;, 500326139L),</b>
+<b class="fc">&nbsp;    KBLAB_SENTENCE_BERT_SWEDISH_CASED(&quot;KBLab/sentence-bert-swedish-cased&quot;, 500457410L),</b>
+<b class="fc">&nbsp;    PRITAMDEKA_S_BIOMED_ROBERTA_SNLI_MULTINLI_STSB(&quot;pritamdeka/S-Biomed-Roberta-snli-multinli-stsb&quot;, 501284135L),</b>
+<b class="fc">&nbsp;    MCHOCHLOV_CODEBERT_BASE_CD_FT(&quot;mchochlov/codebert-base-cd-ft&quot;, 501284494L),</b>
+<b class="fc">&nbsp;    ANNAWEGMANN_STYLE_EMBEDDING(&quot;AnnaWegmann/Style-Embedding&quot;, 501287433L),</b>
+<b class="fc">&nbsp;    IPIPAN_SILVER_RETRIEVER_BASE_V1(&quot;ipipan/silver-retriever-base-v1&quot;, 501614604L),</b>
+<b class="fc">&nbsp;    TIMKOORNSTRA_SAURON(&quot;TimKoornstra/SAURON&quot;, 502033555L),</b>
+<b class="fc">&nbsp;    SANGMINI_MSMARCO_COTMAE_MINILM_L12_EN_KO_JA(&quot;sangmini/msmarco-cotmae-MiniLM-L12_en-ko-ja&quot;, 504910521L),</b>
+<b class="fc">&nbsp;    IMVLADIKON_SENTENCE_TRANSFORMERS_ALEPHBERT(&quot;imvladikon/sentence-transformers-alephbert&quot;, 505898928L),</b>
+<b class="fc">&nbsp;    JINAAI_JINA_EMBEDDINGS_V2_SMALL_EN(&quot;jinaai/jina-embeddings-v2-small-en&quot;, 523027867L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MULTI_QA_DISTILBERT_DOT_V1(&quot;sentence-transformers/multi-qa-distilbert-dot-v1&quot;, 531692650L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MULTI_QA_DISTILBERT_COS_V1(&quot;sentence-transformers/multi-qa-distilbert-cos-v1&quot;, 531693680L),</b>
+<b class="fc">&nbsp;    BARISAYDIN_TEXT2VEC_BASE_MULTILINGUAL(&quot;barisaydin/text2vec-base-multilingual&quot;, 534361171L),</b>
+<b class="fc">&nbsp;    INTFLOAT_E5_SMALL_V2(&quot;intfloat/e5-small-v2&quot;, 534806175L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_MINILM_L_12_V3(&quot;sentence-transformers/msmarco-MiniLM-L-12-v3&quot;, 534860036L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_MINILM_L12_COS_V5(&quot;sentence-transformers/msmarco-MiniLM-L12-cos-v5&quot;, 534862040L),</b>
+<b class="fc">&nbsp;    SADAKMED_DISTILUSE_BASE_MULTILINGUAL_CASED_V2(&quot;sadakmed/distiluse-base-multilingual-cased-v2&quot;, 539972541L),</b>
+<b class="fc">&nbsp;    SADAKMED_DISTILUSE_BASE_MULTILINGUAL_CASED_V1(&quot;sadakmed/distiluse-base-multilingual-cased-v1&quot;, 539972776L),</b>
+<b class="fc">&nbsp;    DIGIO_TWITTER4SSE(&quot;digio/Twitter4SSE&quot;, 541602231L),</b>
+<b class="fc">&nbsp;    HGTHINKER_VIETNAMESE_SBERT(&quot;HgThinker/vietnamese-sbert&quot;, 542099329L),</b>
+<b class="fc">&nbsp;    KEEPITREAL_VIETNAMESE_SBERT(&quot;keepitreal/vietnamese-sbert&quot;, 542107840L),</b>
+<b class="fc">&nbsp;    MEDMEDIANI_ARABIC_KW_MDEL(&quot;medmediani/Arabic-KW-Mdel&quot;, 543394038L),</b>
+<b class="fc">&nbsp;    DDOBOKKI_KLUE_ROBERTA_SMALL_NLI_STS(&quot;ddobokki/klue-roberta-small-nli-sts&quot;, 545536446L),</b>
+<b class="fc">&nbsp;    INFGRAD_STELLA_LARGE_ZH_V2(&quot;infgrad/stella-large-zh-v2&quot;, 652825863L),</b>
+<b class="fc">&nbsp;    AMU_TAO_8K(&quot;amu/tao-8k&quot;, 667548999L),</b>
+<b class="fc">&nbsp;    MRP_SIMCSE_MODEL_M_BERT_THAI_CASED(&quot;mrp/simcse-model-m-bert-thai-cased&quot;, 714456826L),</b>
+<b class="fc">&nbsp;    EZLEE_E_COMMERCE_BERT_BASE_MULTILINGUAL_CASED(&quot;EZlee/e-commerce-bert-base-multilingual-cased&quot;, 715407892L),</b>
+<b class="fc">&nbsp;    NBAILAB_NB_SBERT_BASE(&quot;NbAiLab/nb-sbert-base&quot;, 715413471L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILBERT_BASE_V2(&quot;sentence-transformers/msmarco-distilbert-base-v2&quot;, 797224782L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_QUORA_DISTILBERT_BASE(&quot;sentence-transformers/quora-distilbert-base&quot;, 797224802L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_DISTILBERT_BASE_NLI_STSB_MEAN_TOKENS(&quot;sentence-transformers/distilbert-base-nli-stsb-mean-tokens&quot;, 797225157L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILBERT_BASE_V4(&quot;sentence-transformers/msmarco-distilbert-base-v4&quot;, 797225173L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILBERT_BASE_V3(&quot;sentence-transformers/msmarco-distilbert-base-v3&quot;, 797225186L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_NQ_DISTILBERT_BASE_V1(&quot;sentence-transformers/nq-distilbert-base-v1&quot;, 797225211L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_STSB_DISTILBERT_BASE(&quot;sentence-transformers/stsb-distilbert-base&quot;, 797225223L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_NLI_DISTILBERT_BASE(&quot;sentence-transformers/nli-distilbert-base&quot;, 797225321L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_DISTILBERT_BASE_NLI_MEAN_TOKENS(&quot;sentence-transformers/distilbert-base-nli-mean-tokens&quot;, 797225416L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILBERT_COS_V5(&quot;sentence-transformers/msmarco-distilbert-cos-v5&quot;, 797227197L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_DISTILBERT_BASE_NLI_STSB_QUORA_RANKING(&quot;sentence-transformers/distilbert-base-nli-stsb-quora-ranking&quot;, 797227940L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILBERT_DOT_V5(&quot;sentence-transformers/msmarco-distilbert-dot-v5&quot;, 797243272L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILBERT_BASE_DOT_PROD_V3(&quot;sentence-transformers/msmarco-distilbert-base-dot-prod-v3&quot;, 801943600L),</b>
+<b class="fc">&nbsp;    SONOISA_CLIP_VIT_B_32_JAPANESE_V1(&quot;sonoisa/clip-vit-b-32-japanese-v1&quot;, 803727976L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_TINYBERT_L6_V2(&quot;sentence-transformers/paraphrase-TinyBERT-L6-v2&quot;, 804365804L),</b>
+<b class="fc">&nbsp;    KMARIUNAS_UNCASED_BERT_TRIPLET_40(&quot;kmariunas/uncased-bert-triplet-40&quot;, 876434296L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_FACEBOOK_DPR_CTX_ENCODER_SINGLE_NQ_BASE(&quot;sentence-transformers/facebook-dpr-ctx_encoder-single-nq-base&quot;, 876666203L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_NLI_BERT_BASE(&quot;sentence-transformers/nli-bert-base&quot;, 876667005L),</b>
+<b class="fc">&nbsp;    INTFLOAT_E5_BASE_UNSUPERVISED(&quot;intfloat/e5-base-unsupervised&quot;, 876669021L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_BERT_CO_CONDENSOR(&quot;sentence-transformers/msmarco-bert-co-condensor&quot;, 876675904L),</b>
+<b class="fc">&nbsp;    DENNLINGER_BERT_WIKI_PARAGRAPHS(&quot;dennlinger/bert-wiki-paragraphs&quot;, 876684158L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ALL_MPNET_BASE_V1(&quot;sentence-transformers/all-mpnet-base-v1&quot;, 876722807L),</b>
+<b class="fc">&nbsp;    INTFLOAT_E5_BASE(&quot;intfloat/e5-base&quot;, 876731424L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ALL_MPNET_BASE_V2(&quot;sentence-transformers/all-mpnet-base-v2&quot;, 876747501L),</b>
+<b class="fc">&nbsp;    BIU_NLP_ABSTRACT_SIM_SENTENCE_PUBMED(&quot;biu-nlp/abstract-sim-sentence-pubmed&quot;, 876931102L),</b>
+<b class="fc">&nbsp;    HIIAMSID_SENTENCE_SIMILARITY_SPANISH_ES(&quot;hiiamsid/sentence_similarity_spanish_es&quot;, 879645858L),</b>
+<b class="fc">&nbsp;    SONOISA_SENTENCE_BERT_BASE_JA_MEAN_TOKENS(&quot;sonoisa/sentence-bert-base-ja-mean-tokens&quot;, 885270964L),</b>
+<b class="fc">&nbsp;    SONOISA_SENTENCE_BERT_BASE_JA_MEAN_TOKENS_V2(&quot;sonoisa/sentence-bert-base-ja-mean-tokens-v2&quot;, 885310545L),</b>
+<b class="fc">&nbsp;    JHGAN_KO_SBERT_STS(&quot;jhgan/ko-sbert-sts&quot;, 886044722L),</b>
+<b class="fc">&nbsp;    JHGAN_KO_SBERT_MULTITASK(&quot;jhgan/ko-sbert-multitask&quot;, 886045069L),</b>
+<b class="fc">&nbsp;    JHGAN_KO_SBERT_NLI(&quot;jhgan/ko-sbert-nli&quot;, 886045384L),</b>
+<b class="fc">&nbsp;    JHGAN_KO_SROBERTA_STS(&quot;jhgan/ko-sroberta-sts&quot;, 886050344L),</b>
+<b class="fc">&nbsp;    JHGAN_KO_SROBERTA_MULTITASK(&quot;jhgan/ko-sroberta-multitask&quot;, 886051209L),</b>
+<b class="fc">&nbsp;    NICKPROCK_SENTENCE_BERT_BASE_ITALIAN_XXL_UNCASED(&quot;nickprock/sentence-bert-base-italian-xxl-uncased&quot;, 886645281L),</b>
+<b class="fc">&nbsp;    ANTOINELOUIS_BIENCODER_CAMEMBERT_BASE_MMARCOFR(&quot;antoinelouis/biencoder-camembert-base-mmarcoFR&quot;, 888314464L),</b>
+<b class="fc">&nbsp;    NETHERLANDSFORENSICINSTITUTE_ROBBERT_2022_DUTCH_SENTENCE_TRANSFORMERS(&quot;NetherlandsForensicInstitute/robbert-2022-dutch-sentence-transformers&quot;, 954183237L),</b>
+<b class="fc">&nbsp;    L3CUBE_PUNE_MARATHI_SENTENCE_SIMILARITY_SBERT(&quot;l3cube-pune/marathi-sentence-similarity-sbert&quot;, 959874042L),</b>
+<b class="fc">&nbsp;    L3CUBE_PUNE_TAMIL_SENTENCE_BERT_NLI(&quot;l3cube-pune/tamil-sentence-bert-nli&quot;, 959875603L),</b>
+<b class="fc">&nbsp;    L3CUBE_PUNE_MALAYALAM_SENTENCE_SIMILARITY_SBERT(&quot;l3cube-pune/malayalam-sentence-similarity-sbert&quot;, 959875683L),</b>
+<b class="fc">&nbsp;    L3CUBE_PUNE_INDIC_SENTENCE_BERT_NLI(&quot;l3cube-pune/indic-sentence-bert-nli&quot;, 959875927L),</b>
+<b class="fc">&nbsp;    ANTOINELOUIS_BIENCODER_MMINILMV2_L12_MMARCOFR(&quot;antoinelouis/biencoder-mMiniLMv2-L12-mmarcoFR&quot;, 963385617L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ALL_DISTILROBERTA_V1(&quot;sentence-transformers/all-distilroberta-v1&quot;, 988159693L),</b>
+<b class="fc">&nbsp;    SDADAS_ST_POLISH_PARAPHRASE_FROM_MPNET(&quot;sdadas/st-polish-paraphrase-from-mpnet&quot;, 1001952602L),</b>
+<b class="fc">&nbsp;    D0RJ_E5_BASE_EN_RU(&quot;d0rj/e5-base-en-ru&quot;, 1064431460L),</b>
+<b class="fc">&nbsp;    BKAI_FOUNDATION_MODELS_VIETNAMESE_BI_ENCODER(&quot;bkai-foundation-models/vietnamese-bi-encoder&quot;, 1082117217L),</b>
+<b class="fc">&nbsp;    VOVANPHUC_SUP_SIMCSE_VIETNAMESE_PHOBERT_BASE(&quot;VoVanPhuc/sup-SimCSE-VietNamese-phobert-base&quot;, 1086863154L),</b>
+<b class="fc">&nbsp;    SETU4993_LEALLA_SMALL(&quot;setu4993/LEALLA-small&quot;, 1123385164L),</b>
+<b class="fc">&nbsp;    AIDA_UPM_MSTSB_PARAPHRASE_MULTILINGUAL_MPNET_BASE_V2(&quot;AIDA-UPM/mstsb-paraphrase-multilingual-mpnet-base-v2&quot;, 1126421474L),</b>
+<b class="fc">&nbsp;    LIGHTETERNAL_STSB_XLM_R_GREEK_TRANSFER(&quot;lighteternal/stsb-xlm-r-greek-transfer&quot;, 1126421894L),</b>
+<b class="fc">&nbsp;    SYMANTO_SN_XLM_ROBERTA_BASE_SNLI_MNLI_ANLI_XNLI(&quot;symanto/sn-xlm-roberta-base-snli-mnli-anli-xnli&quot;, 1126437775L),</b>
+<b class="fc">&nbsp;    KAISERRR_PMC_VIT_L_14_MULTILINGUAL(&quot;kaiserrr/pmc-vit-l-14-multilingual&quot;, 1134398395L),</b>
+<b class="fc">&nbsp;    UARITM_MULTILINGUAL_EN_RU_UK(&quot;uaritm/multilingual_en_ru_uk&quot;, 1134401492L),</b>
+<b class="fc">&nbsp;    EMBAAS_SENTENCE_TRANSFORMERS_MULTILINGUAL_E5_BASE(&quot;embaas/sentence-transformers-multilingual-e5-base&quot;, 1134404203L),</b>
+<b class="fc">&nbsp;    UARITM_MULTILINGUAL_EN_UK_PL_RU(&quot;uaritm/multilingual_en_uk_pl_ru&quot;, 1134405835L),</b>
+<b class="fc">&nbsp;    MEEDAN_PARAPHRASE_FILIPINO_MPNET_BASE_V2(&quot;meedan/paraphrase-filipino-mpnet-base-v2&quot;, 1134417514L),</b>
+<b class="fc">&nbsp;    LLUKAS22_PARAPHRASE_MULTILINGUAL_MPNET_BASE_V2_EMBEDDING_ALL(&quot;LLukas22/paraphrase-multilingual-mpnet-base-v2-embedding-all&quot;, 1134852016L),</b>
+<b class="fc">&nbsp;    EFEDERICI_E5_BASE_MULTILINGUAL_4096(&quot;efederici/e5-base-multilingual-4096&quot;, 1141989720L),</b>
+<b class="fc">&nbsp;    SDADAS_MMLW_RETRIEVAL_E5_LARGE(&quot;sdadas/mmlw-retrieval-e5-large&quot;, 1142073524L),</b>
+<b class="fc">&nbsp;    SHIBING624_TEXT2VEC_BASE_CHINESE(&quot;shibing624/text2vec-base-chinese&quot;, 1225878310L),</b>
+<b class="fc">&nbsp;    CMARKEA_DISTILCAMEMBERT_BASE_NLI(&quot;cmarkea/distilcamembert-base-nli&quot;, 1233966108L),</b>
+<b class="fc">&nbsp;    THENLPER_GTE_LARGE_ZH(&quot;thenlper/gte-large-zh&quot;, 1302780948L),</b>
+<b class="fc">&nbsp;    SHIBING624_TEXT2VEC_BGE_LARGE_CHINESE(&quot;shibing624/text2vec-bge-large-chinese&quot;, 1302786763L),</b>
+<b class="fc">&nbsp;    RESEARCH2NLP_ELECTRICAL_STELLA(&quot;Research2NLP/electrical_stella&quot;, 1304912784L),</b>
+<b class="fc">&nbsp;    BAAI_BGE_BASE_EN_V1_5(&quot;BAAI/bge-base-en-v1.5&quot;, 1312805365L),</b>
+<b class="fc">&nbsp;    INTFLOAT_E5_BASE_V2(&quot;intfloat/e5-base-v2&quot;, 1313722035L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_FACEBOOK_DPR_CTX_ENCODER_MULTISET_BASE(&quot;sentence-transformers/facebook-dpr-ctx_encoder-multiset-base&quot;, 1314862396L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_FACEBOOK_DPR_QUESTION_ENCODER_MULTISET_BASE(&quot;sentence-transformers/facebook-dpr-question_encoder-multiset-base&quot;, 1314862432L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_FACEBOOK_DPR_QUESTION_ENCODER_SINGLE_NQ_BASE(&quot;sentence-transformers/facebook-dpr-question_encoder-single-nq-base&quot;, 1314862439L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_STSB_BERT_BASE(&quot;sentence-transformers/stsb-bert-base&quot;, 1314863267L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_BERT_BASE_WIKIPEDIA_SECTIONS_MEAN_TOKENS(&quot;sentence-transformers/bert-base-wikipedia-sections-mean-tokens&quot;, 1314863421L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_BERT_BASE_DOT_V5(&quot;sentence-transformers/msmarco-bert-base-dot-v5&quot;, 1314884613L),</b>
+<b class="fc">&nbsp;    BIU_NLP_ABSTRACT_SIM_QUERY_PUBMED(&quot;biu-nlp/abstract-sim-query-pubmed&quot;, 1314929735L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_NLI_DISTILROBERTA_BASE_V2(&quot;sentence-transformers/nli-distilroberta-base-v2&quot;, 1316717228L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_DISTILROBERTA_BASE_V2(&quot;sentence-transformers/paraphrase-distilroberta-base-v2&quot;, 1316717279L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILROBERTA_BASE_V2(&quot;sentence-transformers/msmarco-distilroberta-base-v2&quot;, 1316717517L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_STSB_DISTILROBERTA_BASE_V2(&quot;sentence-transformers/stsb-distilroberta-base-v2&quot;, 1316717592L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ALLENAI_SPECTER(&quot;sentence-transformers/allenai-specter&quot;, 1320322654L),</b>
+<b class="fc">&nbsp;    STJIRIS_BERT_LARGE_PORTUGUESE_CASED_LEGAL_TSDAE_GPL_NLI_STS_METAKD_V1(&quot;stjiris/bert-large-portuguese-cased-legal-tsdae-gpl-nli-sts-MetaKD-v1&quot;, 1338612674L),</b>
+<b class="fc">&nbsp;    RUFIMELO_BERT_LARGE_PORTUGUESE_CASED_STS(&quot;rufimelo/bert-large-portuguese-cased-sts&quot;, 1338615398L),</b>
+<b class="fc">&nbsp;    STJIRIS_BERT_LARGE_PORTUGUESE_CASED_LEGAL_TSDAE_GPL_NLI_STS_V1(&quot;stjiris/bert-large-portuguese-cased-legal-tsdae-gpl-nli-sts-v1&quot;, 1338619481L),</b>
+<b class="fc">&nbsp;    EMBAAS_SENTENCE_TRANSFORMERS_E5_LARGE_V2(&quot;embaas/sentence-transformers-e5-large-v2&quot;, 1341647009L),</b>
+<b class="fc">&nbsp;    NAUFALIHSAN_INDONESIAN_SBERT_LARGE(&quot;naufalihsan/indonesian-sbert-large&quot;, 1341648109L),</b>
+<b class="fc">&nbsp;    DRSEBASTIANK_MEDBEDDING(&quot;DrSebastianK/medbedding&quot;, 1341655716L),</b>
+<b class="fc">&nbsp;    THENLPER_GTE_LARGE(&quot;thenlper/gte-large&quot;, 1341688021L),</b>
+<b class="fc">&nbsp;    CONSCIOUSAI_CAI_LUNARIS_TEXT_EMBEDDINGS(&quot;consciousAI/cai-lunaris-text-embeddings&quot;, 1341719299L),</b>
+<b class="fc">&nbsp;    DENAYA_INDOSBERT_LARGE(&quot;denaya/indoSBERT-large&quot;, 1342706773L),</b>
+<b class="fc">&nbsp;    DEUTSCHE_TELEKOM_GBERT_LARGE_PARAPHRASE_COSINE(&quot;deutsche-telekom/gbert-large-paraphrase-cosine&quot;, 1344052884L),</b>
+<b class="fc">&nbsp;    DEUTSCHE_TELEKOM_GBERT_LARGE_PARAPHRASE_EUCLIDEAN(&quot;deutsche-telekom/gbert-large-paraphrase-euclidean&quot;, 1344053075L),</b>
+<b class="fc">&nbsp;    JHLEE3421_FAQ_SEMANTIC_KLUE_ROBERTA_LARGE(&quot;jhlee3421/faq-semantic-klue-roberta-large&quot;, 1347759387L),</b>
+<b class="fc">&nbsp;    YS7YOO_SENTENCE_ROBERTA_LARGE_KOR_STS(&quot;ys7yoo/sentence-roberta-large-kor-sts&quot;, 1347770951L),</b>
+<b class="fc">&nbsp;    DANGVANTUAN_CROSSENCODER_CAMEMBERT_LARGE(&quot;dangvantuan/CrossEncoder-camembert-large&quot;, 1350050334L),</b>
+<b class="fc">&nbsp;    CL_NAGOYA_SUP_SIMCSE_JA_LARGE(&quot;cl-nagoya/sup-simcse-ja-large&quot;, 1350138460L),</b>
+<b class="fc">&nbsp;    CL_NAGOYA_UNSUP_SIMCSE_JA_LARGE(&quot;cl-nagoya/unsup-simcse-ja-large&quot;, 1350138870L),</b>
+<b class="fc">&nbsp;    VOICELAB_SBERT_LARGE_CASED_PL(&quot;Voicelab/sbert-large-cased-pl&quot;, 1422987879L),</b>
+<b class="fc">&nbsp;    FLAX_SENTENCE_EMBEDDINGS_ALL_DATASETS_V3_ROBERTA_LARGE(&quot;flax-sentence-embeddings/all_datasets_v3_roberta-large&quot;, 1424216178L),</b>
+<b class="fc">&nbsp;    COINTEGRATED_RUBERT_BASE_CASED_DP_PARAPHRASE_DETECTION(&quot;cointegrated/rubert-base-cased-dp-paraphrase-detection&quot;, 1424603089L),</b>
+<b class="fc">&nbsp;    ABBASGOLESTANI_AG_NLI_DETS_SENTENCE_SIMILARITY_V1(&quot;abbasgolestani/ag-nli-DeTS-sentence-similarity-v1&quot;, 1424949708L),</b>
+<b class="fc">&nbsp;    S_NLP_RUBERT_BASE_CASED_CONVERSATIONAL_PARAPHRASE_V1(&quot;s-nlp/rubert-base-cased-conversational-paraphrase-v1&quot;, 1427358048L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_MULTILINGUAL_MINILM_L12_V2(&quot;sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2&quot;, 1441155294L),</b>
+<b class="fc">&nbsp;    INTFLOAT_MULTILINGUAL_E5_SMALL(&quot;intfloat/multilingual-e5-small&quot;, 1456397601L),</b>
+<b class="fc">&nbsp;    SHIBING624_TEXT2VEC_BASE_MULTILINGUAL(&quot;shibing624/text2vec-base-multilingual&quot;, 1475447734L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ROBERTA_BASE_NLI_MEAN_TOKENS(&quot;sentence-transformers/roberta-base-nli-mean-tokens&quot;, 1498736923L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_ROBERTA_BASE_V3(&quot;sentence-transformers/msmarco-roberta-base-v3&quot;, 1498737534L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_STSB_ROBERTA_BASE(&quot;sentence-transformers/stsb-roberta-base&quot;, 1498737700L),</b>
+<b class="fc">&nbsp;    SDADAS_ST_POLISH_PARAPHRASE_FROM_DISTILROBERTA(&quot;sdadas/st-polish-paraphrase-from-distilroberta&quot;, 1499991122L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_ROBERTA_BASE_ANCE_FIRSTP(&quot;sentence-transformers/msmarco-roberta-base-ance-firstp&quot;, 1503475571L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_QUORA_DISTILBERT_MULTILINGUAL(&quot;sentence-transformers/quora-distilbert-multilingual&quot;, 1619939023L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_DISTILBERT_MULTILINGUAL_NLI_STSB_QUORA_RANKING(&quot;sentence-transformers/distilbert-multilingual-nli-stsb-quora-ranking&quot;, 1619939159L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILBERT_MULTILINGUAL_EN_DE_V2_TMP_LNG_ALIGNED(&quot;sentence-transformers/msmarco-distilbert-multilingual-en-de-v2-tmp-lng-aligned&quot;, 1619939584L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_DISTILBERT_MULTILINGUAL_EN_DE_V2_TMP_TRAINED_SCRATCH(&quot;sentence-transformers/msmarco-distilbert-multilingual-en-de-v2-tmp-trained-scratch&quot;, 1619939629L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_CLIP_VIT_B_32_MULTILINGUAL_V1(&quot;sentence-transformers/clip-ViT-B-32-multilingual-v1&quot;, 1623088124L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_DISTILUSE_BASE_MULTILINGUAL_CASED_V1(&quot;sentence-transformers/distiluse-base-multilingual-cased-v1&quot;, 1623089363L),</b>
+<b class="fc">&nbsp;    COINTEGRATED_LABSE_EN_RU(&quot;cointegrated/LaBSE-en-ru&quot;, 1722020835L),</b>
+<b class="fc">&nbsp;    SETU4993_LEALLA_BASE(&quot;setu4993/LEALLA-base&quot;, 1732164984L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_BERT_BASE_NLI_CLS_TOKEN(&quot;sentence-transformers/bert-base-nli-cls-token&quot;, 1752798722L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_BERT_BASE_NLI_MAX_TOKENS(&quot;sentence-transformers/bert-base-nli-max-tokens&quot;, 1752799127L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_BERT_BASE_NLI_STSB_MEAN_TOKENS(&quot;sentence-transformers/bert-base-nli-stsb-mean-tokens&quot;, 1752799151L),</b>
+<b class="fc">&nbsp;    HIIAMSID_SENTENCE_SIMILARITY_HINDI(&quot;hiiamsid/sentence_similarity_hindi&quot;, 1898639316L),</b>
+<b class="fc">&nbsp;    L3CUBE_PUNE_HINDI_SENTENCE_SIMILARITY_SBERT(&quot;l3cube-pune/hindi-sentence-similarity-sbert&quot;, 1910125113L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ROBERTA_BASE_NLI_STSB_MEAN_TOKENS(&quot;sentence-transformers/roberta-base-nli-stsb-mean-tokens&quot;, 1997326693L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_NLI_ROBERTA_BASE_V2(&quot;sentence-transformers/nli-roberta-base-v2&quot;, 1997327069L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_MSMARCO_ROBERTA_BASE_V2(&quot;sentence-transformers/msmarco-roberta-base-v2&quot;, 1997327352L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_STSB_ROBERTA_BASE_V2(&quot;sentence-transformers/stsb-roberta-base-v2&quot;, 1997327433L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_BERT_BASE_NLI_MEAN_TOKENS(&quot;sentence-transformers/bert-base-nli-mean-tokens&quot;, 2190792186L),</b>
+<b class="fc">&nbsp;    CLIPS_MFAQ(&quot;clips/mfaq&quot;, 2238871436L),</b>
+<b class="fc">&nbsp;    EMBAAS_SENTENCE_TRANSFORMERS_MULTILINGUAL_E5_LARGE(&quot;embaas/sentence-transformers-multilingual-e5-large&quot;, 2261845613L),</b>
+<b class="fc">&nbsp;    SMART_TRIBUNE_SENTENCE_TRANSFORMERS_MULTILINGUAL_E5_LARGE(&quot;smart-tribune/sentence-transformers-multilingual-e5-large&quot;, 2261845912L),</b>
+<b class="fc">&nbsp;    PIERLUIGIC_XL_LEXEME(&quot;pierluigic/xl-lexeme&quot;, 2261859900L),</b>
+<b class="fc">&nbsp;    SETU4993_LEALLA_LARGE(&quot;setu4993/LEALLA-large&quot;, 2378725205L),</b>
+<b class="fc">&nbsp;    GANYMEDENIL_TEXT2VEC_LARGE_CHINESE(&quot;GanymedeNil/text2vec-large-chinese&quot;, 2604914264L),</b>
+<b class="fc">&nbsp;    INTFLOAT_E5_LARGE_UNSUPERVISED(&quot;intfloat/e5-large-unsupervised&quot;, 2682041542L),</b>
+<b class="fc">&nbsp;    INTFLOAT_E5_LARGE(&quot;intfloat/e5-large&quot;, 2682104146L),</b>
+<b class="fc">&nbsp;    LLMRAILS_EMBER_V1(&quot;llmrails/ember-v1&quot;, 2682324569L),</b>
+<b class="fc">&nbsp;    INTFLOAT_E5_LARGE_V2(&quot;intfloat/e5-large-v2&quot;, 2682330013L),</b>
+<b class="fc">&nbsp;    AARI1995_GERMAN_SEMANTIC_STS_V2(&quot;aari1995/German_Semantic_STS_V2&quot;, 2687049043L),</b>
+<b class="fc">&nbsp;    LAJAVANESS_CROSSENCODER_CAMEMBERT_LARGE(&quot;Lajavaness/CrossEncoder-camembert-large&quot;, 2696718911L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ROBERTA_LARGE_NLI_MEAN_TOKENS(&quot;sentence-transformers/roberta-large-nli-mean-tokens&quot;, 2845695742L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ALL_ROBERTA_LARGE_V1(&quot;sentence-transformers/all-roberta-large-v1&quot;, 2845707102L),</b>
+<b class="fc">&nbsp;    D0RJ_E5_LARGE_EN_RU(&quot;d0rj/e5-large-en-ru&quot;, 2930802136L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_MULTILINGUAL_MPNET_BASE_V2(&quot;sentence-transformers/paraphrase-multilingual-mpnet-base-v2&quot;, 3351053454L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_PARAPHRASE_XLM_R_MULTILINGUAL_V1(&quot;sentence-transformers/paraphrase-xlm-r-multilingual-v1&quot;, 3351068034L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_STSB_XLM_R_MULTILINGUAL(&quot;sentence-transformers/stsb-xlm-r-multilingual&quot;, 3351068164L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_XLM_R_DISTILROBERTA_BASE_PARAPHRASE_V1(&quot;sentence-transformers/xlm-r-distilroberta-base-paraphrase-v1&quot;, 3351068526L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_XLM_R_100LANGS_BERT_BASE_NLI_STSB_MEAN_TOKENS(&quot;sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens&quot;, 3351068568L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_XLM_R_BERT_BASE_NLI_STSB_MEAN_TOKENS(&quot;sentence-transformers/xlm-r-bert-base-nli-stsb-mean-tokens&quot;, 3351068726L),</b>
+<b class="fc">&nbsp;    INTFLOAT_MULTILINGUAL_E5_BASE(&quot;intfloat/multilingual-e5-base&quot;, 3378991076L),</b>
+<b class="fc">&nbsp;    WOODY72_MULTILINGUAL_E5_BASE(&quot;woody72/multilingual-e5-base&quot;, 3378991184L),</b>
+<b class="fc">&nbsp;    SETU4993_SMALLER_LABSE(&quot;setu4993/smaller-LaBSE&quot;, 3512900311L),</b>
+<b class="fc">&nbsp;    BAAI_BGE_LARGE_EN_V1_5(&quot;BAAI/bge-large-en-v1.5&quot;, 4019210262L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_BERT_LARGE_NLI_CLS_TOKEN(&quot;sentence-transformers/bert-large-nli-cls-token&quot;, 4023121298L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_STSB_BERT_LARGE(&quot;sentence-transformers/stsb-bert-large&quot;, 4023121756L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_NLI_BERT_LARGE_MAX_POOLING(&quot;sentence-transformers/nli-bert-large-max-pooling&quot;, 4023122032L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_BERT_LARGE_NLI_STSB_MEAN_TOKENS(&quot;sentence-transformers/bert-large-nli-stsb-mean-tokens&quot;, 4023122049L),</b>
+<b class="fc">&nbsp;    DANGVANTUAN_SENTENCE_CAMEMBERT_LARGE(&quot;dangvantuan/sentence-camembert-large&quot;, 4041517356L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_NLI_ROBERTA_LARGE(&quot;sentence-transformers/nli-roberta-large&quot;, 4267149116L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_BERT_LARGE_NLI_MEAN_TOKENS(&quot;sentence-transformers/bert-large-nli-mean-tokens&quot;, 5363703243L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_BERT_LARGE_NLI_MAX_TOKENS(&quot;sentence-transformers/bert-large-nli-max-tokens&quot;, 5363703258L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_LABSE(&quot;sentence-transformers/LaBSE&quot;, 5668685854L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_USE_CMLM_MULTILINGUAL(&quot;sentence-transformers/use-cmlm-multilingual&quot;, 5675108503L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_ROBERTA_LARGE_NLI_STSB_MEAN_TOKENS(&quot;sentence-transformers/roberta-large-nli-stsb-mean-tokens&quot;, 5689102286L),</b>
+<b class="fc">&nbsp;    SENTENCE_TRANSFORMERS_STSB_ROBERTA_LARGE(&quot;sentence-transformers/stsb-roberta-large&quot;, 5689102977L),</b>
+<b class="fc">&nbsp;    INTFLOAT_MULTILINGUAL_E5_LARGE(&quot;intfloat/multilingual-e5-large&quot;, 6759678687L),</b>
+<b class="fc">&nbsp;    SETU4993_LABSE(&quot;setu4993/LaBSE&quot;, 7554057205L),</b>
+<b class="fc">&nbsp;    BLAXZTER_LABSE_SENTENCE_EMBEDDINGS(&quot;Blaxzter/LaBSE-sentence-embeddings&quot;, 7554061681L);</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private final long sizeInBytes;
+&nbsp;
+<b class="fc">&nbsp;    EmbeddingModel(String name, long sizeInBytes) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.sizeInBytes = sizeInBytes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public long getSizeInBytes() {
+<b class="nc">&nbsp;        return sizeInBytes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String fullInfo() {
+<b class="nc">&nbsp;        return &quot;[&quot; + sizeInfo() + &quot;] &quot; + name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String sizeInfo() {
+<b class="nc">&nbsp;        return FileUtils.byteCountToDisplaySize(sizeInBytes);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

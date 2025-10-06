@@ -1,0 +1,339 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > XmpUtilReader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.xmp</a>
+</div>
+
+<h1>Coverage Summary for Class: XmpUtilReader (org.jabref.logic.xmp)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XmpUtilReader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">XmpUtilReader$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.xmp;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.SequencedCollection;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.comparator.BibEntryCompare;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.schema.DublinCoreSchemaCustom;
+&nbsp;
+&nbsp;import org.apache.pdfbox.Loader;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocument;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+&nbsp;import org.apache.pdfbox.pdmodel.common.PDMetadata;
+&nbsp;import org.apache.xmpbox.XMPMetadata;
+&nbsp;import org.apache.xmpbox.schema.DublinCoreSchema;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Readings on XMP are available at docs/code-howtos/xmp-parsing.md
+&nbsp; * &lt;p&gt;
+&nbsp; * See also {@link org.jabref.logic.xmp.XmpUtilWriter#writeDocumentInformation}
+&nbsp; */
+&nbsp;public class XmpUtilReader {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilReader.class);</b>
+&nbsp;
+&nbsp;    private static final String START_TAG = &quot;&lt;rdf:Description&quot;;
+&nbsp;    private static final String END_TAG = &quot;&lt;/rdf:Description&gt;&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final XmpUtilShared XMP_UTIL_SHARED = new XmpUtilShared();</b>
+&nbsp;
+<b class="nc">&nbsp;    public XmpUtilReader() {</b>
+&nbsp;        // See: https://pdfbox.apache.org/2.0/getting-started.html
+<b class="nc">&nbsp;        System.setProperty(&quot;sun.java2d.cmm&quot;, &quot;sun.java2d.cmm.kcms.KcmsServiceProvider&quot;); // To get higher rendering speed on java 8 oder 9 for images</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Will read the XMPMetadata from the given pdf file, closing the file afterwards.
+&nbsp;     *
+&nbsp;     * @param path The path to read the XMPMetadata from.
+&nbsp;     * @return The XMPMetadata object found in the file
+&nbsp;     */
+&nbsp;    public List&lt;XMPMetadata&gt; readRawXmp(Path path) throws IOException {
+<b class="nc">&nbsp;        try (PDDocument document = loadWithAutomaticDecryption(path)) {</b>
+<b class="nc">&nbsp;            return getXmpMetadata(document);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param path The path to read from.
+&nbsp;     * @return list of a single BibEntry retrieved by merging the data from the stream
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; readXmp(Path path, XmpPreferences xmpPreferences) throws IOException {
+<b class="nc">&nbsp;        try (PDDocument document = loadWithAutomaticDecryption(path)) {</b>
+<b class="nc">&nbsp;            return readXmp(path, document, xmpPreferences);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Merges all XMP data together in one entry.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Try to read the given BibTexEntry from the given PDF file.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Looks at the DocumentInformation and the XMP metadata.
+&nbsp;     * Regarding the XMP metadata, only Dublin Core is supported.
+&nbsp;     *
+&nbsp;     * @param path     the path to the PDF file
+&nbsp;     * @param document the PDF document to read from (should have been created from &lt;code&gt;path&lt;/code&gt;
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
+<b class="nc">&nbsp;        final SequencedCollection&lt;BibEntry&gt; result = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;XMPMetadata&gt; xmpMetaList = getXmpMetadata(document);</b>
+<b class="nc">&nbsp;        if (!xmpMetaList.isEmpty()) {</b>
+&nbsp;            // Only support Dublin Core since JabRef 4.2
+<b class="nc">&nbsp;            for (XMPMetadata xmpMeta : xmpMetaList) {</b>
+<b class="nc">&nbsp;                DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());</b>
+<b class="nc">&nbsp;                if (dcSchema != null) {</b>
+<b class="nc">&nbsp;                    DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());</b>
+<b class="nc">&nbsp;                    dcExtractor.extractBibtexEntry().ifPresent(result::add);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        PDDocumentInformation documentInformation = document.getDocumentInformation();</b>
+<b class="nc">&nbsp;        Optional&lt;BibEntry&gt; documentInformationEntry = new DocumentInformationExtractor(documentInformation).extractBibtexEntry();</b>
+<b class="nc">&nbsp;        documentInformationEntry.ifPresent(entry -&gt; {</b>
+<b class="nc">&nbsp;            if (result.isEmpty()) {</b>
+<b class="nc">&nbsp;                result.add(entry);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            BibEntry first = result.getFirst();</b>
+<b class="nc">&nbsp;            switch (BibEntryCompare.compareEntries(first, entry)) {</b>
+&nbsp;                case SUBSET -&gt; {
+<b class="nc">&nbsp;                    result.removeFirst();</b>
+<b class="nc">&nbsp;                    result.addFirst(entry);</b>
+&nbsp;                }
+&nbsp;                case DIFFERENT -&gt;
+<b class="nc">&nbsp;                        result.addFirst(entry);</b>
+&nbsp;                case DISJUNCT_OR_EQUAL_FIELDS,
+&nbsp;                     DISJUNCT -&gt;
+<b class="nc">&nbsp;                        first.mergeWith(entry);</b>
+&nbsp;                // in all other cases (EQUAL, SUPERSET), the documentInformation is ignored
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        result.forEach(entry -&gt; entry.addFile(new LinkedFile(&quot;&quot;, path, &quot;PDF&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        return result.stream().toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is a hack to generate multiple XMPMetadata objects, because the
+&nbsp;     * implementation of the pdfbox does not support methods for reading multiple
+&nbsp;     * DublinCoreSchemas from a single metadata entry.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Moreover, DomXmpParser does not handle unknown namespaces
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @return empty List if no metadata has been found, or cannot properly find start or end tag in metadata
+&nbsp;     */
+&nbsp;    private List&lt;XMPMetadata&gt; getXmpMetadata(PDDocument document) {
+<b class="nc">&nbsp;        PDDocumentCatalog catalog = document.getDocumentCatalog();</b>
+<b class="nc">&nbsp;        PDMetadata metaRaw = catalog.getMetadata();</b>
+<b class="nc">&nbsp;        if (metaRaw == null) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;XMPMetadata&gt; metaList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        String xmp = metaRaw.getCOSObject().toTextString();</b>
+&nbsp;
+&nbsp;        // Simple-string based solution to check for XML elements
+&nbsp;        //   &lt;rdf:Description xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;&gt;...
+&nbsp;        // The heuristics works as most PDf tools use this syntax (i.e., XML prefix names for RDF)
+&nbsp;
+<b class="nc">&nbsp;        int startDescriptionSection = xmp.indexOf(START_TAG);</b>
+<b class="nc">&nbsp;        int endDescriptionSection = xmp.lastIndexOf(END_TAG) + END_TAG.length();</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((startDescriptionSection &lt; 0) || (startDescriptionSection &gt; endDescriptionSection) || (endDescriptionSection == (END_TAG.length() - 1))) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Cannot find start or end tag in metadata. Returning empty list.&quot;);</b>
+<b class="nc">&nbsp;            return metaList;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // XML header for the xmpDomParser
+<b class="nc">&nbsp;        String start = xmp.substring(0, startDescriptionSection);</b>
+&nbsp;        // descriptionArray - mid part of the textual metadata
+<b class="nc">&nbsp;        String[] descriptionsArray = xmp.substring(startDescriptionSection, endDescriptionSection).split(END_TAG);</b>
+&nbsp;        // XML footer for the xmpDomParser
+<b class="nc">&nbsp;        String end = xmp.substring(endDescriptionSection);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String s : descriptionsArray) {</b>
+&nbsp;            // END_TAG is appended, because of the split operation above
+<b class="nc">&nbsp;            String xmpMetaString = start + s + END_TAG + end;</b>
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Parsing RDF Description {}&quot;, xmpMetaString);</b>
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                metaList.add(XMP_UTIL_SHARED.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));</b>
+&nbsp;            } catch (IOException ex) {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Problem parsing XMP schema. Continuing with other schemas.&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return metaList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the specified file with the basic pdfbox functionality and uses an empty string as default password.
+&nbsp;     *
+&nbsp;     * @param path The path to load.
+&nbsp;     * @throws IOException from the underlying @link PDDocument#load(File)
+&nbsp;     */
+&nbsp;    public PDDocument loadWithAutomaticDecryption(Path path) throws IOException {
+&nbsp;        // try to load the document
+&nbsp;        // also uses an empty string as default password
+<b class="nc">&nbsp;        return Loader.loadPDF(path.toFile());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

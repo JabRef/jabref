@@ -1,0 +1,415 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MetaDataParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.util</a>
+</div>
+
+<h1>Coverage Summary for Class: MetaDataParser (org.jabref.logic.importer.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MetaDataParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/84)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/119)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Reader;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanups;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+&nbsp;import org.jabref.logic.util.Version;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypeBuilder;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.EntryTypeFactory;
+&nbsp;import org.jabref.model.metadata.ContentSelectors;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;import org.jabref.model.metadata.SaveOrder;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Writing is done at {@link org.jabref.logic.exporter.MetaDataSerializer}.
+&nbsp; */
+&nbsp;public class MetaDataParser {
+&nbsp;
+&nbsp;    public static final List&lt;FieldFormatterCleanup&gt; DEFAULT_SAVE_ACTIONS;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);</b>
+&nbsp;    private static FileUpdateMonitor fileMonitor;
+<b class="nc">&nbsp;    private static final Pattern SINGLE_BACKSLASH = Pattern.compile(&quot;[^\\\\]\\\\[^\\\\]&quot;);</b>
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        DEFAULT_SAVE_ACTIONS = List.of(</b>
+&nbsp;                new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
+&nbsp;                new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
+&nbsp;                new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
+&nbsp;                new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD,
+&nbsp;                        new ReplaceUnicodeLigaturesFormatter()));
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public MetaDataParser(FileUpdateMonitor fileMonitor) {</b>
+<b class="nc">&nbsp;        MetaDataParser.fileMonitor = fileMonitor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;BibEntryType&gt; parseCustomEntryType(String comment) {
+<b class="nc">&nbsp;        String rest = comment.substring(MetaData.ENTRYTYPE_FLAG.length());</b>
+<b class="nc">&nbsp;        int indexEndOfName = rest.indexOf(&#39;:&#39;);</b>
+<b class="nc">&nbsp;        if (indexEndOfName &lt; 0) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String fieldsDescription = rest.substring(indexEndOfName + 2);</b>
+&nbsp;
+<b class="nc">&nbsp;        int indexEndOfRequiredFields = fieldsDescription.indexOf(&#39;]&#39;);</b>
+<b class="nc">&nbsp;        int indexEndOfOptionalFields = fieldsDescription.indexOf(&#39;]&#39;, indexEndOfRequiredFields + 1);</b>
+<b class="nc">&nbsp;        if ((indexEndOfRequiredFields &lt; 4) || (indexEndOfOptionalFields &lt; (indexEndOfRequiredFields + 6))) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        EntryType type = EntryTypeFactory.parse(rest.substring(0, indexEndOfName));</b>
+<b class="nc">&nbsp;        String reqFields = fieldsDescription.substring(4, indexEndOfRequiredFields);</b>
+<b class="nc">&nbsp;        String optFields = fieldsDescription.substring(indexEndOfRequiredFields + 6, indexEndOfOptionalFields);</b>
+<b class="nc">&nbsp;        BibEntryTypeBuilder entryTypeBuilder = new BibEntryTypeBuilder()</b>
+<b class="nc">&nbsp;                .withType(type)</b>
+<b class="nc">&nbsp;                .withRequiredFields(FieldFactory.parseOrFieldsList(reqFields))</b>
+&nbsp;                // Important fields are optional fields, but displayed first. Thus, they do not need to be separated by &quot;/&quot;.
+&nbsp;                // See org.jabref.model.entry.field.FieldPriority for details on important optional fields.
+<b class="nc">&nbsp;                .withImportantFields(FieldFactory.parseFieldList(optFields));</b>
+<b class="nc">&nbsp;        if (entryTypeBuilder.hasWarnings()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Following custom entry type definition has duplicate fields: {}&quot;, comment);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(entryTypeBuilder.build());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the given data map and returns a new resulting {@link MetaData} instance.
+&nbsp;     */
+&nbsp;    public MetaData parse(Map&lt;String, String&gt; data, Character keywordSeparator, String userAndHost) throws ParseException {
+<b class="nc">&nbsp;        return parse(new MetaData(), data, keywordSeparator, userAndHost);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the data map and changes the given {@link MetaData} instance respectively.
+&nbsp;     *
+&nbsp;     * @return the given metaData instance (which is modified, too)
+&nbsp;     */
+&nbsp;    public MetaData parse(MetaData metaData, Map&lt;String, String&gt; data, Character keywordSeparator, String userAndHost) throws ParseException {
+<b class="nc">&nbsp;        CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;</b>
+<b class="nc">&nbsp;        Map&lt;EntryType, CitationKeyPattern&gt; nonDefaultCiteKeyPatterns = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // process groups (GROUPSTREE and GROUPSTREE_LEGACY) at the very end (otherwise it can happen that not all dependent data are set)
+<b class="nc">&nbsp;        List&lt;Map.Entry&lt;String, String&gt;&gt; entryList = new ArrayList&lt;&gt;(data.entrySet());</b>
+<b class="nc">&nbsp;        entryList.sort(groupsLast());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; entry : entryList) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; values = getAsList(entry.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {</b>
+<b class="nc">&nbsp;                EntryType entryType = EntryTypeFactory.parse(entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length()));</b>
+<b class="nc">&nbsp;                nonDefaultCiteKeyPatterns.put(entryType, new CitationKeyPattern(getSingleItem(values)));</b>
+<b class="nc">&nbsp;            } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {</b>
+&nbsp;                // edge case, it might be one special field e.g. article from biblatex-apa, but we can&#39;t distinguish this from any other field and rather prefer to handle it as UnknownField
+<b class="nc">&nbsp;                metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));</b>
+<b class="nc">&nbsp;            } else if (MetaData.FILE_DIRECTORY.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));</b>
+<b class="nc">&nbsp;            } else if (entry.getKey().startsWith(MetaData.BLG_FILE_PATH + &quot;-&quot;)) {</b>
+<b class="nc">&nbsp;                handleBlgFilePathEntry(entry, metaData);</b>
+<b class="nc">&nbsp;            } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + &#39;-&#39;)) {</b>
+&nbsp;                // The user name starts directly after FILE_DIRECTORY + &#39;-&#39;
+<b class="nc">&nbsp;                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);</b>
+<b class="nc">&nbsp;                metaData.setUserFileDirectory(user, parseDirectory(entry.getValue()));</b>
+<b class="nc">&nbsp;            } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY_LATEX)) {</b>
+&nbsp;                // The user-host string starts directly after FILE_DIRECTORY_LATEX + &#39;-&#39;
+<b class="nc">&nbsp;                String userHostString = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);</b>
+<b class="nc">&nbsp;                metaData.setLatexFileDirectory(userHostString, parseDirectory(entry.getValue()));</b>
+<b class="nc">&nbsp;            } else if (MetaData.SAVE_ACTIONS.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                metaData.setSaveActions(fieldFormatterCleanupsParse(values));</b>
+<b class="nc">&nbsp;            } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));</b>
+<b class="nc">&nbsp;            } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                defaultCiteKeyPattern = new CitationKeyPattern(getSingleItem(values));</b>
+<b class="nc">&nbsp;            } else if (MetaData.PROTECTED_FLAG_META.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                if (Boolean.parseBoolean(getSingleItem(values))) {</b>
+<b class="nc">&nbsp;                    metaData.markAsProtected();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    metaData.markAsNotProtected();</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                metaData.setSaveOrder(SaveOrder.parse(values));</b>
+<b class="nc">&nbsp;            } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData, userAndHost));</b>
+<b class="nc">&nbsp;            } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                Version version = Version.parse(getSingleItem(values));</b>
+<b class="nc">&nbsp;                metaData.setGroupSearchSyntaxVersion(version);</b>
+<b class="nc">&nbsp;            } else if (MetaData.VERSION_DB_STRUCT.equals(entry.getKey())) {</b>
+<b class="nc">&nbsp;                metaData.setVersionDBStructure(getSingleItem(values));</b>
+&nbsp;            } else {
+&nbsp;                // Keep meta data items that we do not know in the file
+<b class="nc">&nbsp;                metaData.putUnknownMetaDataItem(entry.getKey(), values);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!defaultCiteKeyPattern.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN) || !nonDefaultCiteKeyPatterns.isEmpty()) {</b>
+<b class="nc">&nbsp;            metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return metaData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse the content of the value as provided by &quot;raw&quot; content.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
+&nbsp;     * because this leads to difficulties with UNC names.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
+&nbsp;     *
+&nbsp;     * @param value the raw value (as stored in the .bib file)
+&nbsp;     */
+&nbsp;    static String parseDirectory(String value) {
+<b class="nc">&nbsp;        value = StringUtil.removeStringAtTheEnd(value, MetaData.SEPARATOR_STRING);</b>
+<b class="nc">&nbsp;        if (value.contains(&quot;\\\\\\\\&quot;)) {</b>
+&nbsp;            // This is an escaped Windows UNC path
+<b class="nc">&nbsp;            return value.replace(&quot;\\\\&quot;, &quot;\\&quot;);</b>
+<b class="nc">&nbsp;        } else if (value.contains(&quot;\\\\&quot;) &amp;&amp; !SINGLE_BACKSLASH.matcher(value).find()) {</b>
+&nbsp;            // All backslashes escaped
+<b class="nc">&nbsp;            return value.replace(&quot;\\\\&quot;, &quot;\\&quot;);</b>
+&nbsp;        } else {
+&nbsp;            // No backslash escaping
+<b class="nc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Comparator&lt;? super Map.Entry&lt;String, String&gt;&gt; groupsLast() {
+<b class="nc">&nbsp;        return (s1, s2) -&gt; MetaData.GROUPSTREE.equals(s1.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s1.getKey()) ? 1 :</b>
+<b class="nc">&nbsp;                           MetaData.GROUPSTREE.equals(s2.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s2.getKey()) ? -1 : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the first item in the list.
+&nbsp;     * If the specified list does not contain exactly one item, then a {@link ParseException} will be thrown.
+&nbsp;     */
+&nbsp;    private static String getSingleItem(List&lt;String&gt; value) throws ParseException {
+<b class="nc">&nbsp;        if (value.size() == 1) {</b>
+<b class="nc">&nbsp;            return value.getFirst();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new ParseException(&quot;Expected a single item but received &quot; + value);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; getAsList(String value) throws ParseException {
+<b class="nc">&nbsp;        Reader valueReader = Reader.of(value);</b>
+<b class="nc">&nbsp;        List&lt;String&gt; orderedValue = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // We must allow for ; and \ in escape sequences.
+&nbsp;        try {
+&nbsp;            Optional&lt;String&gt; unit;
+<b class="nc">&nbsp;            while ((unit = getNextUnit(valueReader)).isPresent()) {</b>
+<b class="nc">&nbsp;                orderedValue.add(unit.get());</b>
+&nbsp;            }
+&nbsp;        } catch (IOException ex) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Weird error while parsing meta data.&quot;, ex);</b>
+<b class="nc">&nbsp;            throw new ParseException(&quot;Weird error while parsing meta data.&quot;, ex);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return orderedValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads the next unit. Units are delimited by &#39;;&#39; (MetaData.SEPARATOR_CHARACTER).
+&nbsp;     */
+&nbsp;    private static Optional&lt;String&gt; getNextUnit(Reader reader) throws IOException {
+&nbsp;        int c;
+<b class="nc">&nbsp;        boolean escape = false;</b>
+<b class="nc">&nbsp;        StringBuilder res = new StringBuilder();</b>
+<b class="nc">&nbsp;        while ((c = reader.read()) != -1) {</b>
+<b class="nc">&nbsp;            if (escape) {</b>
+&nbsp;                // at org.jabref.logic.exporter.MetaDataSerializer.serializeMetaData, only MetaData.SEPARATOR_CHARACTER, MetaData.ESCAPE_CHARACTER are quoted
+&nbsp;                // That means ; and \\
+<b class="nc">&nbsp;                char character = (char) c;</b>
+<b class="nc">&nbsp;                if (character != MetaData.SEPARATOR_CHARACTER &amp;&amp; character != MetaData.ESCAPE_CHARACTER) {</b>
+&nbsp;                    // Keep the escape character
+<b class="nc">&nbsp;                    res.append(&quot;\\&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                res.append(character);</b>
+<b class="nc">&nbsp;                escape = false;</b>
+<b class="nc">&nbsp;            } else if (c == MetaData.ESCAPE_CHARACTER) {</b>
+<b class="nc">&nbsp;                escape = true;</b>
+<b class="nc">&nbsp;            } else if (c == MetaData.SEPARATOR_CHARACTER) {</b>
+&nbsp;                break;
+&nbsp;            } else {
+<b class="nc">&nbsp;                res.append((char) c);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (!res.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.of(res.toString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static FieldFormatterCleanups fieldFormatterCleanupsParse(List&lt;String&gt; formatterMetaList) {
+<b class="nc">&nbsp;        if ((formatterMetaList != null) &amp;&amp; (formatterMetaList.size() &gt;= 2)) {</b>
+<b class="nc">&nbsp;            boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.getFirst());</b>
+<b class="nc">&nbsp;            String formatterString = formatterMetaList.get(1);</b>
+&nbsp;
+<b class="nc">&nbsp;            return new FieldFormatterCleanups(enablementStatus, FieldFormatterCleanups.parse(formatterString));</b>
+&nbsp;        } else {
+&nbsp;            // return default actions
+<b class="nc">&nbsp;            return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
+&nbsp;     *
+&nbsp;     * @param entry    the metadata entry containing the user-specific .blg path.
+&nbsp;     * @param metaData the MetaData object to update.
+&nbsp;     */
+&nbsp;    private void handleBlgFilePathEntry(Map.Entry&lt;String, String&gt; entry, MetaData metaData) {
+<b class="nc">&nbsp;        String user = entry.getKey().substring(MetaData.BLG_FILE_PATH.length() + 1);</b>
+&nbsp;        List&lt;String&gt; values;
+&nbsp;        try {
+<b class="nc">&nbsp;            values = getAsList(entry.getValue());</b>
+&nbsp;        } catch (ParseException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Invalid .blg metadata format for user {}&quot;, user, e);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (values.size() != 1) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Expected single .blg path entry for user {}, but got {}&quot;, user, values);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        String pathStr = values.getFirst();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Path path = Path.of(pathStr);</b>
+<b class="nc">&nbsp;            metaData.setBlgFilePath(user, path);</b>
+&nbsp;        } catch (InvalidPathException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Invalid .blg file path for user &#39;{}&#39;: &#39;{}&#39;&quot;, user, pathStr, e);</b>
+&nbsp;        } catch (IllegalArgumentException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Illegal argument in .blg file path &#39;{}&#39; for user &#39;{}&#39;&quot;, pathStr, user, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

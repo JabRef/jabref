@@ -1,0 +1,155 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserDefinedFieldsTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: UserDefinedFieldsTab (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserDefinedFieldsTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.SequencedSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.PreviewPanel;
+&nbsp;import org.jabref.gui.undo.RedoAction;
+&nbsp;import org.jabref.gui.undo.UndoAction;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;public class UserDefinedFieldsTab extends FieldsEditorTab {
+&nbsp;    private final LinkedHashSet&lt;Field&gt; fields;
+&nbsp;
+&nbsp;    public UserDefinedFieldsTab(String name,
+&nbsp;                                Set&lt;Field&gt; fields,
+&nbsp;                                UndoManager undoManager,
+&nbsp;                                UndoAction undoAction,
+&nbsp;                                RedoAction redoAction,
+&nbsp;                                GuiPreferences preferences,
+&nbsp;                                JournalAbbreviationRepository journalAbbreviationRepository,
+&nbsp;                                StateManager stateManager,
+&nbsp;                                PreviewPanel previewPanel) {
+<b class="nc">&nbsp;        super(</b>
+&nbsp;                false,
+&nbsp;                undoManager,
+&nbsp;                undoAction,
+&nbsp;                redoAction,
+&nbsp;                preferences,
+&nbsp;                journalAbbreviationRepository,
+&nbsp;                stateManager,
+&nbsp;                previewPanel);
+&nbsp;
+<b class="nc">&nbsp;        this.fields = new LinkedHashSet&lt;&gt;(fields);</b>
+&nbsp;
+<b class="nc">&nbsp;        setText(name);</b>
+<b class="nc">&nbsp;        setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected SequencedSet&lt;Field&gt; determineFieldsToShow(BibEntry entry) {
+<b class="nc">&nbsp;        return fields;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

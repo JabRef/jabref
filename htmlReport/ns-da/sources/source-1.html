@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Language</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.l10n</a>
+</div>
+
+<h1>Coverage Summary for Class: Language (org.jabref.logic.l10n)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Language</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.2%
+  </span>
+  <span class="absValue">
+    (37/45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.l10n;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains all supported languages.
+&nbsp; */
+<b class="fc">&nbsp;public enum Language {</b>
+<b class="fc">&nbsp;    ARABIC(&quot;العربية (Arabic)&quot;, &quot;ar&quot;),</b>
+<b class="fc">&nbsp;    BAHASA_INDONESIA(&quot;Bahasa Indonesia&quot;, &quot;id&quot;),</b>
+<b class="fc">&nbsp;    BRAZILIAN_PORTUGUESE(&quot;Brazilian Portuguese&quot;, &quot;pt_BR&quot;),</b>
+<b class="fc">&nbsp;    DANISH(&quot;Dansk&quot;, &quot;da&quot;),</b>
+<b class="fc">&nbsp;    DUTCH(&quot;Nederlands&quot;, &quot;nl&quot;),</b>
+<b class="fc">&nbsp;    ENGLISH(&quot;English&quot;, &quot;en&quot;),</b>
+<b class="fc">&nbsp;    FINNISH(&quot;Suomi&quot;, &quot;fi&quot;),</b>
+<b class="fc">&nbsp;    FRENCH(&quot;Français&quot;, &quot;fr&quot;),</b>
+<b class="fc">&nbsp;    GERMAN(&quot;Deutsch&quot;, &quot;de&quot;),</b>
+<b class="fc">&nbsp;    GREEK(&quot;ελληνικά (Greek)&quot;, &quot;el&quot;),</b>
+<b class="fc">&nbsp;    ITALIAN(&quot;Italiano&quot;, &quot;it&quot;),</b>
+<b class="fc">&nbsp;    JAPANESE(&quot;Japanese&quot;, &quot;ja&quot;),</b>
+<b class="fc">&nbsp;    KOREAN(&quot;한국어 (Korean)&quot;, &quot;ko&quot;),</b>
+<b class="fc">&nbsp;    NORWEGIAN(&quot;Norsk&quot;, &quot;no&quot;),</b>
+<b class="fc">&nbsp;    PERSIAN(&quot;فارسی (Farsi)&quot;, &quot;fa&quot;),</b>
+<b class="fc">&nbsp;    POLISH(&quot;Polish&quot;, &quot;pl&quot;),</b>
+<b class="fc">&nbsp;    PORTUGUESE(&quot;Português&quot;, &quot;pt&quot;),</b>
+<b class="fc">&nbsp;    RUSSIAN(&quot;Russian&quot;, &quot;ru&quot;),</b>
+<b class="fc">&nbsp;    SIMPLIFIED_CHINESE(&quot;Chinese (Simplified)&quot;, &quot;zh_CN&quot;),</b>
+<b class="fc">&nbsp;    SPANISH(&quot;Español&quot;, &quot;es&quot;),</b>
+<b class="fc">&nbsp;    SWEDISH(&quot;Svenska&quot;, &quot;sv&quot;),</b>
+<b class="fc">&nbsp;    TAGALOG(&quot;Tagalog/Filipino&quot;, &quot;tl&quot;),</b>
+<b class="fc">&nbsp;    TRADITIONAL_CHINESE(&quot;Chinese (Traditional)&quot;, &quot;zh_TW&quot;),</b>
+<b class="fc">&nbsp;    TURKISH(&quot;Turkish&quot;, &quot;tr&quot;),</b>
+<b class="fc">&nbsp;    UKRAINIAN(&quot;украї́нська (Ukrainian)&quot;, &quot;uk&quot;),</b>
+<b class="fc">&nbsp;    VIETNAMESE(&quot;Vietnamese&quot;, &quot;vi&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern IS_NOT_LATIN = Pattern.compile(&quot;[^\\p{IsLatin}]&quot;);</b>
+&nbsp;    private final String displayName;
+&nbsp;    private final String id;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param id Typically as 639-1 code
+&nbsp;     */
+<b class="fc">&nbsp;    Language(String displayName, String id) {</b>
+<b class="fc">&nbsp;        this.displayName = displayName;</b>
+<b class="fc">&nbsp;        this.id = id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;Locale&gt; convertToSupportedLocale(Language language) {
+<b class="fc">&nbsp;        Objects.requireNonNull(language);</b>
+&nbsp;
+&nbsp;        // Very important to split languages like pt_BR into two parts, because otherwise the country would be treated lowercase and create problems in loading
+<b class="fc">&nbsp;        String[] languageParts = language.getId().split(&quot;_&quot;);</b>
+&nbsp;        Locale locale;
+<b class="pc">&nbsp;        if (languageParts.length == 1) {</b>
+<b class="fc">&nbsp;            locale = Locale.of(languageParts[0]);</b>
+<b class="nc">&nbsp;        } else if (languageParts.length == 2) {</b>
+<b class="nc">&nbsp;            locale = Locale.of(languageParts[0], languageParts[1]);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            locale = Locale.ENGLISH;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return Optional.of(locale);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return displayName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getId() {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Language&gt; getSorted() {
+<b class="nc">&nbsp;        return Arrays.stream(values())</b>
+<b class="nc">&nbsp;                     .sorted(Comparator.comparing(language -&gt; removeNonLatinCharacters(language.getDisplayName())))</b>
+<b class="nc">&nbsp;                     .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String removeNonLatinCharacters(String input) {
+<b class="nc">&nbsp;        return IS_NOT_LATIN.matcher(input).replaceAll(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UTF8Checker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.integrity</a>
+</div>
+
+<h1>Coverage Summary for Class: UTF8Checker (org.jabref.logic.integrity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UTF8Checker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.integrity;
+&nbsp;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.charset.CharacterCodingException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.CharsetDecoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;public class UTF8Checker implements EntryChecker {
+&nbsp;    private final Charset charset;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a UTF8Checker that,
+&nbsp;     * &lt;ol&gt;
+&nbsp;     * &lt;li&gt;decode a String into a bytes array&lt;/li&gt;
+&nbsp;     * &lt;li&gt;attempts to decode the bytes array to a character array using the UTF-8 Charset&lt;/li&gt;
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     *
+&nbsp;     * @param charset the charset used to decode BibEntry fields
+&nbsp;     */
+<b class="nc">&nbsp;    public UTF8Checker(Charset charset) {</b>
+<b class="nc">&nbsp;        this.charset = charset;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Detect any non UTF-8 encoded field
+&nbsp;     *
+&nbsp;     * @param entry the BibEntry of BibLatex.
+&nbsp;     * @return return the warning of UTF-8 check for BibLatex.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;IntegrityMessage&gt; check(BibEntry entry) {
+<b class="nc">&nbsp;        List&lt;IntegrityMessage&gt; results = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;Field, String&gt; field : entry.getFieldMap().entrySet()) {</b>
+<b class="nc">&nbsp;            boolean utfOnly = UTF8EncodingChecker(field.getValue().getBytes(charset));</b>
+<b class="nc">&nbsp;            if (!utfOnly) {</b>
+<b class="nc">&nbsp;                results.add(new IntegrityMessage(Localization.lang(&quot;Non-UTF-8 encoded field found&quot;), entry,</b>
+<b class="nc">&nbsp;                        field.getKey()));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return results;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Check whether a byte array is encoded in UTF-8 charset.
+&nbsp;    ///
+&nbsp;    /// Use java api decoder and try&amp;catch block to check the charset.
+&nbsp;    ///
+&nbsp;    /// @param data the byte array used to check the encoding charset
+&nbsp;    /// @return true if is encoded in UTF-8 and false is not encoded in UTF-8
+&nbsp;    public static boolean UTF8EncodingChecker(byte[] data) {
+<b class="nc">&nbsp;        CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            decoder.decode(ByteBuffer.wrap(data));</b>
+&nbsp;        } catch (CharacterCodingException ex) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

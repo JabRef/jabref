@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreviewWithSourceTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab.entrychange</a>
+</div>
+
+<h1>Coverage Summary for Class: PreviewWithSourceTab (org.jabref.gui.collab.entrychange)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreviewWithSourceTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab.entrychange;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.StringWriter;
+&nbsp;
+&nbsp;import javafx.scene.control.Tab;
+&nbsp;import javafx.scene.control.TabPane;
+&nbsp;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.PreviewViewer;
+&nbsp;import org.jabref.logic.bibtex.BibEntryWriter;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;import org.jabref.logic.exporter.BibWriter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.fxmisc.richtext.CodeArea;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class PreviewWithSourceTab {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewWithSourceTab.class);</b>
+&nbsp;
+&nbsp;    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, GuiPreferences preferences, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
+<b class="nc">&nbsp;        return getPreviewWithSourceTab(entry, bibDatabaseContext, preferences, entryTypesManager, previewViewer, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, GuiPreferences preferences, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer, String label) {
+<b class="nc">&nbsp;        previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());</b>
+<b class="nc">&nbsp;        previewViewer.setEntry(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        CodeArea codeArea = new CodeArea();</b>
+<b class="nc">&nbsp;        codeArea.setId(&quot;bibtexcodearea&quot;);</b>
+<b class="nc">&nbsp;        codeArea.setWrapText(true);</b>
+<b class="nc">&nbsp;        codeArea.setDisable(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        TabPane tabPanePreviewCode = new TabPane();</b>
+<b class="nc">&nbsp;        Tab previewTab = new Tab();</b>
+<b class="nc">&nbsp;        previewTab.setContent(previewViewer);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNullOrEmpty(label)) {</b>
+<b class="nc">&nbsp;            previewTab.setText(Localization.lang(&quot;Entry preview&quot;));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            previewTab.setText(label);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            codeArea.appendText(getSourceString(entry, bibDatabaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager));</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error getting Bibtex: {}&quot;, entry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        codeArea.setEditable(false);</b>
+<b class="nc">&nbsp;        Tab codeTab = new Tab(Localization.lang(&quot;%0 source&quot;, bibDatabaseContext.getMode().getFormattedName()), codeArea);</b>
+&nbsp;
+<b class="nc">&nbsp;        tabPanePreviewCode.getTabs().addAll(previewTab, codeTab);</b>
+<b class="nc">&nbsp;        return tabPanePreviewCode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
+<b class="nc">&nbsp;        StringWriter writer = new StringWriter();</b>
+<b class="nc">&nbsp;        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);</b>
+<b class="nc">&nbsp;        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);</b>
+<b class="nc">&nbsp;        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);</b>
+<b class="nc">&nbsp;        return writer.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,227 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > URLCleanup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.cleanup</a>
+</div>
+
+<h1>Coverage Summary for Class: URLCleanup (org.jabref.logic.cleanup)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">URLCleanup</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.cleanup;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Date;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;/**
+&nbsp; * Checks whether URL exists in note field, and stores it under url field.
+&nbsp; */
+<b class="nc">&nbsp;public class URLCleanup implements CleanupJob {</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * The urlRegex was originally fetched from a suggested solution in
+&nbsp;     * https://stackoverflow.com/questions/28185064/python-infinite-loop-in-regex-to-match-url.
+&nbsp;     * In order to be functional, we made the necessary adjustments regarding Java
+&nbsp;     * features (mainly doubled backslashes).
+&nbsp;     */
+&nbsp;    private static final String URL_REGEX = &quot;(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.]&quot;
+&nbsp;            + &quot;[a-z]{2,4}/)(?:[^\\s()&lt;&gt;\\\\]+|\\(([^\\s()&lt;&gt;\\\\]+|(\\([^\\s()&quot;
+&nbsp;            + &quot;&lt;&gt;\\\\]+\\)))*\\))+(?:\\(([^\\s()&lt;&gt;\\\\]+|(\\([^\\s()&lt;&gt;\\\\]+\\&quot;
+&nbsp;            + &quot;)))*\\)|[^\\s`!()\\[\\]{};:&#39;\&quot;.,&lt;&gt;?«»“”‘’]))&quot;;
+<b class="nc">&nbsp;    public static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+&nbsp;    private static final String DATE_TERMS_REGEX = &quot;accessed on|visited on|retrieved on|viewed on&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Field NOTE_FIELD = StandardField.NOTE;</b>
+<b class="nc">&nbsp;    private static final Field URL_FIELD = StandardField.URL;</b>
+<b class="nc">&nbsp;    private static final Field URLDATE_FIELD = StandardField.URLDATE;</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern DATE_TERMS_PATTERN = Pattern.compile(DATE_TERMS_REGEX, Pattern.CASE_INSENSITIVE);</b>
+<b class="nc">&nbsp;    private static final Pattern DATE_PATTERN = Pattern.compile(Date.DATE_REGEX, Pattern.CASE_INSENSITIVE);</b>
+<b class="nc">&nbsp;    private final NormalizeDateFormatter formatter = new NormalizeDateFormatter();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;FieldChange&gt; cleanup(BibEntry entry) {
+<b class="nc">&nbsp;        List&lt;FieldChange&gt; changes = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        String noteFieldValue = entry.getField(NOTE_FIELD).orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        final Matcher urlMatcher = URL_PATTERN.matcher(noteFieldValue);</b>
+<b class="nc">&nbsp;        final Matcher dateTermsMatcher = DATE_TERMS_PATTERN.matcher(noteFieldValue);</b>
+<b class="nc">&nbsp;        final Matcher dateMatcher = DATE_PATTERN.matcher(noteFieldValue);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (urlMatcher.find()) {</b>
+<b class="nc">&nbsp;            String url = urlMatcher.group();</b>
+&nbsp;
+&nbsp;            // Remove the URL from the NoteFieldValue
+<b class="nc">&nbsp;            String newNoteFieldValue = noteFieldValue</b>
+<b class="nc">&nbsp;                    .replace(url, &quot;&quot;)</b>
+&nbsp;
+&nbsp;                    /*
+&nbsp;                     * The following regex erases unnecessary remaining
+&nbsp;                     * content in note field. Explanation:
+&nbsp;                     * &lt;ul&gt;
+&nbsp;                     *     &lt;li&gt;&quot;(, )?&quot;: Matches an optional comma followed by a space&lt;/li&gt;
+&nbsp;                     *     &lt;li&gt;&quot;\\?&quot;: Matches an optional backslash&lt;/li&gt;
+&nbsp;                     *     &lt;li&gt;&quot;url\{\}&quot;: Matches the literal string &quot;url{}&quot;&lt;/li&gt;
+&nbsp;                     * &lt;/ul&gt;
+&nbsp;                     * Note that the backslashes are doubled as Java requirement
+&nbsp;                     */
+<b class="nc">&nbsp;                    .replaceAll(&quot;(, )?\\\\?url\\{\\}(, )?&quot;, &quot;&quot;);</b>
+&nbsp;
+&nbsp;            /*
+&nbsp;             * In case the url and note fields hold the same URL, then we just
+&nbsp;             * remove it from the note field, and no other action is performed.
+&nbsp;             */
+<b class="nc">&nbsp;            if (entry.hasField(URL_FIELD)) {</b>
+<b class="nc">&nbsp;                String urlFieldValue = entry.getField(URL_FIELD).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                if (urlFieldValue.equals(url)) {</b>
+<b class="nc">&nbsp;                    entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);</b>
+<b class="nc">&nbsp;                entry.setField(URL_FIELD, url).ifPresent(changes::add);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (dateTermsMatcher.find()) {</b>
+<b class="nc">&nbsp;                String term = dateTermsMatcher.group();</b>
+<b class="nc">&nbsp;                newNoteFieldValue = newNoteFieldValue</b>
+<b class="nc">&nbsp;                        .replace(term, &quot;&quot;);</b>
+<b class="nc">&nbsp;                if (dateMatcher.find()) {</b>
+<b class="nc">&nbsp;                    String date = dateMatcher.group();</b>
+<b class="nc">&nbsp;                    String formattedDate = formatter.format(date);</b>
+<b class="nc">&nbsp;                    newNoteFieldValue = newNoteFieldValue</b>
+<b class="nc">&nbsp;                            .replace(date, &quot;&quot;).trim()</b>
+<b class="nc">&nbsp;                            .replaceAll(&quot;^,|,$&quot;, &quot;&quot;).trim(); // either starts or ends with a comma</b>
+&nbsp;
+&nbsp;                    // Same approach with the URL cleanup.
+<b class="nc">&nbsp;                    if (entry.hasField(URLDATE_FIELD)) {</b>
+<b class="nc">&nbsp;                        String urlDateFieldValue = entry.getField(URLDATE_FIELD).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                        if (urlDateFieldValue.equals(formattedDate)) {</b>
+<b class="nc">&nbsp;                            entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);</b>
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);</b>
+<b class="nc">&nbsp;                        entry.setField(URLDATE_FIELD, formattedDate).ifPresent(changes::add);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return changes;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

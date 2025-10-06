@@ -1,0 +1,216 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StringSimilarity</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.strings</a>
+</div>
+
+<h1>Coverage Summary for Class: StringSimilarity (org.jabref.logic.util.strings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StringSimilarity</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10.8%
+  </span>
+  <span class="absValue">
+    (4/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.strings;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import info.debatty.java.stringsimilarity.Levenshtein;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="fc">&nbsp;public class StringSimilarity {</b>
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(StringSimilarity.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    private final Levenshtein METRIC_DISTANCE = new Levenshtein();</b>
+&nbsp;    // edit distance threshold for entry title comparison
+<b class="fc">&nbsp;    private final int METRIC_THRESHOLD = 4;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * String similarity based on Levenshtein, ignoreCase, and fixed metric threshold of 4.
+&nbsp;     *
+&nbsp;     * @param a String to compare
+&nbsp;     * @param b String to compare
+&nbsp;     * @return true if Strings are considered as similar by the algorithm
+&nbsp;     */
+&nbsp;    public boolean isSimilar(String a, String b) {
+<b class="nc">&nbsp;        return editDistanceIgnoreCase(a, b) &lt;= METRIC_THRESHOLD;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double editDistanceIgnoreCase(String a, String b) {
+&nbsp;        // TODO: Locale is dependent on the language of the strings. English is a good denominator.
+<b class="nc">&nbsp;        return METRIC_DISTANCE.distance(a.toLowerCase(Locale.ENGLISH), b.toLowerCase(Locale.ENGLISH));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculates the similarity (a number within 0 and 1) between two strings.
+&nbsp;     * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
+&nbsp;     */
+&nbsp;    public double similarity(final String first, final String second) {
+&nbsp;        final String longer;
+&nbsp;        final String shorter;
+&nbsp;
+<b class="nc">&nbsp;        if (first.length() &lt; second.length()) {</b>
+<b class="nc">&nbsp;            longer = second;</b>
+<b class="nc">&nbsp;            shorter = first;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            longer = first;</b>
+<b class="nc">&nbsp;            shorter = second;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final int longerLength = longer.length();</b>
+&nbsp;        // both strings are zero length
+<b class="nc">&nbsp;        if (longerLength == 0) {</b>
+<b class="nc">&nbsp;            return 1.0;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        final double distanceIgnoredCase = editDistanceIgnoreCase(longer, shorter);</b>
+<b class="nc">&nbsp;        final double similarity = (longerLength - distanceIgnoredCase) / longerLength;</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Longer string: {} Shorter string: {} Similarity: {}&quot;, longer, shorter, similarity);</b>
+<b class="nc">&nbsp;        return similarity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the Longest Common Substring (LCS) similarity rating between two strings, ignoring case.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This function uses the following formula = &lt;code&gt;(length of longest substring) / (length of shorter string)&lt;/code&gt;.
+&nbsp;     * The longest common substring is calculated using a space-optimized dynamic programming implementation of the LCS
+&nbsp;     * algorithm found &lt;a href=&quot;https://en.wikipedia.org/wiki/Longest_common_substring&quot;&gt;on Wikipedia&lt;/a&gt;.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static double LCSSimilarity(String first, String second) {
+<b class="nc">&nbsp;        if (first.isEmpty() &amp;&amp; second.isEmpty()) {</b>
+<b class="nc">&nbsp;            return 1.0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (first.isEmpty() || second.isEmpty()) {</b>
+<b class="nc">&nbsp;            return 0.0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        first = first.toLowerCase();</b>
+<b class="nc">&nbsp;        second = second.toLowerCase();</b>
+<b class="nc">&nbsp;        int firstLength = first.length();</b>
+<b class="nc">&nbsp;        int secondLength = second.length();</b>
+&nbsp;
+<b class="nc">&nbsp;        int[] previousMatches = new int[secondLength + 1];</b>
+&nbsp;
+<b class="nc">&nbsp;        int longestSubstringLength = 0;</b>
+<b class="nc">&nbsp;        for (int i = 1; i &lt;= firstLength; i++) {</b>
+<b class="nc">&nbsp;            int[] currentMatches = new int[secondLength + 1];</b>
+<b class="nc">&nbsp;            for (int j = 1; j &lt;= secondLength; j++) {</b>
+<b class="nc">&nbsp;                if (first.charAt(i - 1) == second.charAt(j - 1)) {</b>
+<b class="nc">&nbsp;                    currentMatches[j] = previousMatches[j - 1] + 1;</b>
+<b class="nc">&nbsp;                    longestSubstringLength = Math.max(longestSubstringLength, currentMatches[j]);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    currentMatches[j] = 0;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // Move the current row&#39;s data to the previous row
+<b class="nc">&nbsp;            previousMatches = currentMatches;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return (double) longestSubstringLength / Math.min(firstLength, secondLength);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

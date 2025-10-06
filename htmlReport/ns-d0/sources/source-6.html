@@ -1,0 +1,514 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CffImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: CffImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CffImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/85)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CffImporter$CffEntity</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CffImporter$CffFormat</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CffImporter$CffIdentifier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CffImporter$CffReference</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/95)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.exporter.CffExporter;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.BiblatexSoftwareField;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonAnySetter;
+&nbsp;import com.fasterxml.jackson.annotation.JsonProperty;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+&nbsp;import com.google.common.collect.HashBiMap;
+&nbsp;
+&nbsp;public class CffImporter extends Importer {
+&nbsp;
+<b class="nc">&nbsp;    public static final Map&lt;String, Field&gt; FIELDS_MAP = HashBiMap.create(CffExporter.FIELDS_MAP).inverse();</b>
+<b class="nc">&nbsp;    public static final Map&lt;String, EntryType&gt; TYPES_MAP = HashBiMap.create(CffExporter.TYPES_MAP).inverse();</b>
+&nbsp;
+&nbsp;    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public CffImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {</b>
+<b class="nc">&nbsp;        this.citationKeyPatternPreferences = citationKeyPatternPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;CFF&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StandardFileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.CFF;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;cff&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Importer for the CFF format, which is intended to make software and datasets citable.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // POJO classes for yaml data
+&nbsp;    private static class CffFormat {
+<b class="nc">&nbsp;        private final HashMap&lt;String, String&gt; values = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        @JsonProperty(&quot;authors&quot;)
+&nbsp;        private List&lt;CffEntity&gt; authors;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;identifiers&quot;)
+&nbsp;        private List&lt;CffIdentifier&gt; ids;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;keywords&quot;)
+&nbsp;        private List&lt;String&gt; keywords;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;preferred-citation&quot;)
+&nbsp;        private CffReference preferred;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;references&quot;)
+&nbsp;        private List&lt;CffReference&gt; references;
+&nbsp;
+<b class="nc">&nbsp;        public CffFormat() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @JsonAnySetter
+&nbsp;        private void setValues(String key, String value) {
+<b class="nc">&nbsp;            values.put(key, value);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class CffEntity {
+<b class="nc">&nbsp;        private final HashMap&lt;String, String&gt; values = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        public CffEntity() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @JsonAnySetter
+&nbsp;        private void setValues(String key, String value) {
+<b class="nc">&nbsp;            values.put(key, value);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class CffIdentifier {
+&nbsp;        @JsonProperty(&quot;type&quot;)
+&nbsp;        private String type;
+&nbsp;        @JsonProperty(&quot;value&quot;)
+&nbsp;        private String value;
+&nbsp;
+<b class="nc">&nbsp;        public CffIdentifier() {</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class CffReference {
+<b class="nc">&nbsp;        private final HashMap&lt;String, String&gt; values = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        @JsonProperty(&quot;authors&quot;)
+&nbsp;        private List&lt;CffEntity&gt; authors;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;conference&quot;)
+&nbsp;        private CffEntity conference;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;contact&quot;)
+&nbsp;        private CffEntity contact;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;editors&quot;)
+&nbsp;        private List&lt;CffEntity&gt; editors;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;editors-series&quot;)
+&nbsp;        private List&lt;CffEntity&gt; editorsSeries;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;database-provider&quot;)
+&nbsp;        private CffEntity databaseProvider;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;institution&quot;)
+&nbsp;        private CffEntity institution;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;keywords&quot;)
+&nbsp;        private List&lt;String&gt; keywords;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;languages&quot;)
+&nbsp;        private List&lt;String&gt; languages;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;location&quot;)
+&nbsp;        private CffEntity location;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;publisher&quot;)
+&nbsp;        private CffEntity publisher;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;recipients&quot;)
+&nbsp;        private List&lt;CffEntity&gt; recipients;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;senders&quot;)
+&nbsp;        private List&lt;CffEntity&gt; senders;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;translators&quot;)
+&nbsp;        private List&lt;CffEntity&gt; translators;
+&nbsp;
+&nbsp;        @JsonProperty(&quot;type&quot;)
+&nbsp;        private String type;
+&nbsp;
+<b class="nc">&nbsp;        public CffReference() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @JsonAnySetter
+&nbsp;        private void setValues(String key, String value) {
+<b class="nc">&nbsp;            values.put(key, value);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());</b>
+<b class="nc">&nbsp;        CffFormat citation = mapper.readValue(reader, CffFormat.class);</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entriesList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Remove CFF version and type
+<b class="nc">&nbsp;        citation.values.remove(&quot;cff-version&quot;);</b>
+&nbsp;
+&nbsp;        // Parse main entry
+<b class="nc">&nbsp;        HashMap&lt;Field, String&gt; entryMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        EntryType entryType = TYPES_MAP.getOrDefault(citation.values.get(&quot;type&quot;), StandardEntryType.Software);</b>
+<b class="nc">&nbsp;        citation.values.remove(&quot;type&quot;);</b>
+&nbsp;
+&nbsp;        // Translate CFF author format to JabRef author format
+<b class="nc">&nbsp;        entryMap.put(StandardField.AUTHOR, parseAuthors(citation.authors));</b>
+&nbsp;
+&nbsp;        // Parse keywords
+<b class="nc">&nbsp;        if (citation.keywords != null) {</b>
+<b class="nc">&nbsp;            entryMap.put(StandardField.KEYWORDS, String.join(&quot;, &quot;, citation.keywords));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Map CFF simple fields to JabRef Fields
+<b class="nc">&nbsp;        parseFields(citation.values, entryMap);</b>
+&nbsp;
+&nbsp;        // Select DOI to keep
+<b class="nc">&nbsp;        if ((entryMap.get(StandardField.DOI) == null) &amp;&amp; (citation.ids != null)) {</b>
+<b class="nc">&nbsp;            List&lt;CffIdentifier&gt; doiIds = citation.ids.stream()</b>
+<b class="nc">&nbsp;                                                     .filter(id -&gt; &quot;doi&quot;.equals(id.type))</b>
+<b class="nc">&nbsp;                                                     .toList();</b>
+<b class="nc">&nbsp;            if (doiIds.size() == 1) {</b>
+<b class="nc">&nbsp;                entryMap.put(StandardField.DOI, doiIds.getFirst().value);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Select SWHID to keep
+<b class="nc">&nbsp;        if (citation.ids != null) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; swhIds = citation.ids.stream()</b>
+<b class="nc">&nbsp;                                              .filter(id -&gt; &quot;swh&quot;.equals(id.type))</b>
+<b class="nc">&nbsp;                                              .map(id -&gt; id.value)</b>
+<b class="nc">&nbsp;                                              .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (swhIds.size() == 1) {</b>
+<b class="nc">&nbsp;                entryMap.put(BiblatexSoftwareField.SWHID, swhIds.getFirst());</b>
+<b class="nc">&nbsp;            } else if (swhIds.size() &gt; 1) {</b>
+<b class="nc">&nbsp;                List&lt;String&gt; relSwhIds = swhIds.stream()</b>
+<b class="nc">&nbsp;                                               .filter(id -&gt; id.split(&quot;:&quot;).length &gt; 3) // quick filter for invalid swhids</b>
+<b class="nc">&nbsp;                                               .filter(id -&gt; &quot;rel&quot;.equals(id.split(&quot;:&quot;)[2]))</b>
+<b class="nc">&nbsp;                                               .toList();</b>
+<b class="nc">&nbsp;                if (relSwhIds.size() == 1) {</b>
+<b class="nc">&nbsp;                    entryMap.put(BiblatexSoftwareField.SWHID, relSwhIds.getFirst());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry(entryType);</b>
+<b class="nc">&nbsp;        entry.setField(entryMap);</b>
+<b class="nc">&nbsp;        entriesList.add(entry);</b>
+&nbsp;
+&nbsp;        // Handle `preferred-citation` and `references` fields
+<b class="nc">&nbsp;        BibEntry preferred = null;</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; references = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (citation.preferred != null) {</b>
+<b class="nc">&nbsp;            preferred = parseEntry(citation.preferred);</b>
+<b class="nc">&nbsp;            entriesList.add(preferred);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (citation.references != null) {</b>
+<b class="nc">&nbsp;            references = citation.references.stream().map(this::parseEntry).toList();</b>
+<b class="nc">&nbsp;            entriesList.addAll(references);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ParserResult res = new ParserResult(entriesList);</b>
+<b class="nc">&nbsp;        CitationKeyGenerator gen = new CitationKeyGenerator(res.getDatabaseContext(), citationKeyPatternPreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (preferred != null) {</b>
+<b class="nc">&nbsp;            gen.generateAndSetKey(preferred);</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.CITES, preferred.getCitationKey().orElse(&quot;&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (references != null) {</b>
+<b class="nc">&nbsp;            references.forEach(ref -&gt; {</b>
+<b class="nc">&nbsp;                gen.generateAndSetKey(ref);</b>
+<b class="nc">&nbsp;                String citeKey = ref.getCitationKey().orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                String related = entry.getField(StandardField.RELATED).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.RELATED, related.isEmpty() ? citeKey : related + &quot;,&quot; + citeKey);</b>
+&nbsp;            });
+&nbsp;        }
+<b class="nc">&nbsp;        return res;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());</b>
+&nbsp;        CffFormat citation;
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            citation = mapper.readValue(reader, CffFormat.class);</b>
+<b class="nc">&nbsp;            return (citation != null) &amp;&amp; (citation.values.get(&quot;title&quot;) != null);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String parseAuthors(List&lt;CffEntity&gt; authors) {
+<b class="nc">&nbsp;        return authors.stream()</b>
+<b class="nc">&nbsp;                      .map(author -&gt; author.values)</b>
+<b class="nc">&nbsp;                      .map(vals -&gt; vals.get(&quot;name&quot;) != null ?</b>
+<b class="nc">&nbsp;                                   new Author(vals.get(&quot;name&quot;), &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;) :</b>
+<b class="nc">&nbsp;                                   new Author(vals.get(&quot;given-names&quot;), null, vals.get(&quot;name-particle&quot;),</b>
+<b class="nc">&nbsp;                                           vals.get(&quot;family-names&quot;), vals.get(&quot;name-suffix&quot;)))</b>
+<b class="nc">&nbsp;                      .collect(AuthorList.collect())</b>
+<b class="nc">&nbsp;                      .getAsFirstLastNamesWithAnd();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry parseEntry(CffReference reference) {
+<b class="nc">&nbsp;        Map&lt;Field, String&gt; entryMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        EntryType entryType = TYPES_MAP.getOrDefault(reference.type, StandardEntryType.Article);</b>
+<b class="nc">&nbsp;        entryMap.put(StandardField.AUTHOR, parseAuthors(reference.authors));</b>
+<b class="nc">&nbsp;        parseFields(reference.values, entryMap);</b>
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry(entryType);</b>
+<b class="nc">&nbsp;        entry.setField(entryMap);</b>
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseFields(Map&lt;String, String&gt; values, Map&lt;Field, String&gt; entryMap) {
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; property : values.entrySet()) {</b>
+<b class="nc">&nbsp;            if (FIELDS_MAP.containsKey(property.getKey())) {</b>
+<b class="nc">&nbsp;                entryMap.put(FIELDS_MAP.get(property.getKey()), property.getValue());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                entryMap.put(new UnknownField(property.getKey()), property.getValue());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

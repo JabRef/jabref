@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NewVersionDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.help</a>
+</div>
+
+<h1>Coverage Summary for Class: NewVersionDialog (org.jabref.gui.help)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NewVersionDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.help;
+&nbsp;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonBar;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.Hyperlink;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.Version;
+&nbsp;
+&nbsp;public class NewVersionDialog extends BaseDialog&lt;Boolean&gt; {
+&nbsp;
+&nbsp;    public NewVersionDialog(Version currentVersion,
+&nbsp;                            Version latestVersion,
+&nbsp;                            DialogService dialogService,
+<b class="nc">&nbsp;                            ExternalApplicationsPreferences externalApplicationsPreferences) {</b>
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;New version available&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        ButtonType btnIgnoreUpdate = new ButtonType(Localization.lang(&quot;Ignore this update&quot;), ButtonBar.ButtonData.CANCEL_CLOSE);</b>
+<b class="nc">&nbsp;        ButtonType btnDownloadUpdate = new ButtonType(Localization.lang(&quot;Download update&quot;), ButtonBar.ButtonData.APPLY);</b>
+<b class="nc">&nbsp;        ButtonType btnRemindMeLater = new ButtonType(Localization.lang(&quot;Remind me later&quot;), ButtonBar.ButtonData.CANCEL_CLOSE);</b>
+<b class="nc">&nbsp;        this.getDialogPane().getButtonTypes().addAll(btnIgnoreUpdate, btnDownloadUpdate, btnRemindMeLater);</b>
+<b class="nc">&nbsp;        this.setResultConverter(button -&gt; {</b>
+<b class="nc">&nbsp;            if (button == btnIgnoreUpdate) {</b>
+<b class="nc">&nbsp;                return false;</b>
+<b class="nc">&nbsp;            } else if (button == btnDownloadUpdate) {</b>
+<b class="nc">&nbsp;                NativeDesktop.openBrowserShowPopup(Version.JABREF_DOWNLOAD_URL, dialogService, externalApplicationsPreferences);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        });
+<b class="nc">&nbsp;        Button defaultButton = (Button) this.getDialogPane().lookupButton(btnDownloadUpdate);</b>
+<b class="nc">&nbsp;        defaultButton.setDefaultButton(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        Hyperlink lblMoreInformation = new Hyperlink(Localization.lang(&quot;See what&#39;s new&quot;));</b>
+<b class="nc">&nbsp;        lblMoreInformation.setOnAction(_ -&gt;</b>
+<b class="nc">&nbsp;                NativeDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl(), dialogService, externalApplicationsPreferences)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        VBox container = new VBox(</b>
+<b class="nc">&nbsp;                new Label(Localization.lang(&quot;A new version of JabRef is available!&quot;)),</b>
+<b class="nc">&nbsp;                new Label(Localization.lang(&quot;Latest version: %0&quot;, latestVersion.getFullVersion())),</b>
+<b class="nc">&nbsp;                new Label(Localization.lang(&quot;Installed version: %0&quot;, currentVersion.getFullVersion())),</b>
+&nbsp;                lblMoreInformation
+&nbsp;        );
+<b class="nc">&nbsp;        getDialogPane().setContent(container);</b>
+<b class="nc">&nbsp;        getDialogPane().setPrefWidth(450);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>
