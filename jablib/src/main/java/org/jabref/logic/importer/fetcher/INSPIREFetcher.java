@@ -22,6 +22,8 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -78,6 +80,90 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);
 
         new FieldFormatterCleanup(StandardField.TITLE, new LatexToUnicodeFormatter()).cleanup(entry);
+
+        // Check if the current citation key is bad (too long, contains URL, or illegal chars)
+        String key = entry.getCitationKey().orElse("");
+        if (isBadKey(key)) {
+            // If so, generate a new citation key and set as citation key
+            entry.setCitationKey(generateNewKey(entry));
+        }
+    }
+
+    String generateNewKey(BibEntry entry){
+        // Generate a new citation key following INSPIRE texkey rules
+        String newKey = "";
+        Optional<String> authors = entry.getField(StandardField.AUTHOR);
+        Optional<String> year = entry.getField(StandardField.YEAR);
+
+        // Parse authors into structured list; if absent, returns empty list
+        List<Author> authorList = AuthorList.parse(authors.orElse("")).getAuthors();
+        if (year.isPresent()){
+            // If author info is available, use [first author's last name]:[year][other initials]
+            if (authors.isPresent() && !authorList.isEmpty()){
+                String firstLastName = authorList.getFirst().getNamePrefixAndFamilyName();
+                StringBuilder suffix = new StringBuilder();
+
+                // Append the first letter of each author's last name
+                for (Author author : authorList) {
+                    String lastName = author.getNamePrefixAndFamilyName();
+                    if (!lastName.isEmpty()) {
+                        suffix.append(lastName.charAt(0));
+                    }
+                }
+
+                // Remove the first author's initial
+                if (!suffix.isEmpty()) {
+                    suffix.deleteCharAt(0);
+                }
+                newKey = firstLastName + ":" + year.get() + suffix;
+            }
+            // If no author, but collaboration field exists, use [collaboration]:[year]
+            else if (entry.getField(new UnknownField("collaboration")).isPresent()) {
+                newKey = entry.getField(new UnknownField("collaboration")).get() + ":" + year.get();
+            }
+            // If no author/collaboration, but arXiv eprint exists, use arXiv:[eprint]
+            else if (entry.getField(StandardField.EPRINT).isPresent()) {
+                newKey = "arXiv:" + entry.getField(StandardField.EPRINT).get();
+            }
+            else {
+                // TODO: warning for missing important information
+            }
+        }
+        else {
+            // If no year, fallback to arXiv if available
+            if (entry.getField(StandardField.EPRINT).isPresent()) {
+                newKey = "arXiv:" + entry.getField(StandardField.EPRINT).get();
+            }
+            else {
+                // TODO: warning for missing important information
+            }
+        }
+        return newKey;
+    }
+
+    /**
+     * Checks if the citation key is bad: contains illegal characters, is too long, or is a URL.
+     */
+    boolean isBadKey(String key){
+        char[] invalidChars = {'/', '\\', '*', '?', '"', '<', '>', '|', '#', '%'};
+        for (char c : invalidChars) {
+            if (key.contains(String.valueOf(c))) {
+                return true;
+            }
+        }
+        // Consider key bad if too long or is a URL
+        return key.length() > 30 || key.startsWith("http://") || key.startsWith("https://");
+    }
+
+    /**
+     * If the BibEntry contains a 'texkeys' field, use it as the citation key and clear the field.
+     */
+    void setTexkeys(BibEntry entry){
+        Optional<String> texkeys = entry.getField(new UnknownField("texkeys"));
+        if (texkeys.isPresent() && !texkeys.get().isBlank()) {
+            entry.setCitationKey(texkeys.get());
+            entry.clearField(new UnknownField("texkeys"));
+        }
     }
 
     @Override
@@ -110,6 +196,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         try {
             URLDownload download = getUrlDownload(url);
             List<BibEntry> results = getParser().parseEntries(download.asInputStream());
+            results.forEach(this::setTexkeys);
             results.forEach(this::doPostCleanup);
             return results;
         } catch (ParseException e) {
