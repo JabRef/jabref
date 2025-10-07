@@ -7,7 +7,7 @@ javaPlatform {
 }
 
 val javafx = "25"
-val lucene = "10.3.0"
+val lucene = "10.3.1"
 val pdfbox = "3.0.5"
 
 dependencies {
@@ -34,14 +34,14 @@ dependencies.constraints {
     api("com.ibm.icu:icu4j:72.0.1!!")
 
     api("com.dlsc.gemsfx:gemsfx:3.5.7")
-    api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
+    api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
     api("com.fasterxml:aalto-xml:1.3.3")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket:0.24.0")
     api("com.github.javakeyring:java-keyring:1.0.4")
-    api("com.github.javaparser:javaparser-symbol-solver-core:3.27.0")
+    api("com.github.javaparser:javaparser-symbol-solver-core:3.27.1")
     api("com.github.jknack:handlebars-helpers:4.3.1") // Required by Wiremock - and our patching of Wiremock
     api("com.github.jknack:handlebars:4.3.1") // Required by Wiremock - and our patching of Wiremock
     api("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
@@ -128,15 +128,15 @@ dependencies.constraints {
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.20.1")
     api("org.jspecify:jspecify:1.0.0")
-    api("org.junit.jupiter:junit-jupiter-api:5.13.4")
-    api("org.junit.jupiter:junit-jupiter-params:5.13.4")
-    api("org.junit.jupiter:junit-jupiter:5.13.4")
+    api("org.junit.jupiter:junit-jupiter-api:6.0.0")
+    api("org.junit.jupiter:junit-jupiter-params:6.0.0")
+    api("org.junit.jupiter:junit-jupiter:6.0.0")
     api("org.junit.platform:junit-platform-launcher:1.13.4")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
-    api("org.mockito:mockito-core:5.19.0")
+    api("org.mockito:mockito-core:5.20.0")
     api("org.ow2.asm:asm:9.8")
     api("org.postgresql:postgresql:42.7.7")
     api("org.slf4j:jul-to-slf4j:2.0.17")

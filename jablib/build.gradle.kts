@@ -1,6 +1,5 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.SonatypeHost
 import dev.jbang.gradle.tasks.JBangTask
 import org.checkerframework.gradle.plugin.CheckerFrameworkExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -15,7 +14,7 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.32.0"
+    id("com.vanniktech.maven.publish") version "0.34.0"
 
     // id("dev.jbang") version "0.2.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
@@ -206,7 +205,7 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core")
     // TODO: Use versions of versions/build.gradle.kts
-    mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
+    mockitoAgent("org.mockito:mockito-core:5.20.0") { isTransitive = false }
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.xmlunit:xmlunit-core")
@@ -522,8 +521,7 @@ mavenPublishing {
     sourcesJar = true,
   ))
 
-  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
+  publishToMavenCentral()
   signAllPublications()
 
   coordinates("org.jabref", "jablib", version)
