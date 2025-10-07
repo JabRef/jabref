@@ -160,7 +160,7 @@ jobs:
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-13/jabkit-portable_macos.zip ./jabkit/build/packages/macos-13/jabkit.app && rm -R jabkit/build/packages/macos-13/jabkit.app
             suffix: ''
             archForDebianRepack: ''
-          - os: macos-14
+          - os: macos-15
             displayName: macOS-arm
             archivePortable: 7z a -r jabgui/build/packages/macos-14/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-14/JabRef.app && rm -R jabgui/build/packages/macos-14/JabRef.app
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-14/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-14/jabkit.app && rm -R jabkit/build/packages/macos-14/jabkit.app
