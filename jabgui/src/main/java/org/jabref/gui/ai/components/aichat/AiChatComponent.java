@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -74,6 +75,8 @@ public class AiChatComponent extends VBox {
     @FXML private Hyperlink exQuestion3;
     @FXML private HBox exQuestionBox;
 
+    private String noticeTemplate;
+
     public AiChatComponent(AiService aiService,
                            StringProperty name,
                            ObservableList<ChatMessage> chatHistory,
@@ -117,11 +120,21 @@ public class AiChatComponent extends VBox {
     }
 
     private void initializeNotice() {
-        String newNotice = noticeText
-                .getText()
-                .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
+        this.noticeTemplate = noticeText.getText();
 
-        noticeText.setText(newNotice);
+        noticeText.textProperty().bind(Bindings.createStringBinding(
+                () -> {
+                    String provider = aiPreferences.getAiProvider().getLabel();
+                    String model = aiPreferences.getSelectedChatModel();
+                    return noticeTemplate.replace("%0", provider + " " + model);
+                },
+                aiPreferences.aiProviderProperty(),
+                aiPreferences.openAiChatModelProperty(),
+                aiPreferences.mistralAiChatModelProperty(),
+                aiPreferences.geminiChatModelProperty(),
+                aiPreferences.huggingFaceChatModelProperty(),
+                aiPreferences.gpt4AllChatModelProperty()
+        ));
     }
 
     private void initializeExampleQuestions() {
