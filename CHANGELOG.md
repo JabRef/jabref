@@ -44,7 +44,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for using Medline/Pubmed fetcher with an API key. [#11296](https://github.com/JabRef/jabref/issues/11296#issuecomment-3289005011)
 - We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
-- We added a new tab "Clear content" in the automatic field editor. [#13780](https://github.com/JabRef/jabref/issues/13780) 
+- We added a new tab "Clear content" in the automatic field editor. [#13780](https://github.com/JabRef/jabref/issues/13780)
 
 ### Changed
 
@@ -101,7 +101,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When the pin "Keep dialog always on top" in the global search dialog is selected, the search window stays open when double-clicking on an entry. [#13840](https://github.com/JabRef/jabref/issues/13840)
 - We improved the way we check for matching curly braces in BibTeX fields and made error messages easier to understand. [#12605](https://github.com/JabRef/jabref/issues/12605)
 - We remade a dropdown menu in the "Clear content" tab in the automatic field editor, now it shows only set fields. [#13780](https://github.com/JabRef/jabref/issues/13780)
-- We remade a dropdown menu in the "Copy or Move content" tab in the automatic field editor, now it shows only set fields. [#13780](https://github.com/JabRef/jabref/issues/13780) 
+- We remade a dropdown menu in the "Copy or Move content" tab in the automatic field editor, now it shows only set fields. [#13780](https://github.com/JabRef/jabref/issues/13780)
 
 ### Fixed
 
