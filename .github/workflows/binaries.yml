@@ -154,7 +154,7 @@ jobs:
             archivePortableJabKit: 7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit
             suffix: ''
             archForDebianRepack: ''
-          - os: macos-13  # intel image
+          - os: macos-15-intel  # intel image
             displayName: macOS
             archivePortable: 7z a -r jabgui/build/packages/macos-13/JabRef-portable_macos.zip ./jabgui/build/packages/macos-13/JabRef.app && rm -R jabgui/build/packages/macos-13/JabRef.app
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-13/jabkit-portable_macos.zip ./jabkit/build/packages/macos-13/jabkit.app && rm -R jabkit/build/packages/macos-13/jabkit.app
