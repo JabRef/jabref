@@ -2,7 +2,9 @@ package org.jabref.gui.edit;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
@@ -16,21 +18,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ClearFieldContentViewModelTest {
     ClearFieldContentViewModel clearFieldContentViewModel;
 
     BibEntry entryA;
     BibEntry entryB;
-
-    ObservableList<Field> fieldsA;
-    ObservableList<Field> fieldsB;
-    ObservableList<Field> fields;
+    ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
 
     BibDatabase bibDatabase;
 
-    StateManager stateManager = mock(StateManager.class);
+    StateManager stateManager;
 
     @BeforeEach
     void setUp() {
@@ -48,26 +49,32 @@ class ClearFieldContentViewModelTest {
 
         bibDatabase = new BibDatabase();
 
-        bibDatabase.insertEntry(entryA);
-        bibDatabase.insertEntry(entryB);
+        selectedEntries.addAll(entryA, entryB);
+
+        stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
 
         clearFieldContentViewModel = new ClearFieldContentViewModel(bibDatabase, List.of(entryA, entryB), stateManager);
     }
 
     @Test
     void getSetFieldsShouldReturnOnlyFieldsOfSelectedEntriesThatAreNonEmpty() {
-        stateManager.setSelectedEntries(List.of(entryA, entryB));
-        fields = clearFieldContentViewModel.getSetFields();
-        assertEquals(6, fields.size());
+        assertEquals(6, clearFieldContentViewModel.getSetFields().size());
     }
 
     @Test
-    void getSetFieldsShouldHaveSameSizeAsRealSetFields() {
-        fieldsA = clearFieldContentViewModel.getSetFields();
+    void allSetFieldsShouldBeNonEmpty() {
+        Set<Field> allSetFieldsEntryA = entryA.getFields();
+        for (Field field : allSetFieldsEntryA) {
+            Optional<String> valueOfField = entryA.getField(field);
+            assertTrue(valueOfField.isPresent());
+        }
 
-        int sizeOfFieldsA = fieldsA.size();
-
-        assertEquals(5, sizeOfFieldsA);
+        Set<Field> allSetFieldsEntryB = entryB.getFields();
+        for (Field field : allSetFieldsEntryB) {
+            Optional<String> valueOfField = entryB.getField(field);
+            assertTrue(valueOfField.isPresent());
+        }
     }
 
     @Test

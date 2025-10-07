@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
-import org.jabref.gui.edit.automaticfiededitor.clearfieldcontent.ClearFieldContentViewModel;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentViewModel;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -20,7 +19,6 @@ import static org.mockito.Mockito.mock;
 
 class EditFieldContentTabViewModelTest {
     EditFieldContentViewModel editFieldContentViewModel;
-    ClearFieldContentViewModel clearFieldContentViewModel;
     AbstractAutomaticFieldEditorTabViewModel viewModel;
     BibEntry entryA;
     BibEntry entryB;
@@ -41,25 +39,6 @@ class EditFieldContentTabViewModelTest {
 
         bibDatabase = new BibDatabase();
         editFieldContentViewModel = new EditFieldContentViewModel(bibDatabase, List.of(entryA, entryB), stateManager);
-        clearFieldContentViewModel = new ClearFieldContentViewModel(bibDatabase, List.of(entryA, entryB), stateManager);
-    }
-
-    @Test
-    void clearSelectedFieldShouldClearFieldContentEvenWhenOverwriteFieldContentIsNotEnabled() {
-        clearFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);
-        editFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);
-        editFieldContentViewModel.overwriteFieldContentProperty().set(false);
-        clearFieldContentViewModel.clearSelectedField();
-
-        assertEquals(Optional.empty(), entryA.getField(StandardField.YEAR));
-    }
-
-    @Test
-    void clearSelectedFieldShouldDoNothingWhenFieldDoesntExistOrIsEmpty() {
-        clearFieldContentViewModel.selectedFieldProperty().set(StandardField.FILE);
-        clearFieldContentViewModel.clearSelectedField();
-
-        assertEquals(Optional.empty(), entryA.getField(StandardField.FILE));
     }
 
     @Test
