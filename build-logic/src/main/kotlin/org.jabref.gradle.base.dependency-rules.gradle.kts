@@ -661,12 +661,22 @@ extraJavaModuleInfo {
     module("org.openjdk.jmh:jmh-generator-reflection", "jmh.generator.reflection")
     module("org.apache.commons:commons-math3", "commons.math3")
 
-    module(
-        "org.checkerframework:checker",
-        "org.checkerframework.checker"
-    )
-    module(
-        "org.checkerframework:checker-util",
-        "org.checkerframework.checker.util"
-    )
+    module("javax.inject:javax.inject", "javax.inject") {
+        uses("jakarta.inject")
+    }
+    module("com.google.auto.value:auto-value-annotations", "auto.value.annotations")
+    module("io.github.eisop:dataflow-errorprone", "org.checkerframework.dataflow")
+    module("com.google.googlejavaformat:google-java-format", "com.google.googlejavaformat")
+    module("com.google.errorprone:error_prone_core", "com.google.errorprone.core")
+    module("com.google.errorprone:error_prone_check_api", "com.google.errorprone.check.api")
+    module("com.google.errorprone:error_prone_annotation", "com.google.errorprone.annotation")
+    module("com.google.auto:auto-common", "auto.common")
+    module("com.google.auto.service:auto-service-annotations", "com.google.auto.service")
+    module("com.google.protobuf:protobuf-java", "com.google.protobuf")
+    module("com.github.kevinstern:software-and-algorithms", "software.and.algorithms")
+
+    module("com.uber.nullaway:nullaway", "nullaway")
+    module("org.checkerframework:dataflow-nullaway", "org.checkerframework.dataflow") {
+        exportAllPackages()
+    }
 }

@@ -1,7 +1,8 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import dev.jbang.gradle.tasks.JBangTask
-import org.checkerframework.gradle.plugin.CheckerFrameworkExtension
+import net.ltgt.gradle.errorprone.errorprone
+import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.net.URI
 import java.util.*
@@ -21,7 +22,8 @@ plugins {
     // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
     id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
 
-    id("org.checkerframework") version "0.6.59"
+    id("net.ltgt.errorprone") version "4.3.0"
+    id("net.ltgt.nullaway") version "2.3.0"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -227,23 +229,14 @@ dependencies {
     testImplementation("org.testfx:testfx-core")
     testImplementation("org.testfx:testfx-junit5")
 
-    annotationProcessor(
-        "org.checkerframework:checker"
-    )
+    errorprone("com.google.errorprone:error_prone_core")
+    errorprone("com.uber.nullaway:nullaway")
 }
 /*
 jacoco {
     toolVersion = "0.8.13"
 }
  */
-
-configure<CheckerFrameworkExtension> {
-    checkers =
-        listOf(
-            "org.checkerframework.checker.nullness.NullnessChecker"
-            // "org.checkerframework.common.initializedfields.InitializedFieldsChecker"
-        )
-}
 
 tasks.generateGrammarSource {
     maxHeapSize = "64m"
@@ -422,6 +415,16 @@ tasks.withType<JavaCompile>().configureEach {
 
     // Hint from https://docs.gradle.org/current/userguide/performance.html#run_the_compiler_as_a_separate_process
     options.isFork = true
+
+    options.errorprone {
+        disableAllChecks.set(true)
+        enable("NullAway")
+    }
+
+    options.errorprone.nullaway {
+        warn()
+        annotatedPackages.add("org.jabref")
+    }
 }
 
 tasks.javadoc {

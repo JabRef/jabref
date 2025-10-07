@@ -151,5 +151,8 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.10.4")
     api("org.yaml:snakeyaml:2.5")
     api("tech.units:indriya:2.2.3")
-    api("org.checkerframework:checker:3.51.0")
+    api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
+    api("com.google.errorprone:error_prone_core:2.42.0")
+    api("net.ltgt.nullaway:nullaway:2.3.0")
+    api("com.uber.nullaway:nullaway:0.12.10")
 }
