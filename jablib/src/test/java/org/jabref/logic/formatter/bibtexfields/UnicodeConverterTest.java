@@ -25,13 +25,15 @@ class UnicodeConverterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"{\\\"{a}}, a\u0308", "{\\\"{a}}b, a\u0308b"})
-    void unicodeCombiningAccents(String expected, String text) {
-        assertEquals(expected, formatter.format(text));
-    }
+    @CsvSource({
+            // combining accents
+            "{\\\"{a}}, a\u0308",
+            "{\\\"{a}}b, a\u0308b",
 
-    @ParameterizedTest
-    @CsvSource({"{\\\"{a}}, ä", "{{$\\Epsilon$}}, \u0395"})
+            // plain unicode letters
+            "{\\\"{a}}, ä",
+            "{{$\\Epsilon$}}, \u0395"
+    })
     void unicode(String expected, String text) {
         assertEquals(expected, formatter.format(text));
     }

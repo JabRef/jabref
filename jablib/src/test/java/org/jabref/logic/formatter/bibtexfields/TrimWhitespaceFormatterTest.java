@@ -16,38 +16,38 @@ class TrimWhitespaceFormatterTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"\twhitespace", "whitespace\t", "\twhitespace\t\t"})
-    void removeHorizontalTabulations(String expression) {
-        assertEquals("whitespace", formatter.format(expression));
-    }
+    @ValueSource(strings = {
+            // remove horizontal tabulation
+            "\twhitespace",
+            "whitespace\t",
+            "\twhitespace\t\t",
 
-    @ParameterizedTest
-    @ValueSource(strings = {"\nwhitespace", "whitespace\n", "\nwhitespace\n\n"})
-    void removeLineFeeds(String expression) {
-        assertEquals("whitespace", formatter.format(expression));
-    }
+            // remove line feeds
+            "\nwhitespace",
+            "whitespace\n",
+            "\nwhitespace\n\n",
 
-    @ParameterizedTest
-    @ValueSource(strings = {"\fwhitespace", "whitespace\f", "\fwhitespace\f\f"})
-    void removeFormFeeds(String expression) {
-        assertEquals("whitespace", formatter.format(expression));
-    }
+            // remove form feeds
+            "\fwhitespace",
+            "whitespace\f",
+            "\fwhitespace\f\f",
 
-    @ParameterizedTest
-    @ValueSource(strings = {"\rwhitespace", "whitespace\r", "\rwhitespace\r\r"})
-    void removeCarriageReturnFeeds(String expression) {
-        assertEquals("whitespace", formatter.format(expression));
-    }
+            // remove carriage returns
+            "\rwhitespace",
+            "whitespace\r",
+            "\rwhitespace\r\r",
 
-    @ParameterizedTest
-    @ValueSource(strings = {" whitespace", "whitespace ", " whitespace  "})
-    void removeSeparatorSpaces(String expression) {
-        assertEquals("whitespace", formatter.format(expression));
-    }
+            // remove spaces
+            " whitespace",
+            "whitespace ",
+            " whitespace  ",
 
-    @ParameterizedTest
-    @ValueSource(strings = {" \r\t\fwhitespace", "whitespace \n \r", "   \f\t whitespace  \r \n"})
-    void removeMixedWhitespaceChars(String expression) {
+            // remove combinations
+            " \r\t\fwhitespace",
+            "whitespace \n \r",
+            "   \f\t whitespace  \r \n",
+    })
+    void removeBlankCharacters(String expression) {
         assertEquals("whitespace", formatter.format(expression));
     }
 }
