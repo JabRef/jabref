@@ -48,7 +48,7 @@ Bad, because it lacks support for JSpecify’s `@NullMarked` / `@NullUnmarked` s
 Good, because it is lightweight, fast, and has a low overhead.
 Good, because support for JSpecify is built-in.
 Good, because it fully supports JSpecify annotations.
-Good, because it is endorsed by JSpecify.
+Good, because it is [endorsed by JUnit 6](https://github.com/junit-team/junit-framework/wiki/Upgrading-to-JUnit-6.0#null-safety).
 Bad, because it lacks support for advanced nullness contracts, refinement, and pluggability, and misses some edge cases.
 
 ## No Nullness Framework
