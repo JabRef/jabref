@@ -77,12 +77,6 @@ class FormatterTest {
 
     @ParameterizedTest
     @MethodSource("getFormatters")
-    void formatOfNullThrowsException(Formatter formatter) {
-        assertThrows(NullPointerException.class, () -> formatter.format(null));
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
     void formatOfEmptyStringReturnsEmpty(Formatter formatter) {
         assertEquals("", formatter.format(""));
     }

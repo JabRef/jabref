@@ -12,7 +12,7 @@
         <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
         <ConfigurationLocation id="bundled-google-checks" type="BUNDLED" scope="All" description="Google Checks">(bundled)</ConfigurationLocation>
         <ConfigurationLocation id="146a7353-21b5-4942-a9fe-f1257b4a327f" type="PROJECT_RELATIVE" scope="All" description="JabRef">
-          $PROJECT_DIR$/config/checkstyle/checkstyle.xml
+          $PROJECT_DIR$/../JabRef/config/checkstyle/checkstyle.xml
           <option name="properties">
             <map>
               <entry key="config_loc" value="" />

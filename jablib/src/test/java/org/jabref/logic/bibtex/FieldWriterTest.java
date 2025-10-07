@@ -126,8 +126,15 @@ class FieldWriterTest {
     }
 
     @Test
-    void reportUnbalancedBracingWithEscapedBraces() {
+    void reportUnbalancedBracingWithEscapedClosingBraces() {
         String unbalanced = "{\\}";
+
+        assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));
+    }
+
+    @Test
+    void reportUnbalancedBracingWithEscapedOpeningBraces() {
+        String unbalanced = "\\{}";
 
         assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));
     }

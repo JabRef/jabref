@@ -51,6 +51,7 @@ import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,13 +101,12 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         return false;
     }
 
     @Override
-    public boolean isRecognizedFormat(Path filePath) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Path filePath) throws IOException {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             String str;
             int i = 0;
@@ -121,9 +121,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath) throws IOException {
-        Objects.requireNonNull(filePath);
-
+    public ParserResult importDatabase(@NonNull Path filePath) throws IOException {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
 
@@ -264,6 +262,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
+                    if (keywordName == null) {
+                        LOGGER.error("No keyword name found for keyword with id {}. Please check if the keyword name is present in the XML file and if the keyword name is not empty.", id);
+                        return;
+                    }
+
                     if ("Keyword".equals(reader.getLocalName())) {
                         Keyword keyword = new Keyword(keywordName);
                         knownKeywords.put(id, keyword);
@@ -685,8 +688,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         throw new UnsupportedOperationException("CitaviXmlImporter does not support importDatabase(BufferedReader reader). "
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }

@@ -1,7 +1,6 @@
 package org.jabref.gui.groups;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -58,6 +57,7 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import io.github.adr.linked.ADR;
+import org.jspecify.annotations.NonNull;
 
 public class GroupNodeViewModel {
 
@@ -81,12 +81,17 @@ public class GroupNodeViewModel {
     @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
-        this.databaseContext = Objects.requireNonNull(databaseContext);
-        this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.stateManager = Objects.requireNonNull(stateManager);
-        this.groupNode = Objects.requireNonNull(groupNode);
-        this.localDragBoard = Objects.requireNonNull(localDragBoard);
+    public GroupNodeViewModel(@NonNull BibDatabaseContext databaseContext,
+                              @NonNull StateManager stateManager,
+                              @NonNull TaskExecutor taskExecutor,
+                              @NonNull GroupTreeNode groupNode,
+                              @NonNull CustomLocalDragboard localDragBoard,
+                              @NonNull GuiPreferences preferences) {
+        this.databaseContext = databaseContext;
+        this.taskExecutor = taskExecutor;
+        this.stateManager = stateManager;
+        this.groupNode = groupNode;
+        this.localDragBoard = localDragBoard;
         this.preferences = preferences;
 
         displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(groupNode.getName()));

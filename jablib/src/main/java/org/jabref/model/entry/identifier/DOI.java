@@ -16,6 +16,7 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,9 +111,7 @@ public class DOI implements Identifier {
      * @throws NullPointerException     if DOI/Short DOI is null
      * @throws IllegalArgumentException if doi does not include a valid DOI/Short DOI
      */
-    public DOI(String doi) {
-        Objects.requireNonNull(doi);
-
+    public DOI(@NonNull String doi) {
         // Remove whitespace
         String trimmedDoi = doi.trim();
 
