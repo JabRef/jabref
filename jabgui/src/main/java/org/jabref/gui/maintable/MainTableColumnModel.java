@@ -22,6 +22,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,10 +105,7 @@ public class MainTableColumnModel {
      * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
      */
-    public MainTableColumnModel(Type type, String qualifier) {
-        Objects.requireNonNull(type);
-        Objects.requireNonNull(qualifier);
-
+    public MainTableColumnModel(@NonNull Type type, @NonNull String qualifier) {
         this.typeProperty.setValue(type);
         this.qualifierProperty.setValue(qualifier);
         this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
@@ -243,8 +241,7 @@ public class MainTableColumnModel {
      * @param rawColumnName the name of the column, e.g. "field:author", or "author"
      * @return A new {@code MainTableColumnModel}
      */
-    public static MainTableColumnModel parse(String rawColumnName) {
-        Objects.requireNonNull(rawColumnName);
+    public static MainTableColumnModel parse(@NonNull String rawColumnName) {
         String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
 
         Type type = Type.fromString(splittedName[0]);

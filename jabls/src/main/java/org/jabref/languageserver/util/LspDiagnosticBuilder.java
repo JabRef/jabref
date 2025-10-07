@@ -44,17 +44,17 @@ public final class LspDiagnosticBuilder {
     }
 
     public LspDiagnosticBuilder setMessage(String message) {
-        this.message = Objects.requireNonNull(message, "message must not be null");
+        this.message = message;
         return this;
     }
 
     public LspDiagnosticBuilder setSeverity(DiagnosticSeverity severity) {
-        this.severity = Objects.requireNonNull(severity, "severity must not be null");
+        this.severity = severity;
         return this;
     }
 
     public LspDiagnosticBuilder setSource(String source) {
-        this.source = Objects.requireNonNull(source, "source must not be null");
+        this.source = source;
         return this;
     }
 

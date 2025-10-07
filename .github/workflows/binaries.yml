@@ -199,7 +199,7 @@ jobs:
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -293,7 +293,8 @@ jobs:
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
         # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
-        run: choco install --no-progress rsync
+        # We need to use v6.4.4 as v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
+        run: choco install rsync --version=6.4.4
       - name: Upload jabgui to builds.jabref.org (Windows)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
