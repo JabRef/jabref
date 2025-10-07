@@ -39,19 +39,19 @@ Chosen option: "Error Prone + NullAway" because it comes out best (see below).
 
 ### Checker Framework
 
-Good, because it supports advanced nullness contracts, refinement, and pluggability.
-Bad, because compile times increase significantly.
-Bad, because it lacks support for JSpecify’s `@NullMarked` / `@NullUnmarked` scopes.
+* Good, because it supports advanced nullness contracts, refinement, and pluggability.
+* Bad, because compile times increase significantly.
+* Bad, because it lacks support for JSpecify’s `@NullMarked` / `@NullUnmarked` scopes.
 
 ## Error Prone + NullAway
 
-Good, because it is lightweight, fast, and has a low overhead.
-Good, because support for JSpecify is built-in.
-Good, because it fully supports JSpecify annotations.
-Good, because it is [endorsed by JUnit 6](https://github.com/junit-team/junit-framework/wiki/Upgrading-to-JUnit-6.0#null-safety).
-Bad, because it lacks support for advanced nullness contracts, refinement, and pluggability, and misses some edge cases.
+* Good, because it is lightweight, fast, and has a low overhead.
+* Good, because support for JSpecify is built-in.
+* Good, because it fully supports JSpecify annotations.
+* Good, because it is [endorsed by JUnit 6](https://github.com/junit-team/junit-framework/wiki/Upgrading-to-JUnit-6.0#null-safety).
+* Bad, because it lacks support for advanced nullness contracts, refinement, and pluggability, and misses some edge cases.
 
 ## No Nullness Framework
 
-Good, because zero overhead or tooling complexity.
-Bad, because we suffer from null pointer exceptions at runtime.
+* Good, because zero overhead or tooling complexity.
+* Bad, because we suffer from null pointer exceptions at runtime.
