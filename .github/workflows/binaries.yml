@@ -194,22 +194,14 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.1
 
       # region setup-JDK
+      - name: Create ASDF config
+        if: startsWith(matrix.os, 'macos')
+        run :
+          cat > .tool-versions <<EOF
+          java openjdk-26.ea.18
       - name: Setup JDK 26 EA for "java toolchain" of Gradle
         if: startsWith(matrix.os, 'macos')
-        uses: jdx/mise-action@v2
-        with:
-          mise_toml: |
-            [tools]
-            "java" = { version = "openjdk-26", release_type = "ea" }
-      - name: Make JDK known to gradle (Linux, macOS)
-        if: startsWith(matrix.os, 'macos')
-        shell: bash
-        # Hint by https://mise.jdx.dev/lang/java.html
-        run: mkdir -p ~/.asdf/installs/ && ln -s ~/.local/share/mise/installs/java ~/.asdf/installs/
-      - name: Make JDK known to gradle (Windows)
-        if: startsWith(matrix.os, 'macos')
-        shell: bash
-        run: mv ~/AppData/Local/mise ~/.asdf
+        uses: asdf-vm/actions/install@v4
       - name: Tell gradle to use JDK 26
         if: startsWith(matrix.os, 'macos')
         run: sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
