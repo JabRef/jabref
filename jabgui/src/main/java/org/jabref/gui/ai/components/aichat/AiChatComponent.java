@@ -98,15 +98,6 @@ public class AiChatComponent extends VBox {
 
         aiService.getIngestionService().ingest(name, ListUtil.getLinkedFiles(entries).toList(), bibDatabaseContext);
 
-        System.out.println("Ai service: " + this.aiService);
-        System.out.println("Name: " + name);
-        System.out.println("Chat history: " + chatHistory);
-        System.out.println("Entries: " + this.entries);
-        System.out.println("Database: " + this.bibDatabaseContext);
-        System.out.println("Ai pref: " + this.aiPreferences);
-        System.out.println("Dialog service: " + this.dialogService);
-        System.out.println("Task executor: " + this.taskExecutor);
-
         ViewLoader.view(this)
                   .root(this)
                   .load();
