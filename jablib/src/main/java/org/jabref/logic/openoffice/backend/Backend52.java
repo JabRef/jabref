@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +32,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,17 +132,17 @@ public class Backend52 {
         Codec52.ParsedMarkName parsed = Codec52.parseMarkName(markName).orElseThrow(IllegalArgumentException::new);
 
         List<Citation> citations = parsed.citationKeys.stream()
-                                                       .map(Citation::new)
-                                                       .collect(Collectors.toList());
+                                                      .map(Citation::new)
+                                                      .collect(Collectors.toList());
 
         Optional<OOText> pageInfo = UnoUserDefinedProperty.getStringValue(doc, markName)
-                                                           .map(OOText::fromString);
+                                                          .map(OOText::fromString);
         pageInfo = PageInfo.normalizePageInfo(pageInfo);
 
         setPageInfoInDataInitial(citations, pageInfo);
 
         NamedRange namedRange = citationStorageManager.getNamedRangeFromDocument(doc, markName)
-                                                       .orElseThrow(IllegalArgumentException::new);
+                                                      .orElseThrow(IllegalArgumentException::new);
 
         CitationGroupId groupId = new CitationGroupId(markName);
         CitationGroup group = new CitationGroup(OODataModel.JabRef52,
@@ -166,7 +166,7 @@ public class Backend52 {
      */
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
-                                             List<Optional<OOText>> pageInfos,
+                                             @NonNull List<Optional<OOText>> pageInfos,
                                              CitationType citationType,
                                              XTextCursor position,
                                              boolean insertSpaceAfter)
@@ -178,7 +178,6 @@ public class Backend52 {
             PropertyVetoException,
             IllegalTypeException {
 
-        Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
             throw new IllegalArgumentException();
         }
@@ -271,14 +270,14 @@ public class Backend52 {
 
                 // Try to do something of the pageInfos.
                 String singlePageInfo = pageInfos.stream()
-                                                  .filter(Optional::isPresent)
-                                                  .map(pi -> OOText.toString(pi.get()))
-                                                  .distinct()
-                                                  .collect(Collectors.joining("; "));
+                                                 .filter(Optional::isPresent)
+                                                 .map(pi -> OOText.toString(pi.get()))
+                                                 .distinct()
+                                                 .collect(Collectors.joining("; "));
 
                 int totalCitations = joinableGroup.stream()
-                                                   .map(CitationGroup::numberOfCitations)
-                                                   .mapToInt(Integer::intValue).sum();
+                                                  .map(CitationGroup::numberOfCitations)
+                                                  .mapToInt(Integer::intValue).sum();
                 if (singlePageInfo.isEmpty()) {
                     singlePageInfo = null;
                 }
@@ -286,9 +285,9 @@ public class Backend52 {
 
             case JabRef60:
                 return joinableGroup.stream()
-                                     .flatMap(group -> (group.citationsInStorageOrder.stream()
-                                                                                     .map(Citation::getPageInfo)))
-                                     .collect(Collectors.toList());
+                                    .flatMap(group -> (group.citationsInStorageOrder.stream()
+                                                                                    .map(Citation::getPageInfo)))
+                                    .collect(Collectors.toList());
             default:
                 throw new IllegalArgumentException("unhandled dataModel here");
         }
@@ -382,9 +381,9 @@ public class Backend52 {
                             .orElseThrow(IllegalStateException::new);
                     String context = GetContext.getCursorStringWithContext(cursor, 30, 30, true);
                     Optional<String> pageInfo = group.numberOfCitations() > 0
-                            ? (getPageInfoFromData(group)
+                                                ? (getPageInfoFromData(group)
                             .map(e -> OOText.toString(e)))
-                            : Optional.empty();
+                                                : Optional.empty();
                     CitationEntry entry = new CitationEntry(name, context, pageInfo);
                     citations.add(entry);
                 }

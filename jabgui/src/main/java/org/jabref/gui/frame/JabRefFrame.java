@@ -3,7 +3,6 @@ package org.jabref.gui.frame;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -11,6 +10,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -371,6 +371,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case NEW_INPROCEEDINGS:
                         new NewEntryAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
+                    case BACK:
+                        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::back);
+                        event.consume();
+                        break;
+                    case FORWARD:
+                        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
+                        event.consume();
+                        break;
                     default:
                 }
             }
@@ -451,7 +459,23 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         // Hide tab bar
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
-        EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
+        tabbedPane.getTabs().addListener((ListChangeListener<Tab>) _ -> updateTabBarVisible());
+
+        stateManager.canGoBackProperty().bind(
+                stateManager.activeTabProperty().flatMap(
+                        optionalTab -> optionalTab
+                                .map(LibraryTab::canGoBackProperty)
+                                .orElse(new SimpleBooleanProperty(false))
+                )
+        );
+
+        stateManager.canGoForwardProperty().bind(
+                stateManager.activeTabProperty().flatMap(
+                        optionalTab -> optionalTab
+                                .map(LibraryTab::canGoForwardProperty)
+                                .orElse(new SimpleBooleanProperty(false))
+                )
+        );
     }
 
     private void updateTabBarVisible() {
@@ -529,7 +553,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
-        Objects.requireNonNull(databaseContext);
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
                 this,

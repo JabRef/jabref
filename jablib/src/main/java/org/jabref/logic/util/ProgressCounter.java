@@ -24,7 +24,8 @@ import ai.djl.util.Progress;
  */
 public class ProgressCounter implements Progress {
 
-    private record ProgressMessage(int maxTime, String message) { }
+    private record ProgressMessage(int maxTime, String message) {
+    }
 
     // The list should be sorted by ProgressMessage.maxTime, smaller first.
     private static final List<ProgressMessage> PROGRESS_MESSAGES = List.of(

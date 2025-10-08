@@ -55,11 +55,6 @@ class BibEntryTest {
     }
 
     @Test
-    void setNullFieldThrowsNPE() {
-        assertThrows(NullPointerException.class, () -> entry.setField(null));
-    }
-
-    @Test
     void getFieldIsCaseInsensitive() {
         entry.setField(new UnknownField("TeSt"), "value");
         assertEquals(Optional.of("value"), entry.getField(new UnknownField("tEsT")));
@@ -393,18 +388,6 @@ class BibEntryTest {
     void addNullKeywordThrowsNPE() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         assertThrows(NullPointerException.class, () -> entry.addKeyword((Keyword) null, ','));
-    }
-
-    @Test
-    void putNullKeywordListThrowsNPE() {
-        entry.setField(StandardField.KEYWORDS, "Foo, Bar");
-        assertThrows(NullPointerException.class, () -> entry.putKeywords((KeywordList) null, ','));
-    }
-
-    @Test
-    void putNullKeywordSeparatorThrowsNPE() {
-        entry.setField(StandardField.KEYWORDS, "Foo, Bar");
-        assertThrows(NullPointerException.class, () -> entry.putKeywords(Arrays.asList("A", "B"), null));
     }
 
     @Test

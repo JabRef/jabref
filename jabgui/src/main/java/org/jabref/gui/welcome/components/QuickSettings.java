@@ -88,11 +88,11 @@ public class QuickSettings extends VBox {
                 this::showEntryTableConfigurationDialog);
 
         VBox newContent = new VBox(mainFileDirButton,
-                                 themeButton,
-                                 largeLibraryButton,
-                                 entryTableButton,
-                                 pushApplicationButton,
-                                 onlineServicesButton);
+                themeButton,
+                largeLibraryButton,
+                entryTableButton,
+                pushApplicationButton,
+                onlineServicesButton);
         newContent.getStyleClass().add("quick-settings-container");
         return newContent;
     }

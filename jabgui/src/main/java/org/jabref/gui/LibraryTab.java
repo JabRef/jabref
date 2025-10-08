@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -53,7 +52,7 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -118,6 +117,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final BibEntryTypesManager entryTypesManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
+    private final NavigationHistory navigationHistory = new NavigationHistory();
+    private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
+    private boolean backOrForwardNavigationActionTriggered = false;
 
     private BibDatabaseContext bibDatabaseContext;
 
@@ -171,10 +174,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
      */
     private LibraryTab(@NonNull BibDatabaseContext bibDatabaseContext,
                        @NonNull LibraryTabContainer tabContainer,
-                       DialogService dialogService,
+                       @NonNull DialogService dialogService,
                        AiService aiService,
-                       GuiPreferences preferences,
-                       StateManager stateManager,
+                       @NonNull GuiPreferences preferences,
+                       @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
                        CountingUndoManager undoManager,
@@ -185,8 +188,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.tabContainer = tabContainer;
         this.undoManager = undoManager;
         this.dialogService = dialogService;
-        this.preferences = Objects.requireNonNull(preferences);
-        this.stateManager = Objects.requireNonNull(stateManager);
+        this.preferences = preferences;
+        this.stateManager = stateManager;
         assert bibDatabaseContext.getDatabasePath().isEmpty() || fileUpdateMonitor != null;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -205,8 +208,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         stateManager.activeDatabaseProperty().addListener((_, _, _) -> {
             if (preferences.getSearchPreferences().isFulltext()) {
-              mainTable.getTableModel().refreshSearchMatches();
-           }
+                mainTable.getTableModel().refreshSearchMatches();
+            }
         });
     }
 
@@ -461,13 +464,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void registerUndoableChanges(List<FieldChange> changes) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Save actions"));
+        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Save actions"));
         for (FieldChange change : changes) {
-            ce.addEdit(new UndoableFieldChange(change));
+            compoundEdit.addEdit(new UndoableFieldChange(change));
         }
-        ce.end();
-        if (ce.hasEdits()) {
-            getUndoManager().addEdit(ce);
+        compoundEdit.end();
+        if (compoundEdit.hasEdits()) {
+            getUndoManager().addEdit(compoundEdit);
         }
     }
 
@@ -490,6 +493,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         mainTable.addSelectionListener(event -> {
             List<BibEntry> entries = event.getList().stream().map(BibEntryTableViewModel::getEntry).toList();
             stateManager.setSelectedEntries(entries);
+
+            // track navigation history for single selections
+            if (entries.size() == 1) {
+                newEntryShowing(entries.getFirst());
+            } else if (entries.isEmpty()) {
+                // an empty selection isn't a navigational step, so we don't alter the history list
+                // this avoids adding a "null" entry to the back/forward stack
+                // we just refresh the UI button states to ensure they are consistent with the latest history.
+                updateNavigationState();
+            }
         });
     }
 
@@ -964,11 +977,53 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.changedProperty.setValue(false);
     }
 
+    public void back() {
+        navigationHistory.back().ifPresent(this::navigateToEntry);
+    }
+
+    public void forward() {
+        navigationHistory.forward().ifPresent(this::navigateToEntry);
+    }
+
+    private void navigateToEntry(BibEntry entry) {
+        backOrForwardNavigationActionTriggered = true;
+        clearAndSelect(entry);
+        updateNavigationState();
+    }
+
+    public boolean canGoBack() {
+        return navigationHistory.canGoBack();
+    }
+
+    public boolean canGoForward() {
+        return navigationHistory.canGoForward();
+    }
+
+    private void newEntryShowing(BibEntry entry) {
+        // skip history updates if this is from a back/forward operation
+        if (backOrForwardNavigationActionTriggered) {
+            backOrForwardNavigationActionTriggered = false;
+            return;
+        }
+
+        navigationHistory.add(entry);
+        updateNavigationState();
+    }
+
+    /**
+     * Updates the StateManager with current navigation state
+     * Only update if this is the active tab
+     */
+    public void updateNavigationState() {
+        canGoBackProperty.set(canGoBack());
+        canGoForwardProperty.set(canGoForward());
+    }
+
     /**
      * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
      *
      * @param dataLoadingTask The task to execute to load the data asynchronously.
-     * @param file the path to the file (loaded by the dataLoadingTask)
+     * @param file            the path to the file (loaded by the dataLoadingTask)
      */
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
@@ -1032,6 +1087,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 clipBoardManager,
                 taskExecutor,
                 false);
+    }
+
+    public BooleanProperty canGoBackProperty() {
+        return canGoBackProperty;
+    }
+
+    public BooleanProperty canGoForwardProperty() {
+        return canGoForwardProperty;
     }
 
     private class GroupTreeListener {

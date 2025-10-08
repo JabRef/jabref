@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -28,8 +29,9 @@ public class GenerateCitationKeys implements Runnable {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    @Option(names = "--input", description = "The input .bib file.", required = true)
-    private String inputFile;
+    // [impl->req~jabkit.cli.input-flag~1]
+    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
+    private Path inputFile;
 
     @Option(names = "--output", description = "The output .bib file.")
     private Path outputFile;

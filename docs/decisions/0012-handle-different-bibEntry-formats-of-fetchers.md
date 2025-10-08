@@ -10,7 +10,7 @@ All fetchers (except IDFetchers) in JabRef return BibEntries when fetching entri
 Some fetchers directly receive BibTeX entries from their API, the other fetchers receive their entries in some kind of exchange format such as JSON or XML and then parse this into BibEntries.
 Currently, all fetchers either return BibEntries in BibTeX or BibLaTeX format.
 This can lead to importing BibEntries of one format in a database of the other format.
-How can this inconsistency between fetchers, and their used formats be addressed?
+How can this inconsistency between fetchers and their used formats be addressed?
 
 ## Considered Options
 

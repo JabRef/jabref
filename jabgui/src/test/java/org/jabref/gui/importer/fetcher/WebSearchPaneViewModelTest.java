@@ -40,8 +40,8 @@ class WebSearchPaneViewModelTest {
         assertFalse(viewModel.queryValidationStatus().validProperty().getValue());
     }
 
-     @Test
-     void correctQueryValidationStatus() {
+    @Test
+    void correctQueryValidationStatus() {
         viewModel.queryProperty().setValue("Miami AND Beach OR Houston AND Texas");
         assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
     }

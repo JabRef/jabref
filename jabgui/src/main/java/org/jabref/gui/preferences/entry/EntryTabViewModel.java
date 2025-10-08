@@ -20,6 +20,7 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 public class EntryTabViewModel implements PreferenceTabViewModel {
 
@@ -123,7 +124,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         return new StringConverter<>() {
             @Override
             public String toString(Field field) {
-                return field.getDisplayName();
+                return FieldTextMapper.getDisplayName(field);
             }
 
             @Override
@@ -135,7 +136,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
     public List<Field> getSuggestions(String request) {
         List<Field> suggestions = FieldFactory.getAllFieldsWithOutInternal().stream()
-                                              .filter(field -> field.getDisplayName().toLowerCase().contains(request.toLowerCase()))
+                                              .filter(field -> FieldTextMapper.getDisplayName(field).toLowerCase().contains(request.toLowerCase()))
                                               .collect(Collectors.toList());
 
         Field requestedField = FieldFactory.parseField(request.trim());

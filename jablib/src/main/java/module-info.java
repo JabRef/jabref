@@ -217,10 +217,6 @@ open module org.jabref.jablib {
     requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
-    requires langchain4j.google.ai.gemini;
-    requires langchain4j.hugging.face;
-    requires langchain4j.mistral.ai;
-    requires langchain4j.open.ai;
     uses ai.djl.engine.EngineProvider;
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
@@ -232,7 +228,7 @@ open module org.jabref.jablib {
     /*
      * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene101.Lucene101Codec;
+    uses org.apache.lucene.codecs.lucene103.Lucene103Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;

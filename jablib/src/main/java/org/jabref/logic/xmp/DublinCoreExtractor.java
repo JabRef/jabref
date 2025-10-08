@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is used for <em>both</em> conversion from Dublin Core to BibTeX and conversion form BibTeX to Dublin Core
- *
+ * <p>
  * Related class: {@link org.jabref.logic.xmp.DocumentInformationExtractor}
  */
 public class DublinCoreExtractor {
@@ -75,7 +75,7 @@ public class DublinCoreExtractor {
     private void extractAuthor() {
         List<String> creators = dcSchema.getCreators();
         if ((creators != null) && !creators.isEmpty()) {
-           bibEntry.setField(StandardField.AUTHOR, String.join(" and ", creators));
+            bibEntry.setField(StandardField.AUTHOR, String.join(" and ", creators));
         }
     }
 
@@ -87,11 +87,11 @@ public class DublinCoreExtractor {
         if ((dates != null) && !dates.isEmpty()) {
             String date = dates.getFirst().trim();
             Date.parse(date)
-                    .ifPresent(dateValue -> {
-                        dateValue.getDay().ifPresent(day -> bibEntry.setField(StandardField.DAY, Integer.toString(day)));
-                        dateValue.getMonth().ifPresent(bibEntry::setMonth);
-                        dateValue.getYear().ifPresent(year -> bibEntry.setField(StandardField.YEAR, Integer.toString(year)));
-                    });
+                .ifPresent(dateValue -> {
+                    dateValue.getDay().ifPresent(day -> bibEntry.setField(StandardField.DAY, Integer.toString(day)));
+                    dateValue.getMonth().ifPresent(bibEntry::setMonth);
+                    dateValue.getYear().ifPresent(year -> bibEntry.setField(StandardField.YEAR, Integer.toString(year)));
+                });
         }
     }
 
@@ -181,7 +181,7 @@ public class DublinCoreExtractor {
         try {
             rights = dcSchema.getRights();
         } catch (BadFieldValueException e) {
-           LOGGER.warn("Could not extract rights", e);
+            LOGGER.warn("Could not extract rights", e);
         }
         if (!StringUtil.isNullOrEmpty(rights)) {
             bibEntry.setField(new UnknownField(DC_RIGHTS), rights);
@@ -248,7 +248,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     *  Language is equivalent in both formats (BibTeX and DublinCore)
+     * Language is equivalent in both formats (BibTeX and DublinCore)
      */
     private void extractLanguages() {
         StringBuilder builder = new StringBuilder();
@@ -378,7 +378,7 @@ public class DublinCoreExtractor {
      */
     private void fillLanguages(String languages) {
         Arrays.stream(languages.split(","))
-                .forEach(dcSchema::addLanguage);
+              .forEach(dcSchema::addLanguage);
     }
 
     /**
@@ -458,7 +458,8 @@ public class DublinCoreExtractor {
                     case FILE -> {
                         // we do not write the "file" field, because the file is the PDF itself
                     }
-                    case DAY, MONTH -> {
+                    case DAY,
+                         MONTH -> {
                         // we do not write day and month separately if dc:year can be used
                         if (!bibEntry.hasField(StandardField.YEAR)) {
                             this.fillCustomField(field);

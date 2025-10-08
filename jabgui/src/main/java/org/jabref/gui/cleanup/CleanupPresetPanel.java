@@ -2,7 +2,6 @@ package org.jabref.gui.cleanup;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
@@ -17,9 +16,11 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jspecify.annotations.NonNull;
 
 public class CleanupPresetPanel extends VBox {
 
@@ -40,10 +41,11 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpTimestampToModificationDate;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
-    public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
-        this.databaseContext = Objects.requireNonNull(databaseContext);
+    public CleanupPresetPanel(@NonNull BibDatabaseContext databaseContext,
+                              CleanupPreferences cleanupPreferences,
+                              FilePreferences filePreferences) {
+        this.databaseContext = databaseContext;
 
-        // Load FXML
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -65,7 +67,7 @@ public class CleanupPresetPanel extends VBox {
 
         cleanUpRenamePDFonlyRelativePaths.disableProperty().bind(cleanUpRenamePDF.selectedProperty().not());
 
-        cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
+        cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", FieldTextMapper.getDisplayName(StandardField.FILE)));
 
         String currentPattern = Localization.lang("Filename format pattern (from preferences)")
                                             .concat(filePreferences.getFileNamePattern());

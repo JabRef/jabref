@@ -52,9 +52,9 @@ public class KeyChangeListener {
                  });
             entry.getFields(field -> field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK))
                  .forEach(field -> {
-                String fieldContent = entry.getField(field).orElseThrow();
-                replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
-            });
+                     String fieldContent = entry.getField(field).orElseThrow();
+                     replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
+                 });
         }
     }
 

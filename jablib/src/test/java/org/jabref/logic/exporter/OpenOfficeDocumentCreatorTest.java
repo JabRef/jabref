@@ -83,7 +83,7 @@ public class OpenOfficeDocumentCreatorTest {
             Input.Builder test = Input.from(contentXmlInputStream);
             assertThat(test, CompareMatcher.isSimilarTo(control)
                                            .normalizeWhitespace()
-                                           .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                           .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
         }
     }
 

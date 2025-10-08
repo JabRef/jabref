@@ -33,6 +33,7 @@ class CheckConsistency implements Callable<Integer> {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
+    // [impl->req~jabkit.cli.input-flag~1]
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
     private Path inputFile;
 

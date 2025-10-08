@@ -30,7 +30,7 @@ import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -310,7 +310,7 @@ public class SourceTab extends EntryEditorTab {
                 throw new IllegalStateException(parserResult.getErrorMessage());
             }
 
-            NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
+            NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().getFirst();
             String newKey = newEntry.getCitationKey().orElse(null);
 
@@ -363,7 +363,9 @@ public class SourceTab extends EntryEditorTab {
     private void listenForSaveKeybinding(KeyEvent event) {
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
             switch (binding) {
-                case SAVE_DATABASE, SAVE_ALL, SAVE_DATABASE_AS ->
+                case SAVE_DATABASE,
+                     SAVE_ALL,
+                     SAVE_DATABASE_AS ->
                         storeSource(currentEntry, codeArea.textProperty().getValue());
             }
         });
@@ -380,10 +382,14 @@ public class SourceTab extends EntryEditorTab {
         @Override
         public void execute() {
             switch (command) {
-                case COPY -> codeArea.copy();
-                case CUT -> codeArea.cut();
-                case PASTE -> codeArea.paste();
-                case SELECT_ALL -> codeArea.selectAll();
+                case COPY ->
+                        codeArea.copy();
+                case CUT ->
+                        codeArea.cut();
+                case PASTE ->
+                        codeArea.paste();
+                case SELECT_ALL ->
+                        codeArea.selectAll();
             }
             codeArea.requestFocus();
         }

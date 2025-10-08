@@ -245,10 +245,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
                 return;
             }
-            List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
+            List<Color> colorsOfSiblings = parentNode.getChildren().stream()
+                                                     .map(child -> child.getGroup().getColor())
                                                      .flatMap(Optional::stream)
+                                                     .map(Color::valueOf)
                                                      .toList();
-            Optional<Color> parentColor = parentGroup().getColor();
+            Optional<Color> parentColor = parentGroup().getColor().map(Color::valueOf);
             Color color;
             color = parentColor.map(value -> GroupColorPicker.generateColor(colorsOfSiblings, value)).orElseGet(() -> GroupColorPicker.generateColor(colorsOfSiblings));
             viewModel.colorFieldProperty().setValue(color);

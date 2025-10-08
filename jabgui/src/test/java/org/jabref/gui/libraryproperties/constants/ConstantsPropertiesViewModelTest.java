@@ -37,9 +37,9 @@ class ConstantsPropertiesViewModelTest {
         model.setValues();
 
         List<String> actual = model.stringsListProperty().stream()
-                .map(ConstantsItemModel::labelProperty)
-                .map(StringProperty::getValue)
-                .toList();
+                                   .map(ConstantsItemModel::labelProperty)
+                                   .map(StringProperty::getValue)
+                                   .toList();
 
         assertEquals(expected, actual);
     }
@@ -61,9 +61,9 @@ class ConstantsPropertiesViewModelTest {
         model.resortStrings();
 
         List<String> actual = model.stringsListProperty().stream()
-                .map(ConstantsItemModel::labelProperty)
-                .map(StringProperty::getValue)
-                .toList();
+                                   .map(ConstantsItemModel::labelProperty)
+                                   .map(StringProperty::getValue)
+                                   .toList();
 
         assertEquals(expected, actual);
     }

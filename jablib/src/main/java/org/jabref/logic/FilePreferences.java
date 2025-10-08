@@ -13,7 +13,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.model.strings.StringUtil;
 
 /**
- *  Preferences for the linked files
+ * Preferences for the linked files
  */
 public class FilePreferences {
 

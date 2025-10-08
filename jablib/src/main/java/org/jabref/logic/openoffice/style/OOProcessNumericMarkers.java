@@ -17,7 +17,7 @@ class OOProcessNumericMarkers {
     /**
      * Produce citation markers for the case of numbered citations
      * with bibliography sorted by first appearance in the text.
-     *
+     * <p>
      * Numbered citation markers for each CitationGroup.
      * Numbering is according to first appearance.
      * Assumes global order and local order are already applied.

@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
@@ -49,8 +50,9 @@ class PdfUpdate implements Runnable {
     @Option(names = {"-k", "--citation-key"}, description = "Citation keys", required = true)
     private List<String> citationKeys = List.of(); // ToDo: check dedault value
 
-    @Option(names = "--input", description = "Input file", required = true)
-    private Path inputFile; // Local files only
+    // [impl->req~jabkit.cli.input-flag~1]
+    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
+    private Path inputFile;
 
     @Option(names = "--input-format", description = "Input format of the file", required = true)
     private String inputFormat = "*";

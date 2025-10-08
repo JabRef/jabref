@@ -86,9 +86,12 @@ public class ThemeDialog extends FXDialog {
 
     private void selectInitialTheme() {
         switch (viewModel.getSelectedTheme()) {
-            case LIGHT -> lightRadio.setSelected(true);
-            case DARK -> darkRadio.setSelected(true);
-            case CUSTOM -> customRadio.setSelected(true);
+            case LIGHT ->
+                    lightRadio.setSelected(true);
+            case DARK ->
+                    darkRadio.setSelected(true);
+            case CUSTOM ->
+                    customRadio.setSelected(true);
         }
     }
 

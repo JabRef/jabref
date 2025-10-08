@@ -28,10 +28,10 @@ public class WalkthroughHighlighter {
     /// Applies the specified highlight configuration.
     ///
     /// @param config         The highlight configuration to apply. Default to
-    ///                       BackdropHighlight on the primary windows if null.
+    ///                                             BackdropHighlight on the primary windows if null.
     /// @param scene          The primary scene to apply the highlight to.
     /// @param fallbackTarget The fallback target node to use if no highlight
-    ///                       configuration is provided.
+    ///                                             configuration is provided.
     public void applyHighlight(@Nullable WalkthroughEffect config, @NonNull Scene scene, @Nullable Node fallbackTarget) {
         Map<Window, EffectState> newEffects = computeNewEffects(config, scene, fallbackTarget);
 
@@ -54,8 +54,8 @@ public class WalkthroughHighlighter {
     /// Sets a handler to be called when the user clicks on backdrop or darkened areas.
     ///
     /// @param handler The handler to call when the background is clicked. If null, no
-    ///                action will be taken on background clicks. Usually used to
-    ///                support quit walkthrough on clicking the effects.
+    ///                               action will be taken on background clicks. Usually used to
+    ///                               support quit walkthrough on clicking the effects.
     public void setOnBackgroundClick(@Nullable Runnable handler) {
         this.onBackgroundClickHandler = handler;
     }
@@ -166,7 +166,8 @@ public class WalkthroughHighlighter {
             case FULL_SCREEN_DARKEN -> {
                 // FullScreenDarken doesn't need updates as it has no target node
             }
-            case NONE -> detach(window);
+            case NONE ->
+                    detach(window);
         }
     }
 
@@ -182,8 +183,10 @@ public class WalkthroughHighlighter {
                     applyPulseAnimation(window, targetNode);
                 }
             }
-            case FULL_SCREEN_DARKEN -> applyFullScreenDarken(window);
-            case NONE -> detach(window);
+            case FULL_SCREEN_DARKEN ->
+                    applyFullScreenDarken(window);
+            case NONE ->
+                    detach(window);
         }
     }
 

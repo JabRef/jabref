@@ -6,10 +6,16 @@ module org.jabref.jabls {
 
     requires org.jabref.jablib;
 
+    requires com.fasterxml.jackson.databind;
+
+    requires com.google.common;
+    requires com.google.gson;
+
     requires org.slf4j;
 
     requires org.eclipse.lsp4j;
     requires org.eclipse.lsp4j.jsonrpc;
     requires org.eclipse.lsp4j.websocket;
-    requires com.google.gson;
+    requires org.jspecify;
+
 }

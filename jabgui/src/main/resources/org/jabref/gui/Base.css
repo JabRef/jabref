@@ -1097,12 +1097,26 @@ TextFlow > .tooltip-text-monospaced {
     -fx-border-width: 0;
 }
 
+.mainToolbar .icon-button {
+    -fx-padding: 0.5em;
+}
+
+/*
+ * -fx-icon-size is intentionally omitted to prevent a rendering loop. The library sets font size
+ * based on the computed icon size, which is itself relative to the font size.
+ */
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
-    -fx-font-size: 1.7em;
+    /* `!important` is override library's default font size */
+    -fx-font-size: 1.7em!important;
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
     -fx-icon-color: -jr-theme-text;
+}
+
+.mainToolbar .progress-indicator {
+    -fx-min-width: 2.8em;
+    -fx-max-width: 2.8em;
 }
 
 .search-field {
@@ -3207,7 +3221,7 @@ journalInfo .grid-cell-b {
     -fx-hgap: 1.5em;
     -fx-vgap: 0.8em;
 }
-  
+
 /* Automatic Field Editor */
 .edit-field-content-pane {
     -fx-padding: 0em 1em;

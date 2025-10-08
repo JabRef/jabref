@@ -48,7 +48,7 @@ public class XmpUtilShared {
     /**
      * Will try to read XMP metadata from the given file, returning whether
      * metadata was found.
-     *
+     * <p>
      * Caution: This method is as expensive as it is reading the actual metadata
      * itself from the PDF.
      *

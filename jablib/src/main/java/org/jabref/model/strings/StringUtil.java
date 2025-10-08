@@ -140,7 +140,7 @@ public class StringUtil {
      * String[] s = "ab/cd/ed".split("/"); join(s, "\\", 0, s.length) ->
      * "ab\\cd\\ed"
      *
-     * @param to        Excluding strings[to]
+     * @param to Excluding strings[to]
      */
     public static String join(String[] strings, String separator, int from, int to) {
         if ((strings.length == 0) || (from >= to)) {
@@ -778,7 +778,7 @@ public class StringUtil {
      *
      * @param s The string to check
      * @return {@code True} if the given string does contain at least one whitespace character, {@code False} otherwise
-     * */
+     */
     public static boolean containsWhitespace(String s) {
         return s.chars().anyMatch(Character::isWhitespace);
     }

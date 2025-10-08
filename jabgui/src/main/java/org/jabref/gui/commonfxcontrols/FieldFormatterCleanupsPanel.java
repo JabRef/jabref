@@ -22,6 +22,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -63,7 +64,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
         fieldColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getField()));
         new ValueTableCellFactory<FieldFormatterCleanup, Field>()
-                .withText(Field::getDisplayName)
+                .withText(FieldTextMapper::getDisplayName)
                 .install(fieldColumn);
 
         formatterColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getFormatter()));
@@ -73,9 +74,9 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
         actionsColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getField()));
         new ValueTableCellFactory<FieldFormatterCleanup, Field>()
-                .withGraphic(field -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(field -> Localization.lang("Remove formatter for %0", field.getDisplayName()))
-                .withOnMouseClickedEvent(item -> event -> viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem()))
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(field -> Localization.lang("Remove formatter for %0", FieldTextMapper.getDisplayName(field)))
+                .withOnMouseClickedEvent(_ -> _ -> viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem()))
                 .install(actionsColumn);
 
         viewModel.selectedCleanupProperty().setValue(cleanupsList.getSelectionModel());
@@ -89,7 +90,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
     private void setupCombos() {
         new ViewModelListCellFactory<Field>()
-                .withText(Field::getDisplayName)
+                .withText(FieldTextMapper::getDisplayName)
                 .install(addableFields);
         addableFields.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         addableFields.setOnKeyPressed(event -> {
