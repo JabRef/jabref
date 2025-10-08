@@ -192,12 +192,35 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
-      - name: Setup JDK
+
+      # region setup-JDK
+      - name: Setup JDK 26 EA for "java toolchain" of Gradle
+        if: startsWith(matrix.os, 'macos')
+        uses: jdx/mise-action@v2
+        with:
+          mise_toml: |
+            [tools]
+            "java" = { version = "openjdk-26", release_type = "ea" }
+      - name: Make JDK known to gradle (Linux, macOS)
+        if: startsWith(matrix.os, 'macos')
+        shell: bash
+        # Hint by https://mise.jdx.dev/lang/java.html
+        run: mkdir -p ~/.asdf/installs/ && ln -s ~/.local/share/mise/installs/java ~/.asdf/installs/
+      - name: Make JDK known to gradle (Windows)
+        if: startsWith(matrix.os, 'macos')
+        shell: bash
+        run: mv ~/AppData/Local/mise ~/.asdf
+      - name: Tell gradle to use JDK 26
+        if: startsWith(matrix.os, 'macos')
+        run: sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+      - name: Setup JDK (runtime for gradle)
         uses: actions/setup-java@v5
         with:
           java-version: 25
           distribution: 'corretto'
           check-latest: true
+      # endregion
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
