@@ -83,7 +83,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
-import org.controlsfx.control.HyperlinkLabel;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -301,7 +300,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         HBox title = new HBox(label, providedByButton);
 
         Text message = new Text(Localization.lang(
-                "Total Citations: %0 | Supporting: %1 | Contradicting: %2 | Mentioning: %3 | Unclassified: %4 | Citing Publications: %5",
+                "Total Citations: %0 | Supporting: %1 | Contradicting: %2 | Mentioning: %3 | Unclassified: %4 | Citing Publications: %5 |",
                 tallModel.total(),
                 tallModel.supporting(),
                 tallModel.contradicting(),
@@ -309,13 +308,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                 tallModel.unclassified(),
                 tallModel.citingPublications()
         ));
-        String url = URLs.SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
-        VBox messageBox = getMessageBox(url, message);
-        return new VBox(title, messageBox);
-    }
 
-    private VBox getMessageBox(String url, Text message) {
-        HyperlinkLabel link = new HyperlinkLabel(Localization.lang("See full report at [%0]", url));
+        String url = URLs.SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
+        Hyperlink link = new Hyperlink(Localization.lang("See full report"));
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
                 try {
@@ -331,7 +326,10 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
         });
 
-        return new VBox(message, link);
+        HBox tallies = new HBox(message, link);
+        tallies.setPadding(new Insets(0, 0, 10, 0));
+        tallies.setSpacing(5);
+        return new VBox(title, tallies);
     }
 
     /**
