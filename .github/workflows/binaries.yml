@@ -200,9 +200,6 @@ jobs:
         with:
           website: jdk.java.net
           release: EA
-      - name: Debug
-        run: |
-          cat  /Users/runner/.m2/toolchains.xml
       - name: Tell gradle to use JDK 26
         if: startsWith(matrix.os, 'macos')
         run: sed -i '' 's/JavaLanguageVersion.of(25)/JavaLanguageVersion.of("26-ea")/' build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
