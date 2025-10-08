@@ -39,7 +39,8 @@ class BracketedPatternTest {
     void setUp() {
         bibentry = new BibEntry().withField(StandardField.AUTHOR, "O. Kitsune")
                                  .withField(StandardField.YEAR, "2017")
-                                 .withField(StandardField.PAGES, "213--216");
+                                 .withField(StandardField.PAGES, "213--216")
+                                 .withField(StandardField.TITLE, "Open Source Software And The Private Collective Innovation Model Issues");
 
         dbentry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("HipKro03")
@@ -547,28 +548,25 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[author:lower]", ';', dbentry, database));
     }
 
-    @Test
-    void resolvedFieldAndFormat() {
+    static Stream<Arguments> resolvedFieldAndFormat() {
+        return Stream.of(
+                Arguments.of("[author]", "Eric von Hippel and Georg von Krogh"),
+                Arguments.of("[unknownkey]", ""),
+                Arguments.of("[:]", ""),
+                Arguments.of("[:lower]", ""),
+                Arguments.of("[author:lower]", "eric von hippel and georg von krogh"),
+                Arguments.of("[citationkey]", ""),
+                Arguments.of("[citationkey:]", "")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void resolvedFieldAndFormat(String pattern, String expected) {
         BibEntry child = new BibEntry().withField(StandardField.CROSSREF, "HipKro03");
         database.insertEntry(child);
-
         Character separator = ';';
-        assertEquals("Eric von Hippel and Georg von Krogh",
-                BracketedPattern.expandBrackets("[author]", separator, child, database));
-
-        assertEquals("", BracketedPattern.expandBrackets("[unknownkey]", separator, child, database));
-
-        assertEquals("", BracketedPattern.expandBrackets("[:]", separator, child, database));
-
-        assertEquals("", BracketedPattern.expandBrackets("[:lower]", separator, child, database));
-
-        assertEquals("eric von hippel and georg von krogh",
-                BracketedPattern.expandBrackets("[author:lower]", separator, child, database));
-
-        // the citation key is not inherited
-        assertEquals("", BracketedPattern.expandBrackets("[citationkey]", separator, child, database));
-
-        assertEquals("", BracketedPattern.expandBrackets("[citationkey:]", separator, child, database));
+        assertEquals(expected, BracketedPattern.expandBrackets(pattern, separator, child, database));
     }
 
     @Test
@@ -665,32 +663,29 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[title:shorttitle]", ';', bibEntry, null));
     }
 
-    /**
-     * Test the [:camelN] modifier
-     */
-    @Test
-    void expandBracketsCamelNModifier() {
-        BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.TITLE, "Open Source Software And The Private Collective Innovation Model Issues");
-        assertEquals("Open",
-                BracketedPattern.expandBrackets("[title:camel1]", ';', bibEntry, null));
-        assertEquals("OpenSourceSoftwareAnd",
-                BracketedPattern.expandBrackets("[title:camel4]", ';', bibEntry, null));
-        assertEquals("OpenSourceSoftwareAndThePrivateCollectiveInnovationModelIssues",
-                BracketedPattern.expandBrackets("[title:camel10]", ';', bibEntry, null));
+    @ParameterizedTest
+    @CsvSource({
+            "'[title:camel1]', 'Open'",
+            "'[title:camel4]', 'OpenSourceSoftwareAnd'",
+            "'[title:camel10]', 'OpenSourceSoftwareAndThePrivateCollectiveInnovationModelIssues'"
+    })
+    void expandBracketsCamelNModifier(String pattern, String expected) {
+        assertEquals(expected,
+                BracketedPattern.expandBrackets(pattern, ';', bibentry, null));
     }
 
     /**
      * Test the [camelN] title marker.
      */
-    @Test
-    void expandBracketsCamelNTitle() {
-        assertEquals("Open",
-                BracketedPattern.expandBrackets("[camel1]", ';', dbentry, database));
-        assertEquals("OpenSourceSoftwareAnd",
-                BracketedPattern.expandBrackets("[camel4]", ';', dbentry, database));
-        assertEquals("OpenSourceSoftwareAndThePrivateCollectiveInnovationModelIssues",
-                BracketedPattern.expandBrackets("[camel10]", ';', dbentry, database));
+    @ParameterizedTest
+    @CsvSource({
+            "[camel1], Open",
+            "[camel4], OpenSourceSoftwareAnd",
+            "[camel10], OpenSourceSoftwareAndThePrivateCollectiveInnovationModelIssues"
+    })
+    void expandBracketsCamelNTitle(String pattern, String expected) {
+        assertEquals(expected,
+                BracketedPattern.expandBrackets(pattern, ';', dbentry, database));
     }
 
     @Test
@@ -787,45 +782,18 @@ class BracketedPatternTest {
         assertEquals("2325967120921344", BracketedPattern.expandBrackets("[lastpage]", null, bibEntry, null));
     }
 
-    @Test
-    void expandBracketsWithTestCasesFromRegExpBasedFileFinder() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("HipKro03")
-                .withField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh")
-                .withField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science")
-                .withField(StandardField.JOURNAL, "Organization Science")
-                .withField(StandardField.YEAR, "2003")
-                .withField(StandardField.VOLUME, "14")
-                .withField(StandardField.PAGES, "209--223")
-                .withField(StandardField.NUMBER, "2")
-                .withField(StandardField.ADDRESS, "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA")
-                .withField(StandardField.DOI, "http://dx.doi.org/10.1287/orsc.14.2.209.14992")
-                .withField(StandardField.ISSN, "1526-5455")
-                .withField(StandardField.PUBLISHER, "INFORMS");
-
-        BibDatabase database = new BibDatabase();
-        database.insertEntry(entry);
-
-        assertEquals("", BracketedPattern.expandBrackets("", ',', entry, database));
-
-        assertEquals("dropped", BracketedPattern.expandBrackets("drop[unknownkey]ped", ',', entry, database));
-
-        assertEquals("Eric von Hippel and Georg von Krogh",
-                BracketedPattern.expandBrackets("[author]", ',', entry, database));
-
-        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
-                BracketedPattern.expandBrackets("[author] are two famous authors.", ',', entry, database));
-
-        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
-                BracketedPattern.expandBrackets("[author] are two famous authors.", ',', entry, database));
-
-        assertEquals(
-                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
-                BracketedPattern.expandBrackets("[author] have published [fulltitle] in [journal].", ',', entry, database));
-
-        assertEquals(
-                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
-                BracketedPattern.expandBrackets("[author] have published [title] in [journal].", ',', entry, database));
+    @ParameterizedTest
+    @CsvSource({
+            "'', ''",
+            "'drop[unknownkey]ped', 'dropped'",
+            "'[author]', 'Eric von Hippel and Georg von Krogh'",
+            "'[author] are two famous authors.', 'Eric von Hippel and Georg von Krogh are two famous authors.'",
+            "'[author] have published [fulltitle] in [journal].', 'Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.'",
+            "'[author] have published [title] in [journal].', 'Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private Collective\" Innovation Model: Issues for Organization Science in Organization Science.'"
+    })
+    void expandBracketsWithTestCasesFromRegExpBasedFileFinder(String pattern, String expected) {
+        assertEquals(expected,
+                BracketedPattern.expandBrackets(pattern, ';', dbentry, database));
     }
 
     @Test
@@ -848,7 +816,6 @@ class BracketedPatternTest {
             "'Newton', '[edtrshort]', 'Isaac Newton'",
             "'Newton', '[editorLast]', 'Isaac Newton'",
             "'I', '[editorLastForeIni]', 'Isaac Newton'",
-
             "'EUASA', '[editors]', '{European Union Aviation Safety Agency}'"
     })
     void editorFieldMarkers(String expectedCitationKey, String pattern, String editor) {

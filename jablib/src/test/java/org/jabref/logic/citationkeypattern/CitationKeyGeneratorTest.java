@@ -207,15 +207,19 @@ class CitationKeyGeneratorTest {
         assertEquals(expectedResult, cleanedKey);
     }
 
-    @Test
-    void firstAuthor() {
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[auth]"));
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[auth]"));
+    private static Stream<Arguments> firstAuthor() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "Newton"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton"),
+          Arguments.of(createABibEntryAuthor("K{\\\"o}ning"), "Koening"),
+          Arguments.of(createABibEntryAuthor(""), "")
+        );
+    }
 
-        // https://sourceforge.net/forum/message.php?msg_id=4498555
-        assertEquals("Koening", generateKey(createABibEntryAuthor("K{\\\"o}ning"), "[auth]"));
-
-        assertEquals("", generateKey(createABibEntryAuthor(""), "[auth]"));
+    @ParameterizedTest
+    @MethodSource("firstAuthor")
+    void firstAuthor(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, "[auth]"));
     }
 
     @Test
@@ -382,20 +386,25 @@ class CitationKeyGeneratorTest {
                         database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
-    @Test
-    void authIniN() {
-        assertEquals("", generateKey(AUTHOR_EMPTY, "[authIni4]"));
-        assertEquals("Newt", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni4]"));
-        assertEquals("NeMa", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authIni4]"));
-        assertEquals("NeME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authIni4]"));
-        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "[authIni4]"));
-        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[authIni4]"));
+    private static Stream<Arguments> authIniN() {
+      return Stream.of(
+        Arguments.of(AUTHOR_EMPTY, "[authIni4]", ""),
+        Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni4]", "Newt"),
+        Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authIni4]", "NeMa"),
+        Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authIni4]", "NeME"),
+        Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "[authIni4]", "NMEB"),
+        Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[authIni4]", "NMEB"),
+        Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni1]", "N"),
+        Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni0]", ""),
+        Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni6]", "Newton"),
+        Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni7]", "Newton")
+      );
+    }
 
-        assertEquals("N", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni1]"));
-        assertEquals("", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni0]"));
-
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni6]"));
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni7]"));
+    @ParameterizedTest
+    @MethodSource("authIniN")
+    void authIniN(BibEntry entry, String pattern, String expected) {
+        assertEquals(expected, generateKey(entry, pattern));
     }
 
     @Test
@@ -403,14 +412,21 @@ class CitationKeyGeneratorTest {
         assertEquals("", generateKey(AUTHOR_EMPTY, "[authIni1]"));
     }
 
+    static Stream<Arguments> authAuthEa() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, "Newton"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, "Newton.Maxwell"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, "Newton.Maxwell.ea")
+        );
+    }
+
     /**
      * Tests  [auth.auth.ea]
      */
-    @Test
-    void authAuthEa() {
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, AUTHAUTHEA));
-        assertEquals("Newton.Maxwell", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHAUTHEA));
-        assertEquals("Newton.Maxwell.ea", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTHAUTHEA));
+    @ParameterizedTest
+    @MethodSource("authAuthEa")
+    void authAuthEa(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, AUTHAUTHEA));
     }
 
     @Test
@@ -418,32 +434,40 @@ class CitationKeyGeneratorTest {
         assertEquals("", generateKey(AUTHOR_EMPTY, AUTHAUTHEA));
     }
 
+    static Stream<Arguments> authEtAl() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTH_ETAL, "Newton.etal"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTH_ETAL, "Newton.Maxwell"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTHETAL, "NewtonEtAl"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHETAL, "NewtonMaxwell")
+        );
+    }
+
     /**
      * Tests the [auth.etal] and [authEtAl] patterns
      */
-    @Test
-    void authEtAl() {
-        // tests taken from the comments
+    @ParameterizedTest
+    @MethodSource("authEtAl")
+    void authEtAl(BibEntry entry, String pattern, String expected) {
+        assertEquals(expected, generateKey(entry, pattern));
+    }
 
-        // [auth.etal]
-        assertEquals("Newton.etal", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTH_ETAL));
-        assertEquals("Newton.Maxwell", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTH_ETAL));
-
-        // [authEtAl]
-        assertEquals("NewtonEtAl", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTHETAL));
-        assertEquals("NewtonMaxwell", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHETAL));
+    static Stream<Arguments> authShort() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "NME+"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "NME"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "NM"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton")
+        );
     }
 
     /**
      * Test the [authshort] pattern
      */
-    @Test
-    void authShort() {
-        // tests taken from the comments
-        assertEquals("NME+", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHSHORT));
-        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHSHORT));
-        assertEquals("NM", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHSHORT));
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHSHORT));
+    @ParameterizedTest
+    @MethodSource("authShort")
+    void authShort(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, AUTHSHORT));
     }
 
     @Test
@@ -451,47 +475,74 @@ class CitationKeyGeneratorTest {
         assertEquals("", generateKey(AUTHOR_EMPTY, AUTHSHORT));
     }
 
+    static Stream<Arguments> authNM() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1, 1, "N"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3, 2, "Max"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3, 1, "New"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 2, 4, "Bo"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 6, 4, "Bohr"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, 3, 1, "Aal"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, 4, 2, "Less"),
+          Arguments.of(AUTHOR_EMPTY, 2, 4, "")
+        );
+    }
+
     /**
      * Test the [authN_M] pattern
      */
-    @Test
-    void authNM() {
-        assertEquals("N", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHNOFMTH.formatted(1, 1)));
-        assertEquals("Max", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHNOFMTH.formatted(3, 2)));
-        assertEquals("New", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHNOFMTH.formatted(3, 1)));
-        assertEquals("Bo", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHNOFMTH.formatted(2, 4)));
-        assertEquals("Bohr", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHNOFMTH.formatted(6, 4)));
+    @ParameterizedTest
+    @MethodSource("authNM") // 使用与测试方法同名的方法作为数据源
+    void authNM(BibEntry entry, int n, int m, String expected) {
+        String pattern = AUTHNOFMTH.formatted(n, m);
+        assertEquals(expected, generateKey(entry, pattern));
+    }
 
-        assertEquals("Aal", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHNOFMTH.formatted(3, 1)));
-        assertEquals("Less", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHNOFMTH.formatted(4, 2)));
-
-        assertEquals("", generateKey(AUTHOR_EMPTY, AUTHNOFMTH.formatted(2, 4)));
+    static Stream<Arguments> firstAuthorForenameInitials() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2)
+        );
     }
 
     /**
      * Tests [authForeIni]
      */
-    @Test
-    void firstAuthorForenameInitials() {
-        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHFOREINI));
-        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHFOREINI));
-        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, AUTHFOREINI));
-        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHFOREINI));
+    @ParameterizedTest
+    @MethodSource("firstAuthorForenameInitials")
+    void firstAuthorForenameInitials(BibEntry entry) {
+        assertEquals("I", generateKey(entry, AUTHFOREINI));
+    }
+
+    static Stream<Arguments> firstAuthorVonAndLast() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, "vanderAalst"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, "vanderAalst")
+        );
     }
 
     /**
      * Tests [authFirstFull]
      */
-    @Test
-    void firstAuthorVonAndLast() {
-        assertEquals("vanderAalst", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHFIRSTFULL));
-        assertEquals("vanderAalst", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHFIRSTFULL));
+    @ParameterizedTest
+    @MethodSource("firstAuthorVonAndLast")
+    void firstAuthorVonAndLast(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, AUTHFIRSTFULL));
     }
 
-    @Test
-    void firstAuthorVonAndLastNoVonInName() {
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, AUTHFIRSTFULL));
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHFIRSTFULL));
+    static Stream<Arguments> firstAuthorVonAndLastNoVonInName() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, "Newton"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, "Newton")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("firstAuthorVonAndLastNoVonInName")
+    void firstAuthorVonAndLastNoVonInName(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, AUTHFIRSTFULL));
     }
 
     @ParameterizedTest
@@ -547,34 +598,46 @@ class CitationKeyGeneratorTest {
         assertEquals(expected, generateKey(entry, pattern));
     }
 
+    static Stream<Arguments> lastAuthor() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "Maxwell"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "Einstein"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "Bohr"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "Unknown"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, "Aalst"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, "Lessen")
+        );
+    }
+
     /**
      * Tests [authorLast]
      */
-    @Test
-    void lastAuthor() {
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORLAST));
-        assertEquals("Maxwell", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORLAST));
-        assertEquals("Einstein", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORLAST));
-        assertEquals("Bohr", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORLAST));
-        assertEquals("Unknown", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORLAST));
+    @ParameterizedTest
+    @MethodSource("lastAuthor")
+    void lastAuthor(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, AUTHORLAST));
+    }
 
-        assertEquals("Aalst", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORLAST));
-        assertEquals("Lessen", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORLAST));
+    static Stream<Arguments> lastAuthorForenameInitials() {
+        return Stream.of(
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "I"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "J"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "A"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "N"),
+          Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "H"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, "W"),
+          Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, "T")
+        );
     }
 
     /**
      * Tests [authorLastForeIni]
      */
-    @Test
-    void lastAuthorForenameInitials() {
-        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORLASTFOREINI));
-        assertEquals("J", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORLASTFOREINI));
-        assertEquals("A", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORLASTFOREINI));
-        assertEquals("N", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORLASTFOREINI));
-        assertEquals("H", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORLASTFOREINI));
-
-        assertEquals("W", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORLASTFOREINI));
-        assertEquals("T", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORLASTFOREINI));
+    @ParameterizedTest
+    @MethodSource("lastAuthorForenameInitials")
+    void lastAuthorForenameInitials(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, AUTHORLASTFOREINI));
     }
 
     /**
