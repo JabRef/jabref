@@ -194,14 +194,12 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.1
 
       # region setup-JDK
-      - name: Create ASDF config
+      - name: 'Set up latest JDK EA from jdk.java.net'
         if: startsWith(matrix.os, 'macos')
-        run: |
-          cat > .tool-versions <<EOF
-          java openjdk-26.ea.18
-      - name: Setup JDK 26 EA for "java toolchain" of Gradle
-        if: startsWith(matrix.os, 'macos')
-        uses: asdf-vm/actions/install@v4
+        uses: oracle-actions/setup-java@v1
+        with:
+          website: jdk.java.net
+          release: EA
       - name: Tell gradle to use JDK 26
         if: startsWith(matrix.os, 'macos')
         run: sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
