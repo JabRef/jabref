@@ -196,7 +196,7 @@ jobs:
       # region setup-JDK
       - name: Create ASDF config
         if: startsWith(matrix.os, 'macos')
-        run :
+        run: |
           cat > .tool-versions <<EOF
           java openjdk-26.ea.18
       - name: Setup JDK 26 EA for "java toolchain" of Gradle
