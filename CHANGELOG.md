@@ -44,8 +44,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for using Medline/Pubmed fetcher with an API key. [#11296](https://github.com/JabRef/jabref/issues/11296#issuecomment-3289005011)
 - We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
-- We added a new function computeNoticeText() in AiChatComponent class that automatically changes the notice text in AI chat. [#13855](https://github.com/JabRef/jabref/issues/13855)
-- We added an Observables in AiChatComponent; when any of the observables are changed, the UI text in AI chat auto-updates. [#13855](https://github.com/JabRef/jabref/issues/13855)
 
 ### Changed
 
