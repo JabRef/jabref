@@ -32,6 +32,7 @@ public class ImporterPreferences {
     private final ObservableList<String> catalogs;
     private final ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParser;
     private final IntegerProperty citationsRelationsStoreTTL;
+    private final BooleanProperty preferInspireTexkeys;
 
     public ImporterPreferences(boolean importerEnabled,
                                boolean generateNewKeyOnImport,
@@ -43,7 +44,8 @@ public class ImporterPreferences {
                                boolean persistCustomKeys,
                                List<String> catalogs,
                                PlainCitationParserChoice defaultPlainCitationParser,
-                               int citationsRelationsStoreTTL
+                               int citationsRelationsStoreTTL,
+                               boolean preferInspireTexkeys
     ) {
         this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
@@ -56,6 +58,7 @@ public class ImporterPreferences {
         this.catalogs = FXCollections.observableArrayList(catalogs);
         this.defaultPlainCitationParser = new SimpleObjectProperty<>(defaultPlainCitationParser);
         this.citationsRelationsStoreTTL = new SimpleIntegerProperty(citationsRelationsStoreTTL);
+        this.preferInspireTexkeys = new SimpleBooleanProperty(preferInspireTexkeys);
     }
 
     public boolean areImporterEnabled() {
@@ -175,5 +178,17 @@ public class ImporterPreferences {
 
     public void setCitationsRelationsStoreTTL(int citationsRelationsStoreTTL) {
         this.citationsRelationsStoreTTL.set(citationsRelationsStoreTTL);
+    }
+
+    public boolean isPreferInspireTexkeys() {
+        return preferInspireTexkeys.get();
+    }
+
+    public BooleanProperty preferInspireTexkeysProperty() {
+        return preferInspireTexkeys;
+    }
+
+    public void setPreferInspireTexkeys(boolean preferInspireTexkeys) {
+        this.preferInspireTexkeys.set(preferInspireTexkeys);
     }
 }
