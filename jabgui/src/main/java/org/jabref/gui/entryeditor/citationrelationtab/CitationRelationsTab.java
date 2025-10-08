@@ -150,7 +150,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private VBox getTopLabel() {
-        Hyperlink link = new Hyperlink("Semantic Scholar Information");
+        Hyperlink link = new Hyperlink(Localization.lang("Semantic Scholar Information"));
         link.getStyleClass().add("scite-tallies-label");
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
@@ -279,7 +279,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private VBox getTalliesPane(TalliesResponse tallModel) {
-        Hyperlink link = new Hyperlink("Scite.ai Information");
+        Hyperlink link = new Hyperlink(Localization.lang("Scite.ai Information"));
         link.getStyleClass().add("scite-tallies-label");
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
