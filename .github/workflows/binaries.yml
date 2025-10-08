@@ -202,7 +202,7 @@ jobs:
           release: EA
       - name: Tell gradle to use JDK 26
         if: startsWith(matrix.os, 'macos')
-        run: sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+        run: sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
       - name: Setup JDK (runtime for gradle)
         uses: actions/setup-java@v5
         with:
