@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -97,6 +98,15 @@ public class AiChatComponent extends VBox {
 
         aiService.getIngestionService().ingest(name, ListUtil.getLinkedFiles(entries).toList(), bibDatabaseContext);
 
+        System.out.println("Ai service: " + this.aiService);
+        System.out.println("Name: " + name);
+        System.out.println("Chat history: " + chatHistory);
+        System.out.println("Entries: " + this.entries);
+        System.out.println("Database: " + this.bibDatabaseContext);
+        System.out.println("Ai pref: " + this.aiPreferences);
+        System.out.println("Dialog service: " + this.dialogService);
+        System.out.println("Task executor: " + this.taskExecutor);
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -122,19 +132,24 @@ public class AiChatComponent extends VBox {
     private void initializeNotice() {
         this.noticeTemplate = noticeText.getText();
 
-        noticeText.textProperty().bind(Bindings.createStringBinding(
-                () -> {
-                    String provider = aiPreferences.getAiProvider().getLabel();
-                    String model = aiPreferences.getSelectedChatModel();
-                    return noticeTemplate.replace("%0", provider + " " + model);
-                },
+        noticeText.textProperty().bind(Bindings.createStringBinding(this::computeNoticeText, noticeDependencies()));
+    }
+
+    private String computeNoticeText() {
+        String provider = aiPreferences.getAiProvider().getLabel();
+        String model = aiPreferences.getSelectedChatModel();
+        return noticeTemplate.replace("%0", provider + " " + model);
+    }
+
+    private Observable[] noticeDependencies() {
+        return new Observable[] {
                 aiPreferences.aiProviderProperty(),
                 aiPreferences.openAiChatModelProperty(),
                 aiPreferences.mistralAiChatModelProperty(),
                 aiPreferences.geminiChatModelProperty(),
                 aiPreferences.huggingFaceChatModelProperty(),
                 aiPreferences.gpt4AllChatModelProperty()
-        ));
+        };
     }
 
     private void initializeExampleQuestions() {
