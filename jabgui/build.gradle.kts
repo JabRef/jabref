@@ -25,6 +25,8 @@ dependencies {
 
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
+    // required by javafx-web
+    implementation("org.openjfx:jdk-jsobject")
 
     implementation("com.pixelduke:fxthemes")
 
