@@ -42,6 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added more supported formats of CAYW endpoint of HTTP server. [#13578](https://github.com/JabRef/jabref/issues/13578)
 - We added chronological navigation for entries in each library. [#6352](https://github.com/JabRef/jabref/issues/6352)
 - We added support for using Medline/Pubmed fetcher with an API key. [#11296](https://github.com/JabRef/jabref/issues/11296#issuecomment-3289005011)
+- We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
 
 ### Changed
@@ -69,6 +70,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for import of a Refer/BibIX file format. [#13069](https://github.com/JabRef/jabref/issues/13069)
 - We added markdown rendering and copy capabilities to AI chat responses. [#12234](https://github.com/JabRef/jabref/issues/12234)
 - We added a new `jabkit` command `pseudonymize` to pseudonymize the library. [#13109](https://github.com/JabRef/jabref/issues/13109)
+- We moved the clear fields mechanic in the Automatic Field Editor from the edit content tab to a separate tab. [#13780](https://github.com/JabRef/jabref/issues/13780)
 - We added functionality to focus running instance when trying to start a second instance. [#13129](https://github.com/JabRef/jabref/issues/13129)
 - We added a "Copy Field Content" submenu to the entry context menu, allowing users to quickly copy specific field contents including Author, Journal, Date, Keywords, and Abstract fields from selected entries. [#13280](https://github.com/JabRef/jabref/pull/13280)
 - We added a highlighted diff regarding changes to the Group Tree Structure of a bib file, made outside JabRef. [#11221](https://github.com/JabRef/jabref/issues/11221)
