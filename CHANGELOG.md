@@ -44,7 +44,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for using Medline/Pubmed fetcher with an API key. [#11296](https://github.com/JabRef/jabref/issues/11296#issuecomment-3289005011)
 - We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
-- We added a test for automatically changed notice text in AI chat. [#13855](https://github.com/JabRef/jabref/issues/13855)
 - We added a new function computeNoticeText() in AiChatComponent class that automatically changes the notice text in AI chat. [#13855](https://github.com/JabRef/jabref/issues/13855)
 - We added an Observables in AiChatComponent; when any of the observables are changed, the UI text in AI chat auto-updates. [#13855](https://github.com/JabRef/jabref/issues/13855)
 
@@ -103,7 +102,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved "REDACTED" replacement of API key value in web fetcher search URL [#13796](https://github.com/JabRef/jabref/issues/13796)
 - When the pin "Keep dialog always on top" in the global search dialog is selected, the search window stays open when double-clicking on an entry. [#13840](https://github.com/JabRef/jabref/issues/13840)
 - We improved the way we check for matching curly braces in BibTeX fields and made error messages easier to understand. [#12605](https://github.com/JabRef/jabref/issues/12605)
-- We change function initializeNotice() in AiChatComponent class, which now auto refreshes the UI text in AI chat. [#13855](https://github.com/JabRef/jabref/issues/13855)
 
 ### Fixed
 
