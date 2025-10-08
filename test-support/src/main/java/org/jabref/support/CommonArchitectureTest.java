@@ -170,7 +170,12 @@ public class CommonArchitectureTest {
     @ArchTest
     public void shouldUseJSpecifyAnnotations(JavaClasses classes) {
         ArchRuleDefinition.noClasses()
-                          .should().dependOnClassesThat().resideInAPackage("org.jetbrains.annotations..")
+                          .should()
+                          .dependOnClassesThat()
+                          .resideInAnyPackage(
+                                  "org.jetbrains.annotations..",
+                                  "jakarta.annotation..",
+                                  "javax.annotation..")
                           .because("JSpecify annotations should be used")
                           .check(classes);
     }
