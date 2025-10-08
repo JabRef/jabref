@@ -55,6 +55,7 @@ import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.NoSelectionModel;
+import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -94,10 +95,6 @@ import org.slf4j.LoggerFactory;
 public class CitationRelationsTab extends EntryEditorTab {
 
     public static final String NAME = "Citation relations";
-
-    private static final String SEMANTIC_SCHOLAR_URL = "https://www.semanticscholar.org/";
-    private static final String SCITE_REPORTS_URL_BASE = "https://scite.ai/reports/";
-    private static final String SCITE_URL = "https://scite.ai/";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
@@ -154,21 +151,22 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private VBox getTopLabel() {
         Hyperlink link = new Hyperlink("Semantic Scholar Information");
+        link.getStyleClass().add("scite-tallies-label");
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
                 try {
-                    NativeDesktop.openBrowser(SEMANTIC_SCHOLAR_URL, preferences.getExternalApplicationsPreferences());
+                    NativeDesktop.openBrowser(URLs.SEMANTIC_SCHOLAR_URL, preferences.getExternalApplicationsPreferences());
                 } catch (IOException ioex) {
                     // Can't throw a checked exception from here, so display a message to the user instead.
                     dialogService.showErrorDialogAndWait(
                             "An error occurred opening web browser",
-                            "JabRef was unable to open a web browser for link:\n\n" + SEMANTIC_SCHOLAR_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
+                            "JabRef was unable to open a web browser for link:\n\n" + URLs.SEMANTIC_SCHOLAR_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
                             ioex
                     );
                 }
             }
         });
-        return new VBox(30, link);
+        return new VBox(link);
     }
 
     private void setSciteResultsPane() {
@@ -281,6 +279,23 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private VBox getTalliesPane(TalliesResponse tallModel) {
+        Hyperlink link = new Hyperlink("Scite.ai Information");
+        link.getStyleClass().add("scite-tallies-label");
+        link.setOnAction(event -> {
+            if (event.getSource() instanceof Hyperlink) {
+                try {
+                    NativeDesktop.openBrowser(URLs.SCITE_URL, preferences.getExternalApplicationsPreferences());
+                } catch (IOException ioex) {
+                    // Can't throw a checked exception from here, so display a message to the user instead.
+                    dialogService.showErrorDialogAndWait(
+                            "An error occurred opening web browser",
+                            "JabRef was unable to open a web browser for link:\n\n" + URLs.SCITE_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
+                            ioex
+                    );
+                }
+            }
+        });
+
         Text message = new Text(Localization.lang(
                 "Total Citations: %0 | Supporting: %1 | Contradicting: %2 | Mentioning: %3 | Unclassified: %4 | Citing Publications: %5",
                 tallModel.total(),
@@ -290,25 +305,17 @@ public class CitationRelationsTab extends EntryEditorTab {
                 tallModel.unclassified(),
                 tallModel.citingPublications()
         ));
-        String url = SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
+        String url = URLs.SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
         VBox messageBox = getMessageBox(url, message);
-        messageBox.getStyleClass().add("scite-message-box");
-        return messageBox;
+        return new VBox(link, messageBox);
     }
 
     private VBox getMessageBox(String url, Text message) {
-        HyperlinkLabel link = new HyperlinkLabel(Localization.lang("metrics provided by [%0] - See full report at [%1]", "scite.ai", url));
+        HyperlinkLabel link = new HyperlinkLabel(Localization.lang("See full report at [%0]", url));
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
-                Hyperlink clickedLink = (Hyperlink) event.getSource();
-                String clickedUrl;
-                if (clickedLink.getText().equals("scite.ai")) {
-                    clickedUrl = SCITE_URL;
-                } else {
-                    clickedUrl = url;
-                }
                 try {
-                    NativeDesktop.openBrowser(clickedUrl, preferences.getExternalApplicationsPreferences());
+                    NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
                 } catch (IOException ioex) {
                     // Can't throw a checked exception from here, so display a message to the user instead.
                     dialogService.showErrorDialogAndWait(
@@ -320,7 +327,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
         });
 
-        return new VBox(30, message, link);
+        return new VBox(message, link);
     }
 
     /**
