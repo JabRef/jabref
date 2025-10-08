@@ -661,9 +661,11 @@ extraJavaModuleInfo {
     module("org.openjdk.jmh:jmh-generator-reflection", "jmh.generator.reflection")
     module("org.apache.commons:commons-math3", "commons.math3")
 
-    module("javax.inject:javax.inject", "javax.inject") {
-        uses("jakarta.inject")
-    }
+    // We need to transform this, because the java modules plugin touches all Java paths
+    // Otherwise, one gets following errormessage
+    // configuration ':jablib:annotationProcessor'.
+
+    module("javax.inject:javax.inject", "javax.inject")
     module("com.google.auto.value:auto-value-annotations", "auto.value.annotations")
     module("io.github.eisop:dataflow-errorprone", "org.checkerframework.dataflow")
     module("com.google.googlejavaformat:google-java-format", "com.google.googlejavaformat")
