@@ -117,6 +117,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.preferences;
     exports org.jabref.logic.icore;
     exports org.jabref.model.icore;
+    exports org.jabref.model.sciteTallies;
 
     requires java.base;
 
