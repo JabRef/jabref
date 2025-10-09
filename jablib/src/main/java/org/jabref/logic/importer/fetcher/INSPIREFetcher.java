@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +59,6 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     
     // Timeout configuration (in milliseconds)
     private static final int CONNECT_TIMEOUT_MS = 10000; // 10 seconds
-    private static final int READ_TIMEOUT_MS = 30000;    // 30 seconds
     
     private static final String ERROR_MESSAGE_TEMPLATE = 
         "Failed to fetch from INSPIRE using %s after %d attempts.\n" +
@@ -99,9 +99,8 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
         download.addHeader("User-Agent", "JabRef/" + getClass().getPackage().getImplementationVersion());
         
-        // Set timeouts to prevent hanging
-        download.setConnectTimeout(CONNECT_TIMEOUT_MS);
-        download.setReadTimeout(READ_TIMEOUT_MS);
+        // Set connection timeout to prevent hanging
+        download.setConnectTimeout(Duration.ofMillis(CONNECT_TIMEOUT_MS));
         
         return download;
     }
@@ -288,7 +287,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
                 results.forEach(this::doPostCleanup);
                 return results;
                 
-            } catch (ParseException | IOException e) {
+            } catch (ParseException | FetcherException e) {
                 lastException = new FetcherException(url, 
                     "Failed to fetch from INSPIRE (attempt " + (attempt + 1) + "): " + e.getMessage(), e);
                 
