@@ -412,10 +412,10 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          - os: macos-14
+          - os: macos-15
             displayName: macOS (ARM64)
             suffix: '_arm64'
-          - os: macos-13  # intel image
+          - os: macos-15-intel  # intel image
             displayName: macOS
             suffix: ''
     runs-on: ${{ matrix.os }}
