@@ -173,9 +173,10 @@ public class CommonArchitectureTest {
                           .should()
                           .dependOnClassesThat()
                           .resideInAnyPackage(
-                                  "org.jetbrains.annotations..",
                                   "jakarta.annotation..",
-                                  "javax.annotation..")
+                                  "javax.annotation..",
+                                  "org.eclipse.jgit.annotations",
+                                  "org.jetbrains.annotations..")
                           .because("JSpecify annotations should be used")
                           .check(classes);
     }
