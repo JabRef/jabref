@@ -142,30 +142,35 @@ jobs:
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04 jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04/jabkit-portable_linux.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04/jabkit
             suffix: ''
             archForDebianRepack: '_amd64'
+            eaJDK: false
           - os: ubuntu-22.04-arm
             displayName: linux-arm
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04-arm jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04-arm/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04-arm/jabkit
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
+            eaJDK: false
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef
             archivePortableJabKit: 7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit
             suffix: ''
             archForDebianRepack: ''
+            eaJDK: false
           - os: macos-13  # intel image
             displayName: macOS
             archivePortable: 7z a -r jabgui/build/packages/macos-13/JabRef-portable_macos.zip ./jabgui/build/packages/macos-13/JabRef.app && rm -R jabgui/build/packages/macos-13/JabRef.app
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-13/jabkit-portable_macos.zip ./jabkit/build/packages/macos-13/jabkit.app && rm -R jabkit/build/packages/macos-13/jabkit.app
             suffix: ''
             archForDebianRepack: ''
+            eaJDK: true
           - os: macos-14
             displayName: macOS-arm
             archivePortable: 7z a -r jabgui/build/packages/macos-14/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-14/JabRef.app && rm -R jabgui/build/packages/macos-14/JabRef.app
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-14/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-14/jabkit.app && rm -R jabkit/build/packages/macos-14/jabkit.app
             suffix: '_arm64'
             archForDebianRepack: ''
+            eaJDK: true
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
@@ -180,7 +185,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Install pigz and cache (linux)
-        if: (startsWith(matrix.os, 'ubuntu'))
+        if: startsWith(matrix.os, 'ubuntu')
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: pigz
@@ -195,16 +200,33 @@ jobs:
 
       # region setup-JDK
       - name: 'Set up latest JDK EA from jdk.java.net'
-        if: startsWith(matrix.os, 'macos')
+        if: matrix.eaJDK
         uses: oracle-actions/setup-java@v1
         with:
           website: jdk.java.net
           release: EA
       - name: Tell gradle to use JDK 26
-        if: startsWith(matrix.os, 'macos')
+        if: matrix.eaJDK
         run: |
           sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i '' "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+      - name: Download JavaFX JMODs (macos-13)
+        if: matrix.eaJDK && (matrix.os == 'macos-13')
+        uses: ethanjli/cached-download-action@v0.1.3
+        with:
+          url: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-x64_bin-jmods.zip
+          destination: /tmp/jmods.zip
+      - name: Download JavaFX JMODs (macos-14)
+        if: matrix.eaJDK && (matrix.os == 'macos-14')
+        uses: ethanjli/cached-download-action@v0.1.3
+        with:
+          url: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-aarch64_bin-jmods.zip
+          destination: /tmp/jmods.zip
+      - name: Extract JavaFX JMODs (macos)
+        if: matrix.eaJDK && (startsWith(matrix.os, 'macos'))
+        run: |
+          cd /tmp
+          unzip jmods.zip
       - name: Setup JDK (runtime for gradle)
         uses: actions/setup-java@v5
         with:
