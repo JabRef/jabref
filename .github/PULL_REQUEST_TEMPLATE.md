@@ -11,7 +11,7 @@ Closes _____
 <!-- You can add screenshots or videos (using Loom - https://www.loom.com or by just adding .mp4 files). -->
 <!-- (REPLACE THIS PARAGRAPH) -->
 
-<!-- YOU HAVE TO MODIFY THE ABOVE TEXT FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
+<!-- YOU HAVE TO MODIFY THE ABOVE TEXT TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
 
 ### Mandatory checks
 
