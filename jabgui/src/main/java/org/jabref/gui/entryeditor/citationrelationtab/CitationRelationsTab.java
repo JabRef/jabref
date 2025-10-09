@@ -34,6 +34,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -148,27 +149,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         setSciteResultsPane();
     }
 
-    private HBox getTopLabel() {
-        Label label = new Label(Localization.lang("Citation Relations"));
-        label.getStyleClass().add("scite-tallies-label");
-
-        Button providedByButton = IconTheme.JabRefIcons.HELP.asButton();
-        providedByButton.setTooltip(new Tooltip(Localization.lang("Provided by Semantic Scholar")));
-        providedByButton.setOnAction(event -> {
-            try {
-                NativeDesktop.openBrowser(URLs.SEMANTIC_SCHOLAR_URL, preferences.getExternalApplicationsPreferences());
-            } catch (IOException ioex) {
-                // Can't throw a checked exception from here, so display a message to the user instead.
-                dialogService.showErrorDialogAndWait(
-                        "An error occurred opening web browser",
-                        "JabRef was unable to open a web browser for link:\n\n" + URLs.SEMANTIC_SCHOLAR_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
-                        ioex
-                );
-            }
-        });
-        return new HBox(label, providedByButton);
-    }
-
     private void setSciteResultsPane() {
         progressIndicator.setMaxSize(100, 100);
         sciteResultsPane.add(progressIndicator, 0, 0);
@@ -278,29 +258,13 @@ public class CitationRelationsTab extends EntryEditorTab {
         return errorMessageBox;
     }
 
-    private VBox getTalliesPane(TalliesResponse tallModel) {
-        Label label = new Label(Localization.lang("Citation Metrics"));
-        label.getStyleClass().add("scite-tallies-label");
-
-        Button providedByButton = IconTheme.JabRefIcons.HELP.asButton();
-        providedByButton.setTooltip(new Tooltip(Localization.lang("Provided by scite.ai")));
-        providedByButton.setOnAction(event -> {
-            try {
-                NativeDesktop.openBrowser(URLs.SCITE_URL, preferences.getExternalApplicationsPreferences());
-            } catch (IOException ioex) {
-                // Can't throw a checked exception from here, so display a message to the user instead.
-                dialogService.showErrorDialogAndWait(
-                        "An error occurred opening web browser",
-                        "JabRef was unable to open a web browser for link:\n\n" + URLs.SCITE_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
-                        ioex
-                );
-            }
-        });
-
-        HBox title = new HBox(label, providedByButton);
-
+    private BorderPane getTalliesPane(TalliesResponse tallModel) {
         HBox tallies = new HBox();
+        tallies.setPadding(new Insets(0, 0, 10, 0));
+        tallies.setAlignment(Pos.CENTER_LEFT);
 
+        Text metrics = new Text(Localization.lang("Metrics:"));
+        metrics.getStyleClass().add("markdown-bold");
         Text totalCitations = new Text(Localization.lang("Total Citations: %0", tallModel.total()));
         Text supporting = new Text(Localization.lang("Supporting: %0", tallModel.supporting()));
         Text contradicting = new Text(Localization.lang("Contradicting: %0", tallModel.contradicting()));
@@ -310,6 +274,8 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         Text[] elements = {totalCitations, supporting, contradicting, mentioning, unclassified, citingPublications};
 
+        tallies.getChildren().add(metrics);
+        tallies.getChildren().add(new Text(" "));
         for (Text element : elements) {
             tallies.getChildren().add(element);
             Text separator = new Text(" | ");
@@ -332,10 +298,44 @@ public class CitationRelationsTab extends EntryEditorTab {
                 }
             }
         });
-
         tallies.getChildren().add(link);
-        tallies.setPadding(new Insets(0, 0, 10, 0));
-        return new VBox(title, tallies);
+
+        Button providedByButtonMetrics = IconTheme.JabRefIcons.HELP.asButton();
+        providedByButtonMetrics.setTooltip(new Tooltip(Localization.lang("Metrics provided by scite.ai")));
+        providedByButtonMetrics.setOnAction(event -> {
+            try {
+                NativeDesktop.openBrowser(URLs.SCITE_URL, preferences.getExternalApplicationsPreferences());
+            } catch (IOException ioex) {
+                // Can't throw a checked exception from here, so display a message to the user instead.
+                dialogService.showErrorDialogAndWait(
+                        "An error occurred opening web browser",
+                        "JabRef was unable to open a web browser for link:\n\n" + URLs.SCITE_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
+                        ioex
+                );
+            }
+        });
+        tallies.getChildren().add(providedByButtonMetrics);
+
+        Button providedByButtonRelations = IconTheme.JabRefIcons.HELP.asButton();
+        providedByButtonRelations.setTooltip(new Tooltip(Localization.lang("Relations provided by Semantic Scholar")));
+        providedByButtonRelations.setOnAction(event -> {
+            try {
+                NativeDesktop.openBrowser(URLs.SEMANTIC_SCHOLAR_URL, preferences.getExternalApplicationsPreferences());
+            } catch (IOException ioex) {
+                // Can't throw a checked exception from here, so display a message to the user instead.
+                dialogService.showErrorDialogAndWait(
+                        "An error occurred opening web browser",
+                        "JabRef was unable to open a web browser for link:\n\n" + URLs.SEMANTIC_SCHOLAR_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
+                        ioex
+                );
+            }
+        });
+
+        BorderPane bottomLine = new BorderPane();
+        bottomLine.setLeft(tallies);
+        bottomLine.setRight(providedByButtonRelations);
+
+        return bottomLine;
     }
 
     /**
@@ -622,7 +622,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         citationsRelationsTabViewModel.bindToEntry(entry);
-        VBox entirePanel = new VBox(getTopLabel(), getPaneAndStartSearch(entry), sciteResultsPane);
+        VBox entirePanel = new VBox(getPaneAndStartSearch(entry), sciteResultsPane);
         setContent(entirePanel);
     }
 
