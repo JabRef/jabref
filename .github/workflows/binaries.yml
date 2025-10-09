@@ -157,17 +157,17 @@ jobs:
             suffix: ''
             archForDebianRepack: ''
             eaJDK: false
-          - os: macos-13  # intel image
+          - os: macos-15-intel  # intel image
             displayName: macOS
-            archivePortable: 7z a -r jabgui/build/packages/macos-13/JabRef-portable_macos.zip ./jabgui/build/packages/macos-13/JabRef.app && rm -R jabgui/build/packages/macos-13/JabRef.app
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-13/jabkit-portable_macos.zip ./jabkit/build/packages/macos-13/jabkit.app && rm -R jabkit/build/packages/macos-13/jabkit.app
+            archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
+            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app
             suffix: ''
             archForDebianRepack: ''
             eaJDK: true
-          - os: macos-14
+          - os: macos-15
             displayName: macOS-arm
-            archivePortable: 7z a -r jabgui/build/packages/macos-14/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-14/JabRef.app && rm -R jabgui/build/packages/macos-14/JabRef.app
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-14/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-14/jabkit.app && rm -R jabkit/build/packages/macos-14/jabkit.app
+            archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
+            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app
             suffix: '_arm64'
             archForDebianRepack: ''
             eaJDK: true
@@ -211,13 +211,13 @@ jobs:
           sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i '' "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
       - name: Download JavaFX JMODs (macos-13)
-        if: matrix.eaJDK && (matrix.os == 'macos-13')
+        if: matrix.eaJDK && (matrix.os == 'macos-15-intel')
         uses: ethanjli/cached-download-action@v0.1.3
         with:
           url: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-x64_bin-jmods.zip
           destination: /tmp/jmods.zip
       - name: Download JavaFX JMODs (macos-14)
-        if: matrix.eaJDK && (matrix.os == 'macos-14')
+        if: matrix.eaJDK && (matrix.os == 'macos-15')
         uses: ethanjli/cached-download-action@v0.1.3
         with:
           url: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-aarch64_bin-jmods.zip
