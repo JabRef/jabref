@@ -146,6 +146,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where some file choosers regarding LaTeX-aux files did not open in the directory of the last selected file. [#13861](https://github.com/JabRef/jabref/pull/13861)
 - We fixed an issue where the LaTeX file directory was not stored correctly in combination with the usage of groups from aux files. [#8344](https://github.com/JabRef/jabref/issues/8344)
 - We fixed an issue where ignoring of subdirectories via `.gitingore` patterns did not work in the "Find unlinked files dialog". [forum#5425](https://discourse.jabref.org/t/set-list-of-ignored-folders-paths/5425/6)
+- We fixed an issue where CTRL+W does not close the current tab [#12530](https://github.com/JabRef/jabref/issues/12530)
 
 ### Removed
 
