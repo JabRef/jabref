@@ -30,7 +30,8 @@ jvmDependencyConflicts.patch {
             addTargetPlatformVariant("mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
             addTargetPlatformVariant("mac-aarch64", OperatingSystemFamily.MACOS, MachineArchitecture.ARM64)
             addTargetPlatformVariant("win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
-            // Since JDK26 delivered as JMOD
+            // Workaround for https://github.com/gradlex-org/java-module-packaging/issues/77
+            // We most probably have no JavaScript in JabRef's used WebViews
             removeDependency("org.openjfx:jdk-jsobject")
         }
     }

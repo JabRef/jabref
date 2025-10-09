@@ -117,7 +117,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void configurePreviewView(ThemeManager themeManager) {
         previewView.setContextMenuEnabled(false);
-        previewView.getEngine().setJavaScriptEnabled(true);
+        // Workaround for https://github.com/gradlex-org/java-module-packaging/issues/77
+        previewView.getEngine().setJavaScriptEnabled(false);
         themeManager.installCss(previewView.getEngine());
 
         previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
