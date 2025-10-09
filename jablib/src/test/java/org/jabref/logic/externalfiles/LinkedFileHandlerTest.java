@@ -67,8 +67,8 @@ class LinkedFileHandlerTest {
             "file.pdf, https://example.com/file.doc, pdf",
             "file.pdf, https://example.com/file, pdf",
             "file.pdf, https://example.com/file.pdf, ''",
-            "-.pdf, https://example.com/, pdf",
-            "-.pdf, path/to/file.pdf, pdf",
+            "file.pdf, https://example.com/, pdf",
+            "file.pdf, path/to/file.pdf, pdf",
             "OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf"
     })
     void getSuggestedFileName(String expectedFileName, String link, String extension) {

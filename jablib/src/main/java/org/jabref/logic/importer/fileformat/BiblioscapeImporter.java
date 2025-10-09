@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -18,6 +17,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -48,13 +49,12 @@ public class BiblioscapeImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) {
-        Objects.requireNonNull(reader);
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) {
         return true;
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibItems = new ArrayList<>();
         String line;
         Map<Field, String> hm = new HashMap<>();

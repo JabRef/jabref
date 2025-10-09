@@ -92,7 +92,7 @@ jobs:
       # This step runs in both cases using the proper variables.
       - name: ghprcomment@main
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
-        uses: jbangdev/jbang-action@v0.130.0
+        uses: jbangdev/jbang-action@v0.132.1
         with:
           script: https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
           scriptargs: "-r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}"

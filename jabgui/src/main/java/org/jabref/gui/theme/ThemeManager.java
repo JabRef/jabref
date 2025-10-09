@@ -67,10 +67,10 @@ public class ThemeManager {
     private boolean isDarkMode;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public ThemeManager(WorkspacePreferences workspacePreferences,
-                        FileUpdateMonitor fileUpdateMonitor) {
-        this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
-        this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
+    public ThemeManager(@NonNull WorkspacePreferences workspacePreferences,
+                        @NonNull FileUpdateMonitor fileUpdateMonitor) {
+        this.workspacePreferences = workspacePreferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
         // Always returns something even if the native library is not available - see https://github.com/dukke/FXThemes/issues/15
         this.themeWindowManager = ThemeWindowManagerFactory.create();
 
@@ -209,7 +209,7 @@ public class ThemeManager {
     }
 
     private void updateThemeSettings() {
-        Theme theme = Objects.requireNonNull(workspacePreferences.getTheme());
+        Theme theme = workspacePreferences.getTheme();
 
         if (workspacePreferences.themeSyncOsProperty().getValue()) {
             if (Platform.getPreferences().getColorScheme() == ColorScheme.DARK) {

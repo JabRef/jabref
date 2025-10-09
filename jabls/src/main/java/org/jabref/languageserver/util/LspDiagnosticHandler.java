@@ -45,7 +45,7 @@ public class LspDiagnosticHandler {
         this.clientHandler = clientHandler;
         this.jabRefCliPreferences = cliPreferences;
         this.lspIntegrityCheck = new LspIntegrityCheck(cliPreferences, abbreviationRepository);
-        this.lspConsistencyCheck = new LspConsistencyCheck();
+        this.lspConsistencyCheck = new LspConsistencyCheck(clientHandler.getSettings());
         this.integrityDiagnosticsCache = new ConcurrentHashMap<>();
         this.consistencyDiagnosticsCache = new ConcurrentHashMap<>();
     }
@@ -100,8 +100,12 @@ public class LspDiagnosticHandler {
     private List<Diagnostic> getFinalDiagnosticsList(String uri) {
         ExtensionSettings settings = clientHandler.getSettings();
         return Stream.concat(
-                settings.isIntegrityCheck() ? integrityDiagnosticsCache.getOrDefault(uri, List.of()).stream() : Stream.empty(),
-                settings.isConsistencyCheck() ? consistencyDiagnosticsCache.getOrDefault(uri, List.of()).stream() : Stream.empty()
+                settings.isIntegrityCheck() ?
+                integrityDiagnosticsCache.getOrDefault(uri, List.of()).stream() :
+                Stream.empty(),
+                settings.isConsistencyCheck() ?
+                consistencyDiagnosticsCache.getOrDefault(uri, List.of()).stream() :
+                Stream.empty()
         ).toList();
     }
 

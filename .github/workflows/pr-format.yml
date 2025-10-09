@@ -13,7 +13,7 @@ jobs:
     if: >
       (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
-        (github.actor == 'dependabot[bot]') || (github.actor != 'renovate-bot') ||
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
@@ -46,7 +46,7 @@ jobs:
     if: >
       (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
-        (github.actor == 'dependabot[bot]') || (github.actor != 'renovate-bot') ||
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
@@ -83,7 +83,7 @@ jobs:
     if: >
       (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
-        (github.actor == 'dependabot[bot]') || (github.actor != 'renovate-bot') ||
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||

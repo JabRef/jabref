@@ -11,26 +11,34 @@ jobs:
     if: github.repository == 'JabRef/jabref'
     env:
       HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
-      ACTOR:     ${{ github.actor }}
+      USER:      ${{ github.event.pull_request.user.login }}
       TITLE:     ${{ github.event.pull_request.title }}
     steps:
       - name: Determine if job should run
         id: shouldrun
         shell: bash
         run: |
+          echo USER: $USER
+
+          if [[ "$USER" == "renovate-bot" ]]; then
+            echo "✅ from renote-bot"
+            echo "shouldrun=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$USER" == "dependabot[bot]" ]]; then
+            echo "✅ from dependabot"
+            echo "shouldrun=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           if [[ "$HEAD_REPO" != "JabRef/jabref" ]]; then
             echo "🚫 not from JabRef/jabref"
             echo "shouldrun=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if [[ "$ACTOR" == "renovate-bot" ]]; then
-            echo "✅ from renote-bot"
-            echo "shouldrun=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if [[ "$ACTOR" == "dependabot[bot]" ]] || \
+          if [[ "$USER" == "dependabot[bot]" ]] || \
             [[ "$TITLE" == "Chore(deps): "* ]] || \
             [[ "$TITLE" == "[Bot] "* ]] || \
             [[ "$TITLE" == "Bump "* ]] || \
