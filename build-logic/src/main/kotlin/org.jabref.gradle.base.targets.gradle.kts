@@ -17,7 +17,7 @@ javaModulePackaging {
 
     // Required by https://github.com/openjdk/jfx/blob/jfx24/doc-files/release-notes-24.md#applications-using-jlink-to-create-a-custom-java-runtime-image
     if (System.getProperty("os.name").lowercase().contains("mac")) {
-        jlinkOptions.addAll(listOf("--module-path=/tmp/javafx-jmods-26"))
+        jlinkOptions.addAll(listOf("--module-path", "/tmp/javafx-jmods-26"))
     }
 
     target("ubuntu-22.04") {
