@@ -242,12 +242,12 @@ jobs:
         if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os != 'windows-latest') }}
         run: |
           cd /tmp
-          unzip -j jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
+          unzip jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
       - name: Extract JavaFX JMODs (Windows)
         if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os == 'windows-latest') }}
         run: |
           cd C:\temp
-          unzip -j jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
+          unzip jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
       - name: Setup JDK (runtime for gradle)
         uses: actions/setup-java@v5
         with:
