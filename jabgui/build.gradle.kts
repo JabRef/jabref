@@ -206,6 +206,13 @@ javaModulePackaging {
     }
 }
 
+// Required by https://github.com/openjdk/jfx/blob/jfx24/doc-files/release-notes-24.md#applications-using-jlink-to-create-a-custom-java-runtime-image
+// Hint from https://github.com/gradlex-org/java-module-packaging/issues/77#issuecomment-3388409856
+if (System.getProperty("os.name").lowercase().contains("mac")) {
+    dependencies { runtimeOnly(files("/tmp/javafx-jmods-26")) }
+    tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach { modulePath.from("/tmp/javafx-jmods-26") }
+}
+
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.jabref.testsupport")
 
