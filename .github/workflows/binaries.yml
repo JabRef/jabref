@@ -142,35 +142,40 @@ jobs:
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04 jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04/jabkit-portable_linux.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04/jabkit
             suffix: ''
             archForDebianRepack: '_amd64'
-            eaJDK: false
+            eaJdk: true
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_linux-x64_bin-jmods.zip
           - os: ubuntu-22.04-arm
             displayName: linux-arm
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04-arm jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04-arm/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04-arm/jabkit
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
-            eaJDK: false
+            eaJdk: true
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_linux-aarch64_bin-jmods.zip
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef
             archivePortableJabKit: 7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit
             suffix: ''
             archForDebianRepack: ''
-            eaJDK: false
+            eaJdk: true
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_windows-x64_bin-jmods.zip
           - os: macos-15-intel  # intel image
             displayName: macOS
             archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app
             suffix: ''
             archForDebianRepack: ''
-            eaJDK: true
+            eaJdk: true
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-x64_bin-jmods.zip
           - os: macos-15
             displayName: macOS-arm
             archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app
             suffix: '_arm64'
             archForDebianRepack: ''
-            eaJDK: true
+            eaJdk: true
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-aarch64_bin-jmods.zip
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
@@ -200,32 +205,37 @@ jobs:
 
       # region setup-JDK
       - name: 'Set up latest JDK EA from jdk.java.net'
-        if: matrix.eaJDK
+        if: matrix.eaJdk
         uses: oracle-actions/setup-java@v1
         with:
           website: jdk.java.net
           release: EA
-      - name: Tell gradle to use JDK 26
-        if: matrix.eaJDK
+      - name: Tell gradle to use JDK 26 (macOS)
+        if: matrix.eaJdk && (startsWith(matrix.os, 'macos'))
         run: |
           sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i '' "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-      - name: Download JavaFX JMODs (macos-15-intel)
-        if: matrix.eaJDK && (matrix.os == 'macos-15-intel')
-        uses: ethanjli/cached-download-action@v0.1.3
-        with:
-          url: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-x64_bin-jmods.zip
-          destination: /tmp/jmods.zip
-      - name: Download JavaFX JMODs (macos-15)
-        if: matrix.eaJDK && (matrix.os == 'macos-15')
-        uses: ethanjli/cached-download-action@v0.1.3
-        with:
-          url: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-aarch64_bin-jmods.zip
-          destination: /tmp/jmods.zip
-      - name: Extract JavaFX JMODs (macos)
-        if: matrix.eaJDK && (startsWith(matrix.os, 'macos'))
+      - name: Tell gradle to use JDK 26 (linux, Windows)
+        if: matrix.eaJdk && (!startsWith(matrix.os, 'macos'))
         run: |
-          cd /tmp
+          sed "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+      - name: Download JavaFX JMODs (linux, macOS)
+        if: matrix.eaJdk && (matrix.os != 'windows-latest')
+        uses: ethanjli/cached-download-action@v0.1.3
+        with:
+          url: ${{ matrix.eaJdkJmodsUrl }}
+          destination: /tmp/jmods.zip
+      - name: Download JavaFX JMODs (Windows)
+        if: matrix.eaJdk && (matrix.os == 'windows-latest')
+        uses: ethanjli/cached-download-action@v0.1.3
+        with:
+          url: ${{ matrix.eaJdkJmodsUrl }}
+          destination: "C:\\temp\\jmods.zip"
+      - name: Extract JavaFX JMODs (linux, macOS)
+        if: matrix.eaJdk && (matrix.os != 'windows-latest')
+        run: |
+          cd C:\\temp
           unzip jmods.zip
       - name: Setup JDK (runtime for gradle)
         uses: actions/setup-java@v5
@@ -269,7 +279,7 @@ jobs:
           keychain-password: tEmPoRaRY-PaeSWD
       - name: Build runtime image and installer
         shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
+        run: ./gradlew -i -PeaJdkBuild="${{ matrix.eaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
       - name: Package JabGui application image
         shell: bash
         run: |
