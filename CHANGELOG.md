@@ -105,8 +105,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where search results would show stale entries after deleting entries from search results. [#13984](https://github.com/JabRef/jabref/issues/13984)
 - When filename pattern is missing for linked files, pattern handling has been introduced to avoid suggesting meaningless filenames like "-". [#13735](https://github.com/JabRef/jabref/issues/13735)
-- We fixed an issue where "Specify Bib(La)TeX" tab was not focused when Bib(La)TeX was in the clipboard [#13597](https://github.com/JabRef/jabref/issues/13597)
+- We fixed an issue where "Specify Bib(La)TeX" tab was not focused when Bib(La)TeX was in the clipboard. [#13597](https://github.com/JabRef/jabref/issues/13597)
 - We fixed an issue whereby the 'About' dialog was not honouring the user's configured font preferences. [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We fixed an issue where the Pagetotal column was sorting the values alphabetically instead of numerically. [#12533](https://github.com/JabRef/jabref/issues/12533)
 - We fixed an issue where URLs starting with "www." (without a protocol) in file fields caused an `IllegalArgumentException: URI is not absolute` error. [#12186](https://github.com/JabRef/jabref/issues/12186)
