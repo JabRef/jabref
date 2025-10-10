@@ -90,11 +90,6 @@ extraJavaModuleInfo {
     knownModule("com.github.hypfvieh:dbus-java-core", "org.freedesktop.dbus")
     knownModule("com.github.hypfvieh:dbus-java-transport-native-unixsocket", "org.freedesktop.dbus.transport.jre")
 
-    // Fix "Found an automatic module: jdk.jsobjectEmpty (jdk-jsobject-25.jar)"
-    module("org.openjfx:jdk-jsobject", "jdk.jsobject") {
-        overrideModuleName()
-    }
-
     module("ai.djl.huggingface:tokenizers", "ai.djl.tokenizers") {
         exportAllPackages()
         requires("ai.djl.api")
