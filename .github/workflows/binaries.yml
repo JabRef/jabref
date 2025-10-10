@@ -246,7 +246,7 @@ jobs:
       - name: Extract JavaFX JMODs (Windows)
         if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os == 'windows-latest') }}
         run: |
-          cd C:\\temp
+          cd C:\temp
           unzip jmods.zip
       - name: Setup JDK (runtime for gradle)
         uses: actions/setup-java@v5
