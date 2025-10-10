@@ -83,9 +83,9 @@ jobs:
 
           if [[ "${{ inputs.eaJdk }}" == "true" ]]; then
             echo "JDK EA build enabled"
-            echo "eaJdk=true" >> "$GITHUB_OUTPUT"
+            echo "🚀 eaJdk=true" >> "$GITHUB_OUTPUT"
           else
-            echo "eaJdk=true" >> "$GITHUB_OUTPUT"
+            echo "🛡️ eaJdk=true" >> "$GITHUB_OUTPUT"
           fi
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
