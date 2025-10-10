@@ -264,8 +264,7 @@ public class BibDatabaseContext {
     /**
      * @return The path to store the lucene index files. One directory for each library.
      */
-    @NonNull
-    public Path getFulltextIndexPath() {
+    public @NonNull Path getFulltextIndexPath() {
         Path appData = Directories.getFulltextIndexBaseDirectory();
         Path indexPath;
 

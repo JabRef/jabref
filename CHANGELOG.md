@@ -44,9 +44,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for using Medline/Pubmed fetcher with an API key. [#11296](https://github.com/JabRef/jabref/issues/11296#issuecomment-3289005011)
 - We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
+- We added an option to search and filter the fields and formatters in the Clean up entries dialog. [#13890](https://github.com/JabRef/jabref/issues/13890)
 
 ### Changed
 
+- We merged `Citation information` and `Citation relations` into a singular tab. [#13618](https://github.com/JabRef/jabref/issues/13618)
 - We changed `ISSNCleanup` into `NormalizeIssn` a `ISSN` formatter. [#13748](https://github.com/JabRef/jabref/issues/13748)
 - We changed Citation Relations tab and gave tab panes more descriptive titles and tooltips. [#13619](https://github.com/JabRef/jabref/issues/13619)
 - We changed the name from Open AI Provider to Open AI (or API compatible). [#13585](https://github.com/JabRef/jabref/issues/13585)
@@ -145,6 +147,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where hierarchical keywords would only show the parent keyword in the entry editor. [#11390](https://github.com/JabRef/jabref/issues/11390)
 - We fixed an issue where some file choosers regarding LaTeX-aux files did not open in the directory of the last selected file. [#13861](https://github.com/JabRef/jabref/pull/13861)
 - We fixed an issue where the LaTeX file directory was not stored correctly in combination with the usage of groups from aux files. [#8344](https://github.com/JabRef/jabref/issues/8344)
+- We prevented a brief flash of the default JavaFX (Modena) theme on startup. [#13877](https://github.com/JabRef/jabref/pull/13877)
+- We fixed an issue where button-bar buttons truncated long text with ellipsis. [#13877](https://github.com/JabRef/jabref/pull/13877)
 - We fixed an issue where ignoring of subdirectories via `.gitingore` patterns did not work in the "Find unlinked files dialog". [forum#5425](https://discourse.jabref.org/t/set-list-of-ignored-folders-paths/5425/6)
 
 ### Removed
