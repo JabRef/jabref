@@ -1,38 +1,17 @@
-package org.jabref.gui.entryeditor;
+package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.sciteTallies.TalliesResponse;
 
 import kong.unirest.core.json.JSONObject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-class SciteTabViewModelTest {
-
-    @Mock
-    private GuiPreferences preferences;
-    @Mock
-    private TaskExecutor taskExecutor;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        EntryEditorPreferences entryEditorPreferences = mock(EntryEditorPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(entryEditorPreferences.shouldShowSciteTab()).thenReturn(true);
-        when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
-    }
-
+public class ScienceAiFetcherTest {
     @Test
     void sciteTallyDTO() {
         JSONObject jsonObject = new JSONObject();
@@ -44,7 +23,7 @@ class SciteTabViewModelTest {
         jsonObject.put("citingPublications", 6);
         jsonObject.put("doi", "test_doi");
 
-        SciteTallyModel dto = SciteTallyModel.fromJSONObject(jsonObject);
+        TalliesResponse dto = TalliesResponse.fromJSONObject(jsonObject);
 
         assertEquals(1, dto.total());
         assertEquals(2, dto.supporting());
@@ -57,8 +36,8 @@ class SciteTabViewModelTest {
 
     @Test
     void fetchTallies() throws FetcherException {
-        SciteTabViewModel viewModel = new SciteTabViewModel(preferences, taskExecutor);
-        DOI doi = new DOI(SciteTabTest.SAMPLE_DOI);
+        ScienceAiFetcher viewModel = new ScienceAiFetcher();
+        DOI doi = new DOI("10.1109/ICECS.2010.5724443");
         Optional<DOI> actual = DOI.parse(viewModel.fetchTallies(doi).doi());
         assertEquals(Optional.of(doi), actual);
     }
