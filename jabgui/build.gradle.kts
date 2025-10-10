@@ -209,7 +209,7 @@ javaModulePackaging {
 if (project.findProperty("eaJdkBuild")?.toString() == "true") {
     // Required by https://github.com/openjdk/jfx/blob/jfx24/doc-files/release-notes-24.md#applications-using-jlink-to-create-a-custom-java-runtime-image
     // Hint from https://github.com/gradlex-org/java-module-packaging/issues/77#issuecomment-3388409856
-    OperatingSystem os = org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem;
+    val os = org.gradle.internal.os.OperatingSystem.current();
     if (os.isWindows()) {
         tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach { modulePath.from("c:\\temp\\javafx-jmods-26") }
     } else {
