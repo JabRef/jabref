@@ -235,6 +235,11 @@ jobs:
       - name: Extract JavaFX JMODs (linux, macOS)
         if: matrix.eaJdk && (matrix.os != 'windows-latest')
         run: |
+          cd /tmp
+          unzip jmods.zip
+      - name: Extract JavaFX JMODs (Windows)
+        if: matrix.eaJdk && (matrix.os == 'windows-latest')
+        run: |
           cd C:\\temp
           unzip jmods.zip
       - name: Setup JDK (runtime for gradle)
