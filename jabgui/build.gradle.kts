@@ -165,7 +165,6 @@ javaModulePackaging {
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
             "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
         )
-        appImageOptions.addAll("--win-console")
         targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
             include("jabref-firefox.json")
             include("jabref-chrome.json")
