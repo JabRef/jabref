@@ -82,10 +82,13 @@ jobs:
           fi
 
           if [[ "${{ inputs.eaJdk }}" == "true" ]]; then
-            echo "JDK EA build enabled"
-            echo "🚀 eaJdk=true" >> "$GITHUB_OUTPUT"
+            echo "🚀 JDK EA build enabled"
+            echo "🚀 JDK EA build enabled" >> "$GITHUB_STEP_SUMMARY"
+            echo "eaJdk=true" >> "$GITHUB_OUTPUT"
           else
-            echo "🛡️ eaJdk=true" >> "$GITHUB_OUTPUT"
+            echo "🛡️ JDK stable version used"
+            echo "🛡️ JDK stable version used" >> "$GITHUB_STEP_SUMMARY"
+            echo "eaJdk=true" >> "$GITHUB_OUTPUT"
           fi
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
@@ -363,8 +366,7 @@ jobs:
           compression-level: 0 # no compression
       # endregion
 
-  comment-on-pr:
-    name: Comment on PR
+  comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
     needs: [conditions, build]
     if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
@@ -377,14 +379,8 @@ jobs:
             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
           comment-tag: download-link
           mode: recreate
-
-  comment-on-issue:
-    name: Comment on issue
-    # separate job, because it should wait until all binaries are available
-    needs: [conditions, build]
-    if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
-    runs-on: ubuntu-latest
-    steps:
+      - name: Create GitHub Summary
+        run: echo "The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>." >> "$GITHUB_STEP_SUMMARY"
       - name: echo PR data
         run: |
           echo "PR Number: ${{ github.event.pull_request.number }}"
