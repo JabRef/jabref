@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -141,6 +142,10 @@ public class AiChatComponent extends VBox {
                 aiPreferences.huggingFaceChatModelProperty(),
                 aiPreferences.gpt4AllChatModelProperty()
         };
+    }
+
+    public ReadOnlyStringProperty noticeTextProperty() {
+        return noticeText.textProperty();
     }
 
     private void initializeExampleQuestions() {

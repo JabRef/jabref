@@ -1,27 +1,54 @@
 package org.jabref.gui.ai.components.aichat;
 
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import org.jabref.gui.preferences.ai.AiTabViewModel;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.AiChatLogic;
+import org.jabref.logic.ai.chatting.AiChatService;
+import org.jabref.logic.ai.ingestion.IngestionService;
 import org.jabref.logic.ai.templates.AiTemplate;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.l10n.Language;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
+import dev.langchain4j.data.message.ChatMessage;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class AiTabViewModelTest {
+class AiChatComponentTest {
 
     private AiPreferences prefs;
+    private AiService aiService;
+    private BibDatabaseContext bibDatabaseContext;
+    private DialogService dialogService;
+    private TaskExecutor taskExecutor;
 
-    private AiTabViewModel vm;
+    @BeforeAll
+    static void initFxAndLocalization() throws Exception {
+        Localization.setLanguage(Language.ENGLISH);
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.startup(latch::countDown);
+        latch.await(5, TimeUnit.SECONDS);
+    }
 
     @BeforeEach
     void setUp() {
@@ -60,39 +87,76 @@ class AiTabViewModelTest {
                 )
         );
 
-        CliPreferences cliPrefs = Mockito.mock(CliPreferences.class, Mockito.RETURNS_DEEP_STUBS);
-        when(cliPrefs.getAiPreferences()).thenReturn(prefs);
+        aiService = mock(AiService.class, Mockito.RETURNS_DEEP_STUBS);
+        AiChatService chatService = mock(AiChatService.class);
+        AiChatLogic chatLogic = mock(AiChatLogic.class, Mockito.RETURNS_DEEP_STUBS);
+        when(chatLogic.getChatHistory()).thenReturn(FXCollections.observableArrayList());
+        when(chatService.makeChat(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(chatLogic);
+        when(aiService.getAiChatService()).thenReturn(chatService);
 
-        vm = new AiTabViewModel(cliPrefs);
-        vm.setValues();
+        IngestionService ingestionService = mock(IngestionService.class, Mockito.RETURNS_DEEP_STUBS);
+        when(aiService.getIngestionService()).thenReturn(ingestionService);
+
+        bibDatabaseContext = mock(BibDatabaseContext.class);
+        dialogService = mock(DialogService.class);
+        taskExecutor = mock(TaskExecutor.class);
+    }
+
+    private AiChatComponent createComponent(ObservableList<ChatMessage> chatHistory, ObservableList<BibEntry> entries) throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        final AiChatComponent[] holder = new AiChatComponent[1];
+        Platform.runLater(() -> {
+            holder[0] = new AiChatComponent(
+                    aiService,
+                    new SimpleStringProperty("entry"),
+                    chatHistory,
+                    entries,
+                    bibDatabaseContext,
+                    prefs,
+                    dialogService,
+                    taskExecutor
+            );
+            latch.countDown();
+        });
+        latch.await(5, TimeUnit.SECONDS);
+        return holder[0];
     }
 
     @Test
-    void setValues_populates_current_fields_from_prefs() {
-        assertEquals(AiProvider.OPEN_AI, vm.selectedAiProviderProperty().get());
-        assertEquals("gpt-4o", vm.selectedChatModelProperty().get());
-        assertEquals("https://api.openai.com/v1", vm.apiBaseUrlProperty().get());
-        assertTrue(vm.customizeExpertSettingsProperty().get());
-        assertEquals(prefs.getEmbeddingModel(), vm.selectedEmbeddingModelProperty().get());
+    void noticeTextUpdatesWhenProviderChanges() throws Exception {
+        AiChatComponent component = createComponent(FXCollections.observableArrayList(), FXCollections.observableArrayList());
+
+        String expectedOpenAI = "Current AI model: " + AiProvider.OPEN_AI.getLabel() + " " + prefs.getSelectedChatModel()
+                + ". The AI may generate inaccurate or inappropriate responses. Please verify any information provided.";
+        assertEquals(expectedOpenAI, component.noticeTextProperty().get());
+
+        // Change provider to Mistral; notice should update to use mistral model string
+        prefs.aiProviderProperty().set(AiProvider.MISTRAL_AI);
+        String expectedMistral = "Current AI model: " + AiProvider.MISTRAL_AI.getLabel() + " " + prefs.getSelectedChatModel()
+                + ". The AI may generate inaccurate or inappropriate responses. Please verify any information provided.";
+
+        // Wait briefly for FX binding to react
+        Thread.sleep(50);
+        assertEquals(expectedMistral, component.noticeTextProperty().get());
     }
 
     @Test
-    void switching_provider_preserves_old_and_loads_new_current_fields() {
-        // Change current OpenAI values first
-        vm.selectedChatModelProperty().set("gpt-4o-mini");
-        vm.apiKeyProperty().set("OPENAI_KEY_123");
-        vm.apiBaseUrlProperty().set("https://api.openai.com/v99");
+    void noticeTextUpdatesWhenCurrentModelChangesForSelectedProvider() throws Exception {
+        AiChatComponent component = createComponent(FXCollections.observableArrayList(), FXCollections.observableArrayList());
 
-        // Switch to Mistral
-        vm.selectedAiProviderProperty().set(AiProvider.MISTRAL_AI);
+        // Change the OpenAI chat model while the provider is OpenAI
+        prefs.openAiChatModelProperty().set("gpt-4o-mini");
+        String expected = "Current AI model: " + AiProvider.OPEN_AI.getLabel() + " gpt-4o-mini"
+                + ". The AI may generate inaccurate or inappropriate responses. Please verify any information provided.";
+        Thread.sleep(50);
+        assertEquals(expected, component.noticeTextProperty().get());
 
-        // Current fields now reflect Mistral
-        assertEquals(AiProvider.MISTRAL_AI, vm.selectedAiProviderProperty().get());
-        assertEquals("https://api.mistral.ai", vm.apiBaseUrlProperty().get());
-
-        // Switch back to OpenAI, we should get the previously edited values back
-        vm.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
-        assertEquals("gpt-4o-mini", vm.selectedChatModelProperty().get());
-        assertEquals("https://api.openai.com/v99", vm.apiBaseUrlProperty().get());
+        // Switch provider to Gemini and change a Gemini model
+        prefs.aiProviderProperty().set(AiProvider.GEMINI);
+        prefs.geminiChatModelProperty().set("gemini-1.5-flash");
+        String expectedGemini = "Current AI model: " + AiProvider.GEMINI.getLabel() + " gemini-1.5-flash"
+                + ". The AI may generate inaccurate or inappropriate responses. Please verify any information provided.";
+        Thread.sleep(50);
+        assertEquals(expectedGemini, component.noticeTextProperty().get());
     }
 }
