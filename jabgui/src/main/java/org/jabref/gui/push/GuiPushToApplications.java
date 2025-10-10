@@ -27,11 +27,12 @@ public class GuiPushToApplications {
                 new GuiPushToLyx(dialogService, preferences),
                 new GuiPushToSublimeText(dialogService, preferences),
                 new GuiPushToTexmaker(dialogService, preferences),
+                new GuiPushToTexShop(dialogService, preferences),
                 new GuiPushToTeXstudio(dialogService, preferences),
                 new GuiPushToTeXworks(dialogService, preferences),
                 new GuiPushToVim(dialogService, preferences),
+                new GuiPushToVScode(dialogService, preferences),
                 new GuiPushToWinEdt(dialogService, preferences),
-                new GuiPushToTexShop(dialogService, preferences),
                 new GuiPushToVScode(dialogService, preferences)));
 
         APPLICATIONS.sort(Comparator.comparing(PushToApplication::getDisplayName, String.CASE_INSENSITIVE_ORDER));
