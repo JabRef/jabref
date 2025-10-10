@@ -2,10 +2,12 @@ package org.jabref.gui.push;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
 public class GuiPushToApplications {
@@ -31,6 +33,8 @@ public class GuiPushToApplications {
                 new GuiPushToWinEdt(dialogService, preferences),
                 new GuiPushToTexShop(dialogService, preferences),
                 new GuiPushToVScode(dialogService, preferences)));
+
+        APPLICATIONS.sort(Comparator.comparing(PushToApplication::getDisplayName, String.CASE_INSENSITIVE_ORDER));
 
         return Collections.unmodifiableList(APPLICATIONS);
     }
