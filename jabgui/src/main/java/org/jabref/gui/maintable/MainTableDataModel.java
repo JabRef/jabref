@@ -28,6 +28,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.search.matchers.MatcherSet;
@@ -266,6 +267,20 @@ public class MainTableDataModel {
         @Subscribe
         public void listen(IndexStartedEvent indexStartedEvent) {
             updateSearchMatches(searchQueryProperty.get());
+        }
+
+        @Subscribe
+        public void listen(EntriesRemovedEvent removedEntriesEvent) {
+            // When entries are removed, we need to refresh the search matches
+            // to ensure the filtered list is properly updated and doesn't show stale entries
+            BackgroundTask.wrap(() -> {
+                // Re-run the current search to update the filtered results
+                if (searchQueryProperty.get().isPresent()) {
+                    setSearchMatches(indexManager.search(searchQueryProperty.get().get()));
+                } else {
+                    clearSearchMatches();
+                }
+            }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
         }
     }
 }
