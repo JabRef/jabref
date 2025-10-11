@@ -2,7 +2,9 @@ package org.jabref.languageserver;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.jabref.languageserver.util.LspDefinitionHandler;
 import org.jabref.languageserver.util.LspDiagnosticHandler;
+import org.jabref.languageserver.util.LspParserHandler;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 
@@ -27,6 +29,8 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
     private static final Logger LOGGER = LoggerFactory.getLogger(LspClientHandler.class);
 
     private final LspDiagnosticHandler diagnosticHandler;
+    private final LspParserHandler parserHandler;
+    private final LspDefinitionHandler definitionHandler;
     private final BibtexWorkspaceService workspaceService;
     private final BibtexTextDocumentService textDocumentService;
     private final ExtensionSettings settings;
@@ -35,9 +39,11 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
 
     public LspClientHandler(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.settings = ExtensionSettings.getDefaultSettings();
-        this.diagnosticHandler = new LspDiagnosticHandler(this, cliPreferences, abbreviationRepository);
+        this.parserHandler = new LspParserHandler();
+        this.diagnosticHandler = new LspDiagnosticHandler(this, parserHandler, cliPreferences, abbreviationRepository);
+        this.definitionHandler = new LspDefinitionHandler(parserHandler);
         this.workspaceService = new BibtexWorkspaceService(this, diagnosticHandler);
-        this.textDocumentService = new BibtexTextDocumentService(diagnosticHandler);
+        this.textDocumentService = new BibtexTextDocumentService(diagnosticHandler, definitionHandler);
     }
 
     @Override
@@ -51,6 +57,7 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
 
         capabilities.setTextDocumentSync(syncOptions);
         capabilities.setWorkspace(new WorkspaceServerCapabilities());
+        capabilities.setDefinitionProvider(true);
 
         return CompletableFuture.completedFuture(new InitializeResult(capabilities));
     }
