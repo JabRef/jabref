@@ -7,14 +7,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-public final class CitationStylePreviewLayout implements PreviewLayout {
-    private final CitationStyle citationStyle;
-    private final BibEntryTypesManager bibEntryTypesManager;
-
-    public CitationStylePreviewLayout(CitationStyle citationStyle, BibEntryTypesManager bibEntryTypesManager) {
-        this.citationStyle = citationStyle;
-        this.bibEntryTypesManager = bibEntryTypesManager;
-    }
+public record CitationStylePreviewLayout(
+        CitationStyle citationStyle,
+        BibEntryTypesManager bibEntryTypesManager) implements PreviewLayout {
 
     @Override
     public String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
@@ -44,7 +39,8 @@ public final class CitationStylePreviewLayout implements PreviewLayout {
         return citationStyle.getTitle();
     }
 
-    public CitationStyle getCitationStyle() {
-        return citationStyle;
+    @Override
+    public String getShortTitle() {
+        return citationStyle.getShortTitle();
     }
 }

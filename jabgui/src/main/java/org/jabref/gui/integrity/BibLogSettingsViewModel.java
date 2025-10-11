@@ -54,7 +54,7 @@ public class BibLogSettingsViewModel extends AbstractViewModel {
      *
      * @param databaseContext the current database context used to resolve citation keys in warnings.
      * @return An Optional containing the list of integrity messages if the file exists and can be parsed,
-     *         or an empty Optional if the file does not exist.
+     * or an empty Optional if the file does not exist.
      * @throws JabRefException if the .blg file cannot be parsed or read
      */
     public Optional<List<IntegrityMessage>> getBlgWarnings(BibDatabaseContext databaseContext) throws JabRefException {

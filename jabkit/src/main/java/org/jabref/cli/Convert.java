@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SaveException;
@@ -36,13 +37,14 @@ public class Convert implements Runnable {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    @Option(names = {"--input"}, description = "Input file", required = true)
-    private String inputFile;
+    // [impl->req~jabkit.cli.input-flag~1]
+    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input file", required = true)
+    private Path inputFile;
 
     @Option(names = {"--input-format"}, description = "Input format")
     private String inputFormat;
 
-    @Option(names = {"--output"}, description = "Output file")
+    @Option(names = {"--output"}, converter = CygWinPathConverter.class, description = "Output file")
     private Path outputFile;
 
     @Option(names = {"--output-format"}, description = "Output format")
@@ -108,9 +110,9 @@ public class Convert implements Runnable {
                     fileDirForDatabase,
                     Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
         } catch (IOException
-                | SaveException
-                | ParserConfigurationException
-                | TransformerException ex) {
+                 | SaveException
+                 | ParserConfigurationException
+                 | TransformerException ex) {
             LOGGER.error("Could not export file '{}'.", outputFile, ex);
         }
     }

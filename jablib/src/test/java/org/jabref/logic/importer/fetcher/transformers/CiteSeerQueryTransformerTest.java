@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.search.query.SearchQueryVisitor;
+import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONObject;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -28,11 +29,12 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
 
     @Override
     @Test
-    public void convertYearField() throws QueryNodeParseException {
-        String queryString = "year:2023";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+    public void convertYearField() throws ParseCancellationException {
+        String queryString = "year=2023";
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
         CiteSeerQueryTransformer transformer = getTransformer();
-        transformer.transformLuceneQuery(luceneQuery);
+        transformer.transformSearchQuery(searchQueryList);
 
         Optional<Integer> start = Optional.of(transformer.getJSONPayload().getInt("yearStart"));
         Optional<Integer> end = Optional.of(transformer.getJSONPayload().getInt("yearEnd"));
@@ -42,11 +44,12 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
 
     @Override
     @Test
-    public void convertYearRangeField() throws QueryNodeParseException {
-        String queryString = "year-range:2019-2023";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+    public void convertYearRangeField() throws ParseCancellationException {
+        String queryString = "year-range=2019-2023";
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
         CiteSeerQueryTransformer transformer = getTransformer();
-        transformer.transformLuceneQuery(luceneQuery);
+        transformer.transformSearchQuery(searchQueryList);
 
         Optional<Integer> start = Optional.of(transformer.getJSONPayload().getInt("yearStart"));
         Optional<Integer> end = Optional.of(transformer.getJSONPayload().getInt("yearEnd"));
@@ -55,44 +58,48 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Test
-    void convertPageField() throws QueryNodeParseException {
-        String queryString = "page:2";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+    void convertPageField() throws ParseCancellationException {
+        String queryString = "page=2";
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
         CiteSeerQueryTransformer transformer = getTransformer();
-        transformer.transformLuceneQuery(luceneQuery);
+        transformer.transformSearchQuery(searchQueryList);
 
         Optional<Integer> page = Optional.of(transformer.getJSONPayload().getInt("page"));
         assertEquals(Optional.of(2), page);
     }
 
     @Test
-    void convertPageSizeField() throws QueryNodeParseException {
-        String queryString = "pageSize:20";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+    void convertPageSizeField() throws ParseCancellationException {
+        String queryString = "pageSize=20";
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
         CiteSeerQueryTransformer transformer = getTransformer();
-        transformer.transformLuceneQuery(luceneQuery);
+        transformer.transformSearchQuery(searchQueryList);
 
         Optional<Integer> pageSize = Optional.of(transformer.getJSONPayload().getInt("pageSize"));
         assertEquals(Optional.of(20), pageSize);
     }
 
     @Test
-    void convertSortByField() throws QueryNodeParseException {
-        String queryString = "sortBy:relevance";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+    void convertSortByField() throws ParseCancellationException {
+        String queryString = "sortBy=relevance";
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
         CiteSeerQueryTransformer transformer = getTransformer();
-        transformer.transformLuceneQuery(luceneQuery);
+        transformer.transformSearchQuery(searchQueryList);
 
         Optional<String> sortBy = Optional.of(transformer.getJSONPayload().get("sortBy").toString());
         assertEquals(Optional.of("relevance"), sortBy);
     }
 
     @Test
-    void convertMultipleAuthors() throws QueryNodeParseException {
-        String queryString = "author:\"Wang Wei\" author:\"Zhang Pingwen\" author:\"Zhang Zhifei\"";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+    void convertMultipleAuthors() throws ParseCancellationException {
+        String queryString = "author=\"Wang Wei\" author=\"Zhang Pingwen\" author=\"Zhang Zhifei\"";
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
         CiteSeerQueryTransformer transformer = getTransformer();
-        transformer.transformLuceneQuery(luceneQuery);
+        transformer.transformSearchQuery(searchQueryList);
 
         List<String> authorsActual = transformer.getJSONPayload().getJSONArray("author").toList();
         List<String> authorsExpected = List.of("Wang Wei", "Zhang Pingwen", "Zhang Zhifei");
@@ -100,10 +107,10 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     private static Stream<Arguments> getJSONWithYearVariations() {
-        String baseString = "title:Ericksen-Leslie page:1 pageSize:20 must_have_pdf:false sortBy:relevance";
+        String baseString = "title=Ericksen-Leslie page=1 pageSize=20 must_have_pdf=false sortBy=relevance";
         List<String> withYearAndYearRange = List.of(
-                StringUtil.join(new String[]{baseString, "year:2020"}, " ", 0, 2),
-                StringUtil.join(new String[]{baseString, "year-range:2019-2023"}, " ", 0, 2)
+                StringUtil.join(new String[] {baseString, "year=2020"}, " ", 0, 2),
+                StringUtil.join(new String[] {baseString, "year-range=2019-2023"}, " ", 0, 2)
         );
 
         JSONObject expectedJson = new JSONObject();
@@ -115,14 +122,10 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
 
         List<JSONObject> actualJSONObjects = new ArrayList<>();
         withYearAndYearRange.forEach(requestStr -> {
-            QueryNode luceneQuery;
-            try {
-                luceneQuery = new StandardSyntaxParser().parse(requestStr, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-            } catch (QueryNodeParseException e) {
-                throw new RuntimeException(e);
-            }
+            SearchQuery searchQuery = new SearchQuery(requestStr);
+            BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
             CiteSeerQueryTransformer transformer = new CiteSeerQueryTransformer();
-            transformer.transformLuceneQuery(luceneQuery);
+            transformer.transformSearchQuery(searchQueryList);
             actualJSONObjects.add(transformer.getJSONPayload());
         });
 

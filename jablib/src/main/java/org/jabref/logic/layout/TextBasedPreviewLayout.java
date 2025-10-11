@@ -64,6 +64,10 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
         return NAME;
     }
 
+    public String getShortTitle() {
+        return NAME;
+    }
+
     @Override
     public String getDisplayName() {
         return Localization.lang("Customized preview style");

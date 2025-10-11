@@ -34,7 +34,7 @@ class ExternalLinkCreatorTest {
 
     static Stream<Arguments> specialCharactersProvider() {
         return Stream.of(
-            Arguments.of("!*'();:@&=+$,/?#[]")
+                Arguments.of("!*'();:@&=+$,/?#[]")
         );
     }
 
@@ -50,10 +50,10 @@ class ExternalLinkCreatorTest {
 
     @ParameterizedTest
     @CsvSource({
-        "'歷史書 📖 📚', 'https://www.shortscience.org/internalsearch?q=%E6%AD%B7%E5%8F%B2%E6%9B%B8%20%F0%9F%93%96%20%F0%9F%93%9A'",
-        "'    History Textbook   ', 'https://www.shortscience.org/internalsearch?q=History%20Textbook'",
-        "'History%20Textbook', 'https://www.shortscience.org/internalsearch?q=History%2520Textbook'",
-        "'JabRef bibliography management', 'https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management'"
+            "'歷史書 📖 📚', 'https://www.shortscience.org/internalsearch?q=%E6%AD%B7%E5%8F%B2%E6%9B%B8%20%F0%9F%93%96%20%F0%9F%93%9A'",
+            "'    History Textbook   ', 'https://www.shortscience.org/internalsearch?q=History%20Textbook'",
+            "'History%20Textbook', 'https://www.shortscience.org/internalsearch?q=History%2520Textbook'",
+            "'JabRef bibliography management', 'https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management'"
     })
     void getShortScienceSearchURLEncodesCharacters(String title, String expectedUrl) {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, title);
@@ -65,5 +65,16 @@ class ExternalLinkCreatorTest {
     void getShortScienceSearchURLReturnsEmptyOnMissingTitle() {
         BibEntry entry = new BibEntry();
         assertEquals(Optional.empty(), getShortScienceSearchURL(entry));
+    }
+
+    @Test
+    void getShortScienceSearchURLWithoutLaTeX() {
+        BibEntry entry = new BibEntry();
+        entry.withField(StandardField.TITLE, "{The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages}");
+
+        Optional<String> url = getShortScienceSearchURL(entry);
+
+        String expectedUrl = "https://www.shortscience.org/internalsearch?q=The%20Difference%20Between%20Graph-Based%20and%20Block-Structured%20Business%20Process%20Modelling%20Languages";
+        assertEquals(Optional.of(expectedUrl), url);
     }
 }

@@ -15,7 +15,7 @@ import org.jabref.logic.util.HeadlessExecutorService;
  */
 public class StyleTesterMain extends Application {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         launch(args);
     }
 
@@ -26,8 +26,8 @@ public class StyleTesterMain extends Application {
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
         ThemeManager themeManager = new ThemeManager(
                 JabRefGuiPreferences.getInstance().getWorkspacePreferences(),
-                fileUpdateMonitor,
-                Runnable::run);
+                fileUpdateMonitor
+        );
 
         Scene scene = new Scene(view.getContent());
         themeManager.installCss(scene);

@@ -30,11 +30,10 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -101,23 +100,23 @@ public class SaveDatabaseAction {
 
     private SelfContainedSaveOrder getSaveOrder() {
         return libraryTab.getBibDatabaseContext()
-                .getMetaData().getSaveOrder()
-                .map(so -> {
-                    if (so.getOrderType() == SaveOrder.OrderType.TABLE) {
-                        // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
-                        List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
-                        return new SelfContainedSaveOrder(
-                                SaveOrder.OrderType.SPECIFIED,
-                                sortOrder.stream()
-                                         .filter(col -> col instanceof MainTableColumn<?>)
-                                         .map(column -> ((MainTableColumn<?>) column).getModel())
-                                         .flatMap(model -> model.getSortCriteria().stream())
-                                         .toList());
-                    } else {
-                        return SelfContainedSaveOrder.of(so);
-                    }
-                })
-                .orElse(SaveOrder.getDefaultSaveOrder());
+                         .getMetaData().getSaveOrder()
+                         .map(so -> {
+                             if (so.getOrderType() == SaveOrder.OrderType.TABLE) {
+                                 // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
+                                 List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
+                                 return new SelfContainedSaveOrder(
+                                         SaveOrder.OrderType.SPECIFIED,
+                                         sortOrder.stream()
+                                                  .filter(col -> col instanceof MainTableColumn<?>)
+                                                  .map(column -> ((MainTableColumn<?>) column).getModel())
+                                                  .flatMap(model -> model.getSortCriteria().stream())
+                                                  .toList());
+                             } else {
+                                 return SelfContainedSaveOrder.of(so);
+                             }
+                         })
+                         .orElse(SaveOrder.getDefaultSaveOrder());
     }
 
     public void saveSelectedAsPlain() {
@@ -193,12 +192,13 @@ public class SaveDatabaseAction {
             Path savePath = selectedPath.get();
             // Workaround for linux systems not adding file extension
             if (!savePath.getFileName().toString().toLowerCase().endsWith(".bib")) {
-                savePath = Path.of(savePath.toString() + ".bib");
-                if (!Files.notExists(savePath)) {
-                    if (!dialogService.showConfirmationDialogAndWait(Localization.lang("Overwrite file"), Localization.lang("'%0' exists. Overwrite file?", savePath.getFileName()))) {
-                        return Optional.empty();
-                    }
+                savePath = Path.of(savePath + ".bib");
+                if (!Files.notExists(savePath) && !dialogService.showConfirmationDialogAndWait(
+                        Localization.lang("Overwrite file"),
+                        Localization.lang("'%0' exists. Overwrite file?", savePath.getFileName()))) {
+                    return Optional.empty();
                 }
+
                 selectedPath = Optional.of(savePath);
             }
         }
@@ -246,7 +246,7 @@ public class SaveDatabaseAction {
             dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
-            LOGGER.error("A problem occurred when trying to save the file %s".formatted(targetPath), ex);
+            LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
         } finally {
@@ -263,7 +263,7 @@ public class SaveDatabaseAction {
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
-                BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                         bibWriter,
                         saveConfiguration,
                         preferences.getFieldPreferences(),
@@ -307,7 +307,12 @@ public class SaveDatabaseAction {
                 .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
                 .isPresent();
         if (saveWithDifferentEncoding) {
-            Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
+            Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(
+                    Localization.lang("Save library"),
+                    Localization.lang("Select new encoding"),
+                    Localization.lang("Save library"),
+                    encoding,
+                    OS.ENCODINGS);
             if (newEncoding.isPresent()) {
                 // Make sure to remember which encoding we used.
                 libraryTab.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);

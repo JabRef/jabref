@@ -49,7 +49,7 @@ import com.google.common.eventbus.EventBus;
 public class Main {
    private static EventBus eventBus = new EventBus();
 
-   public static void main(String[] args) {
+   static void main(String[] args) {
       Main main = new Main();
       Listener listener = new Listener();
       eventBus.register(listener);
@@ -68,3 +68,9 @@ The `event` package contains some specific events which occur in JabRef.
 For example: Every time an entry was added to the database a new `EntryAddedEvent` is sent through the `eventBus` which is located in `BibDatabase`.
 
 If you want to catch the event you'll have to register your listener class with the `registerListener(Object listener)` method in `BibDatabase`. `EntryAddedEvent` provides also methods to get the inserted `BibEntry`.
+
+## Throttling events
+
+There is `CoarseChangeFilter` which filters out events (e.g., typing in the same field) that are sent too frequently.
+It is used to prevent the event bus from being flooded with events that are too close together in time.
+The `LibraryTab` offers an instance where subscribers in the UI should use.

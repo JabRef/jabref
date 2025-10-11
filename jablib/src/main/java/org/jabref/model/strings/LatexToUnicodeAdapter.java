@@ -1,12 +1,12 @@
 package org.jabref.model.strings;
 
 import java.text.Normalizer;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 import com.github.tomtung.latex2unicode.LaTeX2Unicode;
 import fastparse.Parsed;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class
@@ -25,8 +25,7 @@ public class LatexToUnicodeAdapter {
      * @param inField a String containing LaTeX
      * @return a String with LaTeX resolved into Unicode, or the original String if the LaTeX could not be parsed
      */
-    public static String format(String inField) {
-        Objects.requireNonNull(inField);
+    public static String format(@NonNull String inField) {
         return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
     }
 
@@ -36,8 +35,7 @@ public class LatexToUnicodeAdapter {
      * @param inField a String containing LaTeX
      * @return an {@code Optional<String>} with LaTeX resolved into Unicode or {@code empty} on failure.
      */
-    public static Optional<String> parse(String inField) {
-        Objects.requireNonNull(inField);
+    public static Optional<String> parse(@NonNull String inField) {
         String toFormat = UNDERSCORE_MATCHER.matcher(inField).replaceAll(REPLACEMENT_CHAR);
         Parsed<String> parsingResult = LaTeX2Unicode.parse(toFormat);
         if (parsingResult instanceof Parsed.Success) {

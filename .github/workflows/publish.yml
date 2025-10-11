@@ -1,0 +1,151 @@
+name: Publish to maven central
+
+on:
+  # On releases
+  push:
+    tags:
+      - '**'
+
+  # Called by the JBang testing jobs to ensure that SNAPSHOT is uptodate
+  workflow_call:
+    secrets:
+      KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64:
+        required: true
+      KOPPOR_SIGNING_KEYID:
+        required: true
+      KOPPOR_SIGNING_PASSWORD:
+        required: true
+      KOPPOR_MAVENCENTRALUSERNAME:
+        required: true
+      KOPPOR_MAVENCENTRALPASSWORD:
+        required: true
+
+  workflow_dispatch:
+    inputs:
+      tagbuild:
+        description: 'Trigger a full maven central release'
+        required: false
+        default: false
+        type: boolean
+
+  # Additional run in addition to the other events, because some resources could have changes
+  schedule:
+    # Run on each Monday
+    - cron: '2 3 * * 1'
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: write
+
+env:
+  GRADLE_OPTS: -Xmx4g -Dorg.gradle.vfs.watch=false
+  JAVA_OPTS: -Xmx4g
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}"
+  cancel-in-progress: true
+
+jobs:
+  detect_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.changed.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Detect changed jablib classes or workflow
+        id: changed
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            jablib/src/main/java/**/*.java
+            .github/workflows/publish.yml
+
+  publish:
+    name: jablib
+    needs: detect_changes
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (needs.detect_changes.outputs.changed == 'true' &&
+        ((github.event_name == 'workflow_call' && github.repository == 'JabRef/jabref') ||
+         (github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
+         (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref'))
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch all history for all tags and branches
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.2.1
+        with:
+          versionSpec: "5.x"
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3.2.1
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+
+      # region Publish JabLib on Maven Central
+      - id: istagbuild
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tagbuild=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tagbuild=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Decode secretKeyRingFile
+        id: secring
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'secring.gpg'
+          encodedString: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
+      - name: store secrets
+        run: |
+          cat >> gradle.properties <<EOF
+          signing.keyId=${{ secrets.KOPPOR_SIGNING_KEYID }}
+          signing.password=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          signing.secretKeyRingFile=${{ steps.secring.outputs.filePath }}
+          mavenCentralUsername=${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
+          mavenCentralPassword=${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
+          EOF
+          grep secretKeyRingFile gradle.properties
+          file ${{ steps.secring.outputs.filePath }}
+          md5sum ${{ steps.secring.outputs.filePath }}
+      - name: publishAllPublicationsToMavenCentralRepository
+        # Different version at maven centrl: 6.0-SNAPSHOT - and not 6.0.23234-SNAPSHOT
+        # We need to manually trigger a full maven central release - to avoid 6.0-alpha3 being published as 6.0 on maven central.
+        run: |
+          if [[ "${{ github.event.inputs.tagbuild }}" == "true" ]]; then
+            tagbuild="true"
+          else
+            tagbuild="false"
+          fi
+          ./gradlew -PprojVersion="${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="$tagbuild" :jablib:publishAllPublicationsToMavenCentralRepository
+      # endregion

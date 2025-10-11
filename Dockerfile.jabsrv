@@ -1,16 +1,21 @@
 FROM gradle:jdk24-noble AS build
 
-WORKDIR /app
+LABEL org.opencontainers.image.title="jabsrv"
+LABEL org.opencontainers.image.description="JabRef's HTTP server"
+
+ARG VERSION="100.0.0"
+ARG VERSION_INFO="100.0.0"
+ARG TAG_BUILD="false"
+
+WORKDIR /build
 
 COPY . .
 
-RUN gradle --no-daemon :jabsrv-cli:jpackage
-
-RUN find jabsrv-cli/build/distribution
+RUN gradle --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabsrv-cli:jpackage
 
 RUN mkdir /dist
 
-RUN mv jabsrv-cli/build/distribution/jabsrv /dist
+RUN mv jabsrv-cli/build/packages/*/* /dist
 
 # jpackage needs glibc; alpine does not work
 FROM debian:bookworm-slim AS runtime

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.apache.hc.core5.net.URIBuilder;
 
@@ -26,8 +27,13 @@ public class ExternalLinkCreator {
                 // This should never be able to happen as it would require the field to be misconfigured.
                 throw new AssertionError("ShortScience URL is invalid.", e);
             }
+
+            // Converting LaTeX-formatted titles (e.g., containing braces) to plain Unicode to ensure compatibility with ShortScience's search URL.
+            // LatexToUnicodeAdapter.format() is being used because it attempts to parse LaTeX, but gracefully degrades to a normalized title on failure.
+            // This avoids sending malformed or literal LaTeX syntax titles that would give the wrong result.
+            String filteredTitle = LatexToUnicodeAdapter.format(title);
             // Direct the user to the search results for the title.
-            uriBuilder.addParameter("q", title.trim());
+            uriBuilder.addParameter("q", filteredTitle.trim());
             return uriBuilder.toString();
         });
     }

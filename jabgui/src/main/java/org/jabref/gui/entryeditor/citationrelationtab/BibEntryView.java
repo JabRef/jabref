@@ -100,8 +100,8 @@ public class BibEntryView {
      *
      * @param text The summary text content
      * @return Node with either:
-     *         - ScrollPane (for RTL text)
-     *         - TextFlowLimited (for LTR text)
+     * - ScrollPane (for RTL text)
+     * - TextFlowLimited (for LTR text)
      */
     private static Node createSummary(String text) {
         if (isRTL(text)) {
@@ -116,13 +116,13 @@ public class BibEntryView {
     }
 
     /**
-     * Creates a label with horizontal scrolling for RTL text, 
+     * Creates a label with horizontal scrolling for RTL text,
      * avoiding JavaFX bug related to RTL text wrapping
      *
      * @param text The label text content
      * @return Node with either:
-     *         - ScrollPane (for RTL text)
-     *         - Wrapped Label (for LTR text)
+     * - ScrollPane (for RTL text)
+     * - Wrapped Label (for LTR text)
      */
     private static Node createLabel(String text) {
         if (isRTL(text)) {

@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
@@ -16,6 +17,7 @@
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.StackPane?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="600" xmlns="http://javafx.com/javafx/8.0.171"
             fx:controller="org.jabref.gui.newentry.NewEntryView">
     <buttonTypes>
@@ -58,11 +60,14 @@
                     </Label>
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <Label text="%Identifier"/>
-                        <TextField fx:id="idText" prefHeight="30.0" HBox.hgrow="ALWAYS">
-                            <tooltip>
-                                <Tooltip text="%Specify the source identifier to look up."/>
-                            </tooltip>
-                        </TextField>
+                        <StackPane HBox.hgrow="ALWAYS">
+                            <TextField fx:id="idText" prefHeight="30.0" HBox.hgrow="ALWAYS">
+                                <tooltip>
+                                    <Tooltip fx:id="idTextTooltip" text="%Specify the source identifier to look up."/>
+                                </tooltip>
+                            </TextField>
+                            <Hyperlink fx:id="idJumpLink" StackPane.alignment="CENTER_RIGHT" text="%Jump to entry" visible="false" style="-fx-padding: 0 15 0 0;"/>
+                        </StackPane>
                     </HBox>
                     <VBox spacing="5.0">
                         <RadioButton fx:id="idLookupGuess" text="%Automatically determine identifier type">

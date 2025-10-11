@@ -2,7 +2,6 @@ package org.jabref.logic.openoffice.backend;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -10,6 +9,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.model.openoffice.style.CitationType;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * How and what is encoded in reference mark names under JabRef 5.2.
@@ -43,9 +44,7 @@ class Codec52 {
          */
         public final List<String> citationKeys;
 
-        ParsedMarkName(String index, CitationType citationType, List<String> citationKeys) {
-            Objects.requireNonNull(index);
-            Objects.requireNonNull(citationKeys);
+        ParsedMarkName(@NonNull String index, CitationType citationType, @NonNull List<String> citationKeys) {
             this.index = index;
             this.citationType = citationType;
             this.citationKeys = citationKeys;
@@ -57,18 +56,25 @@ class Codec52 {
      */
     private static CitationType citationTypeFromInt(int code) {
         return switch (code) {
-            case 1 -> CitationType.AUTHORYEAR_PAR;
-            case 2 -> CitationType.AUTHORYEAR_INTEXT;
-            case 3 -> CitationType.INVISIBLE_CIT;
-            default -> throw new IllegalArgumentException("Invalid CitationType code");
+            case 1 ->
+                    CitationType.AUTHORYEAR_PAR;
+            case 2 ->
+                    CitationType.AUTHORYEAR_INTEXT;
+            case 3 ->
+                    CitationType.INVISIBLE_CIT;
+            default ->
+                    throw new IllegalArgumentException("Invalid CitationType code");
         };
     }
 
     private static int citationTypeToInt(CitationType type) {
         return switch (type) {
-            case AUTHORYEAR_PAR -> 1;
-            case AUTHORYEAR_INTEXT -> 2;
-            case INVISIBLE_CIT -> 3;
+            case AUTHORYEAR_PAR ->
+                    1;
+            case AUTHORYEAR_INTEXT ->
+                    2;
+            case INVISIBLE_CIT ->
+                    3;
         };
     }
 
@@ -131,7 +137,7 @@ class Codec52 {
      */
     public static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
         return names.stream()
-                     .filter(Codec52::isJabRefReferenceMarkName)
-                     .collect(Collectors.toList());
+                    .filter(Codec52::isJabRefReferenceMarkName)
+                    .collect(Collectors.toList());
     }
 }

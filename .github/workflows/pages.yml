@@ -25,11 +25,11 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ github.repository_owner == 'JabRef' }}
+    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Setup Ruby
@@ -47,7 +47,7 @@ jobs:
           cd docs
           bundle exec jekyll build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: docs/_site/
 

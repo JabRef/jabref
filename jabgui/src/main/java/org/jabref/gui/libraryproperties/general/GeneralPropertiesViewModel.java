@@ -20,8 +20,8 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
@@ -36,8 +36,8 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private final BooleanProperty encodingDisableProperty = new SimpleBooleanProperty();
-    private final ListProperty<Charset> encodingsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(Encodings.getCharsets()));
-    private final ObjectProperty<Charset> selectedEncodingProperty = new SimpleObjectProperty<>(Encodings.getCharsets().getFirst());
+    private final ListProperty<Charset> encodingsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(OS.ENCODINGS));
+    private final ObjectProperty<Charset> selectedEncodingProperty = new SimpleObjectProperty<>(OS.ENCODINGS.getFirst());
     private final ListProperty<BibDatabaseMode> databaseModesProperty = new SimpleListProperty<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
     private final SimpleObjectProperty<BibDatabaseMode> selectedDatabaseModeProperty = new SimpleObjectProperty<>(BibDatabaseMode.BIBLATEX);
     private final StringProperty librarySpecificDirectoryProperty = new SimpleStringProperty("");
@@ -98,22 +98,22 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
         if (librarySpecificFileDirectory.isEmpty()) {
             newMetaData.clearLibrarySpecificFileDirectory();
-        } else {
+        } else if (librarySpecificFileDirectoryStatus().isValid()) {
             newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
         }
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
             newMetaData.clearUserFileDirectory(preferences.getFilePreferences().getUserAndHost());
-        } else {
+        } else if (userSpecificFileDirectoryStatus().isValid()) {
             newMetaData.setUserFileDirectory(preferences.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
-        } else {
-            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), Path.of(latexFileDirectory));
+        } else if (laTexFileDirectoryStatus().isValid()) {
+            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
 
         databaseContext.setMetaData(newMetaData);
@@ -137,9 +137,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         ValidationStatus userSpecificFileDirectoryStatus = userSpecificFileDirectoryStatus();
         ValidationStatus laTexFileDirectoryStatus = laTexFileDirectoryStatus();
 
-        return validateAndShowError(librarySpecificFileDirectoryStatus) &&
-                validateAndShowError(userSpecificFileDirectoryStatus) &&
-                validateAndShowError(laTexFileDirectoryStatus);
+        return promptUserToConfirmAction(librarySpecificFileDirectoryStatus) &&
+                promptUserToConfirmAction(userSpecificFileDirectoryStatus) &&
+                promptUserToConfirmAction(laTexFileDirectoryStatus);
     }
 
     public void browseLibrarySpecificDir() {
@@ -231,7 +231,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
                         .map(Files::isDirectory)
                         .orElse(false)) {
                 return ValidationMessage.error(
-                        Localization.lang("File directory '%0' not found.\nCheck \"%1\" file directory path.", directoryPath, messageKey)
+                        Localization.lang("The file directory '%0' for the %1 file path is not found or is inaccessible.", directoryPath, messageKey)
                 );
             }
         } catch (InvalidPathException ex) {
@@ -243,11 +243,15 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return null;
     }
 
-    private boolean validateAndShowError(ValidationStatus status) {
+    private boolean promptUserToConfirmAction(ValidationStatus status) {
         if (!status.isValid()) {
-            status.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
-            return false;
+            return status.getHighestMessage()
+                         .map(message -> dialogService.showConfirmationDialogAndWait(
+                                 Localization.lang("Action required: override default file directories"),
+                                 message.getMessage() + "\n" + Localization.lang("Would you like to save your other preferences?"),
+                                 Localization.lang("Save"),
+                                 Localization.lang("Return to Properties")))
+                         .orElse(false);
         }
         return true;
     }
@@ -267,7 +271,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             if (!currPath.isAbsolute()) {
                 newPath = parentPath.resolve(fileDirectory.get()).toAbsolutePath().toString();
             } else if (currPath.isAbsolute()) {
-                newPath = parentPath.relativize(currPath).toString();
+                Path rel = parentPath.relativize(currPath);
+                newPath = rel.toString().isEmpty() ? "." : rel.toString();
             } else {
                 // case: convert to relative path and currPath is relative
                 return;
@@ -282,7 +287,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     /**
      * For a saved library, any directory relative to the library path will be set as relative; otherwise, it will be set as absolute.
      *
-     * @param fileDirectory file directory to be updated (lib/user/laTex)
+     * @param fileDirectory   file directory to be updated (lib/user/laTex)
      * @param selectedDirPath path of directory (selected by user)
      */
     private void setDirectory(StringProperty fileDirectory, Path selectedDirPath) {
@@ -296,7 +301,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         // set relative path
         fileDirectory.setValue(libPath.get()
-                .getParent()
-                .relativize(selectedDirPath).toString());
+                                      .getParent()
+                                      .relativize(selectedDirPath).toString());
     }
 }

@@ -62,6 +62,9 @@
     -js-summary-text-color: derive(-fx-light-text-color, 70%);
     -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
 
+    -jr-ai-message-user: derive(-jr-theme, -50%);
+    -jr-ai-message-ai: derive(-jr-theme, -75%);
+
     -jr-match-1-odd: -jr-row-odd-background;
     -jr-match-1-even: -jr-row-even-background;
     -jr-match-1-text-color: -fx-mid-text-color;
@@ -140,6 +143,11 @@
     -fx-stroke: -jr-gray-3;
 }
 
+.code-area {
+    -fx-background-color: -jr-background-alt;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
 .code-area .lineno {
     -fx-background-color: -jr-background-alt;
     -fx-text-fill: -fx-mid-text-color;
@@ -181,7 +189,24 @@
     -fx-icon-color: -fx-light-text-color;
 }
 
-
 .file-row-text {
     -fx-text-fill: -fx-light-text-color;
+}
+
+.walkthrough-spotlight {
+    -fx-fill: rgba(0, 0, 0, 0.65);
+}
+
+.walkthrough-darken {
+    -fx-fill: rgba(0, 0, 0, 0.65);
+}
+
+.walkthrough-ping {
+    /* -jr-accent with 75% Alpha */
+    -fx-fill: rgba(37, 86, 82, 0.75);
+}
+
+.walkthrough-tooltip .border {
+    /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
+    -fx-fill: #151924 !important;
 }

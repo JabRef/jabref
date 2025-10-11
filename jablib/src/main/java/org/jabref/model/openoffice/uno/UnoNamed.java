@@ -34,12 +34,12 @@ public class UnoNamed {
         }
 
         XNamed xNamed = UnoCast.cast(XNamed.class, xObject)
-                                .orElseThrow(() -> new IllegalArgumentException("Service is not an XNamed"));
+                               .orElseThrow(() -> new IllegalArgumentException("Service is not an XNamed"));
         xNamed.setName(documentAnnotation.name());
 
         // get XTextContent interface
         XTextContent xTextContent = UnoCast.cast(XTextContent.class, xObject)
-                                            .orElseThrow(() -> new IllegalArgumentException("Service is not an XTextContent"));
+                                           .orElseThrow(() -> new IllegalArgumentException("Service is not an XTextContent"));
         documentAnnotation.range().getText().insertTextContent(documentAnnotation.range(), xTextContent, documentAnnotation.absorb());
         return xNamed;
     }

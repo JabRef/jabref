@@ -1,5 +1,10 @@
 package org.jabref.model.database;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -11,8 +16,12 @@ import java.util.UUID;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -63,23 +72,22 @@ public class BibDatabaseContext {
         this(new BibDatabase());
     }
 
-    public BibDatabaseContext(BibDatabase database) {
+    public BibDatabaseContext(@NonNull BibDatabase database) {
         this(database, new MetaData());
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
-        this.database = Objects.requireNonNull(database);
-        this.metaData = Objects.requireNonNull(metaData);
+    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData) {
+        this.database = database;
+        this.metaData = metaData;
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
+    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
+    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path, @NonNull DatabaseLocation location) {
         this(database, metaData);
-        Objects.requireNonNull(location);
         this.path = path;
 
         if (location == DatabaseLocation.LOCAL) {
@@ -91,7 +99,7 @@ public class BibDatabaseContext {
         return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
     }
 
-    public void setMode(BibDatabaseMode bibDatabaseMode) {
+    public void setMode(@NonNull BibDatabaseMode bibDatabaseMode) {
         metaData.setMode(bibDatabaseMode);
     }
 
@@ -120,8 +128,8 @@ public class BibDatabaseContext {
         return metaData;
     }
 
-    public void setMetaData(MetaData metaData) {
-        this.metaData = Objects.requireNonNull(metaData);
+    public void setMetaData(@NonNull MetaData metaData) {
+        this.metaData = metaData;
     }
 
     public boolean isBiblatexMode() {
@@ -157,7 +165,6 @@ public class BibDatabaseContext {
      * </ol>
      *
      * @param preferences The fileDirectory preferences
-     *
      * @return List of existing absolute paths
      */
     public List<Path> getFileDirectories(FilePreferences preferences) {
@@ -257,8 +264,7 @@ public class BibDatabaseContext {
     /**
      * @return The path to store the lucene index files. One directory for each library.
      */
-    @NonNull
-    public Path getFulltextIndexPath() {
+    public @NonNull Path getFulltextIndexPath() {
         Path appData = Directories.getFulltextIndexBaseDirectory();
         Path indexPath;
 
@@ -274,6 +280,32 @@ public class BibDatabaseContext {
         indexPath = appData.resolve("unsaved");
         LOGGER.debug("Using index for unsaved database: {}", indexPath);
         return indexPath;
+    }
+
+    public static BibDatabaseContext of(Reader bibContentReader, ImportFormatPreferences importFormatPreferences) throws JabRefException {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        try {
+            ParserResult result = parser.parse(bibContentReader);
+            return result.getDatabaseContext();
+        } catch (IOException e) {
+            throw new JabRefException("Failed to parse BibTeX", e);
+        }
+    }
+
+    public static BibDatabaseContext of(String bibContent, ImportFormatPreferences importFormatPreferences) throws JabRefException {
+        return of(Reader.of(bibContent), importFormatPreferences);
+    }
+
+    public static BibDatabaseContext of(InputStream bibContentStream, ImportFormatPreferences importFormatPreferences) throws JabRefException {
+        try (Reader reader = new BufferedReader(new InputStreamReader(bibContentStream))) {
+            return of(reader, importFormatPreferences);
+        } catch (IOException e) {
+            throw new JabRefException("Failed to close stream", e);
+        }
+    }
+
+    public static BibDatabaseContext empty() {
+        return new BibDatabaseContext(new BibDatabase(), new MetaData());
     }
 
     @Override

@@ -1,16 +1,17 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Replaces two subsequent whitespaces (and tabs) to one space in case of single-line fields. In case of multine fields,
  * the field content is kept as is.
- *
+ * <p>
  * Due to the distinction between single line and multiline fields, this formatter does not implement the interface {@link org.jabref.logic.cleanup.Formatter}.
  */
 public class NormalizeWhitespaceFormatter {
@@ -20,8 +21,7 @@ public class NormalizeWhitespaceFormatter {
 
     private final FieldPreferences preferences;
 
-    public NormalizeWhitespaceFormatter(FieldPreferences preferences) {
-        Objects.requireNonNull(preferences);
+    public NormalizeWhitespaceFormatter(@NonNull FieldPreferences preferences) {
         this.preferences = preferences;
     }
 

@@ -236,7 +236,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     ButtonType.OK, openHelp);
 
             result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
-            result.filter(btn -> ButtonType.OK.equals(btn)).ifPresent(btn -> openSharedDatabase(connectionProperties));
+            result.filter(ButtonType.OK::equals).ifPresent(btn -> openSharedDatabase(connectionProperties));
         }
         loading.set(false);
         return false;

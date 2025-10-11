@@ -13,6 +13,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
+import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -147,6 +148,7 @@ class BackupManagerTest {
         BackupManager manager = BackupManager.start(
                 mock(LibraryTab.class),
                 databaseContext,
+                mock(CoarseChangeFilter.class),
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
                 preferences);
         manager.listen(new MetaDataChangedEvent(new MetaData()));
@@ -174,6 +176,7 @@ class BackupManagerTest {
         BackupManager manager = BackupManager.start(
                 mock(LibraryTab.class),
                 databaseContext,
+                mock(CoarseChangeFilter.class),
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
                 preferences);
         manager.listen(new MetaDataChangedEvent(new MetaData()));

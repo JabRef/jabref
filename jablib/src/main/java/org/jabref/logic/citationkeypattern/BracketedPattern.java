@@ -36,6 +36,7 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,8 +164,7 @@ public class BracketedPattern {
      * @param database The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
-    public String expand(BibEntry bibentry, BibDatabase database) {
-        Objects.requireNonNull(bibentry);
+    public String expand(@NonNull BibEntry bibentry, BibDatabase database) {
         Character keywordDelimiter = ';';
         return expand(bibentry, keywordDelimiter, database);
     }
@@ -177,8 +177,7 @@ public class BracketedPattern {
      * @param database         The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
-    public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
-        Objects.requireNonNull(bibentry);
+    public String expand(@NonNull BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 
@@ -187,13 +186,11 @@ public class BracketedPattern {
      *
      * @param pattern          The pattern to expand
      * @param keywordDelimiter The keyword delimiter to use
-     * @param entry            The bibentry to use for expansion
+     * @param entry            The bibEntry to use for expansion
      * @param database         The database for field resolving. May be null.
      * @return The expanded pattern. Not null.
      */
-    public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
-        Objects.requireNonNull(pattern);
-        Objects.requireNonNull(entry);
+    public static String expandBrackets(@NonNull String pattern, Character keywordDelimiter, @NonNull BibEntry entry, BibDatabase database) {
         return expandBrackets(pattern, expandBracketContent(keywordDelimiter, entry, database));
     }
 
@@ -228,8 +225,7 @@ public class BracketedPattern {
      *                              and expanding it
      * @return The expanded pattern. Not null.
      */
-    public static String expandBrackets(String pattern, Function<String, String> bracketContentHandler) {
-        Objects.requireNonNull(pattern);
+    public static String expandBrackets(@NonNull String pattern, Function<String, String> bracketContentHandler) {
         StringBuilder expandedPattern = new StringBuilder();
         pattern = pattern.replace("\\\"", "\u0A17");
         StringTokenizer parsedPattern = new StringTokenizer(pattern, "\\[]\"", true);
@@ -237,7 +233,8 @@ public class BracketedPattern {
         while (parsedPattern.hasMoreTokens()) {
             String token = parsedPattern.nextToken();
             switch (token) {
-                case "\"" -> appendQuote(expandedPattern, parsedPattern);
+                case "\"" ->
+                        appendQuote(expandedPattern, parsedPattern);
                 case "[" -> {
                     String fieldMarker = contentBetweenBrackets(parsedPattern, pattern);
                     expandedPattern.append(bracketContentHandler.apply(fieldMarker));
@@ -249,7 +246,8 @@ public class BracketedPattern {
                         LOGGER.warn("Found a \"\\\" that is not part of an escape sequence");
                     }
                 }
-                default -> expandedPattern.append(token);
+                default ->
+                        expandedPattern.append(token);
             }
         }
 
@@ -275,7 +273,8 @@ public class BracketedPattern {
             String token = tokenizer.nextToken();
             // If the beginning of a quote is found, append the content
             switch (token) {
-                case "\"" -> appendQuote(bracketContent, tokenizer);
+                case "\"" ->
+                        appendQuote(bracketContent, tokenizer);
                 case "]" -> {
                     if (subBrackets == 0) {
                         foundClosingBracket = true;
@@ -288,7 +287,8 @@ public class BracketedPattern {
                     subBrackets++;
                     bracketContent.append(token);
                 }
-                default -> bracketContent.append(token);
+                default ->
+                        bracketContent.append(token);
             }
         }
 
@@ -533,8 +533,8 @@ public class BracketedPattern {
                              // If the author is an institution, use an institution key instead of the full name
                              String lastName = author.getFamilyName()
                                                      .map(lastPart -> isInstitution(author) ?
-                                                             generateInstitutionKey(lastPart) :
-                                                             LatexToUnicodeAdapter.format(lastPart))
+                                                                      generateInstitutionKey(lastPart) :
+                                                                      LatexToUnicodeAdapter.format(lastPart))
                                                      .orElse(null);
                              return new Author(
                                      author.getGivenName().map(LatexToUnicodeAdapter::format).orElse(null),
@@ -798,7 +798,7 @@ public class BracketedPattern {
      */
     private static String firstAuthorVonAndLast(AuthorList authorList) {
         return authorList.isEmpty() ? "" :
-                authorList.getAuthor(0).getNamePrefixAndFamilyName().replace(" ", "");
+               authorList.getAuthor(0).getNamePrefixAndFamilyName().replace(" ", "");
     }
 
     /**
@@ -1283,8 +1283,8 @@ public class BracketedPattern {
      *         <li>null if content is null</li>
      *         </ul>
      */
-     @VisibleForTesting
-     static String generateInstitutionKey(String content) {
+    @VisibleForTesting
+    static String generateInstitutionKey(String content) {
         if (content == null) {
             return null;
         }

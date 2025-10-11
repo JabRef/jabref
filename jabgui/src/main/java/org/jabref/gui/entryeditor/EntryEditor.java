@@ -324,7 +324,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
         tabs.add(new MathSciNetTab());
         tabs.add(new FileAnnotationTab(stateManager, preferences));
-        tabs.add(new SciteTab(preferences, taskExecutor, dialogService));
         tabs.add(new CitationRelationsTab(
                 dialogService,
                 undoManager,
@@ -376,7 +375,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         // Same order as in org.jabref.gui.entryeditor.EntryEditor.createTabs after the call of getAdditionalUserConfiguredTabs
         entryEditorTabList.remove(MathSciNetTab.NAME);
         entryEditorTabList.remove(FileAnnotationTab.NAME);
-        entryEditorTabList.remove(SciteTab.NAME);
         entryEditorTabList.remove(CitationRelationsTab.NAME);
         entryEditorTabList.remove(RelatedArticlesTab.NAME);
         // SourceTab is not listed, because it has different names for BibTeX and biblatex mode
@@ -496,8 +494,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     public void setFocusToField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> {
-        Field actualField = field;
-        boolean fieldFound = false;
+            Field actualField = field;
+            boolean fieldFound = false;
             for (Tab tab : tabbed.getTabs()) {
                 tabbed.getSelectionModel().select(tab);
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)

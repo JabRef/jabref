@@ -93,7 +93,7 @@ public enum StandardField implements Field {
     ORIGDATE("origdate", FieldProperty.DATE),
     ORIGLANGUAGE("origlanguage", FieldProperty.LANGUAGE),
     PAGES("pages"),
-    PAGETOTAL("pagetotal"),
+    PAGETOTAL("pagetotal", FieldProperty.NUMERIC),
     PAGINATION("pagination", FieldProperty.PAGINATION),
     PART("part"),
     PDF("pdf", "PDF"),
@@ -133,12 +133,19 @@ public enum StandardField implements Field {
     XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),
     XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
 
-    // JabRef-specific fields
+    // region: JabRef-specific fields
+
+    CITATIONCOUNT("citationcount"),
     GROUPS("groups"),
+    ICORERANKING("icore"),
     OWNER("owner"),
-    TIMESTAMP("timestamp", FieldProperty.DATE),
+
+    // Timestamp-realted
     CREATIONDATE("creationdate", FieldProperty.DATE),
-    MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
+    MODIFICATIONDATE("modificationdate", FieldProperty.DATE),
+    TIMESTAMP("timestamp", FieldProperty.DATE);
+
+    // endregion
 
     public static final Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
 
@@ -195,14 +202,5 @@ public enum StandardField implements Field {
     @Override
     public boolean isStandardField() {
         return true;
-    }
-
-    @Override
-    public String getDisplayName() {
-        if (displayName == null) {
-            return Field.super.getDisplayName();
-        } else {
-            return displayName;
-        }
     }
 }

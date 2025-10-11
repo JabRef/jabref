@@ -11,6 +11,7 @@ import java.util.SortedSet;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -89,27 +90,50 @@ public class ImportCommand extends SimpleCommand {
                 .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
                 .withInitialDirectory(preferences.getImporterPreferences().getImportWorkingDirectory())
                 .build();
-        dialogService.showFileOpenDialog(fileDialogConfiguration)
-                     .ifPresent(path -> importSingleFile(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
+
+        List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
+
+        if (selectedFiles.isEmpty()) {
+            return; // User cancelled or no files selected
+        }
+
+        importMultipleFiles(selectedFiles, importers, fileDialogConfiguration.getSelectedExtensionFilter());
     }
 
-    private void importSingleFile(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
-        if (!Files.exists(file)) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Import"),
-                    Localization.lang("File not found") + ": '" + file.getFileName() + "'.");
-
-            return;
+    private void importMultipleFiles(List<Path> files, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
+        for (Path file : files) {
+            if (!Files.exists(file)) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Import"),
+                        Localization.lang("File not found") + ": '" + file.getFileName() + "'.");
+                return;
+            }
         }
 
-        if (selectedExtensionFilter == FileFilterConverter.ANY_FILE || "Available import formats".equals(selectedExtensionFilter.getDescription())) {
-            selectedExtensionFilter = FileFilterConverter.determineExtensionFilter(file);
+        BackgroundTask<ParserResult> task;
+        Optional<Importer> format;
+
+        boolean isGeneralFilter = selectedExtensionFilter == FileFilterConverter.ANY_FILE
+                || "Available import formats".equals(selectedExtensionFilter.getDescription());
+
+        if (!isGeneralFilter) {
+            // User picked a specific format
+            format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
+        } else if (files.size() == 1) {
+            // Infer if only one file and no specific filter
+            selectedExtensionFilter = FileFilterConverter.determineExtensionFilter(files.getFirst());
+            format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
+        } else {
+            format = Optional.empty();
         }
 
-        Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(
-                () -> doImport(List.of(file), format.orElse(null)));
+        task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null)));
 
-        if (importMethod == ImportMethod.AS_NEW) {
+        LibraryTab tab = tabContainer.getCurrentLibraryTab();
+
+        // If there is no open library tab, we fall back to importing as new
+        // This prevents a crash in case the user selects "Import into current library"
+        // while no library is currently open.
+        if (importMethod == ImportMethod.AS_NEW || tab == null) {
             task.onSuccess(parserResult -> {
                     tabContainer.addTab(parserResult.getDatabaseContext(), true);
                     dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
@@ -120,13 +144,13 @@ public class ImportCommand extends SimpleCommand {
                 })
                 .executeWith(taskExecutor);
         } else {
-            ImportEntriesDialog dialog = new ImportEntriesDialog(tabContainer.getCurrentLibraryTab().getBibDatabaseContext(), task);
+            ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
             dialogService.showCustomDialogAndWait(dialog);
         }
 
         // Set last working dir for import
-        preferences.getImporterPreferences().setImportWorkingDirectory(file.getParent());
+        preferences.getImporterPreferences().setImportWorkingDirectory(files.getLast().getParent());
     }
 
     /**
@@ -171,8 +195,8 @@ public class ImportCommand extends SimpleCommand {
                         () -> dialogService.showWarningDialogAndWait(
                                 Localization.lang("Import error"),
                                 Localization.lang("Please check your library file for wrong syntax.")
-                                + "\n\n"
-                                + ex.getLocalizedMessage()));
+                                        + "\n\n"
+                                        + ex.getLocalizedMessage()));
             }
         }
 

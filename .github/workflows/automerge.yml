@@ -8,31 +8,66 @@ permissions:
 jobs:
   automerge:
     runs-on: ubuntu-latest
-    # Run only if PR is inside JabRef's main repository and created by dependabot or by an update workflow
-    if: >
-      (github.repository == 'JabRef/jabref') &&
-      (
-        (github.actor == 'renovate-bot' && startsWith(github.event.pull_request.title, 'chore(deps):')) ||
-        (
-          (github.event.pull_request.head.repo.full_name == 'JabRef/jabref') &&
-          (
-            (github.actor == 'dependabot[bot]') ||
-            (
-              startsWith(github.event.pull_request.title, '[Bot] ') ||
-              startsWith(github.event.pull_request.title, 'Bump ') ||
-              startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
-              startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
-            )
-          )
-        )
-      )
+    if: github.repository == 'JabRef/jabref'
+    env:
+      HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+      USER:      ${{ github.event.pull_request.user.login }}
+      TITLE:     ${{ github.event.pull_request.title }}
     steps:
+      - name: Determine if job should run
+        id: shouldrun
+        shell: bash
+        run: |
+          echo USER: $USER
+
+          if [[ "$USER" == "renovate-bot" ]]; then
+            echo "✅ from renote-bot"
+            echo "shouldrun=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$USER" == "dependabot[bot]" ]]; then
+            echo "✅ from dependabot"
+            echo "shouldrun=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$HEAD_REPO" != "JabRef/jabref" ]]; then
+            echo "🚫 not from JabRef/jabref"
+            echo "shouldrun=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$USER" == "dependabot[bot]" ]] || \
+            [[ "$TITLE" == "Chore(deps): "* ]] || \
+            [[ "$TITLE" == "[Bot] "* ]] || \
+            [[ "$TITLE" == "Bump "* ]] || \
+            [[ "$TITLE" == "New Crowdin updates"* ]] || \
+            [[ "$TITLE" == "Update Gradle Wrapper from"* ]]; then
+            echo "✅ title OK"
+            echo "shouldrun=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
+          if echo "$LABELS" | grep -q "^automerge"; then
+            echo "✅ label automerge"
+            echo "shouldrun=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "🚫 no automerge"
+          echo "shouldrun=false" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
       - name: Approve PR
+        if: steps.shouldrun.outputs.shouldrun == 'true'
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
       - name: Merge PR
+        if: steps.shouldrun.outputs.shouldrun == 'true'
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}

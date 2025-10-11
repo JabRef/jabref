@@ -5,7 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
@@ -18,6 +20,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -30,13 +35,14 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
-import org.jabref.gui.mergeentries.MultiMergeEntriesView;
+import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -165,7 +171,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return ControlHelper.truncateString(linkedFile.getDescription(), -1, "...",
                     ControlHelper.EllipsisPosition.CENTER) + " (" +
                     ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
-                    ControlHelper.EllipsisPosition.CENTER) + ")";
+                            ControlHelper.EllipsisPosition.CENTER) + ")";
         }
     }
 
@@ -264,24 +270,58 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private void performRenameWithConflictCheck(String targetFileName) {
+        // Check if a file with the same name already exists
         Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
         boolean overwriteFile = false;
 
         if (existingFile.isPresent()) {
-            overwriteFile = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("File exists"),
-                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
-                    Localization.lang("Overwrite"));
+            // Get existing file path and its directory
+            Path existingFilePath = existingFile.get();
+            Path targetDirectory = existingFilePath.getParent();
 
-            if (!overwriteFile) {
+            // Suggest a non-conflicting file name
+            String suggestedFileName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory, targetFileName);
+
+            // Define available dialog options
+            ButtonType replace = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OTHER);
+            ButtonType keepBoth = new ButtonType(Localization.lang("Keep both"), ButtonBar.ButtonData.OTHER);
+            ButtonType provideAlternative = new ButtonType(Localization.lang("Provide alternative file name"), ButtonBar.ButtonData.OTHER);
+            ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            // Define tooltips for dialog buttons
+            Map<ButtonType, String> tooltips = new HashMap<>();
+            tooltips.put(keepBoth, Localization.lang("New filename: %0", suggestedFileName));
+
+            // Use JabRefDialogService to show a custom dialog with tooltips
+            Optional<ButtonType> result = dialogService.showCustomButtonDialogWithTooltipsAndWait(
+                    Alert.AlertType.CONFIRMATION,
+                    Localization.lang("File already exists"),
+                    Localization.lang("File name: \n'%0'", targetFileName),
+                    tooltips,
+                    replace, keepBoth, provideAlternative, cancel
+            );
+
+            // Show dialog and handle user response
+            if (result.isEmpty() || result.get() == cancel) {
+                return; // User canceled
+            } else if (result.get() == replace) {
+                overwriteFile = true;
+            } else if (result.get() == keepBoth) {
+                targetFileName = suggestedFileName;
+            } else if (result.get() == provideAlternative) {
+                askForNameAndRename();
                 return;
             }
         }
 
         try {
+            // Attempt the rename operation
             linkedFileHandler.renameToName(targetFileName, overwriteFile);
         } catch (IOException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
+            // Display an error dialog if file is locked or inaccessible
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Rename failed"),
+                    Localization.lang("JabRef cannot access the file because it is being used by another process."));
         }
     }
 

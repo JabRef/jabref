@@ -1,0 +1,631 @@
+name: Source Code Tests
+
+on:
+  push:
+    branches:
+      - main
+      - main-release
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+env:
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
+  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+  MedlineAPiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
+  GRADLE_OPTS: -Xmx4g
+  JAVA_OPTS: -Xmx4g
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  # required for publish.yml
+  actions: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  upload-pr-number:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number.txt
+
+  checkstyle:
+    name: Checkstyle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Run checkstyle reporter
+        uses: dbelyaev/action-checkstyle@master
+        with:
+          reporter: github-pr-review
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Run checkstyle using gradle
+        run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+
+  openrewrite:
+    name: OpenRewrite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Run OpenRewrite
+        run: |
+          ./gradlew --no-configuration-cache :rewriteDryRun
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: koppor/intellij-idea-format@update-to-latest-intellij
+        with:
+          file-mask: "*.java"
+          settings-file: ".idea/codeStyles/Project.xml"
+      # job should fail in case there are changes
+      - name: Check if any files changed
+        run: git diff --exit-code
+
+  modernizer:
+    name: Modernizer
+    runs-on: ubuntu-latest
+    # Version 1.11.0 does not run on JDK25: "java.lang.reflect.InvocationTargetException"
+    if: false
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Run modernizer
+        run: |
+          # enable failing of this task if modernizer complains
+          # sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle.kts
+          ./gradlew modernizer
+
+  markdown:
+    name: Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: markdownlint-cli2-action
+        uses: DavidAnson/markdownlint-cli2-action@v20
+        with:
+          globs: |
+            *.md
+            docs/**/*.md
+
+  changelog:
+    name: CHANGELOG.md
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-heylogs-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-heylogs-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Lint CHANGELOG.md
+        run: |
+          # run heylogs verification
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.11.1:bin check CHANGELOG.md > heylogs.txt || true
+
+          # improve output
+          sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
+
+          cat heylogs.txt
+
+          # exit 1 in case of error
+          # We have 1 "valid" issue in CHANGELOG.md
+          grep -q "1 problem" heylogs.txt || exit 1
+
+  changelog-unreleased-only:
+    if: github.event_name == 'pull_request'
+    name: CHANGELOG.md - only unreleased touched
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+          fetch-depth: 0
+      - name: Cache clparse jar
+        id: cache-clparse
+        uses: actions/cache@v4
+        with:
+          path: /tmp/clparse
+          key: clparse-0.9.1
+      - name: unzip
+        if: steps.cache-clparse.outputs.cache-hit != 'true'
+        run: |
+          cd /tmp
+          curl -LO https://github.com/marcaddeo/clparse/releases/download/0.9.1/clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
+          tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
+      - name: Install clparse
+        run: sudo mv /tmp/clparse /usr/local/bin/clparse
+      - name: Check CHANGELOG.md diff
+        run: |
+          diff \
+            <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
+            <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
+
+  javadoc:
+    name: JavaDoc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - run: ./gradlew javadoc
+
+  tests:
+    name: "Unit tests – ${{ matrix.module }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module: [jablib, jabkit, jabsrv, jabgui]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Run ${{ matrix.module }} tests
+        run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        env:
+          CI: "true"
+      - name: Prepare format failed test results
+        if: failure()
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: xml-twig-tools xsltproc
+          version: 1.0
+      - name: Format failed test results
+        if: failure()
+        run: scripts/after-failure.sh
+
+  tests-windows:
+    name: "Unit tests (Windows)"
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        module: [jablib]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Run ${{ matrix.module }} tests
+        run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        env:
+          CI: "true"
+
+  databasetests:
+    if: (github.repository_owner == 'JabRef')
+    name: Database tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Shutdown Ubuntu MySQL
+        run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Run tests on PostgreSQL
+        run: ./gradlew :jablib:databaseTest --rerun-tasks
+        env:
+          CI: "true"
+          DBMS: "postgresql"
+
+  publish:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/publish.yml
+    secrets:
+      KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
+      KOPPOR_SIGNING_KEYID: ${{ secrets.KOPPOR_SIGNING_KEYID }}
+      KOPPOR_SIGNING_PASSWORD: ${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+      KOPPOR_MAVENCENTRALUSERNAME: ${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
+      KOPPOR_MAVENCENTRALPASSWORD: ${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
+
+  jbang:
+    name: JBang (main)
+    runs-on: ubuntu-latest
+    needs: publish
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - run: jbang build .jbang/CheckoutPR.java
+      - run: jbang build .jbang/CloneJabRef.java
+      - run: jbang build --fresh .jbang/JabKitLauncher.java
+      - run: jbang build --fresh .jbang/JabLsLauncher.java
+      - run: jbang build --fresh .jbang/JabSrvLauncher.java
+      - run: jbang run .jbang/JabKitLauncher.java --help
+      - run: jbang run .jbang/JabLsLauncher.java --help
+      - run: jbang run .jbang/JabSrvLauncher.java --help
+
+  jbang-pr:
+    name: JBang (PR)
+    runs-on: ubuntu-latest
+    # does not need publish, because the JBang scripts are modified
+    if: github.ref != 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        launcher: [JabKitLauncher, JabLsLauncher, JabSrvLauncher]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Detect changed jablib classes
+        id: changed-jablib-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            jablib/src/main/java/**/*.java
+          files_ignore: |
+            jablib/src/main/java/**/*-*.java
+      - name: Build ${{ matrix.launcher }} launcher including changed classes
+        shell: bash
+        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
+        run: |
+          # We modify the JBang scripts directly to avoid issues with relative paths
+          for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
+            echo "//SOURCES ../$f" >> ".jbang/${{ matrix.launcher }}.java"
+          done
+          jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
+      - run: jbang ".jbang/${{ matrix.launcher }}.java" --help
+        shell: bash
+
+  codecoverage:
+    if: false
+    name: Code coverage
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Check secrets presence
+        id: checksecrets
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          if [ "$CODECOV_TOKEN" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo "❌ Secret CODECOV_TOKEN not present"
+          else
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo "✔️ Secret CODECOV_TOKEN present"
+          fi
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Checkout source
+        if: github.ref == 'refs/heads/main'
+        uses: actions/checkout@v5
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        if: github.ref == 'refs/heads/main'
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Update test coverage metrics
+        if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
+        env:
+          CI: "true"
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          DBMS: "postgresql"
+      - uses: codecov/codecov-action@v5
+        if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload Codacy report
+        if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        run: bash <(curl -Ls https://coverage.codacy.com/get.sh)
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+
+  requirements_coverage:
+    name: "Validate requirement coverage"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          check-latest: true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - run: ./gradlew traceRequirements
+      - if: always()
+        run: cat build/reports/tracing.txt
+
+  # This is https://github.com/marketplace/actions/gradle-wrapper-validation
+  # It ensures that the jar file is from gradle and not by a strange third party.
+  gradlevalidation:
+    name: "Validate Gradle Wrapper"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          show-progress: 'false'
+      - uses: gradle/actions/wrapper-validation@v5

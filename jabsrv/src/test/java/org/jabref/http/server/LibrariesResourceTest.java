@@ -2,6 +2,8 @@ package org.jabref.http.server;
 
 import java.util.EnumSet;
 
+import org.jabref.http.server.resources.LibrariesResource;
+
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ class LibrariesResourceTest extends ServerTest {
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(LibrariesResource.class);
         addFilesToServeToResourceConfig(resourceConfig);
+        addGuiBridgeToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
         addGlobalExceptionMapperToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();

@@ -19,7 +19,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
-import org.jabref.gui.mergeentries.MultiMergeEntriesView;
+import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.DragDrop;
@@ -114,7 +114,7 @@ public class ImportHandler {
             @Override
             public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
-                CompoundEdit ce = new CompoundEdit();
+                CompoundEdit compoundEdit = new CompoundEdit();
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
@@ -195,10 +195,10 @@ public class ImportHandler {
                     }
                     allEntriesToAdd.addAll(entriesToAdd);
 
-                    ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
-                    ce.end();
+                    compoundEdit.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
+                    compoundEdit.end();
                     // prevent fx thread exception in undo manager
-                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(ce));
+                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit));
 
                     counter++;
                 }
@@ -263,7 +263,7 @@ public class ImportHandler {
                           if (existingDuplicateInLibrary.isPresent()) {
                               Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
                               if (duplicateHandledEntry.isEmpty()) {
-                                    tracker.markSkipped();
+                                  tracker.markSkipped();
                                   return;
                               }
                               finalEntry = duplicateHandledEntry.get();
@@ -350,7 +350,7 @@ public class ImportHandler {
                 List<FieldChange> undo = entryChanger.add(entries);
                 // TODO: Add undo
                 // if (!undo.isEmpty()) {
-                //    ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
+                //    compoundEdit.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
                 //            undo));
                 // }
             }

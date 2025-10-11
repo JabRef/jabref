@@ -1,35 +1,35 @@
 package org.jabref.gui.preferences.websearch;
 
+import java.util.List;
+import java.util.Optional;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.gui.util.component.HelpButton;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.FetcherApiKey;
+import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
-import org.apache.logging.log4j.util.Strings;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
-
     @FXML private CheckBox enableWebSearch;
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
@@ -45,17 +45,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
-    @FXML private TableView<FetcherApiKey> apiKeySelectorTable;
-    @FXML private TableColumn<FetcherApiKey, String> apiKeyName;
-    @FXML private TableColumn<FetcherApiKey, String> customApiKey;
-    @FXML private TableColumn<FetcherApiKey, Boolean> useCustomApiKey;
-    @FXML private Button testCustomApiKey;
-
-    @FXML private CheckBox persistApiKeys;
-    @FXML private SplitPane persistentTooltipWrapper; // The disabled persistApiKeys control does not show tooltips
-    @FXML private TableView<StudyCatalogItem> catalogTable;
-    @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
-    @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
+    @FXML private VBox fetchersContainer;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
@@ -68,12 +58,24 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     }
 
     @Override
+    public List<String> getSearchKeywords() {
+        return List.of(
+                getTabName(),
+                Localization.lang("Configure API key"),
+                Localization.lang("Custom API key"),
+                "api",
+                "api key",
+                "apikey"
+        );
+    }
+
+    @Override
     public String getTabName() {
         return Localization.lang("Web search");
     }
 
     public void initialize() {
-        this.viewModel = new WebSearchTabViewModel(preferences, dialogService, refAiEnabled);
+        this.viewModel = new WebSearchTabViewModel(preferences, refAiEnabled, taskExecutor);
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
@@ -99,7 +101,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         citationsRelationStoreTTL
                 .textProperty()
                 .addListener((_, _, newValue) -> {
-                    if (Strings.isBlank(newValue)) {
+                    if (StringUtil.isBlank(newValue)) {
                         return;
                     }
                     if (!newValue.matches("\\d*")) {
@@ -117,86 +119,47 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
         useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
 
-        new ViewModelTableRowFactory<StudyCatalogItem>()
-                .withOnMouseClickedEvent((entry, event) -> {
-                    if (event.getButton() == MouseButton.PRIMARY) {
-                        entry.setEnabled(!entry.isEnabled());
-                    }
-                })
-                .install(catalogTable);
-
-        catalogColumn.setReorderable(false);
-        catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-
-        catalogEnabledColumn.setResizable(false);
-        catalogEnabledColumn.setReorderable(false);
-        catalogEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(catalogEnabledColumn));
-        catalogEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
-
-        catalogColumn.setEditable(false);
-        catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
-        catalogTable.setItems(viewModel.getCatalogs());
-
-        testCustomApiKey.setDisable(true);
-
-        new ViewModelTableRowFactory<FetcherApiKey>()
-                .install(apiKeySelectorTable);
-
-        apiKeySelectorTable.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
-            if (oldValue != null) {
-                updateFetcherApiKey(oldValue);
-            }
-            if (newValue != null) {
-                viewModel.selectedApiKeyProperty().setValue(newValue);
-                testCustomApiKey.disableProperty().bind(newValue.useProperty().not());
-            }
-        });
-
-        apiKeyName.setCellValueFactory(param -> param.getValue().nameProperty());
-        apiKeyName.setCellFactory(TextFieldTableCell.forTableColumn());
-        apiKeyName.setReorderable(false);
-        apiKeyName.setEditable(false);
-
-        customApiKey.setCellValueFactory(param -> param.getValue().keyProperty());
-        customApiKey.setCellFactory(TextFieldTableCell.forTableColumn());
-        customApiKey.setReorderable(false);
-        customApiKey.setResizable(true);
-        customApiKey.setEditable(true);
-
-        useCustomApiKey.setCellValueFactory(param -> param.getValue().useProperty());
-        useCustomApiKey.setCellFactory(CheckBoxTableCell.forTableColumn(useCustomApiKey));
-        useCustomApiKey.setEditable(true);
-        useCustomApiKey.setResizable(true);
-        useCustomApiKey.setReorderable(false);
-
-        persistApiKeys.selectedProperty().bindBidirectional(viewModel.getApikeyPersistProperty());
-        persistApiKeys.disableProperty().bind(viewModel.apiKeyPersistAvailable().not());
-        EasyBind.subscribe(viewModel.apiKeyPersistAvailable(), available -> {
-            if (!available) {
-                persistentTooltipWrapper.setTooltip(new Tooltip(Localization.lang("Credential store not available.")));
-            } else {
-                persistentTooltipWrapper.setTooltip(null);
-            }
-        });
-
-        apiKeySelectorTable.setItems(viewModel.fetcherApiKeys());
-
-        // Content is set later
-        viewModel.fetcherApiKeys().addListener((InvalidationListener) _ -> {
-            if (!apiKeySelectorTable.getItems().isEmpty()) {
-                apiKeySelectorTable.getSelectionModel().selectFirst();
-            }
-        });
+        InvalidationListener listener = _ -> fetchersContainer
+                .getChildren()
+                .setAll(viewModel.getFetchers()
+                                 .stream()
+                                 .map(this::createFetcherNode).toList());
+        viewModel.getFetchers().addListener(listener);
     }
 
-    private void updateFetcherApiKey(FetcherApiKey apiKey) {
-        if (apiKey != null) {
-            apiKey.setKey(customApiKey.getCellData(apiKey).trim());
+    private Node createFetcherNode(WebSearchTabViewModel.FetcherViewModel item) {
+        HBox container = new HBox();
+        container.getStyleClass().add("fetcher-list-cell");
+        container.setAlignment(Pos.CENTER_LEFT);
+
+        CheckBox enabledCheckBox = new CheckBox();
+        enabledCheckBox.selectedProperty().bindBidirectional(item.enabledProperty());
+
+        Label nameLabel = new Label(item.getName());
+        nameLabel.getStyleClass().add("fetcher-name");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HelpButton helpButton = new HelpButton();
+        Optional<HelpFile> helpFile = item.getFetcher().getHelpPage();
+        if (helpFile.isPresent() && !helpFile.get().getPageName().isEmpty()) {
+            helpButton.setHelpFile(helpFile.get(), dialogService, preferences.getExternalApplicationsPreferences());
+            helpButton.setVisible(true);
+        } else {
+            helpButton.setVisible(false);
         }
+
+        Button configureButton = new Button(Localization.lang("Configure API key"));
+        configureButton.getStyleClass().add("configure-button");
+        configureButton.setOnAction(_ -> showApiKeyDialog(item));
+        configureButton.setVisible(item.isCustomizable());
+
+        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
+        return container;
     }
 
-    @FXML
-    void checkCustomApiKey() {
-        viewModel.checkCustomApiKey();
+    private void showApiKeyDialog(WebSearchTabViewModel.FetcherViewModel fetcherViewModel) {
+        dialogService.showCustomDialogAndWait(new ApiKeyDialog(viewModel, fetcherViewModel));
     }
 }

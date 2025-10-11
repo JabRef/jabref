@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * However, if a lot of events happen in a relatively short time span, then only one task should be invoked.
  *
  * @implNote Once {@link #schedule(Runnable)} is called, the task is delayed for a given time span.
- *         If during this time, {@link #schedule(Runnable)} is called again, then the original task is canceled and the new one scheduled.
+ * If during this time, {@link #schedule(Runnable)} is called again, then the original task is canceled and the new one scheduled.
  */
 public class DelayTaskThrottler {
 
@@ -80,6 +80,7 @@ public class DelayTaskThrottler {
      * Shuts everything down. Upon termination, this method returns.
      */
     public void shutdown() {
-        HeadlessExecutorService.gracefullyShutdown(executor);
+        LOGGER.trace("Gracefully shutting down DelayTaskThrottler");
+        HeadlessExecutorService.gracefullyShutdown("ScheduledThreadPoolExecutor of DelayTaskThrottler", executor, 15);
     }
 }

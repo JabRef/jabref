@@ -11,6 +11,7 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -66,7 +67,7 @@ class StudyRepositoryTest {
      * Set up mocks
      */
     @BeforeEach
-    void setUpMocks() throws IOException, URISyntaxException {
+    void setUpMocks() throws IOException, URISyntaxException, JabRefException {
         libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -134,7 +135,7 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void fetcherResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException {
+    void fetcherResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         List<QueryResult> mockResults = getMockResults();
 
         studyRepository.persist(mockResults);
@@ -145,7 +146,7 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void mergedResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException {
+    void mergedResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         List<QueryResult> mockResults = getMockResults();
         List<BibEntry> expected = new ArrayList<>();
         expected.addAll(getArXivQuantumMockResults());
@@ -160,13 +161,13 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void studyResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException {
+    void studyResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         List<QueryResult> mockResults = getMockResults();
         studyRepository.persist(mockResults);
         assertEquals(new HashSet<>(getNonDuplicateBibEntryResult().getEntries()), new HashSet<>(getTestStudyRepository().getStudyResultEntries().getEntries()));
     }
 
-    private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException {
+    private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {
         setUpTestStudyDefinitionFile();
         studyRepository = new StudyRepository(
                 tempRepositoryDirectory,

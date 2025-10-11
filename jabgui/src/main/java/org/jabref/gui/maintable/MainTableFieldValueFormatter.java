@@ -29,7 +29,7 @@ public class MainTableFieldValueFormatter {
      * unicode if possible.
      *
      * @param fields the fields argument of {@link BibEntryTableViewModel#getFields(OrFields)}.
-     * @param entry the BibEntry of {@link BibEntryTableViewModel}.
+     * @param entry  the BibEntry of {@link BibEntryTableViewModel}.
      * @return The formatted name field.
      */
     public String formatFieldsValues(final OrFields fields, final BibEntry entry) {
@@ -72,14 +72,18 @@ public class MainTableFieldValueFormatter {
         }
 
         return switch (displayStyle) {
-            default -> nameToFormat;
-            case FIRSTNAME_LASTNAME -> authors.latexFree().getAsFirstLastNames(
-                    abbreviationStyle == AbbreviationStyle.FULL,
-                    false);
-            case LASTNAME_FIRSTNAME -> authors.latexFree().getAsLastFirstNames(
-                    abbreviationStyle == AbbreviationStyle.FULL,
-                    false);
-            case NATBIB -> authors.latexFree().getAsNatbib();
+            default ->
+                    nameToFormat;
+            case FIRSTNAME_LASTNAME ->
+                    authors.latexFree().getAsFirstLastNames(
+                            abbreviationStyle == AbbreviationStyle.FULL,
+                            false);
+            case LASTNAME_FIRSTNAME ->
+                    authors.latexFree().getAsLastFirstNames(
+                            abbreviationStyle == AbbreviationStyle.FULL,
+                            false);
+            case NATBIB ->
+                    authors.latexFree().getAsNatbib();
         };
     }
 }

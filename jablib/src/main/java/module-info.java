@@ -103,9 +103,21 @@ open module org.jabref.jablib {
     exports org.jabref.logic.shared.event;
     exports org.jabref.logic.citation;
     exports org.jabref.logic.crawler;
-    exports org.jabref.logic.git;
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
+    exports org.jabref.model.paging;
+    exports org.jabref.logic.git;
+    exports org.jabref.logic.git.conflicts;
+    exports org.jabref.logic.git.io;
+    exports org.jabref.logic.git.merge;
+    exports org.jabref.logic.git.model;
+    exports org.jabref.logic.git.status;
+    exports org.jabref.logic.command;
+    exports org.jabref.logic.git.util;
+    exports org.jabref.logic.git.preferences;
+    exports org.jabref.logic.icore;
+    exports org.jabref.model.icore;
+    exports org.jabref.model.sciteTallies;
 
     requires java.base;
 
@@ -140,14 +152,11 @@ open module org.jabref.jablib {
     // endregion
 
     // region: data mapping
-    requires jakarta.xml.bind;
     requires jdk.xml.dom;
     requires com.google.gson;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
-    // needs to be loaded here as it's otherwise not found at runtime, related to XJC
-    requires org.glassfish.jaxb.runtime;
     // endregion
 
     // region HTTP clients
@@ -202,8 +211,6 @@ open module org.jabref.jablib {
     requires java.keyring;
     requires org.freedesktop.dbus;
 
-    requires org.jooq.jool;
-
     // region AI
     requires ai.djl.api;
     requires ai.djl.pytorch_model_zoo;
@@ -211,10 +218,6 @@ open module org.jabref.jablib {
     requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
-    requires langchain4j.google.ai.gemini;
-    requires langchain4j.hugging.face;
-    requires langchain4j.mistral.ai;
-    requires langchain4j.open.ai;
     uses ai.djl.engine.EngineProvider;
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
@@ -226,22 +229,24 @@ open module org.jabref.jablib {
     /*
      * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene101.Lucene101Codec;
+    uses org.apache.lucene.codecs.lucene103.Lucene103Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;
     requires org.apache.lucene.queryparser;
     // endregion
 
+    // region: appdirs
     requires net.harawata.appdirs;
     requires com.sun.jna;
     requires com.sun.jna.platform;
+    // endregion
 
+    // region: jgit
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.Signer;
-
-    requires transitive org.jspecify;
+    // endregion
 
     // region: other libraries (alphabetically)
     requires cuid;
@@ -251,6 +256,8 @@ open module org.jabref.jablib {
     requires kotlin.stdlib;
     requires mslinks;
     requires org.antlr.antlr4.runtime;
+    requires org.jooq.jool;
     requires org.libreoffice.uno;
+    requires transitive org.jspecify;
     // endregion
 }

@@ -3,7 +3,6 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,10 +22,13 @@ import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -67,6 +69,8 @@ public class PreferencesMigrations {
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
         removeCommentsFromCustomEditorTabs(preferences);
+        addICORERankingFieldToGeneralTab(preferences);
+        upgradeResolveBibTeXStringsFields(preferences);
     }
 
     /**
@@ -238,8 +242,7 @@ public class PreferencesMigrations {
                                                  JabRefCliPreferences prefs, Preferences mainPrefsNode) {
         String preferenceFileNamePattern = mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null);
 
-        if ((preferenceFileNamePattern != null) &&
-                oldStylePattern.equals(preferenceFileNamePattern)) {
+        if (oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
             mainPrefsNode.put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
             LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the preference file", JabRefCliPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
@@ -255,17 +258,27 @@ public class PreferencesMigrations {
         }
     }
 
+    static void upgradeResolveBibTeXStringsFields(JabRefCliPreferences prefs) {
+        String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
+        String currentPrefs = prefs.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS);
+
+        if (oldPrefsValue.equals(currentPrefs)) {
+            currentPrefs += ";monthfiled";
+            prefs.put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, currentPrefs);
+        }
+    }
+
     static void upgradeImportFileAndDirePatterns(JabRefCliPreferences prefs, Preferences mainPrefsNode) {
         // Migrate Import patterns
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
-            String[] oldStylePatterns = new String[]{
+            String[] oldStylePatterns = new String[] {
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-            String[] newStylePatterns = new String[]{"[citationkey]",
+            String[] newStylePatterns = new String[] {"[citationkey]",
                     "[citationkey] - [title]"};
 
-            String[] oldDisplayStylePattern = new String[]{"bibtexkey", "bibtexkey - title"};
+            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -295,11 +308,14 @@ public class PreferencesMigrations {
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliPreferences prefs) {
         // LinkedHashSet because we want to retain the order and add new fields to the end
-        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
-        keys.add("crossref");
-        keys.add("related");
-        keys.add("entryset");
-        prefs.putStringList(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
+        String oldPrefs = "author;editor;title;journal;publisher;keywords";
+        String newFieldsToAdd = "crossref;related;entryset";
+        String currentPrefs = prefs.get(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS);
+
+        if (oldPrefs.equals(currentPrefs)) {
+            currentPrefs += ";" + newFieldsToAdd;
+            prefs.put(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, currentPrefs);
+        }
     }
 
     private static void migrateTypedKeyPrefs(JabRefCliPreferences prefs, Preferences oldPatternPrefs)
@@ -372,7 +388,7 @@ public class PreferencesMigrations {
                 double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
 
                 MainTableColumnModel.Type type = SpecialField.fromName(name)
-                                                             .map(field -> MainTableColumnModel.Type.SPECIALFIELD)
+                                                             .map(_ -> MainTableColumnModel.Type.SPECIALFIELD)
                                                              .orElse(MainTableColumnModel.Type.NORMALFIELD);
 
                 if (i < columnWidths.size()) {
@@ -518,8 +534,8 @@ public class PreferencesMigrations {
                 && (FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
                 || FieldFormatterCleanups.DISABLED.equals(formatterCleanups.getFirst()))) {
             prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
-                    ? Boolean.TRUE
-                    : Boolean.FALSE);
+                                                                    ? Boolean.TRUE
+                                                                    : Boolean.FALSE);
 
             prefs.put(V6_0_CLEANUP_FIELD_FORMATTERS, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
         }
@@ -545,6 +561,42 @@ public class PreferencesMigrations {
                 LOGGER.error("Unable to open key store", ex);
             }
         }
+    }
+
+    /**
+     * Updates the default preferences for the editor fields under the "General" tab to include the ICORE Ranking Field
+     * if it is missing.
+     * <p>
+     * The function first ensures that the current preferences match the previous default (before the ICORE field was added)
+     * and only then does the update.
+     * </p>
+     *
+     * @param preferences the user's current preferences
+     * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
+     */
+    static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
+        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
+
+        Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
+        if (currentGeneralPrefs != null) {
+            Set<Field> expectedGeneralPrefs = Set.of(
+                    StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
+                    StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
+                    StandardField.TIMESTAMP,
+
+                    SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
+                    SpecialField.READ_STATUS, SpecialField.RELEVANCE
+            );
+            if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
+                return;
+            }
+        }
+
+        entryEditorPrefs.put(
+                Localization.lang("General"),
+                FieldFactory.getDefaultGeneralFields().stream().collect(Collectors.toSet())
+        );
+        preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
     }
 
     /**

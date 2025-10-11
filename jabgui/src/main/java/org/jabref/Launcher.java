@@ -32,6 +32,7 @@ import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
 
 /// The main entry point for the JabRef application.
@@ -49,34 +50,37 @@ public class Launcher {
         FOCUS
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         initLogging(args);
 
         Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
         final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
-        Injector.setModelOrService(CliPreferences.class, preferences);
-        Injector.setModelOrService(GuiPreferences.class, preferences);
-
-        // Early exit in case another instance is already running
-        MultipleInstanceAction instanceAction = handleMultipleAppInstances(args, preferences.getRemotePreferences());
-        if (instanceAction == MultipleInstanceAction.SHUTDOWN) {
-            systemExit();
-        } else if (instanceAction == MultipleInstanceAction.FOCUS) {
-            // Send focus command to running instance
-            RemotePreferences remotePreferences = preferences.getRemotePreferences();
-            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
-            remoteClient.sendFocus();
-            systemExit();
-        }
-
-        configureProxy(preferences.getProxyPreferences());
-        configureSSL(preferences.getSSLPreferences());
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                 args,
                 ArgumentProcessor.Mode.INITIAL_START,
                 preferences);
+
+        if (!argumentProcessor.getGuiCli().usageHelpRequested) {
+            Injector.setModelOrService(CliPreferences.class, preferences);
+            Injector.setModelOrService(GuiPreferences.class, preferences);
+
+            // Early exit in case another instance is already running
+            MultipleInstanceAction instanceAction = handleMultipleAppInstances(args, preferences.getRemotePreferences());
+            if (instanceAction == MultipleInstanceAction.SHUTDOWN) {
+                systemExit();
+            } else if (instanceAction == MultipleInstanceAction.FOCUS) {
+                // Send focus command to running instance
+                RemotePreferences remotePreferences = preferences.getRemotePreferences();
+                RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+                remoteClient.sendFocus();
+                systemExit();
+            }
+
+            configureProxy(preferences.getProxyPreferences());
+            configureSSL(preferences.getSSLPreferences());
+        }
 
         List<UiCommand> uiCommands = argumentProcessor.processArguments();
         if (argumentProcessor.shouldShutDown()) {
@@ -105,7 +109,9 @@ public class Launcher {
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug
-        boolean isDebugEnabled = Arrays.stream(args).anyMatch(arg -> "--debug".equalsIgnoreCase(arg));
+        Level logLevel = Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase)
+                         ? Level.DEBUG
+                         : Level.INFO;
 
         // addLogToDisk
         // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging
@@ -121,9 +127,9 @@ public class Launcher {
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
-                "level", isDebugEnabled ? "debug" : "info",
+                "level", logLevel.name().toLowerCase(),
                 "writerFile", "rolling file",
-                "writerFile.level", isDebugEnabled ? "debug" : "info",
+                "writerFile.level", logLevel.name().toLowerCase(),
                 // We need to manually join the path, because ".resolve" does not work on Windows, because ":" is not allowed in file names on Windows
                 "writerFile.file", directory + File.separator + "log_{date:yyyy-MM-dd_HH-mm-ss}.txt",
                 "writerFile.charset", "UTF-8",
@@ -146,6 +152,7 @@ public class Launcher {
      */
     private static MultipleInstanceAction handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         LOGGER.trace("Checking for remote handling...");
+
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());

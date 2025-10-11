@@ -52,18 +52,16 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
         };
     }
 
-    /**
-     * Converts a String value to the Type T. If the type cannot be directly cast to T, this method must be overridden in a subclass
-     *
-     * @param string The input value to convert
-     * @return The value or null if the value could not be cast
-     */
+    /// Converts a String value to the Type T. If the type cannot be directly cast to T, this method must be overridden in a subclass
+    ///
+    /// @param string The input value to convert
+    /// @return The value or null if the value could not be cast
     @SuppressWarnings("unchecked")
     protected T getValueFromString(String string) {
         try {
             return (T) string;
         } catch (ClassCastException ex) {
-            LOGGER.error("Could not cast string to type %1$s. Try overriding the method in a subclass and provide a conversion from string to the concrete type %1$s".formatted(string.getClass()), ex);
+            LOGGER.error("Could not cast string to type {}", string.getClass(), ex);
         }
         return null;
     }

@@ -18,6 +18,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
@@ -28,7 +29,7 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.push.PushToApplicationCommand;
+import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -47,7 +48,7 @@ import org.controlsfx.control.TaskProgressView;
 
 public class MainToolBar extends ToolBar {
     private final LibraryTabContainer frame;
-    private final PushToApplicationCommand pushToApplicationCommand;
+    private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final GlobalSearchBar globalSearchBar;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -57,6 +58,8 @@ public class MainToolBar extends ToolBar {
     private final TaskExecutor taskExecutor;
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
+    private SimpleCommand backCommand;
+    private SimpleCommand forwardCommand;
     private final CountingUndoManager undoManager;
 
     private PopOver entryFromIdPopOver;
@@ -64,7 +67,7 @@ public class MainToolBar extends ToolBar {
     private Subscription taskProgressSubscription;
 
     public MainToolBar(LibraryTabContainer tabContainer,
-                       PushToApplicationCommand pushToApplicationCommand,
+                       GuiPushToApplicationCommand pushToApplicationCommand,
                        GlobalSearchBar globalSearchBar,
                        DialogService dialogService,
                        StateManager stateManager,
@@ -99,6 +102,7 @@ public class MainToolBar extends ToolBar {
 
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
         pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
+        initNavigationCommands();
 
         // Setup Toolbar
 
@@ -118,6 +122,12 @@ public class MainToolBar extends ToolBar {
                         factory.createIconButton(StandardActions.ADD_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.ADD_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        factory.createIconButton(StandardActions.BACK, backCommand),
+                        factory.createIconButton(StandardActions.FORWARD, forwardCommand)),
 
                 new Separator(Orientation.VERTICAL),
 
@@ -207,5 +217,33 @@ public class MainToolBar extends ToolBar {
         });
 
         return new Group(indicator);
+    }
+
+    private void initNavigationCommands() {
+        backCommand = new SimpleCommand() {
+            {
+                executable.bind(stateManager.canGoBackProperty());
+            }
+
+            @Override
+            public void execute() {
+                if (frame.getCurrentLibraryTab() != null) {
+                    frame.getCurrentLibraryTab().back();
+                }
+            }
+        };
+
+        forwardCommand = new SimpleCommand() {
+            {
+                executable.bind(stateManager.canGoForwardProperty());
+            }
+
+            @Override
+            public void execute() {
+                if (frame.getCurrentLibraryTab() != null) {
+                    frame.getCurrentLibraryTab().forward();
+                }
+            }
+        };
     }
 }

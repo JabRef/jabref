@@ -16,9 +16,9 @@ module org.jabref.jabsrv.cli {
     requires jakarta.inject;
 
     requires afterburner.fx;
-
-    // needs to be loaded here as it's otherwise not found at runtime; XJC related maybe
-    // requires org.glassfish.jaxb.runtime;
+    provides com.airhacks.afterburner.views.ResourceLocator
+            with org.jabref.http.cli.JabRefResourceLocator;
+    requires javafx.base;
 
     requires org.glassfish.grizzly;
     requires org.glassfish.grizzly.http;

@@ -1,6 +1,6 @@
 package org.jabref.gui.consistency;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -15,13 +15,16 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class ConsistencyCheckAction extends SimpleCommand {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckAction.class);
     Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -49,16 +52,18 @@ public class ConsistencyCheckAction extends SimpleCommand {
     public void execute() {
         Task<BibliographyConsistencyCheck.Result> task = new Task<>() {
             @Override
-            public BibliographyConsistencyCheck.Result call() throws Exception {
-
+            public BibliographyConsistencyCheck.Result call() {
                 Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
                 if (databaseContext.isEmpty()) {
-                    throw new IllegalStateException((Localization.lang("No library present")));
+                    LOGGER.debug("Consistency check invoked with no library opened.");
+                    dialogService.notify(Localization.lang("No library open"));
+                    return new BibliographyConsistencyCheck.Result(Map.of());
                 }
-                List<BibEntry> entries = databaseContext.get().getEntries();
+
+                BibDatabaseContext bibContext = databaseContext.get();
 
                 BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-                return consistencyCheck.check(entries, (count, total) ->
+                return consistencyCheck.check(bibContext, (count, total) ->
                         UiTaskExecutor.runInJavaFXThread(() -> {
                             updateProgress(count, total);
                             updateMessage(Localization.lang("%0/%1 entry types", count + 1, total));
@@ -77,7 +82,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
         });
         taskExecutor.execute(task);
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Check consistency"),
                 Localization.lang("Checking consistency..."),
                 task);

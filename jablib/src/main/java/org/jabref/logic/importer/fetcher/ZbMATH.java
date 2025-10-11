@@ -3,13 +3,13 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -23,13 +23,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
@@ -38,13 +39,18 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     private final ImportFormatPreferences preferences;
 
-    public ZbMATH(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public ZbMATH(@NonNull ImportFormatPreferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override
     public String getName() {
         return "zbMATH";
+    }
+
+    @Override
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_ZBMATH);
     }
 
     @Override
@@ -104,9 +110,9 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/bibtexoutput/");
-        uriBuilder.addParameter("q", new ZbMathQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // search all fields
+        uriBuilder.addParameter("q", new ZbMathQueryTransformer().transformSearchQuery(queryNode).orElse("")); // search all fields
         uriBuilder.addParameter("start", "0"); // start index
         uriBuilder.addParameter("count", "200"); // should return up to 200 items (instead of default 100)
         return uriBuilder.build().toURL();

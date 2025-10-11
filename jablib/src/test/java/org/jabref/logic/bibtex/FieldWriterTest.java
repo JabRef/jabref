@@ -45,7 +45,7 @@ class FieldWriterTest {
                 ),
                 // source: https://github.com/JabRef/jabref/issues/8303 --> bug2.txt
                 Arguments.of("Particularly, we equip SOVA &#x2013; a Semantic and Ontological Variability Analysis method")
-                );
+        );
     }
 
     @BeforeEach
@@ -126,8 +126,15 @@ class FieldWriterTest {
     }
 
     @Test
-    void reportUnbalancedBracingWithEscapedBraces() {
+    void reportUnbalancedBracingWithEscapedClosingBraces() {
         String unbalanced = "{\\}";
+
+        assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));
+    }
+
+    @Test
+    void reportUnbalancedBracingWithEscapedOpeningBraces() {
+        String unbalanced = "\\{}";
 
         assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));
     }

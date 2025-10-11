@@ -165,7 +165,7 @@ class CSLFormatUtilsTest {
 
                 // Numeric type "[1]", brackets, newlines
                 Arguments.of(
-                        "[1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.<p></p>",
+                        "[1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.<p></p>",
                         STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
                 ),
 
@@ -176,13 +176,13 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” Edited by Phil Taylor. <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
+                        "Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
                         STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Semicolons
                 Arguments.of(
-                        "1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, editor. BibTeX Journal [Internet]. 2016 Jul;34(3):45–67. Available from: https://github.com/JabRef<p></p>",
+                        "1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, editor. BibTeX Journal [Internet]. 2016 July;34(3):45–67. Available from: https://github.com/JabRef<p></p>",
                         STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
                 ),
 
@@ -490,8 +490,7 @@ class CSLFormatUtilsTest {
      * The numeric index should change to the provided "current number".
      * The rest of the citation should stay as it is (other numbers in the body shouldn't be affected).
      *
-     * @implSpec
-     * <ol>
+     * @implSpec <ol>
      * <li>Assumes that {@link CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} works as expected.</li>
      * <li>Assumes that the method {@link CSLFormatUtils#transformHTML(String) transformHTML} works as expected.</li>
      * <li>Run this test ONLY on numeric Citation Styles.</li>
@@ -511,7 +510,7 @@ class CSLFormatUtilsTest {
 
                 // Type: "[1]"
                 Arguments.of(
-                        "[3] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.<p></p>",
+                        "[3] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.<p></p>",
                         STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
                 ),
 

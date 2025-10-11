@@ -17,8 +17,8 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
-import org.jabref.gui.mergeentries.EntriesMergeResult;
-import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
+import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.ai.AiService;
@@ -221,7 +221,8 @@ public class SharedDatabaseUIManager {
                 preferences.getBibEntryPreferences().getKeywordSeparator(),
                 preferences.getFieldPreferences(),
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
-                fileUpdateMonitor);
+                fileUpdateMonitor,
+                preferences.getFilePreferences().getUserAndHost());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
         return bibDatabaseContext;
     }

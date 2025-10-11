@@ -10,12 +10,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
@@ -27,6 +29,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.BaseDialog;
@@ -71,6 +74,9 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class NewEntryView extends BaseDialog<BibEntry> {
+    private static final String BIBTEX_REGEX = "^@([A-Za-z]+)\\{,";
+    private static final String LINE_BREAK = "\n";
+
     private NewEntryViewModel viewModel;
 
     private final NewEntryDialogTab initialApproach;
@@ -104,6 +110,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private TilePane entryCustom;
 
     @FXML private TextField idText;
+    @FXML private Tooltip idTextTooltip;
+    @FXML private Hyperlink idJumpLink;
     @FXML private RadioButton idLookupGuess;
     @FXML private RadioButton idLookupSpecify;
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
@@ -159,6 +167,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     approach = NewEntryDialogTab.ENTER_IDENTIFIER;
                     interpretText.setText(clipboardText);
                     interpretText.selectAll();
+                } else if (clipboardText.split(LINE_BREAK)[0].matches(BIBTEX_REGEX)) {
+                    approach = NewEntryDialogTab.SPECIFY_BIBTEX;
                 } else {
                     approach = preferences.getLatestApproach();
                 }
@@ -199,12 +209,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         visualizer.setDecoration(new IconValidationDecorator());
 
         EasyBind.subscribe(
-            viewModel.executedSuccessfullyProperty(),
-            succeeded -> {
-                if (succeeded) {
-                    onSuccessfulExecution();
-                }
-            });
+                viewModel.executedSuccessfullyProperty(),
+                succeeded -> {
+                    if (succeeded) {
+                        onSuccessfulExecution();
+                    }
+                });
 
         initializeAddEntry();
         initializeLookupIdentifier();
@@ -260,7 +270,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         //       method (each automatically independently, or all through the same fetcher).
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
-        final String clipboardText = ClipBoardManager.getContents().trim();
 
         ToggleGroup toggleGroup = new ToggleGroup();
         idLookupGuess.setToggleGroup(toggleGroup);
@@ -272,9 +281,19 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             idLookupSpecify.selectedProperty().set(true);
         }
 
+        viewModel.populateDOICache();
+
         // [impl->req~newentry.clipboard.autofocus~1]
         Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
         if (validClipboardId.isPresent()) {
+            viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
+                if (isValid) {
+                    Tooltip.install(idText, idTextTooltip);
+                } else {
+                    Tooltip.uninstall(idText, idTextTooltip);
+                }
+            });
+
             idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
 
@@ -301,8 +320,16 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idFetcher.setValue(initialFetcher);
         idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
 
+        idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
+        idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
+
+        idJumpLink.setOnAction(_ -> libraryTab.showAndEdit(viewModel.getDuplicateEntry()));
+
+        TextInputControl textInput = idText;
+        EditorValidator validator = new EditorValidator(this.guiPreferences);
+        validator.configureValidation(viewModel.duplicateDoiValidatorStatus(), textInput);
     }
 
     private void initializeInterpretCitations() {
@@ -487,38 +514,70 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         // Biblatex is a superset of bibtex, with more elaborate descriptions, so its documentation is preferred.
         // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
         return switch (type) {
-            case Article -> Localization.lang("An article in a journal, magazine, newspaper, or other periodical which forms a self-contained unit with its own title.");
-            case Book -> Localization.lang("A single-volume book with one or more authors where the authors share credit for the work as a whole.");
-            case Booklet -> Localization.lang("A book-like work without a formal publisher or sponsoring institution.");
-            case Collection -> Localization.lang("A single-volume collection with multiple, self-contained contributions by distinct authors which have their own title. The work as a whole has no overall author but it will usually have an editor.");
-            case Conference -> Localization.lang("A legacy alias for \"InProceedings\".");
-            case InBook -> Localization.lang("A part of a book which forms a self-contained unit with its own title.");
-            case InCollection -> Localization.lang("A contribution to a collection which forms a self-contained unit with a distinct author and title.");
-            case InProceedings -> Localization.lang("An article in a conference proceedings.");
-            case Manual -> Localization.lang("Technical or other documentation, not necessarily in printed form.");
-            case MastersThesis -> Localization.lang("Similar to \"Thesis\" except that the type field is optional and defaults to the localised term  Master's thesis.");
-            case Misc -> Localization.lang("A fallback type for entries which do not fit into any other category.");
-            case PhdThesis -> Localization.lang("Similar to \"Thesis\" except that the type field is optional and defaults to the localised term PhD thesis.");
-            case Proceedings -> Localization.lang("A single-volume conference proceedings. This type is very similar to \"Collection\".");
-            case TechReport -> Localization.lang("Similar to \"Report\" except that the type field is optional and defaults to the localised term technical report.");
-            case Unpublished -> Localization.lang("A work with an author and a title which has not been formally published, such as a manuscript or the script of a talk.");
-            case BookInBook -> Localization.lang("This type is similar to \"InBook\" but intended for works originally published as a stand-alone book.");
-            case InReference -> Localization.lang("An article in a work of reference. This is a more specific variant of the generic \"InCollection\" entry type.");
-            case MvBook -> Localization.lang("A multi-volume \"Book\".");
-            case MvCollection -> Localization.lang("A multi-volume \"Collection\".");
-            case MvProceedings -> Localization.lang("A multi-volume \"Proceedings\" entry.");
-            case MvReference -> Localization.lang("A multi-volume \"Reference\" entry. The standard styles will treat this entry type as an alias for \"MvCollection\".");
-            case Online -> Localization.lang("This entry type is intended for sources such as web sites which are intrinsically online resources.");
-            case Reference -> Localization.lang("A single-volume work of reference such as an encyclopedia or a dictionary.");
-            case Report -> Localization.lang("A technical report, research report, or white paper published by a university or some other institution.");
-            case Set -> Localization.lang("An entry set is a group of entries which are cited as a single reference and listed as a single item in the bibliography.");
-            case SuppBook -> Localization.lang("Supplemental material in a \"Book\". This type is provided for elements such as prefaces, introductions, forewords, afterwords, etc. which often have a generic title only.");
-            case SuppCollection -> Localization.lang("Supplemental material in a \"Collection\".");
-            case SuppPeriodical -> Localization.lang("Supplemental material in a \"Periodical\". This type may be useful when referring to items such as regular columns, obituaries, letters to the editor, etc. which only have a generic title.");
-            case Thesis -> Localization.lang("A thesis written for an educational institution to satisfy the requirements for a degree.");
-            case WWW -> Localization.lang("An alias for \"Online\", provided for jurabib compatibility.");
-            case Software -> Localization.lang("Computer software. The standard styles will treat this entry type as an alias for \"Misc\".");
-            case Dataset -> Localization.lang("A data set or a similar collection of (mostly) raw data.");
+            case Article ->
+                    Localization.lang("An article in a journal, magazine, newspaper, or other periodical which forms a self-contained unit with its own title.");
+            case Book ->
+                    Localization.lang("A single-volume book with one or more authors where the authors share credit for the work as a whole.");
+            case Booklet ->
+                    Localization.lang("A book-like work without a formal publisher or sponsoring institution.");
+            case Collection ->
+                    Localization.lang("A single-volume collection with multiple, self-contained contributions by distinct authors which have their own title. The work as a whole has no overall author but it will usually have an editor.");
+            case Conference ->
+                    Localization.lang("A legacy alias for \"InProceedings\".");
+            case InBook ->
+                    Localization.lang("A part of a book which forms a self-contained unit with its own title.");
+            case InCollection ->
+                    Localization.lang("A contribution to a collection which forms a self-contained unit with a distinct author and title.");
+            case InProceedings ->
+                    Localization.lang("An article in a conference proceedings.");
+            case Manual ->
+                    Localization.lang("Technical or other documentation, not necessarily in printed form.");
+            case MastersThesis ->
+                    Localization.lang("Similar to \"Thesis\" except that the type field is optional and defaults to the localised term  Master's thesis.");
+            case Misc ->
+                    Localization.lang("A fallback type for entries which do not fit into any other category.");
+            case PhdThesis ->
+                    Localization.lang("Similar to \"Thesis\" except that the type field is optional and defaults to the localised term PhD thesis.");
+            case Proceedings ->
+                    Localization.lang("A single-volume conference proceedings. This type is very similar to \"Collection\".");
+            case TechReport ->
+                    Localization.lang("Similar to \"Report\" except that the type field is optional and defaults to the localised term technical report.");
+            case Unpublished ->
+                    Localization.lang("A work with an author and a title which has not been formally published, such as a manuscript or the script of a talk.");
+            case BookInBook ->
+                    Localization.lang("This type is similar to \"InBook\" but intended for works originally published as a stand-alone book.");
+            case InReference ->
+                    Localization.lang("An article in a work of reference. This is a more specific variant of the generic \"InCollection\" entry type.");
+            case MvBook ->
+                    Localization.lang("A multi-volume \"Book\".");
+            case MvCollection ->
+                    Localization.lang("A multi-volume \"Collection\".");
+            case MvProceedings ->
+                    Localization.lang("A multi-volume \"Proceedings\" entry.");
+            case MvReference ->
+                    Localization.lang("A multi-volume \"Reference\" entry. The standard styles will treat this entry type as an alias for \"MvCollection\".");
+            case Online ->
+                    Localization.lang("This entry type is intended for sources such as web sites which are intrinsically online resources.");
+            case Reference ->
+                    Localization.lang("A single-volume work of reference such as an encyclopedia or a dictionary.");
+            case Report ->
+                    Localization.lang("A technical report, research report, or white paper published by a university or some other institution.");
+            case Set ->
+                    Localization.lang("An entry set is a group of entries which are cited as a single reference and listed as a single item in the bibliography.");
+            case SuppBook ->
+                    Localization.lang("Supplemental material in a \"Book\". This type is provided for elements such as prefaces, introductions, forewords, afterwords, etc. which often have a generic title only.");
+            case SuppCollection ->
+                    Localization.lang("Supplemental material in a \"Collection\".");
+            case SuppPeriodical ->
+                    Localization.lang("Supplemental material in a \"Periodical\". This type may be useful when referring to items such as regular columns, obituaries, letters to the editor, etc. which only have a generic title.");
+            case Thesis ->
+                    Localization.lang("A thesis written for an educational institution to satisfy the requirements for a degree.");
+            case WWW ->
+                    Localization.lang("An alias for \"Online\", provided for jurabib compatibility.");
+            case Software ->
+                    Localization.lang("Computer software. The standard styles will treat this entry type as an alias for \"Misc\".");
+            case Dataset ->
+                    Localization.lang("A data set or a similar collection of (mostly) raw data.");
         };
     }
 
@@ -568,9 +627,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         for (IdBasedFetcher fetcher : idFetcher.getItems()) {
             if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
                     (id instanceof ISBN && (fetcher instanceof IsbnFetcher) ||
-                    (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
-                    (id instanceof RFC && fetcher instanceof RfcFetcher) ||
-                    (id instanceof SSRN && fetcher instanceof DoiFetcher))) {
+                            (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
+                            (id instanceof RFC && fetcher instanceof RfcFetcher) ||
+                            (id instanceof SSRN && fetcher instanceof DoiFetcher))) {
                 return Optional.of(fetcher);
             }
         }

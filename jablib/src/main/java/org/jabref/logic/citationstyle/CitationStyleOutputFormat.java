@@ -5,7 +5,8 @@ import org.jabref.logic.os.OS;
 public enum CitationStyleOutputFormat {
 
     HTML("html", OS.NEWLINE + "<br>" + OS.NEWLINE),
-    TEXT("text", "");
+    TEXT("text", ""),
+    MARKDOWN("markdown", "");
 
     private final String format;
     private final String lineSeparator;

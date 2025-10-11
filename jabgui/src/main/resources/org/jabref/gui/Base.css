@@ -83,6 +83,7 @@
     -jr-info: -jr-light-green;
     -jr-warn: -jr-orange;
     -jr-error: -jr-light-red;
+    -jr-success: -jr-green;
 
     /* Color for the small group view indicator for the number of hits */
     -jr-group-hits-bg: derive(-jr-sidepane-background, -50%);
@@ -262,9 +263,9 @@
     -jr-header-height: 3em;
 
     /* AI chat style */
-    -jr-ai-message-user: -jr-accent;
+    -jr-ai-message-user: derive(-jr-accent, 50%);
     -jr-ai-message-user-border: -jr-theme;
-    -jr-ai-message-ai: -jr-accent;
+    -jr-ai-message-ai: derive(-jr-accent, 80%);
     -jr-ai-message-ai-border: -jr-theme;
     -jr-ai-message-error: -jr-error;
     -jr-ai-message-error-border: derive(-jr-error, -40%);
@@ -404,7 +405,6 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-radius: 0.25em;
     -fx-text-fill: -fx-text-base-color;
 }
-
 
 .button {
     -fx-background-color: transparent;
@@ -734,6 +734,12 @@ TextFlow > .tooltip-text-monospaced {
 .lib-change-header {
     -fx-font-size: 130%;
     -fx-padding: 0.2em 0em 0.2em 0.2em;
+}
+
+.lib-change-legend {
+    -fx-font-size: 11px;
+    -fx-text-fill: #555;
+    -fx-padding: 4 0 0 5;
 }
 
 .table-view .groupColumnBackground {
@@ -1085,12 +1091,26 @@ TextFlow > .tooltip-text-monospaced {
     -fx-border-width: 0;
 }
 
+.mainToolbar .icon-button {
+    -fx-padding: 0.5em;
+}
+
+/*
+ * -fx-icon-size is intentionally omitted to prevent a rendering loop. The library sets font size
+ * based on the computed icon size, which is itself relative to the font size.
+ */
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
-    -fx-font-size: 1.7em;
+    /* `!important` is override library's default font size */
+    -fx-font-size: 1.7em!important;
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
     -fx-icon-color: -jr-theme-text;
+}
+
+.mainToolbar .progress-indicator {
+    -fx-min-width: 2.8em;
+    -fx-max-width: 2.8em;
 }
 
 .search-field {
@@ -1346,11 +1366,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -jr-warn;
 }
 
-.info-message {
-    -fx-fill: -jr-info;
-    -fx-text-fill: -jr-info;
-}
-
 .warning-message {
     -fx-fill: -jr-warn;
     -fx-text-fill: -jr-warn;
@@ -1385,6 +1400,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .dialog-pane {
+    -fx-font-size: 1em;
     -fx-background-color: -fx-control-inner-background;
 }
 
@@ -1745,6 +1761,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
     -fx-font-family: "Arial";
+    -fx-text-fill: -jr-head-fg;
 }
 
 .welcome-no-recent-label {
@@ -1762,38 +1779,150 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -jr-theme;
 }
 
-.welcome-footer-container {
-    -fx-padding: 15px;
+
+/* Welcome Tab Layout Styles */
+.welcome-main-container {
+    -fx-max-width: 64em;
+    -fx-spacing: 2.333em;
     -fx-alignment: center;
-    -fx-spacing: 15px;
+    -fx-padding: 2.667em 2em;
 }
 
-.welcome-footer-label {
-    -fx-font-size: 2.25em;
-    -fx-text-fill: -jr-theme-text;
-    -fx-font-family: "Arial";
+.welcome-top-titles {
+    -fx-spacing: 0.833em;
+    -fx-alignment: top-left;
+    -fx-padding: 0 0 1.667em 0;
 }
 
-.welcome-footer-link {
-    -fx-font-size: 1.2em;
+.welcome-columns-container {
+    -fx-hgap: 2.083em;
+    -fx-vgap: 2.083em;
+    -fx-alignment: top-center;
+}
+
+.welcome-left-column,
+.welcome-right-column {
+    -fx-min-width: 0;
+    -fx-pref-width: 50%;
+    -fx-max-width: 50em;
+}
+
+.welcome-content-column {
+    -fx-spacing: 2.083em;
+    -fx-alignment: top-left;
+}
+
+.welcome-section {
+    -fx-spacing: 1em;
+    -fx-alignment: top-left;
+}
+
+.welcome-links-content {
+    -fx-spacing: 0.667em;
+    -fx-alignment: top-left;
+}
+
+
+/* Welcome Community  */
+.welcome-community-content {
+    -fx-spacing: 1em;
+    -fx-alignment: top-left;
+}
+
+.welcome-community-icons {
+    -fx-hgap: 1em;
+    -fx-vgap: 0.667em;
+    -fx-alignment: center-left;
+}
+
+.welcome-community-links {
+    -fx-spacing: 1.25em;
+    -fx-alignment: center-left;
+}
+
+.welcome-community-link {
+    -fx-font-size: 1.0em;
     -fx-text-fill: -jr-theme;
     -fx-font-family: "Arial";
 }
 
-.welcome-footer-link:hover {
+.welcome-community-link:hover {
     -fx-underline: true;
     -fx-text-fill: derive(-jr-theme, -20%);
 }
 
-.welcome-footer-version {
-    -fx-font-size: 1.2em;
-    -fx-text-fill: -jr-theme;
+.welcome-community-version {
+    -fx-alignment: center-left;
+    -fx-padding: 0.417em 0 0 0;
+}
+
+.welcome-community-version-text {
+    -fx-font-size: 0.9em;
+    -fx-text-fill: -jr-gray-2;
     -fx-font-family: "Arial";
+}
+
+/* donation toast */
+.donation-toast {
+    -fx-background-color: -jr-background-alt;
+    -fx-background-radius: 0.8333333333em;
+    -fx-padding: 0.8333em 1em;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.075), 20, 0.25, 0, 6);
+    -fx-alignment: center-left;
+    -fx-border-color: derive(-jr-base, -10%);
+    -fx-border-radius: 0.8333333333em;
+    -fx-max-height: 4em;
+    -fx-spacing: 1.16667em;
+}
+
+.donation-toast .label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.donation-toast-title {
+    -fx-font-size: 1.0em;
+    -fx-font-weight: bold;
+}
+
+.donation-toast-desc {
+    -fx-font-size: 0.92em;
+}
+
+.donation-toast-text {
+    -fx-spacing: 2;
+}
+
+.donation-btn-primary,
+.donation-btn-secondary,
+.donation-btn-ghost {
+    -fx-padding: 0.5em 1em;
+    -fx-background-radius: 0.5em;
+    -fx-border-radius: 0.5em;
+}
+
+.donation-btn-primary {
+    -fx-background-color: -jr-primary;
+}
+
+.donation-btn-secondary {
+    -fx-background-color: derive(-fx-control-inner-background, -6%);
+}
+
+.donation-btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-1;
+    -fx-stroke-width: 0;
+    -fx-border-width: 0
+}
+
+.donation-btn-ghost:hover {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-2;
 }
 
 /* AboutDialog */
 #aboutDialog .about-heading {
-    -fx-font-size: 30;
+    -fx-font-size: 2.40em;
     -fx-text-fill: -jr-theme;
 }
 
@@ -1806,12 +1935,12 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #aboutDialog .dev-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: -10 0 0 0;
 }
 
 #aboutDialog .sub-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: 0.312em;
 }
 
@@ -1978,7 +2107,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 #entryEditor #bibtexSourceCodeArea .search {
     -rtfx-background-color: #ffff00;
-    -fx-fill: #7800A9 ;
+    -fx-fill: #7800A9;
     -fx-font-size: 1.2em;
     -fx-font-weight: bolder;
 }
@@ -2023,47 +2152,69 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* ErrorConsole */
-
 #errorConsole .list-content {
-    -fx-padding: 0.625em;
+    -fx-padding: 0em;
 }
 
 #errorConsole .info-section {
-    -fx-padding: 0.625em;
-    -fx-background-color: -fx-background;
+    -fx-graphic-text-gap: 0.8em;
+    -fx-font-size: 1.1em;
+    -fx-line-spacing: 0.2em;
+    -fx-padding: 0.6em 1em;
+    -fx-background-color: -jr-transparent-accent;
 }
 
-#errorConsole .info-section .glyph-icon {
-    -fx-font-size: 24.0;
+#errorConsole .button-bar {
+    -fx-padding: 1em 0em 0em 0em;
+}
+
+#errorConsole .error-console-cell {
+    -fx-padding: 0.6em 1em;
+}
+
+#errorConsole .error-console-cell HBox {
+    -fx-spacing: 0.8em;
+}
+
+#errorConsole .message-box {
+    -fx-spacing: 0.5em;
+}
+
+#errorConsole .info-section .glyph-icon,
+#errorConsole .exception .glyph-icon,
+#errorConsole .output .glyph-icon,
+#errorConsole .log .glyph-icon
+{
+    -fx-font-size: 1.5em;
 }
 
 #errorConsole .exception .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-error;
+    -fx-icon-color: -jr-error;
 }
 
 #errorConsole .output .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-warn;
+    -fx-icon-color: -jr-warn;
 }
 
 #errorConsole .log .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-info;
+    -fx-icon-color: -jr-info;
 }
 
-#errorConsole .custom-buttons {
-    -fx-padding: 0.312em;
+/* Poor readability on -jr-accent. See: https://webaim.org/resources/contrastchecker/?fcolor=9E4C00&bcolor=A3B7E6 */
+#errorConsole .error-console-cell:selected .exception .glyph-icon {
+    -fx-icon-color: derive(-jr-error, -50%);
 }
 
-#errorConsole .exception {
-    -fx-text-fill: -fx-text-base-color;
+#errorConsole .error-console-cell:selected .output .glyph-icon {
+    -fx-icon-color: derive(-jr-warn, -50%);
 }
 
-#errorConsole .output {
-    -fx-text-fill: -fx-text-base-color;
+#errorConsole .error-console-cell:selected .log .glyph-icon {
+    -fx-icon-color: derive(-jr-info, -50%);
 }
 
+#errorConsole .exception,
+#errorConsole .output,
 #errorConsole .log {
     -fx-text-fill: -fx-text-base-color;
 }
@@ -2355,6 +2506,51 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 2;
 }
 
+/* WebSearchTab */
+.fetcher-list-cell {
+    -fx-padding: 0.3em 0.6em;
+    -fx-alignment: center-left;
+    -fx-spacing: 0.5em;
+}
+
+.fetcher-list-cell:nth-child(odd) {
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.fetcher-list-cell .label {
+    -fx-font-size: 100%;
+}
+
+.fetcher-list-cell .configure-button {
+    -fx-padding: 0.25em 0.5em;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+#testButton {
+    -fx-padding: 0.25em 0.5em;
+}
+
+#testButton.success {
+    -fx-text-fill: -jr-success;
+}
+
+#testButton.success .glyph-icon {
+    -fx-icon-color: -jr-success;
+}
+
+#testButton.error {
+    -fx-text-fill: -jr-error;
+}
+
+#testButton.error .glyph-icon {
+    -fx-icon-color: -jr-error;
+}
+
+.api-key-dialog-content {
+    -fx-padding: 1em;
+}
+
 /* CitationRelationsTab */
 
 #citationRelationsTab .addEntryButton {
@@ -2448,7 +2644,7 @@ journalInfo .grid-cell-b {
     -fx-border-width: 2.5;
 }
 
-.three-way-merge .styled-text-area .text{
+.three-way-merge .styled-text-area .text {
     -fx-fill: -fx-text-background-color;
 }
 
@@ -2468,7 +2664,7 @@ journalInfo .grid-cell-b {
     -fx-background-color: -jr-menu-background;
 }
 
-.three-way-merge .merge-header-cell .label{
+.three-way-merge .merge-header-cell .label {
     -fx-font-weight: bold;
     -fx-padding: 1, 0, 1, 0;
 }
@@ -2476,7 +2672,7 @@ journalInfo .grid-cell-b {
 .three-way-merge .field-name .glyph-icon,
 .three-way-merge .field-name .ikonli-font-icon {
     -fx-icon-size: 17;
-    -fx-icon-color:  -jr-theme-text;
+    -fx-icon-color: -jr-theme-text;
 }
 
 /* Miscellaneous */
@@ -2490,7 +2686,9 @@ journalInfo .grid-cell-b {
 }
 
 #styleSelectDialog .currentStyleNameLabel {
-    -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
+    -fx-font-size: 1em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -jr-theme;
 }
 
 .exampleQuestionStyle {
@@ -2513,9 +2711,535 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
 }
 
-.text-button-blue{
+.text-button-blue {
     -fx-background-color: transparent;
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.25em;
     -fx-border-color: transparent;
+}
+
+.add-certificate {
+    -fx-pref-width: 17em;
+    -fx-min-width: 17em;
+}
+
+/* Quick Settings */
+.quick-settings-container,
+.walkthroughs-container {
+    -fx-spacing: 0.3333em;
+    -fx-alignment: top-left;
+}
+
+.quick-settings-button {
+    -fx-background-color: derive(-jr-base, 10%);
+    -fx-border-color: -jr-gray-1;
+    -fx-border-width: 0.08333em;
+    -fx-border-radius: 0.333em;
+    -fx-background-radius: 0.333em;
+    -fx-padding: 0.833em 1.167em;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 0.667em;
+    -fx-font-size: 1.0em;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-cursor: hand;
+}
+
+.quick-settings-button:hover {
+    -fx-background-color: -jr-hover;
+    -fx-border-color: -jr-accent;
+}
+
+.quick-settings-button .glyph-icon,
+.quick-settings-button .ikonli-font-icon {
+    -fx-icon-color: -jr-theme-text;
+    -fx-fill: -jr-theme-text;
+    -fx-font-size: 1.1em;
+}
+
+.quick-settings-dialog-container {
+    -fx-padding: 1.333em;
+    -fx-spacing: 1.333em;
+    -fx-pref-width: 42.667em;
+    -fx-font-size: 1em;
+}
+
+.quick-settings-dialog-container > HBox {
+    -fx-alignment: center-left;
+    -fx-spacing: 0.667em;
+}
+
+.quick-settings-dialog-container > ScrollPane {
+    -fx-border-width: 0.083em;
+    -fx-border-color: derive(-fx-base, -20%);
+    -fx-border-radius: 0.333em;
+}
+
+/* Quick Settings: Theme Selection */
+.theme-option {
+    -fx-padding: 0.667em;
+    -fx-border-radius: 0.333em;
+    -fx-background-radius: 0.333em;
+    -fx-spacing: 1em;
+    -fx-alignment: center-left;
+}
+
+.theme-option:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Wireframe base styles */
+.wireframe-container {
+    -fx-border-width: 0.0625em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 0.125em, 0.0, 0, 0.0625em);
+    -fx-border-color: -jr-wf-border-color;
+}
+
+.wireframe-menubar {
+    -fx-padding: 0.1875em 0.0625em;
+    -fx-background-color: -jr-wf-menubar-bg;
+}
+
+.wireframe-menu-item {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-menu-item-bg;
+}
+
+.wireframe-toolbar {
+    -fx-padding: 0.125em;
+    -fx-spacing: 0.375em;
+    -fx-background-color: -jr-wf-toolbar-bg;
+}
+
+.wireframe-tool-item {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-tool-item-bg;
+}
+
+.wireframe-search {
+    -fx-border-width: 0.03125em;
+    -fx-border-radius: 0.125em;
+    -fx-background-radius: 0.125em;
+    -fx-background-color: -jr-wf-search-bg;
+    -fx-border-color: -jr-wf-search-border;
+}
+
+.wireframe-search-field {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-search-field-bg;
+}
+
+.wireframe-sidebar {
+    -fx-padding: 0.25em 0.125em;
+    -fx-background-color: -jr-wf-sidebar-bg;
+}
+
+.wireframe-sidebar-item {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-sidebar-item-bg;
+}
+
+.wireframe-welcome-tab-area {
+    -fx-padding: 0.25em;
+    -fx-alignment: center;
+    -fx-background-color: -jr-wf-welcome-area-bg;
+}
+
+.wireframe-welcome-tab-item {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-welcome-item-bg;
+}
+
+/* Other color scheme */
+.wireframe-light {
+    -jr-wf-menubar-bg: #f9f9f9;
+    -jr-wf-menu-item-bg: -jr-gray-1;
+    -jr-wf-toolbar-bg: #f9f9f9;
+    -jr-wf-tool-item-bg: -jr-theme;
+    -jr-wf-search-bg: -jr-white;
+    -jr-wf-search-border: #dddddd;
+    -jr-wf-search-field-bg: #f8f8f8;
+    -jr-wf-sidebar-bg: -jr-gray-1;
+    -jr-wf-sidebar-item-bg: -jr-theme;
+    -jr-wf-welcome-area-bg: #f3f3f3;
+    -jr-wf-welcome-item-bg: #dddddd;
+}
+
+.wireframe-dark {
+    -jr-wf-menubar-bg: #141824;
+    -jr-wf-menu-item-bg: #424758;
+    -jr-wf-toolbar-bg: #141824;
+    -jr-wf-tool-item-bg: #2c9490;
+    -jr-wf-search-bg: #2c2e3b;
+    -jr-wf-search-border: #424758;
+    -jr-wf-search-field-bg: #424758;
+    -jr-wf-sidebar-bg: #212330;
+    -jr-wf-sidebar-item-bg: #2c9490;
+    -jr-wf-welcome-area-bg: #272b38;
+    -jr-wf-welcome-item-bg: #7d8591;
+}
+
+.wireframe-custom {
+    -jr-wf-menubar-bg: #f5ffe5;
+    -jr-wf-menu-item-bg: #346963;
+    -jr-wf-toolbar-bg: #f5ffe5;
+    -jr-wf-tool-item-bg: #2E838C;
+    -jr-wf-search-bg: -jr-white;
+    -jr-wf-search-border: #2E838C;
+    -jr-wf-search-field-bg: #f0f3ff;
+    -jr-wf-sidebar-bg: #e1ebd1;
+    -jr-wf-sidebar-item-bg: #2E838C;
+    -jr-wf-welcome-area-bg: #E8F2D8;
+    -jr-wf-welcome-item-bg: #2E838C;
+}
+
+/* Quick Settings: Optimization Checkboxes */
+.optimization-checkboxes {
+    -fx-padding: 0 0 0 1em;
+    -fx-spacing: 1.333em;
+}
+
+/* Quick Settings: Push Application Configuration */
+.applications-list {
+    -fx-pref-height: 16.667em;
+    -fx-pref-width: 33.333em;
+}
+
+.application-item {
+    -fx-padding: 0.667em;
+    -fx-border-radius: 0.333em;
+    -fx-background-color: transparent;
+}
+
+.detected-application {
+    -fx-background-color: derive(-jr-accent, 80%);
+    -fx-font-weight: bold;
+}
+
+.application-item:filled:selected {
+    -fx-background-color: -jr-accent;
+    -fx-text-fill: white;
+}
+
+.detected-application .glyph-icon,
+.detected-application .ikonli-font-icon {
+    -fx-icon-color: -jr-theme-text;
+    -fx-fill: -jr-theme-text;
+}
+
+/* Quick Settings: Online Fetchers */
+.fetchers-container {
+    -fx-padding: 1em;
+    -fx-spacing: 1em;
+}
+
+/* Walkthrough Styles */
+.walkthrough-overlay {
+    -fx-background-color: transparent;
+}
+
+.walkthrough-spotlight {
+    /* -jr-blue-gray-4 with 75% Alpha */
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
+.walkthrough-ping {
+    /* -jr-accent with 75% Alpha */
+    -fx-fill: rgba(163, 183, 230, 0.75);
+}
+
+.walkthrough-darken {
+    /* -jr-blue-gray-4 with 75% Alpha */
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
+/* Tooltip Content */
+.walkthrough-tooltip-content-container {
+    -fx-background-color: -jr-background-alt;
+}
+
+.walkthrough-tooltip .border {
+    /* The arrow of the PopOver. Need to override the default `.popover > .border` (https://github.com/controlsfx/controlsfx/blob/194b10bb948389bf18c463006adcec7c92ca6403/controlsfx/src/main/resources/org/controlsfx/control/popover.css#L8) */
+    /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
+    -fx-fill: #f3f3f3 !important;
+}
+
+.walkthrough-tooltip-content-container {
+    -fx-spacing: 1em;
+    -fx-padding: 1em;
+}
+
+.walkthrough-title-container {
+    -fx-max-width: infinity;
+}
+
+.walkthrough-tooltip-title > *,
+.walkthrough-title > * {
+    -fx-text-fill: -jr-theme!important;
+    -fx-fill: -jr-theme!important;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.75em;
+    -fx-line-spacing: -0.25em;
+}
+
+.walkthrough-side-panel-vertical,
+.walkthrough-side-panel-horizontal {
+    -fx-spacing: 1em;
+    -fx-padding: 2em;
+    -fx-background-color: -jr-background-alt;
+}
+
+.walkthrough-side-panel-vertical {
+    -fx-pref-width: 32em;
+    -fx-max-width: 32em;
+    -fx-min-width: 32em;
+}
+
+.walkthrough-side-panel-horizontal {
+    -fx-pref-height: 18em;
+    -fx-max-height: 18em;
+    -fx-min-height: 18em;
+}
+
+.walkthrough-content {
+    -fx-spacing: 1.5em;
+}
+
+/* Text content containers and flows */
+.walkthrough-text-container {
+    -fx-max-width: infinity;
+}
+
+.walkthrough-text-content {
+    -fx-text-fill: -fx-text-base-color;
+    -fx-font-size: 1.2em;
+    -fx-line-spacing: 0.5em;
+}
+
+/* Info block styling */
+.walkthrough-info-container {
+    -fx-border-color: -jr-theme;
+    -fx-border-width: 0 0 0 0.15em;
+    -fx-padding: 0 0 0 0.75em;
+    -fx-spacing: 0.5em;
+    -fx-alignment: top-left;
+}
+
+.walkthrough-info-container .ikonli-font-icon {
+    -fx-icon-color: -jr-theme;
+    /* 20px is used, since using em seems to lead infinite icon size growth */
+    -fx-icon-size: 20px;
+    /* Center align icon with the text */
+    -fx-translate-y: -0.05em;
+}
+
+.walkthrough-info-text {
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.2em;
+    -fx-line-spacing: 0.5em;
+}
+
+/* Action buttons */
+.walkthrough-actions {
+    -fx-spacing: 0;
+}
+
+.walkthrough-right-actions {
+    -fx-spacing: 0.5em;
+}
+
+.walkthrough-continue-button {
+    -fx-background-color: -jr-theme;
+    -fx-text-fill: -jr-white;
+    -fx-font-size: 1.1em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
+    -fx-padding: 0.25em 0.5em;
+}
+
+.walkthrough-skip-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.1em;
+    -fx-border-color: -jr-theme;
+    -fx-border-width: 0.08em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
+    -fx-padding: 0.25em 0.5em;
+}
+
+.walkthrough-back-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.1em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
+    -fx-padding: 0.25em 0.5em;
+}
+
+.walkthrough-quit-button {
+    -fx-background-color: -jr-base;
+    -fx-border-color: transparent;
+    /* For easy clipping */
+    -fx-padding: 0.5em;
+    -fx-min-width: 2em;
+    -fx-min-height: 2em;
+    -fx-pref-width: 2em;
+    -fx-pref-height: 2em;
+    -fx-max-width: 2em;
+    -fx-max-height: 2em;
+}
+
+.walkthrough-quit-button:hover {
+    -fx-background-color: derive(-jr-base, -20%);
+}
+
+.walkthrough-quit-button:pressed {
+    -fx-background-color: derive(-jr-base, 30%);
+}
+
+.walkthrough-quit-button .glyph-icon,
+.walkthrough-quit-button .ikonli-font-icon {
+    -fx-icon-color: -jr-theme;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.2em;
+}
+
+.walkthrough-fullscreen-content {
+    -fx-padding: 0.1875em;
+    -fx-spacing: 1em;
+    -fx-max-width: 48em;
+    -fx-fill-width: true;
+}
+
+/* Markdown styles */
+.markdown-textflow {
+    -fx-text-alignment: left;
+}
+
+.markdown-textflow > * {
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-h1 {
+    -fx-font-size: 2em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h2 {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h3 {
+    -fx-font-size: 1.25em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h4 {
+    -fx-font-size: 1.1em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h5 {
+    -fx-font-size: 1em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h6 {
+    -fx-font-size: 0.875em;
+    -fx-font-weight: bold;
+}
+
+.markdown-bold {
+    -fx-font-weight: bold;
+}
+
+.markdown-italic {
+    -fx-font-style: italic;
+}
+
+.markdown-code {
+    -fx-font-family: monospace;
+    -fx-fill: -jr-theme;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 1);
+}
+
+.markdown-code-block {
+    -fx-font-family: monospace;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-list-bullet {
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
+.markdown-list-number {
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
+.markdown-blockquote-marker {
+    -fx-fill: transparent;
+}
+
+.markdown-blockquote {
+    -fx-fill: -fx-mid-text-color;
+    -fx-font-style: italic;
+}
+
+.markdown-link {
+    -fx-text-fill: -jr-theme;
+    -fx-underline: true;
+}
+
+.markdown-link:hover {
+    -fx-text-fill: #004499;
+}
+
+.invalid-path {
+    -fx-background-color: rgba(238, 82, 83, 0.2);
+    -fx-border-color: -jr-error;
+    -fx-border-width: 1px;
+}
+
+.checkbox-flowpane {
+    -fx-hgap: 1.5em;
+    -fx-vgap: 0.8em;
+}
+
+/* Automatic Field Editor */
+.edit-field-content-pane {
+    -fx-padding: 0em 1em;
+    -fx-spacing: 1em;
+}
+
+.edit-field-content-pane .text-field {
+    -fx-padding: 0.5625em 0.75em;
+}
+
+.edit-field-content-pane .actions {
+    -fx-spacing: 0.75em;
+    -fx-alignment: BASELINE_LEFT;
+}
+
+.edit-field-content-pane .grid-pane {
+    -fx-hgap: 0.75em;
+    -fx-vgap: 0.75em;
+}
+
+.edit-field-content-pane .grid-pane .label {
+    -fx-min-width: 3.5em;
+}
+
+.automatic-field-editor .button-bar .button:default {
+    -fx-min-width: 12em;
 }

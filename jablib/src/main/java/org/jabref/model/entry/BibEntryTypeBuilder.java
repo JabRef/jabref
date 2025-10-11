@@ -106,9 +106,9 @@ public class BibEntryTypeBuilder {
     public BibEntryType build() {
         // Treat required fields as important ones
         Stream<BibField> requiredAsImportant = requiredFields.stream()
-                .map(OrFields::getFields)
-                .flatMap(Set::stream)
-                .map(field -> new BibField(field, FieldPriority.IMPORTANT));
+                                                             .map(OrFields::getFields)
+                                                             .flatMap(Set::stream)
+                                                             .map(field -> new BibField(field, FieldPriority.IMPORTANT));
         SequencedSet<BibField> allFields = Stream.concat(optionalFields.stream(), requiredAsImportant).collect(Collectors.toCollection(LinkedHashSet::new));
         return new BibEntryType(type, allFields, requiredFields);
     }

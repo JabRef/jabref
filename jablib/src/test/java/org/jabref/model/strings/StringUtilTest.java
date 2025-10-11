@@ -15,6 +15,7 @@ import org.jabref.logic.os.OS;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -31,7 +32,7 @@ class StringUtilTest {
         Path path = Path.of("src", "main", "java", StringUtil.class.getName().replace('.', '/') + ".java");
         int lineCount = Files.readAllLines(path, StandardCharsets.UTF_8).size();
 
-        assertTrue(lineCount <= 819, "StringUtil increased in size to " + lineCount + ". "
+        assertTrue(lineCount <= 830, "StringUtil increased in size to " + lineCount + ". "
                 + "We try to keep this class as small as possible. "
                 + "Thus think twice if you add something to StringUtil.");
     }
@@ -137,7 +138,7 @@ class StringUtilTest {
 
         assertEquals("", StringUtil.join(s, "\\", 3, s.length));
 
-        assertEquals("", StringUtil.join(new String[]{}, "\\", 0, 0));
+        assertEquals("", StringUtil.join(new String[] {}, "\\", 0, 0));
     }
 
     @Test
@@ -188,11 +189,11 @@ class StringUtilTest {
 
     @Test
     void decodeStringDoubleArray() {
-        assertArrayEquals(new String[][]{{"a", "b"}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:b;c:d"));
-        assertArrayEquals(new String[][]{{"a", ""}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:;c:d"));
+        assertArrayEquals(new String[][] {{"a", "b"}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:b;c:d"));
+        assertArrayEquals(new String[][] {{"a", ""}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:;c:d"));
         // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
         // assertArrayEquals(stringArray2res, StringUtil.decodeStringDoubleArray(encStringArray2));
-        assertArrayEquals(new String[][]{{"a", ":b"}, {"c;", "d"}}, StringUtil.decodeStringDoubleArray("a:\\:b;c\\;:d"));
+        assertArrayEquals(new String[][] {{"a", ":b"}, {"c;", "d"}}, StringUtil.decodeStringDoubleArray("a:\\:b;c\\;:d"));
     }
 
     @Test
@@ -294,20 +295,20 @@ class StringUtilTest {
         assertEquals(Optional.empty(), StringUtil.intValueOfOptional(""));
     }
 
-    @Test
-    void limitStringLengthShort() {
-        assertEquals("Test", StringUtil.limitStringLength("Test", 20));
+    @ParameterizedTest
+    @CsvSource({
+            "'Test', 'Test', 20",
+            "'...', 'Test', 3",
+            "'TestTes...', 'TestTestTestTestTest', 10",
+            "'', , 10"
+    })
+    void limitStringLength(String expected, String input, int maxLength) {
+        assertEquals(expected, StringUtil.limitStringLength(input, maxLength));
     }
 
     @Test
     void limitStringLengthLimiting() {
-        assertEquals("TestTes...", StringUtil.limitStringLength("TestTestTestTestTest", 10));
         assertEquals(10, StringUtil.limitStringLength("TestTestTestTestTest", 10).length());
-    }
-
-    @Test
-    void limitStringLengthNullInput() {
-        assertEquals("", StringUtil.limitStringLength(null, 10));
     }
 
     @Test

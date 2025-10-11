@@ -9,8 +9,9 @@ jobs:
     name: Determine issue number
     runs-on: ubuntu-latest
     if: >
+      (github.repository == 'JabRef/jabref') &&
       !(
-        (github.actor == 'dependabot[bot]') ||
+        (github.event.pull_request.user.login == 'dependabot[bot]') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
@@ -40,8 +41,8 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #12345` in PULL_REQUEST_TEMPLATE
-          bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!12345\b)\d+)'
+          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #13109` in PULL_REQUEST_TEMPLATE
+          bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!13109\b)\d+)'
           bodyRegexFlags: 'i'
           outputOnly: true
       - run: echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
@@ -56,7 +57,7 @@ jobs:
       contents: read
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Remove assignee
         run: |
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error

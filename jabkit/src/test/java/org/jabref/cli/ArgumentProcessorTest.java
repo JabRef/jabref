@@ -116,7 +116,7 @@ class ArgumentProcessorTest {
         Path outputHtml = tempDir.resolve("output.html").toAbsolutePath();
         String outputHtmlFile = outputHtml.toAbsolutePath().toString();
 
-        when(importerPreferences.getCustomImporters()) .thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
 
         SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.TABLE, List.of());
         ExportPreferences exportPreferences = new ExportPreferences(".html", tempDir, saveOrder, List.of());
@@ -145,9 +145,9 @@ class ArgumentProcessorTest {
 
         int executionResult = commandLine.execute(args.toArray(String[]::new));
 
-        String output = outContent.toString();
-        assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"));
-        assertTrue(output.contains("Consistency check completed"));
+        String output = outContent.toString().replace("\r\n", "\n");
+        assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"), "Expected output to contain sentence: Checking consistency for entry type 1 of 1");
+        assertTrue(output.contains("Consistency check completed"), "Expected output to contain sentence: Consistency check completed");
         assertEquals(0, executionResult);
 
         System.setOut(System.out);

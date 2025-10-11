@@ -100,7 +100,7 @@ class ISIDOREFetcherTest {
 
     @Test
     void author() throws FetcherException {
-        List<BibEntry> actual = fetcher.performSearch("author:\"Adam Strange\"");
+        List<BibEntry> actual = fetcher.performSearch("author=\"Adam Strange\"");
         assertEquals(List.of(new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Howard Green and Karen Boyland and Adam Strange")
                 .withField(StandardField.DOI, "doi:10.3406/htn.1990.2970")

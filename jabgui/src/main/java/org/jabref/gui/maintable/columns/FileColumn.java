@@ -1,7 +1,6 @@
 package org.jabref.gui.maintable.columns;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javafx.scene.Node;
@@ -26,6 +25,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A column that draws a clickable symbol for either all the files of a defined file type
  * or a joined column with all the files of any type
@@ -41,12 +42,12 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
      * Creates a joined column for all the linked files.
      */
     public FileColumn(MainTableColumnModel model,
-                      BibDatabaseContext database,
+                      @NonNull BibDatabaseContext database,
                       DialogService dialogService,
                       GuiPreferences preferences,
                       TaskExecutor taskExecutor) {
         super(model);
-        this.database = Objects.requireNonNull(database);
+        this.database = database;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
@@ -80,13 +81,13 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
      * Creates a column for all the linked files of a single file type.
      */
     public FileColumn(MainTableColumnModel model,
-                      BibDatabaseContext database,
+                      @NonNull BibDatabaseContext database,
                       DialogService dialogService,
                       GuiPreferences preferences,
                       String fileType,
                       TaskExecutor taskExecutor) {
         super(model);
-        this.database = Objects.requireNonNull(database);
+        this.database = database;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
@@ -104,7 +105,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                 .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                     List<LinkedFile> filteredFiles = linkedFiles.stream()
                                                                 .filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(fileType))
-                                                                .collect(Collectors.toList());
+                                                                .toList();
 
                     if (event.getButton() == MouseButton.PRIMARY) {
                         if (filteredFiles.size() == 1) {
@@ -120,7 +121,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                         entry.getEntry(), database, taskExecutor, dialogService, preferences);
                                 MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
                                         linkedFileViewModel.getTypeIcon().getGraphicNode());
-                                menuItem.setOnAction(e -> linkedFileViewModel.open());
+                                menuItem.setOnAction(_ -> linkedFileViewModel.open());
                                 contextMenu.getItems().add(menuItem);
                             }
                             contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());

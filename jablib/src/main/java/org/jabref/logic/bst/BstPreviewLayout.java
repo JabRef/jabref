@@ -56,7 +56,7 @@ public final class BstPreviewLayout implements PreviewLayout {
             return error;
         }
         // ensure that the entry is of BibTeX format (and do not modify the original entry)
-        BibEntry entry = (BibEntry) originalEntry.clone();
+        BibEntry entry = new BibEntry(originalEntry);
         new ConvertToBibtexCleanup().cleanup(entry);
         String result = bstVM.render(List.of(entry));
         // Remove all comments
@@ -92,6 +92,11 @@ public final class BstPreviewLayout implements PreviewLayout {
 
     @Override
     public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getShortTitle() {
         return name;
     }
 

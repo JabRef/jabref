@@ -1,9 +1,8 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
-
-//JAVA 24
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS com.fasterxml.jackson.core:jackson-databind:2.17.1
+//DEPS org.jspecify:jspecify:1.0.0
 //DEPS org.slf4j:slf4j-api:2.0.13
 //DEPS org.slf4j:slf4j-simple:2.0.13
 
@@ -46,20 +45,29 @@ public class CitationStyleCatalogGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         generateCitationStyleCatalog();
     }
 
     public static void generateCitationStyleCatalog() {
         try {
-            if (!Files.exists(STYLES_ROOT.resolve(DEFAULT_STYLE))) {
-                LOGGER.error("Could not find any citation style. Tried with {}.", DEFAULT_STYLE);
+            // JBang's gradle plugin has a strange path handling. If "application->run" is started from the IDE, the path ends with "jabgui"
+            Path root = Path.of(".").toAbsolutePath().normalize();
+            String rootFilename = root.getFileName().toString();
+            if (!"jabref".equalsIgnoreCase(rootFilename) && rootFilename.startsWith("jab")) {
+                LOGGER.info("Running from IDE, adjusting path to styles root");
+                root = root.getParent();
+            }
+            Path stylesRoot = root.resolve(STYLES_ROOT);
+            if (!Files.exists(stylesRoot.resolve(DEFAULT_STYLE))) {
+                LOGGER.error("Could not find any citation style. Tried with {}. Tried in {}. Current directory: {}", DEFAULT_STYLE, root, Path.of(".").toAbsolutePath());
                 return;
             }
 
-            List<CitationStyle> styles = discoverStyles(STYLES_ROOT);
+            List<CitationStyle> styles = discoverStyles(stylesRoot);
 
-            generateCatalog(styles);
+            Path catalogPath = root.resolve(CATALOG_PATH);
+            generateCatalog(styles, stylesRoot, catalogPath);
         } catch (IOException e) {
             LOGGER.error("Error generating citation style catalog", e);
         }
@@ -75,18 +83,17 @@ public class CitationStyleCatalogGenerator {
         }
     }
 
-    private static void generateCatalog(List<CitationStyle> styles) throws IOException {
-        Path catalogFile = Path.of(CATALOG_PATH);
-
+    private static void generateCatalog(List<CitationStyle> styles, Path stylesRoot, Path catalogPath) throws IOException {
         // Create a JSON representation of the styles
         ObjectMapper mapper = new ObjectMapper();
         List<Map<String, Object>> styleInfoList = styles.stream()
                                                         .map(style -> {
                                                             Map<String, Object> info = new HashMap<>();
                                                             Path stylePath = Path.of(style.getFilePath());
-                                                            Path relativePath = STYLES_ROOT.toAbsolutePath().relativize(stylePath.toAbsolutePath());
+                                                            Path relativePath = stylesRoot.toAbsolutePath().relativize(stylePath.toAbsolutePath());
                                                             info.put("path", relativePath.toString());
                                                             info.put("title", style.getTitle());
+                                                            info.put("shortTitle", style.getShortTitle());
                                                             info.put("isNumeric", style.isNumericStyle());
                                                             info.put("hasBibliography", style.hasBibliography());
                                                             info.put("usesHangingIndent", style.usesHangingIndent());
@@ -95,8 +102,8 @@ public class CitationStyleCatalogGenerator {
                                                         .toList();
 
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(styleInfoList);
-        Files.writeString(catalogFile, json);
+        Files.writeString(catalogPath, json);
 
-        LOGGER.info("Generated citation style catalog with {} styles at {}", styles.size(), catalogFile);
+        LOGGER.info("Generated citation style catalog with {} styles at {}", styles.size(), catalogPath);
     }
 }

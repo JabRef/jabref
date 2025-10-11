@@ -12,9 +12,9 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.ACMPortalParser;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class ACMPortalFetcher implements SearchBasedParserFetcher {
 
@@ -37,20 +37,20 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_ACM);
     }
 
-    private static String createQueryString(QueryNode query) {
-        return new DefaultQueryTransformer().transformLuceneQuery(query).orElse("");
+    private static String createQueryString(BaseQueryNode queryNode) {
+        return new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
     }
 
     /**
      * Constructing the url for the searchpage.
      *
-     * @param query query node
+     * @param queryNode the first query node
      * @return query URL
      */
     @Override
-    public URL getURLForQuery(QueryNode query) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        uriBuilder.addParameter("AllField", createQueryString(query));
+        uriBuilder.addParameter("AllField", createQueryString(queryNode));
         return uriBuilder.build().toURL();
     }
 

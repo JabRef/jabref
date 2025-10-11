@@ -31,9 +31,10 @@
         // Install java.
         // See https://github.com/devcontainers/features/tree/main/src/java#options for details.
         "ghcr.io/devcontainers/features/java:1": {
-            "version": "24.0.1-tem",
-            "installGradle": false,
-            "jdkDistro": "Temurin"
+            "version": "latest",
+            "installGradle": true,
+            "gradleVersion": "latest",
+            "jdkDistro": "Corretto"
         }
     }
 }

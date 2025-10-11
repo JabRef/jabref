@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -15,6 +16,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Tooltip;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.util.BaseDialog;
@@ -203,6 +205,21 @@ public interface DialogService extends NotificationService {
      */
     Optional<ButtonType> showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
                                                        ButtonType... buttonTypes);
+
+    /**
+     * This will create and display a new dialog showing a custom {@link DialogPane}
+     * using custom {@link ButtonType}s, and attaches optional {@link Tooltip}s to the buttons.
+     * Useful for providing additional context to the user through tooltips
+     * without cluttering the main dialog content.
+     *
+     * @return Optional with the pressed Button as ButtonType
+     */
+
+    Optional<ButtonType> showCustomButtonDialogWithTooltipsAndWait(Alert.AlertType type,
+                                                                   String title,
+                                                                   String content,
+                                                                   Map<ButtonType, String> tooltips,
+                                                                   ButtonType... buttonTypes);
 
     /**
      * This will create and display a new dialog showing a custom {@link DialogPane}

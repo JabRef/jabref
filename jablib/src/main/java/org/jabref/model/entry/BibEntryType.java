@@ -17,6 +17,8 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
+import org.jspecify.annotations.NonNull;
+
 public class BibEntryType implements Comparable<BibEntryType> {
 
     private final EntryType type;
@@ -25,15 +27,15 @@ public class BibEntryType implements Comparable<BibEntryType> {
 
     /**
      * Provides an enriched EntryType with information about defined standards as mandatory fields etc.
-     *
+     * <p>
      * A builder is available at {@link BibEntryTypeBuilder}
      *
-     * @param type              The EntryType this BibEntryType is wrapped around.
-     * @param allFields         A BibFields list of all fields, including the required fields
-     * @param requiredFields    A OrFields list of just the required fields
+     * @param type           The EntryType this BibEntryType is wrapped around.
+     * @param allFields      A BibFields list of all fields, including the required fields
+     * @param requiredFields A OrFields list of just the required fields
      */
-    public BibEntryType(EntryType type, Collection<BibField> allFields, Collection<OrFields> requiredFields) {
-        this.type = Objects.requireNonNull(type);
+    public BibEntryType(@NonNull EntryType type, Collection<BibField> allFields, Collection<OrFields> requiredFields) {
+        this.type = type;
         this.allFields = new LinkedHashSet<>(allFields);
         this.requiredFields = new LinkedHashSet<>(requiredFields);
     }
@@ -44,8 +46,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
 
     public SequencedSet<BibField> getOptionalFields() {
         return getAllBibFields().stream()
-                             .filter(field -> !isRequired(field.field()))
-                             .collect(Collectors.toCollection(LinkedHashSet::new));
+                                .filter(field -> !isRequired(field.field()))
+                                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public boolean isRequired(Field field) {
@@ -136,8 +138,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
         }
         BibEntryType that = (BibEntryType) o;
         return type.equals(that.type) &&
-               Objects.equals(requiredFields, that.requiredFields) &&
-               Objects.equals(allFields, that.allFields);
+                Objects.equals(requiredFields, that.requiredFields) &&
+                Objects.equals(allFields, that.allFields);
     }
 
     @Override

@@ -16,4 +16,8 @@ public class FilesToServe {
     public List<Path> getFilesToServe() {
         return filesToServe;
     }
+
+    public boolean isEmpty() {
+        return filesToServe == null || filesToServe.isEmpty();
+    }
 }

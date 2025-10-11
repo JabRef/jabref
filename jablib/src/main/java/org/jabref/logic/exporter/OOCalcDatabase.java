@@ -16,6 +16,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -145,7 +146,12 @@ class OOCalcDatabase {
         firstRow.setAttribute("table.style-name", "ro1");
         addTableCell(document, firstRow, "Type");
         for (Field field : toExportFields) {
-            addTableCell(document, firstRow, field.getDisplayName());
+            // Special case for OpenOffice/LibreOffice internal field reporttype, should not be handled as a normal field
+            if ("reporttype".equalsIgnoreCase(field.getName())) {
+                addTableCell(document, firstRow, "Reporttype");
+            } else {
+                addTableCell(document, firstRow, FieldTextMapper.getDisplayName(field));
+            }
         }
 
         table.appendChild(firstRow);

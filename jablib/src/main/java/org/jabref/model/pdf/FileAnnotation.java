@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class FileAnnotation {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotation.class);
 
-    private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
+    private static final int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
     private static final String DATE_TIME_STRING = "^D:\\d{14}$";
     private static final String DATE_TIME_STRING_WITH_TIME_ZONE = "^D:\\d{14}.+";
     private static final String ANNOTATION_DATE_FORMAT = "yyyyMMddHHmmss";
@@ -89,8 +89,8 @@ public class FileAnnotation {
 
         try {
             return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT));
-        } catch (DateTimeParseException e) {
-            LOGGER.info("Expected a parseable date string! However, this text could not be parsed: '%s'".formatted(dateTimeString));
+        } catch (DateTimeParseException _) {
+            LOGGER.info("Expected a parseable date string! However, this text could not be parsed: {}'", dateTimeString);
             return LocalDateTime.now();
         }
     }
@@ -116,7 +116,7 @@ public class FileAnnotation {
      */
     private String abbreviateAnnotationName(final String annotationName) {
         if (annotationName.length() > ABBREVIATED_ANNOTATION_NAME_LENGTH) {
-            return annotationName.subSequence(0, ABBREVIATED_ANNOTATION_NAME_LENGTH).toString() + "...";
+            return annotationName.subSequence(0, ABBREVIATED_ANNOTATION_NAME_LENGTH) + "...";
         }
         return annotationName;
     }

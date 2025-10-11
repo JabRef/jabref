@@ -63,7 +63,7 @@ class CSLStyleUtilsTest {
 
     @ParameterizedTest
     @MethodSource("styleTestData")
-    void parseStyleInfo(String styleName, String expectedTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) throws IOException {
+    void parseStyleInfo(String styleName, String expectedTitle, String expectedShortTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) throws IOException {
         String styleContent;
         try (InputStream inputStream = CSLStyleUtilsTest.class.getResourceAsStream(styleName)) {
             styleContent = new String(inputStream.readAllBytes());
@@ -73,6 +73,7 @@ class CSLStyleUtilsTest {
 
         assertTrue(styleInfo.isPresent());
         assertEquals(expectedTitle, styleInfo.get().title());
+        assertEquals(expectedShortTitle, styleInfo.get().shortTitle());
         assertEquals(expectedNumericNature, styleInfo.get().isNumericStyle());
         assertEquals(expectedBibliographicNature, styleInfo.get().hasBibliography());
         assertEquals(expectedUsesHangingIndent, styleInfo.get().usesHangingIndent());
@@ -80,7 +81,7 @@ class CSLStyleUtilsTest {
 
     @ParameterizedTest
     @MethodSource("styleTestData")
-    void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) {
+    void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, String expectedShortTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) {
         // use absolute path to test csl so that it is treated as external file
         Path resourcePath = Path.of("").toAbsolutePath()
                                 .resolve("src/test/resources/org/jabref/logic/citationstyle")
@@ -90,6 +91,7 @@ class CSLStyleUtilsTest {
 
         assertTrue(citationStyle.isPresent());
         assertEquals(expectedTitle, citationStyle.get().getTitle());
+        assertEquals(expectedShortTitle, citationStyle.get().getShortTitle());
         assertEquals(expectedNumericNature, citationStyle.get().isNumericStyle());
         assertEquals(expectedBibliographicNature, citationStyle.get().hasBibliography());
         assertEquals(expectedUsesHangingIndent, citationStyle.get().usesHangingIndent());
@@ -99,9 +101,9 @@ class CSLStyleUtilsTest {
 
     private static Stream<Arguments> styleTestData() {
         return Stream.of(
-                Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", true, true, false),
-                Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", false, true, true),
-                Arguments.of(LITERATURA, "Literatūra", false, true, true) // Literatūra uses author-date format, so non-numeric
+                Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", "", true, true, false),
+                Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", "APA", false, true, true),
+                Arguments.of(LITERATURA, "Literatūra", "Literatūra", false, true, true) // Literatūra uses author-date format, so non-numeric
         );
     }
 
@@ -136,9 +138,9 @@ class CSLStyleUtilsTest {
                 Arguments.of("IEEE", IEEE),
                 Arguments.of("American Psychological Association 7th edition", APA),
                 Arguments.of("Vancouver", VANCOUVER),
-                Arguments.of("Chicago Manual of Style 17th edition (author-date)", CHICAGO_AUTHOR_DATE),
+                Arguments.of("Chicago Manual of Style 18th edition (author-date)", CHICAGO_AUTHOR_DATE),
                 Arguments.of("Nature", NATURE),
-                Arguments.of("Modern Language Association 9th edition", MLA),
+                Arguments.of("Modern Language Association 9th edition (in-text citations)", MLA),
                 Arguments.of("The Journal of Clinical Ethics", JOURNAL_OF_CLINICAL_ETHICS)
         );
     }

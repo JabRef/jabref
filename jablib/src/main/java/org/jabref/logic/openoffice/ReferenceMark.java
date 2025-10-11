@@ -15,8 +15,13 @@ public class ReferenceMark {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMark.class);
 
-    private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile("^(JABREF_[\\w-:./]+ CID_\\d+(?:, JABREF_[\\w-:./]+ CID_\\d+)*) (\\w+)$");
-    private static final Pattern ENTRY_PATTERN = Pattern.compile("JABREF_([\\w-:./]+) CID_(\\d+)");
+    private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile(
+            "^(JABREF_[\\w-:./]+ CID_\\d+(?:, JABREF_[\\w-:./]+ CID_\\d+)*) (\\w+)$",
+            Pattern.UNICODE_CHARACTER_CLASS);
+
+    private static final Pattern ENTRY_PATTERN = Pattern.compile(
+            "JABREF_([\\w-:./]+) CID_(\\d+)",
+            Pattern.UNICODE_CHARACTER_CLASS);
 
     private final String name;
     private List<String> citationKeys;
@@ -25,10 +30,10 @@ public class ReferenceMark {
 
     /**
      * @param name Allowed formats:
-     * Single entry: <code>JABREF_{citationKey} CID_{citationNumber} {uniqueId}</code>
-     * Group of entries: <code>JABREF_{citationKey1} CID_{citationNumber1}, JABREF_{citationKey2} CID_{citationNumber2}, ..., JABREF_{citationKeyN} CID_{citationNumberN} {uniqueId}</code>
-     * Disallowed: <code>JABREF_{citationKey} CID_{citationNumber}</code> (no unique ID at the end)
-     * Disallowed: <code>JABREF_{citationKey1} CID_{citationNumber1} JABREF_{citationKey2} CID_{citationNumber2} {uniqueId}</code> (no comma between entries)
+     *             Single entry: <code>JABREF_{citationKey} CID_{citationNumber} {uniqueId}</code>
+     *             Group of entries: <code>JABREF_{citationKey1} CID_{citationNumber1}, JABREF_{citationKey2} CID_{citationNumber2}, ..., JABREF_{citationKeyN} CID_{citationNumberN} {uniqueId}</code>
+     *             Disallowed: <code>JABREF_{citationKey} CID_{citationNumber}</code> (no unique ID at the end)
+     *             Disallowed: <code>JABREF_{citationKey1} CID_{citationNumber1} JABREF_{citationKey2} CID_{citationNumber2} {uniqueId}</code> (no comma between entries)
      */
     public ReferenceMark(String name) {
         this.name = name;

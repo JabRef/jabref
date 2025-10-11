@@ -1,9 +1,5 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-
 import javafx.scene.Parent;
 import javafx.scene.control.Tooltip;
 
@@ -15,7 +11,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.pdf.FileAnnotation;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -37,15 +32,18 @@ public class FileAnnotationTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        boolean hasAnnotations = false;
         if (!entryEditorPreferences.shouldShowFileAnnotationsTab()) {
             return entry.getField(StandardField.FILE).isPresent();
         }
-        if (stateManager.activeTabProperty().get().isPresent()) {
-            Map<Path, List<FileAnnotation>> fileAnnotations = stateManager.activeTabProperty().get().get().getAnnotationCache().getFromCache(entry);
-            hasAnnotations = fileAnnotations.values().stream().anyMatch(list -> !list.isEmpty());
-        }
-        return entry.getField(StandardField.FILE).isPresent() && hasAnnotations;
+
+        return entry.getField(StandardField.FILE).isPresent()
+                && stateManager.activeTabProperty().get()
+                               .map(tab -> tab.getAnnotationCache()
+                                              .getFromCache(entry)
+                                              .values()
+                                              .stream()
+                                              .anyMatch(list -> !list.isEmpty()))
+                               .orElse(false);
     }
 
     @Override

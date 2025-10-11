@@ -148,7 +148,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 .withOnMouseClickedEvent(item -> evt -> {
                     CSLStyleSelectViewModel selectedStyle = cslStylesTable.getSelectionModel().getSelectedItem();
                     if (selectedStyle != null) {
-                        viewModel.deleteCslStyle(selectedStyle.getLayout().getCitationStyle());
+                        viewModel.deleteCslStyle(selectedStyle.getLayout().citationStyle());
                     }
                 })
                 .withTooltip(item -> Localization.lang("Remove style"))

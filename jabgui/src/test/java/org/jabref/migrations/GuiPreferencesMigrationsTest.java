@@ -29,9 +29,9 @@ class GuiPreferencesMigrationsTest {
     private JabRefGuiPreferences preferences;
     private Preferences mainPrefsNode;
 
-    private final String[] oldStylePatterns = new String[]{"\\bibtexkey",
+    private final String[] oldStylePatterns = new String[] {"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-    private final String[] newStylePatterns = new String[]{"[citationkey]",
+    private final String[] newStylePatterns = new String[] {"[citationkey]",
             "[citationkey] - [title]"};
 
     @BeforeEach
@@ -219,5 +219,15 @@ class GuiPreferencesMigrationsTest {
             verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherC"), any());
             verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
         }
+    }
+
+    @Test
+    void resolveBibTexStringsFields() {
+        String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
+        String expectedValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon;monthfiled";
+        when(preferences.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS)).thenReturn(oldPrefsValue);
+
+        PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
+        verify(preferences).put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, expectedValue);
     }
 }

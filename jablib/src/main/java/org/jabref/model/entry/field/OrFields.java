@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.SequencedSet;
-import java.util.StringJoiner;
 
 /**
  * Represents a choice between two (or more) fields or any combination of them.
@@ -20,7 +19,7 @@ import java.util.StringJoiner;
  */
 public class OrFields implements Comparable<OrFields> {
 
-    private SequencedSet<Field> fields = new LinkedHashSet<>();
+    private final SequencedSet<Field> fields = new LinkedHashSet<>();
 
     public OrFields(Field field) {
         fields.add(field);
@@ -32,14 +31,6 @@ public class OrFields implements Comparable<OrFields> {
 
     public OrFields(Collection<Field> fieldsToAdd) {
         fields.addAll(fieldsToAdd);
-    }
-
-    public String getDisplayName() {
-        StringJoiner joiner = new StringJoiner("/");
-        for (Field field : fields) {
-            joiner.add(field.getDisplayName());
-        }
-        return joiner.toString();
     }
 
     public Field getPrimary() {

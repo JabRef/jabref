@@ -61,13 +61,13 @@ Check the directory `jablib/src/main/resources/csl-locales`.
 If it is missing or empty, run `git submodule update`.
 If still not fixed, run `git reset --hard` **inside that directory**.
 
-### `org.jabref.architecture.MainArchitectureTest restrictStandardStreams` <span style="color:red">FAILED</span>
+### `org.jabref.support.CommonArchitectureTest restrictStandardStreams` <span style="color:red">FAILED</span>
 
 Check if you've used `System.out.println(...)` (the standard output stream) to log anything into the console.
 This is an architectural violation, as you should use the Logger instead for logging.
 More details on [how to log](https://devdocs.jabref.org/code-howtos/logging.html).
 
-### `org.jabref.architecture.MainArchitectureTest doNotUseLogicInModel` <span style="color:red">FAILED</span>
+### `org.jabref.support.CommonArchitectureTest doNotUseLogicInModel` <span style="color:red">FAILED</span>
 
 One common case when this test fails is when you put any class purely containing business logic inside the `model` package (i.e., inside the directory `org/jabref/model/`).
 To fix this, shift the class to a sub-package within the `logic` package (i.e., the directory`org/jabref/logic/`).

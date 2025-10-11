@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.util.component.HelpButton?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.welcome.quicksettings.EntryTableConfigurationDialog">
+    <content>
+        <VBox styleClass="quick-settings-dialog-container">
+            <HBox alignment="CENTER_LEFT" spacing="4">
+                <Label text="%Configure which columns are displayed in the entry table. The citation key column can be toggled to show or hide citation keys."
+                       wrapText="true" HBox.hgrow="ALWAYS"/>
+                <HelpButton fx:id="helpButton"/>
+            </HBox>
+
+            <CheckBox fx:id="showCitationKeyBox" text="%Show citation key column"/>
+        </VBox>
+    </content>
+
+    <ButtonType fx:constant="CLOSE"/>
+    <ButtonType fx:constant="OK"/>
+</DialogPane>

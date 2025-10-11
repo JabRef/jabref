@@ -10,8 +10,10 @@ jobs:
     name: Determine issue number
     runs-on: ubuntu-latest
     if: >
+      (github.repository == 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
-        (github.actor == 'dependabot[bot]') ||
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
@@ -53,7 +55,6 @@ jobs:
           echo "No valid ticket number found!"
           exit 1
   move_issue:
-    if: github.repository_owner == 'JabRef'
     name: Mark issue as in progress
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
@@ -84,15 +85,15 @@ jobs:
           issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           skip-if-not-in-project: true
   ensure_assignment:
-    if: github.repository_owner == 'JabRef'
     name: Ensure that contributor is assigned (fails if not commented on issue)
+    if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Assign PR creator to issue
@@ -115,10 +116,25 @@ jobs:
           # Append the new assignee
           UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
 
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
+          LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
+          if [ -n "$LABEL" ]; then
+            echo "✅ Found label: $LABEL"
+            SILENT=false
+            # Apply label
+            gh issue edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
+          else
+            echo "🚫 Silent fail if not possible to add assignee"
+            SILENT=true
+          fi
+
           # Update issue with the new assignee list
           echo "Updating issue #${{ needs.determine_issue_number.outputs.issue_number }} updated with assignees: $UPDATED_ASSIGNEES..."
-          gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
-
+          if [ "$SILENT" = true ]; then
+            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}") || true
+          else
+            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Add label "📌 Pinned"
@@ -126,10 +142,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   conflicts_with_target:
+    if: github.repository == 'JabRef/jabref'
     name: Conflicts with target branch
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Check PR mergeability
@@ -143,8 +160,18 @@ jobs:
           echo "✅ No merge conflicts"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  remove_label:
+    if: >
+      (github.repository == 'JabRef/jabref')
+    name: 'Remove label "status: changes-required"'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --remove-label "status: changes-required"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   upload-pr-number:
-    if: ${{ github.repository == 'JabRef/jabref' }}
+    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt

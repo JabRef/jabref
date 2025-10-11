@@ -10,6 +10,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ParseException;
@@ -40,7 +41,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
 
     /**
-     * @param tabContainer Required to close the tab before the study is updated
+     * @param tabContainer               Required to close the tab before the study is updated
      * @param openDatabaseActionSupplier Required to open the tab after the study is executed
      */
     public ExistingStudySearchAction(
@@ -116,7 +117,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                     preferences,
                     new BibEntryTypesManager(),
                     fileUpdateMonitor);
-        } catch (IOException | ParseException e) {
+        } catch (IOException | ParseException | JabRefException e) {
             LOGGER.error("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);
             return;

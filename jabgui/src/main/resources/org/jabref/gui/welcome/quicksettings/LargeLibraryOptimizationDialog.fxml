@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.util.component.HelpButton?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.welcome.quicksettings.LargeLibraryOptimizationDialog">
+    <content>
+        <VBox styleClass="quick-settings-dialog-container">
+            <HBox alignment="CENTER_LEFT" spacing="4">
+                <Label text="%Select features to disable. Disabling these features can significantly improve performance when working with large libraries."
+                       wrapText="true" HBox.hgrow="ALWAYS"/>
+                <HelpButton fx:id="helpButton"/>
+            </HBox>
+
+            <VBox styleClass="optimization-checkboxes">
+                <CheckBox fx:id="disableFulltextIndexing" text="%Fulltext indexing"
+                          selected="true"/>
+                <CheckBox fx:id="disableCreationDate" text="%Creation date timestamps"
+                          selected="true"/>
+                <CheckBox fx:id="disableModificationDate"
+                          text="%Modification date timestamps" selected="true"/>
+                <CheckBox fx:id="disableAutosave" text="%Automatic saving"
+                          selected="true"/>
+                <CheckBox fx:id="disableGroupCount" text="%Group entry counts"
+                          selected="true"/>
+            </VBox>
+        </VBox>
+    </content>
+
+    <ButtonType fx:constant="CLOSE"/>
+    <ButtonType fx:constant="OK"/>
+</DialogPane>

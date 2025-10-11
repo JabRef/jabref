@@ -6,7 +6,7 @@ import java.io.Writer;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * Class to write to a .bib file. Used by {@link BibtexDatabaseWriter}
+ * Class to write to a .bib file. Used by {@link BibDatabaseWriter}
  */
 public class BibWriter {
 

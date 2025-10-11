@@ -1,6 +1,7 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -9,14 +10,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
@@ -44,20 +47,26 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.strings.StringUtil;
 
 import org.jooq.lambda.Unchecked;
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A generic writer for our database. This is independent of the concrete serialization format.
- * For instance, we could also write out YAML or XML by subclassing this class.
+ * Writes a .bib file following the BibTeX / BibLaTeX format using the provided {@link BibWriter}
  * <p>
- * Currently, {@link BibtexDatabaseWriter} is the only subclass of this class (and that class writes a .bib file)
- * <p>
- * The opposite class is {@link org.jabref.logic.importer.fileformat.BibtexParser}
+ * The opposite class is {@link org.jabref.logic.importer.fileformat.BibtexImporter}
  */
-public abstract class BibDatabaseWriter {
-
+public class BibDatabaseWriter {
     public enum SaveType { WITH_JABREF_META_DATA, PLAIN_BIBTEX }
 
+    public static final String DATABASE_ID_PREFIX = "DBID:";
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseWriter.class);
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
+    private static final String COMMENT_PREFIX = "@Comment";
+    private static final String PREAMBLE_PREFIX = "@Preamble";
+
+    private static final String STRING_PREFIX = "@String";
+
     protected final BibWriter bibWriter;
     protected final SelfContainedSaveConfiguration saveConfiguration;
     protected final CitationKeyPatternPreferences keyPatternPreferences;
@@ -65,17 +74,30 @@ public abstract class BibDatabaseWriter {
     protected final BibEntryTypesManager entryTypesManager;
     protected final FieldPreferences fieldPreferences;
 
-    public BibDatabaseWriter(BibWriter bibWriter,
+    public BibDatabaseWriter(@NonNull BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
                              FieldPreferences fieldPreferences,
                              CitationKeyPatternPreferences keyPatternPreferences,
                              BibEntryTypesManager entryTypesManager) {
-        this.bibWriter = Objects.requireNonNull(bibWriter);
+        this.bibWriter = bibWriter;
         this.saveConfiguration = saveConfiguration;
         this.keyPatternPreferences = keyPatternPreferences;
         this.fieldPreferences = fieldPreferences;
         this.entryTypesManager = entryTypesManager;
         assert saveConfiguration.getSaveOrder().getOrderType() != SaveOrder.OrderType.TABLE;
+    }
+
+    public BibDatabaseWriter(Writer writer,
+                             String newline,
+                             SelfContainedSaveConfiguration saveConfiguration,
+                             FieldPreferences fieldPreferences,
+                             CitationKeyPatternPreferences citationKeyPatternPreferences,
+                             BibEntryTypesManager entryTypesManager) {
+        this(new BibWriter(writer, newline),
+                saveConfiguration,
+                fieldPreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager);
     }
 
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData, FieldPreferences fieldPreferences) {
@@ -134,10 +156,8 @@ public abstract class BibDatabaseWriter {
      * non-database save operation (such as the exportDatabase call), we do not wish to use the global preference of
      * saving in standard order.
      */
-    public static List<BibEntry> getSortedEntries(List<BibEntry> entriesToSort, SelfContainedSaveOrder saveOrder) {
-        Objects.requireNonNull(entriesToSort);
-        Objects.requireNonNull(saveOrder);
-
+    public static List<BibEntry> getSortedEntries(@NonNull List<BibEntry> entriesToSort,
+                                                  @NonNull SelfContainedSaveOrder saveOrder) {
         List<Comparator<BibEntry>> comparators = getSaveComparators(saveOrder);
         FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
 
@@ -155,9 +175,9 @@ public abstract class BibDatabaseWriter {
      */
     public void saveDatabase(BibDatabaseContext bibDatabaseContext) throws IOException {
         List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntries()
-                                                .stream()
-                                                .filter(entry -> !entry.isEmpty())
-                                                .toList();
+                                                   .stream()
+                                                   .filter(entry -> !entry.isEmpty())
+                                                   .toList();
         savePartOfDatabase(bibDatabaseContext, entries);
     }
 
@@ -224,19 +244,39 @@ public abstract class BibDatabaseWriter {
         writeEpilogue(bibDatabaseContext.getDatabase().getEpilog());
     }
 
-    protected abstract void writeProlog(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException;
+    protected void writeProlog(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException {
+        // We write the encoding if
+        //   - it is provided (!= null)
+        //   - explicitly set in the .bib file OR not equal to UTF_8
+        // Otherwise, we do not write anything and return
+        if ((encoding == null) || (!bibDatabaseContext.getMetaData().getEncodingExplicitlySupplied() && (encoding.equals(StandardCharsets.UTF_8)))) {
+            return;
+        }
 
-    protected abstract void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException;
+        // Writes the file encoding information.
+        bibWriter.write("% ");
+        bibWriter.writeLine(SaveConfiguration.ENCODING_PREFIX + encoding);
+    }
 
-    protected abstract void writeEpilogue(String epilogue) throws IOException;
+    protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
+        bibtexEntryWriter.write(entry, bibWriter, mode, saveConfiguration.shouldReformatFile());
+    }
+
+    protected void writeEpilogue(String epilogue) throws IOException {
+        if (!StringUtil.isNullOrEmpty(epilogue)) {
+            bibWriter.write(epilogue);
+            bibWriter.finishBlock();
+        }
+    }
 
     /**
      * Writes all data to the specified writer, using each object's toString() method.
      */
-    protected void writeMetaData(MetaData metaData, GlobalCitationKeyPatterns globalCiteKeyPattern) throws IOException {
-        Objects.requireNonNull(metaData);
-
-        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,
+    protected void writeMetaData(@NonNull MetaData metaData,
+                                 GlobalCitationKeyPatterns globalCiteKeyPattern) throws IOException {
+        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(
+                metaData,
                 globalCiteKeyPattern);
 
         for (Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
@@ -244,11 +284,31 @@ public abstract class BibDatabaseWriter {
         }
     }
 
-    protected abstract void writeMetaDataItem(Map.Entry<String, String> metaItem) throws IOException;
+    protected void writeMetaDataItem(Map.Entry<String, String> metaItem) throws IOException {
+        bibWriter.write(COMMENT_PREFIX + "{");
+        bibWriter.write(MetaData.META_FLAG);
+        bibWriter.write(metaItem.getKey());
+        bibWriter.write(":");
+        bibWriter.write(metaItem.getValue());
+        bibWriter.write("}");
+        bibWriter.finishBlock();
+    }
 
-    protected abstract void writePreamble(String preamble) throws IOException;
+    protected void writePreamble(String preamble) throws IOException {
+        if (!StringUtil.isNullOrEmpty(preamble)) {
+            bibWriter.write(PREAMBLE_PREFIX + "{");
+            bibWriter.write(preamble);
+            bibWriter.writeLine("}");
+            bibWriter.finishBlock();
+        }
+    }
 
-    protected abstract void writeDatabaseID(String sharedDatabaseID) throws IOException;
+    protected void writeDatabaseID(String sharedDatabaseID) throws IOException {
+        bibWriter.write("% ");
+        bibWriter.write(DATABASE_ID_PREFIX);
+        bibWriter.write(" ");
+        bibWriter.writeLine(sharedDatabaseID);
+    }
 
     /**
      * Write all strings in alphabetical order, modified to produce a safe (for BibTeX) order of the strings if they
@@ -307,8 +367,36 @@ public abstract class BibDatabaseWriter {
         writeString(bibtexString, maxKeyLength);
     }
 
-    protected abstract void writeString(BibtexString bibtexString, int maxKeyLength)
-            throws IOException;
+    protected void writeString(BibtexString bibtexString, int maxKeyLength) throws IOException {
+        // If the string has not been modified, write it back as it was
+        if (!saveConfiguration.shouldReformatFile() && !bibtexString.hasChanged()) {
+            LOGGER.debug("Writing parsed serialization {}.", bibtexString.getParsedSerialization());
+            bibWriter.write(bibtexString.getParsedSerialization());
+            return;
+        }
+
+        // Write user comments
+        String userComments = bibtexString.getUserComments();
+        if (!userComments.isEmpty()) {
+            bibWriter.writeLine(userComments);
+        }
+
+        bibWriter.write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
+                .repeatSpaces(maxKeyLength - bibtexString.getName().length()) + " = ");
+        if (bibtexString.getContent().isEmpty()) {
+            bibWriter.write("{}");
+        } else {
+            try {
+                String formatted = new FieldWriter(fieldPreferences)
+                        .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
+                bibWriter.write(formatted);
+            } catch (InvalidFieldValueException ex) {
+                throw new IOException(ex);
+            }
+        }
+
+        bibWriter.writeLine("}");
+    }
 
     protected void writeEntryTypeDefinitions(SortedSet<BibEntryType> types) throws IOException {
         for (BibEntryType type : types) {
@@ -316,7 +404,12 @@ public abstract class BibDatabaseWriter {
         }
     }
 
-    protected abstract void writeEntryTypeDefinition(BibEntryType customType) throws IOException;
+    protected void writeEntryTypeDefinition(BibEntryType customType) throws IOException {
+        bibWriter.write(COMMENT_PREFIX + "{");
+        bibWriter.write(MetaDataSerializer.serializeCustomEntryTypes(customType));
+        bibWriter.writeLine("}");
+        bibWriter.finishBlock();
+    }
 
     /**
      * Generate keys for all entries that are lacking keys.

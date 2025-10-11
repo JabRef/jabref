@@ -59,7 +59,7 @@ public class IndexManager {
         this.taskExecutor = executor;
         this.databaseContext = databaseContext;
         this.shouldIndexLinkedFiles = preferences.getFilePreferences().fulltextIndexLinkedFilesProperty();
-        this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
+        this.preferencesListener = (_, _, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
 
         bibFieldsIndexer = new BibFieldsIndexer(preferences.getBibEntryPreferences(), databaseContext, postgreServer.getConnection());

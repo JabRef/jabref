@@ -1,3 +1,4 @@
+.git
 .gitignore
 .dockerignore
 
@@ -5,17 +6,21 @@ Dockerfile
 Dockerfile.*
 .github/
 
+.devcontainer/
+
+*/bin
+*/build
+*/out
+
+docs/
+
+gg.cmd
+gradlew.bat
+
 # no generated files in version control
 src/main/gen/
 src/main/generated/
 src-gen/
-
-src/main/resources/csl-styles
-src/main/resources/csl-locales
-buildres/abbrv.jabref.org
-
-jablib/src/main/resources/csl-styles
-jablib/src/main/resources/csl-locales
 
 .lycheecache
 

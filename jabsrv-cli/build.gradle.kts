@@ -3,8 +3,6 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 plugins {
     id("org.jabref.gradle.module")
     id("application")
-
-    id("org.beryx.jlink") version "3.1.1"
 }
 
 application{
@@ -22,15 +20,13 @@ application{
     )
 }
 
-val javafxVersion = "24.0.1"
-
 dependencies {
     implementation(project(":jablib"))
     implementation(project(":jabsrv"))
 
-    implementation("org.openjfx:javafx-controls:${javafxVersion}")
-    implementation("org.openjfx:javafx-fxml:${javafxVersion}")
-    implementation ("org.openjfx:javafx-graphics:${javafxVersion}")
+    implementation("org.openjfx:javafx-controls")
+    implementation("org.openjfx:javafx-fxml")
+    implementation ("org.openjfx:javafx-graphics")
 
     implementation("org.slf4j:slf4j-api")
     implementation("org.tinylog:slf4j-tinylog")
@@ -114,72 +110,22 @@ tasks.named<JavaExec>("run") {
     }
 }
 
-// This is more or less a clone of jabgui/build.gradle.kts -> jlink
-jlink {
-    // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
-    addExtraDependencies(
-        "javafx"
-    )
+javaModulePackaging {
+    applicationName = "jabsrv"
+    vendor = "JabRef"
 
-    mergedModuleName = "jabsrv.merged.module"
-
-    // We keep debug statements - otherwise "--strip-debug" would be included
-    addOptions(
-        "--compress",
-        "zip-6",
-        "--no-header-files",
-        "--no-man-pages",
-        "--bind-services"
-    )
-
-    launcher {
-        name = "jabsrv"
+    // All targets have to have "app-image" as sole target, since we do not distribute an installer
+    targetsWithOs("windows") {
+        appImageOptions.addAll("--win-console")
+        packageTypes = listOf("app-image")
     }
-
-    // TODO: Remove as soon as dependencies are fixed (upstream)
-    forceMerge(
-        "bcprov",
-        "jaxb",
-        "istack",
-        "stax"
-    )
-
-    mergedModule {
-        uses("org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl")
-
-        uses("org.glassfish.jersey.internal.inject.InjectionManager")
-        uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
-
-        excludeRequires("org.glassfish.hk2.locator")
-        excludeRequires("org.apache.logging.log4j")
-        excludeRequires("kotlin.stdlib")
-
+    targetsWithOs("linux") {
+        options.addAll(
+            "--icon", "$projectDir/../jabgui/src/main/resources/icons/JabRef-linux-icon-64.png",
+        )
+        packageTypes = listOf("app-image")
     }
-    jpackage {
-        outputDir = "distribution"
-
-        imageOptions.addAll(listOf(
-            "--java-options", "--add-reads jabsrv.merged.module=jakarta.inject",
-            "--java-options", "--enable-native-access=jabsrv.merged.module"))
-
-        // See https://docs.oracle.com/en/java/javase/24/docs/specs/man/jpackage.html#platform-dependent-options-for-creating-the-application-package for available options
-        if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
-            imageOptions.addAll(
-                listOf(
-                    "--win-console"
-                )
-            )
-            skipInstaller = true
-        } else if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
-            imageOptions.addAll(
-                listOf(
-                    "--icon", "$projectDir/../jabgui/src/main/resources/icons/JabRef-linux-icon-64.png",
-                    "--app-version", "$version"
-                )
-            )
-            skipInstaller = true
-        } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
-            skipInstaller = true
-        }
+    targetsWithOs("macos") {
+        packageTypes = listOf("app-image")
     }
 }

@@ -1,6 +1,7 @@
 # Compilation, tests, and code style
 
 - jobName: windows installer and portable version
+  workflowName: 'Source Code Tests'
   message: >
     Your code does not compile.
     Please ensure your changes compile successfully before pushing changes.
@@ -9,38 +10,52 @@
     To verify compilation locally, run `./gradlew build` or try running JabRef.
 
 - jobName: 'Unit tests – jablib'
+  workflowName: 'Source Code Tests'
   message: >
     JUnit tests of `jablib` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
 - jobName: 'Unit tests – jabkit'
+  workflowName: 'Source Code Tests'
   message: >
     JUnit tests of `jabkit` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
 - jobName: 'Unit tests – jabsrv'
+  workflowName: 'Source Code Tests'
   message: >
     JUnit tests of `jabsrv` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
+- jobName: format
+  workflowName: 'Source Code Tests'
+  message: >
+    Your code currently does not meet JabRef's code guidelines.
+    IntelliJ auto format covers some cases.
+    There seem to be issues with your code style and autoformat configuration.
+    Please reformat your code (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>) and commit, then push.
+
+
+    In special cases, consider using `// formatter:off` and `// formatter:on` annotations to allow deviation from the code style.
 - jobName: Checkstyle
+  workflowName: 'Source Code Tests'
   message: >
     Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Checkstyle (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Checkstyle (pull_request)" and click on it.
 
 
     In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
@@ -50,28 +65,31 @@
     Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues, commit, and push.
 - jobName: OpenRewrite
+  workflowName: 'Source Code Tests'
   message: >
     Your code currently does not meet JabRef's code guidelines.
     We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / OpenRewrite (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / OpenRewrite (pull_request)" and click on it.
 
 
     The issues found can be **automatically fixed**.
     Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, commit, and push.
 - jobName: Modernizer
+  workflowName: 'Source Code Tests'
   message: >
     Your code currently does not meet JabRef's code guidelines.
     We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Modernizer (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Modernizer (pull_request)" and click on it.
 
 
     Please fix the detected errors, commit, and push.
 
 # CHANGELOG.md and *.md
 
-- jobName: 'CHANGELOG.md needs to be modified'
+- jobName: 'CHANGELOG.md needs to be modified if indicated'
+  workflowName: 'Check PR CHANGELOG.md'
   message: >
     You ticked that you modified `CHANGELOG.md`, but no new entry was found there.
 
@@ -79,41 +97,58 @@
     If you made changes that are visible to the user, please add a brief description along with the issue number to the `CHANGELOG.md` file.
     If you did not, please replace the cross (`[x]`) by a slash (`[/]`) to indicate that no `CHANGELOG.md` entry is necessary.
     More details can be found in our [Developer Documentation about the changelog](https://devdocs.jabref.org/decisions/0007-human-readable-changelog.html).
-- jobName: CHANGELOG.md
+- jobName: 'CHANGELOG.md - only unreleased touched'
+  workflowName: 'Source Code Tests'
   message: >
     While the PR was in progress, a new version of JabRef has been released.
 
 
     You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
+- jobName: CHANGELOG.md
+  workflowName: 'Source Code Tests'
+  message: >
+    You modified `CHANGELOG.md` and did not meet JabRef's rules for consistently formatted Markdown files.
+    To ensure consistent styling, we have [markdown-lint](https://github.com/DavidAnson/markdownlint) in place.
+    [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
+
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Source Code Tests" (on the left), subsection "CHANGELOG.md".
 - jobName: Markdown
+  workflowName: 'Source Code Tests'
   message: >
     You modified Markdown (`*.md`) files and did not meet JabRef's rules for consistently formatted Markdown files.
     To ensure consistent styling, we have [markdown-lint](https://github.com/DavidAnson/markdownlint) in place.
     [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
 
 
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Markdown".
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Source Code Tests" (on the left), subsection "Markdown".
 
 
 # Submodules and branches
 
 - jobName: 'Submodules not modified'
+  workflowName: 'Check PR Modifications'
   message: >
     Your pull request modified git submodules.
 
 
     Please follow our [FAQ on submodules](https://devdocs.jabref.org/code-howtos/faq.html#submodules) to fix.
 - jobName: no-force-push
+  workflowName: 'Check PR Modifications'
   always: true
   message: >
     Hey, we noticed that you **force-pushed** your changes.
     Force pushing is a bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
     Commits are lost and comments on commits lose their context, thus making it harder to review changes.
-    At the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway before being merged into the `main` branch.
+
+
+    When the pull request is getting integrated into `main`, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway.
+    Thus, your individual commit history will not be visible in `main`.
 
 
     In future, **please avoid that**. For now, you can continue working.
 - jobName: 'Conflicts with target branch'
+  workflowName: 'On PR opened/updated'
   message: >
     Your pull request conflicts with the target branch.
 
@@ -121,6 +156,7 @@
     Please [merge `upstream/main`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code.
     For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
 - jobName: 'Source branch is other than "main"'
+  workflowName: 'Check PR Modifications'
   message: >
     You committed your code on the `main` brach of your fork. This is a bad practice.
     The right way is to branch out from `main`, work on your patch/feature in that new branch, and then get that branch merged via the pull request (see [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow)).
@@ -131,26 +167,41 @@
     See [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for more details.
 
 
-# PR text
+# PR hygiene
 
+- jobName: 'Ensure that contributor is assigned (fails if not commented on issue)'
+  workflowName: 'On PR opened/updated'
+  message: >
+    You did not assign yourself to the issue.
+    Thus, it looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.
+
+
+    Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
+
+- jobName: 'PR title must not contain "issue <number>"'
+  workflowName: 'PR Format'
+  always: true
+  message: >
+    The title of the pull request must not start with "Fix for issue xyz".
+    Please use a concise one-line summary that explains what the fix or change actually does.
+    Example of a good title: "Prevent crash when importing malformed BibTeX entries".
 - jobName: 'Mandatory Checks present'
+  workflowName: 'PR Format'
   always: true
   message: >
     You have removed the "Mandatory Checks" section from your pull request description. Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1#L10).
 - jobName: 'PR checklist OK'
+  workflowName: 'PR Format'
   always: true
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
 - jobName: 'Determine issue number'
+  workflowName: 'On PR opened/updated'
   always: true
   message: |
     Your pull request needs to link an issue correctly.
 
-    To ease organizational workflows, please link this pull-request to the issue with syntax as described in <https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue>:
-
-    > <h2 id="linking-a-pull-request-to-an-issue-using-a-keyword">Linking a pull request to an issue using a keyword</h2>
-    > <p>You can link a pull request to an issue by using a supported keyword
-    > in the pull request's description or in a commit message.
+    To ease organizational workflows, please link this pull request to the issue by including a supported keyword in the pull request's description as per syntax described in [GitHub's documentation](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue).
 
     ### Examples
 

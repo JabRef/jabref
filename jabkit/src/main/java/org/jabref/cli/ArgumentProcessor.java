@@ -12,7 +12,6 @@ import javafx.util.Pair;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.FetcherException;
@@ -42,7 +41,7 @@ import static picocli.CommandLine.Option;
         // sorted alphabetically
         subcommands = {
                 CheckConsistency.class,
-//                CheckIntegrity.class,
+                CheckIntegrity.class,
                 Convert.class,
                 Fetch.class,
                 GenerateBibFromAux.class,
@@ -157,9 +156,9 @@ public class ArgumentProcessor implements Runnable {
     }
 
     protected static void saveDatabaseContext(CliPreferences cliPreferences,
-                                       BibEntryTypesManager entryTypesManager,
-                                       BibDatabaseContext bibDatabaseContext,
-                                       Path outputFile) {
+                                              BibEntryTypesManager entryTypesManager,
+                                              BibDatabaseContext bibDatabaseContext,
+                                              Path outputFile) {
         try {
             if (!FileUtil.isBibFile(outputFile)) {
                 System.err.println(Localization.lang("Invalid output file type provided."));
@@ -168,7 +167,7 @@ public class ArgumentProcessor implements Runnable {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                         .withReformatOnSave(cliPreferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
-                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                         bibWriter,
                         saveConfiguration,
                         cliPreferences.getFieldPreferences(),

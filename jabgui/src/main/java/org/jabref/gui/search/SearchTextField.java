@@ -29,8 +29,8 @@ public class SearchTextField {
             // Otherwise, we would have to add a new class for this and handle the case hitting that class in TextInputKeyBindings
 
             if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {
-                       textField.clear();
-                       event.consume();
+                textField.clear();
+                event.consume();
             }
         });
 

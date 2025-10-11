@@ -1,6 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
-
-//JAVA 24
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS com.h2database:h2:2.2.224
@@ -9,6 +7,7 @@
 //DEPS info.debatty:java-string-similarity:2.0.0
 //DEPS org.jooq:jool:0.9.14
 //DEPS org.openjfx:javafx-base:24.0.1
+//DEPS org.jspecify:jspecify:1.0.0
 //DEPS org.slf4j:slf4j-api:2.0.13
 //DEPS org.slf4j:slf4j-simple:2.0.13
 
@@ -47,7 +46,7 @@ public class LtwaListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LtwaListMvGenerator.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         try {
             Path tempCsvFile = Path.of("jablib", "build", "tmp", "ltwa_20210702.csv");
             if (!Files.exists(tempCsvFile)) {

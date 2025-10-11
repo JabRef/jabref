@@ -1,6 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
-
-//JAVA 24
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS com.h2database:h2:2.2.224
@@ -11,6 +9,7 @@
 //DEPS org.openjfx:javafx-base:24.0.1
 //DEPS org.slf4j:slf4j-api:2.0.13
 //DEPS org.slf4j:slf4j-simple:2.0.13
+//DEPS org.jspecify:jspecify:1.0.0
 
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
@@ -44,13 +43,12 @@ import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /// Has to be started in the root of the repository due to <https://github.com/jbangdev/jbang-gradle-plugin/issues/11>
 public class JournalListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalListMvGenerator.class);
 
-    public static void main(String[] args) throws IOException {
+    static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
 
         Path abbreviationsDirectory = Path.of("jablib", "src", "main", "abbrv.jabref.org", "journals");

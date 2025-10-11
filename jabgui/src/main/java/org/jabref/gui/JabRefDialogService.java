@@ -7,9 +7,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
@@ -27,6 +29,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -304,6 +307,33 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
+    public Optional<ButtonType> showCustomButtonDialogWithTooltipsAndWait(AlertType type,
+                                                                          String title,
+                                                                          String content,
+                                                                          Map<ButtonType, String> tooltips,
+                                                                          ButtonType... buttonTypes) {
+        // Use a non-editable Label instead of raw text to prevent editing
+        FXDialog alert = createDialog(type, title, "");
+        Label contentLabel = new Label(content);
+        contentLabel.setWrapText(true);
+        alert.getDialogPane().setContent(contentLabel);
+
+        alert.getDialogPane().getButtonTypes().setAll(buttonTypes);
+
+        // Attach tooltips to buttons
+        Platform.runLater(() -> {
+            for (Map.Entry<ButtonType, String> entry : tooltips.entrySet()) {
+                Button button = (Button) alert.getDialogPane().lookupButton(entry.getKey());
+                if (button != null) {
+                    button.setTooltip(new Tooltip(entry.getValue()));
+                }
+            }
+        });
+
+        return alert.showAndWait();
+    }
+
+    @Override
     public Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane,
                                                         ButtonType... buttonTypes) {
         FXDialog alert = new FXDialog(AlertType.NONE, title);
@@ -416,23 +446,23 @@ public class JabRefDialogService implements DialogService {
         LOGGER.info(message);
 
         UiTaskExecutor.runInJavaFXThread(() ->
-            Notifications.create()
-                         .text(message)
-                         .position(Pos.BOTTOM_CENTER)
-                         .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
-                         .owner(mainWindow)
-                         .threshold(5,
-                            Notifications.create()
-                                         .title(Localization.lang("Last notification"))
-                                         .text(
-                                            "(" + Localization.lang("Check the event log to see all notifications") + ")"
-                                            + "\n\n" + message)
-                                         .onAction(e -> {
-                                            ErrorConsoleAction ec = new ErrorConsoleAction();
-                                            ec.execute();
-                                         }))
-                         .hideCloseButton()
-                         .show());
+                Notifications.create()
+                             .text(message)
+                             .position(Pos.BOTTOM_CENTER)
+                             .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
+                             .owner(mainWindow)
+                             .threshold(5,
+                                     Notifications.create()
+                                                  .title(Localization.lang("Last notification"))
+                                                  .text(
+                                                          "(" + Localization.lang("Check the event log to see all notifications") + ")"
+                                                                  + "\n\n" + message)
+                                                  .onAction(e -> {
+                                                      ErrorConsoleAction ec = new ErrorConsoleAction();
+                                                      ec.execute();
+                                                  }))
+                             .hideCloseButton()
+                             .show());
     }
 
     @Override
@@ -462,6 +492,7 @@ public class JabRefDialogService implements DialogService {
     public List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         List<File> files = chooser.showOpenMultipleDialog(mainWindow);
+        Optional.ofNullable(chooser.getSelectedExtensionFilter()).ifPresent(fileDialogConfiguration::setSelectedExtensionFilter);
         return files != null ? files.stream().map(File::toPath).toList() : List.of();
     }
 
@@ -495,11 +526,11 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public void showCustomDialog(BaseDialog<?> aboutDialogView) {
-        if (aboutDialogView.getOwner() == null) {
-            aboutDialogView.initOwner(mainWindow);
+    public void showCustomDialog(BaseDialog<?> dialogView) {
+        if (dialogView.getOwner() == null) {
+            dialogView.initOwner(mainWindow);
         }
-        aboutDialogView.show();
+        dialogView.show();
     }
 
     @Override

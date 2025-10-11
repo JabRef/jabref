@@ -18,16 +18,14 @@ import org.slf4j.LoggerFactory;
 public class FileAnnotationCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationCache.class);
-    // cache size in entries
-    private final static int CACHE_SIZE = 10;
+
+    private static final int CACHE_SIZE = 1024;
 
     // the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
     private LoadingCache<BibEntry, Map<Path, List<FileAnnotation>>> annotationCache;
 
-    /**
-     * Creates an empty fil annotation cache. Required to allow the annotation cache to be injected into views without
-     * hitting the bug https://github.com/AdamBien/afterburner.fx/issues/71 .
-     */
+    /// Creates an empty file annotation cache. Required to allow the annotation cache to be injected into views without
+    /// hitting the bug <https://github.com/AdamBien/afterburner.fx/issues/71>.
     public FileAnnotationCache() {
     }
 
@@ -47,12 +45,12 @@ public class FileAnnotationCache {
      * @return Map containing a list of annotations in a list for each file
      */
     public Map<Path, List<FileAnnotation>> getFromCache(BibEntry entry) {
-        LOGGER.debug("Loading Bibentry '%s' from cache.".formatted(entry.getCitationKey().orElse(entry.getId())));
+        LOGGER.debug("Loading BibEntry '{}' from cache.", entry.getCitationKey().orElse(entry.getId()));
         return annotationCache.getUnchecked(entry);
     }
 
     public void remove(BibEntry entry) {
-        LOGGER.debug("Deleted Bibentry '%s' from cache.".formatted(entry.getCitationKey().orElse(entry.getId())));
+        LOGGER.debug("Deleted BibEntry '{}' from cache.", entry.getCitationKey().orElse(entry.getId()));
         annotationCache.invalidate(entry);
     }
 }

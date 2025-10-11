@@ -69,7 +69,7 @@ public class FromAuxDialogViewModel {
     public String getDatabaseName(BibDatabaseContext databaseContext) {
         Optional<String> dbOpt = Optional.empty();
         if (databaseContext.getDatabasePath().isPresent()) {
-            dbOpt = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), databaseContext.getDatabasePath().get());
+            dbOpt = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), databaseContext.getDatabasePath().get());
         }
         if (databaseContext.getLocation() == DatabaseLocation.SHARED) {
             return databaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
@@ -82,7 +82,7 @@ public class FromAuxDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
+                .withInitialDirectory(auxFileProperty.get() == null ? preferences.getFilePreferences().getWorkingDirectory().toString() : auxFileProperty.get()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> auxFileProperty.setValue(file.toAbsolutePath().toString()));
     }
 

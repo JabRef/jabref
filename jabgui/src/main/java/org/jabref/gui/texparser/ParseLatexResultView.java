@@ -8,7 +8,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
 
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -18,7 +17,6 @@ import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import jakarta.inject.Inject;
 
 public class ParseLatexResultView extends BaseDialog<Void> {
 
@@ -28,7 +26,6 @@ public class ParseLatexResultView extends BaseDialog<Void> {
     @FXML private ListView<ReferenceViewModel> referenceListView;
     @FXML private CitationsDisplay citationsDisplay;
     @FXML private ButtonType importButtonType;
-    @Inject private ThemeManager themeManager;
     private ParseLatexResultViewModel viewModel;
 
     public ParseLatexResultView(LatexBibEntriesResolverResult resolverResult, BibDatabaseContext databaseContext, Path basePath) {
@@ -46,8 +43,6 @@ public class ParseLatexResultView extends BaseDialog<Void> {
         });
         Button importButton = (Button) getDialogPane().lookupButton(importButtonType);
         importButton.disableProperty().bind(viewModel.importButtonDisabledProperty());
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML

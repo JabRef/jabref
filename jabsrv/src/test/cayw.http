@@ -1,0 +1,27 @@
+#### Serve the latest opened library
+
+GET  http://localhost:23119/better-bibtex/cayw
+
+#### Serve a demo library specified by the URL param
+
+GET http://localhost:23119/better-bibtex/cayw?librarypath=demo
+
+#### Use simple-json format for the response
+
+GET http://localhost:23119/better-bibtex/cayw?librarypath=demo&format=simple-json
+
+#### Use biblatex format for the response
+
+GET http://localhost:23119/better-bibtex/cayw?librarypath=demo&format=biblatex
+
+#### Use biblatex format with a custom command for the response
+
+GET http://localhost:23119/better-bibtex/cayw?librarypath=demo&format=biblatex&command=cite
+
+#### Serve a library specified by its path using the URL param
+
+GET http://localhost:23119/better-bibtex/cayw?librarypath=C%3A%5CUsers%5CDEMO%5CDownloads%5CChocolate.bib
+
+#### Citation picker for Chocolate.bib in C:\git-repositories\JabRef\jablib\src\main\resources
+
+GET http://localhost:23119/better-bibtex/cayw?libraryid=Chocolate.bib-6a732609&format=simple-json

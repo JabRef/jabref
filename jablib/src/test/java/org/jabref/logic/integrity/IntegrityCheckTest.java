@@ -130,7 +130,7 @@ class IntegrityCheckTest {
         entry.setField(StandardField.EPRINT, UUID.randomUUID().toString());
 
         // duplicate entry
-        BibEntry clonedEntry = (BibEntry) entry.clone();
+        BibEntry clonedEntry = new BibEntry(entry);
 
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntry(entry);

@@ -192,13 +192,13 @@ class BibliographyFromPdfImporterTest {
         BibEntry entry09 = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("9")
                 .withField(StandardField.AUTHOR, "A. De Franco and others")
-                        .withField(StandardField.BOOKTITLE, "Proc. IPAC’23, Venice, Italy")
+                .withField(StandardField.BOOKTITLE, "Proc. IPAC’23, Venice, Italy")
                 .withField(StandardField.TITLE, "RF conditioning towards continuous wave of the FRQ of the Linear IFMIF Prototype Accelerator")
                 .withField(StandardField.PAGES, "2345-2348")
                 .withField(StandardField.MONTH, "#may#")
                 .withField(StandardField.YEAR, "2023")
-                        .withField(StandardField.DOI, "10.18429/JACoW-IPAC2023-TUPM065")
-                                .withField(StandardField.COMMENT, "[9] A. De Franco et al., “RF conditioning towards continuous wave of the FRQ of the Linear IFMIF Prototype Accelerator”, in Proc. IPAC’23, Venice, Italy, May 2023, pp. 2345-2348. doi:10.18429/JACoW-IPAC2023-TUPM065");
+                .withField(StandardField.DOI, "10.18429/JACoW-IPAC2023-TUPM065")
+                .withField(StandardField.COMMENT, "[9] A. De Franco et al., “RF conditioning towards continuous wave of the FRQ of the Linear IFMIF Prototype Accelerator”, in Proc. IPAC’23, Venice, Italy, May 2023, pp. 2345-2348. doi:10.18429/JACoW-IPAC2023-TUPM065");
 
         BibEntry entry10 = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("10")
@@ -281,13 +281,13 @@ class BibliographyFromPdfImporterTest {
                 AKAGI_2023,
                 INTERNAL_NOTE,
                 new BibEntry(StandardEntryType.InProceedings)
-                .withCitationKey("18")
-                .withField(StandardField.AUTHOR, "Z. Yao and D. S. Weld and W-P. Chen and H. Sun")
-                .withField(StandardField.BOOKTITLE, "Proceedings of the 2018 World Wide Web Conference")
-                .withField(StandardField.COMMENT, "[18] Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun, “Staqc: A systematically mined question-code dataset from stack overflow,” in Proceedings of the 2018 World Wide Web Conference, 2018, pp. 1693–1703.")
-                .withField(StandardField.TITLE, "Staqc: A systematically mined question-code dataset from stack overflow")
-                .withField(StandardField.PAGES, "1693-1703")
-                .withField(StandardField.YEAR, "2018")
+                        .withCitationKey("18")
+                        .withField(StandardField.AUTHOR, "Z. Yao and D. S. Weld and W-P. Chen and H. Sun")
+                        .withField(StandardField.BOOKTITLE, "Proceedings of the 2018 World Wide Web Conference")
+                        .withField(StandardField.COMMENT, "[18] Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun, “Staqc: A systematically mined question-code dataset from stack overflow,” in Proceedings of the 2018 World Wide Web Conference, 2018, pp. 1693–1703.")
+                        .withField(StandardField.TITLE, "Staqc: A systematically mined question-code dataset from stack overflow")
+                        .withField(StandardField.PAGES, "1693-1703")
+                        .withField(StandardField.YEAR, "2018")
         );
     }
 

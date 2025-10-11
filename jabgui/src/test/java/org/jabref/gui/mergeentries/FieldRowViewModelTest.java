@@ -2,8 +2,8 @@ package org.jabref.gui.mergeentries;
 
 import java.util.Optional;
 
-import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel;
-import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
+import org.jabref.gui.mergeentries.threewaymerge.FieldRowViewModel;
+import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Month;
@@ -178,7 +178,7 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCanBeMerged() {
+    void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCannotBeMerged() {
         FieldRowViewModel authorField = createViewModelForField(StandardField.AUTHOR);
         assertThrows(UnsupportedOperationException.class, authorField::mergeFields);
     }
@@ -212,6 +212,33 @@ public class FieldRowViewModelTest {
 
         assertEquals(oldLeftGroups, groupsField.getLeftFieldValue());
         assertEquals(oldRightGroups, groupsField.getRightFieldValue());
+    }
+
+    @Test
+    void newYearShouldBeSelectedForYearsWithLargeValueGap() {
+        BibEntry leftEntry = new BibEntry().withField(StandardField.YEAR, "1990");
+        BibEntry rightEntry = new BibEntry().withField(StandardField.YEAR, "2020");
+        FieldRowViewModel yearField = new FieldRowViewModel(StandardField.YEAR, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
+        yearField.autoSelectBetterValue();
+        assertEquals(FieldRowViewModel.Selection.RIGHT, yearField.getSelection());
+    }
+
+    @Test
+    void selectRightYearWhenInRange() {
+        BibEntry leftEntry = new BibEntry().withField(StandardField.YEAR, "1700");
+        BibEntry rightEntry = new BibEntry().withField(StandardField.YEAR, "2000");
+        FieldRowViewModel yearField = new FieldRowViewModel(StandardField.YEAR, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
+        yearField.autoSelectBetterValue();
+        assertEquals(FieldRowViewModel.Selection.RIGHT, yearField.getSelection());
+    }
+
+    @Test
+    void selectLeftYearWhenInRange() {
+        BibEntry leftEntry = new BibEntry().withField(StandardField.YEAR, "2005");
+        BibEntry rightEntry = new BibEntry().withField(StandardField.YEAR, "1700");
+        FieldRowViewModel yearField = new FieldRowViewModel(StandardField.YEAR, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
+        yearField.autoSelectBetterValue();
+        assertEquals(FieldRowViewModel.Selection.LEFT, yearField.getSelection());
     }
 
     public FieldRowViewModel createViewModelForField(Field field) {

@@ -133,25 +133,25 @@ class EntryComparatorTest {
     @Test
     void withAuthorIsBeforeWithEmptyAuthorWhenSortingWithNonExistentKey() {
         BibEntry e1 = new BibEntry()
-            .withField(StandardField.AUTHOR, "Stephen King");
+                .withField(StandardField.AUTHOR, "Stephen King");
         BibEntry e2 = new BibEntry()
-            .withField(StandardField.AUTHOR, "");
+                .withField(StandardField.AUTHOR, "");
         assertEquals(-1, new EntryComparator(true, false, InternalField.KEY_FIELD).compare(e1, e2));
     }
 
     @Test
     void withAuthorIsBeforeEmptyAuthorWhenSortingWithAuthor() {
         BibEntry e1 = new BibEntry()
-            .withField(StandardField.AUTHOR, "Stephen King");
+                .withField(StandardField.AUTHOR, "Stephen King");
         BibEntry e2 = new BibEntry()
-            .withField(StandardField.AUTHOR, "");
+                .withField(StandardField.AUTHOR, "");
         assertEquals(-1, new EntryComparator(true, false, StandardField.AUTHOR).compare(e1, e2));
     }
 
     @Test
     void withAuthorIsBeforeWithoutAuthorWhenSortingWithAuthor() {
         BibEntry e1 = new BibEntry()
-            .withField(StandardField.AUTHOR, "Stephen King");
+                .withField(StandardField.AUTHOR, "Stephen King");
         BibEntry e2 = new BibEntry();
         assertEquals(1, new EntryComparator(false, false, StandardField.AUTHOR).compare(e1, e2));
     }

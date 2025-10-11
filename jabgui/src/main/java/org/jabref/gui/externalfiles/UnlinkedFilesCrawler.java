@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,15 +20,16 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
- */
+/// Util class for searching files on the file system which are not linked to a provided {@link org.jabref.model.database.BibDatabase}.
+///
+/// The result is used to create *new* entries. The user has then to use the duplicate check to merge the entries.
+///
+/// Related: {@link org.jabref.gui.externalfiles.AutoSetFileLinksUtil#findAssociatedNotLinkedFiles}
 public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesCrawler.class);
@@ -72,7 +74,6 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
      * and then sorted according to the {@link ExternalFileSorter} value.
      *
      * @param unlinkedPDFFileFilter contains a BibDatabaseContext which is used to determine whether the file is linked
-     *
      * @return FileNodeViewModel containing the data of the current directory and all subdirectories
      * @throws IOException if directory is not a directory or empty
      */
@@ -89,9 +90,10 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         // Filters:
         //   1. UnlinkedPDFFileFilter
         //   2. GitIgnoreFilter
-        ChainedFilters filters = new ChainedFilters(unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory));
+        ChainedFilters filters = new ChainedFilters(List.of(unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory)));
         Map<Boolean, List<Path>> directoryAndFilePartition;
-        try (Stream<Path> filesStream = StreamSupport.stream(Files.newDirectoryStream(directory, filters).spliterator(), false)) {
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory, filters);
+             Stream<Path> filesStream = StreamSupport.stream(dirStream.spliterator(), false)) {
             directoryAndFilePartition = filesStream.collect(Collectors.partitioningBy(Files::isDirectory));
         } catch (IOException e) {
             LOGGER.error("Error while searching files", e);
@@ -135,8 +137,8 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
         // create and add FileNodeViewModel to the FileNodeViewModel for the current directory
         fileNodeViewModelForCurrentDirectory.getChildren().addAll(resultingFiles.stream()
-                .map(FileNodeViewModel::new)
-                .collect(Collectors.toList()));
+                                                                                .map(FileNodeViewModel::new)
+                                                                                .toList());
 
         return fileNodeViewModelForCurrentDirectory;
     }

@@ -11,11 +11,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
@@ -43,7 +44,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class manages all aspects of the study process related to the repository.
- *
+ * <p>
  * It includes the parsing of the study definition file (study.bib) into a Study instance,
  * the structured persistence of the crawling results for the study within the file based repository,
  * as well as the sharing, and versioning of results using git.
@@ -218,7 +219,7 @@ public class StudyRepository {
      *     <li>Update the remote tracking branches of the work and search branch</li>
      * </ol>
      */
-    public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException {
+    public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException, JabRefException {
         updateWorkAndSearchBranch();
 
         gitHandler.checkoutBranch(SEARCH_BRANCH);
@@ -237,6 +238,8 @@ public class StudyRepository {
             updateRemoteSearchAndWorkBranch();
         } catch (GitAPIException e) {
             LOGGER.error("Updating remote repository failed", e);
+        } catch (JabRefException e) {
+            LOGGER.error("Missing Git credentials", e);
         }
     }
 
@@ -244,7 +247,7 @@ public class StudyRepository {
      * Update the remote tracking branches of the work and search branches
      * The currently checked out branch is not changed if the method is executed successfully
      */
-    private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException {
+    private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException, JabRefException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
 
         // update remote search branch
@@ -340,17 +343,17 @@ public class StudyRepository {
      * Returns a string that can be used as a folder name.
      * This removes all characters from the query that are illegal for directory names.
      * Structure: ID-trimmed query
-     *
+     * <p>
      * Examples:
      * Input: '(title: test-title AND abstract: Test)' as a query entry with id 12345678
      * Output: '12345678 - title= test-title AND abstract= Test'
-     *
+     * <p>
      * Input: 'abstract: Test*' as a query entry with id 87654321
      * Output: '87654321 - abstract= Test'
-     *
+     * <p>
      * Input: '"test driven"' as a query entry with id 12348765
      * Output: '12348765 - test driven'
-     *
+     * <p>
      * Note that this method might be similar to {@link org.jabref.logic.util.io.FileUtil#getValidFileName(String)} or {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName(String)}
      *
      * @param query that is trimmed and combined with its query id
@@ -431,7 +434,7 @@ public class StudyRepository {
                     .withSaveOrder(context.getMetaData().getSaveOrder().map(SelfContainedSaveOrder::of).orElse(SaveOrder.getDefaultSaveOrder()))
                     .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
                     preferences.getFieldPreferences(),

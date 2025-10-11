@@ -1,4 +1,4 @@
-# JabRef REST AP
+# JabRef REST API
 
 // This file is for IntelliJ's HTTP Client, available in the Ultimate Edition
 
@@ -14,11 +14,11 @@
 
 ### Get a HTML page asking the user to go to /libraries
 
-GET http://localhost:6050
+GET http://localhost:23119
 
 ### Get the list of all libraries
 
-GET http://localhost:6050/libraries
+GET http://localhost:23119/libraries
 Accept: application/json
 
 ## demo cases
@@ -27,44 +27,70 @@ Accept: application/json
 
 ### Get JSON of Chocolate.bib
 
-GET http://localhost:6050/libraries/demo
+GET http://localhost:23119/libraries/demo
 Accept: application/json
 
 ### Get plain BibTeX of Chocolate.bib
 
-GET http://localhost:6050/libraries/demo
+GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex
+
+### Get list of files in Chocolate.bib
+
+GET http://localhost:23119/libraries/demo/entries/pdffiles
+Accept: application/json
 
 ### Get CSL JSON of Chocolate.bib
 
-// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
-// will show the contents of your first opened library using CSL JSON
-
-GET http://localhost:6050/libraries/demo
+GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex-library-csl+json
+
+### Read demo JabMap (Chocolate.jmp)
+
+GET http://localhost:23119/libraries/demo/map
+Accept: application/json
+
+### Save demo JabMap (Chocolate.jmp) note: this might break the data for the demo map
+
+PUT http://localhost:23119/libraries/demo/map
+Content-Type: application/json
+
+{
+  "name": "demo"
+}
+
+### Get HTML-representation of entry preview for "Tokede_2011" of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo/entries/Tokede_2011
+Accept: text/html
+
+### Get String-representation of entry preview for "Corti_2009" of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo/entries/Corti_2009
+Accept: text/plain
 
 ## From here: C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib is required
 
 ### Get BibTeX of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
 
-GET http://localhost:6050/libraries/Chocolate.bib-6a732609
+GET http://localhost:23119/libraries/Chocolate.bib-6a732609
 Accept: application/x-bibtex
 
 ### Get JSON of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
 
-GET http://localhost:6050/libraries/Chocolate.bib-6a732609
+GET http://localhost:23119/libraries/Chocolate.bib-6a732609
 Accept: application/json
 
 ### Get CSL JSON of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
 
-// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
+// if you have checked out the JabRef code at c:\git-repositories\jabref, then this
 // will show the contents of your first opened library using CSL JSON
 
-GET http://localhost:6050/libraries/Chocolate.bib-6a732609
+GET http://localhost:23119/libraries/Chocolate.bib-6a732609
 Accept: application/x-bibtex-library-csl+json
 
 ## Error cases
 
-### GET not avaialble library
+### GET not available library
 
-GET http://localhost:6050/libraries/notfound
+GET http://localhost:23119/libraries/notfound
