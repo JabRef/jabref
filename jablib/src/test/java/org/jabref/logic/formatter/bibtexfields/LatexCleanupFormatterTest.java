@@ -2,6 +2,8 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,28 +16,21 @@ class LatexCleanupFormatterTest {
         formatter = new LatexCleanupFormatter();
     }
 
-    @Test
-    void test() {
-        assertEquals("$\\alpha\\beta$", formatter.format("$\\alpha$$\\beta$"));
-        assertEquals("{VLSI DSP}", formatter.format("{VLSI} {DSP}"));
-        assertEquals("\\textbf{VLSI} {DSP}", formatter.format("\\textbf{VLSI} {DSP}"));
-        assertEquals("A ${\\Delta\\Sigma}$ modulator for {FPGA DSP}",
-                formatter.format("A ${\\Delta}$${\\Sigma}$ modulator for {FPGA} {DSP}"));
-    }
+    @ParameterizedTest
+    @CsvSource({
+            // General LaTeX cleanup
+            "$\\alpha\\beta$, $\\alpha$$\\beta$",
+            "{VLSI DSP}, {VLSI} {DSP}",
+            "\\textbf{VLSI} {DSP}, \\textbf{VLSI} {DSP}",
+            "A ${\\Delta\\Sigma}$ modulator for {FPGA DSP}, A ${\\Delta}$${\\Sigma}$ modulator for {FPGA} {DSP}",
 
-    @Test
-    void preservePercentSign() {
-        assertEquals("\\%", formatter.format("%"));
-    }
-
-    @Test
-    void escapePercentSignOnlyOnce() {
-        assertEquals("\\%", formatter.format("\\%"));
-    }
-
-    @Test
-    void escapePercentSignOnlnyOnceWithNumber() {
-        assertEquals("50\\%", formatter.format("50\\%"));
+            // Preserve and escape percent signs
+            "\\%, %",
+            "\\%, \\%",
+            "50\\%, 50\\%"
+    })
+    void test(String expected, String oldString) {
+        assertEquals(expected, formatter.format(oldString));
     }
 
     @Test
