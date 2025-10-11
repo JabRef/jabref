@@ -10,6 +10,7 @@ plugins {
 // OpenRewrite should rewrite all sources
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
+// TODO: for local testing with sonar cloud -> change properties in live env
 sonar {
     properties {
         property("sonar.projectKey", "NiklasKaulfers_jabref")
