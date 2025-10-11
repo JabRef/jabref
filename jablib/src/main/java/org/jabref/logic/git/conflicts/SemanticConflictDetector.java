@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
-import org.jabref.logic.git.merge.MergePlan;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -220,7 +220,7 @@ public class SemanticConflictDetector {
             }
         }
 
-        return new MergePlan(fieldPatches, newEntries);
+        return new MergePlan(fieldPatches, newEntries, deletedEntryKeys);
     }
 
     /// Compares base and remote and constructs a patch at the field level. null == the field is deleted.
