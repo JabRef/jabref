@@ -65,7 +65,7 @@ class AiChatComponentTest {
         when(prefs.gpt4AllChatModelProperty()).thenReturn(gpt4AllModelProp);
 
         when(prefs.getAiProvider()).thenAnswer(_ -> providerProp.get());
-        when(prefs.getSelectedChatModel()).thenAnswer(inv -> {
+        when(prefs.getSelectedChatModel()).thenAnswer(_ -> {
             return switch (providerProp.get()) {
                 case OPEN_AI ->
                         openAiModelProp.get();
