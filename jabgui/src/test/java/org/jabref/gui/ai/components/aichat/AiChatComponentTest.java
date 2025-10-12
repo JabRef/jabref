@@ -64,7 +64,7 @@ class AiChatComponentTest {
         when(prefs.huggingFaceChatModelProperty()).thenReturn(hfModelProp);
         when(prefs.gpt4AllChatModelProperty()).thenReturn(gpt4AllModelProp);
 
-        when(prefs.getAiProvider()).thenAnswer(inv -> providerProp.get());
+        when(prefs.getAiProvider()).thenAnswer(_ -> providerProp.get());
         when(prefs.getSelectedChatModel()).thenAnswer(inv -> {
             return switch (providerProp.get()) {
                 case OPEN_AI ->
