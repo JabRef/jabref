@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added the option in Preferences → Linked files → Attached files to adjust the path of attached files and copy them if needed when entries are copied to another library [#12267](https://github.com/JabRef/jabref/issues/12267)
+- We added the option in Preferences → Linked files → Attached files to adjust the path of attached files and copy them if needed when entries are copied or cut to another library [#12267](https://github.com/JabRef/jabref/issues/12267)
 - We made the "Configure API key" option in the Web Search preferences tab searchable via preferences search. [#13929](https://github.com/JabRef/jabref/issues/13929)
 - We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
 - We added support for Cygwin-file paths on a Windows Operating System. [#13274](https://github.com/JabRef/jabref/issues/13274)
