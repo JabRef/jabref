@@ -54,16 +54,8 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
 
             LOGGER.debug(result.toString(2));
 
-            EntryType entryType = StandardEntryType.Article;
-            if (result.has("pubTypeList")) {
-                for (Object o : result.getJSONObject("pubTypeList").getJSONArray("pubType")) {
-                    if ("letter".equalsIgnoreCase(o.toString())) {
-                        entryType = StandardEntryType.Article;
-                        break;
-                        // TODO: handle other types e.g. books
-                    }
-                }
-            }
+            // Determine entry type from pubTypeList if available
+            EntryType entryType = determineEntryType(result);
 
             BibEntry entry = new BibEntry(entryType);
 
@@ -71,22 +63,38 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
             entry.setField(StandardField.ABSTRACT, result.optString("abstractText"));
 
             entry.setField(StandardField.YEAR, result.optString("pubYear"));
-            entry.setField(StandardField.VOLUME, result.optString("journalVolume"));
-            entry.setField(StandardField.ISSUE, result.optString("journalIssue"));
 
             String pages = result.optString("pageInfo");
             entry.setField(StandardField.PAGES, pages);
 
-            entry.setField(StandardField.DOI, result.optString("doi"));
+            String doi = result.optString("doi");
+            entry.setField(StandardField.DOI, doi);
             entry.setField(StandardField.PMID, result.optString("pmid"));
 
-            // Handle URL
-            if (result.has("pmid")) {
-                entry.setField(StandardField.URL, "https://pubmed.ncbi.nlm.nih.gov/" + result.getString("pmid") + "/");
+            // Prefer fulltext URLs (e.g., PDF) when available, otherwise fall back to DOI or PubMed page
+            String bestUrl = extractBestFullTextUrl(result).orElseGet(() -> {
+                if (result.has("pmid")) {
+                    return "https://pubmed.ncbi.nlm.nih.gov/" + result.optString("pmid") + "/";
+                }
+                if (doi != null && !doi.isBlank()) {
+                    return "https://doi.org/" + doi;
+                }
+                return null;
+            });
+            if (bestUrl != null && !bestUrl.isBlank()) {
+                entry.setField(StandardField.URL, bestUrl);
             }
 
             if (result.has("journalInfo") && result.getJSONObject("journalInfo").has("issn")) {
                 entry.setField(StandardField.ISSN, result.getJSONObject("journalInfo").getString("issn"));
+            }
+            // Prefer a full ISO date if provided
+            String printPubDate = result.optString("printPublicationDate");
+            String dateOfPublication = result.optString("dateOfPublication");
+            if (printPubDate != null && printPubDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                entry.setField(StandardField.DATE, printPubDate);
+            } else if (dateOfPublication != null && dateOfPublication.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                entry.setField(StandardField.DATE, dateOfPublication);
             }
 
             // Handle authors
@@ -110,6 +118,36 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
                 JSONArray pubTypes = result.getJSONObject("pubTypeList").getJSONArray("pubType");
                 if (!pubTypes.isEmpty()) {
                     entry.setField(StandardField.PUBSTATE, pubTypes.getString(0));
+                }
+            }
+
+            if (result.has("keywordList") && result.getJSONObject("keywordList").has("keyword")) {
+                JSONArray keywords = result.getJSONObject("keywordList").getJSONArray("keyword");
+                for (int i = 0; i < keywords.length(); i++) {
+                    if (!keywords.isNull(i)) {
+                        String kw = keywords.optString(i, "").trim();
+                        if (!kw.isEmpty()) {
+                            entry.addKeyword(kw, ',');
+                        }
+                    }
+                }
+            }
+            if (result.has("meshHeadingList") && result.getJSONObject("meshHeadingList").has("meshHeading")) {
+                JSONArray mesh = result.getJSONObject("meshHeadingList").getJSONArray("meshHeading");
+                for (int i = 0; i < mesh.length(); i++) {
+                    JSONObject mh = mesh.optJSONObject(i);
+                    if (mh != null) {
+                        String descriptor = mh.optString("descriptorName", "").trim();
+                        if (!descriptor.isEmpty()) {
+                            entry.addKeyword(descriptor, ',');
+                        }
+                    } else if (!mesh.isNull(i)) {
+                        // Sometimes MeSH heading may be a plain string
+                        String s = mesh.optString(i, "").trim();
+                        if (!s.isEmpty()) {
+                            entry.addKeyword(s, ',');
+                        }
+                    }
                 }
             }
 
@@ -139,6 +177,78 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
             return entry;
         } catch (JSONException e) {
             throw new ParseException("Error parsing EuropePMC response", e);
+        }
+    }
+
+    private EntryType determineEntryType(JSONObject result) {
+        EntryType defaultType = StandardEntryType.Article;
+        if (!(result.has("pubTypeList") && result.getJSONObject("pubTypeList").has("pubType"))) {
+            return defaultType;
+        }
+        JSONArray pubTypes = result.getJSONObject("pubTypeList").getJSONArray("pubType");
+        List<String> types = new ArrayList<>();
+        for (int i = 0; i < pubTypes.length(); i++) {
+            types.add(pubTypes.optString(i, "").toLowerCase());
+        }
+        if (matchesAny(types, "book chapter") || matchesAny(types, "chapter")) {
+            return StandardEntryType.InCollection;
+        }
+        if (matchesAny(types, "book")) {
+            return StandardEntryType.Book;
+        }
+        if (matchesAny(types, "conference") || matchesAny(types, "proceedings") || matchesAny(types, "conference paper") || matchesAny(types, "proceedings paper")) {
+            return StandardEntryType.InProceedings;
+        }
+        if (matchesAny(types, "phd") || matchesAny(types, "phd thesis") || matchesAny(types, "doctoral thesis")) {
+            return StandardEntryType.PhdThesis;
+        }
+        if (matchesAny(types, "master") || matchesAny(types, "masters thesis") || matchesAny(types, "master's thesis")) {
+            return StandardEntryType.MastersThesis;
+        }
+        // Letters, reviews, editorials are usually articles
+        return defaultType;
+    }
+
+    // substring matches
+    private boolean matchesAny(List<String> list, String searchString) {
+        return list.stream().anyMatch(entry -> entry.contains(searchString));
+    }
+
+    private Optional<String> extractBestFullTextUrl(JSONObject result) {
+        try {
+            if (!(result.has("fullTextUrlList") && result.getJSONObject("fullTextUrlList").has("fullTextUrl"))) {
+                return Optional.empty();
+            }
+            JSONArray urls = result.getJSONObject("fullTextUrlList").getJSONArray("fullTextUrl");
+            // First pass: prefer open/free PDF
+            for (int i = 0; i < urls.length(); i++) {
+                JSONObject urlEntry = urls.getJSONObject(i);
+                String style = urlEntry.optString("documentStyle", "").toLowerCase();
+                String avail = urlEntry.optString("availability", "").toLowerCase();
+                String url = urlEntry.optString("url", "");
+                if (url == null || url.isBlank()) {
+                    continue;
+                }
+                if ((avail.contains("open") || avail.contains("free")) && style.contains("pdf")) {
+                    return Optional.of(url);
+                }
+            }
+            // Second pass: any PDF
+            for (int i = 0; i < urls.length(); i++) {
+                JSONObject urlEntry = urls.getJSONObject(i);
+                String style = urlEntry.optString("documentStyle", "").toLowerCase();
+                String url = urlEntry.optString("url", "");
+                if (url == null || url.isBlank()) {
+                    continue;
+                }
+                if (style.contains("pdf")) {
+                    return Optional.of(url);
+                }
+            }
+            return Optional.empty();
+        } catch (JSONException e) {
+            LOGGER.error("Error parsing EuropePMC response for {}", result, e);
+            return Optional.empty();
         }
     }
 

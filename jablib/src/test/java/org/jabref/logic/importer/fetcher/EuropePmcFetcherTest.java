@@ -13,13 +13,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
 class EuropePmcFetcherTest {
 
     private EuropePmcFetcher fetcher;
     private BibEntry entryWijedasa;
+    private BibEntry entryWithFulltextAndKeywords;
 
     @BeforeEach
     void setUp() {
@@ -40,14 +40,36 @@ class EuropePmcFetcherTest {
                 .withField(StandardField.VOLUME, "23")
                 .withField(StandardField.URL, "https://pubmed.ncbi.nlm.nih.gov/27670948/")
                 .withField(StandardField.YEAR, "2017");
+
+        entryWithFulltextAndKeywords = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Okpala, Chibuike and Umeh, Ifeoma and Anagu, Linda Onyeka")
+                .withField(StandardField.DOI, "10.12688/openresafrica.15809.2")
+                .withField(StandardField.HOWPUBLISHED, "Electronic-eCollection")
+                .withField(StandardField.ISSN, "2752-6925")
+                .withField(StandardField.JOURNAL, "Open research Africa")
+                .withField(StandardField.KEYWORDS, "rainy season, Preventive Measures, Asymptomatic Malaria, Malaria Transmission.")
+                .withField(new UnknownField("nlmid"), "9918487345206676")
+                .withField(StandardField.PAGES, "5")
+                .withField(StandardField.PMID, "40860931")
+                .withField(StandardField.PUBSTATE, "epublish")
+                .withField(StandardField.TITLE, "Economic empowerment and various preventive strategies play a role in reducing asymptomatic malaria towards the end of the rainy season.")
+                .withField(StandardField.URL, "https://europepmc.org/articles/PMC12375191?pdf=render")
+                .withField(StandardField.VOLUME, "8")
+                .withField(StandardField.YEAR, "2025");
     }
 
     @Test
     void searchByIDWijedasa() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670948");
-        assertTrue(fetchedEntry.isPresent());
-
         fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
         assertEquals(Optional.of(entryWijedasa), fetchedEntry);
+    }
+
+    @Test
+    void searchByIDDownloadsFulltextAndKeywords() throws FetcherException {
+        Optional<BibEntry> fetchedEntry;
+        fetchedEntry = fetcher.performSearchById("40860931");
+        fetchedEntry.get().clearField(StandardField.ABSTRACT);
+        assertEquals(Optional.of(entryWithFulltextAndKeywords), fetchedEntry);
     }
 }
