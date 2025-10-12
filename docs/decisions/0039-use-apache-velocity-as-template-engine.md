@@ -16,6 +16,9 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 ## Decision Drivers
 
 * It should have short and understandable syntax. Especially, it should work well with unset fields and empty `Optional`s.
+
+Implementation decision drivers:
+
 * It should be possible to provide templates out of `String`s (required by the AI feature).
 * It should be fast.
 
