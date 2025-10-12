@@ -875,15 +875,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         // The definitive insertion needs to happen now.
         BibDatabaseContext sourceBibDatabaseContext = clipBoardManager.getSourceBibDatabaseContext().orElse(null);
         copyEntriesWithFeedback(
-            sourceBibDatabaseContext,
-            entriesToAdd,
-            bibDatabaseContext,
-            Localization.lang("Pasted %0 entry(s) to %1"),
-            Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
-            dialogService,
-            preferences.getFilePreferences(),
-            importHandler
-            );
+                sourceBibDatabaseContext,
+                entriesToAdd,
+                bibDatabaseContext,
+                Localization.lang("Pasted %0 entry(s) to %1"),
+                Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
+                dialogService,
+                preferences.getFilePreferences(),
+                importHandler
+        );
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
@@ -903,15 +903,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
         copyEntriesWithFeedback(
-            sourceBibDatabaseContext,
-            entriesToAdd,
-            bibDatabaseContext,
-            Localization.lang("Moved %0 entry(s) to %1"),
-            Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
-            dialogService,
-            preferences.getFilePreferences(),
-            importHandler
-            );
+                sourceBibDatabaseContext,
+                entriesToAdd,
+                bibDatabaseContext,
+                Localization.lang("Moved %0 entry(s) to %1"),
+                Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
+                dialogService,
+                preferences.getFilePreferences(),
+                importHandler
+        );
     }
 
     public void cutEntry() {

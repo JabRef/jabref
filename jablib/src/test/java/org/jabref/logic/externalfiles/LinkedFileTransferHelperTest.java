@@ -65,7 +65,7 @@ class LinkedFileTransferHelperTest {
         targetContext.getDatabase().insertEntry(targetEntry);
 
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-          filePreferences);
+                filePreferences);
 
         BibEntry expectedEntry = new BibEntry();
         LinkedFile expectedLinkedFile = new LinkedFile("Test", "subdir/sourcefiles/test.pdf", "PDF");
@@ -111,7 +111,7 @@ class LinkedFileTransferHelperTest {
         targetContext.getDatabase().insertEntry(targetEntry);
 
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-          filePreferences);
+                filePreferences);
 
         BibEntry expectedEntry = new BibEntry();
         LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
@@ -157,7 +157,7 @@ class LinkedFileTransferHelperTest {
         targetContext.getDatabase().insertEntry(targetEntry);
 
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-          filePreferences);
+                filePreferences);
 
         BibEntry expectedEntry = new BibEntry();
         LinkedFile expectedLinkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
@@ -205,7 +205,7 @@ class LinkedFileTransferHelperTest {
         targetContext.getDatabase().insertEntry(targetEntry);
 
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-          filePreferences);
+                filePreferences);
 
         BibEntry expectedEntry = new BibEntry();
         LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
@@ -447,7 +447,7 @@ class LinkedFileTransferHelperTest {
         targetContext.getDatabase().insertEntry(targetEntry);
 
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-            filePreferences);
+                filePreferences);
 
         Path expectedFile = targetDir.resolve("sourcefiles/test.pdf");
 

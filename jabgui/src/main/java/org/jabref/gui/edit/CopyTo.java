@@ -81,27 +81,27 @@ public class CopyTo extends SimpleCommand {
         entriesToAdd.addAll(entriesWithCrossRef);
 
         copyEntriesWithFeedback(
-            sourceDatabaseContext,
-            entriesToAdd,
-            targetDatabaseContext,
-            Localization.lang("Copied %0 entry(s) to %1, including cross-references"),
-            Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"),
-            dialogService,
-            filePreferences,
-            importHandler
+                sourceDatabaseContext,
+                entriesToAdd,
+                targetDatabaseContext,
+                Localization.lang("Copied %0 entry(s) to %1, including cross-references"),
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"),
+                dialogService,
+                filePreferences,
+                importHandler
         );
     }
 
     public void copyEntriesWithoutCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
         copyEntriesWithFeedback(
-            sourceDatabaseContext,
-            selectedEntries,
-            targetDatabaseContext,
-            Localization.lang("Copied %0 entry(s) to %1, without cross-references"),
-            Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"),
-            dialogService,
-            filePreferences,
-            importHandler
+                sourceDatabaseContext,
+                selectedEntries,
+                targetDatabaseContext,
+                Localization.lang("Copied %0 entry(s) to %1, without cross-references"),
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"),
+                dialogService,
+                filePreferences,
+                importHandler
         );
     }
 

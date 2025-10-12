@@ -169,7 +169,7 @@ public class ClipBoardManager {
     }
 
     public Optional<BibDatabaseContext> getSourceBibDatabaseContext() {
-      return Optional.ofNullable(sourceDatabaseContext);
+        return Optional.ofNullable(sourceDatabaseContext);
     }
 
     public void setSourceBibDatabaseContext(@NonNull BibDatabaseContext context) {

@@ -16,21 +16,21 @@ import org.jspecify.annotations.Nullable;
 public class CopyUtil {
 
     public static void copyEntriesWithFeedback(@Nullable BibDatabaseContext sourceDatabaseContext,
-                                        List<BibEntry> entriesToAdd,
-                                        BibDatabaseContext targetDatabaseContext,
-                                        String successMessage,
-                                        String partialMessage,
-                                        DialogService dialogService,
-                                        FilePreferences filePreferences,
-                                        ImportHandler importHandler) {
+                                               List<BibEntry> entriesToAdd,
+                                               BibDatabaseContext targetDatabaseContext,
+                                               String successMessage,
+                                               String partialMessage,
+                                               DialogService dialogService,
+                                               FilePreferences filePreferences,
+                                               ImportHandler importHandler) {
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(entriesToAdd.size());
         tracker.setOnFinish(() -> {
             int importedCount = tracker.getImportedCount();
             int skippedCount = tracker.getSkippedCount();
 
             String targetName = targetDatabaseContext.getDatabasePath()
-                .map(path -> path.getFileName().toString())
-                .orElse(Localization.lang("target library"));
+                                                     .map(path -> path.getFileName().toString())
+                                                     .orElse(Localization.lang("target library"));
 
             if (importedCount == entriesToAdd.size()) {
                 dialogService.notify(Localization.lang(successMessage, String.valueOf(importedCount), targetName));
@@ -41,8 +41,8 @@ public class CopyUtil {
             }
             if (sourceDatabaseContext != null) {
                 LinkedFileTransferHelper
-                    .adjustLinkedFilesForTarget(sourceDatabaseContext,
-                        targetDatabaseContext, filePreferences);
+                        .adjustLinkedFilesForTarget(sourceDatabaseContext,
+                                targetDatabaseContext, filePreferences);
             }
         });
 

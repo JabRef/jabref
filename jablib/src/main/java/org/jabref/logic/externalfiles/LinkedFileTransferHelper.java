@@ -23,10 +23,11 @@ import org.slf4j.LoggerFactory;
 public class LinkedFileTransferHelper {
 
     private record FileCopyContext(
-      BibDatabaseContext sourceContext,
-      BibDatabaseContext targetContext,
-      FilePreferences filePreferences
-    ) { }
+            BibDatabaseContext sourceContext,
+            BibDatabaseContext targetContext,
+            FilePreferences filePreferences
+    ) {
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileTransferHelper.class);
 
@@ -40,9 +41,9 @@ public class LinkedFileTransferHelper {
      * @param filePreferences File preferences for both contexts
      */
     public static Set<BibEntry> adjustLinkedFilesForTarget(
-        BibDatabaseContext sourceContext,
-        BibDatabaseContext targetContext,
-        FilePreferences filePreferences
+            BibDatabaseContext sourceContext,
+            BibDatabaseContext targetContext,
+            FilePreferences filePreferences
     ) {
         if (!filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()) {
             return Set.of();
@@ -58,8 +59,8 @@ public class LinkedFileTransferHelper {
 
             for (LinkedFile linkedFile : entry.getFiles()) {
                 if (linkedFile.getLink().isEmpty()) {
-                  linkedFiles.add(linkedFile);
-                  continue;
+                    linkedFiles.add(linkedFile);
+                    continue;
                 }
 
                 // In case the file wasn't found at the source or the target - just re-use the existing link
@@ -67,15 +68,15 @@ public class LinkedFileTransferHelper {
                 Optional<Path> targetPrimaryOpt = getPrimaryPath(targetContext, filePreferences);
 
                 if (sourcePathOpt.isEmpty() || targetPrimaryOpt.isEmpty()) {
-                  linkedFiles.add(linkedFile);
-                  continue;
+                    linkedFiles.add(linkedFile);
+                    continue;
                 }
 
                 Path relative;
                 if (sourcePathOpt.get().startsWith(targetPrimaryOpt.get())) {
-                        relative = targetPrimaryOpt.get().relativize(sourcePathOpt.get());
+                    relative = targetPrimaryOpt.get().relativize(sourcePathOpt.get());
                 } else {
-                        relative = Path.of("..").resolve(sourcePathOpt.get().getFileName());
+                    relative = Path.of("..").resolve(sourcePathOpt.get().getFileName());
                 }
 
                 if (isReachableFromPrimaryDirectory(relative)) {
@@ -127,7 +128,7 @@ public class LinkedFileTransferHelper {
 
     private static boolean isPathAdjusted(LinkedFile linkedFile, Path relative, List<LinkedFile> linkedFiles, boolean entryChanged) {
         boolean pathUpdated = adjustPathForReachableFile(
-            linkedFile, relative
+                linkedFile, relative
         );
         if (pathUpdated) {
             entryChanged = true;
@@ -138,12 +139,12 @@ public class LinkedFileTransferHelper {
 
     private static boolean isFileCopied(FileCopyContext context, LinkedFile linkedFile, List<LinkedFile> linkedFiles, boolean entryChanged) {
         boolean fileCopied = copyFileToTargetContext(
-            linkedFile, context
+                linkedFile, context
         );
         if (fileCopied) {
             Optional<Path> newPath = linkedFile.findIn(context.targetContext(), context.filePreferences());
             newPath.ifPresent(path -> linkedFile.setLink(
-                FileUtil.relativize(path, context.targetContext(), context.filePreferences()).toString())
+                    FileUtil.relativize(path, context.targetContext(), context.filePreferences()).toString())
             );
             entryChanged = true;
         }
@@ -157,8 +158,8 @@ public class LinkedFileTransferHelper {
      * @return true if the path was updated, false otherwise
      */
     private static boolean adjustPathForReachableFile(
-        @NonNull LinkedFile linkedFile,
-        @NonNull Path relativePath
+            @NonNull LinkedFile linkedFile,
+            @NonNull Path relativePath
     ) {
         // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
         String newLink = relativePath.toString();
@@ -179,8 +180,8 @@ public class LinkedFileTransferHelper {
      * @return true if the file was successfully copied, false otherwise
      */
     private static boolean copyFileToTargetContext(
-        LinkedFile linkedFile,
-        FileCopyContext context
+            LinkedFile linkedFile,
+            FileCopyContext context
     ) {
         // [impl->req~logic.externalfiles.file-transfer.not-reachable-same-path~1]
         // [impl->req~logic.externalfiles.file-transfer.not-reachable-different-path~1]
