@@ -50,12 +50,12 @@ class AiChatComponentTest {
         Localization.setLanguage(Language.ENGLISH);
 
         prefs = mock(AiPreferences.class, Mockito.RETURNS_DEEP_STUBS);
-        var providerProp = new SimpleObjectProperty<>(AiProvider.OPEN_AI);
-        var openAiModelProp = new SimpleStringProperty("gpt-4o");
-        var mistralModelProp = new SimpleStringProperty("mistral-large");
-        var geminiModelProp = new SimpleStringProperty("gemini-1.5-pro");
-        var hfModelProp = new SimpleStringProperty("hf-model");
-        var gpt4AllModelProp = new SimpleStringProperty("gpt4all");
+        SimpleObjectProperty<AiProvider> providerProp = new SimpleObjectProperty<>(AiProvider.OPEN_AI);
+        SimpleStringProperty openAiModelProp = new SimpleStringProperty("gpt-4o");
+        SimpleStringProperty mistralModelProp = new SimpleStringProperty("mistral-large");
+        SimpleStringProperty geminiModelProp = new SimpleStringProperty("gemini-1.5-pro");
+        SimpleStringProperty hfModelProp = new SimpleStringProperty("hf-model");
+        SimpleStringProperty gpt4AllModelProp = new SimpleStringProperty("gpt4all");
 
         when(prefs.aiProviderProperty()).thenReturn(providerProp);
         when(prefs.openAiChatModelProperty()).thenReturn(openAiModelProp);
