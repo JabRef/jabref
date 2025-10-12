@@ -13,6 +13,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultSearchQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.model.entry.Author;
@@ -32,7 +33,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EuropePmcFetcher implements IdBasedParserFetcher, org.jabref.logic.importer.SearchBasedParserFetcher {
+public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);
 
     @Override
@@ -74,17 +75,14 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, org.jabref.logic.
 
             BibEntry entry = new BibEntry(entryType);
 
-            entry.setField(StandardField.TITLE, result.optString("title"));
-            entry.setField(StandardField.ABSTRACT, result.optString("abstractText"));
-
-            entry.setField(StandardField.YEAR, result.optString("pubYear"));
-
-            String pages = result.optString("pageInfo");
-            entry.setField(StandardField.PAGES, pages);
+            entry.withField(StandardField.TITLE, result.optString("title"))
+                 .withField(StandardField.ABSTRACT, result.optString("abstractText"))
+                 .withField(StandardField.YEAR, result.optString("pubYear"))
+                 .withField(StandardField.PAGES, result.optString("pageInfo"));
 
             String doi = result.optString("doi");
-            entry.setField(StandardField.DOI, doi);
-            entry.setField(StandardField.PMID, result.optString("pmid"));
+            entry.withField(StandardField.DOI, doi)
+                 .withField(StandardField.PMID, result.optString("pmid"));
 
             // Prefer fulltext URLs (e.g., PDF) when available, otherwise fall back to DOI or PubMed page
             String bestUrl = extractBestFullTextUrl(result).orElseGet(() -> {
@@ -158,19 +156,19 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, org.jabref.logic.
                         }
                     } else if (!mesh.isNull(i)) {
                         // Sometimes MeSH heading may be a plain string
-                        String s = mesh.optString(i, "").trim();
-                        if (!s.isEmpty()) {
-                            entry.addKeyword(s, ',');
+                        String meshPlain = mesh.optString(i, "").trim();
+                        if (!meshPlain.isEmpty()) {
+                            entry.addKeyword(meshPlain, ',');
                         }
                     }
                 }
             }
 
             if (result.has("pubModel")) {
-                Optional.ofNullable(result.optString("pubModel")).ifPresent(pubModel -> entry.setField(StandardField.HOWPUBLISHED, pubModel));
+                Optional.ofNullable(result.optString("pubModel")).ifPresent(pubModel -> entry.withField(StandardField.HOWPUBLISHED, pubModel));
             }
             if (result.has("publicationStatus")) {
-                Optional.ofNullable(result.optString("publicationStatus")).ifPresent(pubStatus -> entry.setField(StandardField.PUBSTATE, pubStatus));
+                Optional.ofNullable(result.optString("publicationStatus")).ifPresent(pubStatus -> entry.withField(StandardField.PUBSTATE, pubStatus));
             }
 
             if (result.has("journalInfo")) {
