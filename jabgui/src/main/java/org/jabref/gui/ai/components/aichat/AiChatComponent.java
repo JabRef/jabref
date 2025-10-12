@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,6 +40,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.ListUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.google.common.annotations.VisibleForTesting;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
@@ -127,7 +127,8 @@ public class AiChatComponent extends VBox {
         noticeText.textProperty().bind(Bindings.createStringBinding(this::computeNoticeText, noticeDependencies()));
     }
 
-    private String computeNoticeText() {
+    @VisibleForTesting
+    String computeNoticeText() {
         String provider = aiPreferences.getAiProvider().getLabel();
         String model = aiPreferences.getSelectedChatModel();
         return noticeTemplate.replace("%0", provider + " " + model);
@@ -142,10 +143,6 @@ public class AiChatComponent extends VBox {
                 aiPreferences.huggingFaceChatModelProperty(),
                 aiPreferences.gpt4AllChatModelProperty()
         };
-    }
-
-    public ReadOnlyStringProperty noticeTextProperty() {
-        return noticeText.textProperty();
     }
 
     private void initializeExampleQuestions() {
