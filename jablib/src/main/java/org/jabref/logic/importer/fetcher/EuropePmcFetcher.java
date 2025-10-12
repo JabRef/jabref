@@ -140,9 +140,9 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, org.jabref.logic.
                 JSONArray keywords = result.getJSONObject("keywordList").getJSONArray("keyword");
                 for (int i = 0; i < keywords.length(); i++) {
                     if (!keywords.isNull(i)) {
-                        String kw = keywords.optString(i, "").trim();
-                        if (!kw.isEmpty()) {
-                            entry.addKeyword(kw, ',');
+                        String keyword = keywords.optString(i, "").trim();
+                        if (!keyword.isEmpty()) {
+                            entry.addKeyword(keyword, ',');
                         }
                     }
                 }
