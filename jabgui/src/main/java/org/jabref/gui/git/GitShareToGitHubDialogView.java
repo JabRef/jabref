@@ -15,6 +15,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 
@@ -50,6 +51,9 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     private TaskExecutor taskExecutor;
 
     @Inject
+    private GitHandlerRegistry gitHandlerRegistry;
+
+    @Inject
     private GuiPreferences preferences;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
@@ -62,7 +66,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        this.viewModel = new GitShareToGitHubDialogViewModel(preferences.getGitPreferences(), stateManager, dialogService, taskExecutor);
+        this.viewModel = new GitShareToGitHubDialogViewModel(preferences.getGitPreferences(), stateManager, dialogService, taskExecutor, gitHandlerRegistry);
 
         this.setTitle(Localization.lang("Share this Library to GitHub"));
 

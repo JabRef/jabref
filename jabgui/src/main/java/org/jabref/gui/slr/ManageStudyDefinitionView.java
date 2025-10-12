@@ -103,7 +103,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     /**
      * This is used to edit an existing study.
      *
-     * @param study the study to edit
+     * @param study          the study to edit
      * @param studyDirectory the directory of the study
      */
     public ManageStudyDefinitionView(Study study, Path studyDirectory) {
@@ -128,10 +128,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
                                                 Bindings.isEmpty(viewModel.getQueries()),
                                                 Bindings.isEmpty(viewModel.getCatalogs())),
-                                                Bindings.isEmpty(viewModel.getAuthors())),
-                                                viewModel.getTitle().isEmpty()),
-                                                viewModel.getDirectory().isEmpty()),
-                                                directoryWarning.visibleProperty()));
+                                        Bindings.isEmpty(viewModel.getAuthors())),
+                                viewModel.getTitle().isEmpty()),
+                        viewModel.getDirectory().isEmpty()),
+                directoryWarning.visibleProperty()));
 
         setResultConverter(button -> {
             if (button == saveSurveyButtonType) {

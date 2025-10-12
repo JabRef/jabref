@@ -88,7 +88,8 @@ class SearchCitationsRelationsServiceTest {
                     _ -> citationsToReturn,
                     citationsDatabase::put,
                     List::of,
-                    (_, _) -> { },
+                    (_, _) -> {
+                    },
                     _ -> true,
                     _ -> false
             );
@@ -169,7 +170,8 @@ class SearchCitationsRelationsServiceTest {
             CitationFetcher fetcher = createMockFetcher(referencer, null, referencesToReturn, null);
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                     List::of,
-                    (_, _) -> { },
+                    (_, _) -> {
+                    },
                     _ -> referencesToReturn,
                     referencesDatabase::put,
                     _ -> false,

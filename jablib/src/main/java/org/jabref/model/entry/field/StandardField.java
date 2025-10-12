@@ -133,13 +133,19 @@ public enum StandardField implements Field {
     XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),
     XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
 
-    // JabRef-specific fields
-    GROUPS("groups"),
-    OWNER("owner"),
+    // region: JabRef-specific fields
+
     CITATIONCOUNT("citationcount"),
-    TIMESTAMP("timestamp", FieldProperty.DATE),
+    GROUPS("groups"),
+    ICORERANKING("icore"),
+    OWNER("owner"),
+
+    // Timestamp-realted
     CREATIONDATE("creationdate", FieldProperty.DATE),
-    MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
+    MODIFICATIONDATE("modificationdate", FieldProperty.DATE),
+    TIMESTAMP("timestamp", FieldProperty.DATE);
+
+    // endregion
 
     public static final Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
 
@@ -196,14 +202,5 @@ public enum StandardField implements Field {
     @Override
     public boolean isStandardField() {
         return true;
-    }
-
-    @Override
-    public String getDisplayName() {
-        if (displayName == null) {
-            return Field.super.getDisplayName();
-        } else {
-            return displayName;
-        }
     }
 }

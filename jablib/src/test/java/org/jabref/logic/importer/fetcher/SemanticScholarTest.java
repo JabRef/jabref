@@ -102,7 +102,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFindByArXiv() throws URISyntaxException, IOException, FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.EPRINT, "1407.3561")
-                              .withField(StandardField.ARCHIVEPREFIX, "arXiv");
+                                       .withField(StandardField.ARCHIVEPREFIX, "arXiv");
         assertEquals(
                 Optional.of(new URI("https://arxiv.org/pdf/1407.3561.pdf").toURL()),
                 fetcher.findFullText(entry)

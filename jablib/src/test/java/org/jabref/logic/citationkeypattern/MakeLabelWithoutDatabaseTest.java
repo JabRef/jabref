@@ -43,8 +43,8 @@ class MakeLabelWithoutDatabaseTest {
     void makeAuthorLabelForFileSearch() {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, "John Doe")
-        .withField(StandardField.YEAR, "2016")
-        .withField(StandardField.TITLE, "An awesome paper on JabRef");
+                .withField(StandardField.YEAR, "2016")
+                .withField(StandardField.TITLE, "An awesome paper on JabRef");
 
         String label = citationKeyGenerator.generateKey(entry);
         assertEquals("Doe", label);

@@ -137,8 +137,8 @@ import org.slf4j.LoggerFactory;
  * contents of the defaults HashMap that are defined in this class.
  * There are more default parameters in this map which belong to separate preference classes.
  * <p>
- *  This class is injected into formatter using reflection to avoid tight coupling and
- *  is easier than injecting via constructor due to amount of refactoring
+ * This class is injected into formatter using reflection to avoid tight coupling and
+ * is easier than injecting via constructor due to amount of refactoring
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
@@ -876,7 +876,6 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
-
     /**
      * @deprecated Never ever add a call to this method. There should be only one
      * caller. All other usages should get the preferences passed (or injected). The
@@ -1286,8 +1285,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
-                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
-                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
+               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
+               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
 
     //*************************************************************************************************************
@@ -1861,8 +1860,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
                 yield SaveOrder.getDefaultSaveOrder();
             }
-            case SPECIFIED -> SelfContainedSaveOrder.of(exportSaveOrder);
-            case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
+            case SPECIFIED ->
+                    SelfContainedSaveOrder.of(exportSaveOrder);
+            case ORIGINAL ->
+                    SaveOrder.getDefaultSaveOrder();
         };
 
         return new SelfContainedSaveConfiguration(
@@ -2415,7 +2416,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getFieldPreferences(),
                 getXmpPreferences(),
                 getDOIPreferences(),
-                getGrobidPreferences());
+                getGrobidPreferences(),
+                getFilePreferences());
     }
 
     // endregion
@@ -2515,9 +2517,9 @@ public class JabRefCliPreferences implements CliPreferences {
         if (getBoolean(GITHUB_REMEMBER_PAT_KEY)) {
             try (final Keyring keyring = Keyring.create()) {
                 return new Password(
-                    keyring.getPassword("org.jabref", "github"),
-                    getInternalPreferences().getUserAndHost())
-                    .decrypt();
+                        keyring.getPassword("org.jabref", "github"),
+                        getInternalPreferences().getUserAndHost())
+                        .decrypt();
             } catch (PasswordAccessException ex) {
                 LOGGER.warn("No GitHub token stored in keyring");
             } catch (Exception ex) {

@@ -62,8 +62,8 @@ class EntryLinkListTest {
 
     @Test
     void givenBibEntryWhenParsingThenExpectLink() {
-      ParsedEntryLink expected = new ParsedEntryLink(new BibEntry().withCitationKey("key"));
-      assertFalse(expected.getLinkedEntry().isEmpty());
+        ParsedEntryLink expected = new ParsedEntryLink(new BibEntry().withCitationKey("key"));
+        assertFalse(expected.getLinkedEntry().isEmpty());
     }
 
     @Test

@@ -52,8 +52,8 @@ class ControlHelperTest {
     @NullSource
     void truncateWithNullEllipsisPositionThrowsNullPointerException(ControlHelper.EllipsisPosition ellipsisPosition) {
         assertThrows(
-            NullPointerException.class,
-            () -> ControlHelper.truncateString(TEXT, MAX_CHARACTERS, ELLIPSIS_STRING, ellipsisPosition)
+                NullPointerException.class,
+                () -> ControlHelper.truncateString(TEXT, MAX_CHARACTERS, ELLIPSIS_STRING, ellipsisPosition)
         );
     }
 }

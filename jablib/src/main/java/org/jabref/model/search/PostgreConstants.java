@@ -13,44 +13,44 @@ public enum PostgreConstants {
     public static final List<String> POSTGRES_FUNCTIONS = List.of(
             // HTML highlighting function
             """
-                CREATE OR REPLACE FUNCTION regexp_mark(string text, pattern text)
-                    RETURNS text
-                    LANGUAGE plpgsql
-                AS
-                $$
-                BEGIN
-                    RETURN regexp_replace(string, format('(%s)', pattern), '<mark style="background: orange">\\1</mark>', 'gi');
-                END
-                $$;
-            """,
+                        CREATE OR REPLACE FUNCTION regexp_mark(string text, pattern text)
+                            RETURNS text
+                            LANGUAGE plpgsql
+                        AS
+                        $$
+                        BEGIN
+                            RETURN regexp_replace(string, format('(%s)', pattern), '<mark style="background: orange">\\1</mark>', 'gi');
+                        END
+                        $$;
+                    """,
 
             // Extract positions of a pattern in a string
             // Source: https://www.postgresql.org/message-id/flat/0aabac3c-9049-4c55-a82d-a70c5ba43d4d%40www.fastmail.com
             """
-                CREATE OR REPLACE FUNCTION regexp_positions(string text, pattern text, OUT start_pos integer, OUT end_pos integer)
-                    RETURNS SETOF RECORD
-                    LANGUAGE plpgsql
-                AS
-                $$
-                DECLARE
-                    match text;
-                    remainder text := string;
-                    len integer;
-                    pos integer;
-                BEGIN
-                    end_pos := 0;
-                    FOR match IN SELECT (regexp_matches(string, format('(%s)', pattern), 'gi'))[1] LOOP
-                            len := length(match);
-                            pos := position(match in remainder);
-                            start_pos := pos + end_pos;
-                            end_pos := start_pos + len - 1;
-                            RETURN NEXT;
-                            remainder := right(remainder, 1 - len - pos);
-                        END LOOP;
-                    RETURN;
-                END
-                $$;
-            """
+                        CREATE OR REPLACE FUNCTION regexp_positions(string text, pattern text, OUT start_pos integer, OUT end_pos integer)
+                            RETURNS SETOF RECORD
+                            LANGUAGE plpgsql
+                        AS
+                        $$
+                        DECLARE
+                            match text;
+                            remainder text := string;
+                            len integer;
+                            pos integer;
+                        BEGIN
+                            end_pos := 0;
+                            FOR match IN SELECT (regexp_matches(string, format('(%s)', pattern), 'gi'))[1] LOOP
+                                    len := length(match);
+                                    pos := position(match in remainder);
+                                    start_pos := pos + end_pos;
+                                    end_pos := start_pos + len - 1;
+                                    RETURN NEXT;
+                                    remainder := right(remainder, 1 - len - pos);
+                                END LOOP;
+                            RETURN;
+                        END
+                        $$;
+                    """
     );
 
     private final String value;

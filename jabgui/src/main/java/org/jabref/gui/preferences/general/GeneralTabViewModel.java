@@ -408,7 +408,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public void importCSSFile() {
         String fileDir = customPathToThemeProperty.getValue().isEmpty() ? preferences.getInternalPreferences().getLastPreferencesExportPath().toString()
-                : customPathToThemeProperty.getValue();
+                                                                        : customPathToThemeProperty.getValue();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSS)

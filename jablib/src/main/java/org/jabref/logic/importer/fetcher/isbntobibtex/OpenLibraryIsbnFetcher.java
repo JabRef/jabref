@@ -146,11 +146,11 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
         }
 
         List<Author> authors = IntStream.range(0, works.length())
-                                          .mapToObj(works::getJSONObject)
-                                          .map(obj -> obj.getString("key"))
-                                          .map(worksLink -> BASE_URL + worksLink + ".json")
-                                          .flatMap(this::fromWorkToAuthors)
-                                          .collect(Collectors.toList());
+                                        .mapToObj(works::getJSONObject)
+                                        .map(obj -> obj.getString("key"))
+                                        .map(worksLink -> BASE_URL + worksLink + ".json")
+                                        .flatMap(this::fromWorkToAuthors)
+                                        .collect(Collectors.toList());
         return AuthorList.of(authors).getAsLastFirstNamesWithAnd(false);
     }
 

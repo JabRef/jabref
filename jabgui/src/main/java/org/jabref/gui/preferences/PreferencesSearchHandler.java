@@ -56,8 +56,8 @@ class PreferencesSearchHandler {
         String searchQuery = query.toLowerCase(Locale.ROOT);
 
         List<PreferencesTab> matchedTabs = preferenceTabs.stream()
-                .filter(tab -> tabMatchesQuery(tab, searchQuery))
-                .collect(Collectors.toList());
+                                                         .filter(tab -> tabMatchesQuery(tab, searchQuery))
+                                                         .collect(Collectors.toList());
 
         filteredPreferenceTabs.setAll(matchedTabs);
     }
@@ -65,18 +65,19 @@ class PreferencesSearchHandler {
     /**
      * Checks if a tab matches the given search query either by its name or by its controls.
      *
-     * @param tab The preferences tab to check.
+     * @param tab   The preferences tab to check.
      * @param query The search query.
      * @return True if the tab matches the query.
      */
     private boolean tabMatchesQuery(PreferencesTab tab, String query) {
-        boolean tabNameMatches = tab.getTabName().toLowerCase(Locale.ROOT).contains(query);
+        boolean tabNameMatches = tab.getSearchKeywords().stream()
+                                    .anyMatch(keyword -> keyword.toLowerCase(Locale.ROOT).contains(query));
 
         boolean controlMatches = preferenceTabsControls.get(tab).stream()
-                .filter(control -> controlMatchesQuery(control, query))
-                .peek(this::highlightControl)
-                .findAny()
-                .isPresent();
+                                                       .filter(control -> controlMatchesQuery(control, query))
+                                                       .peek(this::highlightControl)
+                                                       .findAny()
+                                                       .isPresent();
 
         return tabNameMatches || controlMatches;
     }
@@ -102,8 +103,8 @@ class PreferencesSearchHandler {
 
         if (control instanceof ComboBox<?> comboBox && !comboBox.getItems().isEmpty()) {
             return comboBox.getItems().stream()
-                    .map(Object::toString)
-                    .anyMatch(item -> item.toLowerCase(Locale.ROOT).contains(query));
+                           .map(Object::toString)
+                           .anyMatch(item -> item.toLowerCase(Locale.ROOT).contains(query));
         }
 
         if (control instanceof TextField textField && textField.getText() != null) {
@@ -160,9 +161,9 @@ class PreferencesSearchHandler {
     /**
      * Recursively scans nodes and collects all controls.
      *
-     * @param node The current node being scanned.
+     * @param node       The current node being scanned.
      * @param controlMap Map storing tabs and their corresponding controls.
-     * @param tab The PreferencesTab associated with the current node.
+     * @param tab        The PreferencesTab associated with the current node.
      */
     private void scanControls(Node node, ArrayListMultimap<PreferencesTab, Control> controlMap, PreferencesTab tab) {
         if (node instanceof Control control) {

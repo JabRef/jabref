@@ -26,9 +26,12 @@ public class ThemeWireFrame extends VBox {
                         styleClass.startsWith("wireframe-custom"));
 
         String themeClassName = switch (themeType) {
-            case LIGHT -> "wireframe-light";
-            case DARK -> "wireframe-dark";
-            case CUSTOM -> "wireframe-custom";
+            case LIGHT ->
+                    "wireframe-light";
+            case DARK ->
+                    "wireframe-dark";
+            case CUSTOM ->
+                    "wireframe-custom";
         };
         getStyleClass().add(themeClassName);
     }

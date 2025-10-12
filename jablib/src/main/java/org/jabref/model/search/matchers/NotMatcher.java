@@ -1,9 +1,9 @@
 package org.jabref.model.search.matchers;
 
-import java.util.Objects;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Inverts the search result.
@@ -16,8 +16,8 @@ public class NotMatcher implements SearchMatcher {
 
     private final SearchMatcher otherMatcher;
 
-    public NotMatcher(SearchMatcher otherMatcher) {
-        this.otherMatcher = Objects.requireNonNull(otherMatcher);
+    public NotMatcher(@NonNull SearchMatcher otherMatcher) {
+        this.otherMatcher = otherMatcher;
     }
 
     @Override

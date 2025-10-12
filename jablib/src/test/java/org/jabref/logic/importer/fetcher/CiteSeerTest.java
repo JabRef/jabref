@@ -63,16 +63,16 @@ class CiteSeerTest {
         assertEquals(List.of(expected), fetchedEntries);
     }
 
-    /*
-    * CiteSeer seems to only apply year ranges effectively when we search for entries
-    * with associated pdfs, year values do not accurately reflect realistic values
-    * */
+    /**
+     * CiteSeer seems to only apply year ranges effectively when we search for entries
+     * with associated pdfs, year values do not accurately reflect realistic values
+     */
     @Disabled
     @Test
     void searchWithSortingByYear() throws FetcherException {
         Optional<String> expected = Optional.of("1552");
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:Theory AND year:1552 AND sortBy:Year");
-        for (BibEntry actual: fetchedEntries) {
+        for (BibEntry actual : fetchedEntries) {
             if (actual.hasField(StandardField.YEAR)) {
                 assertEquals(expected, actual.getField(StandardField.YEAR));
             }

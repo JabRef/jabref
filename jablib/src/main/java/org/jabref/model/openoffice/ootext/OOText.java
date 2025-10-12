@@ -1,6 +1,6 @@
 package org.jabref.model.openoffice.ootext;
 
-import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Text with HTML-like markup as understood by OOTextIntoOO.write
@@ -11,8 +11,7 @@ public class OOText {
 
     private final String data;
 
-    private OOText(String data) {
-        Objects.requireNonNull(data);
+    private OOText(@NonNull String data) {
         this.data = data;
     }
 

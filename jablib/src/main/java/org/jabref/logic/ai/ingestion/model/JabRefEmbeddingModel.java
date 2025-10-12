@@ -43,9 +43,11 @@ public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
     // Used to update the tab content after the data is available
     private final EventBus eventBus = new EventBus();
 
-    public static class EmbeddingModelBuiltEvent { }
+    public static class EmbeddingModelBuiltEvent {
+    }
 
-    public static class EmbeddingModelBuildingErrorEvent { }
+    public static class EmbeddingModelBuildingErrorEvent {
+    }
 
     // Empty if there is no error.
     private String errorWhileBuildingModel = "";

@@ -76,7 +76,7 @@ public class GitStatusViewModel extends AbstractViewModel {
 
     public void refresh(Path path) {
         handlerRegistry.fromAnyPath(path).ifPresentOrElse(handler -> {
-            GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(path);
+            GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(handler);
             setTracking(snapshot.tracking());
             setSyncStatus(snapshot.syncStatus());
             setConflictDetected(snapshot.conflict());

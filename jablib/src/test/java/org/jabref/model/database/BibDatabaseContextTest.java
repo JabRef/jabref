@@ -174,12 +174,12 @@ class BibDatabaseContextTest {
     @Test
     void ofParsesValidBibtexStringCorrectly() throws Exception {
         String bibContent = """
-        @article{Alice2023,
-            author = {Alice},
-            title = {Test Title},
-            year = {2023}
-        }
-        """;
+                @article{Alice2023,
+                    author = {Alice},
+                    title = {Test Title},
+                    year = {2023}
+                }
+                """;
 
         BibDatabaseContext context = BibDatabaseContext.of(bibContent, importPrefs);
         BibEntry expected = new BibEntry(StandardEntryType.Article)
@@ -194,12 +194,12 @@ class BibDatabaseContextTest {
     @Test
     void ofParsesValidBibtexStreamCorrectly() throws Exception {
         String bibContent = """
-        @article{Alice2023,
-            author = {Alice},
-            title = {Test Title},
-            year = {2023}
-        }
-        """;
+                @article{Alice2023,
+                    author = {Alice},
+                    title = {Test Title},
+                    year = {2023}
+                }
+                """;
 
         try (InputStream bibContentStream = new ByteArrayInputStream(bibContent.getBytes(StandardCharsets.UTF_8))) {
             BibDatabaseContext context = BibDatabaseContext.of(bibContentStream, importPrefs);

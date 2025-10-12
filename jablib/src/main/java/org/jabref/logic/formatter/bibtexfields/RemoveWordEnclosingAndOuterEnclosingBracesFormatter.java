@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
 import java.util.StringJoiner;
 
 import org.jabref.logic.cleanup.Formatter;
@@ -46,7 +45,6 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
 
     @Override
     public String format(String input) {
-        Objects.requireNonNull(input);
         if (StringUtil.isBlank(input)) {
             return input;
         }

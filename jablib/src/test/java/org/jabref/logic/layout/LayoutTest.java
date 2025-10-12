@@ -130,7 +130,7 @@ class LayoutTest {
         // combined (!a&&b)
         layoutText = layout(
                 "\\begin{!editor&&author}\\format[HTMLChars]{\\author}\\end{!editor&&author}" +
-                "\\begin{editor&&!author}\\format[HTMLChars]{\\editor} (eds.)\\end{editor&&!author}", entry);
+                        "\\begin{editor&&!author}\\format[HTMLChars]{\\editor} (eds.)\\end{editor&&!author}", entry);
 
         assertEquals("Author", layoutText);
     }
@@ -177,8 +177,8 @@ class LayoutTest {
     void annotatedField() throws IOException {
         UnknownField annotatedField = new UnknownField("author+an");
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-            .withField(annotatedField, "1:corresponding,2:highlight")
-            .withField(StandardField.AUTHOR, "Joe Doe and Mary Jane");
+                .withField(annotatedField, "1:corresponding,2:highlight")
+                .withField(StandardField.AUTHOR, "Joe Doe and Mary Jane");
 
         String layoutText = layout("\\author: \\author \\author+an", entry);
 

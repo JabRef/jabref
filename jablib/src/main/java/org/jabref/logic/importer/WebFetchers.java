@@ -39,6 +39,7 @@ import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.logic.importer.fetcher.Medra;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
+import org.jabref.logic.importer.fetcher.OpenAlex;
 import org.jabref.logic.importer.fetcher.ResearchGate;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScholarArchiveFetcher;
@@ -78,7 +79,8 @@ public class WebFetchers {
                     fetcher = new ArXivFetcher(importFormatPreferences);
             case ISSN ->
                     fetcher = new IssnFetcher();
-            case null, default -> {
+            case null,
+                 default -> {
                 return Optional.empty();
             }
         }
@@ -111,7 +113,7 @@ public class WebFetchers {
         set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new GvkFetcher(importFormatPreferences));
         set.add(new BvbFetcher());
-        set.add(new MedlineFetcher());
+        set.add(new MedlineFetcher(importerPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
@@ -120,6 +122,7 @@ public class WebFetchers {
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerNatureWebFetcher(importerPreferences));
         set.add(new CrossRef());
+        set.add(new OpenAlex());
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences, importerPreferences));
@@ -144,12 +147,12 @@ public class WebFetchers {
         set.add(new ArXivFetcher(importFormatPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new IsbnFetcher(importFormatPreferences));
-                // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
-                // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+        // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
+        // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new DiVA(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new EuropePmcFetcher());
-        set.add(new MedlineFetcher());
+        set.add(new MedlineFetcher(importerPreferences));
         set.add(new TitleFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
@@ -174,11 +177,12 @@ public class WebFetchers {
         set.add(new IsbnFetcher(importFormatPreferences));
         set.add(new IssnFetcher());
         // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
-                // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+        // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new SemanticScholar(importerPreferences));
+        set.add(new OpenAlex());
         set.add(new ResearchGate(importFormatPreferences));
 
         // Uses the PDFs - and then uses the parsed DOI. Makes it 10% a web fetcher.
@@ -223,6 +227,8 @@ public class WebFetchers {
         fetchers.add(new OpenAccessDoi());
         fetchers.add(new SemanticScholar(importerPreferences));
         fetchers.add(new ResearchGate(importFormatPreferences));
+        // OpenAlex provides OA locations and direct PDF links via its API
+        fetchers.add(new OpenAlex());
         return fetchers;
     }
 
@@ -236,12 +242,13 @@ public class WebFetchers {
         fetchers.add(new ScienceDirect(importerPreferences));
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));
+        fetchers.add(new MedlineFetcher(importerPreferences));
         return fetchers;
     }
 }
 
 /**
- *  Places "Search pre-configured" to the first of the set
+ * Places "Search pre-configured" to the first of the set
  */
 class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
     @Override

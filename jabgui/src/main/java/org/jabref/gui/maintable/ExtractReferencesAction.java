@@ -36,7 +36,7 @@ import org.jspecify.annotations.Nullable;
  *   <li>Mode choice A: online or offline</li>
  *   <li>Mode choice B: complete entry or single file (the latter is not implemented)</li>
  * </ul>
- *
+ * <p>
  * The mode is selected by the preferences whether to use Grobid or not.
  */
 public class ExtractReferencesAction extends SimpleCommand {
@@ -59,7 +59,7 @@ public class ExtractReferencesAction extends SimpleCommand {
     /**
      * Can be used to bind the action on a context menu in the linked file view (future work)
      *
-     * @param entry the entry to handle (can be null)
+     * @param entry      the entry to handle (can be null)
      * @param linkedFile the linked file (can be null)
      */
     private ExtractReferencesAction(@NonNull DialogService dialogService,
@@ -164,7 +164,7 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     /**
      * Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.
-     *
+     * <p>
      * TODO: Move this part to logic somehow
      *
      * @param currentEntry used to create citation keys if the importer did not provide one from the imported entry

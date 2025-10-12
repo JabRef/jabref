@@ -86,8 +86,8 @@ public class OOBibBaseConnect {
         try {
             // get the bridge factory from the local service manager
             XBridgeFactory bridgeFactory = queryInterface(XBridgeFactory.class,
-                                                          Bootstrap.createSimpleServiceManager()
-                    .createInstance("com.sun.star.bridge.BridgeFactory"));
+                    Bootstrap.createSimpleServiceManager()
+                             .createInstance("com.sun.star.bridge.BridgeFactory"));
 
             if (bridgeFactory != null) {
                 for (XBridge bridge : bridgeFactory.getExistingBridges()) {
@@ -148,8 +148,8 @@ public class OOBibBaseConnect {
         }
 
         List<DocumentTitleViewModel> viewModel = list.stream()
-                                                      .map(DocumentTitleViewModel::new)
-                                                      .collect(Collectors.toList());
+                                                     .map(DocumentTitleViewModel::new)
+                                                     .collect(Collectors.toList());
 
         // This whole method is part of a background task when
         // auto-detecting instances, so we need to show dialog in FX

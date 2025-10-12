@@ -2,6 +2,8 @@ package org.jabref.http.server;
 
 import java.util.EnumSet;
 
+import org.jabref.http.server.resources.LibrariesResource;
+
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.Test;

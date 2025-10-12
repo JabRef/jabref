@@ -13,7 +13,7 @@ jobs:
       (github.repository == 'JabRef/jabref') &&
       (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
-        (github.actor == 'dependabot[bot]') ||
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
@@ -161,11 +161,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   remove_label:
-    if: github.repository == 'JabRef/jabref'
-    name: Remove label "status: changes-required"
+    if: >
+      (github.repository == 'JabRef/jabref')
+    name: 'Remove label "status: changes-required"'
     runs-on: ubuntu-latest
     steps:
-      - run: gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --remove-label "status: changes-required"
+      - run: |
+          gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --remove-label "status: changes-required"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   upload-pr-number:
     if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest

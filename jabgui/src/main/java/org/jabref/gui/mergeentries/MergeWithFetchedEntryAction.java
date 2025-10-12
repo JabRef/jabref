@@ -10,6 +10,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
@@ -44,7 +45,7 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
 
         if (stateManager.getSelectedEntries().size() != 1) {
             dialogService.showInformationDialogAndWait(
-                    Localization.lang("Merge entry with %0 information", new OrFields(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT).getDisplayName()),
+                    Localization.lang("Merge entry with %0 information", FieldTextMapper.getDisplayName(new OrFields(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT))),
                     Localization.lang("This operation requires exactly one item to be selected."));
         }
 

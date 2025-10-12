@@ -29,7 +29,7 @@ class StudyCatalogToFetcherConverter {
 
     /**
      * Returns a list of instances of all active library fetchers.
-     *
+     * <p>
      * A fetcher is considered active if there exists an library entry of the library the fetcher is associated with that is enabled.
      *
      * @return Instances of all active fetchers defined in the study definition.
