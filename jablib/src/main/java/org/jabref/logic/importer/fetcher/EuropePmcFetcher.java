@@ -102,11 +102,12 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
                 entry.setField(StandardField.ISSN, result.getJSONObject("journalInfo").getString("issn"));
             }
             // Prefer a full ISO date if provided
+            final String datePattern = "\\d{4}-\\d{2}-\\d{2}";
             String printPubDate = result.optString("printPublicationDate");
             String dateOfPublication = result.optString("dateOfPublication");
-            if (printPubDate != null && printPubDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            if (printPubDate != null && printPubDate.matches(datePattern)) {
                 entry.setField(StandardField.DATE, printPubDate);
-            } else if (dateOfPublication != null && dateOfPublication.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            } else if (dateOfPublication != null && dateOfPublication.matches(datePattern)) {
                 entry.setField(StandardField.DATE, dateOfPublication);
             }
 
