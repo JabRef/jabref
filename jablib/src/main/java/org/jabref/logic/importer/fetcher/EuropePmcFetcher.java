@@ -239,12 +239,12 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, org.jabref.logic.
             for (int i = 0; i < urls.length(); i++) {
                 JSONObject urlEntry = urls.getJSONObject(i);
                 String style = urlEntry.optString("documentStyle", "").toLowerCase();
-                String avail = urlEntry.optString("availability", "").toLowerCase();
+                String availability = urlEntry.optString("availability", "").toLowerCase();
                 String url = urlEntry.optString("url", "");
                 if (url == null || url.isBlank()) {
                     continue;
                 }
-                if ((avail.contains("open") || avail.contains("free")) && style.contains("pdf")) {
+                if ((availability.contains("open") || availability.contains("free")) && style.contains("pdf")) {
                     return Optional.of(url);
                 }
             }
