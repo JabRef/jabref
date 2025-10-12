@@ -13,6 +13,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.fetcher.transformers.DefaultSearchQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -22,19 +23,33 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EuropePmcFetcher implements IdBasedParserFetcher {
+public class EuropePmcFetcher implements IdBasedParserFetcher, org.jabref.logic.importer.SearchBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         return new URI("https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=" + identifier + "&resultType=core&format=json").toURL();
+    }
+
+    @Override
+    public URL getURLForQuery(BaseQueryNode queryList) throws URISyntaxException, MalformedURLException {
+        DefaultSearchQueryTransformer transformer = new DefaultSearchQueryTransformer();
+        String query = transformer.transformSearchQuery(queryList).orElse("");
+        URIBuilder uriBuilder = new URIBuilder("https://www.ebi.ac.uk/europepmc/webservices/rest/search");
+        // Europe PMC expects a Lucene-like query in the 'query' parameter
+        uriBuilder.addParameter("query", query);
+        uriBuilder.addParameter("resultType", "core");
+        uriBuilder.addParameter("format", "json");
+        return uriBuilder.build().toURL();
     }
 
     @Override

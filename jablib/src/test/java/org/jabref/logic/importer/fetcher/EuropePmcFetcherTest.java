@@ -72,4 +72,13 @@ class EuropePmcFetcherTest {
         fetchedEntry.get().clearField(StandardField.ABSTRACT);
         assertEquals(Optional.of(entryWithFulltextAndKeywords), fetchedEntry);
     }
+
+    @Test
+    void searchByDoiTermReturnsWijedasa() throws FetcherException {
+        // Use Europe PMC fielded search: DOI
+        var results = fetcher.performSearch("doi:10.1111/gcb.13516");
+        BibEntry first = results.getFirst();
+        first.clearField(StandardField.ABSTRACT);
+        assertEquals(entryWijedasa, first);
+    }
 }
