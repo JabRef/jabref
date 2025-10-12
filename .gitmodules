@@ -1,7 +1,7 @@
 [submodule "abbrv.jabref.org"]
   path = jablib/src/main/abbrv.jabref.org
   url = https://github.com/JabRef/abbrv.jabref.org.git
-# ignore = all
+  ignore = all
   shallow = true
 [submodule "csl-styles"]
   path = jablib/src/main/resources/csl-styles
@@ -11,5 +11,5 @@
 [submodule "csl-locales"]
   path = jablib/src/main/resources/csl-locales
   url = https://github.com/citation-style-language/locales.git
-#  ignore = all
+  ignore = all
   shallow = true
