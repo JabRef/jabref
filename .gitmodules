@@ -11,5 +11,5 @@
 [submodule "csl-locales"]
   path = jablib/src/main/resources/csl-locales
   url = https://github.com/citation-style-language/locales.git
-  ignore = all
+#  ignore = all
   shallow = true
