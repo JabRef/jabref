@@ -67,11 +67,16 @@ class AiChatComponentTest {
         when(prefs.getAiProvider()).thenAnswer(inv -> providerProp.get());
         when(prefs.getSelectedChatModel()).thenAnswer(inv -> {
             return switch (providerProp.get()) {
-                case OPEN_AI -> openAiModelProp.get();
-                case MISTRAL_AI -> mistralModelProp.get();
-                case GEMINI -> geminiModelProp.get();
-                case HUGGING_FACE -> hfModelProp.get();
-                case GPT4ALL -> gpt4AllModelProp.get();
+                case OPEN_AI ->
+                        openAiModelProp.get();
+                case MISTRAL_AI ->
+                        mistralModelProp.get();
+                case GEMINI ->
+                        geminiModelProp.get();
+                case HUGGING_FACE ->
+                        hfModelProp.get();
+                case GPT4ALL ->
+                        gpt4AllModelProp.get();
             };
         });
 
@@ -133,11 +138,16 @@ class AiChatComponentTest {
         // Set the provider and the corresponding model
         prefs.aiProviderProperty().set(provider);
         switch (provider) {
-            case OPEN_AI -> prefs.openAiChatModelProperty().set(newModel);
-            case MISTRAL_AI -> prefs.mistralAiChatModelProperty().set(newModel);
-            case GEMINI -> prefs.geminiChatModelProperty().set(newModel);
-            case HUGGING_FACE -> prefs.huggingFaceChatModelProperty().set(newModel);
-            case GPT4ALL -> prefs.gpt4AllChatModelProperty().set(newModel);
+            case OPEN_AI ->
+                    prefs.openAiChatModelProperty().set(newModel);
+            case MISTRAL_AI ->
+                    prefs.mistralAiChatModelProperty().set(newModel);
+            case GEMINI ->
+                    prefs.geminiChatModelProperty().set(newModel);
+            case HUGGING_FACE ->
+                    prefs.huggingFaceChatModelProperty().set(newModel);
+            case GPT4ALL ->
+                    prefs.gpt4AllChatModelProperty().set(newModel);
         }
 
         Thread.sleep(50);
