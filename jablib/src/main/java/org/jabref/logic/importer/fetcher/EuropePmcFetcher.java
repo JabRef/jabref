@@ -150,9 +150,9 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, org.jabref.logic.
             if (result.has("meshHeadingList") && result.getJSONObject("meshHeadingList").has("meshHeading")) {
                 JSONArray mesh = result.getJSONObject("meshHeadingList").getJSONArray("meshHeading");
                 for (int i = 0; i < mesh.length(); i++) {
-                    JSONObject mh = mesh.optJSONObject(i);
-                    if (mh != null) {
-                        String descriptor = mh.optString("descriptorName", "").trim();
+                    JSONObject meshHeading = mesh.optJSONObject(i);
+                    if (meshHeading != null) {
+                        String descriptor = meshHeading.optString("descriptorName", "").trim();
                         if (!descriptor.isEmpty()) {
                             entry.addKeyword(descriptor, ',');
                         }
