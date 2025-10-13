@@ -343,11 +343,15 @@ public class FileUtil {
      * @param fileNamePattern the filename pattern
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
-        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+    public static Optional<String> createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
-        if (targetName.isEmpty()) {
+        if (targetName.isEmpty() || "-".equals(targetName)) {
             targetName = entry.getCitationKey().orElse("default");
+        }
+
+        if ("default".equals(targetName)) {
+            return Optional.empty();
         }
 
         // Remove LaTeX commands (e.g., \mkbibquote{}) from expanded fields before cleaning filename
@@ -356,7 +360,7 @@ public class FileUtil {
         // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
 
-        return targetName;
+        return Optional.of(targetName);
     }
 
     /**

@@ -386,6 +386,15 @@ class BracketedPatternTest {
     }
 
     @Test
+    void expandBracketsWithMissingAuthorAndYear() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "").withField(StandardField.YEAR, "");
+
+        assertEquals(" - ",
+                BracketedPattern.expandBrackets("[author] - [year]", ';', bibEntry, database));
+    }
+
+    @Test
     void bibentryExpansionTest() {
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         assertEquals("2017_Kitsune_213", pattern.expand(bibentry));

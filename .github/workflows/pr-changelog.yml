@@ -1,6 +1,6 @@
 name: Check PR CHANGELOG.md
 
-# Seperate check PR, because of triggers both at code update and at comment update
+# Separate check PR, because of triggers both at code update and at comment update
 on:
   pull_request:
     types: [opened, reopened, synchronize, edited]

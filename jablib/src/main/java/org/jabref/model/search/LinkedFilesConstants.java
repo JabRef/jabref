@@ -13,7 +13,7 @@ public enum LinkedFilesConstants {
      * 2. Lucene codec changes (see module-info.java Lucene section)
      * Incrementing triggers reindexing.
      */
-    VERSION("4"),
+    VERSION("5"),
     PATH("path"),
     CONTENT("content"),
     ANNOTATIONS("annotations"),

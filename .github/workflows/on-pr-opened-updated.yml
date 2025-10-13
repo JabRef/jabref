@@ -162,8 +162,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   remove_label:
     if: >
-      (github.repository == 'JabRef/jabref') &&
-      (github.event.pull_request.head.repo.full_name == 'JabRef/jabref')
+      (github.repository == 'JabRef/jabref')
     name: 'Remove label "status: changes-required"'
     runs-on: ubuntu-latest
     steps:
