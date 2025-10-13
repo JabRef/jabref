@@ -70,14 +70,14 @@ class StudyYamlV1MigratorTest {
         // Check queries are converted correctly
         List<StudyQuery> queries = migratedStudy.getQueries();
         assertEquals(2, queries.size());
-        assertEquals("machine learning", queries.get(0).getQuery());
+        assertEquals("machine learning", queries.getFirst().getQuery());
         assertEquals("artificial intelligence", queries.get(1).getQuery());
 
         // Check databases are converted to catalogs
         List<StudyCatalog> catalogs = migratedStudy.getCatalogs();
         assertEquals(2, catalogs.size());
-        assertEquals("IEEE", catalogs.get(0).getName());
-        assertTrue(catalogs.get(0).isEnabled()); // Should default to true
+        assertEquals("IEEE", catalogs.getFirst().getName());
+        assertTrue(catalogs.getFirst().isEnabled()); // Should default to true
         assertEquals("ACM", catalogs.get(1).getName());
         assertFalse(catalogs.get(1).isEnabled()); // Should preserve false
     }
@@ -112,7 +112,7 @@ class StudyYamlV1MigratorTest {
         assertEquals(2, queries.size());
 
         // Simple query
-        StudyQuery simpleQuery = queries.get(0);
+        StudyQuery simpleQuery = queries.getFirst();
         assertEquals("simple query", simpleQuery.getQuery());
 
         // Complex query
@@ -148,8 +148,8 @@ class StudyYamlV1MigratorTest {
         assertEquals(3, catalogs.size());
 
         // First database should default to enabled=true
-        assertTrue(catalogs.get(0).isEnabled());
-        assertEquals("Database1", catalogs.get(0).getName());
+        assertTrue(catalogs.getFirst().isEnabled());
+        assertEquals("Database1", catalogs.getFirst().getName());
 
         // Second database explicitly enabled
         assertTrue(catalogs.get(1).isEnabled());
