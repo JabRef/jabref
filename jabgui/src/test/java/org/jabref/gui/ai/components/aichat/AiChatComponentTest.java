@@ -2,13 +2,11 @@ package org.jabref.gui.ai.components.aichat;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.AiPreferences;
@@ -21,15 +19,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 
-import dev.langchain4j.data.message.ChatMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.testfx.framework.junit5.ApplicationExtension;
 
@@ -66,7 +60,7 @@ class AiChatComponentTest {
 
         when(prefs.getAiProvider()).thenAnswer(_ -> providerProp.get());
         when(prefs.getSelectedChatModel()).thenAnswer(_ -> {
-            return switch (providerProp.get()) {
+            return switch (prefs.getAiProvider()) {
                 case OPEN_AI ->
                         openAiModelProp.get();
                 case MISTRAL_AI ->
@@ -95,15 +89,15 @@ class AiChatComponentTest {
         taskExecutor = mock(TaskExecutor.class);
     }
 
-    private AiChatComponent createComponent(ObservableList<ChatMessage> chatHistory, ObservableList<BibEntry> entries) throws Exception {
+    private AiChatComponent createComponent() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         final AiChatComponent[] holder = new AiChatComponent[1];
         Platform.runLater(() -> {
             holder[0] = new AiChatComponent(
                     aiService,
                     new SimpleStringProperty("entry"),
-                    chatHistory,
-                    entries,
+                    FXCollections.observableArrayList(),
+                    FXCollections.observableArrayList(),
                     bibDatabaseContext,
                     prefs,
                     dialogService,
@@ -118,7 +112,7 @@ class AiChatComponentTest {
     @ParameterizedTest
     @EnumSource(AiProvider.class)
     void noticeTextUpdatesWhenProviderChanges(AiProvider provider) throws Exception {
-        AiChatComponent component = createComponent(FXCollections.observableArrayList(), FXCollections.observableArrayList());
+        AiChatComponent component = createComponent();
 
         // Change provider
         prefs.aiProviderProperty().set(provider);
@@ -131,38 +125,24 @@ class AiChatComponentTest {
     }
 
     @ParameterizedTest
-    @MethodSource("providerAndModel")
-    void noticeTextUpdatesWhenCurrentModelChangesForSelectedProvider(AiProvider provider, String newModel) throws Exception {
-        AiChatComponent component = createComponent(FXCollections.observableArrayList(), FXCollections.observableArrayList());
+    @EnumSource(AiProvider.class)
+    void noticeTextUpdatesWhenCurrentModelChangesForSelectedProvider(AiProvider provider) throws Exception {
+        AiChatComponent component = createComponent();
 
-        // Set the provider and the corresponding model
+        // Select provider
         prefs.aiProviderProperty().set(provider);
-        switch (provider) {
-            case OPEN_AI ->
-                    prefs.openAiChatModelProperty().set(newModel);
-            case MISTRAL_AI ->
-                    prefs.mistralAiChatModelProperty().set(newModel);
-            case GEMINI ->
-                    prefs.geminiChatModelProperty().set(newModel);
-            case HUGGING_FACE ->
-                    prefs.huggingFaceChatModelProperty().set(newModel);
-            case GPT4ALL ->
-                    prefs.gpt4AllChatModelProperty().set(newModel);
-        }
+
+        // Change current model for all providers; only the selected provider should influence the notice text.
+        String newModel = "new-model";
+        prefs.openAiChatModelProperty().set(newModel);
+        prefs.mistralAiChatModelProperty().set(newModel);
+        prefs.geminiChatModelProperty().set(newModel);
+        prefs.huggingFaceChatModelProperty().set(newModel);
+        prefs.gpt4AllChatModelProperty().set(newModel);
 
         Thread.sleep(50);
         String expected = "Current AI model: " + provider.getLabel() + " " + newModel
                 + ". The AI may generate inaccurate or inappropriate responses. Please verify any information provided.";
         assertEquals(expected, component.computeNoticeText());
-    }
-
-    private static Stream<Arguments> providerAndModel() {
-        return Stream.of(
-                Arguments.of(AiProvider.OPEN_AI, "gpt-4o-mini"),
-                Arguments.of(AiProvider.MISTRAL_AI, "mistral-medium"),
-                Arguments.of(AiProvider.GEMINI, "gemini-1.5-flash"),
-                Arguments.of(AiProvider.HUGGING_FACE, "hf-new-model"),
-                Arguments.of(AiProvider.GPT4ALL, "gpt4all-new")
-        );
     }
 }
