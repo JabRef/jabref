@@ -6,8 +6,11 @@ javaPlatform {
     allowDependencies()
 }
 
+// in case this is updated, also .github/workflows/binaries.yml (look for "eaJdkJmodsUrl" and its use)
 val javafx = "25"
+
 val lucene = "10.3.1"
+
 val pdfbox = "3.0.5"
 
 dependencies {
