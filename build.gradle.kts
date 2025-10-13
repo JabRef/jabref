@@ -15,6 +15,8 @@ sonar {
     properties {
         property("sonar.projectKey", "NiklasKaulfers_jabref")
         property("sonar.organization", "niklaskaulfers")
+        property("sonar.java.binaries", ".")
+        property("sonar.sourceEncoding", "UTF-8")
     }
 }
 
