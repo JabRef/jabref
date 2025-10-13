@@ -45,7 +45,7 @@ public class CopyLinkedFilesAction extends SimpleCommand {
         this.filePreferences = filePreferences;
 
         this.executable.bind(Bindings.createBooleanBinding(
-                () -> this.linkedFiles.stream().anyMatch(this::isLocalExisting),
+                () -> this.linkedFiles.stream().allMatch(this::isLocalExisting),
                 dependencies(this.linkedFiles)));
     }
 
@@ -80,24 +80,19 @@ public class CopyLinkedFilesAction extends SimpleCommand {
             }
         }
 
-        String title = Localization.lang("Copy linked file");
         String target = exportDir.map(Path::toString).orElse("");
 
         if (linkedFiles.size() == 1) {
             if (copiedFiles == 1) {
                 dialogService.notify(Localization.lang("Successfully copied %0 file(s) to %1.", copiedFiles, target));
             } else {
-                dialogService.showErrorDialogAndWait(
-                        title,
-                        Localization.lang("Could not copy file to %0, maybe the file is already existing?", target));
+                dialogService.notify(Localization.lang("Could not copy file to %0, maybe the file is already existing?", target));
             }
         } else {
             if (failedCount == 0) {
                 dialogService.notify(Localization.lang("Successfully copied %0 file(s) to %1.", copiedFiles, target));
             } else {
-                dialogService.showErrorDialogAndWait(
-                        title,
-                        Localization.lang("Copied %0 file(s). Failed: %1", copiedFiles, failedCount));
+                dialogService.notify(Localization.lang("Copied %0 file(s). Failed: %1", copiedFiles, failedCount));
             }
         }
     }

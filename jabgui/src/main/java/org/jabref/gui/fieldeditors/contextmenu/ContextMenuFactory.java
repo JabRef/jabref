@@ -32,7 +32,7 @@ public class ContextMenuFactory {
         );
     }
 
-    public ContextMenu createMenuForSelection(ObservableList<LinkedFileViewModel> selection) {
+    public @NonNull ContextMenu createMenuForSelection(ObservableList<LinkedFileViewModel> selection) {
         Objects.requireNonNull(selection, "selection must not be null");
 
         ContextMenu menu = new ContextMenu();

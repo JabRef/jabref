@@ -1,8 +1,12 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -14,6 +18,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -25,6 +30,8 @@ import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 record MultiSelectionMenuBuilder(
         DialogService dialogService,
@@ -33,6 +40,8 @@ record MultiSelectionMenuBuilder(
         GuiPreferences preferences,
         LinkedFilesEditorViewModel viewModel
 ) implements ContextMenuBuilder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultiSelectionMenuBuilder.class);
 
     MultiSelectionMenuBuilder(@NonNull DialogService dialogService,
                               @NonNull BibDatabaseContext databaseContext,
@@ -56,36 +65,33 @@ record MultiSelectionMenuBuilder(
         ActionFactory actionFactory = new ActionFactory();
         List<MenuItem> menuItems = new ArrayList<>();
 
-        SelectionChecks checks = new SelectionChecks(databaseContext, preferences);
-
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.OPEN_FILE, selection, _ -> true));
-        menuItems.add(customBatchItem(actionFactory, StandardActions.OPEN_FOLDER, selection, checks::isLocalAndExists, checks::openContainingFolders));
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.DOWNLOAD_FILE, selection, checks::isOnline));
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.REDOWNLOAD_FILE, selection, checks::hasSourceUrl));
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.MOVE_FILE_TO_FOLDER, selection, checks::isMovableToDefaultDir));
-        menuItems.add(buildCopyToFolderItem(actionFactory, selection, checks));
-        menuItems.add(customBatchItem(actionFactory, StandardActions.REMOVE_LINKS, selection, _ -> true,
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.OPEN_FILE, selection, this::alwaysEnabled));
+        menuItems.add(customBatchItem(actionFactory, StandardActions.OPEN_FOLDER, selection, this::isLocalAndExists, this::openContainingFolders));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.DOWNLOAD_FILE, selection, this::isOnline));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.REDOWNLOAD_FILE, selection, this::hasSourceUrl));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.MOVE_FILE_TO_FOLDER, selection, this::isMovableToDefaultDir));
+        menuItems.add(buildCopyToFolderItem(actionFactory, selection));
+        menuItems.add(customBatchItem(actionFactory, StandardActions.REMOVE_LINKS, selection, this::alwaysEnabled,
                 linkedFileViewModels -> linkedFileViewModels.forEach(linkedFileViewModel ->
                         new ContextAction(StandardActions.REMOVE_LINKS, linkedFileViewModel, databaseContext, bibEntry, preferences, viewModel).execute())));
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.DELETE_FILE, selection, checks::isLocalAndExists));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.DELETE_FILE, selection, this::isLocalAndExists));
 
         return menuItems;
     }
 
     private MenuItem buildCopyToFolderItem(ActionFactory actionFactory,
-                                           ObservableList<LinkedFileViewModel> selection,
-                                           SelectionChecks checks) {
+                                           ObservableList<LinkedFileViewModel> selection) {
         SimpleCommand copyCommand = new SimpleCommand() {
             {
                 executable.bind(Bindings.createBooleanBinding(
-                        () -> selection.stream().anyMatch(checks::isLocalAndExists),
+                        () -> selection.stream().anyMatch(MultiSelectionMenuBuilder.this::isLocalAndExists),
                         selection));
             }
 
             @Override
             public void execute() {
                 var localLinkedFiles = selection.stream()
-                                                .filter(checks::isLocalAndExists)
+                                                .filter(MultiSelectionMenuBuilder.this::isLocalAndExists)
                                                 .toList();
 
                 if (localLinkedFiles.isEmpty()) {
@@ -184,5 +190,53 @@ record MultiSelectionMenuBuilder(
         };
 
         return actionFactory.createMenuItem(action, command);
+    }
+
+    boolean alwaysEnabled(LinkedFileViewModel ignored) {
+        return true;
+    }
+
+    boolean isLocalAndExists(LinkedFileViewModel linkedFileViewModel) {
+        return !linkedFileViewModel.getFile().isOnlineLink()
+                && linkedFileViewModel.getFile()
+                                      .findIn(databaseContext, preferences.getFilePreferences())
+                                      .isPresent();
+    }
+
+    boolean isOnline(LinkedFileViewModel linkedFileViewModel) {
+        return linkedFileViewModel.getFile().isOnlineLink();
+    }
+
+    boolean hasSourceUrl(LinkedFileViewModel linkedFileViewModel) {
+        return !linkedFileViewModel.getFile().getSourceUrl().isEmpty();
+    }
+
+    boolean isMovableToDefaultDir(LinkedFileViewModel linkedFileViewModel) {
+        return isLocalAndExists(linkedFileViewModel)
+                && !linkedFileViewModel.isGeneratedPathSameAsOriginal();
+    }
+
+    void openContainingFolders(List<LinkedFileViewModel> linkedFileViewModels) {
+        Map<Path, Path> representativeByDir = new LinkedHashMap<>();
+
+        for (LinkedFileViewModel vm : linkedFileViewModels) {
+            Optional<Path> resolved = vm.getFile().findIn(databaseContext, preferences.getFilePreferences());
+            if (resolved.isEmpty()) {
+                continue;
+            }
+
+            Path file = resolved.get().toAbsolutePath().normalize();
+            Path dir = (file.getParent() != null) ? file.getParent() : file;
+
+            representativeByDir.putIfAbsent(dir, file);
+        }
+
+        for (Path fileToSelect : representativeByDir.values()) {
+            try {
+                NativeDesktop.get().openFolderAndSelectFile(fileToSelect);
+            } catch (IOException e) {
+                LOGGER.warn("Could not open folder and select file: {}", fileToSelect, e);
+            }
+        }
     }
 }
