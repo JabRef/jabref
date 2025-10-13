@@ -69,6 +69,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
+    private final BooleanProperty preferInspireTexkeysProperty = new SimpleBooleanProperty();
+
     private final BooleanProperty apikeyPersistProperty = new SimpleBooleanProperty();
     private final BooleanProperty apikeyPersistAvailableProperty = new SimpleBooleanProperty();
 
@@ -153,6 +155,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
+        preferInspireTexkeysProperty.setValue(preferences.getImporterPreferences().isPreferInspireTexkeys());
+
         Set<FetcherApiKey> savedApiKeys = preferences.getImporterPreferences().getApiKeys();
         Set<String> enabledCatalogs = new HashSet<>(importerPreferences.getCatalogs());
 
@@ -206,6 +210,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
+
+        importerPreferences.setPreferInspireTexkeys(preferInspireTexkeysProperty.getValue());
 
         importerPreferences.setCatalogs(
                 fetchers.stream()
@@ -287,6 +293,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public IntegerProperty citationsRelationsStoreTTLProperty() {
         return citationsRelationStoreTTL;
+    }
+
+    public BooleanProperty preferInspireTexkeysProperty() {
+        return preferInspireTexkeysProperty;
     }
 
     public void checkApiKey(FetcherViewModel fetcherViewModel, String apiKey, Consumer<Boolean> onFinished) {

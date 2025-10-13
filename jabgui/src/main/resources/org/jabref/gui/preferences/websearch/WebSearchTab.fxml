@@ -47,6 +47,11 @@
         <TextField fx:id="grobidURL" HBox.hgrow="ALWAYS"/>
     </HBox>
 
+    <Label styleClass="sectionHeader" text="%INSPIRE preferences"/>
+    <FlowPane styleClass="checkbox-flowpane">
+        <CheckBox fx:id="preferInspireTexkeys" text="%Prefer INSPIRE texkeys; clean URL-like citation keys"/>
+    </FlowPane>
+
     <Label styleClass="sectionHeader" text="%Web search fetchers"/>
     <VBox fx:id="fetchersContainer"/>
 </fx:root>
