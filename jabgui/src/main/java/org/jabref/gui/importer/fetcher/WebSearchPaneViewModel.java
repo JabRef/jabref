@@ -1,9 +1,12 @@
 package org.jabref.gui.importer.fetcher;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -22,6 +25,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
@@ -40,6 +44,8 @@ public class WebSearchPaneViewModel {
     private final ObjectProperty<SearchBasedFetcher> selectedFetcher = new SimpleObjectProperty<>();
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
+    private final BooleanProperty identifierDetected = new SimpleBooleanProperty(false);
+    private final StringProperty detectedIdentifierType = new SimpleStringProperty("");
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
@@ -68,6 +74,9 @@ public class WebSearchPaneViewModel {
             sidePanePreferences.setWebSearchFetcherSelected(newIndex);
         });
 
+        // Subscribe to query changes to detect identifiers
+        EasyBind.subscribe(query, this::updateIdentifierDetection);
+
         searchQueryValidator = new FunctionBasedValidator<>(
                 query,
                 queryText -> {
@@ -94,7 +103,7 @@ public class WebSearchPaneViewModel {
                             int line = offendingToken.getLine();
                             int charPositionInLine = offendingToken.getCharPositionInLine() + 1;
 
-                            return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", line, charPositionInLine));
+                            return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", offendingToken.getText(), charPositionInLine));
                         }
 
                         // Fallback for other failing reasons
@@ -129,10 +138,8 @@ public class WebSearchPaneViewModel {
 
     public void search() {
         if (!preferences.getImporterPreferences().areImporterEnabled()) {
-            if (!preferences.getImporterPreferences().areImporterEnabled()) {
-                dialogService.notify(Localization.lang("Web search disabled"));
-                return;
-            }
+            dialogService.notify(Localization.lang("Web search disabled"));
+            return;
         }
 
         String query = getQuery().trim();
@@ -171,5 +178,56 @@ public class WebSearchPaneViewModel {
 
     public ValidationStatus queryValidationStatus() {
         return searchQueryValidator.getValidationStatus();
+    }
+
+    public boolean isIdentifierDetected() {
+        return identifierDetected.get();
+    }
+
+    public BooleanProperty identifierDetectedProperty() {
+        return identifierDetected;
+    }
+
+    public String getDetectedIdentifierType() {
+        return detectedIdentifierType.get();
+    }
+
+    public StringProperty detectedIdentifierTypeProperty() {
+        return detectedIdentifierType;
+    }
+
+    private void updateIdentifierDetection(String queryText) {
+        if (StringUtil.isBlank(queryText)) {
+            identifierDetected.set(false);
+            detectedIdentifierType.set("");
+            return;
+        }
+
+        Optional<Identifier> identifier = Identifier.from(queryText.trim());
+        if (identifier.isPresent()) {
+            identifierDetected.set(true);
+            detectedIdentifierType.set(getIdentifierTypeName(identifier.get()));
+        } else {
+            identifierDetected.set(false);
+            detectedIdentifierType.set("");
+        }
+    }
+
+    private String getIdentifierTypeName(Identifier identifier) {
+        String className = identifier.getClass().getSimpleName();
+        switch (className) {
+            case "DOI":
+                return Localization.lang("DOI");
+            case "ArXivIdentifier":
+                return Localization.lang("ArXiv");
+            case "ISBN":
+                return Localization.lang("ISBN");
+            case "SSRN":
+                return Localization.lang("SSRN");
+            case "RFC":
+                return Localization.lang("RFC");
+            default:
+                return className;
+        }
     }
 }
