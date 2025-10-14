@@ -1,4 +1,4 @@
-package org.jabref.logic.git.merge.util;
+package org.jabref.logic.git.merge.planning.util;
 
 import java.util.List;
 import java.util.Map;

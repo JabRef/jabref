@@ -117,6 +117,8 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.preferences;
     exports org.jabref.logic.icore;
     exports org.jabref.model.icore;
+    exports org.jabref.logic.git.merge.planning;
+    exports org.jabref.logic.git.merge.execution;
 
     requires java.base;
 
@@ -258,5 +260,6 @@ open module org.jabref.jablib {
     requires org.jooq.jool;
     requires org.libreoffice.uno;
     requires transitive org.jspecify;
+    requires org.jabref.jablib;
     // endregion
 }

@@ -10,9 +10,8 @@ import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
-import org.jabref.logic.git.merge.DefaultMergeBookkeeper;
-import org.jabref.logic.git.merge.MergeBookkeeper;
-import org.jabref.logic.git.merge.SemanticMergeAnalyzer;
+import org.jabref.logic.git.merge.execution.MergeBookkeeper;
+import org.jabref.logic.git.merge.planning.SemanticMergeAnalyzer;
 import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.MergeAnalysis;
 import org.jabref.logic.git.model.MergePlan;
@@ -50,7 +49,7 @@ public class GitSyncService {
         return new GitSyncService(
                 importFormatPreferences,
                 registry,
-                new DefaultMergeBookkeeper(registry)
+                new MergeBookkeeper(registry)
         );
     }
 

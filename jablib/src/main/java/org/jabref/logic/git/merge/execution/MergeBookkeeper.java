@@ -1,4 +1,4 @@
-package org.jabref.logic.git.merge;
+package org.jabref.logic.git.merge.execution;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,14 +26,22 @@ import org.eclipse.jgit.lib.RefUpdate;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 
-public final class DefaultMergeBookkeeper implements MergeBookkeeper {
+/// Record the GUI-produced merge result into Git history.
+/// Creates the right commit shape based on the merge graph:
+///  - BEHIND: fast-forward if content equals remote;
+///            otherwise create a new commit on top of `remote`.
+///  - DIVERGED: create a merge commit with parents [localHead, remote].
+///
+/// Preconditions:
+///  - GUI has already saved the final .bib file to disk.
+///  - No unrelated unstaged changes (defensive check recommended).
+public final class MergeBookkeeper {
     private final GitHandlerRegistry registry;
 
-    public DefaultMergeBookkeeper(GitHandlerRegistry registry) {
+    public MergeBookkeeper(GitHandlerRegistry registry) {
         this.registry = registry;
     }
 
-    @Override
     public BookkeepingResult resultRecord(Path bibFilePath, PullPlan computation)
             throws IOException, GitAPIException, JabRefException {
 

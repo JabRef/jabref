@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.io.GitFileReader;
+import org.jabref.logic.git.merge.execution.MergeBookkeeper;
 import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -38,7 +39,7 @@ import static org.mockito.Mockito.when;
 /// - The final merged content has been written to disk on the GUI layer;
 /// - Then call DefaultMergeBookkeeper.resultRecord(...) to perform "bookkeeping";
 /// - Use JGit to verify the commit shape.
-public class DefaultMergeBookkeeperTest {
+public class MergeBookkeeperTest {
 
     private Path remoteDir;
     private Path localDir;
@@ -135,7 +136,7 @@ public class DefaultMergeBookkeeperTest {
         Files.writeString(bibPath, remoteAdvance, StandardCharsets.UTF_8);
 
         // Bookkeeping
-        MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
+        MergeBookkeeper bookkeeper = new MergeBookkeeper(handlerRegistry);
         BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
 
         assertEquals(BookkeepingResult.Kind.FAST_FORWARD, result.kind(), "Expected a fast-forward");
@@ -183,7 +184,7 @@ public class DefaultMergeBookkeeperTest {
                 """;
         Files.writeString(bibPath, finalMerged, StandardCharsets.UTF_8);
 
-        MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
+        MergeBookkeeper bookkeeper = new MergeBookkeeper(handlerRegistry);
         BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
 
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT,
@@ -240,7 +241,7 @@ public class DefaultMergeBookkeeperTest {
                 """;
         Files.writeString(bibPath, finalMerged, StandardCharsets.UTF_8);
 
-        MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
+        MergeBookkeeper bookkeeper = new MergeBookkeeper(handlerRegistry);
         BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT,
                 result.kind(),

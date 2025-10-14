@@ -12,7 +12,6 @@ import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.git.model.BookkeepingResult;
-import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -40,6 +39,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyAutoPlan;
+import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyResolved;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -355,18 +356,18 @@ class GitSyncServiceTest {
 
         String expectedMerged = """
                     @article{a,
-                    author = {author-a},
-                    doi = {xya},
+                      author = {author-a},
+                      doi = {xya},
                     }
 
                     @article{b,
-                    author = {author-b},
-                    doi = {xyz},
+                      author = {author-b},
+                      doi = {xyz},
                     }
 
                     @article{c,
-                    author = {alice-c + bob-c},
-                    title = {Title C},
+                      author = {alice-c + bob-c},
+                      title = {Title C},
                     }
                 """;
         assertEquals(normalize(expectedMerged), normalize(mergedText), "Merged content did not match expected result");
@@ -413,51 +414,5 @@ class GitSyncServiceTest {
         config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, branch, ConfigConstants.CONFIG_KEY_REMOTE, remote);
         config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, branch, ConfigConstants.CONFIG_KEY_MERGE, Constants.R_HEADS + branch);
         config.save();
-    }
-
-    /// Apply (remote - base) patches safely into the in-memory DB, plus safe new/deleted entries.
-    private static void applyAutoPlan(BibDatabaseContext bibDatabaseContext, MergePlan plan) {
-        // new entries
-        for (BibEntry e : plan.newEntries()) {
-            bibDatabaseContext.getDatabase().insertEntry(new BibEntry(e));
-        }
-        // field patches (null means delete field)
-        plan.fieldPatches().forEach((key, patch) ->
-                bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresent(entry -> {
-                    patch.forEach((field, newVal) -> {
-                        if (newVal == null) {
-                            entry.clearField(field);
-                        } else {
-                            entry.setField(field, newVal);
-                        }
-                    });
-                })
-        );
-        // deletions that are semantically safe (local kept base)
-        for (String key : plan.deletedEntryKeys()) {
-            bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresent(e -> bibDatabaseContext.getDatabase().removeEntry(e));
-        }
-    }
-
-    /**
-     * Apply user-resolved entries into MEMORY: replace or insert by citation key.
-     * (Aligned with MergeEntriesAction’s “edit the in-memory database first” philosophy.)
-     */
-    private static void applyResolved(BibDatabaseContext bibDatabaseContext, List<BibEntry> resolved) {
-        for (BibEntry merged : resolved) {
-            merged.getCitationKey().ifPresent(key -> {
-                bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresentOrElse(existing -> {
-                    // Replace content of existing entry with the resolved one
-                    existing.setType(merged.getType());
-                    // Clear fields that disappeared; then copy all fields from resolved
-                    existing.getFields().forEach(f -> {
-                        if (merged.getField(f).isEmpty()) {
-                            existing.clearField(f);
-                        }
-                    });
-                    merged.getFields().forEach(f -> merged.getField(f).ifPresent(v -> existing.setField(f, v)));
-                }, () -> bibDatabaseContext.getDatabase().insertEntry(new BibEntry(merged)));
-            });
-        }
     }
 }

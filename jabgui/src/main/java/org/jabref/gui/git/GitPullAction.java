@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -27,6 +28,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+
+import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyAutoPlan;
+import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyResolved;
 
 public class GitPullAction extends SimpleCommand {
 
@@ -120,18 +124,20 @@ public class GitPullAction extends SimpleCommand {
                                                   Localization.lang("Fast-forwarded to remote.")
                                           );
                                       } else {
-                                          String stats = Localization.lang(
+                                          StringJoiner joiner = new StringJoiner(" ");
+                                          joiner.add(Localization.lang(
                                                   "Auto-applied changes: %0 new, %1 modified, %2 deleted.",
-                                                  Integer.toString(autoNewCount),
-                                                  Integer.toString(autoModifiedCount),
-                                                  Integer.toString(autoDeletedCount)
-                                          );
+                                                  String.valueOf(autoNewCount),
+                                                  String.valueOf(autoModifiedCount),
+                                                  String.valueOf(autoDeletedCount)
+                                          ));
                                           if (manualResolvedCount > 0) {
-                                              stats = stats + " " + Localization.lang(
+                                              joiner.add(Localization.lang(
                                                       "%0 conflicts resolved.",
-                                                      Integer.toString(manualResolvedCount)
-                                              );
+                                                      String.valueOf(manualResolvedCount)
+                                              ));
                                           }
+                                          String stats = joiner.toString();
 
                                           dialogService.showInformationDialogAndWait(
                                                   Localization.lang("Git Pull"),
@@ -146,6 +152,10 @@ public class GitPullAction extends SimpleCommand {
                 .executeWith(taskExecutor);
     }
 
+    /// Prepares a merge plan for the given library and file path.
+    ///
+    /// @return An Optional containing the PullPlan if a merge is needed,
+    ///         or Optional.empty() if the local library is already up-to-date or ahead of the remote branch.
     private Optional<PullPlan> prepareMergeResult(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
         GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), registry);
         GitHandler handler = registry.get(bibPath.getParent());
@@ -155,60 +165,10 @@ public class GitPullAction extends SimpleCommand {
         return gitSyncService.prepareMerge(databaseContext, bibPath);
     }
 
-    private BookkeepingResult saveAndFinalize(Path bibPath,
-                                              BibDatabaseContext databaseContext,
-                                              PullPlan pullPlan)
-            throws IOException, GitAPIException, JabRefException {
+    private BookkeepingResult saveAndFinalize(Path bibPath, BibDatabaseContext databaseContext, PullPlan pullPlan) throws IOException, GitAPIException, JabRefException {
         GitFileWriter.write(bibPath, databaseContext, guiPreferences.getImportFormatPreferences());
-        // Git bookkeeping
         GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry);
         return gitSyncService.finalizeMerge(bibPath, pullPlan);
-    }
-
-    // ------------------- helpers: memory mutations -------------------
-
-    /// Apply (remote - base) patches safely into the in-memory DB, plus safe new/deleted entries.
-    private static void applyAutoPlan(BibDatabaseContext bibDatabaseContext, MergePlan plan) {
-        // new entries
-        for (BibEntry entry : plan.newEntries()) {
-            bibDatabaseContext.getDatabase().insertEntry(new BibEntry(entry));
-        }
-        // field patches (null means delete field)
-        plan.fieldPatches().forEach((key, patch) ->
-                bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresent(entry -> {
-                    patch.forEach((field, newValue) -> {
-                        if (newValue == null) {
-                            entry.clearField(field);
-                        } else {
-                            entry.setField(field, newValue);
-                        }
-                    });
-                })
-        );
-        // deletions that are semantically safe (local kept base)
-        for (String key : plan.deletedEntryKeys()) {
-            bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresent(e -> bibDatabaseContext.getDatabase().removeEntry(e));
-        }
-    }
-
-    /**
-     * Apply user-resolved entries into MEMORY: replace or insert by citation key.
-     * (Aligned with MergeEntriesAction’s “edit the in-memory database first” philosophy.)
-     */
-    private static void applyResolved(BibDatabaseContext bibDatabaseContext, List<BibEntry> resolved) {
-        for (BibEntry merged : resolved) {
-            merged.getCitationKey().ifPresent(key -> {
-                bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresentOrElse(existing -> {
-                    existing.setType(merged.getType());
-                    existing.getFields().forEach(field -> {
-                        if (merged.getField(field).isEmpty()) {
-                            existing.clearField(field);
-                        }
-                    });
-                    merged.getFields().forEach(field -> merged.getField(field).ifPresent(value -> existing.setField(field, value)));
-                }, () -> bibDatabaseContext.getDatabase().insertEntry(new BibEntry(merged)));
-            });
-        }
     }
 
     private void showPullError(Throwable exception) {

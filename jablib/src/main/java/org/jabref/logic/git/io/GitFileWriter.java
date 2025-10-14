@@ -19,12 +19,10 @@ public class GitFileWriter {
 
     /// @implNote this should be in sync with {@link org.jabref.gui.exporter.SaveDatabaseAction#saveDatabase}
     public static void write(Path file, BibDatabaseContext bibDatabaseContext, ImportFormatPreferences importPrefs) throws IOException {
-        Object lock = FILE_LOCKS.computeIfAbsent(file.toAbsolutePath().normalize(), _ -> new Object());
-
         SelfContainedSaveConfiguration saveConfiguration = new SelfContainedSaveConfiguration();
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
 
-        synchronized (lock) {
+        synchronized (FILE_LOCKS.computeIfAbsent(file.toAbsolutePath().normalize(), _ -> new Object())) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
                 BibDatabaseWriter writer = new BibDatabaseWriter(

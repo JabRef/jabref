@@ -2,7 +2,9 @@ package org.jabref.logic.git.model;
 
 import java.util.Optional;
 
-/// This is the return value of the bookkeeping layer ({@link org.jabref.logic.git.merge.MergeBookkeeper}),
+import org.jabref.logic.git.merge.execution.MergeBookkeeper;
+
+/// This is the return value of the bookkeeping layer ({@link MergeBookkeeper}),
 /// indicating "whether we performed a fast-forward or created a new (merge or single-parent) commit."
 /// It does not participate in any content synthesis; the input file content must be the merge result already prepared before the GUI.
 /// If "the local is strictly behind the remote and the file content is exactly the same as the remote" → fast-forward, no new commit is created;

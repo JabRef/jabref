@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.jabref.logic.git.merge.planning.SemanticMergeAnalyzer;
 import org.jabref.logic.git.model.MergeAnalysis;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
