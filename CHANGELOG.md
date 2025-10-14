@@ -160,7 +160,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the ability to change internal preference values. [#13012](https://github.com/JabRef/jabref/pull/13012)
 - We removed support for MySQL/MariaDB and Oracle. [#12990](https://github.com/JabRef/jabref/pull/12990)
-- We removed library migrations (users need to use JabRef 6.0-alpha.1 to perform migrations) [#12990](https://github.com/JabRef/jabref/pull/12990)
+- We removed library migrations (users need to use JabRef 6.0-alpha.1 to perform migrations) [#12990](https://github.com/JabRef/jabref/pull/12990) 
 
 ## [6.0-alpha2] – 2025-04-27
 
