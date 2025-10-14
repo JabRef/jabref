@@ -154,6 +154,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where ignoring of subdirectories via `.gitingore` patterns did not work in the "Find unlinked files dialog". [forum#5425](https://discourse.jabref.org/t/set-list-of-ignored-folders-paths/5425/6)
 - We fixed an issue where the "Applications to push entries to" list in the preferences was not sorted alphabetically. [#14058](https://github.com/JabRef/jabref/issues/14058)
 - We fixed an issue where notice text in AI chat was not automatically refreshed when the user changed preferences.[#13855](https://github.com/JabRef/jabref/issues/13855)
+- We fixed an issue where the user could add custom entry types with spaces in their names. [#14088](https://github.com/JabRef/jabref/issues/14088)
 
 ### Removed
 
