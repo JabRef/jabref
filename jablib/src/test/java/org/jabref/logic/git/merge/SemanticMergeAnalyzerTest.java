@@ -449,7 +449,7 @@ public class SemanticMergeAnalyzerTest {
         assertEquals(1, matches.size(),
                 "Expected exactly one new entry with key '" + expectedKey + "', but found " + matches.size());
 
-        BibEntry actual = matches.get(0);
+        BibEntry actual = matches.getFirst();
         assertEntryEqualsIgnoringId(expected, actual);
     }
 
@@ -461,7 +461,7 @@ public class SemanticMergeAnalyzerTest {
 
     private static void assertDeletes(MergeAnalysis analysis, Set<String> expectedKeys) {
         Set<String> actual = new LinkedHashSet<>(analysis.autoPlan().deletedEntryKeys());
-        assertTrue(actual.equals(expectedKeys), "Deleted keys mismatch. expected=" + expectedKeys + " actual=" + actual);
+        assertEquals(actual, expectedKeys, "Deleted keys mismatch. expected=" + expectedKeys + " actual=" + actual);
     }
 
     private static void assertEntryEqualsIgnoringId(BibEntry expected, BibEntry actual) {
