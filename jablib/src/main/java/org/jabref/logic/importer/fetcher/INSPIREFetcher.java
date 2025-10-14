@@ -1,9 +1,11 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +25,8 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -32,15 +36,40 @@ import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fetches data from the INSPIRE database.
+ *
+ * Enhanced version with:
+ * - Retry mechanism for network failures
+ * - Better error handling and logging
+ * - Validation of fetched data
+ * - Optimized request headers
  */
 public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher, IdBasedFetcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(INSPIREFetcher.class);
 
     private static final String INSPIRE_HOST = "https://inspirehep.net/api/literature/";
     private static final String INSPIRE_DOI_HOST = "https://inspirehep.net/api/doi/";
     private static final String INSPIRE_ARXIV_HOST = "https://inspirehep.net/api/arxiv/";
+
+    // Retry configuration
+    private static final int MAX_RETRIES = 3;
+    private static final long RETRY_DELAY_MS = 1000; // 1 second base delay
+
+    // Timeout configuration (in milliseconds)
+    private static final int CONNECT_TIMEOUT_MS = 10000; // 10 seconds
+
+    private static final String ERROR_MESSAGE_TEMPLATE =
+        "Failed to fetch from INSPIRE using %s after %d attempts.\n" +
+        "Possible causes:\n" +
+        "- Network connection issue\n" +
+        "- INSPIRE service temporarily unavailable\n" +
+        "- Invalid identifier format\n" +
+        "Please check your internet connection and try again.";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -74,7 +103,14 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     @Override
     public URLDownload getUrlDownload(URL url) {
         URLDownload download = new URLDownload(url);
+
+        // Set comprehensive headers
         download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
+        download.addHeader("User-Agent", "JabRef/" + getClass().getPackage().getImplementationVersion());
+
+        // Set connection timeout to prevent hanging
+        download.setConnectTimeout(Duration.ofMillis(CONNECT_TIMEOUT_MS));
+
         return download;
     }
 
@@ -87,6 +123,24 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);
 
         new FieldFormatterCleanup(StandardField.TITLE, new LatexToUnicodeFormatter()).cleanup(entry);
+
+        // Log the citation key for debugging
+        if (LOGGER.isDebugEnabled()) {
+            entry.getCitationKey().ifPresent(citationKey ->
+                LOGGER.debug("Post-cleanup citation key: {}", citationKey)
+            );
+        }
+    }
+
+    /**
+     * If the BibEntry contains a 'texkeys' field, use it as the citation key and clear the field.
+     */
+    void setTexkeys(BibEntry entry){
+        Optional<String> texkeys = entry.getField(new UnknownField("texkeys"));
+        if (texkeys.isPresent() && !texkeys.get().isBlank()) {
+            entry.setCitationKey(texkeys.get());
+            entry.clearField(new UnknownField("texkeys"));
+        }
     }
 
     @Override
@@ -116,11 +170,19 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         Optional<String> eprint = entry.getField(StandardField.EPRINT);
 
         String urlString;
-        if (archiveprefix.filter("arxiv"::equals).isPresent() && eprint.isPresent()) {
+        String identifier;
+
+        // Prioritize arXiv (INSPIRE has best support for arXiv identifiers)
+        if (archiveprefix.filter("arxiv"::equalsIgnoreCase).isPresent() && eprint.isPresent()) {
             urlString = INSPIRE_ARXIV_HOST + eprint.get();
+            identifier = "arXiv:" + eprint.get();
+            LOGGER.debug("Using INSPIRE arXiv endpoint for: {}", identifier);
         } else if (doi.isPresent()) {
             urlString = INSPIRE_DOI_HOST + doi.get();
+            identifier = "DOI:" + doi.get();
+            LOGGER.debug("Using INSPIRE DOI endpoint for: {}", identifier);
         } else {
+            LOGGER.debug("No suitable identifier found for INSPIRE search");
             return List.of();
         }
 
@@ -128,7 +190,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         try {
             url = new URI(urlString).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
-            throw new FetcherException("Invalid URL", e);
+            throw new FetcherException("Invalid INSPIRE URL: " + urlString, e);
         }
 
         // Use retry mechanism for robust fetching
@@ -313,3 +375,4 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         }
     }
 }
+
