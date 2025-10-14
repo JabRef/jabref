@@ -38,4 +38,9 @@ public class URLs {
     public static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE";
     public static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
     public static final String PRIVACY_POLICY_URL = "https://github.com/JabRef/jabref/blob/main/PRIVACY.md";
+
+    // Citations tab URLs
+    public static final String SEMANTIC_SCHOLAR_URL = "https://www.semanticscholar.org/";
+    public static final String SCITE_REPORTS_URL_BASE = "https://scite.ai/reports/";
+    public static final String SCITE_URL = "https://scite.ai/";
 }

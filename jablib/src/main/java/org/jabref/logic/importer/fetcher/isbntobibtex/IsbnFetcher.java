@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher.isbntobibtex;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -19,6 +18,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.util.OptionalUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +91,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> isbn = entry.getField(StandardField.ISBN);
         if (isbn.isPresent()) {
             return OptionalUtil.toList(performSearchById(isbn.get()));
@@ -100,8 +100,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         }
     }
 
-    public IsbnFetcher addRetryFetcher(AbstractIsbnFetcher retryFetcher) {
-        Objects.requireNonNull(retryFetcher, "Please provide a valid isbn fetcher.");
+    public IsbnFetcher addRetryFetcher(@NonNull AbstractIsbnFetcher retryFetcher) {
         retryIsbnFetcher.add(retryFetcher);
         return this;
     }

@@ -72,23 +72,22 @@ public class BibDatabaseContext {
         this(new BibDatabase());
     }
 
-    public BibDatabaseContext(BibDatabase database) {
+    public BibDatabaseContext(@NonNull BibDatabase database) {
         this(database, new MetaData());
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
-        this.database = Objects.requireNonNull(database);
-        this.metaData = Objects.requireNonNull(metaData);
+    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData) {
+        this.database = database;
+        this.metaData = metaData;
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
+    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
+    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path, @NonNull DatabaseLocation location) {
         this(database, metaData);
-        Objects.requireNonNull(location);
         this.path = path;
 
         if (location == DatabaseLocation.LOCAL) {
@@ -100,7 +99,7 @@ public class BibDatabaseContext {
         return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
     }
 
-    public void setMode(BibDatabaseMode bibDatabaseMode) {
+    public void setMode(@NonNull BibDatabaseMode bibDatabaseMode) {
         metaData.setMode(bibDatabaseMode);
     }
 
@@ -129,8 +128,8 @@ public class BibDatabaseContext {
         return metaData;
     }
 
-    public void setMetaData(MetaData metaData) {
-        this.metaData = Objects.requireNonNull(metaData);
+    public void setMetaData(@NonNull MetaData metaData) {
+        this.metaData = metaData;
     }
 
     public boolean isBiblatexMode() {
@@ -265,8 +264,7 @@ public class BibDatabaseContext {
     /**
      * @return The path to store the lucene index files. One directory for each library.
      */
-    @NonNull
-    public Path getFulltextIndexPath() {
+    public @NonNull Path getFulltextIndexPath() {
         Path appData = Directories.getFulltextIndexBaseDirectory();
         Path indexPath;
 
