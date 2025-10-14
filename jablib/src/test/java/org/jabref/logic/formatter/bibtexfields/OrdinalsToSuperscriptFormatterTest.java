@@ -43,15 +43,11 @@ class OrdinalsToSuperscriptFormatterTest {
             "'1\\textsuperscript{st} 1stword words1st inside1stwords', '1st 1stword words1st inside1stwords'"
     })
     void replacesSuperscript(String expected, String input) {
-        expectCorrect(expected, input);
+        assertEquals(expected, formatter.format(input));
     }
 
     @Test
     void formatExample() {
         assertEquals("11\\textsuperscript{th}", formatter.format(formatter.getExampleInput()));
-    }
-
-    private void expectCorrect(String expected, String input) {
-        assertEquals(expected, formatter.format(input));
     }
 }

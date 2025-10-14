@@ -22,7 +22,9 @@ class HtmlToLatexFormatterTest {
     @ParameterizedTest
     @CsvSource({
             // Return the same string
-            "abc, abc", "aaa, aaa", "(p < 0.01), (p < 0.01)",
+            "abc, abc",
+            "aaa, aaa",
+            "(p < 0.01), (p < 0.01)",
 
             // IEEE-style HTML entity for em dash
             "Towards situation-aware adaptive workflows: SitOPT --- A general purpose situation-aware workflow management system, Towards situation-aware adaptive workflows: SitOPT &amp;#x2014; A general purpose situation-aware workflow management system",
@@ -31,10 +33,17 @@ class HtmlToLatexFormatterTest {
             "{{\\aa}}{\\\"{a}}{\\\"{o}}, &aring;&auml;&ouml;",
 
             // Format combined accents
-            "{\\'{\\i}}, i&#x301;", "{\\\"{a}}, a&#776;", "{\\\"{a}}, a&#x308;", "{\\\"{a}}b, a&#776;b", "{\\\"{a}}b, a&#x308;b",
+            "{\\'{\\i}}, i&#x301;",
+            "{\\\"{a}}, a&#776;",
+            "{\\\"{a}}, a&#x308;",
+            "{\\\"{a}}b, a&#776;b",
+            "{\\\"{a}}b, a&#x308;b",
 
             // Format HTML entities
-            "{\\\"{a}}, &auml;", "{\\\"{a}}, &#228;", "{\\\"{a}}, &#xe4;", "{{$\\Epsilon$}}, &Epsilon;",
+            "{\\\"{a}}, &auml;",
+            "{\\\"{a}}, &#228;",
+            "{\\\"{a}}, &#xe4;",
+            "{{$\\Epsilon$}}, &Epsilon;",
 
             // Strip tags
             "aaa, <b>aaa</b>"

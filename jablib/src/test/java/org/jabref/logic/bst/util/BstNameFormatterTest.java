@@ -99,13 +99,20 @@ class BstNameFormatterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"C, Charles", "V, Vall{\\'e}e", "{\\'e}, {\\'e}", "{\\'e, {\\'e", "E, {E"})
+    @CsvSource({
+            "C, Charles",
+            "V, Vall{\\'e}e",
+            "{\\'e}, {\\'e}",
+            "{\\'e, {\\'e",
+            "E, {E"
+    })
     void getFirstCharOfString(String expected, String s) {
         assertEquals(expected, BstNameFormatter.getFirstCharOfString(s));
     }
 
     @ParameterizedTest
-    @CsvSource({"6, Vall{\\'e}e, -1",
+    @CsvSource({
+            "6, Vall{\\'e}e, -1",
             "2, Vall{\\'e}e, 2",
             "1, Vall{\\'e}e, 1",
             "6, Vall{\\'e}e, 6",
