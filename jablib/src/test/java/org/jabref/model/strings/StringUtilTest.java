@@ -20,8 +20,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,10 +35,14 @@ class StringUtilTest {
                 + "Thus think twice if you add something to StringUtil.");
     }
 
-    @Test
-    void booleanToBinaryString() {
-        assertEquals("0", StringUtil.booleanToBinaryString(false));
-        assertEquals("1", StringUtil.booleanToBinaryString(true));
+    @ParameterizedTest
+    @CsvSource({
+             "false, 0",
+             "true, 1",
+    })
+
+    void booleanToBinaryString(boolean input, String expected) {
+        assertEquals(expected, StringUtil.booleanToBinaryString(input));
     }
 
     @Test
@@ -68,101 +70,134 @@ class StringUtilTest {
         assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
     }
 
-    @Test
-    void unifyLineBreaks() {
-        // Mac < v9
-        String result = StringUtil.unifyLineBreaks("\r", "newline");
-        assertEquals("newline", result);
-        // Windows
-        result = StringUtil.unifyLineBreaks("\r\n", "newline");
-        assertEquals("newline", result);
-        // Unix
-        result = StringUtil.unifyLineBreaks("\n", "newline");
-        assertEquals("newline", result);
+    @ParameterizedTest
+    @CsvSource({
+            // Mac < v9
+            "'\r',newline",
+            // Windows
+            "'\r\n','newline'",
+            // Unix
+            "'\n', 'newline'"
+    })
+
+    void unifyLineBreaks(String input, String expected) {
+        assertEquals(expected, StringUtil.unifyLineBreaks(input, expected));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "aa,bib,aa.bib",
+            ".login,bib,.login.bib",
+            "a.bib,bib,a.bib",
+            "a.bib,BIB,a.bib",
+            "a,bib,a.bib",
+            "a.bb,bib,a.bb",
+            ",bib,''"
+    })
+
+    void getCorrectFileName(String filename, String extension, String expected) {
+        assertEquals(expected, StringUtil.getCorrectFileName(filename, extension));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "&#33;,!",
+            "&#33;&#33;&#33;,!!!"
+    })
+
+    void quoteForHTML(String expected, String input) {
+        assertEquals(expected, StringUtil.quoteForHTML(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "ABC,{ABC}",
+            "ABC,{{ABC}}",
+            "{abc},{abc}",
+            "ABCDEF,{ABC}{DEF}"
+    })
+
+    void removeBracesAroundCapitals(String expected, String input) {
+        assertEquals(expected, StringUtil.removeBracesAroundCapitals(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "ABC,{ABC}",
+            "{ABC},{ABC}",
+            "abc,abc",
+            "#ABC#,#ABC#",
+            "ABC def EFG,{ABC} def {EFG}"
+    })
+
+    void putBracesAroundCapitals(String input, String expected) {
+        assertEquals(expected, StringUtil.putBracesAroundCapitals(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'',''",
+            "'   aaa\t\t\n\r','aaa'",
+            "'  {a}    ','a'",
+            "'  \"a\"    ','a'",
+            "'  {{a}}    ','{a}'",
+            "'  \"{a}\"    ','{a}'",
+            "'  \"{a\"}    ','\"{a\"}'"
+    })
+
+    void shaveString(String input, String expected) {
+        assertEquals(expected, StringUtil.shaveString(input));
     }
 
     @Test
-    void getCorrectFileName() {
-        assertEquals("aa.bib", StringUtil.getCorrectFileName("aa", "bib"));
-        assertEquals(".login.bib", StringUtil.getCorrectFileName(".login", "bib"));
-        assertEquals("a.bib", StringUtil.getCorrectFileName("a.bib", "bib"));
-        assertEquals("a.bib", StringUtil.getCorrectFileName("a.bib", "BIB"));
-        assertEquals("a.bib", StringUtil.getCorrectFileName("a", "bib"));
-        assertEquals("a.bb", StringUtil.getCorrectFileName("a.bb", "bib"));
-        assertEquals("", StringUtil.getCorrectFileName(null, "bib"));
-    }
-
-    @Test
-    void quoteForHTML() {
-        assertEquals("&#33;", StringUtil.quoteForHTML("!"));
-        assertEquals("&#33;&#33;&#33;", StringUtil.quoteForHTML("!!!"));
-    }
-
-    @Test
-    void removeBracesAroundCapitals() {
-        assertEquals("ABC", StringUtil.removeBracesAroundCapitals("{ABC}"));
-        assertEquals("ABC", StringUtil.removeBracesAroundCapitals("{{ABC}}"));
-        assertEquals("{abc}", StringUtil.removeBracesAroundCapitals("{abc}"));
-        assertEquals("ABCDEF", StringUtil.removeBracesAroundCapitals("{ABC}{DEF}"));
-    }
-
-    @Test
-    void putBracesAroundCapitals() {
-        assertEquals("{ABC}", StringUtil.putBracesAroundCapitals("ABC"));
-        assertEquals("{ABC}", StringUtil.putBracesAroundCapitals("{ABC}"));
-        assertEquals("abc", StringUtil.putBracesAroundCapitals("abc"));
-        assertEquals("#ABC#", StringUtil.putBracesAroundCapitals("#ABC#"));
-        assertEquals("{ABC} def {EFG}", StringUtil.putBracesAroundCapitals("ABC def EFG"));
-    }
-
-    @Test
-    void shaveString() {
+    void shaveStringReturnsEmptyWhenNull() {
         assertEquals("", StringUtil.shaveString(null));
-        assertEquals("", StringUtil.shaveString(""));
-        assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
-        assertEquals("a", StringUtil.shaveString("  {a}    "));
-        assertEquals("a", StringUtil.shaveString("  \"a\"    "));
-        assertEquals("{a}", StringUtil.shaveString("  {{a}}    "));
-        assertEquals("{a}", StringUtil.shaveString("  \"{a}\"    "));
-        assertEquals("\"{a\"}", StringUtil.shaveString("  \"{a\"}    "));
     }
 
-    @Test
-    void join() {
-        String[] s = {"ab", "cd", "ed"};
-        assertEquals("ab\\cd\\ed", StringUtil.join(s, "\\", 0, s.length));
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+    'ab\\cd\\ed', 'ab;cd;ed', 0, 3
+    'cd\\ed',     'ab;cd;ed', 1, 3
+    'ed',         'ab;cd;ed', 2, 3
+    '',           'ab;cd;ed', 3, 3
+    '',           '',         0, 0
+    """)
 
-        assertEquals("cd\\ed", StringUtil.join(s, "\\", 1, s.length));
-
-        assertEquals("ed", StringUtil.join(s, "\\", 2, s.length));
-
-        assertEquals("", StringUtil.join(s, "\\", 3, s.length));
-
-        assertEquals("", StringUtil.join(new String[] {}, "\\", 0, 0));
+    void join(String expected, String arrayStr, int from, int to) {
+        String[] array = arrayStr.split(";");
+        assertEquals(expected, StringUtil.join(array, "\\", from, to));
     }
 
-    @Test
-    void stripBrackets() {
-        assertEquals("foo", StringUtil.stripBrackets("[foo]"));
-        assertEquals("[foo]", StringUtil.stripBrackets("[[foo]]"));
-        assertEquals("", StringUtil.stripBrackets(""));
-        assertEquals("[foo", StringUtil.stripBrackets("[foo"));
-        assertEquals("]", StringUtil.stripBrackets("]"));
-        assertEquals("", StringUtil.stripBrackets("[]"));
-        assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
-        assertNull(StringUtil.stripBrackets(null));
+    @ParameterizedTest
+    @CsvSource(useHeadersInDisplayName = true, textBlock = """
+    EXPECTED, INPUT
+    foo,      '[foo]'
+    '[foo]',  '[[foo]]'
+    '',       ''
+    '[foo',   '[foo'
+    ']',      ']'
+    '',       '[]'
+    'f[]f',   'f[]f'
+    """)
+
+    void stripBrackets(String expected, String input) {
+        assertEquals(expected, StringUtil.stripBrackets(input));
     }
 
-    @Test
-    void getPart() {
-        // Get word between braces
-        assertEquals("{makes}", StringUtil.getPart("Practice {makes} perfect", 8, false));
-        // When the string is empty and start Index equal zero
-        assertEquals("", StringUtil.getPart("", 0, false));
-        // When the word are in between close curly bracket
-        assertEquals("", StringUtil.getPart("A closed mouth catches no }flies}", 25, false));
-        // Get the word from the end of the sentence
-        assertEquals("bite", StringUtil.getPart("Barking dogs seldom bite", 19, true));
+    @ParameterizedTest
+    @CsvSource({
+            // Get word between braces
+            "'{makes}','Practice {makes} perfect',8,false",
+            // When the string is empty and start Index equal zero
+            "'','',0,false",
+            // When the word are in between close curly bracket
+            "'','A closed mouth catches no }flies}',25,false",
+            // Get the word from the end of the sentence
+            "'bite','Barking dogs seldom bite',19,true"
+    })
+
+    void getPart(String expected, String input, int startIndex, boolean forward) {
+        assertEquals(expected, StringUtil.getPart(input, startIndex, forward));
     }
 
     @Test
@@ -170,72 +205,89 @@ class StringUtilTest {
         // Unused in JabRef, but should be added in case it finds some use
     }
 
-    @Test
-    void wrap() {
+    @ParameterizedTest
+    @CsvSource({
+            "'aaaaa bbbbb ccccc',5,'aaaaanewline\tbbbbbnewline\tccccc'",
+            "'aaaaa bbbbb ccccc',8,'aaaaa bbbbbnewline\tccccc'",
+            "'aaaaa bbbbb ccccc',11,'aaaaa bbbbbnewline\tccccc'",
+            "'aaaaa bbbbb ccccc',12,'aaaaa bbbbb ccccc'",
+            "'aaaaa\nbbbbb\nccccc',12,'aaaaanewline\tnewline\tbbbbbnewline\tnewline\tccccc'",
+            "'aaaaa\n\nbbbbb\nccccc',12,'aaaaanewline\tnewline\tnewline\tbbbbbnewline\tnewline\tccccc'",
+            "'aaaaa\r\nbbbbb\r\nccccc',12,'aaaaanewline\tnewline\tbbbbbnewline\tnewline\tccccc'"
+    })
+
+    void wrap(String input, int wrapLength, String expected) {
         String newline = "newline";
-        assertEquals("aaaaa" + newline + "\tbbbbb" + newline + "\tccccc",
-                StringUtil.wrap("aaaaa bbbbb ccccc", 5, newline));
-        assertEquals("aaaaa bbbbb" + newline + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8, newline));
-        assertEquals("aaaaa bbbbb" + newline + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11, newline));
-        assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12, newline));
-        assertEquals("aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
-                StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12, newline));
-        assertEquals(
-                "aaaaa" + newline + "\t" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
-                StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12, newline));
-        assertEquals("aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
-                StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12, newline));
+        assertEquals(expected, StringUtil.wrap(input, wrapLength, newline));
     }
 
-    @Test
-    void decodeStringDoubleArray() {
-        assertArrayEquals(new String[][] {{"a", "b"}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:b;c:d"));
-        assertArrayEquals(new String[][] {{"a", ""}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:;c:d"));
-        // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
-        // assertArrayEquals(stringArray2res, StringUtil.decodeStringDoubleArray(encStringArray2));
-        assertArrayEquals(new String[][] {{"a", ":b"}, {"c;", "d"}}, StringUtil.decodeStringDoubleArray("a:\\:b;c\\;:d"));
+    @ParameterizedTest
+    @MethodSource("provideDecodeStringDoubleArrayData")
+    void decodeStringDoubleArray(String input, String[][] expected) {
+        assertArrayEquals(expected, StringUtil.decodeStringDoubleArray(input));
     }
 
-    @Test
-    void isInCurlyBrackets() {
-        assertFalse(StringUtil.isInCurlyBrackets(""));
-        assertFalse(StringUtil.isInCurlyBrackets(null));
-        assertTrue(StringUtil.isInCurlyBrackets("{}"));
-        assertTrue(StringUtil.isInCurlyBrackets("{a}"));
-        assertTrue(StringUtil.isInCurlyBrackets("{a{a}}"));
-        assertTrue(StringUtil.isInCurlyBrackets("{{\\AA}sa {\\AA}Stor{\\aa}}"));
-        assertFalse(StringUtil.isInCurlyBrackets("{"));
-        assertFalse(StringUtil.isInCurlyBrackets("}"));
-        assertFalse(StringUtil.isInCurlyBrackets("a{}a"));
-        assertFalse(StringUtil.isInCurlyBrackets("{\\AA}sa {\\AA}Stor{\\aa}"));
+    static Stream<Arguments> provideDecodeStringDoubleArrayData() {
+        return Stream.of(
+                Arguments.of("a:b;c:d", new String[][]{{"a", "b"}, {"c", "d"}}),
+                Arguments.of("a:;c:d", new String[][]{{"a", ""}, {"c", "d"}}),
+                Arguments.of("a:\\:b;c\\;:d", new String[][]{{"a", ":b"}, {"c;", "d"}})
+        );
     }
 
-    @Test
-    void isInSquareBrackets() {
-        assertFalse(StringUtil.isInSquareBrackets(""));
-        assertFalse(StringUtil.isInSquareBrackets(null));
-        assertTrue(StringUtil.isInSquareBrackets("[]"));
-        assertTrue(StringUtil.isInSquareBrackets("[a]"));
-        assertFalse(StringUtil.isInSquareBrackets("["));
-        assertFalse(StringUtil.isInSquareBrackets("]"));
-        assertFalse(StringUtil.isInSquareBrackets("a[]a"));
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+    false,
+    true, {}
+    true, {a}
+    true, '{a{a}}'
+    true, '{{\\AA}sa {\\AA}Stor{\\aa}}'
+    false, {
+    false, }
+    false, a{}a
+    false, '{\\AA}sa {\\AA}Stor{\\aa}'
+    """)
+
+    void isInCurlyBrackets(boolean expected, String input) {
+        assertEquals(expected, StringUtil.isInCurlyBrackets(input));
     }
 
-    @Test
-    void isInCitationMarks() {
-        assertFalse(StringUtil.isInCitationMarks(""));
-        assertFalse(StringUtil.isInCitationMarks(null));
-        assertTrue(StringUtil.isInCitationMarks("\"\""));
-        assertTrue(StringUtil.isInCitationMarks("\"a\""));
-        assertFalse(StringUtil.isInCitationMarks("\""));
-        assertFalse(StringUtil.isInCitationMarks("a\"\"a"));
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+    false,
+    true, []
+    true, [a]
+    false, [
+    false, ]
+    false, a[]a
+    """)
+
+    void isInSquareBrackets(boolean expected, String input) {
+        assertEquals(expected, StringUtil.isInSquareBrackets(input));
     }
 
-    @Test
-    void intValueOfSingleDigit() {
-        assertEquals(1, StringUtil.intValueOf("1"));
-        assertEquals(2, StringUtil.intValueOf("2"));
-        assertEquals(8, StringUtil.intValueOf("8"));
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+    false,
+    true, ""
+    true, "a"
+    false, "
+    false, a""a
+    """)
+
+    void isInCitationMarks(boolean expected, String input) {
+        assertEquals(expected, StringUtil.isInCitationMarks(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1,'1'",
+            "2,'2'",
+            "8,'8'"
+    })
+
+    void intValueOfSingleDigit(int expected, String input) {
+        assertEquals(expected, StringUtil.intValueOf(input));
     }
 
     @Test
@@ -263,11 +315,15 @@ class StringUtilTest {
         assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(""));
     }
 
-    @Test
-    void intValueOfWithNullSingleDigit() {
-        assertEquals(Optional.of(1), StringUtil.intValueOfOptional("1"));
-        assertEquals(Optional.of(2), StringUtil.intValueOfOptional("2"));
-        assertEquals(Optional.of(8), StringUtil.intValueOfOptional("8"));
+    @ParameterizedTest
+    @CsvSource({
+            "1,'1'",
+            "2,'2'",
+            "8,'8'"
+    })
+
+    void intValueOfWithNullSingleDigit(int expected, String input) {
+        assertEquals(Optional.of(expected), StringUtil.intValueOfOptional(input));
     }
 
     @Test
@@ -302,6 +358,7 @@ class StringUtilTest {
             "'TestTes...', 'TestTestTestTestTest', 10",
             "'', , 10"
     })
+
     void limitStringLength(String expected, String input, int maxLength) {
         assertEquals(expected, StringUtil.limitStringLength(input, maxLength));
     }
@@ -311,10 +368,13 @@ class StringUtilTest {
         assertEquals(10, StringUtil.limitStringLength("TestTestTestTestTest", 10).length());
     }
 
-    @Test
-    void replaceSpecialCharacters() {
-        assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
-        assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
+    @ParameterizedTest
+    @CsvSource({
+            "'Hallo Arger','Hallo Arger'",
+            "'aaAeoeeee','åÄöéèë'"
+    })
+    void replaceSpecialCharacters(String expected, String input) {
+        assertEquals(expected, StringUtil.replaceSpecialCharacters(input));
     }
 
     @Test
@@ -337,11 +397,14 @@ class StringUtilTest {
         assertEquals(result, StringUtil.repeatSpaces(count));
     }
 
-    @Test
-    void repeat() {
-        assertEquals("", StringUtil.repeat(0, 'a'));
-        assertEquals("a", StringUtil.repeat(1, 'a'));
-        assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
+    @ParameterizedTest
+    @CsvSource({
+            "'',0,'a'",
+            "'a',1,'a'",
+            "'aaaaaaa',7,'a'"
+    })
+    void repeat(String expected, int count, char character) {
+        assertEquals(expected, StringUtil.repeat(count, character));
     }
 
     @Test
@@ -359,19 +422,27 @@ class StringUtilTest {
         assertEquals("<b>BB</b>", StringUtil.boldHTML(null, "BB"));
     }
 
-    @Test
-    void unquote() {
-        assertEquals("a:", StringUtil.unquote("a::", ':'));
-        assertEquals("a:;", StringUtil.unquote("a:::;", ':'));
-        assertEquals("a:b%c;", StringUtil.unquote("a::b:%c:;", ':'));
+    @ParameterizedTest
+    @CsvSource({
+            "'a:','a::',':'",
+            "'a:;','a:::;',':'",
+            "'a:b%c;','a::b:%c:;',':'"
+    })
+
+    void unquote(String expected, String input, char quoteChar) {
+        assertEquals(expected, StringUtil.unquote(input, quoteChar));
     }
 
-    @Test
-    void capitalizeFirst() {
-        assertEquals("", StringUtil.capitalizeFirst(""));
-        assertEquals("Hello world", StringUtil.capitalizeFirst("Hello World"));
-        assertEquals("A", StringUtil.capitalizeFirst("a"));
-        assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
+    @ParameterizedTest
+    @CsvSource({
+            "'',''",
+            "'Hello world','Hello World'",
+            "'A','a'",
+            "'Aa','AA'"
+    })
+
+    void capitalizeFirst(String expected, String input) {
+        assertEquals(expected, StringUtil.capitalizeFirst(input));
     }
 
     private static Stream<Arguments> getQuoteStringIfSpaceIsContainedData() {
@@ -385,14 +456,17 @@ class StringUtilTest {
 
     @ParameterizedTest
     @MethodSource("getQuoteStringIfSpaceIsContainedData")
-    void guoteStringIfSpaceIsContained(String expected, String source) {
+    void quoteStringIfSpaceIsContained(String expected, String source) {
         assertEquals(expected, StringUtil.quoteStringIfSpaceIsContained(source));
     }
 
-    @Test
-    void stripAccents() {
-        assertEquals("aAoeee", StringUtil.stripAccents("åÄöéèë"));
-        assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
+    @ParameterizedTest
+    @CsvSource({
+            "'aAoeee','åÄöéèë'",
+            "'Muhlbach','Mühlbach'"
+    })
+    void stripAccents(String expected, String input) {
+        assertEquals(expected, StringUtil.stripAccents(input));
     }
 
     static Stream<Arguments> containsWhitespace() {
