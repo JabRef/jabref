@@ -18,6 +18,9 @@
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspDiagnosticBuilder.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspDiagnosticHandler.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspIntegrityCheck.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspLinkHandler.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspParserHandler.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspRangeUtil.java
 
 // REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
 // REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots
