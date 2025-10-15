@@ -13,8 +13,10 @@ public class DefinitionProviderFactory {
 
     public static Optional<DefinitionProvider> getDefinitionProvider(LspParserHandler parserHandler, String languageId) {
         return Optional.ofNullable(PROVIDER_MAP.computeIfAbsent(languageId.toLowerCase(), key -> switch (key) {
-            case "markdown" -> new MarkdownDefinitionProvider(parserHandler);
-            default -> null;
+            case "markdown" ->
+                    new MarkdownDefinitionProvider(parserHandler);
+            default ->
+                    null;
         }));
     }
 }
