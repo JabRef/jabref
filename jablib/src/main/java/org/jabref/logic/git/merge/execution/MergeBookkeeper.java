@@ -115,25 +115,25 @@ public final class MergeBookkeeper {
                                                 ObjectId... parents) throws IOException {
 
         try (ObjectInserter inserter = repo.newObjectInserter()) {
-            CommitBuilder cb = new CommitBuilder();
-            cb.setTreeId(treeId);
-            cb.setParentIds(parents);
-            cb.setAuthor(new PersonIdent(repo));
-            cb.setCommitter(new PersonIdent(repo));
-            cb.setMessage(message);
+            CommitBuilder commitBuilder = new CommitBuilder();
+            commitBuilder.setTreeId(treeId);
+            commitBuilder.setParentIds(parents);
+            commitBuilder.setAuthor(new PersonIdent(repo));
+            commitBuilder.setCommitter(new PersonIdent(repo));
+            commitBuilder.setMessage(message);
 
-            ObjectId newCommitId = inserter.insert(cb);
+            ObjectId newCommitId = inserter.insert(commitBuilder);
             inserter.flush();
 
-            RefUpdate ru = repo.updateRef(branchRef);
+            RefUpdate refUpdate = repo.updateRef(branchRef);
             ObjectId expectedOld = repo.resolve(Constants.HEAD);
             if (expectedOld != null) {
-                ru.setExpectedOldObjectId(expectedOld);
+                refUpdate.setExpectedOldObjectId(expectedOld);
             }
-            ru.setNewObjectId(newCommitId);
-            ru.setRefLogMessage("commit: " + message, false);
-            RefUpdate.Result r = ru.update();
-            switch (r) {
+            refUpdate.setNewObjectId(newCommitId);
+            refUpdate.setRefLogMessage("commit: " + message, false);
+            RefUpdate.Result result = refUpdate.update();
+            switch (result) {
                 case FAST_FORWARD:
                 case NEW:
                 case FORCED:
@@ -141,7 +141,7 @@ public final class MergeBookkeeper {
                 case RENAMED:
                     return BookkeepingResult.newCommit(newCommitId.getName());
                 default:
-                    throw new IOException("Ref update failed: " + r);
+                    throw new IOException("Ref update failed: " + result);
             }
         }
     }
