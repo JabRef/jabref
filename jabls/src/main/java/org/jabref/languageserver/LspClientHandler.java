@@ -29,7 +29,7 @@ import org.eclipse.lsp4j.services.LanguageClientAware;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +81,7 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
         return CompletableFuture.completedFuture(new InitializeResult(capabilities));
     }
 
-    private static @NotNull WorkspaceServerCapabilities getWorkspaceServerCapabilities() {
+    private static @NonNull WorkspaceServerCapabilities getWorkspaceServerCapabilities() {
         WorkspaceServerCapabilities workspaceCapabilities = new WorkspaceServerCapabilities();
         FileOperationPattern bibFilePattern = new FileOperationPattern("**/*.{bib,bibtex}");
         bibFilePattern.setMatches(FileOperationPatternKind.File);
