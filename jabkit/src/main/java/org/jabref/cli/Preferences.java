@@ -29,7 +29,7 @@ class Preferences implements Runnable {
     protected ArgumentProcessor argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();
 
     @Override
     public void run() {

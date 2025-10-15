@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.cli.ArgumentProcessor;
+import org.jabref.cli.GuiArgumentProcessor;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
@@ -57,9 +57,9 @@ public class Launcher {
 
         final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
 
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(
+        GuiArgumentProcessor argumentProcessor = new GuiArgumentProcessor(
                 args,
-                ArgumentProcessor.Mode.INITIAL_START,
+                GuiArgumentProcessor.Mode.INITIAL_START,
                 preferences);
 
         if (!argumentProcessor.getGuiCli().usageHelpRequested) {

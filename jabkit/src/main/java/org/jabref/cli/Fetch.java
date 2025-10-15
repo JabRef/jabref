@@ -29,10 +29,10 @@ class Fetch implements Runnable {
     }
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKitArgumentProcessor argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();
 
     @Option(names = "--provider", required = true)
     private String provider;
@@ -73,7 +73,7 @@ class Fetch implements Runnable {
             }
 
             if (outputFile != null) {
-                ArgumentProcessor.saveDatabase(
+                JabKitArgumentProcessor.saveDatabase(
                         argumentProcessor.cliPreferences,
                         argumentProcessor.entryTypesManager,
                         new BibDatabase(matches),

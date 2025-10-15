@@ -29,10 +29,10 @@ public class Pseudonymize implements Runnable {
     private static final String CSV_EXTENSION = ".csv";
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKitArgumentProcessor argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();
 
     @ADR(45)
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "BibTeX file to be pseudonymized", required = true)
@@ -53,7 +53,7 @@ public class Pseudonymize implements Runnable {
         Path pseudoBibPath = resolveOutputPath(outputFile.toString(), inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
         Path pseudoKeyPath = resolveOutputPath(keyFile, inputPath, fileName + PSEUDO_SUFFIX + CSV_EXTENSION);
 
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKitArgumentProcessor.importFile(
                 inputPath,
                 "bibtex",
                 argumentProcessor.cliPreferences,
@@ -78,7 +78,7 @@ public class Pseudonymize implements Runnable {
             return;
         }
 
-        ArgumentProcessor.saveDatabaseContext(
+        JabKitArgumentProcessor.saveDatabaseContext(
                 argumentProcessor.cliPreferences,
                 argumentProcessor.entryTypesManager,
                 result.bibDatabaseContext(),

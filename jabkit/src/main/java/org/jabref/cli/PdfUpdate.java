@@ -42,7 +42,7 @@ class PdfUpdate implements Runnable {
     protected Pdf pdf;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();
 
     @Option(names = "--format", description = "Format to update (xmp, bibtex-attachment)", split = ",")
     private List<String> formats = List.of("xmp", "bibtex-attachment"); // ToDO: default value?
@@ -67,7 +67,7 @@ class PdfUpdate implements Runnable {
             return;
         }
 
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKitArgumentProcessor.importFile(
                 inputFile,
                 inputFormat,
                 pdf.argumentProcessor.cliPreferences,

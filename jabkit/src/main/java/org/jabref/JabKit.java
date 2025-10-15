@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
-import org.jabref.cli.ArgumentProcessor;
+import org.jabref.cli.JabKitArgumentProcessor;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -71,13 +71,13 @@ public class JabKit {
             BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
-            ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
+            JabKitArgumentProcessor argumentProcessor = new JabKitArgumentProcessor(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(argumentProcessor);
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,
-                    ArgumentProcessor.getAvailableImportFormats(preferences),
-                    ArgumentProcessor.getAvailableExportFormats(preferences),
+                    JabKitArgumentProcessor.getAvailableImportFormats(preferences),
+                    JabKitArgumentProcessor.getAvailableExportFormats(preferences),
                     WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
 
             // Show help when no arguments are given. Placed after header and footer setup

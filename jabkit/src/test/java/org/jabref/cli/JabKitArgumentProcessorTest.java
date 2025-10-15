@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ArgumentProcessorTest {
+class JabKitArgumentProcessorTest {
 
     private final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
@@ -67,14 +67,14 @@ class ArgumentProcessorTest {
                 0,
                 0));
 
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
+        JabKitArgumentProcessor argumentProcessor = new JabKitArgumentProcessor(preferences, entryTypesManager);
         commandLine = new CommandLine(argumentProcessor);
     }
 
     @Test
     void auxImport(@TempDir Path tempDir) throws URISyntaxException {
-        String fullBib = Path.of(ArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
-        String auxFile = Path.of(ArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
+        String fullBib = Path.of(JabKitJabKitArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String auxFile = Path.of(JabKitJabKitArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
 
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
@@ -87,11 +87,11 @@ class ArgumentProcessorTest {
 
     @Test
     void search(@TempDir Path tempDir) throws URISyntaxException, IOException {
-        Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
+        Path originBib = Path.of(Objects.requireNonNull(JabKitArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 
         Path expectedBib = Path.of(
-                Objects.requireNonNull(ArgumentProcessorTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
+                Objects.requireNonNull(JabKitArgumentProcessorTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
                        .toURI()
         );
 
@@ -110,7 +110,7 @@ class ArgumentProcessorTest {
 
     @Test
     void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws URISyntaxException {
-        Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
+        Path originBib = Path.of(Objects.requireNonNull(JabKitArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 
         Path outputHtml = tempDir.resolve("output.html").toAbsolutePath();
@@ -135,7 +135,7 @@ class ArgumentProcessorTest {
 
     @Test
     void checkConsistency() throws URISyntaxException {
-        Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
+        Path testBib = Path.of(Objects.requireNonNull(JabKitArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--output-format", "txt");
@@ -155,7 +155,7 @@ class ArgumentProcessorTest {
 
     @Test
     void checkConsistencyPorcelain() throws URISyntaxException {
-        Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
+        Path testBib = Path.of(Objects.requireNonNull(JabKitArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
         // "txt" is the default output format; thus not provided here

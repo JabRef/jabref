@@ -51,8 +51,8 @@ import static picocli.CommandLine.Option;
                 Pseudonymize.class,
                 Search.class
         })
-public class ArgumentProcessor implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
+public class JabKitArgumentProcessor implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabKitArgumentProcessor.class);
 
     protected final CliPreferences cliPreferences;
     protected final BibEntryTypesManager entryTypesManager;
@@ -63,7 +63,7 @@ public class ArgumentProcessor implements Runnable {
     @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
     private boolean versionInfoRequested;
 
-    public ArgumentProcessor(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
+    public JabKitArgumentProcessor(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
         this.cliPreferences = cliPreferences;
         this.entryTypesManager = entryTypesManager;
     }

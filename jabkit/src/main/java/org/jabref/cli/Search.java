@@ -39,10 +39,10 @@ class Search implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Search.class);
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKitArgumentProcessor argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();
 
     @Option(names = {"--query"}, description = "Search query", required = true)
     private String query;
@@ -59,7 +59,7 @@ class Search implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKitArgumentProcessor.importFile(
                 inputFile,
                 "bibtex",
                 argumentProcessor.cliPreferences,
@@ -104,7 +104,7 @@ class Search implements Runnable {
         if ("bibtex".equals(outputFormat)) {
             // output a bib file as default or if
             // provided exportFormat is "bib"
-            ArgumentProcessor.saveDatabase(
+            JabKitArgumentProcessor.saveDatabase(
                     argumentProcessor.cliPreferences,
                     argumentProcessor.entryTypesManager,
                     new BibDatabase(matches),

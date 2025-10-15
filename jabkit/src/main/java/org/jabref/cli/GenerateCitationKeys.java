@@ -24,10 +24,10 @@ public class GenerateCitationKeys implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKitArgumentProcessor argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();
 
     // [impl->req~jabkit.cli.input-flag~1]
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
@@ -38,7 +38,7 @@ public class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKitArgumentProcessor.importFile(
                 inputFile,
                 "bibtex",
                 argumentProcessor.cliPreferences,
@@ -67,7 +67,7 @@ public class GenerateCitationKeys implements Runnable {
         }
 
         if (outputFile != null) {
-            ArgumentProcessor.saveDatabase(
+            JabKitArgumentProcessor.saveDatabase(
                     argumentProcessor.cliPreferences,
                     argumentProcessor.entryTypesManager,
                     parserResult.get().getDatabase(),

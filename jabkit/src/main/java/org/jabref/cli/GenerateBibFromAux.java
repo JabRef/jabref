@@ -28,10 +28,10 @@ class GenerateBibFromAux implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateBibFromAux.class);
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKitArgumentProcessor argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();
 
     @Option(names = "--aux", required = true)
     private Path auxFile;
@@ -45,7 +45,7 @@ class GenerateBibFromAux implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> pr = ArgumentProcessor.importFile(
+        Optional<ParserResult> pr = JabKitArgumentProcessor.importFile(
                 inputFile,
                 "bibtex",
                 argumentProcessor.cliPreferences,
@@ -83,7 +83,7 @@ class GenerateBibFromAux implements Runnable {
                                           .collect(Collectors.joining("\n\n")));
             return;
         } else {
-            ArgumentProcessor.saveDatabase(
+            JabKitArgumentProcessor.saveDatabase(
                     argumentProcessor.cliPreferences,
                     argumentProcessor.entryTypesManager,
                     subDatabase,

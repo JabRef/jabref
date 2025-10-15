@@ -32,10 +32,10 @@ public class Convert implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Convert.class);
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKitArgumentProcessor argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();
 
     // [impl->req~jabkit.cli.input-flag~1]
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input file", required = true)
@@ -52,7 +52,7 @@ public class Convert implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, inputFormat, argumentProcessor.cliPreferences, sharedOptions.porcelain);
+        Optional<ParserResult> parserResult = JabKitArgumentProcessor.importFile(inputFile, inputFormat, argumentProcessor.cliPreferences, sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
@@ -81,7 +81,7 @@ public class Convert implements Runnable {
         }
 
         if ("bibtex".equalsIgnoreCase(format)) {
-            ArgumentProcessor.saveDatabase(
+            JabKitArgumentProcessor.saveDatabase(
                     argumentProcessor.cliPreferences,
                     argumentProcessor.entryTypesManager,
                     parserResult.getDatabase(),
