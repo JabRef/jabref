@@ -45,6 +45,6 @@ public class LspParserHandler {
 
     public boolean citationKeyExists(String citationKey) {
         return parserResults.values().stream()
-                .anyMatch(parserResult -> !parserResult.getDatabase().getEntriesByCitationKey(citationKey).isEmpty());
+                            .anyMatch(parserResult -> !parserResult.getDatabase().getEntriesByCitationKey(citationKey).isEmpty());
     }
 }
