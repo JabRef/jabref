@@ -170,6 +170,18 @@ public class AiChatComponent extends VBox {
             onSendMessage(userMessage);
         });
 
+        chatPrompt.setRegenerateCallback(() -> {
+            deleteLastMessage();
+            deleteLastMessage();
+
+            chatPrompt.switchToNormalState();
+
+            String lastUserPrompt = chatPrompt.getLastUserPrompt();
+            if (lastUserPrompt != null && !lastUserPrompt.isEmpty()) {
+                onSendMessage(lastUserPrompt);
+            }
+        });
+
         chatPrompt.requestPromptFocus();
 
         updatePromptHistory();
