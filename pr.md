@@ -5,14 +5,14 @@ Resolves split package/class collision noted in [#14052](https://github.com/JabR
 ## Changes
 
 - Rename `jabkit`’s `ArgumentProcessor` → `JabKitArgumentProcessor`
-- Rename `jabgui`’s `ArgumentProcessor` → `GuiArgumentProcessor`
+- Rename `jabgui`'s `ArgumentProcessor` → `JabGuiArgumentProcessor`
 - Update all imports, constructor calls, and static usages across CLI commands
 - Update tests and file names accordingly
 - Verified compile and tests for `jabkit`; CLI help smoke test executed via Gradle
 
 ### Files of note
 - `jabkit/src/main/java/org/jabref/cli/JabKitArgumentProcessor.java`
-- `jabgui/src/main/java/org/jabref/cli/GuiArgumentProcessor.java`
+- `jabgui/src/main/java/org/jabref/cli/JabGuiArgumentProcessor.java`
 - `jabkit/src/main/java/org/jabref/JabKit.java`
 - CLI commands in `jabkit/src/main/java/org/jabref/cli/*` updated to reference `JabKitArgumentProcessor`
 - Tests: `jabkit/src/test/java/org/jabref/cli/JabKitArgumentProcessorTest.java`
@@ -31,7 +31,7 @@ Resolves split package/class collision noted in [#14052](https://github.com/JabR
 ## Rationale
 
 - Eliminates split packages in `org.jabref.cli` across modules
-- Makes responsibilities explicit (`JabKit*` for CLI toolkit, `Gui*` for GUI startup/arg handling)
+- Makes responsibilities explicit (`JabKit*` for CLI toolkit, `JabGui*` for GUI startup/arg handling)
 - Reduces risk for module resolution conflicts moving towards stricter module boundaries
 
 ## Checklist

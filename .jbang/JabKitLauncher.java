@@ -6,7 +6,7 @@
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //SOURCES ../jabkit/src/main/java/org/jabref/cli/converter/CygWinPathConverter.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/ArgumentProcessor.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/JabKitArgumentProcessor.java
 //SOURCES ../jabkit/src/main/java/org/jabref/cli/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/cli/CheckIntegrity.java
 //SOURCES ../jabkit/src/main/java/org/jabref/cli/Convert.java
