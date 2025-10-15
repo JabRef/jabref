@@ -91,13 +91,13 @@ public class DoiResolution implements FulltextFetcher {
             if (citationMetaTag.isPresent()) {
                 return citationMetaTag;
             }
-            
+
             // Wiley-specific URL pattern handling
             Optional<URL> wileyPdfUrl = findWileyPdfUrl(doiLink);
             if (wileyPdfUrl.isPresent()) {
                 return wileyPdfUrl;
             }
-            
+
             Optional<URL> embeddedLink = findEmbeddedLink(html, base);
             if (embeddedLink.isPresent()) {
                 return embeddedLink;

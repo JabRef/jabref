@@ -29,8 +29,8 @@ public class JabGuiArgumentProcessor {
     private boolean guiNeeded = true;
 
     public JabGuiArgumentProcessor(String[] args,
-                             Mode startupMode,
-                             GuiPreferences preferences) {
+                                   Mode startupMode,
+                                   GuiPreferences preferences) {
         this.startupMode = startupMode;
         this.preferences = preferences;
         this.guiCli = new GuiCommandLine();
