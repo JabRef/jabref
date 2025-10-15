@@ -1,3 +1,5 @@
+# Fix package and class name collision across modules (#14052)
+
 ## Summary
 
 Resolves split package/class collision noted in [#14052](https://github.com/JabRef/jabref/issues/14052): both `jabgui` and `jabkit` defined `org.jabref.cli.ArgumentProcessor` with different responsibilities. This violates Java module best practices and risks runtime ambiguity.
@@ -11,6 +13,7 @@ Resolves split package/class collision noted in [#14052](https://github.com/JabR
 - Verified compile and tests for `jabkit`; CLI help smoke test executed via Gradle
 
 ### Files of note
+
 - `jabkit/src/main/java/org/jabref/cli/JabKitArgumentProcessor.java`
 - `jabgui/src/main/java/org/jabref/cli/JabGuiArgumentProcessor.java`
 - `jabkit/src/main/java/org/jabref/JabKit.java`
