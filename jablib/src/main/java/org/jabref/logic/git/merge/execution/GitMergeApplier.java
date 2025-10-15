@@ -6,11 +6,8 @@ import org.jabref.logic.git.model.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.google.common.annotations.VisibleForTesting;
-
 public class GitMergeApplier {
     /// Apply (remote - base) patches safely in the current BibDatabaseContext, plus safe new/deleted entries.
-    @VisibleForTesting
     public static void applyAutoPlan(BibDatabaseContext bibDatabaseContext, MergePlan plan) {
         for (BibEntry entry : plan.newEntries()) {
             bibDatabaseContext.getDatabase().insertEntry(new BibEntry(entry));
@@ -35,7 +32,6 @@ public class GitMergeApplier {
 
     /// Apply user-resolved entries into the current BibDatabaseContext: replace or insert by citation key.
     /// (Aligned with `MergeEntriesAction`’s “edit the in-memory library first” philosophy.)
-    @VisibleForTesting
     public static void applyResolved(BibDatabaseContext bibDatabaseContext, List<BibEntry> resolved) {
         for (BibEntry merged : resolved) {
             merged.getCitationKey().ifPresent(key -> {

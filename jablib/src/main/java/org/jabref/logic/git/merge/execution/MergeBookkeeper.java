@@ -42,9 +42,7 @@ public final class MergeBookkeeper {
         this.registry = registry;
     }
 
-    public BookkeepingResult resultRecord(Path bibFilePath, PullPlan computation)
-            throws IOException, GitAPIException, JabRefException {
-
+    public BookkeepingResult resultRecord(Path bibFilePath, PullPlan computation) throws IOException, GitAPIException, JabRefException {
         Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRoot.isEmpty()) {
             throw new JabRefException("Finalize aborted: Path is not inside a Git repository.");
@@ -100,20 +98,14 @@ public final class MergeBookkeeper {
         }
     }
 
-    private static boolean blobEqualsCommitPath(Git git, RevCommit commit, String relativePath, Path file) {
-        try {
-            Optional<String> content = GitFileReader.readFileFromCommit(git, commit, Path.of(relativePath));
-            if (content.isEmpty()) {
-                return false;
-            }
-            String remoteText = content.get();
-            String current = Files.readString(file);
-            return Objects.equals(remoteText, current);
-        } catch (IOException e) {
+    private static boolean blobEqualsCommitPath(Git git, RevCommit commit, String relativePath, Path file) throws JabRefException, IOException {
+        Optional<String> content = GitFileReader.readFileFromCommit(git, commit, Path.of(relativePath));
+        if (content.isEmpty()) {
             return false;
-        } catch (JabRefException e) {
-            throw new RuntimeException(e);
         }
+        String remoteText = content.get();
+        String current = Files.readString(file);
+        return Objects.equals(remoteText, current);
     }
 
     private BookkeepingResult commitWithParents(Repository repo,
