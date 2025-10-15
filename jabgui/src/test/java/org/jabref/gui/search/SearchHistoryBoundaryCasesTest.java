@@ -249,7 +249,7 @@ class SearchHistoryBoundaryCasesTest {
         assertEquals(10000, result.size(), "Large history should be handled correctly");
         
         // Verify last item is correct
-        assertEquals("item9999", result.get(result.size() - 1), "Last item should be correct");
+        assertEquals("item9999", result.getLast(), "Last item should be correct");
     }
 
     // ========== Boundary Tests for Cross-Database Behavior ==========
