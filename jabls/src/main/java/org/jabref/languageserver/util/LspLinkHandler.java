@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class LspLinkHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LspDiagnosticHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LspLinkHandler.class);
 
     private final LspParserHandler parserHandler;
 
