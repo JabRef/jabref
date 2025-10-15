@@ -462,8 +462,8 @@ class StringUtilTest {
 
     @ParameterizedTest
     @CsvSource({
-            "'aAoeee','åÄöéèë'",
-            "'Muhlbach','Mühlbach'"
+            "aAoeee,åÄöéèë",
+            "Muhlbach,Mühlbach"
     })
     void stripAccents(String expected, String input) {
         assertEquals(expected, StringUtil.stripAccents(input));
