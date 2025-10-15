@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-public class GuiArgumentProcessor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GuiArgumentProcessor.class);
+public class JabGuiArgumentProcessor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabGuiArgumentProcessor.class);
 
     public enum Mode { INITIAL_START, REMOTE_START }
 
@@ -28,7 +28,7 @@ public class GuiArgumentProcessor {
     private final List<UiCommand> uiCommands = new ArrayList<>();
     private boolean guiNeeded = true;
 
-    public GuiArgumentProcessor(String[] args,
+    public JabGuiArgumentProcessor(String[] args,
                              Mode startupMode,
                              GuiPreferences preferences) {
         this.startupMode = startupMode;

@@ -40,6 +40,12 @@ class DoiResolutionTest {
         );
     }
 
+    @Test
+    void wileyWindEnergyPdfUrl() throws IOException {
+        entry.setField(StandardField.DOI, "10.1002/we.2952");
+        assertEquals(Optional.of(URLUtil.create("https://onlinelibrary.wiley.com/doi/pdf/10.1002/we.2952")), finder.findFullText(entry));
+    }
+
     @Disabled("Cannot fetch due to Cloudflare protection")
     @Test
     void linkWithPdfStringLeadsToFulltext() throws IOException {

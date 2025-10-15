@@ -73,8 +73,8 @@ class JabKitArgumentProcessorTest {
 
     @Test
     void auxImport(@TempDir Path tempDir) throws URISyntaxException {
-        String fullBib = Path.of(JabKitJabKitArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
-        String auxFile = Path.of(JabKitJabKitArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
+        String fullBib = Path.of(JabKitArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String auxFile = Path.of(JabKitArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
 
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 

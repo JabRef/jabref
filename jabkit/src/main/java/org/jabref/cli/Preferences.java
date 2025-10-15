@@ -26,7 +26,7 @@ class Preferences implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Preferences.class);
 
     @ParentCommand
-    protected ArgumentProcessor argumentProcessor;
+    protected JabKitArgumentProcessor argumentProcessor;
 
     @Mixin
     private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();

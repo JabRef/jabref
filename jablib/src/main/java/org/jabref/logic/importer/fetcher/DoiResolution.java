@@ -91,6 +91,13 @@ public class DoiResolution implements FulltextFetcher {
             if (citationMetaTag.isPresent()) {
                 return citationMetaTag;
             }
+            
+            // Wiley-specific URL pattern handling
+            Optional<URL> wileyPdfUrl = findWileyPdfUrl(doiLink);
+            if (wileyPdfUrl.isPresent()) {
+                return wileyPdfUrl;
+            }
+            
             Optional<URL> embeddedLink = findEmbeddedLink(html, base);
             if (embeddedLink.isPresent()) {
                 return embeddedLink;
@@ -148,6 +155,23 @@ public class DoiResolution implements FulltextFetcher {
             try {
                 return Optional.of(URLUtil.create(citationPdfUrl.get()));
             } catch (MalformedURLException _) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Handle Wiley-specific URL patterns.
+     * Converts Wiley article URLs from /doi/full/ to /doi/pdf/ format.
+     */
+    private Optional<URL> findWileyPdfUrl(String doiLink) {
+        if (doiLink.contains("onlinelibrary.wiley.com/doi/full/")) {
+            String pdfUrl = doiLink.replace("/doi/full/", "/doi/pdf/");
+            try {
+                return Optional.of(URLUtil.create(pdfUrl));
+            } catch (MalformedURLException e) {
+                LOGGER.warn("Failed to create Wiley PDF URL: {}", pdfUrl, e);
                 return Optional.empty();
             }
         }

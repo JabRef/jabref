@@ -13,7 +13,7 @@ import static picocli.CommandLine.ParentCommand;
         })
 class Pdf implements Runnable {
     @ParentCommand
-    protected ArgumentProcessor argumentProcessor;
+    protected JabKitArgumentProcessor argumentProcessor;
 
     @Mixin
     private JabKitArgumentProcessor.SharedOptions sharedOptions = new JabKitArgumentProcessor.SharedOptions();

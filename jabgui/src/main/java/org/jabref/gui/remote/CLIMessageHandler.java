@@ -5,7 +5,7 @@ import java.util.List;
 
 import javafx.application.Platform;
 
-import org.jabref.cli.GuiArgumentProcessor;
+import org.jabref.cli.JabGuiArgumentProcessor;
 import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.UiCommand;
@@ -29,9 +29,9 @@ public class CLIMessageHandler implements RemoteMessageHandler {
     @Override
     public void handleCommandLineArguments(String[] message) {
         LOGGER.info("Processing message {}", Arrays.stream(message).toList());
-        GuiArgumentProcessor argumentProcessor = new GuiArgumentProcessor(
+        JabGuiArgumentProcessor argumentProcessor = new JabGuiArgumentProcessor(
                 message,
-                GuiArgumentProcessor.Mode.REMOTE_START,
+                JabGuiArgumentProcessor.Mode.REMOTE_START,
                 preferences);
         List<UiCommand> uiCommands = argumentProcessor.processArguments();
         Platform.runLater(() -> uiMessageHandler.handleUiCommands(uiCommands));
