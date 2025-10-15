@@ -5,6 +5,7 @@ import java.util.concurrent.Callable;
 import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.languageserver.LspLauncher;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ public class ServerCli implements Callable<Void> {
 
     @Override
     public Void call() throws InterruptedException {
+        RemoteMessageHandler messageHandler = _ -> LOGGER.error("Received a message while running as a standalone language server. This is not supported.");
         LspLauncher lspLauncher = new LspLauncher(JabRefCliPreferences.getInstance(), port);
         lspLauncher.run();
 

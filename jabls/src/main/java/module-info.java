@@ -17,5 +17,6 @@ module org.jabref.jabls {
     requires org.eclipse.lsp4j.jsonrpc;
     requires org.eclipse.lsp4j.websocket;
     requires org.jspecify;
+    requires org.jetbrains.annotations;
 
 }

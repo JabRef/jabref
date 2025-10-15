@@ -42,4 +42,27 @@ public class LspRangeUtil {
                 new Position(Math.max(range.endLine() - 1, 0), Math.max(range.endColumn() - 1, 0))
         );
     }
+
+    public static Range convertToLspRange(String content, int startIndex, int endIndex) {
+        Position start = convertToLspPosition(content, startIndex);
+        Position end = convertToLspPosition(content, endIndex);
+        return new Range(start, end);
+    }
+
+    public static Position convertToLspPosition(String content, int index) {
+        int clampedIndex = Math.max(0, Math.min(content.length(), index));
+        int line = 0;
+        int column = 0;
+
+        for (int i = 0; i < clampedIndex; i++) {
+            if (content.charAt(i) == '\n') {
+                line++;
+                column = 0;
+            } else {
+                column++;
+            }
+        }
+
+        return new Position(line, column);
+    }
 }
