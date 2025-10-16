@@ -1,3 +1,4 @@
+// java
 package org.jabref.gui.importer.fetcher;
 
 import javafx.beans.binding.Bindings;
@@ -32,6 +33,11 @@ public class WebSearchPaneView extends VBox {
 
     private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass("invalid");
 
+    // helper variables
+    private String lastKey = "";
+    private long lastKeyTime = 0;
+    private int cycleIndex = 0;
+
     private final WebSearchPaneViewModel viewModel;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
@@ -58,7 +64,7 @@ public class WebSearchPaneView extends VBox {
     }
 
     /**
-     * Allows triggering search on pressing enter
+     * Allows triggering search on pressing enter.
      */
     private void enableEnterToTriggerSearch(TextField query) {
         query.setOnKeyPressed(event -> {
@@ -82,7 +88,8 @@ public class WebSearchPaneView extends VBox {
     }
 
     /**
-     * Create combo box for selecting fetcher
+     * Creates a combo box for selecting a fetcher.
+     * Enable letter-jump and cycling in the ComboBox for improved keyboard navigation (\#14083)
      */
     private ComboBox<SearchBasedFetcher> createFetcherComboBox() {
         ComboBox<SearchBasedFetcher> fetchers = new ComboBox<>();
@@ -93,11 +100,37 @@ public class WebSearchPaneView extends VBox {
         fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
         fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
         HBox.setHgrow(fetchers, Priority.ALWAYS);
+
+        fetchers.setOnKeyPressed(event -> {
+            if (event.getText().length() == 1 && Character.isLetter(event.getText().charAt(0))) {
+                String ch = event.getText().toLowerCase();
+
+                long currentTime = System.currentTimeMillis();
+
+                if (ch.equals(lastKey) && (currentTime - lastKeyTime) < 1000) {
+                    cycleIndex++;
+                } else {
+                    cycleIndex = 0;
+                }
+                lastKey = ch;
+                lastKeyTime = currentTime;
+
+                var matching = fetchers.getItems().stream()
+                                       .filter(f -> f.getName().toLowerCase().startsWith(ch))
+                                       .toList();
+
+                if (!matching.isEmpty()) {
+                    fetchers.setValue(matching.get(cycleIndex % matching.size()));
+                }
+                event.consume();
+            }
+        });
+
         return fetchers;
     }
 
     /**
-     * Create text field for search query
+     * Creates text field for search query.
      */
     private TextField createQueryField() {
         TextField query = SearchTextField.create(preferences.getKeyBindingRepository());
@@ -109,7 +142,7 @@ public class WebSearchPaneView extends VBox {
     }
 
     /**
-     * Create button that triggers search
+     * Creates button that triggers search.
      */
     private Button createSearchButton() {
         BooleanExpression importerEnabled = preferences.getImporterPreferences().importerEnabledProperty();
@@ -122,7 +155,7 @@ public class WebSearchPaneView extends VBox {
     }
 
     /**
-     * Creatse help button for currently selected fetcher
+     * Creates help button for currently selected fetcher.
      */
     private StackPane createHelpButtonContainer() {
         StackPane helpButtonContainer = new StackPane();
@@ -139,7 +172,7 @@ public class WebSearchPaneView extends VBox {
     }
 
     /**
-     * Creates an observable boolean value that is true if no database is open
+     * Creates an observable boolean value that is true if no database is open.
      */
     private ObservableBooleanValue searchDisabledProperty() {
         return Bindings.createBooleanBinding(

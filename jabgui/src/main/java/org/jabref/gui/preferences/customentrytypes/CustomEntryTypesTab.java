@@ -58,6 +58,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @Inject private StateManager stateManager;
 
+
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     private CustomLocalDragboard localDragboard;
@@ -171,6 +172,28 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
             event.getTableView().refresh();
         });
 
+        // Filter ComboBox dropdown options as user types for modern UI/autocomplete experience (#14083)
+
+        ObservableList<Field> fullItemList = viewModel.fieldsForAdding();
+
+        addNewField.getEditor().textProperty().addListener((obs, oldText, newText) -> {
+            // Show all items if text is empty
+            if (newText == null || newText.isEmpty()) {
+                addNewField.setItems(fullItemList);
+                addNewField.hide(); // refresh dropdown
+                addNewField.show();
+                return;
+            }
+
+            ObservableList<Field> filteredItems = fullItemList.filtered(
+                    field -> field.getName().toLowerCase().startsWith(newText.toLowerCase())
+            );
+
+            addNewField.setItems(filteredItems);
+            addNewField.hide(); // refresh dropdown
+            addNewField.show();
+        });
+
         fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));
         fieldTypeColumn.setCellValueFactory(item -> item.getValue().requiredProperty());
         makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
@@ -199,12 +222,12 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         addNewField.setItems(viewModel.fieldsForAdding());
         addNewField.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
-
+        addNewField.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
         // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
         // since the enabled/disabled state of addNewFieldButton won't update otherwise
         EasyBind.subscribe(addNewField.getEditor().textProperty(), text -> addNewField.setValue(FieldsUtil.FIELD_STRING_CONVERTER.fromString(text)));
-    }
+    }  // end of setupFieldsTable()
 
     private void makeRotatedColumnHeader(TableColumn<?, ?> column, String text) {
         Label label = new Label();
@@ -267,7 +290,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     @FXML
     void addNewField() {
         viewModel.addNewField();
-    }
+    }  // end of addNewField()
 
     @FXML
     void resetEntryTypes() {

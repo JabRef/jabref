@@ -65,6 +65,11 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Button remoteHelp;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private BibEntryTypesManager entryTypesManager;
+//  helper variables
+    private String lastLanguageKey = "";
+    private long lastLanguageKeyTime = 0;
+    private int languageCycleIndex = 0;
+
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -97,7 +102,30 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
                 .install(language);
         language.itemsProperty().bind(viewModel.languagesListProperty());
         language.valueProperty().bindBidirectional(viewModel.selectedLanguageProperty());
+        // Enable letter-jump and cycling in the Language ComboBox for improved keyboard navigation (#14083)
+        language.setOnKeyPressed(event -> {
+            if (event.getText().length() == 1 && Character.isLetter(event.getText().charAt(0))) {
+                String ch = event.getText().toLowerCase();
+                long currentTime = System.currentTimeMillis();
 
+                if (ch.equals(lastLanguageKey) && (currentTime - lastLanguageKeyTime) < 1000) {
+                    languageCycleIndex++;
+                } else {
+                    languageCycleIndex = 0;
+                }
+                lastLanguageKey = ch;
+                lastLanguageKeyTime = currentTime;
+
+                var matching = language.getItems().stream()
+                                       .filter(lang -> lang.getDisplayName().toLowerCase().startsWith(ch))
+                                       .toList();
+
+                if (!matching.isEmpty()) {
+                    language.setValue(matching.get(languageCycleIndex % matching.size()));
+                }
+                event.consume();
+            }
+        });
         fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());
 
         // Spinner does neither support alignment nor disableProperty in FXML
