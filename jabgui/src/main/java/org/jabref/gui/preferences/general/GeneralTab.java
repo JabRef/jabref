@@ -65,28 +65,24 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Button remoteHelp;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private BibEntryTypesManager entryTypesManager;
-//  helper variables
+    //  helper variables
     private String lastLanguageKey = "";
     private long lastLanguageKeyTime = 0;
     private int languageCycleIndex = 0;
 
-
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     // The fontSizeFormatter formats the input given to the fontSize spinner so that non valid values cannot be entered.
-    private final TextFormatter<Integer> fontSizeFormatter = new TextFormatter<>(new IntegerStringConverter(), 9,
-            c -> {
-                if (Pattern.matches("\\d*", c.getText())) {
-                    return c;
-                }
-                c.setText("0");
-                return c;
-            });
+    private final TextFormatter<Integer> fontSizeFormatter = new TextFormatter<>(new IntegerStringConverter(), 9, c -> {
+        if (Pattern.matches("\\d*", c.getText())) {
+            return c;
+        }
+        c.setText("0");
+        return c;
+    });
 
     public GeneralTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        ViewLoader.view(this).root(this).load();
     }
 
     @Override
@@ -97,9 +93,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     public void initialize() {
         this.viewModel = new GeneralTabViewModel(dialogService, preferences, fileUpdateMonitor);
 
-        new ViewModelListCellFactory<Language>()
-                .withText(Language::getDisplayName)
-                .install(language);
+        new ViewModelListCellFactory<Language>().withText(Language::getDisplayName).install(language);
         language.itemsProperty().bind(viewModel.languagesListProperty());
         language.valueProperty().bindBidirectional(viewModel.selectedLanguageProperty());
         // Enable letter-jump and cycling in the Language ComboBox for improved keyboard navigation (#14083)
@@ -116,9 +110,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
                 lastLanguageKey = ch;
                 lastLanguageKeyTime = currentTime;
 
-                var matching = language.getItems().stream()
-                                       .filter(lang -> lang.getDisplayName().toLowerCase().startsWith(ch))
-                                       .toList();
+                var matching = language.getItems().stream().filter(lang -> lang.getDisplayName().toLowerCase().startsWith(ch)).toList();
 
                 if (!matching.isEmpty()) {
                     language.setValue(matching.get(languageCycleIndex % matching.size()));
@@ -135,9 +127,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
-        new ViewModelListCellFactory<ThemeTypes>()
-                .withText(ThemeTypes::getDisplayName)
-                .install(theme);
+        new ViewModelListCellFactory<ThemeTypes>().withText(ThemeTypes::getDisplayName).install(theme);
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
         themeSyncOs.selectedProperty().bindBidirectional(viewModel.themeSyncOsProperty());
@@ -158,9 +148,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         confirmHideTabBar.selectedProperty().bindBidirectional(viewModel.confirmHideTabBarProperty());
         donationNeverShow.selectedProperty().bindBidirectional(viewModel.donationNeverShowProperty());
 
-        new ViewModelListCellFactory<BibDatabaseMode>()
-                .withText(BibDatabaseMode::getFormattedName)
-                .install(biblatexMode);
+        new ViewModelListCellFactory<BibDatabaseMode>().withText(BibDatabaseMode::getFormattedName).install(biblatexMode);
         biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
         biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
 

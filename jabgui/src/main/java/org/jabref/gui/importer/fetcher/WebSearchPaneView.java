@@ -55,11 +55,7 @@ public class WebSearchPaneView extends VBox {
         StackPane helpButtonContainer = createHelpButtonContainer();
         HBox fetcherContainer = new HBox(createFetcherComboBox(), helpButtonContainer);
 
-        getChildren().addAll(
-                fetcherContainer,
-                createQueryField(),
-                createSearchButton()
-        );
+        getChildren().addAll(fetcherContainer, createQueryField(), createSearchButton());
         this.disableProperty().bind(searchDisabledProperty());
     }
 
@@ -75,16 +71,15 @@ public class WebSearchPaneView extends VBox {
     }
 
     private void addQueryValidationHints(TextField query) {
-        EasyBind.subscribe(viewModel.queryValidationStatus().validProperty(),
-                valid -> {
-                    if (!valid && viewModel.queryValidationStatus().getHighestMessage().isPresent()) {
-                        query.setTooltip(new Tooltip(viewModel.queryValidationStatus().getHighestMessage().get().getMessage()));
-                        query.pseudoClassStateChanged(QUERY_INVALID, true);
-                    } else {
-                        query.setTooltip(null);
-                        query.pseudoClassStateChanged(QUERY_INVALID, false);
-                    }
-                });
+        EasyBind.subscribe(viewModel.queryValidationStatus().validProperty(), valid -> {
+            if (!valid && viewModel.queryValidationStatus().getHighestMessage().isPresent()) {
+                query.setTooltip(new Tooltip(viewModel.queryValidationStatus().getHighestMessage().get().getMessage()));
+                query.pseudoClassStateChanged(QUERY_INVALID, true);
+            } else {
+                query.setTooltip(null);
+                query.pseudoClassStateChanged(QUERY_INVALID, false);
+            }
+        });
     }
 
     /**
@@ -93,9 +88,7 @@ public class WebSearchPaneView extends VBox {
      */
     private ComboBox<SearchBasedFetcher> createFetcherComboBox() {
         ComboBox<SearchBasedFetcher> fetchers = new ComboBox<>();
-        new ViewModelListCellFactory<SearchBasedFetcher>()
-                .withText(SearchBasedFetcher::getName)
-                .install(fetchers);
+        new ViewModelListCellFactory<SearchBasedFetcher>().withText(SearchBasedFetcher::getName).install(fetchers);
         fetchers.itemsProperty().bind(viewModel.fetchersProperty());
         fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
         fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
@@ -115,9 +108,7 @@ public class WebSearchPaneView extends VBox {
                 lastKey = ch;
                 lastKeyTime = currentTime;
 
-                var matching = fetchers.getItems().stream()
-                                       .filter(f -> f.getName().toLowerCase().startsWith(ch))
-                                       .toList();
+                var matching = fetchers.getItems().stream().filter(f -> f.getName().toLowerCase().startsWith(ch)).toList();
 
                 if (!matching.isEmpty()) {
                     fetchers.setValue(matching.get(cycleIndex % matching.size()));
@@ -175,9 +166,6 @@ public class WebSearchPaneView extends VBox {
      * Creates an observable boolean value that is true if no database is open.
      */
     private ObservableBooleanValue searchDisabledProperty() {
-        return Bindings.createBooleanBinding(
-                () -> stateManager.getOpenDatabases().isEmpty(),
-                stateManager.getOpenDatabases()
-        );
+        return Bindings.createBooleanBinding(() -> stateManager.getOpenDatabases().isEmpty(), stateManager.getOpenDatabases());
     }
 }

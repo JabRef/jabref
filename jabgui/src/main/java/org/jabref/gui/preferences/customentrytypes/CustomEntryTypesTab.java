@@ -58,15 +58,12 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @Inject private StateManager stateManager;
 
-
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     private CustomLocalDragboard localDragboard;
 
     public CustomEntryTypesTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        ViewLoader.view(this).root(this).load();
     }
 
     @Override
@@ -75,8 +72,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     }
 
     public void initialize() {
-        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                                           .orElse(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
+        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode).orElse(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
         BibEntryTypesManager entryTypesRepository = preferences.getCustomEntryTypesRepository();
 
         this.viewModel = new CustomEntryTypesTabViewModel(mode, entryTypesRepository, dialogService, preferences);
@@ -106,30 +102,26 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         entryTypeActionsColumn.setSortable(false);
         entryTypeActionsColumn.setReorderable(false);
         entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
-        new ValueTableCellFactory<EntryTypeViewModel, String>()
-                .withGraphic((type, _) -> {
-                    if (type instanceof CustomEntryTypeViewModel) {
-                        return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
-                    } else {
-                        return null;
-                    }
-                })
-                .withTooltip((type, name) -> {
-                    if (type instanceof CustomEntryTypeViewModel) {
-                        return Localization.lang("Remove entry type") + " " + name;
-                    } else {
-                        return null;
-                    }
-                })
-                .withOnMouseClickedEvent((type, _) -> {
-                    if (type instanceof CustomEntryTypeViewModel) {
-                        return _ -> viewModel.removeEntryType(entryTypesTable.getSelectionModel().getSelectedItem());
-                    } else {
-                        return _ -> {
-                        };
-                    }
-                })
-                .install(entryTypeActionsColumn);
+        new ValueTableCellFactory<EntryTypeViewModel, String>().withGraphic((type, _) -> {
+            if (type instanceof CustomEntryTypeViewModel) {
+                return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
+            } else {
+                return null;
+            }
+        }).withTooltip((type, name) -> {
+            if (type instanceof CustomEntryTypeViewModel) {
+                return Localization.lang("Remove entry type") + " " + name;
+            } else {
+                return null;
+            }
+        }).withOnMouseClickedEvent((type, _) -> {
+            if (type instanceof CustomEntryTypeViewModel) {
+                return _ -> viewModel.removeEntryType(entryTypesTable.getSelectionModel().getSelectedItem());
+            } else {
+                return _ -> {
+                };
+            }
+        }).install(entryTypeActionsColumn);
 
         viewModel.selectedEntryTypeProperty().bind(entryTypesTable.getSelectionModel().selectedItemProperty());
         viewModel.entryTypeToAddProperty().bindBidirectional(addNewEntryType.textProperty());
@@ -185,9 +177,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 return;
             }
 
-            ObservableList<Field> filteredItems = fullItemList.filtered(
-                    field -> field.getName().toLowerCase().startsWith(newText.toLowerCase())
-            );
+            ObservableList<Field> filteredItems = fullItemList.filtered(field -> field.getName().toLowerCase().startsWith(newText.toLowerCase()));
 
             addNewField.setItems(filteredItems);
             addNewField.hide(); // refresh dropdown
@@ -207,18 +197,9 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         fieldTypeActionColumn.setEditable(false);
         fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().displayNameProperty());
 
-        new ValueTableCellFactory<FieldViewModel, String>()
-                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
-                .withOnMouseClickedEvent(_ -> _ -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
-                .install(fieldTypeActionColumn);
+        new ValueTableCellFactory<FieldViewModel, String>().withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()).withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name)).withOnMouseClickedEvent(_ -> _ -> viewModel.removeField(fields.getSelectionModel().getSelectedItem())).install(fieldTypeActionColumn);
 
-        new ViewModelTableRowFactory<FieldViewModel>()
-                .setOnDragDetected(this::handleOnDragDetected)
-                .setOnDragDropped(this::handleOnDragDropped)
-                .setOnDragOver(this::handleOnDragOver)
-                .setOnDragExited(this::handleOnDragExited)
-                .install(fields);
+        new ViewModelTableRowFactory<FieldViewModel>().setOnDragDetected(this::handleOnDragDetected).setOnDragDropped(this::handleOnDragDropped).setOnDragOver(this::handleOnDragOver).setOnDragExited(this::handleOnDragExited).install(fields);
 
         addNewField.setItems(viewModel.fieldsForAdding());
         addNewField.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
@@ -238,16 +219,14 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         column.getStyleClass().add("rotated");
     }
 
-    private void handleOnDragOver(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent
-            event) {
+    private void handleOnDragOver(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.FIELD)) {
             event.acceptTransferModes(TransferMode.MOVE);
             ControlHelper.setDroppingPseudoClasses(row, event);
         }
     }
 
-    private void handleOnDragDetected(TableRow<FieldViewModel> row, FieldViewModel fieldViewModel, MouseEvent
-            event) {
+    private void handleOnDragDetected(TableRow<FieldViewModel> row, FieldViewModel fieldViewModel, MouseEvent event) {
         row.startFullDrag();
         FieldViewModel field = fields.getSelectionModel().getSelectedItem();
 
@@ -294,10 +273,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void resetEntryTypes() {
-        boolean reset = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Reset entry types and fields to defaults"),
-                Localization.lang("This will reset all entry types to their default values and remove all custom entry types"),
-                Localization.lang("Reset to default"));
+        boolean reset = dialogService.showConfirmationDialogAndWait(Localization.lang("Reset entry types and fields to defaults"), Localization.lang("This will reset all entry types to their default values and remove all custom entry types"), Localization.lang("Reset to default"));
         if (reset) {
             viewModel.resetAllCustomEntryTypes();
             fields.getSelectionModel().clearSelection();
