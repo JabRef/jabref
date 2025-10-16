@@ -5,7 +5,6 @@ import java.util.concurrent.Callable;
 import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.languageserver.LspLauncher;
 import org.jabref.logic.preferences.JabRefCliPreferences;
-import org.jabref.logic.remote.server.RemoteMessageHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
