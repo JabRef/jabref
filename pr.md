@@ -129,4 +129,13 @@ All tests pass successfully, providing confidence in the search history function
 - [x] New and existing unit tests pass locally
 - [x] Any dependent changes have been merged and published
 
+### Mandatory checks
+
+- [x] Code follows the project's style guidelines
+- [x] Self-review of the code has been performed
+- [x] Code has been commented, particularly in hard-to-understand areas
+- [x] Changes generate no new warnings
+- [x] New and existing unit tests pass locally
+- [x] Any dependent changes have been merged and published
+
 Fixes #12947
