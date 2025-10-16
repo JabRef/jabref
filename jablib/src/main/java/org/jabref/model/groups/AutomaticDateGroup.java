@@ -11,20 +11,39 @@ import org.jabref.model.entry.field.Field;
 public class AutomaticDateGroup extends AutomaticGroup{
 
     private final Field field;
+    private final DateGranularity granularity;
 
     public AutomaticDateGroup(String name, GroupHierarchyType context, Field field) {
         super(name, context);
 
         this.field = field;
+        granularity = DateGranularity.YEAR;
+    }
+    public AutomaticDateGroup(String name, GroupHierarchyType context, Field field, DateGranularity granularity) {
+        super(name, context);
+        this.field = field;
+        this.granularity = granularity;
     }
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
         var out = new LinkedHashSet<GroupTreeNode>();
-        DateGroup.extractYear(field, entry).ifPresent(y->{
-            String year = String.format("%04d", y);
-            DateGroup child = new DateGroup(year, GroupHierarchyType.INDEPENDENT, field, year);
-            out.add(new GroupTreeNode(child));
+
+        DateGroup.extractDate(field, entry).ifPresent(d -> {
+            switch (granularity) {
+                case YEAR -> {
+                    DateGroup.extractYear(field, entry).ifPresent(y -> {
+                        String key = String.format("%04d", y);
+                        out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
+                    });
+                }
+                case MONTH -> DateGroup.getDateKey(d, "YYYY-MM").ifPresent(key -> {
+                    out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
+                });
+                case FULL_DATE -> DateGroup.getDateKey(d, "YYYY-MM-DD").ifPresent(key -> {
+                    out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
+                });
+            }
         });
         return out;       
     }
@@ -49,7 +68,7 @@ public class AutomaticDateGroup extends AutomaticGroup{
             return false;
         }
         AutomaticDateGroup that = (AutomaticDateGroup) o;
-        return Objects.equals(field, that.field);
+        return Objects.equals(field, that.field) && granularity == that.granularity;
     }
 
     

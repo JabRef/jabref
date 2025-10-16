@@ -4,6 +4,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.*;
 import org.junit.jupiter.api.Test;
+import org.jabref.model.entry.Month;
 
 import java.util.List;
 
@@ -75,4 +76,83 @@ class AutomaticDateGroupTest {
         assertTrue(matches.contains(e2));
         assertFalse(matches.contains(e3));
     }
+
+
+
+    // MONTH granularity from DATE field (YYYY-MM-DD -> bucket "YYYY-MM")
+    @Test
+    void createsMonthBucketFromDateField() {
+        BibEntry e = new BibEntry().withField(StandardField.DATE, "2024-10-14");
+        AutomaticDateGroup byMonth = new AutomaticDateGroup("By Month", GroupHierarchyType.INCLUDING,
+                StandardField.DATE, DateGranularity.MONTH);
+
+        var children = byMonth.createSubgroups(e);
+        assertEquals(1, children.size());
+        GroupTreeNode node = children.iterator().next();
+        assertEquals("2024-10", node.getName());
+        assertTrue(node.getGroup().contains(e));
+    }
+
+    @Test
+    void mergesSameMonthAcrossEntries() {
+        BibEntry e1 = new BibEntry().withField(StandardField.DATE, "2024-10-14");
+        BibEntry e2 = new BibEntry().withField(StandardField.DATE, "2024-10");
+        BibEntry e3 = new BibEntry().withField(StandardField.DATE, "2024-11-01");
+
+        AutomaticDateGroup byMonth = new AutomaticDateGroup("By Month", GroupHierarchyType.INCLUDING,
+                StandardField.DATE, DateGranularity.MONTH);
+
+        var merged = byMonth.createSubgroups(FXCollections.observableArrayList(List.of(e1, e2, e3)));
+        assertEquals(2, merged.size()); // 2024-10 and 2024-11 present
+
+        // Find the 2024-10 bucket and assert matches
+        GroupTreeNode bucket = merged.stream()
+                                    .filter(n -> "2024-10".equals(n.getName()))
+                                    .findFirst()
+                                    .orElseThrow();
+        var matches = bucket.findMatches(List.of(e1, e2, e3));
+        assertEquals(2, matches.size());
+        assertTrue(matches.contains(e1));
+        assertTrue(matches.contains(e2));
+        assertFalse(matches.contains(e3));
+    }
+
+    // FULL_DATE granularity creates day bucket when full date is present
+    @Test
+    void createsFullDateBucketFromDateField() {
+        BibEntry e = new BibEntry().withField(StandardField.DATE, "2024-10-14");
+        AutomaticDateGroup byDay = new AutomaticDateGroup("By Day", GroupHierarchyType.INCLUDING,
+                StandardField.DATE, DateGranularity.FULL_DATE);
+
+        var children = byDay.createSubgroups(e);
+        assertEquals(1, children.size());
+        GroupTreeNode node = children.iterator().next();
+        assertEquals("2024-10-14", node.getName());
+        assertTrue(node.getGroup().contains(e));
+    }
+
+    // FULL_DATE bucket matches only exact date
+    @Test
+    void fullDateBucketMatchesOnlyExactDate() {
+        BibEntry e1 = new BibEntry().withField(StandardField.DATE, "2024-10-14");
+        BibEntry e2 = new BibEntry().withField(StandardField.DATE, "2024-10-03");
+        BibEntry e3 = new BibEntry().withField(StandardField.DATE, "2024-10-14");
+
+        AutomaticDateGroup byDay = new AutomaticDateGroup("By Day", GroupHierarchyType.INCLUDING,
+                StandardField.DATE, DateGranularity.FULL_DATE);
+
+        var nodes = byDay.createSubgroups(FXCollections.observableArrayList(List.of(e1, e2, e3)));
+        // after merge we should have a node "2024-10-14" and maybe one "2024-10-03"
+        GroupTreeNode bucket = nodes.stream()
+                                    .filter(n -> "2024-10-14".equals(n.getName()))
+                                    .findFirst()
+                                    .orElseThrow();
+
+        var matches = bucket.findMatches(List.of(e1, e2, e3));
+        assertEquals(2, matches.size()); // e1 and e3
+        assertTrue(matches.contains(e1));
+        assertTrue(matches.contains(e3));
+        assertFalse(matches.contains(e2));
+    }
+
 }
