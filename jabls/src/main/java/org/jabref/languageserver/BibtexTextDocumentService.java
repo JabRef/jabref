@@ -22,6 +22,9 @@ import org.eclipse.lsp4j.DocumentLink;
 import org.eclipse.lsp4j.DocumentLinkParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
+import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -41,7 +44,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
     private final Map<String, String> contentCache;
     private LanguageClient client;
 
-    public BibtexTextDocumentService(RemoteMessageHandler messageHandler, @NonNull LspClientHandler clientHandler, @NonNull LspDiagnosticHandler diagnosticHandler, @NonNull LspLinkHandler linkHandler) {
+    public BibtexTextDocumentService(@NonNull RemoteMessageHandler messageHandler, @NonNull LspClientHandler clientHandler, @NonNull LspDiagnosticHandler diagnosticHandler, @NonNull LspLinkHandler linkHandler) {
         this.clientHandler = clientHandler;
         this.diagnosticHandler = diagnosticHandler;
         this.linkHandler = linkHandler;
@@ -56,23 +59,28 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     @Override
     public void didOpen(DidOpenTextDocumentParams params) {
-        LOGGER.debug("didOpen {}", params.getTextDocument().getUri());
-        fileUriToLanguageId.putIfAbsent(params.getTextDocument().getUri(), params.getTextDocument().getLanguageId());
-        if ("bibtex".equals(params.getTextDocument().getLanguageId())) {
-            diagnosticHandler.computeAndPublishDiagnostics(client, params.getTextDocument().getUri(), params.getTextDocument().getText(), params.getTextDocument().getVersion());
+        TextDocumentItem textDocument = params.getTextDocument();
+        LOGGER.debug("didOpen {}", textDocument.getUri());
+        fileUriToLanguageId.putIfAbsent(textDocument.getUri(), textDocument.getLanguageId());
+
+        if ("bibtex".equals(textDocument.getLanguageId())) {
+            diagnosticHandler.computeAndPublishDiagnostics(client, textDocument.getUri(), textDocument.getText(), textDocument.getVersion());
         } else {
-            contentCache.put(params.getTextDocument().getUri(), params.getTextDocument().getText());
+            contentCache.put(textDocument.getUri(), textDocument.getText());
         }
     }
 
     @Override
     public void didChange(DidChangeTextDocumentParams params) {
-        LOGGER.debug("didChange {}", params.getTextDocument().getUri());
-        String languageId = fileUriToLanguageId.get(params.getTextDocument().getUri());
+        VersionedTextDocumentIdentifier textDocument = params.getTextDocument();
+        TextDocumentContentChangeEvent contentChange = params.getContentChanges().getFirst();
+        LOGGER.debug("didChange {}", textDocument.getUri());
+        String languageId = fileUriToLanguageId.get(textDocument.getUri());
+
         if ("bibtex".equalsIgnoreCase(languageId)) {
-            diagnosticHandler.computeAndPublishDiagnostics(client, params.getTextDocument().getUri(), params.getContentChanges().getFirst().getText(), params.getTextDocument().getVersion());
+            diagnosticHandler.computeAndPublishDiagnostics(client, textDocument.getUri(), contentChange.getText(), textDocument.getVersion());
         } else {
-            contentCache.put(params.getTextDocument().getUri(), params.getContentChanges().getFirst().getText());
+            contentCache.put(textDocument.getUri(), contentChange.getText());
         }
     }
 
