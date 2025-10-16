@@ -27,9 +27,9 @@ public class DateGroup extends AbstractGroup {
     static Optional<Date> extractDate(Field field, BibEntry entry) {
         boolean isCore =
                 (field == StandardField.DATE)
-             || (field == StandardField.YEAR)
-             || (field == StandardField.MONTH)
-             || (field == StandardField.DAY);
+                        || (field == StandardField.YEAR)
+                        || (field == StandardField.MONTH)
+                        || (field == StandardField.DAY);
 
         if (isCore) {
             // use alias resolution so DATE <-> YEAR/MONTH/DAY works either way
@@ -53,7 +53,8 @@ public class DateGroup extends AbstractGroup {
         int numOfdashes = (int) dateKeyFormat.chars().filter(ch -> ch == '-').count();
         Optional<Integer> y = d.getYear();
         return switch (numOfdashes) {
-            case 0 -> y.map(val -> "%04d".formatted(val)); // "YYYY"
+            case 0 ->
+                    y.map(val -> "%04d".formatted(val)); // "YYYY"
             case 1 -> { // "YYYY-MM"
                 if (d.getYear().isPresent() && d.getMonth().isPresent()) {
                     String out = "%04d-%02d".formatted(d.getYear().get(), d.getMonth().get().getNumber());
@@ -73,7 +74,8 @@ public class DateGroup extends AbstractGroup {
                     yield Optional.empty();
                 }
             }
-            default -> Optional.empty();
+            default ->
+                    Optional.empty();
         };
     }
 

@@ -37,15 +37,17 @@ public class AutomaticDateGroup extends AutomaticGroup {
                         out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
                     });
                 }
-                case MONTH -> DateGroup.getDateKey(d, "YYYY-MM").ifPresent(key -> {
-                    out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
-                });
-                case FULL_DATE -> DateGroup.getDateKey(d, "YYYY-MM-DD").ifPresent(key -> {
-                    out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
-                });
+                case MONTH ->
+                        DateGroup.getDateKey(d, "YYYY-MM").ifPresent(key -> {
+                            out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
+                        });
+                case FULL_DATE ->
+                        DateGroup.getDateKey(d, "YYYY-MM-DD").ifPresent(key -> {
+                            out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
+                        });
             }
         });
-        return out;       
+        return out;
     }
 
     @Override

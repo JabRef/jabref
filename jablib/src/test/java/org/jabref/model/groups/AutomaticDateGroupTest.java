@@ -106,9 +106,9 @@ class AutomaticDateGroupTest {
 
         // Find the 2024-10 bucket and assert matches
         GroupTreeNode bucket = merged.stream()
-                                    .filter(n -> "2024-10".equals(n.getName()))
-                                    .findFirst()
-                                    .orElseThrow();
+                                     .filter(n -> "2024-10".equals(n.getName()))
+                                     .findFirst()
+                                     .orElseThrow();
         var matches = bucket.findMatches(List.of(e1, e2, e3));
         assertEquals(2, matches.size());
         assertTrue(matches.contains(e1));
