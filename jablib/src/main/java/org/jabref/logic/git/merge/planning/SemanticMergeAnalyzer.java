@@ -1,4 +1,4 @@
-package org.jabref.logic.git.merge;
+package org.jabref.logic.git.merge.planning;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
-import org.jabref.logic.git.merge.util.AutoPlan;
-import org.jabref.logic.git.merge.util.ConflictRules;
-import org.jabref.logic.git.merge.util.EntryTriples;
+import org.jabref.logic.git.merge.planning.util.AutoPlan;
+import org.jabref.logic.git.merge.planning.util.ConflictRules;
+import org.jabref.logic.git.merge.planning.util.EntryTriples;
 import org.jabref.logic.git.model.MergeAnalysis;
 import org.jabref.logic.git.model.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;

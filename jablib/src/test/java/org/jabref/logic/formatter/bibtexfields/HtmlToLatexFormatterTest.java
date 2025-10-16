@@ -2,6 +2,8 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,56 +19,37 @@ class HtmlToLatexFormatterTest {
         formatter = new HtmlToLatexFormatter();
     }
 
-    @Test
-    void formatWithoutHtmlCharactersReturnsSameString() {
-        assertEquals("abc", formatter.format("abc"));
-    }
+    @ParameterizedTest
+    @CsvSource({
+            // Return the same string
+            "abc, abc",
+            "aaa, aaa",
+            "(p < 0.01), (p < 0.01)",
 
-    @Test
-    void formatIeeeHtml() {
-        assertEquals("Towards situation-aware adaptive workflows: SitOPT --- A general purpose situation-aware workflow management system", formatter.format("Towards situation-aware adaptive workflows: SitOPT &amp;#x2014; A general purpose situation-aware workflow management system"));
-    }
+            // IEEE-style HTML entity for em dash
+            "Towards situation-aware adaptive workflows: SitOPT --- A general purpose situation-aware workflow management system, Towards situation-aware adaptive workflows: SitOPT &amp;#x2014; A general purpose situation-aware workflow management system",
 
-    @Test
-    void formatMultipleHtmlCharacters() {
-        assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", formatter.format("&aring;&auml;&ouml;"));
-    }
+            // Format multiple HTML characters
+            "{{\\aa}}{\\\"{a}}{\\\"{o}}, &aring;&auml;&ouml;",
 
-    @Test
-    void formatCombinedAccent() {
-        assertEquals("{\\'{\\i}}", formatter.format("i&#x301;"));
-    }
+            // Format combined accents
+            "{\\'{\\i}}, i&#x301;",
+            "{\\\"{a}}, a&#776;",
+            "{\\\"{a}}, a&#x308;",
+            "{\\\"{a}}b, a&#776;b",
+            "{\\\"{a}}b, a&#x308;b",
 
-    @Test
-    void basic() {
-        assertEquals("aaa", formatter.format("aaa"));
-    }
+            // Format HTML entities
+            "{\\\"{a}}, &auml;",
+            "{\\\"{a}}, &#228;",
+            "{\\\"{a}}, &#xe4;",
+            "{{$\\Epsilon$}}, &Epsilon;",
 
-    @Test
-    void html() {
-        assertEquals("{\\\"{a}}", formatter.format("&auml;"));
-        assertEquals("{\\\"{a}}", formatter.format("&#228;"));
-        assertEquals("{\\\"{a}}", formatter.format("&#xe4;"));
-        assertEquals("{{$\\Epsilon$}}", formatter.format("&Epsilon;"));
-    }
-
-    @Test
-    void htmlRemoveTags() {
-        assertEquals("aaa", formatter.format("<b>aaa</b>"));
-    }
-
-    @Test
-    void htmlCombiningAccents() {
-        assertEquals("{\\\"{a}}", formatter.format("a&#776;"));
-        assertEquals("{\\\"{a}}", formatter.format("a&#x308;"));
-        assertEquals("{\\\"{a}}b", formatter.format("a&#776;b"));
-        assertEquals("{\\\"{a}}b", formatter.format("a&#x308;b"));
-    }
-
-    @Test
-    void keepsSingleLessThan() {
-        String text = "(p < 0.01)";
-        assertEquals(text, formatter.format(text));
+            // Strip tags
+            "aaa, <b>aaa</b>"
+    })
+    void html(String expected, String text) {
+        assertEquals(expected, formatter.format(text));
     }
 
     @Test
