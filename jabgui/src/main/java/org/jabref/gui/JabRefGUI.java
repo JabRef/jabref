@@ -292,7 +292,7 @@ public class JabRefGUI extends Application {
         Scene scene = new Scene(JabRefGUI.mainFrame);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCss(scene);
+        themeManager.installCssImmediately(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {

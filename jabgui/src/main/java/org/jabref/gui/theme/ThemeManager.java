@@ -105,19 +105,29 @@ public class ThemeManager {
         }
     }
 
-    /// Installs the base and additional css files as stylesheets in the given scene.
+    /// Installs the base and additional CSS files as stylesheets in the given scene.
+    ///
+    /// This method is primarily intended to be called by `JabRefGUI` during startup.
+    /// Using `installCss` directly would cause a delay in theme application, resulting
+    /// in a brief flash of the default JavaFX theme (Modena CSS) before the intended theme appears.
+    public void installCssImmediately(Scene scene) {
+        List<String> stylesheets = scene.getStylesheets();
+        scene.getStylesheets().clear();
+        List<String> baseOrThemeStylesheet = Stream
+                .of(baseStyleSheet.getSceneStylesheet(),
+                        theme.getAdditionalStylesheet().map(StyleSheet::getSceneStylesheet).orElse(null)
+                ).filter(Objects::nonNull)
+                .map(URL::toExternalForm)
+                .toList();
+
+        stylesheets.addAll(baseOrThemeStylesheet);
+    }
+
+    /// Registers a runnable on JavaFX thread to install the base and additional css files as stylesheets in the given scene.
     public void installCss(@NonNull Scene scene) {
         // Because of race condition in JavaFX, IndexOutOfBounds will be thrown, despite
         // all the invocation to this method come directly from the UI thread
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            List<String> stylesheets = Stream
-                    .of(baseStyleSheet.getSceneStylesheet(),
-                            theme.getAdditionalStylesheet().map(StyleSheet::getSceneStylesheet).orElse(null)
-                    ).filter(Objects::nonNull)
-                    .map(URL::toExternalForm)
-                    .toList();
-            scene.getStylesheets().setAll(stylesheets);
-        });
+        UiTaskExecutor.runInJavaFXThread(() -> installCssImmediately(scene));
     }
 
     /// Installs the css file as a stylesheet in the given web engine. Changes in the

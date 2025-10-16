@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,6 +40,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.ListUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.google.common.annotations.VisibleForTesting;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
@@ -73,6 +76,8 @@ public class AiChatComponent extends VBox {
     @FXML private Hyperlink exQuestion2;
     @FXML private Hyperlink exQuestion3;
     @FXML private HBox exQuestionBox;
+
+    private String noticeTemplate;
 
     public AiChatComponent(AiService aiService,
                            StringProperty name,
@@ -117,11 +122,27 @@ public class AiChatComponent extends VBox {
     }
 
     private void initializeNotice() {
-        String newNotice = noticeText
-                .getText()
-                .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
+        this.noticeTemplate = noticeText.getText();
 
-        noticeText.setText(newNotice);
+        noticeText.textProperty().bind(Bindings.createStringBinding(this::computeNoticeText, noticeDependencies()));
+    }
+
+    @VisibleForTesting
+    String computeNoticeText() {
+        String provider = aiPreferences.getAiProvider().getLabel();
+        String model = aiPreferences.getSelectedChatModel();
+        return noticeTemplate.replace("%0", provider + " " + model);
+    }
+
+    private Observable[] noticeDependencies() {
+        return new Observable[] {
+                aiPreferences.aiProviderProperty(),
+                aiPreferences.openAiChatModelProperty(),
+                aiPreferences.mistralAiChatModelProperty(),
+                aiPreferences.geminiChatModelProperty(),
+                aiPreferences.huggingFaceChatModelProperty(),
+                aiPreferences.gpt4AllChatModelProperty()
+        };
     }
 
     private void initializeExampleQuestions() {
