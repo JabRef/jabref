@@ -1,6 +1,5 @@
 package org.jabref.languageserver;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.jabref.languageserver.util.LspDiagnosticHandler;
@@ -11,11 +10,6 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
 
 import org.eclipse.lsp4j.DocumentLinkOptions;
-import org.eclipse.lsp4j.FileOperationFilter;
-import org.eclipse.lsp4j.FileOperationOptions;
-import org.eclipse.lsp4j.FileOperationPattern;
-import org.eclipse.lsp4j.FileOperationPatternKind;
-import org.eclipse.lsp4j.FileOperationsServerCapabilities;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.MessageParams;
@@ -29,7 +23,6 @@ import org.eclipse.lsp4j.services.LanguageClientAware;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,30 +68,7 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
         linkOptions.setResolveProvider(true);
         capabilities.setDocumentLinkProvider(linkOptions);
 
-        WorkspaceServerCapabilities workspaceCapabilities = getWorkspaceServerCapabilities();
-        capabilities.setWorkspace(workspaceCapabilities);
-
         return CompletableFuture.completedFuture(new InitializeResult(capabilities));
-    }
-
-    private static @NonNull WorkspaceServerCapabilities getWorkspaceServerCapabilities() {
-        WorkspaceServerCapabilities workspaceCapabilities = new WorkspaceServerCapabilities();
-        FileOperationPattern bibFilePattern = new FileOperationPattern("**/*.{bib,bibtex}");
-        bibFilePattern.setMatches(FileOperationPatternKind.File);
-
-        FileOperationFilter bibFilter = new FileOperationFilter();
-        bibFilter.setScheme("file");
-        bibFilter.setPattern(bibFilePattern);
-
-        FileOperationOptions fileOperationOptions = new FileOperationOptions(List.of(bibFilter));
-
-        FileOperationsServerCapabilities fileOperationsServerCapabilities = new FileOperationsServerCapabilities();
-        fileOperationsServerCapabilities.setDidCreate(fileOperationOptions);
-        fileOperationsServerCapabilities.setDidRename(fileOperationOptions);
-        fileOperationsServerCapabilities.setDidDelete(fileOperationOptions);
-
-        workspaceCapabilities.setFileOperations(fileOperationsServerCapabilities);
-        return workspaceCapabilities;
     }
 
     @Override
