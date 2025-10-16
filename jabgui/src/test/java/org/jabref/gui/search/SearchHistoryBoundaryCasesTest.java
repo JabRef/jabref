@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Comprehensive boundary case tests for search history retrieval functionality.
- * This addresses Issue #13116 by testing edge cases and boundary conditions.
+ * This addresses Issue #12947 by testing edge cases and boundary conditions.
  */
 @ExtendWith(ApplicationExtension.class)
 class SearchHistoryBoundaryCasesTest {
