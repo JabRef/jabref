@@ -15,7 +15,7 @@ This PR addresses Issue #12947 by adding comprehensive boundary case tests for s
 
 ## Test Coverage Details
 
-### getLastSearchHistory(int size) Boundary Cases:
+### getLastSearchHistory(int size) Boundary Cases
 
 - Zero size requests
 - Negative size requests (proper exception handling)
@@ -25,7 +25,7 @@ This PR addresses Issue #12947 by adding comprehensive boundary case tests for s
 - Single item scenarios
 - Very large size requests (Integer.MAX_VALUE)
 
-### addSearchHistory(String search) Boundary Cases:
+### addSearchHistory(String search) Boundary Cases
 
 - Null string handling
 - Empty string handling
@@ -36,19 +36,19 @@ This PR addresses Issue #12947 by adding comprehensive boundary case tests for s
 - Duplicate entry handling and deduplication
 - Multiple consecutive duplicates
 
-### clearSearchHistory() Boundary Cases:
+### clearSearchHistory() Boundary Cases
 
 - Clearing already empty history
 - Clearing large history (1,000+ items)
 - Multiple consecutive clear operations
 
-### Cross-Database Behavior:
+### Cross-Database Behavior
 
 - Search history sharing across multiple databases
 - Rapid database switching scenarios
 - Order preservation during database changes
 
-### Edge Cases:
+### Edge Cases
 
 - Consecutive identical entries
 - Case-sensitive duplicate handling

@@ -52,7 +52,7 @@ class SearchHistoryBoundaryCasesTest {
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
         stateManager.addSearchHistory("test3");
-        
+
         List<String> result = stateManager.getLastSearchHistory(0);
         assertTrue(result.isEmpty(), "Requesting 0 items should return empty list");
     }
@@ -61,7 +61,7 @@ class SearchHistoryBoundaryCasesTest {
     void getLastSearchHistoryWithNegativeSize() {
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
-        
+
         // The actual implementation throws IllegalArgumentException for negative sizes
         assertThrows(IllegalArgumentException.class, () -> stateManager.getLastSearchHistory(-1),
                 "Negative size should throw IllegalArgumentException");
@@ -71,7 +71,7 @@ class SearchHistoryBoundaryCasesTest {
     void getLastSearchHistoryWithSizeLargerThanHistory() {
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
-        
+
         List<String> result = stateManager.getLastSearchHistory(10);
         List<String> expected = List.of("test1", "test2");
         assertEquals(expected, result, "Requesting more items than available should return all items");
@@ -82,7 +82,7 @@ class SearchHistoryBoundaryCasesTest {
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
         stateManager.addSearchHistory("test3");
-        
+
         List<String> result = stateManager.getLastSearchHistory(3);
         List<String> expected = List.of("test1", "test2", "test3");
         assertEquals(expected, result, "Requesting exact number of items should return all items");
@@ -97,10 +97,10 @@ class SearchHistoryBoundaryCasesTest {
     @Test
     void getLastSearchHistoryWithSingleItem() {
         stateManager.addSearchHistory("single");
-        
+
         List<String> result = stateManager.getLastSearchHistory(1);
         assertEquals(List.of("single"), result, "Single item should be returned correctly");
-        
+
         List<String> resultMultiple = stateManager.getLastSearchHistory(3);
         assertEquals(List.of("single"), resultMultiple, "Requesting more than available should return all items");
     }
@@ -109,7 +109,7 @@ class SearchHistoryBoundaryCasesTest {
     void getLastSearchHistoryWithVeryLargeSize() {
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
-        
+
         List<String> result = stateManager.getLastSearchHistory(Integer.MAX_VALUE);
         List<String> expected = List.of("test1", "test2");
         assertEquals(expected, result, "Very large size should return all available items");
@@ -138,7 +138,7 @@ class SearchHistoryBoundaryCasesTest {
         stateManager.addSearchHistory("   ");
         stateManager.addSearchHistory("\t");
         stateManager.addSearchHistory("\n");
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of("   ", "\t", "\n"), result, "Whitespace-only strings should be preserved");
     }
@@ -147,7 +147,7 @@ class SearchHistoryBoundaryCasesTest {
     void addSearchHistoryWithVeryLongString() {
         String longString = "a".repeat(10000);
         stateManager.addSearchHistory(longString);
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of(longString), result, "Very long strings should be handled correctly");
     }
@@ -156,7 +156,7 @@ class SearchHistoryBoundaryCasesTest {
     void addSearchHistoryWithSpecialCharacters() {
         String specialChars = "!@#$%^&*()_+-=[]{}|;':\",./<>?`~";
         stateManager.addSearchHistory(specialChars);
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of(specialChars), result, "Special characters should be preserved");
     }
@@ -165,7 +165,7 @@ class SearchHistoryBoundaryCasesTest {
     void addSearchHistoryWithUnicodeCharacters() {
         String unicode = "测试🔍αβγδε";
         stateManager.addSearchHistory(unicode);
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of(unicode), result, "Unicode characters should be preserved");
     }
@@ -175,7 +175,7 @@ class SearchHistoryBoundaryCasesTest {
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
         stateManager.addSearchHistory("test1"); // Duplicate
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of("test2", "test1"), result, "Duplicates should be moved to end");
     }
@@ -187,7 +187,7 @@ class SearchHistoryBoundaryCasesTest {
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test3");
         stateManager.addSearchHistory("test1"); // Multiple duplicates
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of("test2", "test3", "test1"), result, "Multiple duplicates should be handled correctly");
     }
@@ -208,7 +208,7 @@ class SearchHistoryBoundaryCasesTest {
         for (int i = 0; i < 1000; i++) {
             stateManager.addSearchHistory("test" + i);
         }
-        
+
         assertFalse(stateManager.getWholeSearchHistory().isEmpty(), "History should not be empty before clearing");
         stateManager.clearSearchHistory();
         assertTrue(stateManager.getWholeSearchHistory().isEmpty(), "History should be empty after clearing");
@@ -218,10 +218,10 @@ class SearchHistoryBoundaryCasesTest {
     void clearSearchHistoryMultipleTimes() {
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
-        
+
         stateManager.clearSearchHistory();
         assertTrue(stateManager.getWholeSearchHistory().isEmpty(), "First clear should work");
-        
+
         stateManager.clearSearchHistory();
         assertTrue(stateManager.getWholeSearchHistory().isEmpty(), "Second clear should also work");
     }
@@ -232,7 +232,7 @@ class SearchHistoryBoundaryCasesTest {
     void getWholeSearchHistoryReturnsImmutableView() {
         stateManager.addSearchHistory("test1");
         List<String> history = stateManager.getWholeSearchHistory();
-        
+
         // The returned list should be observable but modifications should be controlled
         assertNotNull(history, "getWholeSearchHistory should never return null");
         assertEquals(1, history.size(), "History should contain added item");
@@ -244,10 +244,10 @@ class SearchHistoryBoundaryCasesTest {
         for (int i = 0; i < 10000; i++) {
             stateManager.addSearchHistory("item" + i);
         }
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(10000, result.size(), "Large history should be handled correctly");
-        
+
         // Verify last item is correct
         assertEquals("item9999", result.getLast(), "Last item should be correct");
     }
@@ -258,7 +258,7 @@ class SearchHistoryBoundaryCasesTest {
     void searchHistorySharedAcrossDatabasesWithEmptyHistory() {
         stateManager.setActiveDatabase(dbContext1);
         stateManager.setActiveDatabase(dbContext2);
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertTrue(result.isEmpty(), "Empty history should be shared across databases");
     }
@@ -267,10 +267,10 @@ class SearchHistoryBoundaryCasesTest {
     void searchHistorySharedAcrossDatabasesWithBoundarySizes() {
         stateManager.setActiveDatabase(dbContext1);
         stateManager.addSearchHistory("db1_query");
-        
+
         stateManager.setActiveDatabase(dbContext2);
         stateManager.addSearchHistory("db2_query");
-        
+
         // Test boundary case: request more items than available
         List<String> result = stateManager.getLastSearchHistory(5);
         assertEquals(List.of("db1_query", "db2_query"), result, "Cross-database history should work with boundary sizes");
@@ -283,10 +283,10 @@ class SearchHistoryBoundaryCasesTest {
             stateManager.setActiveDatabase(i % 2 == 0 ? dbContext1 : dbContext2);
             stateManager.addSearchHistory("query" + i);
         }
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(10, result.size(), "All queries should be preserved regardless of database switching");
-        
+
         // Verify order is maintained
         for (int i = 0; i < 10; i++) {
             assertEquals("query" + i, result.get(i), "Order should be maintained");
@@ -300,7 +300,7 @@ class SearchHistoryBoundaryCasesTest {
         stateManager.addSearchHistory("same");
         stateManager.addSearchHistory("same");
         stateManager.addSearchHistory("same");
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of("same"), result, "Consecutive identical entries should be deduplicated");
     }
@@ -310,7 +310,7 @@ class SearchHistoryBoundaryCasesTest {
         stateManager.addSearchHistory("Test");
         stateManager.addSearchHistory("test");
         stateManager.addSearchHistory("TEST");
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of("Test", "test", "TEST"), result, "Case-sensitive duplicates should be preserved");
     }
@@ -321,7 +321,7 @@ class SearchHistoryBoundaryCasesTest {
         stateManager.addSearchHistory("");
         stateManager.addSearchHistory("   ");
         stateManager.addSearchHistory("another");
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of("valid", "", "   ", "another"), result, "Mixed empty and non-empty entries should be preserved");
     }
@@ -331,10 +331,10 @@ class SearchHistoryBoundaryCasesTest {
         stateManager.addSearchHistory("original");
         stateManager.clearSearchHistory();
         stateManager.addSearchHistory("new");
-        
+
         List<String> result = stateManager.getWholeSearchHistory();
         assertEquals(List.of("new"), result, "History should work correctly after clear and re-add");
-        
+
         List<String> lastResult = stateManager.getLastSearchHistory(1);
         assertEquals(List.of("new"), lastResult, "getLastSearchHistory should work after clear and re-add");
     }
