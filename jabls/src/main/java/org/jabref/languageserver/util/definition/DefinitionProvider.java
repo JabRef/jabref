@@ -19,7 +19,9 @@ import org.eclipse.lsp4j.Range;
 
 public abstract class DefinitionProvider {
 
-    private static final Pattern CITATION_KEY_PATTERN = Pattern.compile("@[a-z0-9_\\-.+:]+", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CITATION_KEY_PATTERN = Pattern.compile("@(?<citationkey>[a-z0-9_.+:-]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern VALID_BEFORE_AT = Pattern.compile("[\\s\\[({;,:\\-—–«“\"'’]?");
+    private static final Pattern CITATION_KEY_CHAR_PATTERN = Pattern.compile("[a-z0-9_\\-:.+]", Pattern.CASE_INSENSITIVE);
 
     protected final LspParserHandler parserHandler;
 
@@ -44,7 +46,7 @@ public abstract class DefinitionProvider {
         Matcher matcher = CITATION_KEY_PATTERN.matcher(content);
         return matcher.results()
                       .map(matchResult -> {
-                          String citationKey = matchResult.group().substring(1); // remove leading '@'
+                          String citationKey = matchResult.group("citationkey");
                           Range range = LspRangeUtil.convertToLspRange(content, matchResult.start(), matchResult.end());
                           DocumentLink documentLink = new DocumentLink();
                           documentLink.setRange(range);
@@ -117,26 +119,14 @@ public abstract class DefinitionProvider {
     }
 
     private boolean isCitationKeyCharacter(char c) {
-        return (c >= 'A' && c <= 'Z')
-                || (c >= 'a' && c <= 'z')
-                || (c >= '0' && c <= '9')
-                || c == '_' || c == '-' || c == ':' || c == '.' || c == '+';
+        return CITATION_KEY_CHAR_PATTERN.matcher(String.valueOf(c)).matches();
     }
 
     private boolean isValidCitationKeyCharBefore(String content, int idBeforeAt) {
         if (idBeforeAt < 0) {
             return true;
         }
-        char p = content.charAt(idBeforeAt);
-
-        if (Character.isLetterOrDigit(p) || p == '_' || p == '.') {
-            return false;
-        }
-
-        return Character.isWhitespace(p)
-                || p == '[' || p == '(' || p == '{'
-                || p == ';' || p == ',' || p == ':'
-                || p == '-' || p == '—' || p == '–' || p == '«' || p == '“' || p == '"'
-                || p == '\'';
+        String before = content.substring(idBeforeAt, idBeforeAt + 1);
+        return VALID_BEFORE_AT.matcher(before).matches();
     }
 }
