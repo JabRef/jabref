@@ -5,6 +5,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+/// Because only postions are supported by the lsp https://github.com/microsoft/language-server-protocol/issues/96 we need to convert back and forth
 public class LspRangeUtil {
 
     public static int toOffset(String content, Position pos) {
