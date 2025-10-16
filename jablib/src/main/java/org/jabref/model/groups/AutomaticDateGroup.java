@@ -3,15 +3,14 @@ package org.jabref.model.groups;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-public class AutomaticDateGroup extends AutomaticGroup{
+public class AutomaticDateGroup extends AutomaticGroup {
 
-    private final Field field;
     private final DateGranularity granularity;
+    private final Field field;
 
     public AutomaticDateGroup(String name, GroupHierarchyType context, Field field) {
         super(name, context);
@@ -19,6 +18,7 @@ public class AutomaticDateGroup extends AutomaticGroup{
         this.field = field;
         granularity = DateGranularity.YEAR;
     }
+
     public AutomaticDateGroup(String name, GroupHierarchyType context, Field field, DateGranularity granularity) {
         super(name, context);
         this.field = field;
@@ -33,7 +33,7 @@ public class AutomaticDateGroup extends AutomaticGroup{
             switch (granularity) {
                 case YEAR -> {
                     DateGroup.extractYear(field, entry).ifPresent(y -> {
-                        String key = String.format("%04d", y);
+                        String key = "%04d".formatted(y);
                         out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
                     });
                 }
@@ -51,7 +51,6 @@ public class AutomaticDateGroup extends AutomaticGroup{
     @Override
     public AbstractGroup deepCopy() {
         return new AutomaticDateGroup(this.name.getValue(), this.context, this.field);
-
     }
 
     @Override
@@ -70,6 +69,4 @@ public class AutomaticDateGroup extends AutomaticGroup{
         AutomaticDateGroup that = (AutomaticDateGroup) o;
         return Objects.equals(field, that.field) && granularity == that.granularity;
     }
-
-    
 }

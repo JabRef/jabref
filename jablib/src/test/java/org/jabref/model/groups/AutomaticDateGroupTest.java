@@ -1,14 +1,17 @@
 package org.jabref.model.groups;
-import javafx.collections.FXCollections;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.groups.*;
-import org.junit.jupiter.api.Test;
-import org.jabref.model.entry.Month;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import javafx.collections.FXCollections;
+
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutomaticDateGroupTest {
 
@@ -47,8 +50,6 @@ class AutomaticDateGroupTest {
         assertEquals("2023", merged.getFirst().getName());
     }
 
-
-
     @Test
     void automaticDateGroupBuildsBucketAndFindsMatches() {
         // Parent automatic group using DATE field
@@ -76,8 +77,6 @@ class AutomaticDateGroupTest {
         assertTrue(matches.contains(e2));
         assertFalse(matches.contains(e3));
     }
-
-
 
     // MONTH granularity from DATE field (YYYY-MM-DD -> bucket "YYYY-MM")
     @Test
@@ -154,5 +153,4 @@ class AutomaticDateGroupTest {
         assertTrue(matches.contains(e3));
         assertFalse(matches.contains(e2));
     }
-
 }
