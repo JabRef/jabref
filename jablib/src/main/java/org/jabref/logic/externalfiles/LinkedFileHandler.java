@@ -242,33 +242,17 @@ public class LinkedFileHandler {
     }
 
     /**
-     * Determines the file name based on the pattern specified in the preferences and valid for the file system.
+     * Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
      *
      * @param extension The extension of the file. If empty, no extension is added.
-     * @return A filename based on the pattern specified in the preferences and valid for the file system.
+     * @return The suggested filename, including extension.
      */
     public String getSuggestedFileName(@NonNull String extension) {
         Optional<String> targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern());
         if (targetFileName.isEmpty() && linkedFile.isOnlineLink()) {
-            String oldFileName = linkedFile.getLink();
-            int lastSlashIndex = oldFileName.lastIndexOf('/');
-            if (lastSlashIndex >= 0 && lastSlashIndex < oldFileName.length() - 1) {
-                String fileNameFromUrl = oldFileName.substring(lastSlashIndex + 1);
-                int queryIndex = fileNameFromUrl.indexOf('?');
-                if (queryIndex > 0) {
-                    fileNameFromUrl = fileNameFromUrl.substring(0, queryIndex);
-                }
-                if (!fileNameFromUrl.isEmpty()) {
-                    if (!extension.isEmpty()) {
-                        Optional<String> existingExtension = FileUtil.getFileExtension(fileNameFromUrl);
-                        if (existingExtension.isEmpty() || !existingExtension.get().equalsIgnoreCase(extension)) {
-                            String baseName = FileUtil.getBaseName(fileNameFromUrl);
-                            fileNameFromUrl = baseName + "." + extension;
-                        }
-                    }
-                    return FileUtil.getValidFileName(fileNameFromUrl);
-                }
-            }
+            String fullLinkedFileName = linkedFile.getFileName();
+            extension = FileUtil.getFileExtension(fullLinkedFileName).orElse("");
+            targetFileName = Optional.of(FileUtil.getBaseName(fullLinkedFileName));
         }
 
         String baseName = targetFileName.orElse("file");

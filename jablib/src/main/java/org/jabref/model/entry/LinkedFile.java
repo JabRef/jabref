@@ -142,6 +142,22 @@ public class LinkedFile implements Serializable {
         }
     }
 
+    public String getFileName() {
+    	String linkName = getLink();
+    	assert linkName != null;
+        int lastSlashIndex = linkName.lastIndexOf('/');
+        if (lastSlashIndex >= 0 && lastSlashIndex < linkName.length() - 1) {
+            linkName = linkName.substring(lastSlashIndex + 1);
+        }
+        if (isOnlineLink() && !linkName.isEmpty()) {
+            int queryIndex = linkName.indexOf('?');
+            if (queryIndex > 0) {
+                linkName = linkName.substring(0, queryIndex);
+            }
+        }
+        return linkName;
+    }
+
     public String getSourceUrl() {
         return sourceURL.get();
     }

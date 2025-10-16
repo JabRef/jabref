@@ -89,21 +89,21 @@ public class FileUtil {
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
-     * @return the extension (without leading dot), trimmed and in lowercase.
+     * @return the extension (without leading dot), trimmed and in lowercase
      */
     public static Optional<String> getFileExtension(Path file) {
         return getFileExtension(file.getFileName().toString());
     }
 
     /**
-     * Returns the name part of a file name (i.e., everything in front of last ".").
+     * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(String fileNameWithExtension) {
         return com.google.common.io.Files.getNameWithoutExtension(fileNameWithExtension);
     }
 
     /**
-     * Returns the name part of a file name (i.e., everything in front of last ".").
+     * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(Path fileNameWithExtension) {
         return getBaseName(fileNameWithExtension.getFileName().toString());

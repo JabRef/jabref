@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -27,13 +29,18 @@ import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 
@@ -220,13 +227,25 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        layoutText = """
-                <html>
-                    <body id="previewBody">
-                        <div id="content"> %s </div>
-                    </body>
-                </html>
-                """.formatted(text);
+        Optional<String> image = getCoverImageURI();
+        if (image.isPresent()) {
+            layoutText = """
+                    <html>
+                        <body id="previewBody">
+                            <div id="content"> %s </div>
+                            <img src="%s">
+                        </body>
+                    </html>
+                    """.formatted(text, image.get());
+        } else {
+            layoutText = """
+                    <html>
+                        <body id="previewBody">
+                            <div id="content"> %s </div>
+                        </body>
+                    </html>
+                    """.formatted(text);
+        }
         highlightLayoutText();
         setHvalue(0);
     }
@@ -244,6 +263,51 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         } else {
             UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(layoutText));
         }
+    }
+
+    private Optional<String> getCoverImageURI() {
+        if (shouldShowCoverImage()) {
+            String nameFromFormat = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileNamePattern()).orElse("cover");
+            List<LinkedFile> linkedFiles = entry.getFiles();
+            for (LinkedFile file : linkedFiles) {
+                String fileName = FileUtil.getBaseName(file.getFileName());
+
+                // matches images that are either named according to the preferred file name format
+                // or images with "COVER" in their description, to allow setting the cover to any image regardless of name.
+                if (isFileTypeAValidCoverImage(file.getFileType()) && (fileName.equals(nameFromFormat) || file.getDescription().contains("COVER"))) {
+                    if (file.isOnlineLink()) {
+                        return Optional.of(file.getLink());
+                    } else {
+                    	Optional<Path> fileLocation = file.findIn(databaseContext, preferences.getFilePreferences());
+                    	if (fileLocation.isPresent()) {
+                            return Optional.of(fileLocation.get().toUri().toString());
+                        }
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+    
+    private boolean shouldShowCoverImage() {
+        if (entry == null) return false;
+
+        return switch (entry.getType()) {
+            case StandardEntryType.Book, StandardEntryType.Booklet, StandardEntryType.BookInBook, StandardEntryType.InBook, StandardEntryType.MvBook -> true;
+            default -> false;
+        };
+    }
+
+    private boolean isFileTypeAValidCoverImage(String fileType) {
+        // needed because most image type names are stored in a localisation dependent way
+        Optional<ExternalFileType> actualFileType = ExternalFileTypes.getExternalFileTypeByName(fileType, preferences.getExternalApplicationsPreferences());
+        if (actualFileType.isPresent()) {
+            return switch (actualFileType.get().getMimeType()) {
+                case "image/png", "image/gif", "image/jpeg", "image/tiff", "image/vnd.djuv" -> true;
+                default -> false;
+            };
+        }
+        return false;
     }
 
     public void print() {
