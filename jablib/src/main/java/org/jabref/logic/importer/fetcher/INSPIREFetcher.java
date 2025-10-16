@@ -13,8 +13,9 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.EntryBasedFetcher;
+import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -30,6 +31,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
@@ -45,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * - Validation of fetched data
  * - Optimized request headers
  */
-public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher {
+public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher, IdBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(INSPIREFetcher.class);
 
@@ -69,6 +72,12 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         "Please check your internet connection and try again.";
 
     private final ImportFormatPreferences importFormatPreferences;
+
+    private static final int MAX_RETRIES = 3;
+    private static final long RETRY_DELAY_MS = 1000;
+    private static final String ERROR_MESSAGE_TEMPLATE = "Failed to fetch from INSPIRE for identifier '%s' after %d attempts.";
+
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(INSPIREFetcher.class);
 
     public INSPIREFetcher(ImportFormatPreferences preferences) {
         this.importFormatPreferences = preferences;
@@ -140,6 +149,21 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     }
 
     @Override
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
+        if (arXivIdentifier.isPresent()) {
+            return performSearchByArXivId(arXivIdentifier.get());
+        }
+
+        Optional<DOI> doi = DOI.parse(identifier);
+        if (doi.isPresent()) {
+            return performSearchByDoi(doi.get());
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
     public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> doi = entry.getField(StandardField.DOI);
         Optional<String> archiveprefix = entry.getFieldOrAlias(StandardField.ARCHIVEPREFIX);
@@ -170,15 +194,30 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         }
 
         // Use retry mechanism for robust fetching
-        List<BibEntry> results = performSearchWithRetry(url, identifier);
+        List<BibEntry> results = performSearchWithRetry(url, entry.getCitationKey().orElse("unknown"));
 
-        // Apply Sonia's texkeys extraction (3.1 task)
+        // Apply texkeys extraction - CRITICAL for Issue #12292
         results.forEach(this::setTexkeys);
 
         // Validate and log results
-        validateResults(results, identifier);
+        validateResults(results, entry.getCitationKey().orElse("unknown"));
 
         return results;
+    }
+
+    private Optional<BibEntry> performSearchByArXivId(ArXivIdentifier identifier) throws FetcherException {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.ARCHIVEPREFIX, "arXiv");
+        entry.setField(StandardField.EPRINT, identifier.asString());
+        identifier.getClassification().ifPresent(classification ->
+                entry.setField(StandardField.PRIMARYCLASS, classification));
+        return performSearch(entry).stream().findFirst();
+    }
+
+    private Optional<BibEntry> performSearchByDoi(DOI doi) throws FetcherException {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.DOI, doi.asString());
+        return performSearch(entry).stream().findFirst();
     }
 
     /**
@@ -298,6 +337,41 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
             } else {
                 LOGGER.debug("Entry [{}] has no journal info (may be preprint only)", identifier);
             }
+        }
+    }
+
+    /**
+     * Extracts texkeys from INSPIRE API response and sets it as citation key.
+     * INSPIRE returns texkeys in a temporary field that needs to be extracted,
+     * set as the citation key, and then cleaned up.
+     *
+     * This is a critical part of Issue #12292 fix - ensuring INSPIRE's standard
+     * texkeys are properly applied to entries fetched via arXiv identifiers.
+     *
+     * @param entry The BibEntry to process
+     */
+    private void setTexkeys(BibEntry entry) {
+        Optional<String> texkeys = entry.getField(new UnknownField("texkeys"));
+        
+        if (texkeys.isPresent() && !texkeys.get().isBlank()) {
+            // INSPIRE may return multiple texkeys separated by commas
+            // Take the first one as the primary citation key
+            String firstTexkey = texkeys.get().split(",")[0].trim();
+            
+            if (!firstTexkey.isEmpty()) {
+                entry.setCitationKey(firstTexkey);
+                LOGGER.debug("Set citation key from INSPIRE texkeys: '{}'", firstTexkey);
+                
+                // Log if there were multiple texkeys
+                if (texkeys.get().contains(",")) {
+                    LOGGER.debug("INSPIRE provided multiple texkeys, using first: '{}'", firstTexkey);
+                }
+            }
+            
+            // Clean up the temporary texkeys field to avoid showing it in the UI
+            entry.clearField(new UnknownField("texkeys"));
+        } else {
+            LOGGER.debug("No texkeys field found in INSPIRE response for entry");
         }
     }
 }
