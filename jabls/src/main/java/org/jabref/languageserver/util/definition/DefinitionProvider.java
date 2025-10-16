@@ -19,9 +19,9 @@ import org.eclipse.lsp4j.Range;
 
 public abstract class DefinitionProvider {
 
+    private static final Pattern CITATION_KEY_CHAR_PATTERN = Pattern.compile("[a-z0-9_\\-:.+]", Pattern.CASE_INSENSITIVE);
     private static final Pattern CITATION_KEY_PATTERN = Pattern.compile("@(?<citationkey>[a-z0-9_.+:-]+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern VALID_BEFORE_AT = Pattern.compile("[\\s\\[({;,:\\-—–«“\"'’]?");
-    private static final Pattern CITATION_KEY_CHAR_PATTERN = Pattern.compile("[a-z0-9_\\-:.+]", Pattern.CASE_INSENSITIVE);
 
     protected final LspParserHandler parserHandler;
 
