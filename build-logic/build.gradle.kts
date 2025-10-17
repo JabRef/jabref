@@ -8,8 +8,8 @@ repositories {
 
 dependencies {
     implementation("com.adarshr:gradle-test-logger-plugin:4.0.0")
-    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:3.0.4")
-    implementation("com.github.andygoossens:gradle-modernizer-plugin:1.11.0")
+    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:3.1.0")
+    implementation("com.github.andygoossens:gradle-modernizer-plugin:1.12.0")
     implementation("org.gradlex:extra-java-module-info:1.13.1")
     implementation("org.gradlex:java-module-dependencies:1.10")
     implementation("org.gradlex:java-module-packaging:1.1") // required for platform-specific packaging of JavaFX dependencies

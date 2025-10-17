@@ -346,11 +346,11 @@ public class FileUtil {
     public static Optional<String> createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
         String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
-        if (targetName.isEmpty() || targetName.equals("-")) {
+        if (targetName.isEmpty() || "-".equals(targetName)) {
             targetName = entry.getCitationKey().orElse("default");
         }
 
-        if (targetName.equals("default")) {
+        if ("default".equals(targetName)) {
             return Optional.empty();
         }
 
