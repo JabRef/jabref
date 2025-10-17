@@ -71,7 +71,7 @@ dependencies.constraints {
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
-    api("io.github.adr:e-adr:2.0.0-SNAPSHOT")
+    api("io.github.adr:e-adr:2.0.0")
     api("io.github.classgraph:classgraph:4.8.181")
     api("io.github.java-diff-utils:java-diff-utils:4.15")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
@@ -151,4 +151,8 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.10.4")
     api("org.yaml:snakeyaml:2.5")
     api("tech.units:indriya:2.2.3")
+    api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
+    api("com.google.errorprone:error_prone_core:2.42.0")
+    api("net.ltgt.nullaway:nullaway:2.3.0")
+    api("com.uber.nullaway:nullaway:0.12.10")
 }

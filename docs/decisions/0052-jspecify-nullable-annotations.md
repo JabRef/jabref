@@ -1,8 +1,6 @@
 ---
-title: Adopt JSpecify nullness annotations for compile-time null safety
-nav_order: 51
+nav_order: 52
 parent: Decision Records
-status: pending
 ---
 
 # Adopt JSpecify nullness annotations for compile-time null safety
@@ -28,7 +26,7 @@ We want to detect null-safety issues earlier at compile time and improve API cla
 
 ## Decision Outcome
 
-Chosen option: "Adopt JSpecify annotations" because comes out best (see below).
+Chosen option: "Adopt JSpecify annotations" because it comes out best (see below).
 
 ## Consequences
 
