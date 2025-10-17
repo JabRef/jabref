@@ -24,6 +24,8 @@ plugins {
 
     id("net.ltgt.errorprone") version "4.3.0"
     id("net.ltgt.nullaway") version "2.3.0"
+
+    id("com.github.spotbugs") version "6.4.2"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -45,6 +47,17 @@ configurations {
 }
 tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach {
     dependsOn(tasks.withType<AntlrTask>())
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask::class).configureEach {
+    reports {
+        create("html") {
+            required.set(true)
+        }
+        create("text") {
+            required.set(false)
+        }
+    }
 }
 
 // See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
