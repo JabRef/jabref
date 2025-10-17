@@ -110,7 +110,6 @@ public class MergeBookkeeperTest {
         if (remoteGit != null) {
             remoteGit.close();
         }
-        
         RepositoryCache.clear();
         WindowCache.reconfigure(new WindowCacheConfig());
     }
