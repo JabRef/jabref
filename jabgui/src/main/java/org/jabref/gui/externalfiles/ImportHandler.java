@@ -250,8 +250,20 @@ public class ImportHandler {
         importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK, new EntryImportHandlerTracker());
     }
 
+    /**
+     * Imports an entry into the database with duplicate checking and handling.
+     * Creates a copy of the entry for processing - the original entry parameter is not modified.
+     * The copied entry may be modified during cleanup and duplicate handling.
+     *
+     * @param bibDatabaseContext the database context to import into
+     * @param entry the entry to import (original will not be modified)
+     * @param decision the duplicate resolution strategy to apply
+     * @param tracker tracks the import status of the entry
+     */
     private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
-        BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
+        // The original entry should not be modified
+        BibEntry entryCopy = new BibEntry(entry);
+        BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entryCopy);
 
         BackgroundTask.wrap(() -> findDuplicate(bibDatabaseContext, entryToInsert))
                       .onFailure(e -> {
