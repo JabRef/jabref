@@ -97,12 +97,12 @@ public class BooktitleCleanupPanel extends VBox {
             fieldLabel.getStyleClass().add("field-label");
             cleanupGrid.add(fieldLabel, labelIndex, rowIndex);
 
-            ToggleGroup toggelGroup = new ToggleGroup();
-            toggleGroups.put(field, toggelGroup);
+            ToggleGroup toggleGroup = new ToggleGroup();
+            toggleGroups.put(field, toggleGroup);
 
             int columnIndex = 1;
             for (BooktitleCleanupAction cleanupAction : BooktitleCleanupAction.values()) {
-                RadioButton radioButton = createRadioButton(cleanupAction, toggelGroup);
+                RadioButton radioButton = createRadioButton(cleanupAction, toggleGroup);
 
                 if (cleanupAction == field.getDefaultAction()) {
                     radioButton.setSelected(true);
