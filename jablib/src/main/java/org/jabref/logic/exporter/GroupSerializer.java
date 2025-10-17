@@ -11,7 +11,6 @@ import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
-import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
