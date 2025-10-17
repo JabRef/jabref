@@ -17,10 +17,13 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.internal.storage.file.WindowCache;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.SystemReader;
@@ -107,6 +110,9 @@ public class MergeBookkeeperTest {
         if (remoteGit != null) {
             remoteGit.close();
         }
+        
+        RepositoryCache.clear();
+        WindowCache.reconfigure(new WindowCacheConfig());
     }
 
     // Scene 1: BEHIND + content equals the remote -> fast-forward
