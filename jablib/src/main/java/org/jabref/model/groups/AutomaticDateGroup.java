@@ -25,6 +25,26 @@ public class AutomaticDateGroup extends AutomaticGroup {
         this.granularity = granularity;
     }
 
+    /**
+     * Gets the field used for date extraction.
+     * Required by GroupSerializer for serialization.
+     *
+     * @return The field (e.g., StandardField.DATE or StandardField.YEAR)
+     */
+    public Field getField() {
+        return field;
+    }
+
+    /**
+     * Gets the granularity level for date grouping.
+     * Required by GroupSerializer for serialization.
+     *
+     * @return The granularity (YEAR, MONTH, or FULL_DATE)
+     */
+    public DateGranularity getGranularity() {
+        return granularity;
+    }
+
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
         var out = new LinkedHashSet<GroupTreeNode>();
@@ -52,12 +72,12 @@ public class AutomaticDateGroup extends AutomaticGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticDateGroup(this.name.getValue(), this.context, this.field);
+        return new AutomaticDateGroup(this.name.getValue(), this.context, this.field, this.granularity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(field);
+        return Objects.hash(field, granularity);
     }
 
     @Override

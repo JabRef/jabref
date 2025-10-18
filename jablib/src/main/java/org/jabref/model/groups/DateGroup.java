@@ -7,6 +7,10 @@ import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+/**
+ * Group that matches entries based on their date/year field value.
+ * Supports grouping by YEAR, MONTH, or FULL_DATE granularity.
+ */
 public class DateGroup extends AbstractGroup {
 
     String date; // bucket key: "YYYY" or "YYYY-MM" or "YYYY-MM-DD"
