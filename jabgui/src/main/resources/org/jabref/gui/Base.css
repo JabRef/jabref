@@ -1404,6 +1404,15 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -fx-control-inner-background;
 }
 
+.innerGridPane {
+    -fx-hgap: 1em;
+    -fx-vgap: 1em;
+}
+
+.prefIndent {
+    -fx-padding: 0 0 0 1.667em;
+}
+
 .code-area .text {
     -fx-fill: -fx-text-background-color;
 }
