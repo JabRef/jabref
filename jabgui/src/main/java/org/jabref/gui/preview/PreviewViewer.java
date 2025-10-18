@@ -228,41 +228,21 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void setPreviewText(String text) {
         Optional<String> image = getCoverImageURI();
+        String coverIfAny = "";
         if (image.isPresent()) {
-            layoutText = """
-                    <html>
-                        <body id="previewBody">
-                            <div id="content"> %s </div>
-                            <img src="%s">
-                        </body>
-                    </html>
-                    """.formatted(text, image.get());
-        } else {
-            layoutText = """
-                    <html>
-                        <body id="previewBody">
-                            <div id="content"> %s </div>
-                        </body>
-                    </html>
-                    """.formatted(text);
+            coverIfAny = "<img style=\"border-width:1px;border-style:solid;border-colorblack;display:block;height:12rem;\" src=\"%s\"> <br>".formatted(image.get());
         }
+
+        layoutText = """
+                <html>
+                    <body id="previewBody">
+                        %s <div id="content"> %s </div>
+                    </body>
+                </html>
+            """.formatted(coverIfAny, text);
+        System.out.println(layoutText);
         highlightLayoutText();
         setHvalue(0);
-    }
-
-    private void highlightLayoutText() {
-        if (layoutText == null) {
-            return;
-        }
-
-        String queryText = searchQueryProperty.get();
-        if (StringUtil.isNotBlank(queryText)) {
-            SearchQuery searchQuery = new SearchQuery(queryText);
-            String highlighted = Highlighter.highlightHtml(layoutText, searchQuery);
-            UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(highlighted));
-        } else {
-            UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(layoutText));
-        }
     }
 
     private Optional<String> getCoverImageURI() {
@@ -288,9 +268,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
         return Optional.empty();
     }
-    
+
     private boolean shouldShowCoverImage() {
-        if (entry == null) return false;
+        //entry is sometimes null when setPreviewText is called
+        if (entry == null) {
+        	return false;
+        }
 
         return switch (entry.getType()) {
             case StandardEntryType.Book, StandardEntryType.Booklet, StandardEntryType.BookInBook, StandardEntryType.InBook, StandardEntryType.MvBook -> true;
@@ -299,15 +282,27 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private boolean isFileTypeAValidCoverImage(String fileType) {
-        // needed because most image type names are stored in a localisation dependent way
+        // needed because most image type names are stored in a localization dependent way
         Optional<ExternalFileType> actualFileType = ExternalFileTypes.getExternalFileTypeByName(fileType, preferences.getExternalApplicationsPreferences());
         if (actualFileType.isPresent()) {
-            return switch (actualFileType.get().getMimeType()) {
-                case "image/png", "image/gif", "image/jpeg", "image/tiff", "image/vnd.djuv" -> true;
-                default -> false;
-            };
+            return actualFileType.get().getMimeType().startsWith("image/");
         }
         return false;
+    }
+
+    private void highlightLayoutText() {
+        if (layoutText == null) {
+            return;
+        }
+
+        String queryText = searchQueryProperty.get();
+        if (StringUtil.isNotBlank(queryText)) {
+            SearchQuery searchQuery = new SearchQuery(queryText);
+            String highlighted = Highlighter.highlightHtml(layoutText, searchQuery);
+            UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(highlighted));
+        } else {
+            UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(layoutText));
+        }
     }
 
     public void print() {
