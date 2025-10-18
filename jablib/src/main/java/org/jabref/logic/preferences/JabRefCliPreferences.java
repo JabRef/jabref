@@ -230,6 +230,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEARCH_CATALOGS = "searchCatalogs";
     public static final String DEFAULT_PLAIN_CITATION_PARSER = "defaultPlainCitationParser";
     public static final String CITATIONS_RELATIONS_STORE_TTL = "citationsRelationsStoreTTL";
+    public static final String PREFER_INSPIRE_TEXKEYS = "preferInspireTexkeys";
     public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
@@ -527,6 +528,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(CITATIONS_RELATIONS_STORE_TTL, 30);
+        defaults.put(PREFER_INSPIRE_TEXKEYS, Boolean.TRUE);
 
         defaults.put(ADD_IMPORTED_ENTRIES, Boolean.FALSE);
         defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang("Imported entries"));
@@ -2223,7 +2225,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
                 getStringList(SEARCH_CATALOGS),
                 PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER)),
-                getInt(CITATIONS_RELATIONS_STORE_TTL)
+                getInt(CITATIONS_RELATIONS_STORE_TTL),
+                getBoolean(PREFER_INSPIRE_TEXKEYS)
         );
 
         EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
@@ -2236,6 +2239,7 @@ public class JabRefCliPreferences implements CliPreferences {
         importerPreferences.getCatalogs().addListener((InvalidationListener) _ -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
         EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (_, _, newValue) -> put(DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));
         EasyBind.listen(importerPreferences.citationsRelationsStoreTTLProperty(), (_, _, newValue) -> put(CITATIONS_RELATIONS_STORE_TTL, newValue.toString()));
+        EasyBind.listen(importerPreferences.preferInspireTexkeysProperty(), (_, _, newValue) -> putBoolean(PREFER_INSPIRE_TEXKEYS, newValue));
 
         return importerPreferences;
     }

@@ -45,6 +45,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
+    @FXML private CheckBox preferInspireTexkeys;
+
     @FXML private VBox fetchersContainer;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
@@ -118,6 +120,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
         useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
+
+        preferInspireTexkeys.selectedProperty().bindBidirectional(viewModel.preferInspireTexkeysProperty());
 
         InvalidationListener listener = _ -> fetchersContainer
                 .getChildren()
