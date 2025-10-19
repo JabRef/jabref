@@ -12,7 +12,7 @@ val pdfbox = "3.0.5"
 
 dependencies {
     api(platform("ai.djl:bom:0.34.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.4.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.7.1"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
