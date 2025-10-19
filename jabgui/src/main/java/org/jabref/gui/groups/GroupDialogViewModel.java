@@ -381,7 +381,7 @@ public class GroupDialogViewModel {
             if (resultingGroup != null) {
                 preferences.getGroupsPreferences().setDefaultHierarchicalContext(groupHierarchySelectedProperty.getValue());
 
-                resultingGroup.setColor(Boolean.TRUE.equals(colorUseProperty.getValue()) ? colorProperty.getValue() : null);
+                resultingGroup.setColor(Boolean.TRUE.equals(colorUseProperty.getValue()) ? colorProperty.getValue().toString() : null);
                 resultingGroup.setDescription(descriptionProperty.getValue());
                 resultingGroup.setIconName(iconProperty.getValue());
                 return resultingGroup;
@@ -416,7 +416,7 @@ public class GroupDialogViewModel {
         } else {
             nameProperty.setValue(editedGroup.getName());
             colorUseProperty.setValue(editedGroup.getColor().isPresent());
-            colorProperty.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));
+            colorProperty.setValue(editedGroup.getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor()));
             descriptionProperty.setValue(editedGroup.getDescription().orElse(""));
             iconProperty.setValue(editedGroup.getIconName().orElse(""));
             groupHierarchySelectedProperty.setValue(editedGroup.getHierarchicalContext());
@@ -473,10 +473,12 @@ public class GroupDialogViewModel {
         if (parentNode == null) {
             color = GroupColorPicker.generateColor(List.of());
         } else {
-            List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
+            List<Color> colorsOfSiblings = parentNode.getChildren().stream()
+                                                     .map(child -> child.getGroup().getColor())
                                                      .flatMap(Optional::stream)
+                                                     .map(Color::valueOf)
                                                      .toList();
-            Optional<Color> parentColor = parentNode.getGroup().getColor();
+            Optional<Color> parentColor = parentNode.getGroup().getColor().map(Color::valueOf);
             color = parentColor.map(value -> GroupColorPicker.generateColor(colorsOfSiblings, value))
                                .orElseGet(() -> GroupColorPicker.generateColor(colorsOfSiblings));
         }

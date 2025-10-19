@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -48,6 +47,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.strings.StringUtil;
 
 import org.jooq.lambda.Unchecked;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,12 +74,12 @@ public class BibDatabaseWriter {
     protected final BibEntryTypesManager entryTypesManager;
     protected final FieldPreferences fieldPreferences;
 
-    public BibDatabaseWriter(BibWriter bibWriter,
+    public BibDatabaseWriter(@NonNull BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
                              FieldPreferences fieldPreferences,
                              CitationKeyPatternPreferences keyPatternPreferences,
                              BibEntryTypesManager entryTypesManager) {
-        this.bibWriter = Objects.requireNonNull(bibWriter);
+        this.bibWriter = bibWriter;
         this.saveConfiguration = saveConfiguration;
         this.keyPatternPreferences = keyPatternPreferences;
         this.fieldPreferences = fieldPreferences;
@@ -156,10 +156,8 @@ public class BibDatabaseWriter {
      * non-database save operation (such as the exportDatabase call), we do not wish to use the global preference of
      * saving in standard order.
      */
-    public static List<BibEntry> getSortedEntries(List<BibEntry> entriesToSort, SelfContainedSaveOrder saveOrder) {
-        Objects.requireNonNull(entriesToSort);
-        Objects.requireNonNull(saveOrder);
-
+    public static List<BibEntry> getSortedEntries(@NonNull List<BibEntry> entriesToSort,
+                                                  @NonNull SelfContainedSaveOrder saveOrder) {
         List<Comparator<BibEntry>> comparators = getSaveComparators(saveOrder);
         FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
 
@@ -275,10 +273,10 @@ public class BibDatabaseWriter {
     /**
      * Writes all data to the specified writer, using each object's toString() method.
      */
-    protected void writeMetaData(MetaData metaData, GlobalCitationKeyPatterns globalCiteKeyPattern) throws IOException {
-        Objects.requireNonNull(metaData);
-
-        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,
+    protected void writeMetaData(@NonNull MetaData metaData,
+                                 GlobalCitationKeyPatterns globalCiteKeyPattern) throws IOException {
+        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(
+                metaData,
                 globalCiteKeyPattern);
 
         for (Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {

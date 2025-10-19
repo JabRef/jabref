@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
@@ -18,6 +17,7 @@ import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONObject;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +44,7 @@ public class SpringerNatureFullTextFetcher implements FulltextFetcher, Customiza
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
         // Try unique DOI first
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 

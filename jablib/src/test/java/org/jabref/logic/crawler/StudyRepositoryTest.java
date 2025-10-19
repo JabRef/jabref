@@ -37,6 +37,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -97,19 +99,51 @@ class StudyRepositoryTest {
      * Tests whether the file structure of the repository is created correctly from the study definitions file.
      */
     @Test
-    void repositoryStructureCorrectlyCreated() {
+    void quantumRepositoryStructureCorrectlyCreated() {
         // When repository is instantiated the directory structure is created
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
+    }
+
+    @Test
+    void cloudComputingRepositoryStructureCorrectlyCreated() {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));
+    }
+
+    @Test
+    void softwareEngineeringRepositoryStructureCorrectlyCreated() {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "ArXiv.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "ArXiv.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "ArXiv.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "Springer.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "Springer.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "Springer.bib")));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    void quantumFilesCreated(String fileName) {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", fileName)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    void cloudComputingFilesCreated(String fileName) {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", fileName)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    void softwareEngineeringFilesCreated(String fileName) {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", fileName)));
+    }
+
+    @Test
+    void doesNotCreateUnexpectedQuantumFile() {
         assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "IEEEXplore.bib")));
+    }
+
+    @Test
+    void doesNotCreateUnexpectedCloudComputingFile() {
         assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "IEEEXplore.bib")));
+    }
+
+    @Test
+    void doesNotCreateUnexpectedSoftwareEngineeringFile() {
         assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "IEEEXplore.bib")));
     }
 

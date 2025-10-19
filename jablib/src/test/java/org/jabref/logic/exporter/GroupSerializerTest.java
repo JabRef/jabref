@@ -71,7 +71,7 @@ class GroupSerializerTest {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         group.setIconName("test icon");
         group.setExpanded(true);
-        group.setColor(Color.ALICEBLUE);
+        group.setColor(Color.ALICEBLUE.toString());
         group.setDescription("test description");
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(List.of("0 StaticGroup:myExplicitGroup;0;1;0xf0f8ffff;test icon;test description;"), serialization);

@@ -3,11 +3,12 @@ package org.jabref.logic.layout.format;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.jabref.logic.bst.util.BstNameFormatter;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.AuthorList;
+
+import org.jspecify.annotations.NonNull;
 
 /// This layout formatter uses the BibTeX `name.format$` method and provides ultimate flexibility.
 ///
@@ -153,13 +154,11 @@ public class NameFormatter implements LayoutFormatter {
         this.parameter = parameter;
     }
 
-    public static Map<String, String> getNameFormatters(NameFormatterPreferences prefs) {
-        Objects.requireNonNull(prefs);
-
+    public static Map<String, String> getNameFormatters(@NonNull NameFormatterPreferences preferences) {
         Map<String, String> result = new HashMap<>();
 
-        List<String> names = prefs.getNameFormatterKey();
-        List<String> formats = prefs.getNameFormatterValue();
+        List<String> names = preferences.getNameFormatterKey();
+        List<String> formats = preferences.getNameFormatterValue();
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {

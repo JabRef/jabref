@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,6 +46,8 @@ import org.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+
+import org.jspecify.annotations.NonNull;
 
 public class Formatters {
     private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
@@ -123,14 +124,11 @@ public class Formatters {
         return all;
     }
 
-    public static Optional<Formatter> getFormatterForKey(String name) {
-        Objects.requireNonNull(name);
+    public static Optional<Formatter> getFormatterForKey(@NonNull String name) {
         return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();
     }
 
-    public static Optional<Formatter> getFormatterForModifier(String modifier) {
-        Objects.requireNonNull(modifier);
-
+    public static Optional<Formatter> getFormatterForModifier(@NonNull String modifier) {
         switch (modifier) {
             case "lower":
                 return Optional.of(new LowerCaseFormatter());

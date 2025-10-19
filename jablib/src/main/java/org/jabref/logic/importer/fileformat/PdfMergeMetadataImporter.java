@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -36,6 +35,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,10 +175,9 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /**
      * Imports the BibTeX data from the given PDF file and relativized the paths of each linked file based on the context and the file preferences.
      */
-    public ParserResult importDatabase(Path filePath, BibDatabaseContext context, FilePreferences filePreferences) throws IOException {
-        Objects.requireNonNull(context);
-        Objects.requireNonNull(filePreferences);
-
+    public ParserResult importDatabase(Path filePath,
+                                       @NonNull BibDatabaseContext context,
+                                       @NonNull FilePreferences filePreferences) throws IOException {
         ParserResult parserResult = importDatabase(filePath);
 
         RelativePathsCleanup relativePathsCleanup = new RelativePathsCleanup(context, filePreferences);
@@ -214,7 +213,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         }
 
         @Override
-        public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+        public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
             for (LinkedFile file : entry.getFiles()) {
                 Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
                 if (filePath.isPresent()) {

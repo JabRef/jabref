@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -18,6 +17,7 @@ import org.jabref.logic.util.strings.StringSimilarity;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
@@ -194,9 +194,7 @@ public class JournalAbbreviationRepository {
         return Optional.of(candidates.getFirst());
     }
 
-    public void addCustomAbbreviation(Abbreviation abbreviation) {
-        Objects.requireNonNull(abbreviation);
-
+    public void addCustomAbbreviation(@NonNull Abbreviation abbreviation) {
         // We do NOT want to keep duplicates
         // The set automatically "removes" duplicates
         // What is a duplicate? An abbreviation is NOT the same if any field is NOT equal (e.g., if the shortest unique differs, the abbreviation is NOT the same)

@@ -15,6 +15,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +51,12 @@ public class CitationKeyGenerator extends BracketedPattern {
         this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()), bibDatabaseContext.getDatabase(), citationKeyPatternPreferences);
     }
 
-    public CitationKeyGenerator(AbstractCitationKeyPatterns citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
-        this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
-        this.database = Objects.requireNonNull(database);
-        this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
+    public CitationKeyGenerator(@NonNull AbstractCitationKeyPatterns citeKeyPattern,
+                                @NonNull BibDatabase database,
+                                @NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this.citeKeyPattern = citeKeyPattern;
+        this.database = database;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
     }
 
@@ -94,8 +97,7 @@ public class CitationKeyGenerator extends BracketedPattern {
      * @param entry a {@link BibEntry}
      * @return a citation key based on the user's preferences
      */
-    public String generateKey(BibEntry entry) {
-        Objects.requireNonNull(entry);
+    public String generateKey(@NonNull BibEntry entry) {
         String currentKey = entry.getCitationKey().orElse(null);
 
         String newKey = createCitationKeyFromPattern(entry);

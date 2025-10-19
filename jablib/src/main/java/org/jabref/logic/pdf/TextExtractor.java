@@ -2,7 +2,6 @@ package org.jabref.logic.pdf;
 
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
-import java.util.Objects;
 
 import org.jabref.architecture.AllowedToUseAwt;
 
@@ -12,6 +11,7 @@ import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Extracts the text of marked annotations using bounding boxes.
@@ -26,9 +26,9 @@ public final class TextExtractor {
      * @param page          the page the annotation is on, must not be null
      * @param boundingBoxes the raw annotation, must not be null
      */
-    public TextExtractor(PDPage page, COSArray boundingBoxes) {
-        this.page = Objects.requireNonNull(page);
-        this.boundingBoxes = Objects.requireNonNull(boundingBoxes);
+    public TextExtractor(@NonNull PDPage page, @NonNull COSArray boundingBoxes) {
+        this.page = page;
+        this.boundingBoxes = boundingBoxes;
     }
 
     /**

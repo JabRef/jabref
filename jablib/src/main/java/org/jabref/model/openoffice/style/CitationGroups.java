@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -14,6 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.util.OOListUtil;
 import org.jabref.model.openoffice.util.OOPair;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,8 +120,7 @@ public class CitationGroups {
      * <p>
      * Also set indexInGlobalOrder for each citation group.
      */
-    public void setGlobalOrder(List<CitationGroupId> globalOrder) {
-        Objects.requireNonNull(globalOrder);
+    public void setGlobalOrder(@NonNull List<CitationGroupId> globalOrder) {
         if (globalOrder.size() != numberOfCitationGroups()) {
             throw new IllegalStateException("setGlobalOrder: globalOrder.size() != numberOfCitationGroups()");
         }

@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,6 +38,7 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Fetches data from the SAO/NASA Astrophysics Data System (<a href="https://ui.adsabs.harvard.edu/">https://ui.adsabs.harvard.edu/</a>)
@@ -50,11 +50,11 @@ public class AstrophysicsDataSystem
     private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
     private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
-    private final ImportFormatPreferences preferences;
+    private final ImportFormatPreferences importFormatPreferences;
     private final ImporterPreferences importerPreferences;
 
-    public AstrophysicsDataSystem(ImportFormatPreferences preferences, ImporterPreferences importerPreferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public AstrophysicsDataSystem(@NonNull ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
         this.importerPreferences = importerPreferences;
     }
 
@@ -70,7 +70,7 @@ public class AstrophysicsDataSystem
     /**
      * @return export URL endpoint
      */
-    private static URL getURLforExport() throws URISyntaxException, MalformedURLException {
+    private static URL getUrlForExport() throws URISyntaxException, MalformedURLException {
         return new URIBuilder(API_EXPORT_URL).build().toURL();
     }
 
@@ -136,7 +136,7 @@ public class AstrophysicsDataSystem
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences);
+        return new BibtexParser(importFormatPreferences);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class AstrophysicsDataSystem
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         if (entry.getFieldOrAlias(StandardField.TITLE).isEmpty() && entry.getFieldOrAlias(StandardField.AUTHOR).isEmpty()) {
             return List.of();
         }
@@ -240,7 +240,7 @@ public class AstrophysicsDataSystem
 
         URL urLforExport;
         try {
-            urLforExport = getURLforExport();
+            urLforExport = getUrlForExport();
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
         }

@@ -10,7 +10,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -22,6 +21,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +48,7 @@ public class BibtexImporter extends Importer {
      * https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
      */
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) {
-        Objects.requireNonNull(reader);
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) {
         return true;
     }
 
@@ -128,7 +127,7 @@ public class BibtexImporter extends Importer {
      * reader manually to the metadata
      */
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
     }
 
