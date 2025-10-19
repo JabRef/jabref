@@ -19,6 +19,13 @@ dependencies {
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.6.0"))
+
+    api(platform("org.junit:junit-bom:6.0.0"))
+    api("org.junit.jupiter:junit-jupiter-api")
+    api("org.junit.jupiter:junit-jupiter-params")
+    api("org.junit.jupiter:junit-jupiter")
+    api("org.junit.platform:junit-platform-launcher")
+
 }
 
 dependencies.constraints {
@@ -128,10 +135,6 @@ dependencies.constraints {
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.20.1")
     api("org.jspecify:jspecify:1.0.0")
-    api("org.junit.jupiter:junit-jupiter-api:6.0.0")
-    api("org.junit.jupiter:junit-jupiter-params:6.0.0")
-    api("org.junit.jupiter:junit-jupiter:6.0.0")
-    api("org.junit.platform:junit-platform-launcher:6.0.0")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
