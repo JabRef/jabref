@@ -131,7 +131,7 @@ dependencies.constraints {
     api("org.junit.jupiter:junit-jupiter-api:6.0.0")
     api("org.junit.jupiter:junit-jupiter-params:6.0.0")
     api("org.junit.jupiter:junit-jupiter:6.0.0")
-    api("org.junit.platform:junit-platform-launcher:1.13.4")
+    api("org.junit.platform:junit-platform-launcher:6.0.0")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
