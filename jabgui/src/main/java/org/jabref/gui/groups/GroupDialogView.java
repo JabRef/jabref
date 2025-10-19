@@ -44,6 +44,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -228,6 +229,16 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         autoGroupPersonsField.textProperty().bindBidirectional(viewModel.autoGroupPersonsFieldProperty());
 
         texGroupFilePath.textProperty().bindBidirectional(viewModel.texGroupFilePathProperty());
+
+        // Date Group bindings
+        dateRadioButton.selectedProperty().bindBidirectional(viewModel.dateRadioButtonSelectedProperty());
+        dateGroupFieldCombo.valueProperty().bindBidirectional(viewModel.dateGroupFieldProperty());
+        dateGroupOptionCombo.valueProperty().bindBidirectional(viewModel.dateGroupOptionProperty());
+        dateGroupIncludeEmpty.selectedProperty().bindBidirectional(viewModel.dateGroupIncludeEmptyProperty());
+
+        // Initialize Date Group ComboBoxes
+        dateGroupFieldCombo.setItems(FXCollections.observableArrayList(FieldFactory.getDateFields()));
+        dateGroupOptionCombo.setItems(FXCollections.observableArrayList(DateGranularity.values()));
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
