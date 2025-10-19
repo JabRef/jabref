@@ -29,7 +29,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class BibDatabaseContextTest {
-
     private Path currentWorkingDir;
 
     private FilePreferences fileDirPrefs;

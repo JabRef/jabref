@@ -116,6 +116,9 @@ public class AiPreferences {
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
 
+        this.apiKeyChangeListener = () -> {
+        };
+
         this.templates = Map.of(
                 AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_SYSTEM_MESSAGE)),
                 AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_USER_MESSAGE)),
@@ -550,14 +553,14 @@ public class AiPreferences {
     }
 
     public void setTemplate(AiTemplate aiTemplate, String template) {
-        templates.get(aiTemplate).set(template);
+        templateProperty(aiTemplate).set(template);
     }
 
     public String getTemplate(AiTemplate aiTemplate) {
-        return templates.get(aiTemplate).get();
+        return templateProperty(aiTemplate).get();
     }
 
     public StringProperty templateProperty(AiTemplate aiTemplate) {
-        return templates.get(aiTemplate);
+        return templates.getOrDefault(aiTemplate, new SimpleStringProperty(""));
     }
 }

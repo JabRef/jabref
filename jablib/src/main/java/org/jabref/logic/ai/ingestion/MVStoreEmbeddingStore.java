@@ -125,7 +125,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         PriorityQueue<EmbeddingMatch<TextSegment>> matches = new PriorityQueue<>(comparator);
 
         applyFilter(request.filter()).forEach(id -> {
-            EmbeddingRecord eRecord = embeddingsMap.get(id);
+            EmbeddingRecord eRecord = embeddingsMap.getOrDefault(id, new EmbeddingRecord(null, "", new float[0]));
 
             double cosineSimilarity = CosineSimilarity.between(Embedding.from(eRecord.embeddingVector), request.queryEmbedding());
             double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);
