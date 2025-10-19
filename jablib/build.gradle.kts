@@ -190,6 +190,8 @@ dependencies {
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
     implementation("io.github.adr:e-adr")
 
+    api("io.github.darvil82:terminal-text-formatter:2.2.0")
+
     implementation("io.zonky.test:embedded-postgres")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
@@ -217,6 +219,8 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
+
+
 
     testImplementation("org.hamcrest:hamcrest")
 
@@ -246,7 +250,7 @@ tasks.generateGrammarSource {
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
 
-var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
+val taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
@@ -258,7 +262,7 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     onlyIf {!generatedJournalFile.get().asFile.exists()}
 }
 
-var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
+val taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
     group = "JabRef"
     description = "Generates a catalog of all available citation styles"
 
@@ -270,7 +274,7 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     onlyIf {!cslCatalogJson.get().asFile.exists()}
 }
 
-var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
+val ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
 
 tasks.register("downloadLtwaFile") {
     group = "JabRef"
@@ -300,7 +304,7 @@ tasks.register("downloadLtwaFile") {
     }
 }
 
-var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
+val taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     group = "JabRef"
     description = "Converts the LTWA CSV file to a H2 MVStore"
     dependsOn("downloadLtwaFile", tasks.named("generateGrammarSource"))

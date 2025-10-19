@@ -73,7 +73,8 @@ public class JabKit {
 
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(argumentProcessor);
-            String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
+            String formattedBanner = String.format(BuildInfo.JABREF_BANNER.toString(), buildInfo.version);
+            String usageHeader = formattedBanner + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,
                     ArgumentProcessor.getAvailableImportFormats(preferences),
