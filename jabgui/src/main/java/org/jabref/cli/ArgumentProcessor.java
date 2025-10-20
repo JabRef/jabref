@@ -46,7 +46,7 @@ public class ArgumentProcessor {
         if ((startupMode == Mode.INITIAL_START) && cli.isVersionHelpRequested()) {
             String bannerString = BuildInfo.JABREF_BANNER.toString();
 
-            String formattedBanner = String.format(bannerString, new BuildInfo().version);
+            String formattedBanner = bannerString.formatted(new BuildInfo().version);
 
             System.out.println(formattedBanner);
 
@@ -57,7 +57,7 @@ public class ArgumentProcessor {
         if ((startupMode == Mode.INITIAL_START) && cli.isUsageHelpRequested()) {
             String bannerString = BuildInfo.JABREF_BANNER.toString();
 
-            String formattedBanner = String.format(bannerString, new BuildInfo().version);
+            String formattedBanner = bannerString.formatted(new BuildInfo().version);
 
             System.out.println(formattedBanner);
             System.out.println(cli.getUsageMessage());
