@@ -15,9 +15,12 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 
 ## Decision Drivers
 
-* It should be fast.
-* It should be possible to provide templates out of `String`s (required by the AI feature).
 * It should have short and understandable syntax. Especially, it should work well with unset fields and empty `Optional`s.
+
+Implementation decision drivers:
+
+* It should be possible to provide templates out of `String`s (required by the AI feature).
+* It should be fast.
 
 ## Considered Options
 
@@ -76,6 +79,8 @@ Here are the papers you are analyzing:
 ${CanonicalBibEntry.getCanonicalRepresentation(entry)}
 </#list>
 ```
+
+Note: There is a modern implementation [FreshMarker](https://gitlab.com/schegge/freshmarker) keeping the same syntax.
 
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
