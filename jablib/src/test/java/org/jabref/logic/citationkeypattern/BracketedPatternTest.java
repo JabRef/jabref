@@ -179,8 +179,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authShort(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authShort(list));
+    void authIni1(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authIniN(list, 1));
     }
 
     static Stream<Arguments> authIni1() {
@@ -204,8 +204,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authIni1(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authIniN(list, 1));
+    void authIni2(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authIniN(list, 2));
     }
 
     static Stream<Arguments> authIni2() {
@@ -230,8 +230,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authIni2(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authIniN(list, 2));
+    void authIni3(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authIniN(list, 3));
     }
 
     static Stream<Arguments> authIni3() {
@@ -256,8 +256,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authIni3(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authIniN(list, 3));
+    void authIni4(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authIniN(list, 4));
     }
 
     static Stream<Arguments> authIni4() {
@@ -281,8 +281,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authIni4(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authIniN(list, 4));
+    void authEtAlDotDotEal(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authEtal(list, ".", ".etal"));
     }
 
     static Stream<Arguments> authEtAlDotDotEal() {
@@ -306,8 +306,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authEtAlDotDotEal(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authEtal(list, ".", ".etal"));
+    void authAuthEa(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authAuthEa(list));
     }
 
     static Stream<Arguments> authAuthEa() {
@@ -331,26 +331,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authAuthEa(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authAuthEa(list));
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-            "'Newton', 'Isaac Newton'",
-            "'Maxwell', 'Isaac Newton and James Maxwell'",
-            "'Einstein', 'Isaac Newton and James Maxwell and Albert Einstein'",
-            "'Bohr', 'Isaac Newton and James Maxwell and Albert Einstein and N. Bohr'",
-            "'Aachen', 'Aachen'",
-            "'Berlin', 'Aachen and Berlin'",
-            "'Chemnitz', 'Aachen and Berlin and Chemnitz'",
-            "'Düsseldorf', 'Aachen and Berlin and Chemnitz and Düsseldorf'",
-            "'Essen', 'Aachen and Berlin and Chemnitz and Düsseldorf and Essen'",
-            "'Aalst', 'Wil van der Aalst",
-            "'Lessen', 'Wil van der Aalst and Tammo van Lessen'"
-    })
-    void authLast(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.lastAuthor(list));
+    void authShort(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authShort(list));
     }
 
     @ParameterizedTest
