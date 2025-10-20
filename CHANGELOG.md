@@ -45,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
 - We added an option to search and filter the fields and formatters in the Clean up entries dialog. [#13890](https://github.com/JabRef/jabref/issues/13890)
+- We added support for managing multiple linked files via the entry context menu. [#12567](https://github.com/JabRef/jabref/issues/12567)
 
 ### Changed
 
@@ -151,7 +152,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We prevented a brief flash of the default JavaFX (Modena) theme on startup. [#13877](https://github.com/JabRef/jabref/pull/13877)
 - We fixed an issue where button-bar buttons truncated long text with ellipsis. [#13877](https://github.com/JabRef/jabref/pull/13877)
 - We fixed an issue where ignoring of subdirectories via `.gitingore` patterns did not work in the "Find unlinked files dialog". [forum#5425](https://discourse.jabref.org/t/set-list-of-ignored-folders-paths/5425/6)
+- We fixed an issue where CTRL+W does not close the current tab [#12530](https://github.com/JabRef/jabref/issues/12530)
 - We fixed an issue where the "Applications to push entries to" list in the preferences was not sorted alphabetically. [#14058](https://github.com/JabRef/jabref/issues/14058)
+- We fixed an issue where notice text in AI chat was not automatically refreshed when the user changed preferences.[#13855](https://github.com/JabRef/jabref/issues/13855)
+- We fixed an issue where the user could add custom entry types with spaces in their names. [#14088](https://github.com/JabRef/jabref/issues/14088)
 
 ### Removed
 
