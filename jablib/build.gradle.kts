@@ -190,7 +190,7 @@ dependencies {
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
     implementation("io.github.adr:e-adr")
 
-    api("io.github.darvil82:terminal-text-formatter:2.2.0")
+    api("io.github.darvil82:terminal-text-formatter")
 
     implementation("io.zonky.test:embedded-postgres")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
@@ -219,8 +219,6 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
-
-
 
     testImplementation("org.hamcrest:hamcrest")
 
@@ -262,7 +260,7 @@ val taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     onlyIf {!generatedJournalFile.get().asFile.exists()}
 }
 
-val taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
+var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
     group = "JabRef"
     description = "Generates a catalog of all available citation styles"
 
@@ -274,7 +272,7 @@ val taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     onlyIf {!cslCatalogJson.get().asFile.exists()}
 }
 
-val ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
+var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
 
 tasks.register("downloadLtwaFile") {
     group = "JabRef"
@@ -304,7 +302,7 @@ tasks.register("downloadLtwaFile") {
     }
 }
 
-val taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
+var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     group = "JabRef"
     description = "Converts the LTWA CSV file to a H2 MVStore"
     dependsOn("downloadLtwaFile", tasks.named("generateGrammarSource"))

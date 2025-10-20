@@ -47,7 +47,7 @@ dependencies {
 
     implementation("io.github.adr:e-adr")
 
-    implementation("io.github.darvil82:terminal-text-formatter:2.2.0")
+    implementation("io.github.darvil82:terminal-text-formatter")
 
     testImplementation(project(":test-support"))
     testImplementation("org.mockito:mockito-core")

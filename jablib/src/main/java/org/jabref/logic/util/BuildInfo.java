@@ -14,18 +14,23 @@ import textFormatter.color.SimpleColor;
 public final class BuildInfo {
     public static final TextFormatter JABREF_BANNER =
             TextFormatter.of("""
-                                    &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
-                                    &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
-                                    &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
-                                    &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&&&&&&
-                                    &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
-                                    &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
-                                 &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
-                                 """, SimpleColor.MAGENTA).concat(TextFormatter.of("\nVersion: %s\n", SimpleColor.BRIGHT_WHITE))
-                         .concat("""
-                                 Staying on top of your literature since 2003 - https://www.jabref.org/
-                                 Please report issues at https://github.com/JabRef/jabref/issues
-                                 """);
+
+               &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
+               &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
+               &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
+               &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&&&&&&
+               &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
+               &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
+            &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
+            """, SimpleColor.MAGENTA)
+            .concat(
+                    TextFormatter.of("\nVersion: %s\n", SimpleColor.BRIGHT_WHITE)
+            )
+            .concat(
+                    """
+                    Staying on top of your literature since 2003 - https://www.jabref.org/
+                    Please report issues at https://github.com/JabRef/jabref/issues"""
+            );
 
     public static final String UNKNOWN_VERSION = "UNKNOWN";
 
@@ -79,8 +84,7 @@ public final class BuildInfo {
     private static String getValue(Properties properties, String key, String defaultValue) {
         String result = Optional.ofNullable(properties.getProperty(key))
                                 // workaround unprocessed build.properties file --> just remove the reference to some variable used in build.gradle
-                                .map(value -> value.replaceAll("\\$\\{.*\\}", ""))
-                                .orElse("");
+                                .map(value -> value.replaceAll("\\$\\{.*\\}", "")).orElse("");
         if (!result.isEmpty()) {
             return result;
         }
