@@ -15,26 +15,26 @@ public final class BuildInfo {
     public static final TextFormatter JABREF_BANNER =
             TextFormatter.of("""
 
-                       &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
-                       &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
-                       &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
-                       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&&&&&&
-                       &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
-                       &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
-                    &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
+                                    &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
+                                    &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
+                                    &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
+                                    &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&&&&&&
+                                    &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
+                                    &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
+                                 &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
 
-                    """, SimpleColor.MAGENTA)
+                                 """, SimpleColor.MAGENTA)
 
-                    .concat (
-                        TextFormatter.of("\nVersion: %s\n", SimpleColor.BRIGHT_WHITE)
-                    )
+                         .concat(
+                                 TextFormatter.of("\nVersion: %s\n", SimpleColor.BRIGHT_WHITE)
+                         )
 
-                    .concat(
-                        """
-                            Staying on top of your literature since 2003 - https://www.jabref.org/
-                            Please report issues at https://github.com/JabRef/jabref/issues
-                        """
-                    );
+                         .concat(
+                                 """
+                                             Staying on top of your literature since 2003 - https://www.jabref.org/
+                                             Please report issues at https://github.com/JabRef/jabref/issues
+                                         """
+                         );
 
     public static final String UNKNOWN_VERSION = "UNKNOWN";
     public static final String OS = System.getProperty("os.name", UNKNOWN_VERSION);
