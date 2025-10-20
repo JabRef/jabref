@@ -25,13 +25,13 @@ javaModulePackaging {
         architecture = MachineArchitecture.ARM64
         packageTypes = listOf("app-image", "deb", "rpm")
     }
-    target("macos-13") {
+    target("macos-15-intel") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("app-image", "dmg", "pkg")
         singleStepPackaging = true
     }
-    target("macos-14") {
+    target("macos-15") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.ARM64
         packageTypes = listOf("app-image", "dmg", "pkg")
