@@ -33,7 +33,12 @@ public class HelpButton extends Button {
             if (isHelpFileSet) {
                 throw new IllegalStateException("Help file has already been set");
             }
-            setOnAction(_ -> new OpenBrowserAction(helpUrl.get(), Injector.instantiateModelOrService(DialogService.class), Injector.instantiateModelOrService(GuiPreferences.class).getExternalApplicationsPreferences()).execute());
+
+            setOnAction(_ -> new OpenBrowserAction(
+                    helpUrl.get(),
+                    Injector.instantiateModelOrService(DialogService.class),
+                    Injector.instantiateModelOrService(GuiPreferences.class).getExternalApplicationsPreferences()
+            ).execute());
         });
     }
 
@@ -42,7 +47,9 @@ public class HelpButton extends Button {
         setHelpUrl(url);
     }
 
-    public void setHelpFile(@NonNull HelpFile helpFile, @NonNull DialogService dialogService, @NonNull ExternalApplicationsPreferences externalApplicationsPreferences) {
+    public void setHelpFile(@NonNull HelpFile helpFile,
+                            @NonNull DialogService dialogService,
+                            @NonNull ExternalApplicationsPreferences externalApplicationsPreferences) {
         if (isHelpFileSet) {
             throw new IllegalStateException("Help file has already been set");
         }
