@@ -70,11 +70,6 @@ public class StudyQuery {
         this.lucene = lucene != null ? lucene : Optional.empty();
     }
 
-    @JsonIgnore
-    public void setLucene(String lucene) {
-        this.lucene = Optional.ofNullable(lucene);
-    }
-
     public Map<String, String> getCatalogSpecific() {
         return catalogSpecific.orElse(Map.of());
     }
