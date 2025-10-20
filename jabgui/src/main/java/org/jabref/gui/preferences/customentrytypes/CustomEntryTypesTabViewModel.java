@@ -72,8 +72,8 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
         entryTypeValidator = new FunctionBasedValidator<>(
                 entryTypeToAdd,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
+                input -> StringUtil.isNotBlank(input) && !input.contains(" "),
+                ValidationMessage.error(Localization.lang("Entry type cannot be empty and must not contain spaces.")));
         fieldValidator = new FunctionBasedValidator<>(
                 newFieldToAdd,
                 input -> (input != null) && StringUtil.isNotBlank(FieldTextMapper.getDisplayName(input)),
