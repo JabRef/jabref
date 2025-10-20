@@ -12,13 +12,20 @@ val pdfbox = "3.0.5"
 
 dependencies {
     api(platform("ai.djl:bom:0.34.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.4.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.7.1"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.6.0"))
+
+    api(platform("org.junit:junit-bom:6.0.0"))
+    api("org.junit.jupiter:junit-jupiter-api")
+    api("org.junit.jupiter:junit-jupiter-params")
+    api("org.junit.jupiter:junit-jupiter")
+    api("org.junit.platform:junit-platform-launcher")
+
 }
 
 dependencies.constraints {
@@ -37,6 +44,7 @@ dependencies.constraints {
     api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
+    api("com.fasterxml.jackson-datatype-jdk8:2.20.0")
     api("com.fasterxml:aalto-xml:1.3.3")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket:0.24.0")
@@ -49,7 +57,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
-    api("com.google.guava:guava:33.4.8-jre")
+    api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.28")
     api("com.h2database:h2-mvstore:2.3.232")
     api("com.konghq:unirest-java-core:4.5.1")
@@ -85,8 +93,8 @@ dependencies.constraints {
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     api("net.bytebuddy:byte-buddy:1.17.6")
     api("net.harawata:appdirs:1.4.0")
-    api("net.java.dev.jna:jna-jpms:5.18.0")
-    api("net.java.dev.jna:jna-platform:5.18.0")
+    api("net.java.dev.jna:jna-jpms:5.18.1")
+    api("net.java.dev.jna:jna-platform:5.18.1")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.0")
@@ -128,10 +136,6 @@ dependencies.constraints {
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.20.1")
     api("org.jspecify:jspecify:1.0.0")
-    api("org.junit.jupiter:junit-jupiter-api:6.0.0")
-    api("org.junit.jupiter:junit-jupiter-params:6.0.0")
-    api("org.junit.jupiter:junit-jupiter:6.0.0")
-    api("org.junit.platform:junit-platform-launcher:1.13.4")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
