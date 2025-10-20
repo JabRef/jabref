@@ -171,15 +171,11 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
 
         stateManager.getSelectedEntries().addListener((InvalidationListener) _ -> {
-                    if (stateManager.getSelectedEntries().isEmpty()) {
-                        // [impl->req~entry-editor.keep-showing~1]
-                        // No change in the entry editor
-                        // We allow users to edit the "old" entry
-                    } else {
-                        setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
-                    }
-                }
-        );
+            if (!stateManager.getSelectedEntries().isEmpty()) {
+                setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
+                Platform.runLater(() -> tabbed.requestFocus());
+            }
+        });
 
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (_, _, newValue) -> {
@@ -261,11 +257,23 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         close();
                         event.consume();
                         break;
+                    case JUMP_TO_FIELD:
+                        showJumpToFieldDialog();
+                        event.consume();
+                        break;
                     default:
                         // Pass other keys to parent
                 }
             }
         });
+    }
+
+    private void showJumpToFieldDialog() {
+        if (getCurrentlyEditedEntry() == null) {
+            return;
+        }
+        JumpToFieldDialog dialog = new JumpToFieldDialog(this);
+        dialog.showAndWait();
     }
 
     @FXML
@@ -420,6 +428,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         return currentlyEditedEntry;
     }
 
+    public List<EntryEditorTab> getAllPossibleTabs() {
+        return allPossibleTabs;
+    }
+
     public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
         if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
             return;
@@ -434,14 +446,25 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
 
         typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
-            typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+            typeLabel.setText(new TypedBibEntry(this.currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
             adaptVisibleTabs();
             setupToolBar();
-            getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
+            getSelectedTab().notifyAboutFocus(this.currentlyEditedEntry);
         });
+
+        typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+
+        adaptVisibleTabs();
+
+        setupToolBar();
 
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
+        }
+
+        EntryEditorTab selectedTab = getSelectedTab();
+        if (selectedTab != null) {
+            Platform.runLater(() -> selectedTab.notifyAboutFocus(currentlyEditedEntry));
         }
     }
 
@@ -490,6 +513,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
         new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(currentlyEditedEntry, fetcher);
+    }
+
+    public void jumpToField(String fieldName) {
+        setFocusToField(org.jabref.model.entry.field.FieldFactory.parseField(fieldName));
     }
 
     public void setFocusToField(Field field) {
