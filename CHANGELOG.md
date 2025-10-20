@@ -10,6 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
+
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
 - We made the "Configure API key" option in the Web Search preferences tab searchable via preferences search. [#13929](https://github.com/JabRef/jabref/issues/13929)
 - We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
