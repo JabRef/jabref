@@ -38,6 +38,7 @@ class MakeLabelWithDatabaseTest {
         pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         bibtexKeyPattern = new DatabaseCitationKeyPatterns(pattern);
         preferences = new CitationKeyPatternPreferences(
+                true,
                 false,
                 false,
                 false,
@@ -70,6 +71,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateDefaultKeyAlwaysLetter() {
         preferences = new CitationKeyPatternPreferences(
+                true,
                 false,
                 false,
                 false,
@@ -88,6 +90,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateDefaultKeyAlwaysLetterAlreadyExistsDuplicatesStartAtB() {
         preferences = new CitationKeyPatternPreferences(
+                true,
                 false,
                 false,
                 false,
@@ -111,6 +114,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateDefaultKeyStartDuplicatesAtB() {
         preferences = new CitationKeyPatternPreferences(
+                true,
                 false,
                 false,
                 false,
@@ -129,6 +133,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateDefaultKeyAlreadyExistsDuplicatesStartAtB() {
         preferences = new CitationKeyPatternPreferences(
+                true,
                 false,
                 false,
                 false,
@@ -430,6 +435,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateKeyRegExReplace() {
         preferences = new CitationKeyPatternPreferences(
+                true,
                 false,
                 false,
                 false,
