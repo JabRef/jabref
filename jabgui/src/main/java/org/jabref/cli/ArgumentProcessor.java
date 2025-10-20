@@ -76,7 +76,7 @@ public class ArgumentProcessor {
             return uiCommands;
         }
 
-        if (StringUtil.isBlank(guiCli.jumpToKey)) {
+        if (StringUtil.isNotBlank(guiCli.jumpToKey)) {
             uiCommands.add(new UiCommand.JumpToEntryKey(guiCli.jumpToKey));
         }
 

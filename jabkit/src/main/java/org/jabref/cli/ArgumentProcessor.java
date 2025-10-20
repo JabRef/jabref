@@ -70,11 +70,11 @@ public class ArgumentProcessor implements Runnable {
 
     @Override
     public void run() {
-       String bannerString = BuildInfo.JABREF_BANNER.toString();
+        String bannerString = BuildInfo.JABREF_BANNER.toString();
 
-       String formattedBanner = String.format(bannerString, new BuildInfo().version);
+        String formattedBanner = String.format(bannerString, new BuildInfo().version);
 
-       System.out.println(formattedBanner);
+        System.out.println(formattedBanner);
     }
 
     /**
