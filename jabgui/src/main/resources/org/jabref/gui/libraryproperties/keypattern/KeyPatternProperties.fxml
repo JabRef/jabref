@@ -12,7 +12,7 @@
          fx:controller="org.jabref.gui.libraryproperties.keypattern.KeyPatternPropertiesView">
     <HBox alignment="BOTTOM_LEFT" spacing="8.0">
         <Label styleClass="sectionHeader" text="%Key patterns"/>
-        <HelpButton helpUrl="https://docs.jabref.org/setup/citationkeypatterns"/>
+        <HelpButton helpUrl="https://docs.jabref.org/setup/citationkeypatterns" tooltip="%Help on key patterns"/>
     </HBox>
     <Label text="%( Note: Press return to commit changes in the table! )"/>
     <AnchorPane VBox.vgrow="ALWAYS">

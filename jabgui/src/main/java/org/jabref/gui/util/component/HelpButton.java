@@ -18,6 +18,7 @@ import org.jspecify.annotations.NonNull;
 
 public class HelpButton extends Button {
     private final StringProperty helpUrl = new SimpleStringProperty("");
+    private final StringProperty tooltip = new SimpleStringProperty("");
     private boolean isHelpFileSet = false;
 
     public HelpButton() {
