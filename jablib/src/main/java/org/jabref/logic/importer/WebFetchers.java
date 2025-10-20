@@ -135,6 +135,7 @@ public class WebFetchers {
         set.add(new BiodiversityLibrary(importerPreferences));
         set.add(new LOBIDFetcher());
         set.add(new ScholarArchiveFetcher());
+        set.add(new EuropePmcFetcher());
         return set;
     }
 
