@@ -26,7 +26,7 @@ public final class BuildInfo {
                     """, SimpleColor.MAGENTA)
 
                     .concat (
-                        (TextFormatter.of("\nVersion: %s\n", SimpleColor.BRIGHT_WHITE)
+                        TextFormatter.of("\nVersion: %s\n", SimpleColor.BRIGHT_WHITE)
                     )
 
                     .concat(
