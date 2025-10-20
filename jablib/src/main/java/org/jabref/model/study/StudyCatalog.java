@@ -1,11 +1,11 @@
 package org.jabref.model.study;
 
 /// data model for the view `org.jabref.gui.slr.StudyCatalogItem`
-public class StudyDatabase {
+public class StudyCatalog {
     private String name;
     private boolean enabled;
 
-    public StudyDatabase(String name, boolean enabled) {
+    public StudyCatalog(String name, boolean enabled) {
         this.name = name;
         this.enabled = enabled;
     }
@@ -13,7 +13,7 @@ public class StudyDatabase {
     /**
      * Used for Jackson deserialization
      */
-    public StudyDatabase() {
+    public StudyCatalog() {
         // Per default fetcher is activated
         this.enabled = true;
     }
@@ -43,7 +43,7 @@ public class StudyDatabase {
             return false;
         }
 
-        StudyDatabase that = (StudyDatabase) o;
+        StudyCatalog that = (StudyCatalog) o;
 
         if (isEnabled() != that.isEnabled()) {
             return false;
