@@ -45,7 +45,6 @@ public class ArgumentProcessor {
 
         if ((startupMode == Mode.INITIAL_START) && cli.isVersionHelpRequested()) {
             System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
-
             guiNeeded = false;
             return List.of();
         }
