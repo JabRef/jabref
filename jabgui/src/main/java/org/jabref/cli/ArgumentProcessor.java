@@ -44,14 +44,14 @@ public class ArgumentProcessor {
         guiNeeded = true;
 
         if ((startupMode == Mode.INITIAL_START) && cli.isVersionHelpRequested()) {
-            System.out.printf((BuildInfo.JABREF_BANNER) + "%n", new BuildInfo().version);
+            System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
 
             guiNeeded = false;
             return List.of();
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isUsageHelpRequested()) {
-            System.out.printf((BuildInfo.JABREF_BANNER) + "%n", new BuildInfo().version);
+            System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
             System.out.println(cli.getUsageMessage());
 
             guiNeeded = false;
