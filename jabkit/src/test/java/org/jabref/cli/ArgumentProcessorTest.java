@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,61 +14,21 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.model.search.SearchDisplayMode;
-import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Answers;
-import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ArgumentProcessorTest {
-
-    private final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    private final BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
-    private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    private final ExportPreferences exportPreferences = mock(ExportPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-
-    private CommandLine commandLine;
-
-    @BeforeEach()
-    void setup() {
-        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
-        when(exportPreferences.getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
-
-        when(preferences.getExportPreferences()).thenReturn(exportPreferences);
-        when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
-        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
-                SearchDisplayMode.FILTER,
-                EnumSet.noneOf(SearchFlags.class),
-                false,
-                false,
-                0,
-                0,
-                0));
-
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
-        commandLine = new CommandLine(argumentProcessor);
-    }
+class ArgumentProcessorTest extends AbstractJabKitTest {
 
     @Test
     void auxImport(@TempDir Path tempDir) throws URISyntaxException {
