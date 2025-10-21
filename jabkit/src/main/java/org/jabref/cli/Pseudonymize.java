@@ -41,7 +41,7 @@ public class Pseudonymize implements Runnable {
     @Option(names = {"--output"}, converter = CygWinPathConverter.class, description = "Output pseudo-bib file")
     private Path outputFile;
 
-    @Option(names = {"--key"},converter = CygWinPathConverter.class, description = "Output pseudo-keys file")
+    @Option(names = {"--key"}, converter = CygWinPathConverter.class, description = "Output pseudo-keys file")
     private Path keyFile;
 
     @Option(names = {"-f", "--force"}, description = "Overwrite output file(s) if any exist(s)")
@@ -95,7 +95,6 @@ public class Pseudonymize implements Runnable {
             LOGGER.error("Unable to save keys for pseudonymized library", ex);
         }
     }
-
 
     private Path resolveOutputPath(Path customPath, Path inputPath, String defaultFileName) {
         return customPath != null ? customPath : inputPath.toAbsolutePath().getParent().resolve(defaultFileName);
