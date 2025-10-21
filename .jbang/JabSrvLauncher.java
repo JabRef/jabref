@@ -58,6 +58,7 @@
 // https://jitpack.io/#jabref/jabref/main-SNAPSHOT
 // DEPS com.github.jabref:jabref:main-SNAPSHOT
 
+//DEPS io.github.darvil82:terminal-text-formatter:2.2.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.jspecify:jspecify:1.0.0
 
