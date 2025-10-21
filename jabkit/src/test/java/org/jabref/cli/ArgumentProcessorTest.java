@@ -32,8 +32,8 @@ class ArgumentProcessorTest extends AbstractJabKitTest {
 
     @Test
     void auxImport(@TempDir Path tempDir) throws URISyntaxException {
-        String fullBib = Path.of(ArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
-        String auxFile = Path.of(ArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
+        String fullBib = getClassResourceAsFullyQualifiedString("origin.bib");
+        String auxFile = getClassResourceAsFullyQualifiedString("paper.aux");
 
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
@@ -46,7 +46,7 @@ class ArgumentProcessorTest extends AbstractJabKitTest {
 
     @Test
     void search(@TempDir Path tempDir) throws URISyntaxException, IOException {
-        Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
+        Path originBib = getClassResourceAsPath("origin.bib");
         String originBibFile = originBib.toAbsolutePath().toString();
 
         Path expectedBib = Path.of(
@@ -69,7 +69,7 @@ class ArgumentProcessorTest extends AbstractJabKitTest {
 
     @Test
     void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws URISyntaxException {
-        Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
+        Path originBib = getClassResourceAsPath("origin.bib");
         String originBibFile = originBib.toAbsolutePath().toString();
 
         Path outputHtml = tempDir.resolve("output.html").toAbsolutePath();
@@ -93,8 +93,8 @@ class ArgumentProcessorTest extends AbstractJabKitTest {
     }
 
     @Test
-    void checkConsistency() throws URISyntaxException {
-        Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
+    void checkConsistency() {
+        Path testBib = getClassResourceAsPath("origin.bib");
         String testBibFile = testBib.toAbsolutePath().toString();
 
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--output-format", "txt");
@@ -113,8 +113,8 @@ class ArgumentProcessorTest extends AbstractJabKitTest {
     }
 
     @Test
-    void checkConsistencyPorcelain() throws URISyntaxException {
-        Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
+    void checkConsistencyPorcelain() {
+        Path testBib = getClassResourceAsPath("origin.bib");
         String testBibFile = testBib.toAbsolutePath().toString();
 
         // "txt" is the default output format; thus not provided here

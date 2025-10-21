@@ -1,6 +1,9 @@
 package org.jabref.cli;
 
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.Objects;
 
 import javafx.collections.FXCollections;
 
@@ -48,5 +51,37 @@ public abstract class AbstractJabKitTest {
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
         commandLine = new CommandLine(argumentProcessor);
+    }
+
+    /**
+     * Gets class resource as fully qualified string.
+     * Useful for scenarios where you want a resource as a command line argument
+     * <p>
+     * Throws a runtime exception if the resource URL cannot be turned into a URI.
+     *
+     * @param resourceName the resource name
+     * @return the class resource as fully qualified string
+     */
+    String getClassResourceAsFullyQualifiedString(String resourceName) {
+        return getClassResourceAsPath(resourceName).toAbsolutePath().toString();
+    }
+
+    /**
+     * Gets class resource as a path.
+     * <p>
+     * Throws a runtime exception if the resource URL cannot be turned into a URI.
+     *
+     * @param resourceName the resource name
+     * @return the class resource as path
+     */
+    Path getClassResourceAsPath(String resourceName) {
+        try {
+            return Path.of(Objects.requireNonNull(this.getClass().getResource(resourceName), "Could not find resource: " + resourceName).toURI())
+                       .toAbsolutePath();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(
+                    String.format("Wrong resource name %s for class %s", resourceName, this.getClass()), e
+            );
+        }
     }
 }
