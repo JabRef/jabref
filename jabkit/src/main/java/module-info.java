@@ -26,5 +26,4 @@ module org.jabref.jabkit {
     // region: other libraries (alphabetically)
     requires io.github.adr;
     // endregion
-    requires textFormatter;
 }
