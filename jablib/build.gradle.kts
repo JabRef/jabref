@@ -249,7 +249,7 @@ tasks.generateGrammarSource {
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
 
-val taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
+var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
