@@ -30,7 +30,16 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Represents the link to an external file (e.g. associated PDF file).
- * This class is {@link Serializable} which is needed for drag and drop in gui
+ * This class is {@link Serializable} which is needed for drag and drop in gui.
+ * <p>
+ * Use static factory methods to create instances for better clarity:
+ * <ul>
+ *   <li>{@link #of(String, Path, String)} - for local file paths</li>
+ *   <li>{@link #of(String, String, String)} - for string-based links</li>
+ *   <li>{@link #of(URL, String)} - for online resources</li>
+ *   <li>{@link #of(Path)} - for path without description</li>
+ * </ul>
+ * </p>
  */
 @AllowedToUseLogic("Uses FileUtil from logic")
 @NullMarked
@@ -39,7 +48,7 @@ public class LinkedFile implements Serializable {
     private static final String REGEX_URL = "^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
-    private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
+    private static final LinkedFile NULL_OBJECT = of("", Path.of(""), "");
 
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
@@ -49,50 +58,139 @@ public class LinkedFile implements Serializable {
     private transient StringProperty fileType = new SimpleStringProperty();
     private transient StringProperty sourceURL = new SimpleStringProperty();
 
-    public LinkedFile(String description, Path link, String fileType) {
-        this(description, link.toString(), fileType);
-    }
-
-    public LinkedFile(String description, Path link, String fileType, String sourceUrl) {
-        this(description, link.toString(), fileType, sourceUrl);
-    }
-
-    public LinkedFile(String description, String link, FileType fileType) {
-        this(description, link, fileType.getName());
-    }
-
     /**
+     * Private constructor - use static factory methods instead.
      * Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.
+     *
+     * @param description the file description
+     * @param link        the file link as string
+     * @param fileType    the file type
+     * @param sourceUrl   the source URL where the file was obtained
      */
-    public LinkedFile(String description, String link, String fileType, String sourceUrl) {
+    private LinkedFile(String description, String link, String fileType, String sourceUrl) {
         this.description.setValue(description);
         setLink(link);
         this.fileType.setValue(fileType);
         this.sourceURL.setValue(sourceUrl);
     }
 
-    public LinkedFile(String description, String link, String fileType) {
-        this(description, link, fileType, "");
-    }
+    // Static Factory Methods
 
-    public LinkedFile(URL link, String fileType) {
-        this("", link.toString(), fileType);
-    }
-
-    public LinkedFile(String description, URL link, String fileType) {
-        this(description, link.toString(), fileType);
-    }
-
-    public LinkedFile(String description, URL link, String fileType, String sourceUrl) {
-        this(description, link.toString(), fileType, sourceUrl);
+    /**
+     * Creates a LinkedFile from a local file path.
+     * This is the most common way to create a LinkedFile for local files.
+     *
+     * @param description the file description
+     * @param link        the file path
+     * @param fileType    the file type, e.g., "PDF", "TXT"
+     * @return a new LinkedFile instance
+     */
+    public static LinkedFile of(String description, Path link, String fileType) {
+        return new LinkedFile(description, link.toString(), fileType, "");
     }
 
     /**
-     * Constructs a new LinkedFile with an empty file type and an empty description
+     * Creates a LinkedFile from a local file path with a source URL.
+     *
+     * @param description the file description
+     * @param link        the file path
+     * @param fileType    the file type, e.g., "PDF", "TXT"
+     * @param sourceUrl   the source URL where the file was obtained
+     * @return a new LinkedFile instance
      */
-    public LinkedFile(Path link) {
-        this("", link, "");
+    public static LinkedFile of(String description, Path link, String fileType, String sourceUrl) {
+        return new LinkedFile(description, link.toString(), fileType, sourceUrl);
     }
+
+    /**
+     * Creates a LinkedFile from string representations.
+     * This is useful when parsing file information from external sources.
+     *
+     * @param description the file description
+     * @param link        the file link as string
+     * @param fileType    the file type (as FileType object)
+     * @return a new LinkedFile instance
+     */
+    public static LinkedFile of(String description, String link, FileType fileType) {
+        return new LinkedFile(description, link, fileType.getName(), "");
+    }
+
+    /**
+     * Creates a LinkedFile from string representations with source URL.
+     * This is the most flexible factory method, accepting all parameters as strings.
+     *
+     * @param description the file description
+     * @param link        the file link as string
+     * @param fileType    the file type
+     * @param sourceUrl   the source URL where the file was obtained
+     * @return a new LinkedFile instance
+     */
+    public static LinkedFile of(String description, String link, String fileType, String sourceUrl) {
+        return new LinkedFile(description, link, fileType, sourceUrl);
+    }
+
+    /**
+     * Creates a LinkedFile from string representations without source URL.
+     *
+     * @param description the file description
+     * @param link        the file link as string
+     * @param fileType    the file type
+     * @return a new LinkedFile instance
+     */
+    public static LinkedFile of(String description, String link, String fileType) {
+        return new LinkedFile(description, link, fileType, "");
+    }
+
+    /**
+     * Creates a LinkedFile from a URL without description.
+     * Useful for online resources where no description is needed.
+     *
+     * @param link     the URL
+     * @param fileType the file type, e.g., "URL", "HTML"
+     * @return a new LinkedFile instance
+     */
+    public static LinkedFile of(URL link, String fileType) {
+        return new LinkedFile("", link.toString(), fileType, "");
+    }
+
+    /**
+     * Creates a LinkedFile from a URL with description.
+     * Recommended for online resources that need a descriptive label.
+     *
+     * @param description the file description
+     * @param link        the URL
+     * @param fileType    the file type, e.g., "URL", "HTML"
+     * @return a new LinkedFile instance
+     */
+    public static LinkedFile of(String description, URL link, String fileType) {
+        return new LinkedFile(description, link.toString(), fileType, "");
+    }
+
+    /**
+     * Creates a LinkedFile from a URL with description and source URL.
+     *
+     * @param description the file description
+     * @param link        the URL
+     * @param fileType    the file type, e.g., "URL", "HTML"
+     * @param sourceUrl   the source URL where the file was obtained
+     * @return a new LinkedFile instance
+     */
+    public static LinkedFile of(String description, URL link, String fileType, String sourceUrl) {
+        return new LinkedFile(description, link.toString(), fileType, sourceUrl);
+    }
+
+    /**
+     * Creates a LinkedFile with an empty file type and an empty description.
+     * Useful for quick creation when only the path is known.
+     *
+     * @param link the file path
+     * @return a new LinkedFile instance
+     */
+    public static LinkedFile of(Path link) {
+        return new LinkedFile("", link.toString(), "", "");
+    }
+
+    // Properties
 
     public StringProperty descriptionProperty() {
         return description;
@@ -109,6 +207,8 @@ public class LinkedFile implements Serializable {
     public StringProperty sourceUrlProperty() {
         return sourceURL;
     }
+
+    // Getters and Setters
 
     public String getFileType() {
         return fileType.get();
@@ -154,19 +254,7 @@ public class LinkedFile implements Serializable {
         return new Observable[] {this.link, this.description, this.fileType, this.sourceURL};
     }
 
-    @Override
-    public boolean equals(@Nullable Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o instanceof LinkedFile that) {
-            return Objects.equals(description.get(), that.description.get())
-                    && Objects.equals(link.get(), that.link.get())
-                    && Objects.equals(fileType.get(), that.fileType.get())
-                    && Objects.equals(sourceURL.get(), that.sourceURL.get());
-        }
-        return false;
-    }
+    // Serialization
 
     /**
      * Writes serialized object to ObjectOutputStream, automatically called
@@ -191,6 +279,8 @@ public class LinkedFile implements Serializable {
         sourceURL = new SimpleStringProperty(in.readUTF());
     }
 
+    // Utility Methods
+
     /**
      * Checks if the given String is an online link
      *
@@ -200,21 +290,6 @@ public class LinkedFile implements Serializable {
     public static boolean isOnlineLink(String toCheck) {
         String normalizedFilePath = toCheck.trim().toLowerCase();
         return URL_PATTERN.matcher(normalizedFilePath).matches();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(description.get(), link.get(), fileType.get(), sourceURL.get());
-    }
-
-    @Override
-    public String toString() {
-        return "ParsedFileField{" +
-                "description='" + description.get() + '\'' +
-                ", link='" + link.get() + '\'' +
-                ", fileType='" + fileType.get() + '\'' +
-                (StringUtil.isNullOrEmpty(sourceURL.get()) ? "" : (", sourceUrl='" + sourceURL.get() + '\'')) +
-                '}';
     }
 
     public boolean isEmpty() {
@@ -255,5 +330,36 @@ public class LinkedFile implements Serializable {
         } catch (InvalidPathException ex) {
             return Optional.empty();
         }
+    }
+
+    // Object Methods
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof LinkedFile that) {
+            return Objects.equals(description.get(), that.description.get())
+                    && Objects.equals(link.get(), that.link.get())
+                    && Objects.equals(fileType.get(), that.fileType.get())
+                    && Objects.equals(sourceURL.get(), that.sourceURL.get());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description.get(), link.get(), fileType.get(), sourceURL.get());
+    }
+
+    @Override
+    public String toString() {
+        return "ParsedFileField{" +
+                "description='" + description.get() + '\'' +
+                ", link='" + link.get() + '\'' +
+                ", fileType='" + fileType.get() + '\'' +
+                (StringUtil.isNullOrEmpty(sourceURL.get()) ? "" : (", sourceUrl='" + sourceURL.get() + '\'')) +
+                '}';
     }
 }
