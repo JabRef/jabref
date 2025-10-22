@@ -402,7 +402,7 @@ public class MarcXmlParser implements Parser {
     private static void handleVolltext(BibEntry bibEntry, String fieldName, String resource, Field fallBackField) {
         if ("Volltext".equals(fieldName) && StringUtil.isNotBlank(resource)) {
             try {
-                LinkedFile linkedFile = new LinkedFile("", URLUtil.create(resource), StandardFileType.PDF.getName());
+                LinkedFile linkedFile = LinkedFile.of("", URLUtil.create(resource), StandardFileType.PDF.getName());
                 bibEntry.setFiles(List.of(linkedFile));
             } catch (MalformedURLException | IllegalArgumentException e) {
                 LOGGER.info("Malformed URL: {}", resource);

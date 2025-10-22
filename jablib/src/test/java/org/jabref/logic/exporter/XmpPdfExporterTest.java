@@ -89,7 +89,7 @@ class XmpPdfExporterTest {
                   .withField(StandardField.EPRINTTYPE, "asdf")
                   .withField(StandardField.OWNER, "Ich")
                   .withField(StandardField.URL, "www.url.de")
-                  .withFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
+                  .withFiles(List.of(LinkedFile.of("non-existing", "path/to/nowhere.pdf", "PDF")));
 
         VAPNIK_2000.withCitationKey("vapnik2000")
                    .withField(StandardField.TITLE, "The Nature of Statistical Learning Theory")
@@ -132,7 +132,7 @@ class XmpPdfExporterTest {
         }
         LinkedFile linkedFile = createDefaultLinkedFile("existing.pdf", tempDir);
         OLLY_2018.setFiles(List.of(linkedFile));
-        TORAL_2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
+        TORAL_2006.setFiles(List.of(LinkedFile.of("non-existing", "path/to/nowhere.pdf", "PDF")));
     }
 
     @ParameterizedTest
@@ -215,7 +215,7 @@ class XmpPdfExporterTest {
             pdf.save(pdfFile.toAbsolutePath().toString());
         }
 
-        return new LinkedFile("", pdfFile, "PDF");
+        return LinkedFile.of("", pdfFile, "PDF");
     }
 }
 

@@ -97,7 +97,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
         // We use the absolute path here as we do not know the context where this import will be used.
         // The caller is responsible for making the path relative if necessary.
-        entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
+        entry.addFile(LinkedFile.of("", filePath, StandardFileType.PDF.getName()));
         return List.of(entry);
     }
 

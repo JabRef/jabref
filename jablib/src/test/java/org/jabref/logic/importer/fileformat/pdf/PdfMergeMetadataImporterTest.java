@@ -87,7 +87,7 @@ class PdfMergeMetadataImporterTest {
         expected.setField(StandardField.VOLUME, "1");
 
         // From merge
-        expected.setFiles(List.of(new LinkedFile("", file.toAbsolutePath(), StandardFileType.PDF.getName())));
+        expected.setFiles(List.of(LinkedFile.of("", file.toAbsolutePath(), StandardFileType.PDF.getName())));
 
         assertEquals(List.of(expected), result);
     }

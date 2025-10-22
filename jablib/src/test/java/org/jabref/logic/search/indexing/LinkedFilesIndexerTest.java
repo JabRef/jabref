@@ -54,7 +54,7 @@ public class LinkedFilesIndexerTest {
     void exampleThesisIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
-                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+                .withFiles(List.of(LinkedFile.of("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -70,7 +70,7 @@ public class LinkedFilesIndexerTest {
     void dontIndexNonPdf() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
-                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.AUX.getName())));
+                .withFiles(List.of(LinkedFile.of("Example Thesis", "thesis-example.pdf", StandardFileType.AUX.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -86,7 +86,7 @@ public class LinkedFilesIndexerTest {
     void dontIndexOnlineLinks() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
-                .withFiles(List.of(new LinkedFile("Example Thesis", "https://raw.githubusercontent.com/JabRef/jabref/main/src/test/resources/pdfs/thesis-example.pdf", StandardFileType.PDF.getName())));
+                .withFiles(List.of(LinkedFile.of("Example Thesis", "https://raw.githubusercontent.com/JabRef/jabref/main/src/test/resources/pdfs/thesis-example.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -103,7 +103,7 @@ public class LinkedFilesIndexerTest {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
                 .withCitationKey("Example2017")
-                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+                .withFiles(List.of(LinkedFile.of("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -119,7 +119,7 @@ public class LinkedFilesIndexerTest {
     void metaDataIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withFiles(List.of(new LinkedFile("Example Thesis", "metaData.pdf", StandardFileType.PDF.getName())));
+                .withFiles(List.of(LinkedFile.of("Example Thesis", "metaData.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -136,7 +136,7 @@ public class LinkedFilesIndexerTest {
         // given
         BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis)
                 .withCitationKey("ExampleThesis2017")
-                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+                .withFiles(List.of(LinkedFile.of("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(exampleThesis), mock(BackgroundTask.class));
@@ -149,7 +149,7 @@ public class LinkedFilesIndexerTest {
 
         BibEntry metadata = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("MetaData2017")
-                .withFiles(List.of(new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
+                .withFiles(List.of(LinkedFile.of("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(metadata), mock(BackgroundTask.class));
@@ -166,7 +166,7 @@ public class LinkedFilesIndexerTest {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
                 .withCitationKey("Example2017")
-                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+                .withFiles(List.of(LinkedFile.of("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
 
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
 

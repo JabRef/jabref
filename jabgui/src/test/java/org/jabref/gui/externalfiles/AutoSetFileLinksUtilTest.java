@@ -52,7 +52,7 @@ class AutoSetFileLinksUtilTest {
     @Test
     void findAssociatedNotLinkedFilesSuccess() throws IOException {
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(path.getParent()));
-        List<LinkedFile> expected = List.of(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF"));
+        List<LinkedFile> expected = List.of(LinkedFile.of("", Path.of("CiteKey.pdf"), "PDF"));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(expected, actual);
@@ -73,7 +73,7 @@ class AutoSetFileLinksUtilTest {
         Files.createDirectories(oldPath.getParent());
         Files.createFile(oldPath);
 
-        LinkedFile stale = new LinkedFile("", oldPath.toString(), "PDF");
+        LinkedFile stale = LinkedFile.of("", oldPath.toString(), "PDF");
         BibEntry entry = new BibEntry(StandardEntryType.Misc);
         entry.addFile(stale);
 

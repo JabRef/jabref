@@ -39,7 +39,7 @@ public class LinkedFile implements Serializable {
     private static final String REGEX_URL = "^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
-    private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
+    private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of("").toString(), "", "");
 
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
@@ -49,49 +49,49 @@ public class LinkedFile implements Serializable {
     private transient StringProperty fileType = new SimpleStringProperty();
     private transient StringProperty sourceURL = new SimpleStringProperty();
 
-    public LinkedFile(String description, Path link, String fileType) {
-        this(description, link.toString(), fileType);
-    }
-
-    public LinkedFile(String description, Path link, String fileType, String sourceUrl) {
-        this(description, link.toString(), fileType, sourceUrl);
-    }
-
-    public LinkedFile(String description, String link, FileType fileType) {
-        this(description, link, fileType.getName());
-    }
-
     /**
      * Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.
      */
-    public LinkedFile(String description, String link, String fileType, String sourceUrl) {
+    private LinkedFile(String description, String link, String fileType, String sourceUrl) {
         this.description.setValue(description);
         setLink(link);
         this.fileType.setValue(fileType);
         this.sourceURL.setValue(sourceUrl);
     }
 
-    public LinkedFile(String description, String link, String fileType) {
-        this(description, link, fileType, "");
+    public static LinkedFile of(String description, Path link, String fileType) {
+        return new LinkedFile(description, link.toString(), fileType, "");
     }
 
-    public LinkedFile(URL link, String fileType) {
-        this("", link.toString(), fileType);
+    public static LinkedFile of(String description, Path link, String fileType, String sourceUrl) {
+        return new LinkedFile(description, link.toString(), fileType, sourceUrl);
     }
 
-    public LinkedFile(String description, URL link, String fileType) {
-        this(description, link.toString(), fileType);
+    public static LinkedFile of(String description, String link, FileType fileType) {
+        return new LinkedFile(description, link, fileType.getName(), "");
     }
 
-    public LinkedFile(String description, URL link, String fileType, String sourceUrl) {
-        this(description, link.toString(), fileType, sourceUrl);
+    public static LinkedFile of(String description, String link, String fileType) {
+        return new LinkedFile(description, link, fileType, "");
+    }
+
+    public static LinkedFile of(URL link, String fileType) {
+        return new LinkedFile("", link.toString(), fileType, "");
+    }
+
+    public static LinkedFile of(String description, URL link, String fileType) {
+        return new LinkedFile(description, link.toString(), fileType, "");
+    }
+
+    public static LinkedFile of(String description, URL link, String fileType, String sourceUrl) {
+        return new LinkedFile(description, link.toString(), fileType, sourceUrl);
     }
 
     /**
      * Constructs a new LinkedFile with an empty file type and an empty description
      */
-    public LinkedFile(Path link) {
-        this("", link, "");
+    public static LinkedFile of(Path link) {
+        return new LinkedFile("", link.toString(), "", "");
     }
 
     public StringProperty descriptionProperty() {

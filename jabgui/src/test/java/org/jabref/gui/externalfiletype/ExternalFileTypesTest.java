@@ -89,7 +89,7 @@ class ExternalFileTypesTest {
 
     @Test
     void getExternalFileTypeByLinkedFile() {
-        LinkedFile testfile = new LinkedFile("A testfile", "https://testserver.com/testfile.pdf", "PDF");
+        LinkedFile testfile = LinkedFile.of("A testfile", "https://testserver.com/testfile.pdf", "PDF");
         assertEquals(Optional.of(StandardExternalFileType.PDF), ExternalFileTypes.getExternalFileTypeByLinkedFile(testfile, false, externalApplicationsPreferences));
     }
 

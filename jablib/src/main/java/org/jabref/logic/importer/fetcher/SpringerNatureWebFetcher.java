@@ -128,7 +128,7 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
                     JSONObject url = (JSONObject) data;
                     if ("pdf".equalsIgnoreCase(url.optString("format"))) {
                         try {
-                            entry.addFile(new LinkedFile(URLUtil.create(url.optString("value")), "PDF"));
+                            entry.addFile(LinkedFile.of(URLUtil.create(url.optString("value")), "PDF"));
                         } catch (MalformedURLException e) {
                             LOGGER.info("Malformed URL: {}", url.optString("value"));
                         }

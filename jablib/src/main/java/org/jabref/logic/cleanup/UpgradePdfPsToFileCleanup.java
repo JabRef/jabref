@@ -41,7 +41,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
                     return;
                 }
                 Path path = Path.of(fieldContent);
-                LinkedFile flEntry = new LinkedFile(path.getFileName().toString(), path, field.getValue());
+                LinkedFile flEntry = LinkedFile.of(path.getFileName().toString(), path, field.getValue());
                 fileList.add(flEntry);
 
                 entry.clearField(field.getKey());

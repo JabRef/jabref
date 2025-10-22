@@ -246,19 +246,19 @@ class BibEntryTest {
     @Test
     void getAndAddToLinkedFileList() {
         List<LinkedFile> files = entry.getFiles();
-        files.add(new LinkedFile("", Path.of(""), ""));
+        files.add(LinkedFile.of("", Path.of(""), ""));
         entry.setFiles(files);
-        assertEquals(List.of(new LinkedFile("", Path.of(""), "")), entry.getFiles());
+        assertEquals(List.of(LinkedFile.of("", Path.of(""), "")), entry.getFiles());
     }
 
     @Test
     void replaceOfLinkWorks() throws MalformedURLException {
         List<LinkedFile> files = new ArrayList<>();
         String urlAsString = "https://www.example.org/file.pdf";
-        files.add(new LinkedFile(URLUtil.create(urlAsString), ""));
+        files.add(LinkedFile.of(URLUtil.create(urlAsString), ""));
         entry.setFiles(files);
 
-        LinkedFile linkedFile = new LinkedFile("", Path.of("file.pdf", ""), "");
+        LinkedFile linkedFile = LinkedFile.of("", Path.of("file.pdf", ""), "");
         entry.replaceDownloadedFile(urlAsString, linkedFile);
         assertEquals(List.of(linkedFile), entry.getFiles());
     }

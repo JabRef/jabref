@@ -107,7 +107,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, externalApplicationsPreferences)
                                                               .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
-        return new LinkedFile("", relativePath, suggestedFileType.getName());
+        return LinkedFile.of("", relativePath, suggestedFileType.getName());
     }
 
     private void wireAggregateDownloadBindings() {
@@ -268,7 +268,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     private void addFromURLAndDownload(URL url) {
         LinkedFileViewModel onlineFile = new LinkedFileViewModel(
-                new LinkedFile(url, ""),
+                LinkedFile.of(url, ""),
                 entry,
                 databaseContext,
                 taskExecutor,

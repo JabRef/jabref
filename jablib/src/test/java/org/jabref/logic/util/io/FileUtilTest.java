@@ -562,12 +562,12 @@ class FileUtilTest {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
         Path testPdf = filesPath.resolve("test.pdf");
-        BibEntry source1 = new BibEntry().withFiles(List.of(new LinkedFile(testPdf)));
-        BibEntry target1 = new BibEntry().withFiles(List.of(new LinkedFile(filesPath.relativize(testPdf))));
+        BibEntry source1 = new BibEntry().withFiles(List.of(LinkedFile.of(testPdf)));
+        BibEntry target1 = new BibEntry().withFiles(List.of(LinkedFile.of(filesPath.relativize(testPdf))));
 
         testPdf = bibPath.resolve("test.pdf");
-        BibEntry source2 = new BibEntry().withFiles(List.of(new LinkedFile(testPdf)));
-        BibEntry target2 = new BibEntry().withFiles(List.of(new LinkedFile(bibTempDir.relativize(testPdf))));
+        BibEntry source2 = new BibEntry().withFiles(List.of(LinkedFile.of(testPdf)));
+        BibEntry target2 = new BibEntry().withFiles(List.of(LinkedFile.of(bibTempDir.relativize(testPdf))));
 
         return Stream.of(
                 Arguments.of(List.of(target1), List.of(source1), database, fileDirPrefs),

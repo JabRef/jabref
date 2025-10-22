@@ -65,8 +65,8 @@ class XmpUtilReaderTest {
         Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore.bib").toURI());
         List<BibEntry> expected = bibtexImporter.importDatabase(bibFile).getDatabase().getEntries();
         expected.forEach(bibEntry -> bibEntry.setFiles(Arrays.asList(
-                new LinkedFile("", Path.of("paper.pdf"), "PDF"),
-                new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
+                LinkedFile.of("", Path.of("paper.pdf"), "PDF"),
+                LinkedFile.of("", pathPdf.toAbsolutePath(), "PDF"))
         ));
 
         assertEquals(expected, entries);
@@ -80,7 +80,7 @@ class XmpUtilReaderTest {
         Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore_partial_date.bib").toURI());
         List<BibEntry> expected = bibtexImporter.importDatabase(bibFile).getDatabase().getEntries();
         expected.forEach(bibEntry -> bibEntry.setFiles(List.of(
-                new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
+                LinkedFile.of("", pathPdf.toAbsolutePath(), "PDF"))
         ));
 
         assertEquals(expected, entries);
@@ -104,7 +104,7 @@ class XmpUtilReaderTest {
         List<BibEntry> expected = bibtexImporter.importDatabase(bibFile).getDatabase().getEntries();
 
         expected.forEach(bibEntry -> bibEntry.setFiles(List.of(
-                new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
+                LinkedFile.of("", pathPdf.toAbsolutePath(), "PDF"))
         ));
 
         assertEquals(expected, entries);

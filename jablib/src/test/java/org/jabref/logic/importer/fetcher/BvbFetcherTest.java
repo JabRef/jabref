@@ -31,7 +31,7 @@ class BvbFetcherTest {
             .withField(StandardField.AUTHOR, "Bloch, Joshua")
             .withField(StandardField.TITLEADDON, "Joshua Bloch")
             .withField(StandardField.EDITION, "3. Auflage, Übersetzung der englischsprachigen 3. Originalausgabe 2018")
-            .withFiles(List.of(new LinkedFile("", "http://search.ebscohost.com/login.aspx?direct=true&scope=site&db=nlebk&db=nlabk&AN=1906353", StandardFileType.PDF)))
+            .withFiles(List.of(LinkedFile.of("", "http://search.ebscohost.com/login.aspx?direct=true&scope=site&db=nlebk&db=nlabk&AN=1906353", StandardFileType.PDF)))
             .withField(StandardField.ISBN, "9783960886402")
             .withField(StandardField.KEYWORDS, "Klassen, Interfaces, Generics, Enums, Annotationen, Lambdas, Streams, Module, parallel, Parallele Programmierung, Serialisierung, funktional, funktionale Programmierung, Java EE, Jakarta EE")
             .withField(StandardField.ADDRESS, "Heidelberg")

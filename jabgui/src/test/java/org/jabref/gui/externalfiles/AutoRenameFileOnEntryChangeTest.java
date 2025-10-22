@@ -88,7 +88,7 @@ class AutoRenameFileOnEntryChangeTest {
     @Test
     void noFileRenameByDefault() throws IOException {
         Files.createFile(tempDir.resolve("oldKey2081.pdf"));
-        entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));
+        entry.setFiles(List.of(LinkedFile.of("", "oldKey2081.pdf", "PDF")));
         entry.setField(StandardField.AUTHOR, "newKey");
 
         assertEquals("oldKey2081.pdf", entry.getFiles().getFirst().getLink());
@@ -98,7 +98,7 @@ class AutoRenameFileOnEntryChangeTest {
     @Test
     void noFileRenameOnEmptyFilePattern() throws IOException {
         Files.createFile(tempDir.resolve("oldKey2081.pdf"));
-        entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));
+        entry.setFiles(List.of(LinkedFile.of("", "oldKey2081.pdf", "PDF")));
         when(filePreferences.getFileNamePattern()).thenReturn("");
         when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(true);
         entry.setField(StandardField.AUTHOR, "newKey");
@@ -110,7 +110,7 @@ class AutoRenameFileOnEntryChangeTest {
     @Test
     void singleFileRenameOnEntryChange() throws IOException {
         Files.createFile(tempDir.resolve("oldKey2081.pdf"));
-        entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));
+        entry.setFiles(List.of(LinkedFile.of("", "oldKey2081.pdf", "PDF")));
         when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(true);
 
         // change author only
@@ -140,11 +140,11 @@ class AutoRenameFileOnEntryChangeTest {
             Files.createFile(filePath);
         }
 
-        LinkedFile pdfLinkedFile = new LinkedFile("", "oldKey2081.pdf", "PDF");
-        LinkedFile jpgLinkedFile = new LinkedFile("", "oldKey2081.jpg", "JPG");
-        LinkedFile csvLinkedFile = new LinkedFile("", "oldKey2081.csv", "CSV");
-        LinkedFile docLinkedFile = new LinkedFile("", "oldKey2081.doc", "DOC");
-        LinkedFile docxLinkedFile = new LinkedFile("", "oldKey2081.docx", "DOCX");
+        LinkedFile pdfLinkedFile = LinkedFile.of("", "oldKey2081.pdf", "PDF");
+        LinkedFile jpgLinkedFile = LinkedFile.of("", "oldKey2081.jpg", "JPG");
+        LinkedFile csvLinkedFile = LinkedFile.of("", "oldKey2081.csv", "CSV");
+        LinkedFile docLinkedFile = LinkedFile.of("", "oldKey2081.doc", "DOC");
+        LinkedFile docxLinkedFile = LinkedFile.of("", "oldKey2081.docx", "DOCX");
 
         entry.setFiles(List.of(pdfLinkedFile, jpgLinkedFile, csvLinkedFile, docLinkedFile, docxLinkedFile));
         when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(true);
@@ -173,7 +173,7 @@ class AutoRenameFileOnEntryChangeTest {
         Files.createFile(tempDir.resolve("newKey2081 (1).pdf"));
 
         Files.createFile(tempDir.resolve("oldKey2081.pdf"));
-        entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));
+        entry.setFiles(List.of(LinkedFile.of("", "oldKey2081.pdf", "PDF")));
         when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(true);
 
         entry.setField(StandardField.AUTHOR, "newKey");

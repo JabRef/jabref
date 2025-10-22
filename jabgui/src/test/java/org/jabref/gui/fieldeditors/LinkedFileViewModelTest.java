@@ -105,7 +105,7 @@ class LinkedFileViewModelTest {
     @Test
     void deleteWhenFilePathNotPresentReturnsTrue() {
         // Making this a spy, so we can inject an empty optional without digging into the implementation
-        linkedFile = spy(new LinkedFile("", Path.of("nonexistent file"), ""));
+        linkedFile = spy(LinkedFile.of("", Path.of("nonexistent file"), ""));
         doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
@@ -119,7 +119,7 @@ class LinkedFileViewModelTest {
 
     @Test
     void deleteWhenRemoveChosenReturnsTrueButDoesNotDeletesFile() {
-        linkedFile = new LinkedFile("", tempFile, "");
+        linkedFile = LinkedFile.of("", tempFile, "");
         // Mock the dialog created at {@link org.jabref.gui.linkedfile.DeleteFileAction.execute}
         when(dialogService.showCustomDialogAndWait(
                 anyString(),
@@ -137,7 +137,7 @@ class LinkedFileViewModelTest {
 
     @Test
     void deleteWhenDeleteChosenReturnsTrueAndDeletesFile() {
-        linkedFile = new LinkedFile("", tempFile, "");
+        linkedFile = LinkedFile.of("", tempFile, "");
         when(dialogService.showCustomDialogAndWait(
                 anyString(),
                 any(DialogPane.class),
@@ -154,7 +154,7 @@ class LinkedFileViewModelTest {
 
     @Test
     void deleteMissingFileReturnsTrue() {
-        linkedFile = new LinkedFile("", Path.of("!!nonexistent file!!"), "");
+        linkedFile = LinkedFile.of("", Path.of("!!nonexistent file!!"), "");
         when(dialogService.showCustomDialogAndWait(
                 anyString(),
                 any(DialogPane.class),
@@ -170,7 +170,7 @@ class LinkedFileViewModelTest {
 
     @Test
     void deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile() {
-        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        linkedFile = LinkedFile.of("desc", tempFile, "pdf");
         when(dialogService.showCustomDialogAndWait(
                 anyString(),
                 any(DialogPane.class),
@@ -198,7 +198,7 @@ class LinkedFileViewModelTest {
 
         URL url = URLUtil.create("https://www.google.com/");
         String fileType = StandardExternalFileType.URL.getName();
-        linkedFile = new LinkedFile(url, fileType);
+        linkedFile = LinkedFile.of(url, fileType);
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
 
@@ -209,7 +209,7 @@ class LinkedFileViewModelTest {
 
     @Test
     void isNotSamePath() {
-        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        linkedFile = LinkedFile.of("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -221,7 +221,7 @@ class LinkedFileViewModelTest {
 
     @Test
     void isSamePath() {
-        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        linkedFile = LinkedFile.of("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -234,7 +234,7 @@ class LinkedFileViewModelTest {
     // Tests if isGeneratedPathSameAsOriginal takes into consideration File directory pattern
     @Test
     void isNotSamePathWithPattern() {
-        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        linkedFile = LinkedFile.of("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
@@ -247,7 +247,7 @@ class LinkedFileViewModelTest {
     // Tests if isGeneratedPathSameAsOriginal takes into consideration File directory pattern
     @Test
     void isSamePathWithPattern() throws IOException {
-        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        linkedFile = LinkedFile.of("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
@@ -273,7 +273,7 @@ class LinkedFileViewModelTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl(boolean keepHtml) throws MalformedURLException {
-        linkedFile = new LinkedFile(URLUtil.create("http://arxiv.org/pdf/1207.0408v1"), "pdf");
+        linkedFile = LinkedFile.of(URLUtil.create("http://arxiv.org/pdf/1207.0408v1"), "pdf");
         // Needed Mockito stubbing methods to run test
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");

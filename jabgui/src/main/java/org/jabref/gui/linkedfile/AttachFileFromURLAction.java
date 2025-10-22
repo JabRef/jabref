@@ -63,7 +63,7 @@ public class AttachFileFromURLAction extends SimpleCommand {
         try {
             URL url = URLUtil.create(urlforDownload.get());
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
-                    new LinkedFile(url, ""),
+                    LinkedFile.of(url, ""),
                     entry,
                     databaseContext,
                     taskExecutor,

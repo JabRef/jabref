@@ -44,7 +44,7 @@ public class RelativePathsCleanup implements CleanupJob {
             }
             LinkedFile newFileEntry = fileEntry;
             if (!oldFileName.equals(newFileName)) {
-                newFileEntry = new LinkedFile(fileEntry.getDescription(), Path.of(newFileName), fileEntry.getFileType());
+                newFileEntry = LinkedFile.of(fileEntry.getDescription(), Path.of(newFileName), fileEntry.getFileType());
                 changed = true;
             }
             newFileList.add(newFileEntry);

@@ -51,7 +51,7 @@ public class ExternalFilesEntryLinker {
                                       .map(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences).orElse(new UnknownExternalFileType(ext)).getName())
                                       .orElse("");
             Path relativePath = FileUtil.relativize(file, bibDatabaseContextSupplier.get(), filePreferences);
-            LinkedFile linkedFile = new LinkedFile("", relativePath, typeName);
+            LinkedFile linkedFile = LinkedFile.of("", relativePath, typeName);
 
             String link = linkedFile.getLink();
             boolean alreadyLinked = existingFiles.stream().anyMatch(existingFile -> existingFile.getLink().equals(link));
@@ -81,7 +81,7 @@ public class ExternalFilesEntryLinker {
             String typeName = FileUtil.getFileExtension(file)
                                       .map(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences).orElse(new UnknownExternalFileType(ext)).getName())
                                       .orElse("");
-            LinkedFile linkedFile = new LinkedFile("", file, typeName);
+            LinkedFile linkedFile = LinkedFile.of("", file, typeName);
             LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, bibDatabaseContextSupplier.get(), filePreferences);
             try {
                 linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, true);

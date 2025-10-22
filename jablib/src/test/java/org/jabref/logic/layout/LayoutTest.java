@@ -141,7 +141,7 @@ class LayoutTest {
     @Test
     void wrapFileLinksExpandFile() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.addFile(new LinkedFile("Test file", Path.of("encrypted.pdf"), "PDF"));
+        entry.addFile(LinkedFile.of("Test file", Path.of("encrypted.pdf"), "PDF"));
 
         String layoutText = layout(
                 "\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}",

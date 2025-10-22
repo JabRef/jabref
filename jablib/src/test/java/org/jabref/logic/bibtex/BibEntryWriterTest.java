@@ -125,7 +125,7 @@ class BibEntryWriterTest {
     @Test
     void writeEntryWithFile() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        LinkedFile file = new LinkedFile("test", Path.of("/home/uers/test.pdf"), "PDF");
+        LinkedFile file = LinkedFile.of("test", Path.of("/home/uers/test.pdf"), "PDF");
         entry.addFile(file);
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);

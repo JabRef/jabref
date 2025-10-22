@@ -791,14 +791,14 @@ public class BibtexParser implements Parser {
                             NSString relativePath = (NSString) plist.objectForKey("relativePath");
                             Path path = Path.of(relativePath.getContent());
 
-                            LinkedFile file = new LinkedFile("", path, "");
+                            LinkedFile file = LinkedFile.of("", path, "");
                             entry.addFile(file);
                         } else if (plist.containsKey("$objects") && plist.objectForKey("$objects") instanceof NSArray nsArray) {
                             if (nsArray.getArray().length > INDEX_RELATIVE_PATH_IN_PLIST) {
                                 NSString relativePath = (NSString) nsArray.objectAtIndex(INDEX_RELATIVE_PATH_IN_PLIST);
                                 Path path = Path.of(relativePath.getContent());
 
-                                LinkedFile file = new LinkedFile("", path, "");
+                                LinkedFile file = LinkedFile.of("", path, "");
                                 entry.addFile(file);
                             }
                         } else {

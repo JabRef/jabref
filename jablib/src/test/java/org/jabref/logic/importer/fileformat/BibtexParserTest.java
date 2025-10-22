@@ -2243,7 +2243,7 @@ class BibtexParserTest {
                 .withCitationKey("Test2017");
         BibEntry secondEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Test2")
-                .withFiles(List.of(new LinkedFile("", "../../../Papers/Asheim2005 The Geography of Innovation Regional Innovation Systems.pdf", "")));
+                .withFiles(List.of(LinkedFile.of("", "../../../Papers/Asheim2005 The Geography of Innovation Regional Innovation Systems.pdf", "")));
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
     }

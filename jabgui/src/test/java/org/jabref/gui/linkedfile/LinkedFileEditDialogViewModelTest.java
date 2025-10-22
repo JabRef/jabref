@@ -48,11 +48,11 @@ class LinkedFileEditDialogViewModelTest {
         Files.createFile(invalidFile);
         when(dialogService.showConfirmationDialogAndWait(any(), any(), any())).thenReturn(true);
 
-        LinkedFileEditDialogViewModel viewModel = new LinkedFileEditDialogViewModel(new LinkedFile("", "", ""), bibDatabaseContext, dialogService, externalApplicationsPreferences, filePreferences);
+        LinkedFileEditDialogViewModel viewModel = new LinkedFileEditDialogViewModel(LinkedFile.of("", "", ""), bibDatabaseContext, dialogService, externalApplicationsPreferences, filePreferences);
 
         viewModel.checkForBadFileNameAndAdd(invalidFile);
 
-        LinkedFile expectedFile = new LinkedFile("", tempDir.resolve("_invalid.pdf").toString(), "PDF");
+        LinkedFile expectedFile = LinkedFile.of("", tempDir.resolve("_invalid.pdf").toString(), "PDF");
         assertEquals(expectedFile, viewModel.getNewLinkedFile());
     }
 }

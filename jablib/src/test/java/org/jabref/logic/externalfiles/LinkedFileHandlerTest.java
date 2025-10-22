@@ -51,7 +51,7 @@ class LinkedFileHandlerTest {
         final Path tempFile = tempFolder.resolve(originalFileName);
         Files.createFile(tempFile);
 
-        final LinkedFile linkedFile = new LinkedFile("", tempFile, "");
+        final LinkedFile linkedFile = LinkedFile.of("", tempFile, "");
         LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
 
         linkedFileHandler.renameToName(newFileName, false);

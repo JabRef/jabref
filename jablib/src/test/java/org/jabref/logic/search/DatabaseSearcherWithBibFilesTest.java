@@ -57,22 +57,22 @@ class DatabaseSearcherWithBibFilesTest {
 
     private static final BibEntry MINIMAL_SENTENCE_CASE = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-sentence-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-sentence-case.pdf", StandardFileType.PDF.getName())));
+            .withFiles(List.of(LinkedFile.of("", "minimal-sentence-case.pdf", StandardFileType.PDF.getName())));
     private static final BibEntry MINIMAL_ALL_UPPER_CASE = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-all-upper-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-all-upper-case.pdf", StandardFileType.PDF.getName())));
+            .withFiles(List.of(LinkedFile.of("", "minimal-all-upper-case.pdf", StandardFileType.PDF.getName())));
     private static final BibEntry MINIMAL_MIXED_CASE = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-mixed-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-mixed-case.pdf", StandardFileType.PDF.getName())));
+            .withFiles(List.of(LinkedFile.of("", "minimal-mixed-case.pdf", StandardFileType.PDF.getName())));
     private static final BibEntry MINIMAL_NOTE_SENTENCE_CASE = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note-sentence-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-note-sentence-case.pdf", StandardFileType.PDF.getName())));
+            .withFiles(List.of(LinkedFile.of("", "minimal-note-sentence-case.pdf", StandardFileType.PDF.getName())));
     private static final BibEntry MINIMAL_NOTE_ALL_UPPER_CASE = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note-all-upper-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-note-all-upper-case.pdf", StandardFileType.PDF.getName())));
+            .withFiles(List.of(LinkedFile.of("", "minimal-note-all-upper-case.pdf", StandardFileType.PDF.getName())));
     private static final BibEntry MINIMAL_NOTE_MIXED_CASE = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note-mixed-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-note-mixed-case.pdf", StandardFileType.PDF.getName())));
+            .withFiles(List.of(LinkedFile.of("", "minimal-note-mixed-case.pdf", StandardFileType.PDF.getName())));
 
     private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);

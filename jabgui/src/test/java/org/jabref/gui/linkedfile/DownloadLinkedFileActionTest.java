@@ -95,7 +95,7 @@ class DownloadLinkedFileActionTest {
     void replacesLinkedFiles(@TempDir Path tempFolder) throws MalformedURLException {
         String url = "http://arxiv.org/pdf/1207.0408v1";
 
-        LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
+        LinkedFile linkedFile = LinkedFile.of(URLUtil.create(url), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -112,7 +112,7 @@ class DownloadLinkedFileActionTest {
                 new CurrentThreadTaskExecutor());
         downloadLinkedFileAction.execute();
 
-        assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
+        assertEquals(List.of(LinkedFile.of("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
     }
 
     @ParameterizedTest
@@ -120,7 +120,7 @@ class DownloadLinkedFileActionTest {
     void doesntReplaceSourceURL(boolean keepHtml) throws IOException {
         String url = "http://arxiv.org/pdf/1207.0408v1";
 
-        LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
+        LinkedFile linkedFile = LinkedFile.of(URLUtil.create(url), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -137,7 +137,7 @@ class DownloadLinkedFileActionTest {
                 new CurrentThreadTaskExecutor());
         downloadLinkedFileAction.execute();
 
-        assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
+        assertEquals(List.of(LinkedFile.of("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
 
         linkedFile = entry.getFiles().getFirst();
 
@@ -159,7 +159,7 @@ class DownloadLinkedFileActionTest {
                 keepHtml);
         downloadLinkedFileAction2.execute();
 
-        assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
+        assertEquals(List.of(LinkedFile.of("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
     }
 
     @Test
@@ -175,7 +175,7 @@ class DownloadLinkedFileActionTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "text/html; charset=utf-8")));
 
-        LinkedFile linkedFile = new LinkedFile(URLUtil.create("http://localhost:2331/html"), "");
+        LinkedFile linkedFile = LinkedFile.of(URLUtil.create("http://localhost:2331/html"), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -211,7 +211,7 @@ class DownloadLinkedFileActionTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "text/html; charset=utf-8")));
 
-        LinkedFile linkedFile = new LinkedFile(URLUtil.create("http://localhost:2331/html"), "");
+        LinkedFile linkedFile = LinkedFile.of(URLUtil.create("http://localhost:2331/html"), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");

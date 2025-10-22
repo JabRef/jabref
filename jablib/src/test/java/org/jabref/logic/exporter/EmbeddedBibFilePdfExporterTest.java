@@ -89,7 +89,7 @@ class EmbeddedBibFilePdfExporterTest {
         toral2006.setField(StandardField.OWNER, "Ich");
         toral2006.setField(StandardField.URL, "www.url.de");
 
-        toral2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
+        toral2006.setFiles(List.of(LinkedFile.of("non-existing", "path/to/nowhere.pdf", "PDF")));
 
         vapnik2000.setCitationKey("vapnik2000");
         vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
@@ -187,7 +187,7 @@ class EmbeddedBibFilePdfExporterTest {
             pdf.save(pdfFile.toAbsolutePath().toString());
         }
 
-        return new LinkedFile("A linked pdf", pdfFile, "PDF");
+        return LinkedFile.of("A linked pdf", pdfFile, "PDF");
     }
 
     @ParameterizedTest

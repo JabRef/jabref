@@ -499,12 +499,12 @@ public class ImportHandler {
             if (!entries.isEmpty()) {
                 entries.forEach(entry -> {
                     if (entry.getFiles().isEmpty()) {
-                        entry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
+                        entry.addFile(LinkedFile.of("", targetFile, StandardFileType.PDF.getName()));
                     }
                 });
             } else {
                 BibEntry emptyEntry = new BibEntry();
-                emptyEntry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
+                emptyEntry.addFile(LinkedFile.of("", targetFile, StandardFileType.PDF.getName()));
                 entries.add(emptyEntry);
             }
             return entries;

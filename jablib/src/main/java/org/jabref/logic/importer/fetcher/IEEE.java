@@ -124,7 +124,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         entry.setField(StandardField.ISSUE, jsonEntry.optString("issue"));
         String pdfUrl = jsonEntry.optString("pdf_url");
         if (!StringUtil.isBlank(pdfUrl)) {
-            entry.addFile(new LinkedFile("", pdfUrl, "PDF"));
+            entry.addFile(LinkedFile.of("", pdfUrl, "PDF"));
         }
         entry.setField(StandardField.JOURNALTITLE, jsonEntry.optString("publication_title"));
         entry.setField(StandardField.DATE, jsonEntry.optString("publication_date"));
