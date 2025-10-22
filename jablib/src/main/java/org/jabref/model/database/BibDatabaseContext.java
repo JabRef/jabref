@@ -68,29 +68,44 @@ public class BibDatabaseContext {
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
-    public BibDatabaseContext() {
-        this(new BibDatabase());
+    public static class Builder {
+        private BibDatabase database = new BibDatabase();
+        private MetaData metaData = new MetaData();
+        private Path path;
+        private DatabaseLocation location = DatabaseLocation.LOCAL;
+
+        public Builder database(BibDatabase database) {
+            this.database = database;
+            return this;
+        }
+
+        public Builder metaData(MetaData metaData) {
+            this.metaData = metaData;
+            return this;
+        }
+
+        public Builder path(Path path) {
+            this.path = path;
+            return this;
+        }
+
+        public Builder location(DatabaseLocation location) {
+            this.location = location;
+            return this;
+        }
+
+        public BibDatabaseContext build() {
+            return new BibDatabaseContext(this);
+        }
     }
 
-    public BibDatabaseContext(@NonNull BibDatabase database) {
-        this(database, new MetaData());
-    }
+    private BibDatabaseContext(Builder builder) {
+        this.database = builder.database;
+        this.metaData = builder.metaData;
+        this.path = builder.path;
+        this.location = builder.location;
 
-    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData) {
-        this.database = database;
-        this.metaData = metaData;
-        this.location = DatabaseLocation.LOCAL;
-    }
-
-    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path) {
-        this(database, metaData, path, DatabaseLocation.LOCAL);
-    }
-
-    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path, @NonNull DatabaseLocation location) {
-        this(database, metaData);
-        this.path = path;
-
-        if (location == DatabaseLocation.LOCAL) {
+        if (this.location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
         }
     }
@@ -305,7 +320,7 @@ public class BibDatabaseContext {
     }
 
     public static BibDatabaseContext empty() {
-        return new BibDatabaseContext(new BibDatabase(), new MetaData());
+        return new Builder().build();
     }
 
     @Override
