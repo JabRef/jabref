@@ -163,4 +163,50 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
     public void setShowOnFocus(boolean showOnFocus) {
         this.showOnFocus = showOnFocus;
     }
+
+
+    public static class Builder<T> {
+        private TextInputControl textInputControl;
+        private Callback<ISuggestionRequest, Collection<T>> suggestionProvider;
+        private StringConverter<T> converter = AutoCompletionTextInputBinding.defaultStringConverter();
+        private AutoCompletionStrategy inputAnalyzer = new ReplaceStrategy();
+        private boolean showOnFocus = false;
+
+        public Builder() {
+        }
+
+        public Builder<T> addTextInputControl(TextInputControl textInputControl) {
+            this.textInputControl = textInputControl;
+            return this;
+        }
+
+        public Builder<T> addSuggestionProvider(Callback<ISuggestionRequest, Collection<T>> suggestionProvider) {
+            this.suggestionProvider = suggestionProvider;
+            return this;
+        }
+
+        public Builder<T> addConverter(StringConverter<T> converter) {
+            this.converter = converter;
+            return this;
+        }
+
+        public Builder<T> addInputAnalyzer(AutoCompletionStrategy inputAnalyzer) {
+            this.inputAnalyzer = inputAnalyzer;
+            return this;
+        }
+
+        public Builder<T> setShowOnFocus(boolean showOnFocus) {
+            this.showOnFocus = showOnFocus;
+            return this;
+        }
+
+        public AutoCompletionTextInputBinding<T> build() {
+            AutoCompletionTextInputBinding<T> builder =
+                new AutoCompletionTextInputBinding<>(textInputControl, suggestionProvider, converter, inputAnalyzer);
+            builder.setShowOnFocus(showOnFocus);
+            return builder;
+        }
+    }
+
+
 }
