@@ -68,32 +68,69 @@ public class BibDatabaseContext {
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
+    /**
+     * Builder for creating BibDatabaseContext instances with optional configuration.
+     * Default values:
+     * database: empty BibDatabase
+     * metaData: empty MetaData
+     * path: null
+     * location: LOCAL
+     **/
     public static class Builder {
         private BibDatabase database = new BibDatabase();
         private MetaData metaData = new MetaData();
         private Path path;
         private DatabaseLocation location = DatabaseLocation.LOCAL;
 
+        /**
+         * Sets the database for this context.
+         *
+         * @param database the BibDatabase to use
+         * @return this builder
+         */
         public Builder database(BibDatabase database) {
             this.database = database;
             return this;
         }
 
+        /**
+         * Sets the metadata for this context.
+         *
+         * @param metaData the metadata to use
+         * @return this builder
+         */
         public Builder metaData(MetaData metaData) {
             this.metaData = metaData;
             return this;
         }
 
+        /**
+         * Sets the file path.
+         *
+         * @param path the file path
+         * @return this builder
+         */
         public Builder path(Path path) {
             this.path = path;
             return this;
         }
 
+        /**
+         * Sets the database location.
+         *
+         * @param location the database location (LOCAL or SHARED)
+         * @return this builder
+         */
         public Builder location(DatabaseLocation location) {
             this.location = location;
             return this;
         }
 
+        /**
+         * Builds and returns a new BibDatabaseContext with the configured values.
+         *
+         * @return a new BibDatabaseContext instance
+         */
         public BibDatabaseContext build() {
             return new BibDatabaseContext(this);
         }
