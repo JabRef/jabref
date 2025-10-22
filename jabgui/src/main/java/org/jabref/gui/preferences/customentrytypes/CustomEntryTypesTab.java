@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -40,6 +39,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
+import org.controlsfx.control.SearchableComboBox;
 
 public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> implements PreferencesTab {
 
@@ -52,7 +52,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     @FXML private TableColumn<FieldViewModel, Boolean> fieldTypeColumn;
     @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
     @FXML private TableColumn<FieldViewModel, Boolean> fieldTypeMultilineColumn;
-    @FXML private ComboBox<Field> addNewField;
+    @FXML private SearchableComboBox<Field> addNewField;
     @FXML private Button addNewEntryTypeButton;
     @FXML private Button addNewFieldButton;
 

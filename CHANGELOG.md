@@ -358,6 +358,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We disabled the actions "Open Terminal here" and "Reveal in file explorer" for unsaved libraries. [#11920](https://github.com/JabRef/jabref/issues/11920)
 - JabRef now opens the corresponding directory in the library properties when "Browse" is clicked. [#12223](https://github.com/JabRef/jabref/pull/12223)
 - We changed the icon for macOS to be more consistent with Apple's Guidelines [#8443](https://github.com/JabRef/jabref/issues/8443)
+- We changed  fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
 
 ### Fixed
 
