@@ -1,5 +1,3 @@
-import org.gradle.api.internal.artifacts.dsl.dependencies.DependenciesExtensionModule.module
-
 plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.jvm-dependency-conflict-resolution")
@@ -219,6 +217,11 @@ extraJavaModuleInfo {
     module("info.debatty:java-string-similarity", "java.string.similarity")
     module("io.github.classgraph:classgraph", "io.github.classgraph") {
         overrideModuleName()
+        exportAllPackages()
+    }
+
+    module("io.github.darvil82:utils", "utils"){
+        patchRealModule()
         exportAllPackages()
     }
     module("io.github.adr:e-adr", "io.github.adr") {
@@ -662,4 +665,25 @@ extraJavaModuleInfo {
     module("org.openjdk.jmh:jmh-generator-bytecode", "jmh.generator.bytecode")
     module("org.openjdk.jmh:jmh-generator-reflection", "jmh.generator.reflection")
     module("org.apache.commons:commons-math3", "commons.math3")
+
+    // We need to transform this, because the java modules plugin touches all Java paths
+    // Otherwise, one gets following errormessage
+    // configuration ':jablib:annotationProcessor'.
+
+    module("javax.inject:javax.inject", "javax.inject")
+    module("com.google.auto.value:auto-value-annotations", "auto.value.annotations")
+    module("io.github.eisop:dataflow-errorprone", "org.checkerframework.dataflow")
+    module("com.google.googlejavaformat:google-java-format", "com.google.googlejavaformat")
+    module("com.google.errorprone:error_prone_core", "com.google.errorprone.core")
+    module("com.google.errorprone:error_prone_check_api", "com.google.errorprone.check.api")
+    module("com.google.errorprone:error_prone_annotation", "com.google.errorprone.annotation")
+    module("com.google.auto:auto-common", "auto.common")
+    module("com.google.auto.service:auto-service-annotations", "com.google.auto.service")
+    module("com.google.protobuf:protobuf-java", "com.google.protobuf")
+    module("com.github.kevinstern:software-and-algorithms", "software.and.algorithms")
+
+    module("com.uber.nullaway:nullaway", "nullaway")
+    module("org.checkerframework:dataflow-nullaway", "org.checkerframework.dataflow") {
+        exportAllPackages()
+    }
 }

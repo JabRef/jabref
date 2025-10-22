@@ -58,6 +58,7 @@
 // https://jitpack.io/#jabref/jabref/main-SNAPSHOT
 // DEPS com.github.jabref:jabref:main-SNAPSHOT
 
+//DEPS io.github.darvil82:terminal-text-formatter:2.2.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.jspecify:jspecify:1.0.0
 
@@ -85,7 +86,7 @@
 //DEPS com.konghq:unirest-modules-gson:4.5.1
 //DEPS com.google.guava:guava:33.5.0-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS net.harawata:appdirs:1.4.0
+//DEPS net.harawata:appdirs:1.5.0
 //DEPS de.undercouch:citeproc-java:3.3.0
 
 /// This class is required for [jbang](https://www.jbang.dev/)

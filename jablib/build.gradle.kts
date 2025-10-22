@@ -1,6 +1,8 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import dev.jbang.gradle.tasks.JBangTask
+import net.ltgt.gradle.errorprone.errorprone
+import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.net.URI
 import java.util.*
@@ -19,6 +21,9 @@ plugins {
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
     // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
     id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
+
+    id("net.ltgt.errorprone") version "4.3.0"
+    id("net.ltgt.nullaway") version "2.3.0"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -102,6 +107,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
     // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
 
     implementation("com.fasterxml:aalto-xml")
 
@@ -185,6 +191,8 @@ dependencies {
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
     implementation("io.github.adr:e-adr")
 
+    api("io.github.darvil82:terminal-text-formatter")
+
     implementation("io.zonky.test:embedded-postgres")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
@@ -223,6 +231,9 @@ dependencies {
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core")
     testImplementation("org.testfx:testfx-junit5")
+
+    errorprone("com.google.errorprone:error_prone_core")
+    errorprone("com.uber.nullaway:nullaway")
 }
 /*
 jacoco {
@@ -407,6 +418,16 @@ tasks.withType<JavaCompile>().configureEach {
 
     // Hint from https://docs.gradle.org/current/userguide/performance.html#run_the_compiler_as_a_separate_process
     options.isFork = true
+
+    options.errorprone {
+        disableAllChecks.set(true)
+        enable("NullAway")
+    }
+
+    options.errorprone.nullaway {
+        warn()
+        annotatedPackages.add("org.jabref")
+    }
 }
 
 tasks.javadoc {

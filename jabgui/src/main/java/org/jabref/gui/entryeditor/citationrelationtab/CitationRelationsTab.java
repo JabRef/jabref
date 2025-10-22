@@ -3,6 +3,8 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +16,12 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -28,9 +34,13 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -46,6 +56,7 @@ import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.NoSelectionModel;
+import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -67,6 +78,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.sciteTallies.TalliesResponse;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -99,6 +111,9 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
+    private final ProgressIndicator progressIndicator;
+    private final GridPane sciteResultsPane;
+
     public CitationRelationsTab(DialogService dialogService,
                                 UndoManager undoManager,
                                 StateManager stateManager,
@@ -112,7 +127,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        setText(Localization.lang("Citation relations"));
+        setText(Localization.lang("Citations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
         setId("citationRelationsTab");
 
@@ -128,6 +143,199 @@ public class CitationRelationsTab extends EntryEditorTab {
                 fileUpdateMonitor,
                 taskExecutor
         );
+
+        this.progressIndicator = new ProgressIndicator();
+        this.sciteResultsPane = new GridPane();
+        setSciteResultsPane();
+    }
+
+    private void setSciteResultsPane() {
+        progressIndicator.setMaxSize(100, 100);
+        sciteResultsPane.add(progressIndicator, 0, 0);
+
+        ColumnConstraints column = new ColumnConstraints();
+        column.setPercentWidth(100);
+        column.setHalignment(HPos.CENTER);
+
+        sciteResultsPane.getColumnConstraints().setAll(column);
+        sciteResultsPane.setId("scitePane");
+        setContent(sciteResultsPane);
+
+        EasyBind.subscribe(citationsRelationsTabViewModel.statusProperty(), status -> {
+            sciteResultsPane.getChildren().clear();
+            switch (status) {
+                case IN_PROGRESS ->
+                        onSciteLookUp();
+                case FOUND ->
+                        citationsRelationsTabViewModel.getCurrentResult().ifPresent(result -> sciteResultsPane.add(getTalliesPane(result), 0, 0));
+                case ERROR ->
+                        sciteResultsPane.add(getErrorPane(), 0, 0);
+                case DOI_MISSING ->
+                        onDoiMissing();
+                case DOI_LOOK_UP ->
+                        onDoiLookUp();
+                case DOI_LOOK_UP_ERROR ->
+                        onDoiLookUpError();
+            }
+        });
+    }
+
+    private void onDoiLookUpError() {
+        onDoiMissing();
+        dialogService.notify(Localization.lang("No DOI found."));
+    }
+
+    private void onSciteLookUp() {
+        sciteResultsPane.getChildren().clear();
+
+        VBox vBox = new VBox();
+        vBox.getChildren().add(progressIndicator);
+        vBox.setStyle("-fx-alignment: center;");
+
+        sciteResultsPane.add(vBox, 0, 0);
+
+        GridPane.setHalignment(vBox, HPos.CENTER);
+        GridPane.setValignment(vBox, VPos.CENTER);
+
+        GridPane.setHgrow(vBox, Priority.ALWAYS);
+        GridPane.setVgrow(vBox, Priority.ALWAYS);
+    }
+
+    private void onDoiLookUp() {
+        sciteResultsPane.getChildren().clear();
+
+        Label label = new Label(Localization.lang("Looking up DOI..."));
+
+        VBox vBox = new VBox();
+        vBox.getChildren().add(progressIndicator);
+        vBox.getChildren().add(label);
+        vBox.setSpacing(2d);
+        vBox.setStyle("-fx-alignment: center;");
+
+        sciteResultsPane.add(vBox, 0, 0);
+
+        GridPane.setHalignment(vBox, HPos.CENTER);
+        GridPane.setValignment(vBox, VPos.CENTER);
+
+        GridPane.setHgrow(vBox, Priority.ALWAYS);
+        GridPane.setVgrow(vBox, Priority.ALWAYS);
+    }
+
+    private void onDoiMissing() {
+        sciteResultsPane.getChildren().clear();
+
+        Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
+        Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
+        link.setOnAction(doiLookUp());
+
+        HBox hBox = new HBox();
+        hBox.getChildren().add(label);
+        hBox.getChildren().add(link);
+        hBox.setSpacing(2d);
+        hBox.setStyle("-fx-alignment: center;");
+
+        sciteResultsPane.add(hBox, 0, 0);
+
+        GridPane.setHalignment(hBox, HPos.CENTER);
+        GridPane.setValignment(hBox, VPos.CENTER);
+
+        GridPane.setHgrow(hBox, Priority.ALWAYS);
+        GridPane.setVgrow(hBox, Priority.ALWAYS);
+    }
+
+    private EventHandler<ActionEvent> doiLookUp() {
+        return actionEvent -> {
+            citationsRelationsTabViewModel.lookUpDoi(currentEntry);
+        };
+    }
+
+    private VBox getErrorPane() {
+        Label titleLabel = new Label(Localization.lang("Error"));
+        titleLabel.setId("scite-error-label");
+        Text errorMessageText = new Text(citationsRelationsTabViewModel.searchErrorProperty().get());
+        VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
+        errorMessageBox.getStyleClass().add("scite-error-box");
+        return errorMessageBox;
+    }
+
+    private BorderPane getTalliesPane(TalliesResponse tallModel) {
+        HBox tallies = new HBox();
+        tallies.setPadding(new Insets(0, 0, 10, 0));
+        tallies.setAlignment(Pos.CENTER_LEFT);
+
+        Text metrics = new Text(Localization.lang("Metrics:"));
+        metrics.getStyleClass().add("markdown-bold");
+        Text totalCitations = new Text(Localization.lang("Total Citations: %0", tallModel.total()));
+        Text supporting = new Text(Localization.lang("Supporting: %0", tallModel.supporting()));
+        Text contradicting = new Text(Localization.lang("Contradicting: %0", tallModel.contradicting()));
+        Text mentioning = new Text(Localization.lang("Mentioning: %0", tallModel.mentioning()));
+        Text unclassified = new Text(Localization.lang("Unclassified: %0", tallModel.unclassified()));
+        Text citingPublications = new Text(Localization.lang("Citing Publications: %0", tallModel.citingPublications()));
+
+        Text[] elements = {totalCitations, supporting, contradicting, mentioning, unclassified, citingPublications};
+
+        tallies.getChildren().add(metrics);
+        tallies.getChildren().add(new Text(" "));
+        for (Text element : elements) {
+            tallies.getChildren().add(element);
+            Text separator = new Text(" | ");
+            tallies.getChildren().add(separator);
+        }
+
+        String url = URLs.SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
+        Hyperlink link = new Hyperlink(Localization.lang("See full report"));
+        link.setOnAction(event -> {
+            if (event.getSource() instanceof Hyperlink) {
+                try {
+                    NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
+                } catch (IOException ioex) {
+                    // Can't throw a checked exception from here, so display a message to the user instead.
+                    dialogService.showErrorDialogAndWait(
+                            "An error occurred opening web browser",
+                            "JabRef was unable to open a web browser for link:\n\n" + url + "\n\nError Message:\n\n" + ioex.getMessage(),
+                            ioex
+                    );
+                }
+            }
+        });
+        tallies.getChildren().add(link);
+
+        Button providedByButtonMetrics = IconTheme.JabRefIcons.HELP.asButton();
+        providedByButtonMetrics.setTooltip(new Tooltip(Localization.lang("Metrics provided by scite.ai")));
+        providedByButtonMetrics.setOnAction(event -> {
+            try {
+                NativeDesktop.openBrowser(URLs.SCITE_URL, preferences.getExternalApplicationsPreferences());
+            } catch (IOException ioex) {
+                // Can't throw a checked exception from here, so display a message to the user instead.
+                dialogService.showErrorDialogAndWait(
+                        "An error occurred opening web browser",
+                        "JabRef was unable to open a web browser for link:\n\n" + URLs.SCITE_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
+                        ioex
+                );
+            }
+        });
+        tallies.getChildren().add(providedByButtonMetrics);
+
+        Button providedByButtonRelations = IconTheme.JabRefIcons.HELP.asButton();
+        providedByButtonRelations.setTooltip(new Tooltip(Localization.lang("Relations provided by Semantic Scholar")));
+        providedByButtonRelations.setOnAction(event -> {
+            try {
+                NativeDesktop.openBrowser(URLs.SEMANTIC_SCHOLAR_URL, preferences.getExternalApplicationsPreferences());
+            } catch (IOException ioex) {
+                // Can't throw a checked exception from here, so display a message to the user instead.
+                dialogService.showErrorDialogAndWait(
+                        "An error occurred opening web browser",
+                        "JabRef was unable to open a web browser for link:\n\n" + URLs.SEMANTIC_SCHOLAR_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
+                        ioex
+                );
+            }
+        });
+
+        BorderPane bottomLine = new BorderPane();
+        bottomLine.setLeft(tallies);
+        bottomLine.setRight(providedByButtonRelations);
+
+        return bottomLine;
     }
 
     /**
@@ -413,7 +621,9 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        setContent(getPaneAndStartSearch(entry));
+        citationsRelationsTabViewModel.bindToEntry(entry);
+        VBox entirePanel = new VBox(getPaneAndStartSearch(entry), sciteResultsPane);
+        setContent(entirePanel);
     }
 
     private void searchForRelations(CitationComponents citationComponents,
