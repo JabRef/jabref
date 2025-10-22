@@ -116,6 +116,9 @@ dependencies {
     implementation("org.antlr:antlr4-runtime")
 
     implementation("com.google.guava:guava")
+    implementation("com.github.ben-manes.caffeine:caffeine") {
+        exclude(group = "org.checkerframework", module = "checker-qual")
+    }
 
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.inject:jakarta.inject-api")
