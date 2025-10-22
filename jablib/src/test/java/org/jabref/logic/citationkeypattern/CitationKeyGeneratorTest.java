@@ -1187,3 +1187,4 @@ class CitationKeyGeneratorTest {
         assertEquals("Artemenko2019", generateKey(entry, "[auth][year]"));
     }
 }
+
