@@ -379,6 +379,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
                         event.consume();
                         break;
+                    case CLOSE_DATABASE:
+                        new CloseDatabaseAction(this, stateManager).execute();
+                        event.consume();
+                        break;
                     default:
                 }
             }

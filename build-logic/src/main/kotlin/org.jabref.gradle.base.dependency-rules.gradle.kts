@@ -221,6 +221,11 @@ extraJavaModuleInfo {
         overrideModuleName()
         exportAllPackages()
     }
+
+    module("io.github.darvil82:utils", "utils"){
+        patchRealModule()
+        exportAllPackages()
+    }
     module("io.github.adr:e-adr", "io.github.adr") {
         patchRealModule()
         exportAllPackages()
