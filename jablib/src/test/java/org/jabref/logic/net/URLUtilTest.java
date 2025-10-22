@@ -7,6 +7,9 @@ import java.net.URL;
 import org.jabref.logic.util.URLUtil;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,68 +20,72 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class URLUtilTest {
 
-    @Test
-    void cleanGoogleSearchURL() {
-        // empty text
-        assertEquals("", URLUtil.cleanGoogleSearchURL(""));
-        assertEquals(" ", URLUtil.cleanGoogleSearchURL(" "));
-        // no URL
-        assertEquals("this is no url!", URLUtil.cleanGoogleSearchURL("this is no url!"));
-        // no Google search URL
-        assertEquals("http://dl.acm.org/citation.cfm?id=321811", URLUtil.cleanGoogleSearchURL("http://dl.acm.org/citation.cfm?id=321811"));
-        // malformed Google URL
-        assertEquals("https://www.google.de/url♥", URLUtil.cleanGoogleSearchURL("https://www.google.de/url♥"));
-        // no queries
-        assertEquals("https://www.google.de/url", URLUtil.cleanGoogleSearchURL("https://www.google.de/url"));
-        assertEquals("https://www.google.de/url?", URLUtil.cleanGoogleSearchURL("https://www.google.de/url?"));
-        // no multiple queries
-        assertEquals("https://www.google.de/url?key=value", URLUtil.cleanGoogleSearchURL("https://www.google.de/url?key=value"));
-        // no key values
-        assertEquals("https://www.google.de/url?key", URLUtil.cleanGoogleSearchURL("https://www.google.de/url?key"));
-        assertEquals("https://www.google.de/url?url", URLUtil.cleanGoogleSearchURL("https://www.google.de/url?url"));
-        assertEquals("https://www.google.de/url?key=", URLUtil.cleanGoogleSearchURL("https://www.google.de/url?key="));
-        // no url param
-        assertEquals("https://www.google.de/url?key=value&key2=value2", URLUtil.cleanGoogleSearchURL("https://www.google.de/url?key=value&key2=value2"));
-        // no url param value
-        assertEquals("https://www.google.de/url?url=", URLUtil.cleanGoogleSearchURL("https://www.google.de/url?url="));
-        // url param value no URL
-        assertEquals("https://www.google.de/url?url=this+is+no+url", URLUtil.cleanGoogleSearchURL("https://www.google.de/url?url=this+is+no+url"));
-        // Http
-        assertEquals(
-                "http://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
-                URLUtil.cleanGoogleSearchURL("http://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=http%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w"));
-        // Https
-        assertEquals(
-                "https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
-                URLUtil.cleanGoogleSearchURL("https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=https%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w"));
-        // root domain
-        assertEquals(
-                "https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
-                URLUtil.cleanGoogleSearchURL("https://google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=https%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w"));
-        // foreign domain
-        assertEquals(
-                "https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
-                URLUtil.cleanGoogleSearchURL("https://www.google.fr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=https%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w"));
-        // foreign domain co.uk
-        assertEquals(
-                "https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
-                URLUtil.cleanGoogleSearchURL("https://www.google.co.uk/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=https%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w"));
-        // accept ftp results
-        assertEquals(
-                "ftp://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
-                URLUtil.cleanGoogleSearchURL("https://www.google.fr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=ftp%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w"));
+    @ParameterizedTest
+    @ValueSource(strings = {
+            // empty text
+            "",
+            " ",
+            // no URL
+            "this is no url!",
+            // no Google search URL
+            "http://dl.acm.org/citation.cfm?id=321811",
+            // malformed Google URL
+            "https://www.google.de/url♥",
+            // no queries
+            "https://www.google.de/url",
+            "https://www.google.de/url?",
+            // no multiple queries
+            "https://www.google.de/url?key=value",
+            // no key values
+            "https://www.google.de/url?key",
+            "https://www.google.de/url?url",
+            "https://www.google.de/url?key=",
+            // no url param
+            "https://www.google.de/url?key=value&key2=value2",
+            // no url param value
+            "https://www.google.de/url?url=",
+            // url param value no URL
+            "https://www.google.de/url?url=this+is+no+url"
+    })
+    void cleanGoogleSearchURLShouldReturnOriginalURL(String input) {
+        assertEquals(input, URLUtil.cleanGoogleSearchURL(input));
     }
 
-    @Test
-    void isURLshouldAcceptValidURL() {
-        assertTrue(URLUtil.isURL("http://www.google.com"));
-        assertTrue(URLUtil.isURL("https://www.google.com"));
+    @ParameterizedTest
+    @CsvSource({
+            // Http
+            "http://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=http%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w, http://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
+            // Https
+            "https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=https%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w, https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
+            // root domain
+            "https://google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=https%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w, https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
+            // foreign domain
+            "https://www.google.fr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=https%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w, https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
+            // foreign domain co.uk
+            "https://www.google.co.uk/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=https%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w, https://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters",
+            // accept ftp results
+            "https://www.google.fr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=ftp%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w, ftp://moz.com/ugc/the-ultimate-guide-to-the-google-search-parameters"
+    })
+    void cleanGoogleSearchURLShouldReturnTargetURL(String input, String expected) {
+        assertEquals(expected, URLUtil.cleanGoogleSearchURL(input));
     }
 
-    @Test
-    void isURLshouldRejectInvalidURL() {
-        assertFalse(URLUtil.isURL("www.google.com"));
-        assertFalse(URLUtil.isURL("google.com"));
+    @ParameterizedTest
+    @CsvSource({
+            "http://www.google.com",
+            "https://www.google.com"
+    })
+    void isURLshouldAcceptValidURL(String url) {
+        assertTrue(URLUtil.isURL(url));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "www.google.com",
+            "google.com"
+    })
+    void isURLshouldRejectInvalidURL(String url) {
+        assertFalse(URLUtil.isURL(url));
     }
 
     @Test
