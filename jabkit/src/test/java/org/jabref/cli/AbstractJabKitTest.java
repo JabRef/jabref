@@ -1,5 +1,7 @@
 package org.jabref.cli;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -32,6 +34,9 @@ public abstract class AbstractJabKitTest {
 
     protected CommandLine commandLine;
 
+    private StringWriter outWriter;
+    private StringWriter errWriter;
+
     @BeforeEach()
     void setup() {
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
@@ -51,6 +56,32 @@ public abstract class AbstractJabKitTest {
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
         commandLine = new CommandLine(argumentProcessor);
+
+        outWriter = new StringWriter();
+        PrintWriter out = new PrintWriter(outWriter);
+        errWriter = new StringWriter();
+        PrintWriter err = new PrintWriter(errWriter);
+
+        commandLine.setOut(out);
+        commandLine.setErr(err);
+    }
+
+    /**
+     * Returns the captured standard output from the command line execution.
+     *
+     * @return The captured stdout string.
+     */
+    protected String getStandardOutput() {
+        return outWriter.toString();
+    }
+
+    /**
+     * Returns the captured error output from the command line execution.
+     *
+     * @return The captured stderr string.
+     */
+    protected String getErrorOutput() {
+        return errWriter.toString();
     }
 
     /**
