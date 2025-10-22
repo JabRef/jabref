@@ -43,7 +43,16 @@ import org.slf4j.LoggerFactory;
  * </p>
  * <p>
  * To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+ * Alternatively, use the {@link Builder} for flexible construction:
  * </p>
+ * <pre>{@code
+ * BibDatabaseContext context = BibDatabaseContext.builder()
+ *     .database(database)
+ *     .metaData(metaData)
+ *     .databasePath(path)
+ *     .location(DatabaseLocation.LOCAL)
+ *     .build();
+ * }</pre>
  */
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
@@ -68,24 +77,53 @@ public class BibDatabaseContext {
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
+    /**
+     * Creates a new BibDatabaseContext with an empty database.
+     */
     public BibDatabaseContext() {
         this(new BibDatabase());
     }
 
+    /**
+     * Creates a new BibDatabaseContext with the given database.
+     *
+     * @param database the BibDatabase (must not be null)
+     */
     public BibDatabaseContext(@NonNull BibDatabase database) {
         this(database, new MetaData());
     }
 
+    /**
+     * Creates a new BibDatabaseContext with the given database and metadata.
+     *
+     * @param database the BibDatabase (must not be null)
+     * @param metaData the MetaData (must not be null)
+     */
     public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData) {
         this.database = database;
         this.metaData = metaData;
         this.location = DatabaseLocation.LOCAL;
     }
 
+    /**
+     * Creates a new BibDatabaseContext with the given database, metadata, and path.
+     *
+     * @param database the BibDatabase (must not be null)
+     * @param metaData the MetaData (must not be null)
+     * @param path     the file path where the database is located (can be null)
+     */
     public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
+    /**
+     * Creates a new BibDatabaseContext with the given database, metadata, path, and location.
+     *
+     * @param database the BibDatabase (must not be null)
+     * @param metaData the MetaData (must not be null)
+     * @param path     the file path where the database is located (can be null)
+     * @param location the database location type (must not be null)
+     */
     public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path, @NonNull DatabaseLocation location) {
         this(database, metaData);
         this.path = path;
@@ -93,6 +131,31 @@ public class BibDatabaseContext {
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
         }
+    }
+
+    /**
+     * Private constructor for use by the Builder.
+     *
+     * @param builder the Builder containing all configuration parameters
+     */
+    private BibDatabaseContext(Builder builder) {
+        this.database = builder.database;
+        this.metaData = builder.metaData;
+        this.path = builder.path;
+        this.location = builder.location;
+
+        if (this.location == DatabaseLocation.LOCAL) {
+            convertToLocalDatabase();
+        }
+    }
+
+    /**
+     * Creates a new Builder for constructing BibDatabaseContext instances.
+     *
+     * @return a new Builder instance with default values
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
     public BibDatabaseMode getMode() {
@@ -348,5 +411,106 @@ public class BibDatabaseContext {
      */
     public String getUid() {
         return uid;
+    }
+
+    /**
+     * Builder for creating {@link BibDatabaseContext} instances with a fluent API.
+     * Provides flexible configuration of database context properties.
+     *
+     * <p>Example usage:</p>
+     * <pre>{@code
+     * BibDatabaseContext context = BibDatabaseContext.builder()
+     *     .database(myDatabase)
+     *     .metaData(myMetaData)
+     *     .databasePath(Paths.get("my-library.bib"))
+     *     .location(DatabaseLocation.LOCAL)
+     *     .build();
+     * }</pre>
+     *
+     * <p>For simple cases, the default constructors can still be used:</p>
+     * <pre>{@code
+     * BibDatabaseContext context = new BibDatabaseContext();
+     * BibDatabaseContext context = new BibDatabaseContext(database);
+     * }</pre>
+     */
+    public static class Builder {
+        // Optional parameters with default values
+        private BibDatabase database = new BibDatabase();
+        private MetaData metaData = new MetaData();
+        private Path path = null;
+        private DatabaseLocation location = DatabaseLocation.LOCAL;
+
+        /**
+         * Creates a new Builder with default values.
+         */
+        public Builder() {
+            // Default constructor with default values initialized above
+        }
+
+        /**
+         * Sets the BibDatabase for this context.
+         *
+         * @param database the BibDatabase (must not be null)
+         * @return this Builder instance for method chaining
+         * @throws IllegalArgumentException if database is null
+         */
+        public Builder database(@NonNull BibDatabase database) {
+            if (database == null) {
+                throw new IllegalArgumentException("database cannot be null");
+            }
+            this.database = database;
+            return this;
+        }
+
+        /**
+         * Sets the MetaData for this context.
+         *
+         * @param metaData the MetaData (must not be null)
+         * @return this Builder instance for method chaining
+         * @throws IllegalArgumentException if metaData is null
+         */
+        public Builder metaData(@NonNull MetaData metaData) {
+            if (metaData == null) {
+                throw new IllegalArgumentException("metaData cannot be null");
+            }
+            this.metaData = metaData;
+            return this;
+        }
+
+        /**
+         * Sets the file path where the database is located.
+         *
+         * @param path the file path (can be null for unsaved databases)
+         * @return this Builder instance for method chaining
+         */
+        public Builder databasePath(Path path) {
+            this.path = path;
+            return this;
+        }
+
+        /**
+         * Sets the database location type (local or shared).
+         *
+         * @param location the DatabaseLocation (must not be null)
+         * @return this Builder instance for method chaining
+         * @throws IllegalArgumentException if location is null
+         */
+        public Builder location(@NonNull DatabaseLocation location) {
+            if (location == null) {
+                throw new IllegalArgumentException("location cannot be null");
+            }
+            this.location = location;
+            return this;
+        }
+
+        /**
+         * Builds and returns a new {@link BibDatabaseContext} instance
+         * with the configured parameters.
+         *
+         * @return a new BibDatabaseContext instance
+         */
+        public BibDatabaseContext build() {
+            return new BibDatabaseContext(this);
+        }
     }
 }
