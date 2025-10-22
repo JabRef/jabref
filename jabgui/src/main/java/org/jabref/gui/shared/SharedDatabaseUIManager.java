@@ -214,7 +214,7 @@ public class SharedDatabaseUIManager {
     }
 
     private BibDatabaseContext getBibDatabaseContextForSharedDatabase() {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext bibDatabaseContext = BibDatabaseContext.empty();
         bibDatabaseContext.setMode(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(
                 bibDatabaseContext,

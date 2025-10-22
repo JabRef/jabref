@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 
 public class DocbookExporterTest {
 
-    public BibDatabaseContext databaseContext = new BibDatabaseContext.Builder().build();
+    public BibDatabaseContext databaseContext = BibDatabaseContext.empty();
     public Charset charset = StandardCharsets.UTF_8;
 
     private Exporter exportFormat;

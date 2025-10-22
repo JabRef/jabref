@@ -80,7 +80,7 @@ class UnlinkedFilesCrawlerTest {
         Path databasePath = testRoot.resolve("test.bib");
         Files.createFile(databasePath);
 
-        BibDatabaseContext databaseContext = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext databaseContext = BibDatabaseContext.empty();
         databaseContext.setDatabasePath(databasePath);
 
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);

@@ -95,13 +95,13 @@ class EditionCheckerTest {
     }
 
     private EditionChecker createBibtexEditionChecker(Boolean allowIntegerEdition) {
-        BibDatabaseContext bibtex = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext bibtex = BibDatabaseContext.empty();
         bibtex.setMode(BibDatabaseMode.BIBTEX);
         return new EditionChecker(bibtex, allowIntegerEdition);
     }
 
     private EditionChecker createBiblatexEditionChecker(Boolean allowIntegerEdition) {
-        BibDatabaseContext biblatex = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext biblatex = BibDatabaseContext.empty();
         biblatex.setMode(BibDatabaseMode.BIBLATEX);
         return new EditionChecker(biblatex, allowIntegerEdition);
     }

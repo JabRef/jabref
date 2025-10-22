@@ -44,7 +44,7 @@ public class OpenOfficeDocumentCreatorTest {
 
         exporter = new OpenOfficeDocumentCreator();
 
-        databaseContext = new BibDatabaseContext.Builder().build();
+        databaseContext = BibDatabaseContext.empty();
         charset = StandardCharsets.UTF_8;
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);

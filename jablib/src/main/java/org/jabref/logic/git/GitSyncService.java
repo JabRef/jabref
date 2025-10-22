@@ -107,7 +107,7 @@ public class GitSyncService {
                 Optional<String> baseContent = GitFileReader.readFileFromCommit(git, baseCommitOpt.get(), relativePath);
                 base = baseContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(baseContent.get(), importFormatPreferences);
             } else {
-                base = new BibDatabaseContext.Builder().build();
+                base = BibDatabaseContext.empty();
             }
 
             Optional<String> remoteContent = GitFileReader.readFileFromCommit(git, remoteCommit, relativePath);

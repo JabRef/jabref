@@ -123,7 +123,7 @@ class EmbeddedBibFilePdfExporterTest {
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
 
-        databaseContext = new BibDatabaseContext.Builder().build();
+        databaseContext = BibDatabaseContext.empty();
         BibDatabase dataBase = databaseContext.getDatabase();
 
         initBibEntries();

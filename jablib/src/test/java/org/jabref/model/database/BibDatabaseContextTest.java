@@ -46,7 +46,7 @@ class BibDatabaseContextTest {
 
     @Test
     void getFileDirectoriesWithEmptyDbParent() {
-        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext database = BibDatabaseContext.empty();
         database.setDatabasePath(Path.of("biblio.bib"));
         assertEquals(List.of(currentWorkingDir), database.getFileDirectories(fileDirPrefs));
     }
@@ -55,7 +55,7 @@ class BibDatabaseContextTest {
     void getFileDirectoriesWithRelativeDbParent() {
         Path file = Path.of("relative/subdir").resolve("biblio.bib");
 
-        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext database = BibDatabaseContext.empty();
         database.setDatabasePath(file);
         assertEquals(List.of(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
     }
@@ -64,7 +64,7 @@ class BibDatabaseContextTest {
     void getFileDirectoriesWithRelativeDottedDbParent() {
         Path file = Path.of("./relative/subdir").resolve("biblio.bib");
 
-        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext database = BibDatabaseContext.empty();
         database.setDatabasePath(file);
         assertEquals(List.of(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
     }
@@ -72,7 +72,7 @@ class BibDatabaseContextTest {
     @Test
     void getFileDirectoriesWithDotAsDirectory() {
         Path file = Path.of("biblio.bib");
-        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext database = BibDatabaseContext.empty();
         database.setDatabasePath(currentWorkingDir.resolve(file));
         database.getMetaData().setLibrarySpecificFileDirectory(".");
         assertEquals(List.of(currentWorkingDir), database.getFileDirectories(fileDirPrefs));
@@ -82,7 +82,7 @@ class BibDatabaseContextTest {
     void getFileDirectoriesWithAbsoluteDbParent() {
         Path file = Path.of("/absolute/subdir").resolve("biblio.bib");
 
-        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext database = BibDatabaseContext.empty();
         database.setDatabasePath(file);
         assertEquals(List.of(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
     }
@@ -91,7 +91,7 @@ class BibDatabaseContextTest {
     void getFileDirectoriesWithRelativeMetadata() {
         Path file = Path.of("/absolute/subdir").resolve("biblio.bib");
 
-        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext database = BibDatabaseContext.empty();
         database.setDatabasePath(file);
         database.getMetaData().setLibrarySpecificFileDirectory("../Literature");
         assertEquals(List.of(
@@ -106,7 +106,7 @@ class BibDatabaseContextTest {
     void getFileDirectoriesWithMetadata() {
         Path file = Path.of("/absolute/subdir").resolve("biblio.bib");
 
-        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext database = BibDatabaseContext.empty();
         database.setDatabasePath(file);
         database.getMetaData().setLibrarySpecificFileDirectory("Literature");
         assertEquals(List.of(
@@ -153,7 +153,7 @@ class BibDatabaseContextTest {
 
     @Test
     void getFullTextIndexPathWhenPathIsNull() {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext bibDatabaseContext = BibDatabaseContext.empty();
         bibDatabaseContext.setDatabasePath(null);
 
         Path expectedPath = Directories.getFulltextIndexBaseDirectory().resolve("unsaved");
@@ -166,7 +166,7 @@ class BibDatabaseContextTest {
     void getFullTextIndexPathWhenPathIsNotNull() {
         Path existingPath = Path.of("some_path.bib");
 
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext bibDatabaseContext = BibDatabaseContext.empty();
         bibDatabaseContext.setDatabasePath(existingPath);
 
         Path actualPath = bibDatabaseContext.getFulltextIndexPath();

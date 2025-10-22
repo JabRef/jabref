@@ -43,7 +43,7 @@ class MarkdownTitleExporterTest {
                 SAVE_MOST_RECENT_FIRST_SAVE_ORDER,
                 BlankLineBehaviour.DELETE_BLANKS);
 
-        databaseContext = new BibDatabaseContext.Builder().build();
+        databaseContext = BibDatabaseContext.empty();
     }
 
     @Test

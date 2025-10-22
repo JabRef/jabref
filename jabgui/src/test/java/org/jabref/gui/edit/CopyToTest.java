@@ -72,7 +72,7 @@ public class CopyToTest {
         when(stateManager.getSelectedEntries()).thenReturn((ObservableList<BibEntry>) selectedEntries);
 
         this.sourceDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry, entryWithCrossRef, referencedEntry)));
-        this.targetDatabaseContext = new BibDatabaseContext.Builder().build();
+        this.targetDatabaseContext = BibDatabaseContext.empty();
 
         CopyToPreferences copyToPreferences = mock(CopyToPreferences.class);
         when(preferences.getCopyToPreferences()).thenReturn(copyToPreferences);

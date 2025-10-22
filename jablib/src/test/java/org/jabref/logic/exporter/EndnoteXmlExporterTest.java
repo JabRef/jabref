@@ -37,7 +37,7 @@ class EndnoteXmlExporterTest {
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        databaseContext = new BibDatabaseContext.Builder().build();
+        databaseContext = BibDatabaseContext.empty();
         exporter = new EndnoteXmlExporter(new BibEntryPreferences(','));
 
         bookEntry = new BibEntry(StandardEntryType.Book)

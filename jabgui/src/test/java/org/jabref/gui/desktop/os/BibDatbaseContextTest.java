@@ -30,7 +30,7 @@ public class BibDatbaseContextTest {
         Path userDirJabRef = NativeDesktop.get().getDefaultFileChooserDirectory();
 
         when(fileDirPrefs.getMainFileDirectory()).thenReturn(Optional.of(userDirJabRef));
-        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext database = BibDatabaseContext.empty();
         database.setDatabasePath(Path.of("biblio.bib"));
         assertEquals(List.of(userDirJabRef), database.getFileDirectories(fileDirPrefs));
     }

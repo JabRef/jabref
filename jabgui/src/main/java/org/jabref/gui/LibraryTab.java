@@ -1037,7 +1037,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               CountingUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
-        BibDatabaseContext context = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext context = BibDatabaseContext.empty();
         context.setDatabasePath(file);
 
         LibraryTab newTab = new LibraryTab(

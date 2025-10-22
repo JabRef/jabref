@@ -57,7 +57,7 @@ public class DocBook5ExporterTest {
         LocalDate myDate = LocalDate.of(2018, 1, 1);
 
         xmlFile = Path.of(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
-        databaseContext = new BibDatabaseContext.Builder().build();
+        databaseContext = BibDatabaseContext.empty();
         charset = StandardCharsets.UTF_8;
         BibEntry entry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "my paper title")

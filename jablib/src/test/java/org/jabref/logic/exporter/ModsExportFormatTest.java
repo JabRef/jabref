@@ -26,7 +26,7 @@ class ModsExportFormatTest {
 
     @BeforeEach
     void setUp() throws URISyntaxException {
-        databaseContext = new BibDatabaseContext.Builder().build();
+        databaseContext = BibDatabaseContext.empty();
         modsExportFormat = new ModsExporter();
         new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
         Path.of(ModsExportFormatTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI());

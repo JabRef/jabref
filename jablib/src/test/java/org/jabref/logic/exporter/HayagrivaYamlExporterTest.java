@@ -41,7 +41,7 @@ class HayagrivaYamlExporterTest {
                 SaveOrder.getDefaultSaveOrder(),
                 BlankLineBehaviour.DELETE_BLANKS);
 
-        databaseContext = new BibDatabaseContext.Builder().build();
+        databaseContext = BibDatabaseContext.empty();
     }
 
     @Test

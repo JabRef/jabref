@@ -42,7 +42,7 @@ class GroupDialogViewModelTest {
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) {
         this.temporaryFolder = temporaryFolder;
-        bibDatabaseContext = new BibDatabaseContext.Builder().build();
+        bibDatabaseContext = BibDatabaseContext.empty();
 
         when(group.getName()).thenReturn("Group");
 

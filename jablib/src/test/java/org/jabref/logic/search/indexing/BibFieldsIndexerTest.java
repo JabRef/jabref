@@ -43,7 +43,7 @@ public class BibFieldsIndexerTest {
 
     @Test
     void addToIndexIsIdempotentForSameEntry() throws Exception {
-        BibDatabaseContext databaseContext = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext databaseContext = BibDatabaseContext.empty();
         Connection connection = postgreServer.getConnection();
         BibFieldsIndexer indexer = new BibFieldsIndexer(bibEntryPreferences, databaseContext, connection);
 

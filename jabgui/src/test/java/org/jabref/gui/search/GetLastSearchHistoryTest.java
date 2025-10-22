@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(ApplicationExtension.class)
 class GetLastSearchHistoryTest {
     private final StateManager stateManager = new JabRefGuiStateManager();
-    private final BibDatabaseContext dbContext1 = new BibDatabaseContext.Builder().build();
-    private final BibDatabaseContext dbContext2 = new BibDatabaseContext.Builder().build();
+    private final BibDatabaseContext dbContext1 = BibDatabaseContext.empty();
+    private final BibDatabaseContext dbContext2 = BibDatabaseContext.empty();
 
     @Start
     void onStart(Stage stage) {

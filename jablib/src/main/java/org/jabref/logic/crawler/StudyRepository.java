@@ -141,7 +141,7 @@ public class StudyRepository {
                     preferences.getImportFormatPreferences(),
                     fileUpdateMonitor).getDatabaseContext();
         }
-        return new BibDatabaseContext.Builder().build();
+        return BibDatabaseContext.empty();
     }
 
     /**
@@ -153,7 +153,7 @@ public class StudyRepository {
                     preferences.getImportFormatPreferences(),
                     fileUpdateMonitor).getDatabaseContext();
         }
-        return new BibDatabaseContext.Builder().build();
+        return BibDatabaseContext.empty();
     }
 
     /**
@@ -165,7 +165,7 @@ public class StudyRepository {
                     preferences.getImportFormatPreferences(),
                     fileUpdateMonitor).getDatabaseContext();
         }
-        return new BibDatabaseContext.Builder().build();
+        return BibDatabaseContext.empty();
     }
 
     /**

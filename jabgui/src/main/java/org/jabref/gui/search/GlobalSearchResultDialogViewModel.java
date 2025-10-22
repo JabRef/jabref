@@ -9,7 +9,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class GlobalSearchResultDialogViewModel {
-    private final BibDatabaseContext searchDatabaseContext = new BibDatabaseContext.Builder().build();
+    private final BibDatabaseContext searchDatabaseContext = BibDatabaseContext.empty();
     private final BooleanProperty keepOnTop = new SimpleBooleanProperty();
 
     public GlobalSearchResultDialogViewModel(SearchPreferences searchPreferences) {

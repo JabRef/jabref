@@ -149,7 +149,7 @@ class PdfMergeMetadataImporterTest {
     void importRelativizesFilePath() throws URISyntaxException, IOException {
         // Initialize database and preferences
         FilePreferences preferences = mock(FilePreferences.class);
-        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext database = BibDatabaseContext.empty();
 
         // Initialize file and working directory
         Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/minimal.pdf").toURI());
