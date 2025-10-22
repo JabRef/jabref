@@ -485,7 +485,7 @@ public class GroupDialogViewModel {
                     dateRadioButtonSelectedProperty.setValue(Boolean.TRUE);
                     dateGroupFieldProperty.setValue(group.getField());
                     dateGroupOptionProperty.setValue(group.getGranularity());
-                    dateGroupIncludeEmptyProperty.setValue(false); // Not supported yet
+                    dateGroupIncludeEmptyProperty.setValue(false);
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
                 typeTexProperty.setValue(true);

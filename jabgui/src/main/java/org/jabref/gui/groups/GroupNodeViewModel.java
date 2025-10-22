@@ -462,8 +462,8 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof TexGroup) {
             return false;
-        } else if (group instanceof AutomaticDateGroup) { // <-- add this branch
-            return false; // date groups are computed, not manually assigned
+        } else if (group instanceof AutomaticDateGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
