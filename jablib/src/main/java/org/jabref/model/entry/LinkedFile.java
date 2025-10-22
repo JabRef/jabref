@@ -94,6 +94,19 @@ public class LinkedFile implements Serializable {
         this("", link, "");
     }
 
+    // Static factory methods
+    public static LinkedFile fromPath(String description, Path link, String fileType) {
+        return new LinkedFile(description, link, fileType);
+    }
+
+    public static LinkedFile fromUrl(String description, URL link, String fileType) {
+        return new LinkedFile(description, link, fileType);
+    }
+
+    public static LinkedFile of(String description, String link, String fileType) {
+        return new LinkedFile(description, link, fileType);
+    }
+
     public StringProperty descriptionProperty() {
         return description;
     }
