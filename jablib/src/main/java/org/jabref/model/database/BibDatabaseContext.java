@@ -349,4 +349,42 @@ public class BibDatabaseContext {
     public String getUid() {
         return uid;
     }
+    /**
+     * Builder for {@link BibDatabaseContext}.
+     */
+    public static class Builder {
+        private BibDatabase database = new BibDatabase();
+        private MetaData metaData = new MetaData();
+        private Path path;
+        private DatabaseLocation location = DatabaseLocation.LOCAL;
+
+        public Builder database(BibDatabase database) {
+            this.database = database;
+            return this;
+        }
+
+        public Builder metaData(MetaData metaData) {
+            this.metaData = metaData;
+            return this;
+        }
+
+        public Builder path(Path path) {
+            this.path = path;
+            return this;
+        }
+
+        public Builder location(DatabaseLocation location) {
+            this.location = location;
+            return this;
+        }
+
+        /**
+         * Builds the BibDatabaseContext.
+         *
+         * @return a new instance
+         */
+        public BibDatabaseContext build() {
+            return new BibDatabaseContext(database, metaData, path, location);
+        }
+    }
 }
