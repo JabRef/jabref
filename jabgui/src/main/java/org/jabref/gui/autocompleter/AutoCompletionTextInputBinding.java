@@ -38,9 +38,10 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 /**
- * Represents a binding between a text input control and an auto-completion popup
- * This class is a slightly modified version of {@link impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding}
- * that works with general text input controls instead of just text fields.
+* Binds a text input control (TextField, TextArea, ...) to an auto-completion popup.
+ * Shows suggestions while the user types.
+ *
+ * @param <T> the type of suggestions shown in the popup
  */
 public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> {
 
@@ -71,7 +72,6 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
      */
     private AutoCompletionTextInputBinding(final TextInputControl textInputControl,
                                            Callback<ISuggestionRequest, Collection<T>> suggestionProvider) {
-
         this(textInputControl,
                 suggestionProvider,
                 AutoCompletionTextInputBinding.defaultStringConverter(),
@@ -97,6 +97,7 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         getCompletionTarget().focusedProperty().addListener(focusChangedListener);
     }
 
+    /** Returns a simple converter that turns objects into strings and back. */
     private static <T> StringConverter<T> defaultStringConverter() {
         return new StringConverter<>() {
             @Override
@@ -128,6 +129,7 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         return autoComplete(textArea, suggestionProvider, AutoCompletionTextInputBinding.defaultStringConverter(), inputAnalyzer);
     }
 
+    /** Updates the current input text for auto-completion. */
     private void setUserInputText(String newText) {
         if (newText == null) {
             newText = "";
@@ -160,11 +162,19 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         getCompletionTarget().positionCaret(newText.length());
     }
 
+    /** Sets whether suggestions are shown when the input control gains focus. */
     public void setShowOnFocus(boolean showOnFocus) {
         this.showOnFocus = showOnFocus;
     }
 
 
+    /**
+     * Builder for creating AutoCompletionTextInputBinding instances.
+     *
+     * @param <T> the type of suggestions provided by the binding
+     *           but also should be used since it is important to be cautious and
+     *           have this class check for type-safe
+     */
     public static class Builder<T> {
         private TextInputControl textInputControl;
         private Callback<ISuggestionRequest, Collection<T>> suggestionProvider;
@@ -172,34 +182,66 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         private AutoCompletionStrategy inputAnalyzer = new ReplaceStrategy();
         private boolean showOnFocus = false;
 
-        public Builder() {
-        }
-
+        /**
+         * Sets the text input control to bind auto-completion to.
+         *
+         * @param textInputControl the control to enhance with auto-completion
+         * @return this builder for method chaining
+         */
         public Builder<T> addTextInputControl(TextInputControl textInputControl) {
             this.textInputControl = textInputControl;
             return this;
         }
 
+        /**
+         * Sets the provider which generates suggestions based on user input.
+         *
+         * @param suggestionProvider callback that provides completion suggestions
+         * @return this builder for method chaining
+         */
         public Builder<T> addSuggestionProvider(Callback<ISuggestionRequest, Collection<T>> suggestionProvider) {
             this.suggestionProvider = suggestionProvider;
             return this;
         }
 
+        /**
+         * Sets the string converter for transforming suggestions to display text.
+         *
+         * @param converter the converter to use for suggestion display
+         * @return this builder for method chaining
+         */
         public Builder<T> addConverter(StringConverter<T> converter) {
             this.converter = converter;
             return this;
         }
 
+        /**
+         * Sets the strategy for analyzing user input and determining completion behavior.
+         *
+         * @param inputAnalyzer the input analysis strategy
+         * @return this builder for method chaining
+         */
         public Builder<T> addInputAnalyzer(AutoCompletionStrategy inputAnalyzer) {
             this.inputAnalyzer = inputAnalyzer;
             return this;
         }
 
+        /**
+         * Sets whether to show suggestions when the control receives focus.
+         *
+         * @param showOnFocus true to show suggestions on focus, false otherwise
+         * @return this builder for method chaining
+         */
         public Builder<T> setShowOnFocus(boolean showOnFocus) {
             this.showOnFocus = showOnFocus;
             return this;
         }
 
+        /**
+         * Builds and returns the configured auto-completion binding.
+         *
+         * @return a new AutoCompletionTextInputBinding instance with the specified configuration
+         */
         public AutoCompletionTextInputBinding<T> build() {
             AutoCompletionTextInputBinding<T> builder =
                 new AutoCompletionTextInputBinding<>(textInputControl, suggestionProvider, converter, inputAnalyzer);
@@ -210,3 +252,4 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
 
 
 }
+

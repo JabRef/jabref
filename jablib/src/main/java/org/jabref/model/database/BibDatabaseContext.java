@@ -68,24 +68,39 @@ public class BibDatabaseContext {
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
+    /**
+     * Creates a new BibDatabaseContext with an empty database and metadata.
+     */
     public BibDatabaseContext() {
         this(new BibDatabase());
     }
 
+    /**
+     * Creates a new BibDatabaseContext with the given database and empty metadata.
+     */
     public BibDatabaseContext(@NonNull BibDatabase database) {
         this(database, new MetaData());
     }
 
+    /**
+     * Creates a new BibDatabaseContext with the given database and metadata.
+     */
     public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData) {
         this.database = database;
         this.metaData = metaData;
         this.location = DatabaseLocation.LOCAL;
     }
 
+    /**
+     * Creates a new BibDatabaseContext with the given database, metadata, and file path.
+     */
     public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
+    /**
+     * Creates a new BibDatabaseContext with the given database, metadata, file path, and location type.
+     */
     public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path, @NonNull DatabaseLocation location) {
         this(database, metaData);
         this.path = path;
@@ -120,10 +135,12 @@ public class BibDatabaseContext {
         this.path = null;
     }
 
+    /** Returns the BibDatabase for this context. */
     public BibDatabase getDatabase() {
         return database;
     }
 
+    /** Returns the metadata associated with this database. */
     public MetaData getMetaData() {
         return metaData;
     }
@@ -227,6 +244,7 @@ public class BibDatabaseContext {
                 .orElse(path);
     }
 
+    /** Returns the current DatabaseSynchronizer */
     public DatabaseSynchronizer getDBMSSynchronizer() {
         return this.dbmsSynchronizer;
     }
@@ -235,6 +253,7 @@ public class BibDatabaseContext {
         this.dbmsSynchronizer = null;
     }
 
+    /** Returns the location type (LOCAL or SHARED) of this database. */
     public DatabaseLocation getLocation() {
         return this.location;
     }
@@ -257,6 +276,7 @@ public class BibDatabaseContext {
         this.location = DatabaseLocation.LOCAL;
     }
 
+    /** Returns all BibEntries in this database. */
     public List<BibEntry> getEntries() {
         return database.getEntries();
     }
@@ -350,32 +370,38 @@ public class BibDatabaseContext {
         return uid;
     }
 
+    /** Builder for creating BibDatabaseContext instances. */
     public static class Builder {
         private BibDatabase database;
         private MetaData metaData;
         private Path path;
         private DatabaseLocation location = DatabaseLocation.LOCAL;
 
+        /** Sets the database to use. */
         public Builder database(BibDatabase database) {
             this.database = database;
             return this;
         }
 
+        /** Sets the metadata to use. */
         public Builder metaData(MetaData metaData) {
             this.metaData = metaData;
             return this;
         }
 
+        /** Sets the path for this database. */
         public Builder path(Path path) {
             this.path = path;
             return this;
         }
 
+        /** Sets the location (LOCAL or SHARED) for this database. */
         public Builder location(DatabaseLocation location) {
             this.location = location;
             return this;
         }
 
+        /** Creates a BibDatabaseContext using the values provided in this builder. */
         public BibDatabaseContext build() {
             BibDatabaseContext context = new BibDatabaseContext(database, metaData);
             context.setDatabasePath(path);
