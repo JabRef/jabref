@@ -349,4 +349,44 @@ public class BibDatabaseContext {
     public String getUid() {
         return uid;
     }
+
+    public static class Builder {
+        private BibDatabase database;
+        private MetaData metaData;
+        private Path path;
+        private DatabaseLocation location = DatabaseLocation.LOCAL;
+
+        public Builder database(BibDatabase database) {
+            this.database = database;
+            return this;
+        }
+
+        public Builder metaData(MetaData metaData) {
+            this.metaData = metaData;
+            return this;
+        }
+
+        public Builder path(Path path) {
+            this.path = path;
+            return this;
+        }
+
+        public Builder location(DatabaseLocation location) {
+            this.location = location;
+            return this;
+        }
+
+        public BibDatabaseContext build() {
+            BibDatabaseContext context = new BibDatabaseContext(database, metaData);
+            context.setDatabasePath(path);
+
+            if (location == DatabaseLocation.SHARED) {
+                context.convertToSharedDatabase(null);
+            } else {
+                context.convertToLocalDatabase();
+            }
+
+            return context;
+        }
+    }
 }
