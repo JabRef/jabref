@@ -18,7 +18,7 @@ class BibDatabaseDiffTest {
 
     @Test
     void compareOfEmptyDatabasesReportsNoDifferences() {
-        BibDatabaseDiff diff = BibDatabaseDiff.compare(new BibDatabaseContext(), new BibDatabaseContext());
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(BibDatabaseContext.empty(), BibDatabaseContext.empty());
 
         assertEquals(Optional.empty(), diff.getPreambleDifferences());
         assertEquals(Optional.empty(), diff.getMetaDataDifferences());

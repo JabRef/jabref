@@ -16,22 +16,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class EditionCheckerTest {
     @Test
     void isFirstCharacterANumber() {
-        assertTrue(createSimpleEditionChecker(new BibDatabaseContext(), false).isFirstCharDigit("0HelloWorld"));
+        assertTrue(createSimpleEditionChecker(BibDatabaseContext.empty(), false).isFirstCharDigit("0HelloWorld"));
     }
 
     @Test
     void isFirstCharacterANumberFalseForEmptyString() {
-        assertFalse(createSimpleEditionChecker(new BibDatabaseContext(), false).isFirstCharDigit(""));
+        assertFalse(createSimpleEditionChecker(BibDatabaseContext.empty(), false).isFirstCharDigit(""));
     }
 
     @Test
     void isFirstCharacterNotANumber() {
-        assertFalse(createSimpleEditionChecker(new BibDatabaseContext(), false).isFirstCharDigit("HelloWorld"));
+        assertFalse(createSimpleEditionChecker(BibDatabaseContext.empty(), false).isFirstCharDigit("HelloWorld"));
     }
 
     @Test
     void editionCheckerDoesNotComplainIfAllowIntegerEditionIsEnabled() {
-        assertEquals(Optional.empty(), createSimpleEditionChecker(new BibDatabaseContext(), true).checkValue("2"));
+        assertEquals(Optional.empty(), createSimpleEditionChecker(BibDatabaseContext.empty(), true).checkValue("2"));
     }
 
     @Test
@@ -95,13 +95,13 @@ class EditionCheckerTest {
     }
 
     private EditionChecker createBibtexEditionChecker(Boolean allowIntegerEdition) {
-        BibDatabaseContext bibtex = new BibDatabaseContext();
+        BibDatabaseContext bibtex = new BibDatabaseContext.Builder().build();
         bibtex.setMode(BibDatabaseMode.BIBTEX);
         return new EditionChecker(bibtex, allowIntegerEdition);
     }
 
     private EditionChecker createBiblatexEditionChecker(Boolean allowIntegerEdition) {
-        BibDatabaseContext biblatex = new BibDatabaseContext();
+        BibDatabaseContext biblatex = new BibDatabaseContext.Builder().build();
         biblatex.setMode(BibDatabaseMode.BIBLATEX);
         return new EditionChecker(biblatex, allowIntegerEdition);
     }

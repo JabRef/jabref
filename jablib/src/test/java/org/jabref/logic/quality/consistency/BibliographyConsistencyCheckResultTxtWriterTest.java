@@ -42,7 +42,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         database.insertEntry(first);
         database.insertEntry(second);
 
-        BibDatabaseContext bibContext = new BibDatabaseContext(database);
+        BibDatabaseContext bibContext = new BibDatabaseContext.Builder().database(database).build();
         bibContext.setMode(BibDatabaseMode.BIBTEX);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
         });

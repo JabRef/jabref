@@ -50,7 +50,7 @@ public class MSBibExportFormatFilesTest {
 
     @BeforeEach
     void setUp(@TempDir Path testFolder) throws IOException {
-        databaseContext = new BibDatabaseContext();
+        databaseContext = new BibDatabaseContext.Builder().build();
         charset = StandardCharsets.UTF_8;
         exporter = new MSBibExporter();
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");

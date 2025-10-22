@@ -247,7 +247,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     private PreviewViewer initializePreviewViewer(BibEntry entry) {
         PreviewViewer viewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        viewer.setDatabaseContext(new BibDatabaseContext());
+        viewer.setDatabaseContext(BibDatabaseContext.empty());
         viewer.setEntry(entry);
         return viewer;
     }

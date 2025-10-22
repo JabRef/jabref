@@ -46,7 +46,9 @@ public class CitationStyleGenerator {
      * @implNote The bibliography is generated using an external library which may take some time, debatable if it is better to call it from outside the main Thread.
      */
     protected static String generateBibliography(List<BibEntry> bibEntries, String style, BibEntryTypesManager entryTypesManager) {
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(bibEntries));
+        BibDatabaseContext context = new BibDatabaseContext.Builder()
+                .database(new BibDatabase(bibEntries))
+                .build();
         context.setMode(BibDatabaseMode.BIBLATEX);
         return generateBibliography(bibEntries, style, CitationStyleOutputFormat.HTML, context, entryTypesManager).getFirst();
     }

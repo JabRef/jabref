@@ -88,7 +88,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.latexFiles = new LatexParserResults();
         this.listener = new CitationsAlterationListener();
 
-        this.currentDatabaseContext = new BibDatabaseContext();
+        this.currentDatabaseContext = new BibDatabaseContext.Builder().build();
         this.directory.set(FileUtil.getInitialDirectory(currentDatabaseContext, preferences.getFilePreferences().getWorkingDirectory()));
     }
 

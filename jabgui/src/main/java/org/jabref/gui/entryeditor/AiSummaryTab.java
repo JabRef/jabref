@@ -53,7 +53,7 @@ public class AiSummaryTab extends EntryEditorTab {
      */
     @Override
     protected void bindToEntry(BibEntry entry) {
-        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
+        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(BibDatabaseContext.empty());
         setContent(new SummaryComponent(
                 bibDatabaseContext,
                 entry,

@@ -297,7 +297,7 @@ class StudyRepositoryTest {
                 .withField(StandardField.TITLE, "Automatic Control, Robotics, and Information Processing");
         entry3.setType(StandardEntryType.Article);
 
-        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(new BibDatabaseContext(), citationKeyPatternPreferences);
+        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(BibDatabaseContext.empty(), citationKeyPatternPreferences);
         citationKeyGenerator.generateAndSetKey(entry3);
 
         return List.of(entry1, entry2, entry3);

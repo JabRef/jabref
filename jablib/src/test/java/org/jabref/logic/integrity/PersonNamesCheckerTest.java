@@ -21,10 +21,10 @@ class PersonNamesCheckerTest {
 
     @BeforeEach
     void setUp() {
-        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        BibDatabaseContext databaseContext = new BibDatabaseContext.Builder().build();
         databaseContext.setMode(BibDatabaseMode.BIBTEX);
         checker = new PersonNamesChecker(databaseContext);
-        BibDatabaseContext database = new BibDatabaseContext();
+        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
         database.setMode(BibDatabaseMode.BIBLATEX);
         checkerb = new PersonNamesChecker(database);
     }

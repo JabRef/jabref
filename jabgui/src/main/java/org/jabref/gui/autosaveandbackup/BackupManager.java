@@ -269,7 +269,10 @@ public class BackupManager {
         bibDatabaseContext.getDatabase().getStringValues().stream().map(BibtexString::clone)
                           .map(BibtexString.class::cast)
                           .forEach(bibDatabaseClone::addString);
-        BibDatabaseContext bibDatabaseContextClone = new BibDatabaseContext(bibDatabaseClone, bibDatabaseContext.getMetaData());
+        BibDatabaseContext bibDatabaseContextClone = new BibDatabaseContext.Builder()
+                .database(bibDatabaseClone)
+                .metaData(bibDatabaseContext.getMetaData())
+                .build();
 
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         // We want to have successful backups only

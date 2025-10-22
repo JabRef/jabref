@@ -176,7 +176,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
         PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        previewViewer.setDatabaseContext(new BibDatabaseContext());
+        previewViewer.setDatabaseContext(BibDatabaseContext.empty());
         previewViewer.setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
         previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()

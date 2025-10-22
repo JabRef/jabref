@@ -27,7 +27,7 @@ class MainTableDataModelTest {
 
     @Test
     void additionToObservableMapTriggersUpdate() {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext.Builder().build();
         ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
         ObservableList<BibEntry> allEntries = FXCollections.unmodifiableObservableList(entries);
         NameDisplayPreferences nameDisplayPreferences = new NameDisplayPreferences(NameDisplayPreferences.DisplayStyle.AS_IS, NameDisplayPreferences.AbbreviationStyle.FULL);

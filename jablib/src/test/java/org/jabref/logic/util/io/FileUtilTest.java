@@ -554,7 +554,7 @@ class FileUtilTest {
         Path bibPath = bibTempDir.resolve("bibliography.bib");
         Path filesPath = bibTempDir.resolve("files").resolve("pdfs");
 
-        BibDatabaseContext database = new BibDatabaseContext();
+        BibDatabaseContext database = new BibDatabaseContext.Builder().build();
         database.setDatabasePath(bibPath);
         database.getMetaData().setLibrarySpecificFileDirectory(filesPath.toString());
 

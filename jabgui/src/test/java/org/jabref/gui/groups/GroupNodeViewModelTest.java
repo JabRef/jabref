@@ -42,7 +42,7 @@ class GroupNodeViewModelTest {
     void setUp() {
         stateManager = mock(StateManager.class);
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
-        databaseContext = new BibDatabaseContext();
+        databaseContext = new BibDatabaseContext.Builder().build();
         taskExecutor = new CurrentThreadTaskExecutor();
         preferences = mock(GuiPreferences.class);
         when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(

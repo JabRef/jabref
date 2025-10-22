@@ -131,7 +131,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
         String fileName = file.getTermsList().getLocation();
         try {
-            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, fileName, termsFileType);
+            NativeDesktop.openExternalFileAnyFormat(BibDatabaseContext.empty(), externalApplicationsPreferences, filePreferences, fileName, termsFileType);
         } catch (IOException e) {
             LOGGER.warn("Problem open protected terms file editor", e);
         }

@@ -59,7 +59,7 @@ public class ModsExportFormatFilesTest {
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        databaseContext = new BibDatabaseContext();
+        databaseContext = new BibDatabaseContext.Builder().build();
         charset = StandardCharsets.UTF_8;
         exporter = new ModsExporter();
         bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());

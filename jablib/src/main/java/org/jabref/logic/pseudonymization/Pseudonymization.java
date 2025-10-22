@@ -36,7 +36,9 @@ public class Pseudonymization {
                 stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
 
         BibDatabase bibDatabase = new BibDatabase(newEntries);
-        BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
+        BibDatabaseContext result = new BibDatabaseContext.Builder()
+                .database(bibDatabase)
+                .build();
         result.setMode(bibDatabaseContext.getMode());
 
         return new Result(result, valueMapping);

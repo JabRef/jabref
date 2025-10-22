@@ -39,7 +39,7 @@ class CffExporterTest {
     @BeforeAll
     static void setUp() {
         cffExporter = new CffExporter();
-        databaseContext = new BibDatabaseContext();
+        databaseContext = new BibDatabaseContext.Builder().build();
     }
 
     @Test

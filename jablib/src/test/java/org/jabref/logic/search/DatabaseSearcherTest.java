@@ -50,7 +50,7 @@ public class DatabaseSearcherTest {
 
         when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(false);
         when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
-        databaseContext = spy(new BibDatabaseContext());
+        databaseContext = spy(BibDatabaseContext.empty());
         when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);
 
         postgreServer = new PostgreServer();

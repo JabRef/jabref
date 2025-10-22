@@ -44,7 +44,7 @@ class GroupTreeViewModelTest {
 
     @BeforeEach
     void setUp() {
-        databaseContext = new BibDatabaseContext();
+        databaseContext = new BibDatabaseContext.Builder().build();
         stateManager = new JabRefGuiStateManager();
         stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
         taskExecutor = new CurrentThreadTaskExecutor();

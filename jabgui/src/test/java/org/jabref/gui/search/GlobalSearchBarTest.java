@@ -60,7 +60,7 @@ public class GlobalSearchBarTest {
 
         stateManager = new JabRefGuiStateManager();
         // Need for active database, otherwise the searchField will be disabled
-        stateManager.setActiveDatabase(new BibDatabaseContext());
+        stateManager.setActiveDatabase(BibDatabaseContext.empty());
 
         // Instantiate GlobalSearchBar class, so the change listener is registered
         GlobalSearchBar searchBar = new GlobalSearchBar(

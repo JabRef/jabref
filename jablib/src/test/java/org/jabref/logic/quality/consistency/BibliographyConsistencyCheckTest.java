@@ -32,7 +32,7 @@ class BibliographyConsistencyCheckTest {
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PUBLISHER, "publisher");
         BibDatabase database = new BibDatabase(List.of(first, second));
-        BibDatabaseContext bibContext = new BibDatabaseContext(database);
+        BibDatabaseContext bibContext = new BibDatabaseContext.Builder().database(database).build();
         bibContext.setMode(BibDatabaseMode.BIBTEX);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
         });

@@ -73,7 +73,9 @@ class PseudonymizationTest {
                 .withField(StandardField.AUTHOR, "Author Two")
                 .withField(StandardField.PAGES, "some pages");
 
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(first, second)));
+        BibDatabaseContext databaseContext = new BibDatabaseContext.Builder()
+                .database(new BibDatabase(List.of(first, second)))
+                .build();
 
         Pseudonymization pseudonymization = new Pseudonymization();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
@@ -84,7 +86,9 @@ class PseudonymizationTest {
         BibEntry secondPseudo = new BibEntry("citationkey-2")
                 .withField(StandardField.AUTHOR, "author-2")
                 .withField(StandardField.PAGES, "pages-1");
-        BibDatabaseContext bibDatabaseContextExpected = new BibDatabaseContext(new BibDatabase(List.of(firstPseudo, secondPseudo)));
+        BibDatabaseContext bibDatabaseContextExpected = new BibDatabaseContext.Builder()
+                .database(new BibDatabase(List.of(firstPseudo, secondPseudo)))
+                .build();
         bibDatabaseContextExpected.setMode(BibDatabaseMode.BIBLATEX);
         Pseudonymization.Result expected = new Pseudonymization.Result(
                 bibDatabaseContextExpected,

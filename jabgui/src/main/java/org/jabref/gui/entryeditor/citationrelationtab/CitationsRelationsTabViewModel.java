@@ -68,7 +68,7 @@ public class CitationsRelationsTabViewModel {
     }
 
     public void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(BibDatabaseContext.empty());
 
         List<BibEntry> entries = entriesToImport.stream()
                                                 .map(CitationRelationItem::entry)

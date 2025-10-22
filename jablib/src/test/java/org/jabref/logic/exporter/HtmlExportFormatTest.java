@@ -42,7 +42,7 @@ public class HtmlExportFormatTest {
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder());
 
-        databaseContext = new BibDatabaseContext();
+        databaseContext = new BibDatabaseContext.Builder().build();
         charset = StandardCharsets.UTF_8;
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "my paper title");

@@ -298,7 +298,9 @@ public class CSLCitationOOAdapter {
                                                .toList();
 
         BibDatabase unifiedDatabase = new BibDatabase(citedEntries);
-        BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);
+        BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext.Builder()
+                .database(unifiedDatabase)
+                .build();
 
         // Next, we get the list of reference marks sorted in order of appearance in the document
         List<CSLReferenceMark> marksInOrder = markManager.getMarksInOrder();

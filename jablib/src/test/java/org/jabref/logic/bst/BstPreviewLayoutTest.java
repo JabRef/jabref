@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 
 class BstPreviewLayoutTest {
 
-    private final BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+    private final BibDatabaseContext bibDatabaseContext = new BibDatabaseContext.Builder().build();
 
     @Test
     void generatePreviewForSimpleEntryUsingAbbr() throws URISyntaxException {

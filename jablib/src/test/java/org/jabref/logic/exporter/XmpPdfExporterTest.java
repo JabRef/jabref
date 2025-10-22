@@ -115,7 +115,7 @@ class XmpPdfExporterTest {
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         importer = new PdfXmpImporter(xmpPreferences);
 
-        databaseContext = new BibDatabaseContext();
+        databaseContext = new BibDatabaseContext.Builder().build();
         BibDatabase dataBase = databaseContext.getDatabase();
 
         initBibEntries();

@@ -186,7 +186,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
 
         // Quick solution to always use BibLaTeX mode at the checker to allow pages ranges with single dash, too
         // Example: pages = {1-2}
-        BibDatabaseContext ctx = new BibDatabaseContext();
+        BibDatabaseContext ctx = new BibDatabaseContext.Builder().build();
         ctx.setMode(BibDatabaseMode.BIBLATEX);
         this.pagesChecker = new PagesChecker(ctx);
     }

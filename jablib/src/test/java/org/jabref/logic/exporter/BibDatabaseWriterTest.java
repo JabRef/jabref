@@ -89,7 +89,7 @@ class BibDatabaseWriterTest {
         initializeDatabaseWriter();
         database = new BibDatabase();
         metaData = new MetaData();
-        bibtexContext = new BibDatabaseContext(database, metaData);
+        bibtexContext = new BibDatabaseContext.Builder().database(database).metaData(metaData).build();
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldPreferences);
     }

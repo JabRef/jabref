@@ -49,7 +49,7 @@ public class ExporterTest {
     void exportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
         Files.createFile(tmpFile);
-        exportFormat.export(new BibDatabaseContext(), tmpFile, List.of());
+        exportFormat.export(BibDatabaseContext.empty(), tmpFile, List.of());
         assertEquals(List.of(), Files.readAllLines(tmpFile));
     }
 }

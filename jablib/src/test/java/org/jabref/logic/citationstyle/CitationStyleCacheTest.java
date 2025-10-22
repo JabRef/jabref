@@ -23,7 +23,7 @@ class CitationStyleCacheTest {
         BibEntry bibEntry = new BibEntry().withCitationKey("test");
         List<BibEntry> entries = List.of(bibEntry);
         BibDatabase database = new BibDatabase(entries);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        BibDatabaseContext databaseContext = new BibDatabaseContext.Builder().database(database).build();
         CitationStyleCache csCache = new CitationStyleCache(databaseContext);
 
         assertNotNull(csCache.getCitationFor(bibEntry));

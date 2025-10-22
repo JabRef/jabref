@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 class XmpExporterTest {
 
     private Exporter exporter;
-    private final BibDatabaseContext databaseContext = new BibDatabaseContext();
+    private final BibDatabaseContext databaseContext = new BibDatabaseContext.Builder().build();
     private final XmpPreferences xmpPreferences = mock(XmpPreferences.class);
 
     @BeforeEach

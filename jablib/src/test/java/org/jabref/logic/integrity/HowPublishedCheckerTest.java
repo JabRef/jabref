@@ -18,8 +18,8 @@ class HowPublishedCheckerTest {
 
     @BeforeEach
     void setUp() {
-        BibDatabaseContext databaseContext = new BibDatabaseContext();
-        BibDatabaseContext databaseBiblatex = new BibDatabaseContext();
+        BibDatabaseContext databaseContext = new BibDatabaseContext.Builder().build();
+        BibDatabaseContext databaseBiblatex = new BibDatabaseContext.Builder().build();
         databaseContext.setMode(BibDatabaseMode.BIBTEX);
         checker = new HowPublishedChecker(databaseContext);
         databaseBiblatex.setMode(BibDatabaseMode.BIBLATEX);

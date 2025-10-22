@@ -35,7 +35,7 @@ class ContentSelectorViewModelTest {
 
     @BeforeEach
     void setUp() {
-        databaseContext = new BibDatabaseContext();
+        databaseContext = new BibDatabaseContext.Builder().build();
         viewModel = new ContentSelectorViewModel(databaseContext, dialogService);
         viewModel.setValues();
     }

@@ -47,7 +47,7 @@ class EndnoteXmlExporterFilesTest {
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        databaseContext = new BibDatabaseContext();
+        databaseContext = new BibDatabaseContext.Builder().build();
         exporter = new EndnoteXmlExporter(new BibEntryPreferences(','));
         endnoteXmlImporter = new EndnoteXmlImporter(importFormatPreferences);
         bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
