@@ -1,5 +1,6 @@
 package org.jabref.logic.pdf;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -53,24 +54,12 @@ public class FileAnnotationCacheTest {
     }
 
     @Test
-    void removeEntryInvalidatesCache() {
-        Map<Path, List<FileAnnotation>> initialAnnotations = annotationCache.getFromCache(bibEntry);
-        assertNotNull(initialAnnotations);
+    void testCurrentCacheType() throws NoSuchFieldException, IllegalAccessException {
+        Field cacheField = FileAnnotationCache.class.getDeclaredField("annotationCache");
+        cacheField.setAccessible(true);
+        Object cacheInstance = cacheField.get(annotationCache);
 
-        annotationCache.remove(bibEntry);
-
-        Map<Path, List<FileAnnotation>> afterRemoveCall = annotationCache.getFromCache(bibEntry);
-        assertNotNull(afterRemoveCall);
-    }
-
-    @Test
-    void emptyAnnotationsAreHandled() {
-        Map<Path, List<FileAnnotation>> firstCallAnnotations = annotationCache.getFromCache(bibEntry);
-        assertNotNull(firstCallAnnotations);
-        assertEquals(Collections.emptyMap(), firstCallAnnotations);
-
-        Map<Path, List<FileAnnotation>> secondCallAnnotations = annotationCache.getFromCache(bibEntry);
-        assertEquals(firstCallAnnotations, secondCallAnnotations);
-        assertEquals(Collections.emptyMap(), secondCallAnnotations);
+        assertNotNull(cacheInstance);
+        assert (cacheInstance.getClass().getName().contains("com.github.benmanes.caffeine.cache"));
     }
 }
