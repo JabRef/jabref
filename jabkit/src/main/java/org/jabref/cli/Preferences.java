@@ -58,11 +58,11 @@ class Preferences implements Runnable {
     @Command(name = "import", description = "Import preferences from a file.")
     static class PreferencesImport implements Callable<Integer> {
 
-        @ParentCommand
-        private Preferences parent;
-
         @Parameters(index = "0", arity = "1", description = "The file to import preferences from.")
         Path inputFile;
+
+        @ParentCommand
+        private Preferences parent;
 
         @Override
         public Integer call() {
@@ -79,11 +79,11 @@ class Preferences implements Runnable {
     @Command(name = "export", description = "Export preferences to a file.")
     static class PreferencesExport implements Callable<Integer> {
 
-        @ParentCommand
-        private Preferences parent;
-
         @Parameters(index = "0", arity = "1", description = "The file to export preferences to.")
         Path outputFile;
+
+        @ParentCommand
+        private Preferences parent;
 
         @Override
         public Integer call() {
