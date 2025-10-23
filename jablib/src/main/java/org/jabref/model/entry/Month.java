@@ -3,7 +3,7 @@ package org.jabref.model.entry;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Represents a Month of the Year.

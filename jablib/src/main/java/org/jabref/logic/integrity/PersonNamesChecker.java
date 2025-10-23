@@ -8,7 +8,7 @@ import org.jabref.logic.layout.format.RemoveBrackets;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class PersonNamesChecker implements ValueChecker {
 

@@ -18,7 +18,7 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class GroupSerializer {
     private static String serializeAllEntriesGroup() {

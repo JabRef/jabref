@@ -1,6 +1,6 @@
 package org.jabref.model.openoffice.ootext;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Helper functions to produce some of the markup as understood by OOTextIntoOO.write

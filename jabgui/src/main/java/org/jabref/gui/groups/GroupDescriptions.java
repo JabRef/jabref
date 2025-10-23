@@ -5,7 +5,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.SmartGroup;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class GroupDescriptions {
 

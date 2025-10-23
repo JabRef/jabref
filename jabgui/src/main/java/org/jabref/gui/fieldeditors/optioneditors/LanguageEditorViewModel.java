@@ -12,7 +12,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Langid;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class LanguageEditorViewModel extends OptionEditorViewModel<Langid> {
     private BibDatabaseMode databaseMode;

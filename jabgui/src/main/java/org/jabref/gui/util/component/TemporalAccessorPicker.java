@@ -22,7 +22,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.model.entry.Date;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * A date picker with configurable datetime format where both date and time can be changed via the text field and the

@@ -12,7 +12,7 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

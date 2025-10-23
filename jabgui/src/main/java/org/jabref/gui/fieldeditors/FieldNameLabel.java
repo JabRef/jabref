@@ -9,7 +9,7 @@ import javafx.stage.Screen;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class FieldNameLabel extends Label {
 

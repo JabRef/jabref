@@ -10,7 +10,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class TitleFetcher implements IdBasedFetcher {
 

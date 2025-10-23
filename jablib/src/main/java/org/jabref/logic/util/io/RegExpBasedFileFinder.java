@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 class RegExpBasedFileFinder implements FileFinder {
 

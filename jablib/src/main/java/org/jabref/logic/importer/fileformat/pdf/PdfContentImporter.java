@@ -24,7 +24,7 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -33,7 +33,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
 import org.jspecify.annotations.Nullable;
 
-import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
+import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 
 /**
  * Parses data of the first page of the PDF and creates a BibTeX entry.

@@ -2,7 +2,7 @@ package org.jabref.model.entry.field;
 
 import java.util.StringJoiner;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class FieldTextMapper {
     public static String getDisplayName(Field field) {

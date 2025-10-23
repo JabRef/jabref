@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 public class FieldFactory {
