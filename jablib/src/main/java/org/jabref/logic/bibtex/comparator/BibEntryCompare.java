@@ -7,6 +7,14 @@ import java.util.SequencedSet;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+/// This class is a strict entry comparator. See [Result] for possible comparison outcomes.
+///
+/// Alternative comparison approaches:
+///
+/// - In package `org.jabref.logic.bibtex.comparator`, one finds multiple comparators implementing `Comparator<BibEntry>`.
+///   Example: [org.jabref.logic.bibtex.comparator.EntryComparator]
+/// - A whole library can be compared using [org.jabref.logic.bibtex.comparator.BibDatabaseDiff].
+/// - Similarity checks can be executed by the duplicate check: [org.jabref.logic.database.DuplicateCheck#isDuplicate]
 public class BibEntryCompare {
     public enum Result { SUBSET, EQUAL, SUPERSET, DISJUNCT, DISJUNCT_OR_EQUAL_FIELDS, DIFFERENT }
 
