@@ -35,10 +35,6 @@ dependencies {
 
     implementation("com.google.guava:guava")
 
-    implementation("com.github.ben-manes.caffeine:caffeine") {
-        exclude(group = "org.checkerframework", module = "checker-qual")
-    }
-
     implementation("org.slf4j:slf4j-api")
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
     implementation("org.slf4j:jul-to-slf4j")

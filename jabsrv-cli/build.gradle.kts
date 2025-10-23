@@ -84,10 +84,6 @@ dependencies {
 
     implementation("com.google.guava:guava")
 
-    implementation("com.github.ben-manes.caffeine:caffeine") {
-        exclude(group = "org.checkerframework", module = "checker-qual")
-    }
-
     implementation("org.jabref:afterburner.fx")
     implementation("net.harawata:appdirs")
 
