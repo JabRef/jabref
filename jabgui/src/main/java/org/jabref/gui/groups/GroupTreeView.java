@@ -610,23 +610,19 @@ public class GroupTreeView extends BorderPane {
                     new ContextAction(StandardActions.GROUP_SUGGESTED_GROUPS_ADD, group)));
         }
 
-        MenuItem sortGroup;
-        sortGroup = new Menu(Localization.lang("Sort"), null,
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT,
-                        new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE,
-                        new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES,
-                        new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE,
-                        new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group))
-        );
-
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
-                sortGroup,
+                new Menu(Localization.lang("Sort"), null,
+                        factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT,
+                                new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
+                        factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE,
+                                new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
+                        factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES,
+                                new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, group)),
+                        factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE,
+                                new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group))),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
