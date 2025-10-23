@@ -15,6 +15,9 @@ dependencies {
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket")
 
     implementation("com.google.guava:guava")
+    implementation("com.github.ben-manes.caffeine:caffeine") {
+        exclude(group = "org.checkerframework", module = "checker-qual")
+    }
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     testImplementation("org.slf4j:jul-to-slf4j")
