@@ -223,6 +223,11 @@ dependencies {
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core")
     testImplementation("org.testfx:testfx-junit5")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation("org.assertj:assertj-core:3.25.3")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
 }
 /*
 jacoco {
@@ -576,4 +581,12 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+    // 可选：控制台显示通过/失败
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
 }
