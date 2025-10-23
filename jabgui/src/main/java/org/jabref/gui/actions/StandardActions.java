@@ -226,6 +226,8 @@ public enum StandardActions implements Action {
     GROUP_SUBGROUP_RENAME(Localization.lang("Rename subgroup"), KeyBinding.GROUP_SUBGROUP_RENAME),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
+    GROUP_SUBGROUP_SORT_MENU(Localization.lang("Sort...")),
+
     CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache")),
 
     GIT(Localization.lang("Git"), IconTheme.JabRefIcons.GIT_SYNC),
