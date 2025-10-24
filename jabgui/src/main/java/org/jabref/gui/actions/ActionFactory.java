@@ -14,7 +14,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.sun.javafx.scene.control.ContextMenuContent;

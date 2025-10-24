@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * This formatter escapes characters so that they are suitable for HTML.

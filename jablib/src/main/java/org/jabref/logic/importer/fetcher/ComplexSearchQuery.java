@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.apache.lucene.index.Term;
 import org.jspecify.annotations.NonNull;

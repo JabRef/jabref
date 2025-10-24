@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 /**
  * Currently only checks the key if there is an author, year, and title present.

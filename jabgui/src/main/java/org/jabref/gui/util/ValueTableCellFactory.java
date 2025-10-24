@@ -15,7 +15,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Screen;
 import javafx.util.Callback;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Constructs a {@link TableCell} based on the value of the cell and a bunch of specified converter methods.

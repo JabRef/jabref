@@ -4,7 +4,7 @@ import java.util.StringJoiner;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NullMarked;
 

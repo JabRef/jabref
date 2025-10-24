@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher.transformers;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.casechanger.Word;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Needs to be instantiated for each new query
