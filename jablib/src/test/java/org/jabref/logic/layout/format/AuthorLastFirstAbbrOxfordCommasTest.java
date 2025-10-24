@@ -2,7 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -11,25 +12,23 @@ class AuthorLastFirstAbbrOxfordCommasTest {
     /**
      * Test method for {@link org.jabref.logic.layout.format.AuthorLastFirstAbbrOxfordCommas#format(java.lang.String)}.
      */
-    @Test
-    void format() {
-        LayoutFormatter a = new AuthorLastFirstAbbrOxfordCommas();
+    @ParameterizedTest
+    @CsvSource({
+            // Empty case
+            "'', ''",
 
-        // Empty case
-        assertEquals("", a.format(""));
+            // Single Names
+            "Van Something Someone, 'Someone, V. S.'",
 
-        // Single Names
-        assertEquals("Someone, V. S.", a.format("Van Something Someone"));
+            // Two names
+            "'John von Neumann and Black Brown, Peter', 'von Neumann, J. and Black Brown, P.'",
 
-        // Two names
-        assertEquals("von Neumann, J. and Black Brown, P.", a
-                .format("John von Neumann and Black Brown, Peter"));
-
-        // Three names
-        assertEquals("von Neumann, J., Smith, J., and Black Brown, P.", a
-                .format("von Neumann, John and Smith, John and Black Brown, Peter"));
-
-        assertEquals("von Neumann, J., Smith, J., and Black Brown, P.", a
-                .format("John von Neumann and John Smith and Black Brown, Peter"));
+            // Three names
+            "'von Neumann, John and Smith, John and Black Brown, Peter', 'von Neumann, J., Smith, J., and Black Brown, P.'",
+            "'John von Neumann and John Smith and Black Brown, Peter', 'von Neumann, J., Smith, J., and Black Brown, P.'"
+    })
+    void format(String input, String expected) {
+        LayoutFormatter formatter = new AuthorLastFirstAbbrOxfordCommas();
+        assertEquals(expected, formatter.format(input));
     }
 }
