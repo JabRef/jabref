@@ -185,7 +185,7 @@ public class DuplicateCheck {
         // Harmonise case:
         final String authorOne = AuthorList.fixAuthorLastNameOnlyCommas(stringOne, false).replace(" and ", " ").toLowerCase(Locale.ROOT);
         final String authorTwo = AuthorList.fixAuthorLastNameOnlyCommas(stringTwo, false).replace(" and ", " ").toLowerCase(Locale.ROOT);
-        final double similarity = DuplicateCheck.correlateByWords(authorOne, authorTwo);
+        final double similarity = StringSimilarity.correlateByWords(authorOne, authorTwo);
         if (similarity > 0.8) {
             return EQUAL;
         }
@@ -213,7 +213,7 @@ public class DuplicateCheck {
     private static int compareJournalField(final String stringOne, final String stringTwo) {
         final String processedStringOne = stringOne.replace(".", "").toLowerCase(Locale.ROOT);
         final String processedStringTwo = stringTwo.replace(".", "").toLowerCase(Locale.ROOT);
-        final double similarity = DuplicateCheck.correlateByWords(processedStringOne, processedStringTwo);
+        final double similarity = StringSimilarity.correlateByWords(processedStringOne, processedStringTwo);
         if (similarity > 0.8) {
             return EQUAL;
         }
@@ -229,7 +229,7 @@ public class DuplicateCheck {
     private static int compareField(final String stringOne, final String stringTwo) {
         final String processedStringOne = StringUtil.unifyLineBreaks(stringOne.toLowerCase(Locale.ROOT).trim(), OS.NEWLINE);
         final String processedStringTwo = StringUtil.unifyLineBreaks(stringTwo.toLowerCase(Locale.ROOT).trim(), OS.NEWLINE);
-        final double similarity = DuplicateCheck.correlateByWords(processedStringOne, processedStringTwo);
+        final double similarity = StringSimilarity.correlateByWords(processedStringOne, processedStringTwo);
         if (similarity > 0.8) {
             return EQUAL;
         }
@@ -276,29 +276,6 @@ public class DuplicateCheck {
     /// @return true if the content is equal (with normalized linebreaks), false otherwise.
     private static boolean isSingleFieldEqual(BibEntry one, BibEntry two, Field field) {
         return StringUtil.equalsUnifiedLineBreak(one.getField(field), two.getField(field));
-    }
-
-    /**
-     * Compare two strings on the basis of word-by-word correlation analysis.
-     *
-     * @param s1 The first string
-     * @param s2 The second string
-     * @return a value in the interval [0, 1] indicating the degree of match.
-     */
-    public static double correlateByWords(final String s1, final String s2) {
-        final String[] w1 = s1.split("\\s");
-        final String[] w2 = s2.split("\\s");
-        final int n = Math.min(w1.length, w2.length);
-        final StringSimilarity match = new StringSimilarity();
-        int misses = 0;
-        for (int i = 0; i < n; i++) {
-            double corr = match.similarity(w1[i], w2[i]);
-            if (corr < 0.75) {
-                misses++;
-            }
-        }
-        final double missRate = (double) misses / (double) n;
-        return 1 - missRate;
     }
 
     /**
