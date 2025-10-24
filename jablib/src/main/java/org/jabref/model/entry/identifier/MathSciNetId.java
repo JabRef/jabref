@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -14,6 +15,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * Article identifier for MathSciNet (also sometimes called "MRNumber")
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class MathSciNetId implements Identifier {
 
     private final String identifier;

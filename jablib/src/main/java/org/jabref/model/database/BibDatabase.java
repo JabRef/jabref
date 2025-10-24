@@ -23,12 +23,14 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.IdGenerator;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -38,6 +40,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -49,6 +52,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A bibliography database. This is the "bib" file (or the library stored in a shared SQL database)
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
@@ -683,8 +687,8 @@ public class BibDatabase {
     /**
      * @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
      * @implNote New entries are always added to the end of the list and always get a higher ID.
-     * See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
-     * {@link org.jabref.model.entry.IdGenerator IdGenerator},
+     * See {@link BibEntry#BibEntry(EntryType) BibEntry},
+     * {@link IdGenerator IdGenerator},
      * {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
      * Therefore, using binary search to find the index.
      * @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.

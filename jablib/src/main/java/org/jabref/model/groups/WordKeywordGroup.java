@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -23,6 +24,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * Matches entries if a given field contains a specified word.
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger {
 
     protected final Character keywordSeparator;
@@ -139,6 +141,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         boolean contains(BibEntry entry);
     }
 
+    @AllowedToUseLogic("Uses StringUtil temporarily")
     class StringSearchStrategy implements SearchStrategy {
         Set<String> searchWords;
 

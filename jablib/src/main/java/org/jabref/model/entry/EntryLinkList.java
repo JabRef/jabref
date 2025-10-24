@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class EntryLinkList {
 
     public static final String SEPARATOR = ",";

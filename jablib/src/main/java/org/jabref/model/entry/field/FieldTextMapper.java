@@ -2,8 +2,10 @@ package org.jabref.model.entry.field;
 
 import java.util.StringJoiner;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class FieldTextMapper {
     public static String getDisplayName(Field field) {
         if (field.isStandardField()) {

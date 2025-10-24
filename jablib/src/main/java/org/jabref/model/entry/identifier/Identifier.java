@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
 
@@ -16,6 +17,7 @@ import org.jabref.model.entry.field.Field;
  *     <li><code>public static boolean isValid(String value)</code></li>
  * </ul>
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public interface Identifier {
 
     /**

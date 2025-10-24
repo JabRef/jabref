@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.UnoCast;
@@ -50,6 +51,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Interpret OOText into an OpenOffice or LibreOffice writer document.
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 @AllowedToUseAwt("Requires AWT for changing document properties")
 public class OOTextIntoOO {
 

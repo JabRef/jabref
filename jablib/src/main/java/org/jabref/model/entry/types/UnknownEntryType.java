@@ -3,10 +3,12 @@ package org.jabref.model.entry.types;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class UnknownEntryType implements EntryType {
     private final String name;
 
