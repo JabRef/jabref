@@ -5,9 +5,9 @@ import java.util.List;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.util.strings.StringUtil;
 
 public class MoveFieldValueAction extends SimpleCommand {
     private final Field fromField;

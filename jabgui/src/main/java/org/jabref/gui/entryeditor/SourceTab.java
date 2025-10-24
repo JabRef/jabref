@@ -43,6 +43,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -50,7 +51,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 

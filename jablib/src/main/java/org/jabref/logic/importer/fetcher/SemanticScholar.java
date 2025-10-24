@@ -21,13 +21,13 @@ import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.URLUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.logic.util.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;

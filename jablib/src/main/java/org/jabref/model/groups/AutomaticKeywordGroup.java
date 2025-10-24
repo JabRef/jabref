@@ -4,11 +4,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.util.strings.StringUtil;
 
 public class AutomaticKeywordGroup extends AutomaticGroup {
 

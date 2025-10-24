@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.NotificationService;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.BibEntry;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;

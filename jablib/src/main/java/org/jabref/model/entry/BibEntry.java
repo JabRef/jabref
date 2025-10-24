@@ -28,6 +28,7 @@ import javafx.collections.ObservableMap;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -43,7 +44,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.annotations.VisibleForTesting;

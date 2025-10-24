@@ -13,8 +13,8 @@ import java.util.Set;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.LinkedFile;
 
 // Do not make this class final, as it otherwise can't be mocked for tests
 public class ExternalFileTypes {

@@ -7,9 +7,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.search.query.SearchQueryVisitor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.logic.util.strings.StringUtil;
 
 import kong.unirest.core.json.JSONObject;
 import org.antlr.v4.runtime.misc.ParseCancellationException;

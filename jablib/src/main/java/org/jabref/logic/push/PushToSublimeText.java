@@ -9,8 +9,8 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.StreamGobbler;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

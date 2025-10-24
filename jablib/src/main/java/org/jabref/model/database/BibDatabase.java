@@ -24,6 +24,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -37,7 +38,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.util.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;

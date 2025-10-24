@@ -29,6 +29,7 @@ import org.jabref.logic.importer.fileformat.medline.PersonalNameSubject;
 import org.jabref.logic.importer.util.MathMLParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
@@ -37,7 +38,6 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;

@@ -18,13 +18,13 @@ import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.util.strings.StringUtil;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;

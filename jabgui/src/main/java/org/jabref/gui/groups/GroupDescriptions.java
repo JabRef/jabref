@@ -1,11 +1,11 @@
 package org.jabref.gui.groups;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.SmartGroup;
-import org.jabref.logic.util.strings.StringUtil;
 
 public class GroupDescriptions {
 

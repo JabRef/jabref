@@ -47,6 +47,7 @@ import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -64,7 +65,6 @@ import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;

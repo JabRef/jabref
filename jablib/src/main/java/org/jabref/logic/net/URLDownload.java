@@ -41,8 +41,8 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.http.SimpleHttpResponse;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.http.SimpleHttpResponse;
 
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;

@@ -1,8 +1,8 @@
 package org.jabref.gui.undo;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibtexString;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.BibtexString;
 
 public class UndoableStringChange extends AbstractUndoableJabRefEdit {
 

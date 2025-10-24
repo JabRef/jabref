@@ -32,10 +32,10 @@ import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;

@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.LinkedFile;
 
 public class FileFieldWriter {
 

@@ -5,10 +5,10 @@ import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.RemoveBrackets;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
-import org.jabref.logic.util.strings.StringUtil;
 
 public class PersonNamesChecker implements ValueChecker {
 

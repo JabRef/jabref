@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.jabref.model.database.BibDatabase;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.database.BibDatabase;
 
 public class EntryLinkList {
 

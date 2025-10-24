@@ -26,13 +26,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.logic.util.strings.StringUtil;
 
 import com.github.javakeyring.Keyring;
 import org.slf4j.Logger;

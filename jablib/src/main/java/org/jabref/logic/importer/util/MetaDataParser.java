@@ -21,6 +21,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.logic.util.Version;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -32,7 +33,6 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;

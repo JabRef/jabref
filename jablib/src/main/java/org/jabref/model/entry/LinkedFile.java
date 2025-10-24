@@ -22,8 +22,8 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

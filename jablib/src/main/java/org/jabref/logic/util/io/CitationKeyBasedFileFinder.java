@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;

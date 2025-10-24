@@ -1,8 +1,8 @@
 package org.jabref.gui.mergeentries.threewaymerge.fieldsmerger;
 
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 

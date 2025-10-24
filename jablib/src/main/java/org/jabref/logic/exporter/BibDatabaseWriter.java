@@ -32,6 +32,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -44,7 +45,6 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.logic.util.strings.StringUtil;
 
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NonNull;

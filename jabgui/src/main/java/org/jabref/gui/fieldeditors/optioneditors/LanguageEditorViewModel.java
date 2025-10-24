@@ -9,10 +9,10 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Langid;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.util.strings.StringUtil;
 
 public class LanguageEditorViewModel extends OptionEditorViewModel<Langid> {
     private BibDatabaseMode databaseMode;

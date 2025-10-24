@@ -4,10 +4,10 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.EntryComparator;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.logic.util.strings.StringUtil;
 
 import com.google.common.base.Equivalence;
 import org.controlsfx.control.textfield.AutoCompletionBinding;

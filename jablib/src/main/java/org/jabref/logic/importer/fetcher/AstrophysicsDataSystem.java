@@ -27,12 +27,12 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.logic.util.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;

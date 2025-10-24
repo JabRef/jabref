@@ -44,10 +44,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;

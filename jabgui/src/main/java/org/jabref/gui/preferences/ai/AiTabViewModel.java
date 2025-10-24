@@ -27,9 +27,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbers;
 import org.jabref.logic.util.OptionalObjectProperty;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
-import org.jabref.logic.util.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;

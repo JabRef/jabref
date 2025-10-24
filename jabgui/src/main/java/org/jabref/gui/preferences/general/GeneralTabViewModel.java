@@ -43,8 +43,8 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;

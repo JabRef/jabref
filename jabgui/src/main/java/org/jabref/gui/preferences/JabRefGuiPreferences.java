@@ -64,6 +64,7 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -72,7 +73,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;

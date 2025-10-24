@@ -5,8 +5,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.jabref.model.entry.field.Field;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.field.Field;
 
 /**
  * All implementing classes should additionally offer

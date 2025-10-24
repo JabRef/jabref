@@ -84,13 +84,13 @@ import org.jabref.logic.layout.format.WrapContent;
 import org.jabref.logic.layout.format.WrapFileLinks;
 import org.jabref.logic.layout.format.XMLChars;
 import org.jabref.logic.openoffice.style.OOPreFormatter;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

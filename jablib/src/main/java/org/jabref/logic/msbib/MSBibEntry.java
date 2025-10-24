@@ -8,11 +8,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
-import org.jabref.logic.util.strings.StringUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

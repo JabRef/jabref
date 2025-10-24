@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
@@ -25,7 +26,6 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.util.strings.StringUtil;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;

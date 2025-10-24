@@ -16,12 +16,12 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultSearchQueryTransformer;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.logic.util.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;

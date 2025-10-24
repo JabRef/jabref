@@ -8,9 +8,9 @@ import java.util.Optional;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.util.strings.StringUtil;
 
 public class FileChecker implements ValueChecker {
 

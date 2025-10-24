@@ -14,11 +14,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.UnoCast;
 import org.jabref.model.openoffice.uno.UnoCrossRef;
 import org.jabref.model.openoffice.util.OOPair;
-import org.jabref.logic.util.strings.StringUtil;
 
 import com.sun.star.awt.FontSlant;
 import com.sun.star.awt.FontStrikeout;
