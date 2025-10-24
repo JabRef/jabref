@@ -45,7 +45,6 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         commandLine.execute("pseudonymize", "-f", "--input=" + origin, "--output=" + output, "--key=" + key);
         assertTrue(output.toFile().exists());
         assertTrue(key.toFile().exists());
-        System.out.println(Files.readLines(output.toFile(), Charset.defaultCharset()));
         assertTrue(Files.readLines(output.toFile(), Charset.defaultCharset()).size() > 1);
     }
 

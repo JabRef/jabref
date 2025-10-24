@@ -5,8 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.exporter.XmpExporter;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -83,10 +81,5 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=bibtex");
 
         assertEquals(1, Files.list(tempDir).collect(Collectors.toSet()).size());
-    }
-
-    @Test
-    void help() {
-        System.out.println(new XmpExporter(preferences.getXmpPreferences()).getId());
     }
 }

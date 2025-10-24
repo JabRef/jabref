@@ -111,7 +111,7 @@ public abstract class AbstractJabKitTest {
                        .toAbsolutePath();
         } catch (URISyntaxException e) {
             throw new RuntimeException(
-                    String.format("Wrong resource name %s for class %s", resourceName, this.getClass()), e
+                    "Wrong resource name %s for class %s".formatted(resourceName, this.getClass()), e
             );
         }
     }
