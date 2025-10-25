@@ -170,30 +170,38 @@ public class GroupsParser {
         return newGroup;
     }
 
-    private static AbstractGroup automaticDateGroupFromString(String string) {
-        if (!string.startsWith(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID)) {
-            throw new IllegalArgumentException("AutomaticDateGroup cannot be created from \"" + string + "\".");
-        }
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(string.substring(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID
-                .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+private static AbstractGroup automaticDateGroupFromString(String string) {
+    if (!string.startsWith(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID)) {
+        throw new IllegalArgumentException("AutomaticDateGroup cannot be created from \"" + string + "\".");
+    }
+    QuotedStringTokenizer tok = new QuotedStringTokenizer(
+            string.substring(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID.length()),
+            MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
+            MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
-        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
-        Field field = FieldFactory.parseField(StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
-        String granularityString = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        DateGranularity granularity = DateGranularity.YEAR;
-        if (granularityString != null && !granularityString.isBlank()) {
+    String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+    GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
+    Field field = FieldFactory.parseField(StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+
+    // Granularity may be missing in older metadata; default to YEAR
+    String granularityString = tok.hasMoreTokens()
+            ? StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)
+            : null;
+
+    DateGranularity granularity = DateGranularity.YEAR;
+    if (granularityString != null && !granularityString.isBlank()) {
         try {
             granularity = DateGranularity.valueOf(granularityString);
         } catch (IllegalArgumentException ignored) {
-            // Unknown/legacy value -> keep default YEAR
+            // Unknown legacy value -> keep default YEAR
         }
     }
 
-        AutomaticDateGroup newGroup = new AutomaticDateGroup(name, context, field, granularity);
-        addGroupDetails(tok, newGroup);
-        return newGroup;
-    }
+    AutomaticDateGroup newGroup = new AutomaticDateGroup(name, context, field, granularity);
+    addGroupDetails(tok, newGroup);
+    return newGroup;
+}
+
 
     private static AbstractGroup automaticKeywordGroupFromString(String string) {
         if (!string.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
