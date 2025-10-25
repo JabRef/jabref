@@ -5,6 +5,9 @@ plugins {
     id("application")
 }
 
+group = "org.jabref.languageserver"
+version = project.findProperty("projVersion") ?: "100.0.0"
+
 application{
     mainClass.set("org.jabref.languageserver.cli.ServerCli")
     mainModule.set("org.jabref.jabls.cli")
@@ -58,7 +61,7 @@ tasks.named<JavaExec>("run") {
 }
 
 javaModulePackaging {
-    applicationName = "jabös"
+    applicationName = "jabls"
     vendor = "JabRef"
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer

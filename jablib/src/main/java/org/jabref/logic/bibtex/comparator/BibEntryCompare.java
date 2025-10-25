@@ -7,6 +7,7 @@ import java.util.SequencedSet;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+/// This class is a strict entry comparator. See [Result] for possible comparison outcomes.
 public class BibEntryCompare {
     public enum Result { SUBSET, EQUAL, SUPERSET, DISJUNCT, DISJUNCT_OR_EQUAL_FIELDS, DIFFERENT }
 
