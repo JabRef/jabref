@@ -140,30 +140,35 @@ jobs:
             displayName: linux
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04 JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04/JabRef-portable_linux.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04 jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04/jabkit-portable_linux.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04/jabkit
+            archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04 jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04/jabls-portable_linux.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04/jabls
             suffix: ''
             archForDebianRepack: '_amd64'
           - os: ubuntu-22.04-arm
             displayName: linux-arm
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04-arm jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04-arm/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04-arm/jabkit
+            archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04-arm jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04-arm/jabls-cli-portable_linux_arm64.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04-arm/jabls
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef
             archivePortableJabKit: 7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit
+            archivePortableJabLS: 7z a -r jabls-cli/build/packages/windows-latest/jabls-portable_windows.zip ./jabls-cli/build/packages/windows-latest/jabls && rm -R jabls-cli/build/packages/windows-latest/jabls
             suffix: ''
             archForDebianRepack: ''
           - os: macos-15-intel  # intel image
             displayName: macOS
             archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app
+            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app
             suffix: ''
             archForDebianRepack: ''
           - os: macos-15
             displayName: macOS-arm
             archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app
+            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-arm.zip ./jabls-cli/build/packages/macos-15/jabkit.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
             suffix: '_arm64'
             archForDebianRepack: ''
     runs-on: ${{ matrix.os }}
@@ -265,6 +270,15 @@ jobs:
           set -e
           ${{ matrix.archivePortableJabKit }}
 
+      - name: Build JabLS-CLI
+        shell: bash
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabls-cli:jpackage
+      - name: Package JabLS-CLI application image
+        shell: bash
+        run: |
+          set -e
+          ${{ matrix.archivePortableJabLS }}
+
       # region Upload to builds.jabref.org / GitHub artifacts store
       - name: Setup SSH key
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')
@@ -304,9 +318,13 @@ jobs:
       - name: Upload jabkkit to builds.jabref.org (Windows)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
-        # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+      - name: Upload jabls-cli to builds.jabref.org (Windows)
+        if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        shell: cmd
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabgui to builds.jabref.org (linux, macOS)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
@@ -317,6 +335,11 @@ jobs:
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+      - name: Upload jabls-cli to builds.jabref.org (linux, macOS)
+        if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@v4
