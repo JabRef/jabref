@@ -181,7 +181,15 @@ public class GroupsParser {
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         Field field = FieldFactory.parseField(StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         String granularityString = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        DateGranularity granularity = DateGranularity.valueOf(granularityString);
+        DateGranularity granularity = DateGranularity.YEAR;
+        if (granularityString != null && !granularityString.isBlank()) {
+        try {
+            granularity = DateGranularity.valueOf(granularityString);
+        } catch (IllegalArgumentException ignored) {
+            // Unknown/legacy value -> keep default YEAR
+        }
+    }
+
         AutomaticDateGroup newGroup = new AutomaticDateGroup(name, context, field, granularity);
         addGroupDetails(tok, newGroup);
         return newGroup;
