@@ -54,6 +54,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SmartGroup;
@@ -230,6 +231,9 @@ public class ImportHandler {
         ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(entries);
         importCleanedEntries(entries);
+
+        // Check for long keys and show guidance notification
+        checkForLongKeysAndNotify(entries);
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
@@ -524,6 +528,41 @@ public class ImportHandler {
                                                       .filter(node -> node.getGroup() instanceof SmartGroup)
                                                       .findFirst())
                                    .ifPresent(smtGrp -> smtGrp.addEntriesToGroup(entriesToInsert));
+        }
+    }
+
+    /**
+     * Checks for entries with long citation keys and shows a guidance notification if found.
+     * This helps users understand when they might want to use shorter, more manageable keys.
+     */
+    private void checkForLongKeysAndNotify(List<BibEntry> entries) {
+        if (entries.isEmpty()) {
+            return;
+        }
+
+        // Define threshold for "long" keys (e.g., more than 20 characters)
+        // Temporarily lowered for testing/demo purposes
+        final int LONG_KEY_THRESHOLD = 20;
+
+        List<BibEntry> entriesWithLongKeys = entries.stream()
+                .filter(entry -> {
+                    String citationKey = entry.getCitationKey().orElse("");
+                    return citationKey.length() > LONG_KEY_THRESHOLD;
+                })
+                .toList();
+
+        if (!entriesWithLongKeys.isEmpty()) {
+            String message = Localization.lang("Imported %0 entries with long citation keys (>%1 characters). " +
+                    "Consider using shorter keys for better readability and management.",
+                    entriesWithLongKeys.size(), LONG_KEY_THRESHOLD);
+
+            LOGGER.info("Long key detection: Found {} entries with keys longer than {} characters",
+                    entriesWithLongKeys.size(), LONG_KEY_THRESHOLD);
+
+            // Show notification to user
+            UiTaskExecutor.runInJavaFXThread(() ->
+                dialogService.notify(message)
+            );
         }
     }
 }
