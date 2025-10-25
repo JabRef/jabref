@@ -67,29 +67,3 @@ tasks.cyclonedxBom {
     componentGroup = "org.jabref"
 }
 
-
-subprojects {
-    // 仅对应用了 Java 插件的子模块生效
-    plugins.withId("java") {
-        // Toolchain（可改成 17）
-        the<JavaPluginExtension>().toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
-        }
-
-        dependencies {
-            add("testImplementation", "org.junit.jupiter:junit-jupiter:5.10.2")
-            add("testImplementation", "org.assertj:assertj-core:3.25.3")
-            add("testImplementation", "org.mockito:mockito-junit-jupiter:5.12.0")
-            add("testImplementation", "org.mockito:mockito-inline:5.2.0")
-            add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher:1.10.2")
-        }
-
-        tasks.withType<Test>().configureEach {
-            useJUnitPlatform()
-            testLogging { events("passed", "skipped", "failed") }
-            systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
-        }
-    }
-}
-
-
