@@ -3,12 +3,14 @@ package org.jabref.gui.preferences;
 import java.util.Locale;
 import java.util.Optional;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.TreeTableView;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -95,6 +97,14 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 preferencesContainer.setContent(preferencesTab.getBuilder());
                 preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
                 preferencesTab.getStyleClass().add("preferencesTab");
+                this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                        if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
+                            this.closeDialog();
+                            event.consume();
+                        }
+                    }
+                });
             } else {
                 preferencesContainer.setContent(null);
             }
@@ -117,58 +127,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.getMemoryStickProperty());
 
         viewModel.setValues();
-        // Delay execution until JavaFX has completed layout and the Scene object is attached to the DialogPane
-        Platform.runLater(this::installGlobalCloseBehavior);
-    }
-
-    private void installGlobalCloseBehavior() {
-        var scene = getDialogPane().getScene();
-
-        // Capture events BEFORE child nodes
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
-            if (!preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, e)) {
-                return;
-            }
-
-            // If any cell-based control is editing (ListView/TableView/TreeView/TreeTableView),
-            // record that the close input is for canceling edit; DO NOT consume, let the control cancel.
-            if (isAnyCellControlEditing()) {
-                return;
-            }
-
-            // No editing in progress --> close dialog
-            closeDialog();
-            e.consume();
-        });
-    }
-
-    private boolean isAnyCellControlEditing() {
-        var root = getDialogPane();
-
-        for (var n : root.lookupAll(".list-view")) {
-            if (n instanceof javafx.scene.control.ListView<?> lv && lv.getEditingIndex() != -1) {
-                return true;
-            }
-        }
-
-        for (var n : root.lookupAll(".table-view")) {
-            if (n instanceof javafx.scene.control.TableView<?> tv && tv.getEditingCell() != null) {
-                return true;
-            }
-        }
-
-        for (var n : root.lookupAll(".tree-view")) {
-            if (n instanceof javafx.scene.control.TreeView<?> trv && trv.getEditingItem() != null) {
-                return true;
-            }
-        }
-
-        for (var n : root.lookupAll(".tree-table-view")) {
-            if (n instanceof javafx.scene.control.TreeTableView<?> ttv && ttv.getEditingCell() != null) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @FXML
