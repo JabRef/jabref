@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.LocationDetector;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -31,6 +32,14 @@ public class FieldCheckers {
             fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
         }
         fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleLocationChecker(LocationDetector.getInstance()));
+        fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleYearChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleMonthChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new BooktitlePageRangeChecker());
+        fieldCheckers.put(StandardField.JOURNAL, new BooktitleLocationChecker(LocationDetector.getInstance()));
+        fieldCheckers.put(StandardField.JOURNAL, new BooktitleYearChecker());
+        fieldCheckers.put(StandardField.JOURNAL, new BooktitleMonthChecker());
+        fieldCheckers.put(StandardField.JOURNAL, new BooktitlePageRangeChecker());
         fieldCheckers.put(StandardField.TITLE, new BracketChecker());
         fieldCheckers.put(StandardField.TITLE, new TitleChecker(databaseContext));
         fieldCheckers.put(StandardField.DOI, new DoiValidityChecker());
@@ -56,6 +65,10 @@ public class FieldCheckers {
             fieldCheckers.put(StandardField.URLDATE, new DateChecker());
             fieldCheckers.put(StandardField.EVENTDATE, new DateChecker());
             fieldCheckers.put(StandardField.ORIGDATE, new DateChecker());
+            fieldCheckers.put(StandardField.JOURNALTITLE, new BooktitleLocationChecker(LocationDetector.getInstance()));
+            fieldCheckers.put(StandardField.JOURNALTITLE, new BooktitleYearChecker());
+            fieldCheckers.put(StandardField.JOURNALTITLE, new BooktitleMonthChecker());
+            fieldCheckers.put(StandardField.JOURNALTITLE, new BooktitlePageRangeChecker());
         }
 
         return fieldCheckers;
