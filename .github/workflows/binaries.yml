@@ -168,7 +168,7 @@ jobs:
             displayName: macOS-arm
             archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
             archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app
-            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-arm.zip ./jabls-cli/build/packages/macos-15/jabkit.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
+            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-arm.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
             suffix: '_arm64'
             archForDebianRepack: ''
     runs-on: ${{ matrix.os }}

@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -10,18 +11,23 @@ import java.util.Optional;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedParserFetcher;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultSearchQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
@@ -30,11 +36,19 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParserFetcher {
+public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParserFetcher, FulltextFetcher, CustomizableKeyFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);
+    private static final String WILEY_TDM_API_URL = "https://api.wiley.com/onlinelibrary/tdm/v1/articles/";
+    
+    private final ImporterPreferences importerPreferences;
+
+    public EuropePmcFetcher(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
@@ -274,5 +288,182 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
     @Override
     public String getName() {
         return "Europe/PMCID";
+    }
+
+    @Override
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
+        // Check if this is a Wiley publication
+        if (!isWileyPublication(entry)) {
+            return Optional.empty();
+        }
+
+        // Get DOI from the entry
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
+        if (doi.isEmpty()) {
+            LOGGER.debug("No DOI found for entry, cannot fetch Wiley fulltext");
+            return Optional.empty();
+        }
+
+        try {
+            return fetchWileyFulltext(doi.get());
+        } catch (Exception e) {
+            LOGGER.warn("Failed to fetch Wiley fulltext for DOI: {}", doi.get(), e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.PUBLISHER;
+    }
+
+    /**
+     * Checks if the given BibEntry is from Wiley publisher.
+     * This is determined by checking the DOI prefix or publisher field.
+     */
+    private boolean isWileyPublication(BibEntry entry) {
+        // Check DOI prefix for Wiley (10.1002)
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
+        if (doi.isPresent() && doi.get().toString().startsWith("10.1002/")) {
+            return true;
+        }
+
+        // Check publisher field
+        Optional<String> publisher = entry.getField(StandardField.PUBLISHER);
+        if (publisher.isPresent()) {
+            String pub = publisher.get().toLowerCase();
+            return pub.contains("wiley") || pub.contains("john wiley");
+        }
+
+        return false;
+    }
+
+    /**
+     * Fetches fulltext PDF URL from Wiley TDM API.
+     * This requires a TDM-Client-Token for authentication.
+     */
+    private Optional<URL> fetchWileyFulltext(DOI doi) throws IOException {
+        // First try: Wiley TDM API with token (best option for subscribed content)
+        Optional<URL> tdmResult = tryWileyTdmApi(doi);
+        if (tdmResult.isPresent()) {
+            return tdmResult;
+        }
+        
+        // Second try: Check Europe PMC for open access version
+        Optional<URL> openAccessResult = tryEuropePmcOpenAccess(doi);
+        if (openAccessResult.isPresent()) {
+            LOGGER.info("Found open access version of Wiley article via Europe PMC: {}", doi);
+            return openAccessResult;
+        }
+        
+        // Third try: Check if Wiley has made it freely available
+        Optional<URL> directWileyResult = tryDirectWileyAccess(doi);
+        if (directWileyResult.isPresent()) {
+            LOGGER.info("Found freely available Wiley article: {}", doi);
+            return directWileyResult;
+        }
+        
+        LOGGER.debug("No fulltext found for Wiley DOI: {}", doi);
+        return Optional.empty();
+    }
+    
+    /**
+     * Attempts to fetch fulltext from Wiley TDM API using authentication token.
+     *
+     * @param doi the DOI to fetch
+     * @return URL to the PDF if successful, empty otherwise
+     */
+    private Optional<URL> tryWileyTdmApi(DOI doi) {
+        if (importerPreferences == null) {
+            return Optional.empty();
+        }
+        
+        Optional<String> apiKey = importerPreferences.getApiKey(getName());
+        if (apiKey.isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = WILEY_TDM_API_URL + doi.toString();
+            LOGGER.debug("Trying Wiley TDM API: {}", apiUrl);
+            
+            URLDownload download = new URLDownload(apiUrl);
+            download.addHeader("Wiley-TDM-Client-Token", apiKey.get());
+            download.addHeader("Accept", "application/pdf");
+            
+            try {
+                download.asInputStream().close(); // Test the connection
+            } catch (FetcherException e) {
+                return Optional.empty();
+            }
+            
+            return Optional.of(new URI(apiUrl).toURL());
+        } catch (IOException | URISyntaxException e) {
+            LOGGER.debug("Wiley TDM API failed: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+    
+    /**
+     * Searches Europe PMC for open access versions of Wiley articles.
+     *
+     * @param doi the DOI to search for
+     * @return URL to the open access PDF if found, empty otherwise
+     */
+    private Optional<URL> tryEuropePmcOpenAccess(DOI doi) {
+        try {
+            // Query Europe PMC for this DOI to check if there's an OA version
+            String queryUrl = "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:" + 
+                             doi.toString() + "&resultType=core&format=json";
+            URLDownload download = new URLDownload(queryUrl);
+            String response = download.asString();
+            
+            // Parse and check for fulltext URLs in the response
+            JSONObject json = new JSONObject(response);
+            if (json.has("resultList")) {
+                JSONObject resultList = json.getJSONObject("resultList");
+                if (resultList.has("result") && resultList.getJSONArray("result").length() > 0) {
+                    JSONObject result = resultList.getJSONArray("result").getJSONObject(0);
+                    Optional<String> urlString = extractBestFullTextUrl(result);
+                    if (urlString.isPresent()) {
+                        return Optional.of(new URI(urlString.get()).toURL());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Europe PMC open access check failed: {}", e.getMessage());
+        }
+        return Optional.empty();
+    }
+    
+    /**
+     * Attempts direct access to Wiley PDF URLs for freely available articles.
+     * Some Wiley articles are made freely available without requiring authentication.
+     *
+     * @param doi the DOI to check
+     * @return URL to the PDF if freely accessible, empty otherwise
+     */
+    private Optional<URL> tryDirectWileyAccess(DOI doi) {
+        try {
+            // Try direct PDF URL patterns that Wiley sometimes uses for open access
+            String pdfUrl = "https://onlinelibrary.wiley.com/doi/pdf/" + doi.toString();
+            URLDownload download = new URLDownload(pdfUrl);
+            download.addHeader("Accept", "application/pdf");
+            
+            // Try to check if PDF is accessible
+            Optional<String> contentType = download.getMimeType();
+            if (contentType.isPresent() && contentType.get().contains("pdf")) {
+                return Optional.of(new URI(pdfUrl).toURL());
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Direct Wiley access check failed: {}", e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public String getTestUrl() {
+        // Use a known Wiley DOI for testing the TDM token
+        return WILEY_TDM_API_URL + "10.1002/andp.19053221004";
     }
 }

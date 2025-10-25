@@ -135,7 +135,7 @@ public class WebFetchers {
         set.add(new BiodiversityLibrary(importerPreferences));
         set.add(new LOBIDFetcher());
         set.add(new ScholarArchiveFetcher());
-        set.add(new EuropePmcFetcher());
+        set.add(new EuropePmcFetcher(importerPreferences));
         return set;
     }
 
@@ -152,7 +152,7 @@ public class WebFetchers {
         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new DiVA(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
-        set.add(new EuropePmcFetcher());
+        set.add(new EuropePmcFetcher(importerPreferences));
         set.add(new MedlineFetcher(importerPreferences));
         set.add(new TitleFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
