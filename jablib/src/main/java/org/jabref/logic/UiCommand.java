@@ -10,9 +10,6 @@ public sealed interface UiCommand {
     record JumpToEntryKey(String citationKey) implements UiCommand {
     }
 
-    record JumpToField() implements UiCommand {
-    }
-
     record OpenLibraries(List<Path> toImport) implements UiCommand {
     }
 
