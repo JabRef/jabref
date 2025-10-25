@@ -1,4 +1,4 @@
-package org.jabref.logic.git.merge.util;
+package org.jabref.logic.git.merge.planning.util;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +48,7 @@ public final class AutoPlan {
             }
             // B2: only remote added -> add remote entry
             if (localEntry == null && remoteEntry != null) {
-                newEntries.add(remoteEntry); // consider cloning if you want stronger immutability guarantees
+                newEntries.add(remoteEntry);
             }
             return;
         }
