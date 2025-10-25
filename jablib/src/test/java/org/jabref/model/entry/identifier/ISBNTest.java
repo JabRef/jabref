@@ -10,10 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ISBNTest {
 
     @ParameterizedTest
-    @CsvSource({
-            "0-123456-47-9",
-            "0-9752298-0-X"
-    })
+    @CsvSource(
+            textBlock = """
+                    0-123456-47-9
+                    0-9752298-0-X
+                    """
+    )
     void isValidFormat10Correct(String isbn) {
         assertTrue(new ISBN(isbn).isValidFormat());
     }
@@ -24,11 +26,13 @@ class ISBNTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "0-123456-47-9",
-            "0-9752298-0-X",
-            "0-9752298-0-x"
-    })
+    @CsvSource(
+            textBlock = """
+                    0-123456-47-9
+                    0-9752298-0-X
+                    0-9752298-0-x
+                    """
+    )
     void isValidChecksum10Correct(String isbn) {
         assertTrue(new ISBN(isbn).isValidChecksum());
     }
@@ -59,10 +63,12 @@ class ISBNTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "0-123456-47-9",
-            "0-9752298-0-X"
-    })
+    @CsvSource(
+            textBlock = """
+                    0-123456-47-9
+                    0-9752298-0-X
+                    """
+    )
     void isIsbn10Correct(String isbn) {
         assertTrue(new ISBN(isbn).isIsbn10());
     }

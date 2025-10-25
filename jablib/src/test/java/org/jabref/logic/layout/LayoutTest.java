@@ -110,16 +110,19 @@ class LayoutTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            // || (OR)
-            "\\begin{editor||author}\\format[HTMLChars]{\\author}\\end{editor||author}, Author",
-            // && (AND)
-            "\\begin{editor&&author}\\format[HTMLChars]{\\author}\\end{editor&&author}, ''",
-            // ! (NOT)
-            "\\begin{!year}\\format[HTMLChars]{(no year)}\\end{!year}, (no year)",
-            // combined (!a&&b)
-            "\\begin{!editor&&author}\\format[HTMLChars]{\\author}\\end{!editor&&author}\\begin{editor&&!author}\\format[HTMLChars]{\\editor} (eds.)\\end{editor&&!author}, Author"
-    })
+    @CsvSource(
+            delimiterString = "->",
+            textBlock = """
+                    # || (OR)
+                    \\begin{editor||author}\\format[HTMLChars]{\\author}\\end{editor||author} -> Author
+                    # && (AND)
+                    \\begin{editor&&author}\\format[HTMLChars]{\\author}\\end{editor&&author} -> ''
+                    # ! (NOT)
+                    \\begin{!year}\\format[HTMLChars]{(no year)}\\end{!year} -> (no year)
+                    # combined (!a&&b)
+                    \\begin{!editor&&author}\\format[HTMLChars]{\\author}\\end{{!editor&&author}\\begin{editor&&!author}\\format[HTMLChars]{\\editor} (eds.)\\end{editor&&!author} -> Author
+                    """
+    )
     void beginConditionals(String layoutString, String expected) throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.AUTHOR, "Author");

@@ -12,8 +12,8 @@ import org.jabref.model.texparser.LatexParserResults;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,12 +38,14 @@ class DefaultTexParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "\\citet21312{123U123n123resolvedKey}",
-            "\\1cite[pr234e][post]{UnresolvedKey}",
-            "\\citep55{5}UnresolvedKey}",
-            "\\cit2et{UnresolvedKey}"
-    })
+    @CsvSource(
+            textBlock = """
+                    \\citet21312{123U123n123resolvedKey}
+                    \\1cite[pr234e][post]{UnresolvedKey}
+                    \\citep55{5}UnresolvedKey}
+                    \\cit2et{UnresolvedKey}
+                    """
+    )
     void nonMatchCite(String citeString) {
         LatexParserResult latexParserResult = new DefaultLatexParser().parse(citeString);
         LatexParserResult expectedParserResult = new LatexParserResult(Path.of(""));

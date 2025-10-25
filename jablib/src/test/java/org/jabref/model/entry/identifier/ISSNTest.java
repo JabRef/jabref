@@ -41,11 +41,13 @@ class ISSNTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "0027-9633",
-            "2434-561X",
-            "2434-561x"
-    })
+    @CsvSource(
+            textBlock = """
+                    0027-9633
+                    2434-561X
+                    2434-561x
+                    """
+    )
     void isValidChecksumCorrect(String issn) {
         assertTrue(new ISSN(issn).isValidChecksum());
     }

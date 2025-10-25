@@ -15,13 +15,14 @@ class RemoteUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "0",
-            "1023"
-    })
+    @CsvSource(
+            textBlock = """
+                    0
+                    1023
+                    """
+    )
     void rejectReservedSystemPorts(int port) {
-        String message = "Port number must be outside reserved system range (0-1023).";
-        assertFalse(RemoteUtil.isUserPort(port), message);
+        assertFalse(RemoteUtil.isUserPort(port));
     }
 
     @Test
@@ -31,13 +32,14 @@ class RemoteUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            // ports 1024 -> 65535
-            "1024",
-            "65535"
-    })
+    @CsvSource(
+            textBlock = """
+                    # ports 1024 -> 65535
+                    1024
+                    65535
+                    """
+    )
     void acceptPortsAboveSystemPorts(int port) {
-        String message = "Port number in between 1024 and 65535 should be valid.";
-        assertTrue(RemoteUtil.isUserPort(port), message);
+        assertTrue(RemoteUtil.isUserPort(port));
     }
 }
