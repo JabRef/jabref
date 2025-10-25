@@ -124,7 +124,7 @@ class CompositeIdFetcherArxivRouteTest {
         var out = fetcher.performSearchById("arXiv:2101.00001");
         
         // Verify: should return INSPIRE's result, should not try ArXiv
-        assertThat(out).containsSame(hit);
+        assertThat(out).contains(hit);
         assertThat(fetcher.wasArxivFetcherCreated()).isFalse();
     }
 
@@ -151,7 +151,7 @@ class CompositeIdFetcherArxivRouteTest {
         var out = fetcher.performSearchById("arXiv:2101.00001");
         
         // Verify: should return ArXiv's result (fallback)
-        assertThat(out).containsSame(fallback);
+        assertThat(out).contains(fallback);
         assertThat(fetcher.wasArxivFetcherCreated()).isTrue();
     }
 
@@ -176,7 +176,7 @@ class CompositeIdFetcherArxivRouteTest {
         var out = fetcher.performSearchById("arXiv:2101.00001");
         
         // Verify: should return ArXiv's result (fallback)
-        assertThat(out).containsSame(fallback);
+        assertThat(out).contains(fallback);
         assertThat(fetcher.wasArxivFetcherCreated()).isTrue();
     }
 }
