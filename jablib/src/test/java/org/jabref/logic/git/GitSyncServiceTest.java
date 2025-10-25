@@ -5,13 +5,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
-import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
-import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
-import org.jabref.logic.git.model.PullResult;
+import org.jabref.logic.git.io.GitFileWriter;
+import org.jabref.logic.git.model.BookkeepingResult;
+import org.jabref.logic.git.model.PullPlan;
+import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -37,8 +39,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyAutoPlan;
+import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyResolved;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -58,7 +62,6 @@ class GitSyncServiceTest {
 
     private ImportFormatPreferences importFormatPreferences;
     private GitConflictResolverStrategy gitConflictResolverStrategy;
-    private GitSemanticMergeExecutor mergeExecutor;
     private BibDatabaseContext context;
     private GitHandlerRegistry gitHandlerRegistry;
 
@@ -125,7 +128,6 @@ class GitSyncServiceTest {
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         gitConflictResolverStrategy = mock(GitConflictResolverStrategy.class);
-        mergeExecutor = new GitSemanticMergeExecutorImpl(importFormatPreferences);
         gitHandlerRegistry = new GitHandlerRegistry();
 
         // create fake remote repo
@@ -207,10 +209,22 @@ class GitSyncServiceTest {
 
     @Test
     void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandlerRegistry, gitConflictResolverStrategy, mergeExecutor);
-        PullResult result = syncService.fetchAndMerge(context, library);
+        GitSyncService syncService = GitSyncService.create(importFormatPreferences, gitHandlerRegistry);
+        Optional<PullPlan> pullPlan = syncService.prepareMerge(context, library);
 
-        assertTrue(result.isSuccessful());
+        assertEquals(List.of(), pullPlan.get().conflicts(), "Expected no conflicts");
+        assertFalse(pullPlan.get().autoPlan().isEmpty(), "Expected auto changes from remote");
+        assertFalse(pullPlan.get().isNoop(), "Should not be UP_TO_DATE");
+        assertFalse(pullPlan.get().isNoopAhead(), "Should not be AHEAD");
+
+        applyAutoPlan(context, pullPlan.get().autoPlan());
+        GitFileWriter.write(library, context, importFormatPreferences);
+        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
+
+        assertFalse(bookkeepingResult.isFastForward(), "DIVERGED without conflicts should produce a merge commit");
+        RevCommit head = aliceGit.log().setMaxCount(1).call().iterator().next();
+        assertEquals(2, head.getParentCount(), "Expected a two-parent merge commit");
+
         String merged = Files.readString(library);
 
         String expected = """
@@ -230,9 +244,23 @@ class GitSyncServiceTest {
 
     @Test
     void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandlerRegistry, gitConflictResolverStrategy, mergeExecutor);
-        syncService.push(context, library);
+        GitSyncService syncService = GitSyncService.create(importFormatPreferences, gitHandlerRegistry);
+        Optional<PullPlan> pullPlan = syncService.prepareMerge(context, library);
 
+        assertFalse(pullPlan.get().isNoop(), "Should not be up to date");
+        assertFalse(pullPlan.get().isNoopAhead(), "Should not be ahead");
+        assertEquals(List.of(), pullPlan.get().conflicts(), "This case expects an auto-merge only");
+
+        applyAutoPlan(context, pullPlan.get().autoPlan());
+        GitFileWriter.write(library, context, importFormatPreferences);
+
+        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
+        assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
+
+        PushResult pushResult = syncService.push(context, library);
+        assertEquals(new PushResult(true, false), pushResult, "Expected pushResult to indicate a successful push");
+
+        aliceGit.fetch().setRemote("origin").call();
         String pushedContent = GitFileReader
                 .readFileFromCommit(aliceGit, aliceGit.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"))
                 .orElseThrow(() -> new IllegalStateException("Expected file 'library.bib' not found in commit"));
@@ -249,10 +277,14 @@ class GitSyncServiceTest {
                 """;
 
         assertEquals(normalize(expected), normalize(pushedContent));
+        RevCommit head = aliceGit.log().setMaxCount(1).call().iterator().next();
+        assertEquals(2, head.getParentCount(), "Expected a two-parent merge commit");
     }
 
     @Test
     void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution() throws Exception {
+        GitSyncService syncService = GitSyncService.create(importFormatPreferences, gitHandlerRegistry);
+
         Path bobLibrary = bobDir.resolve("library.bib");
         String bobEntry = """
                       @article{b,
@@ -294,6 +326,12 @@ class GitSyncServiceTest {
         String actualContent = Files.readString(library);
         context = BibDatabaseContext.of(actualContent, importFormatPreferences);
 
+        Optional<PullPlan> pullPlan = syncService.prepareMerge(context, library);
+        assertFalse(pullPlan.get().isNoop(), "Should not be up to date");
+        assertFalse(pullPlan.get().isNoopAhead(), "Should not be ahead");
+        assertFalse(pullPlan.get().conflicts().isEmpty(), "This case expects a conflict");
+
+        applyAutoPlan(context, pullPlan.get().autoPlan());
         // Setup mock conflict resolver
         GitConflictResolverStrategy resolver = mock(GitConflictResolverStrategy.class);
         when(resolver.resolveConflicts(anyList())).thenAnswer(invocation -> {
@@ -306,18 +344,33 @@ class GitSyncServiceTest {
             return List.of(resolved);
         });
 
-        GitSyncService service = new GitSyncService(importFormatPreferences, gitHandlerRegistry, resolver, mergeExecutor);
-        PullResult result = service.fetchAndMerge(context, library);
-
-        assertTrue(result.isSuccessful());
-        List<BibEntry> merged = result.getMergedEntries();
-        BibEntry entryC = merged.stream()
-                                .filter(entry -> "c".equals(entry.getCitationKey().orElse("")))
-                                .findFirst()
-                                .orElseThrow(() -> new AssertionError("Entry 'c' not found in merged result"));
-
-        assertEquals("alice-c + bob-c", entryC.getField(StandardField.AUTHOR).orElse(""));
+        List<BibEntry> resolvedEntries = resolver.resolveConflicts(pullPlan.get().conflicts());
         verify(resolver).resolveConflicts(anyList());
+        applyResolved(context, resolvedEntries);
+
+        GitFileWriter.write(library, context, importFormatPreferences);
+        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
+        assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
+
+        String mergedText = Files.readString(library);
+
+        String expectedMerged = """
+                    @article{a,
+                      author = {author-a},
+                      doi = {xya},
+                    }
+
+                    @article{b,
+                      author = {author-b},
+                      doi = {xyz},
+                    }
+
+                    @article{c,
+                      author = {alice-c + bob-c},
+                      title = {Title C},
+                    }
+                """;
+        assertEquals(normalize(expectedMerged), normalize(mergedText), "Merged content did not match expected result");
     }
 
     @Test

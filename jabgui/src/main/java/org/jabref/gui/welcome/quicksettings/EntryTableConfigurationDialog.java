@@ -45,6 +45,6 @@ public class EntryTableConfigurationDialog extends FXDialog {
 
         showCitationKeyBox.selectedProperty().bindBidirectional(viewModel.showCitationKeyProperty());
 
-        helpButton.setHelpPage(URLs.ENTRY_TABLE_COLUMNS_DOC);
+        helpButton.setHelpUrl(URLs.ENTRY_TABLE_COLUMNS_DOC);
     }
 }
