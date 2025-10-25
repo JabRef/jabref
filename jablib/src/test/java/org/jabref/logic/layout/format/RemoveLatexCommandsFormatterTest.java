@@ -1,7 +1,8 @@
 package org.jabref.logic.layout.format;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,48 +15,36 @@ class RemoveLatexCommandsFormatterTest {
         formatter = new RemoveLatexCommandsFormatter();
     }
 
-    @Test
-    void withoutLatexCommandsUnmodified() {
-        assertEquals("some text", formatter.format("some text"));
-    }
+    @ParameterizedTest
+    @CsvSource({
+            // Without LaTeX commands
+            "some text, some text",
 
-    @Test
-    void singleCommandWiped() {
-        assertEquals("", formatter.format("\\sometext"));
-    }
+            // Single command wiped
+            "\\sometext, ''",
 
-    @Test
-    void singleSpaceAfterCommandRemoved() {
-        assertEquals("text", formatter.format("\\some text"));
-    }
+            // Single space after command removed
+            "\\some text, text",
 
-    @Test
-    void multipleSpacesAfterCommandRemoved() {
-        assertEquals("text", formatter.format("\\some     text"));
-    }
+            // Multiple spaces after command removed
+            "\\some     text, text",
 
-    @Test
-    void escapedBackslashBecomesBackslash() {
-        assertEquals("\\", formatter.format("\\\\"));
-    }
+            // Escaped backslash becomes backslash
+            "'\\\\', '\\'",
 
-    @Test
-    void escapedBackslashFollowedByTextBecomesBackslashFollowedByText() {
-        assertEquals("\\some text", formatter.format("\\\\some text"));
-    }
+            // Escaped backslash followed by text
+            "'\\\\some text', '\\some text'",
 
-    @Test
-    void escapedBackslashKept() {
-        assertEquals("\\some text\\", formatter.format("\\\\some text\\\\"));
-    }
+            // Escaped backslash kept
+            "'\\\\some text\\\\', '\\some text\\'",
 
-    @Test
-    void escapedUnderscoreReplaces() {
-        assertEquals("some_text", formatter.format("some\\_text"));
-    }
+            // Escaped underscore replaced
+            "some\\_text, some_text",
 
-    @Test
-    void exampleUrlCorrectlyCleaned() {
-        assertEquals("http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf", formatter.format("http://pi.informatik.uni-siegen.de/stt/36\\_2/./03\\_Technische\\_Beitraege/ZEUS2016/beitrag\\_2.pdf"));
+            // Realistic LaTeX URL with escaped underscores
+            "'http://pi.informatik.uni-siegen.de/stt/36\\_2/./03\\_Technische\\_Beitraege/ZEUS2016/beitrag\\_2.pdf', 'http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf'"
+    })
+    void format(String input, String expected) {
+        assertEquals(expected, formatter.format(input));
     }
 }
