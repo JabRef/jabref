@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -318,34 +319,35 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     }
 
     /**
-     * Extracts texkeys from INSPIRE API response and sets it as citation key.
-     * INSPIRE returns texkeys in a temporary field that needs to be extracted,
-     * set as the citation key, and then cleaned up.
+     * Extract texkeys and set as citation key.
      *
-     * This is a critical part of Issue #12292 fix - ensuring INSPIRE's standard
-     * texkeys are properly applied to entries fetched via arXiv identifiers.
+     * A critical part of Issue #12292 fix - ensuring INSPIRE's
+     * texkeys are used for entries fetched via arXiv identifiers.
      *
-     * @param entry The BibEntry to process
+     * @param entry The BibEntry to be processed
      */
-    private void setTexkeys(BibEntry entry) {
-        Optional<String> texkeys = entry.getField(new UnknownField("texkeys"));
-
-        if (texkeys.isPresent() && !texkeys.get().isBlank()) {
-            // INSPIRE may return multiple texkeys separated by commas
-            // Take the first one as the primary citation key
-            String firstTexkey = texkeys.get().split(",")[0].trim();
-
+    void setTexkeys(BibEntry entry) {
+        // Get texkeys from entry
+        Optional<String> texkey = entry.getField(new UnknownField("texkeys"));
+        if (texkey.isPresent() && !texkey.get().isBlank()) {
+            // There may be multiple texkeys separated by commas
+            // Take the first non-empty one (if any) as the citation key
+            String firstTexkey = Arrays.stream(texkey.get().split(","))
+                                       .map(String::trim)
+                                       .filter(s -> !s.isEmpty())
+                                       .findFirst()
+                                       .orElse("");
+            // If texkey exists
             if (!firstTexkey.isEmpty()) {
                 entry.setCitationKey(firstTexkey);
                 LOGGER.debug("Set citation key from INSPIRE texkeys: '{}'", firstTexkey);
 
-                // Log if there were multiple texkeys
-                if (texkeys.get().contains(",")) {
-                    LOGGER.debug("INSPIRE provided multiple texkeys, using first: '{}'", firstTexkey);
+                // Log if there were multiple texkeys (yet may have empty ones)
+                if (texkey.get().contains(",")) {
+                    LOGGER.debug("INSPIRE provided multiple texkeys, using first available one: '{}'", firstTexkey);
                 }
             }
-
-            // Clean up the temporary texkeys field to avoid showing it in the UI
+            // Clean up the temporary texkeys field
             entry.clearField(new UnknownField("texkeys"));
         } else {
             LOGGER.debug("No texkeys field found in INSPIRE response for entry");

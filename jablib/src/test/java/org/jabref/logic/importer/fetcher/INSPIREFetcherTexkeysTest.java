@@ -1,120 +1,59 @@
-// src/test/java/org/jabref/logic/importer/fetcher/INSPIREFetcher_TexkeysTest.java
 package org.jabref.logic.importer.fetcher;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.assertj.core.api.Assertions.*;
-
-/**
- * Tests INSPIREFetcher's handling of texkeys.
- * Does not use Mockito - instead uses testable implementations.
- */
 class INSPIREFetcherTexkeysTest {
 
-    /**
-     * Test Parser that returns pre-parsed BibEntry (containing texkeys field).
-     */
-    private static class TestParserWithTexkeys implements Parser {
-        private final ImportFormatPreferences prefs;
-        private final String bibtexContent;
+    @Test
+    void setTexkeys_appliesFirstKeyAndClearsField() {
+        ImportFormatPreferences prefs = org.mockito.Mockito.mock(ImportFormatPreferences.class);
+        INSPIREFetcher fetcher = new INSPIREFetcher(prefs);
 
-        public TestParserWithTexkeys(ImportFormatPreferences prefs, String bibtexContent) {
-            this.prefs = prefs;
-            this.bibtexContent = bibtexContent;
-        }
+        BibEntry entry = new BibEntry();
+        entry.setField(new UnknownField("texkeys"), "Smith2020,AnotherKey,ThirdKey");
 
-        @Override
-        public List<BibEntry> parseEntries(InputStream inputStream) {
-            // Ignore input stream, parse predetermined BibTeX content
-            BibtexParser realParser = new BibtexParser(prefs);
-            return realParser.parseEntries(new ByteArrayInputStream(bibtexContent.getBytes()));
-        }
-    }
+        fetcher.setTexkeys(entry);
 
-    /**
-     * Test URLDownload replacement.
-     */
-    private static class TestURLDownload extends URLDownload {
-        public TestURLDownload(URL source) {
-            super(source);
-        }
+        // citation key should be Smith2020
+        assertTrue(entry.getCitationKey().isPresent(), "Citation key should be present");
+        assertEquals("Smith2020", entry.getCitationKey().get());
 
-        @Override
-        public InputStream asInputStream() {
-            return new ByteArrayInputStream(new byte[0]);
-        }
-    }
-
-    /**
-     * Testable INSPIREFetcher subclass that overrides network-related methods.
-     */
-    private static class TestableINSPIREFetcher extends INSPIREFetcher {
-        private final Parser testParser;
-
-        public TestableINSPIREFetcher(ImportFormatPreferences preferences, Parser testParser) {
-            super(preferences);
-            this.testParser = testParser;
-        }
-
-        @Override
-        public Parser getParser() {
-            return testParser;
-        }
-
-        @Override
-        public URLDownload getUrlDownload(URL url) {
-            return new TestURLDownload(url);
-        }
+        // texkeys field should be cleared
+        assertTrue(entry.getField(new UnknownField("texkeys")).isEmpty(),
+                "texkeys field should be cleared after processing");
     }
 
     @Test
-    void texkeysAppliedAndCleared() throws Exception {
-        // Create basic ImportFormatPreferences
-        ImportFormatPreferences prefs = new ImportFormatPreferences(
-            null, null, null, null, null, null, null
-        );
+    void setTexkeys_handlesEmptyOrMissingFieldGracefully() {
+        ImportFormatPreferences prefs = org.mockito.Mockito.mock(ImportFormatPreferences.class);
+        INSPIREFetcher fetcher = new INSPIREFetcher(prefs);
 
-        // Prepare BibTeX content containing texkeys
-        String bib = """
-                @article{dummy,
-                  title={T},
-                  texkeys={Smith2020,Another}
-                }
-                """;
-        
-        // Create test parser that returns parsed BibEntry (containing texkeys)
-        Parser testParser = new TestParserWithTexkeys(prefs, bib);
-        
-        TestableINSPIREFetcher fetcher = new TestableINSPIREFetcher(prefs, testParser);
+        BibEntry entry = new BibEntry(); // no texkeys field
+        fetcher.setTexkeys(entry);
 
-        // Create an entry with DOI to trigger search
-        var base = new BibEntry();
-        base.setField(StandardField.DOI, "10.1000/xyz");
+        assertTrue(entry.getCitationKey().isEmpty(), "No citation key should be set");
+        assertTrue(entry.getField(new UnknownField("texkeys")).isEmpty(),
+                "texkeys field should remain empty");
+    }
 
-        // Perform search
-        var out = fetcher.performSearch(base);
-        
-        // Verify results
-        assertThat(out).hasSize(1);
-        var e = out.get(0);
-        
-        // texkeys should be applied as citation key (first one)
-        assertThat(e.getCitationKey()).hasValue("Smith2020");
-        
-        // texkeys field should be cleared (not shown in final result)
-        assertThat(e.getField(new UnknownField("texkeys"))).isEmpty();
+    @Test
+    void setTexkeys_ignoresBlankValues() {
+        ImportFormatPreferences prefs = org.mockito.Mockito.mock(ImportFormatPreferences.class);
+        INSPIREFetcher fetcher = new INSPIREFetcher(prefs);
+
+        BibEntry entry = new BibEntry();
+        entry.setField(new UnknownField("texkeys"), ", , RealKey");
+
+        fetcher.setTexkeys(entry);
+
+        assertTrue(entry.getCitationKey().isPresent(), "Citation key should be set");
+        assertEquals("RealKey", entry.getCitationKey().get(), "The first non-empty texkey should be used");
+        assertTrue(entry.getField(new UnknownField("texkeys")).isEmpty(),
+                "texkeys field should be cleared after applying citation key");
     }
 }
-
