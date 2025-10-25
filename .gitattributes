@@ -15,3 +15,4 @@ gradlew text eol=lf
 CHANGELOG.md merge=union
 jablib/src/main/resources/l10n/JabRef_en.properties merge=union
 src/main/resources/l10n/JabRef_en.properties merge=union
+*.md diff=markdown whitespace=trailing-space
