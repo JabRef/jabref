@@ -360,7 +360,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - JabRef now opens the corresponding directory in the library properties when "Browse" is clicked. [#12223](https://github.com/JabRef/jabref/pull/12223)
 - We changed the icon for macOS to be more consistent with Apple's Guidelines [#8443](https://github.com/JabRef/jabref/issues/8443)
 
-
 ### Fixed
 
 - We fixed an issue where certain actions were not disabled when no libraries were open. [#11923](https://github.com/JabRef/jabref/issues/11923)
