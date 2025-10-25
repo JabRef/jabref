@@ -46,8 +46,12 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 
 import kong.unirest.core.UnirestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebSearchTabViewModel.class);
     private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
@@ -140,6 +144,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        LOGGER.debug("Setting values for WebSearchTabViewModel");
+        
         enableWebSearchProperty.setValue(importerPreferences.areImporterEnabled());
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
@@ -148,6 +154,11 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         addImportedEntriesGroupName.setValue(libraryPreferences.getAddImportedEntriesGroupName());
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
         citationsRelationStoreTTL.setValue(importerPreferences.getCitationsRelationsStoreTTL());
+        
+        LOGGER.debug("Web search enabled: {}, Duplicate warning: {}, Download linked files: {}", 
+                importerPreferences.areImporterEnabled(), 
+                importerPreferences.shouldWarnAboutDuplicatesOnImport(),
+                filePreferences.shouldDownloadLinkedFiles());
 
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
@@ -192,11 +203,18 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        LOGGER.debug("Storing WebSearchTabViewModel settings");
+        
         importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
         libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
+        
+        LOGGER.info("Web search settings updated - Enabled: {}, Duplicate warning: {}, Download linked files: {}", 
+                enableWebSearchProperty.getValue(),
+                warnAboutDuplicatesOnImportProperty.getValue(),
+                shouldDownloadLinkedOnlineFiles.getValue());
         if (addImportedEntriesGroupName.getValue().isEmpty() || addImportedEntriesGroupName.getValue().startsWith(" ")) {
             libraryPreferences.setAddImportedEntriesGroupName(Localization.lang("Imported entries"));
         } else {
@@ -300,19 +318,24 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     }
 
     public void checkApiKey(FetcherViewModel fetcherViewModel, String apiKey, Consumer<Boolean> onFinished) {
+        LOGGER.debug("Checking API key for fetcher: {}", fetcherViewModel.getName());
+        
         Callable<Boolean> tester = () -> {
             WebFetcher webFetcher = fetcherViewModel.getFetcher();
 
             if (!(webFetcher instanceof CustomizableKeyFetcher fetcher)) {
+                LOGGER.warn("Fetcher {} is not a CustomizableKeyFetcher", fetcherViewModel.getName());
                 return false;
             }
 
             String testUrlWithoutApiKey = fetcher.getTestUrl();
             if (testUrlWithoutApiKey == null) {
+                LOGGER.warn("No test URL available for fetcher: {}", fetcherViewModel.getName());
                 return false;
             }
 
             if (apiKey.isEmpty()) {
+                LOGGER.warn("Empty API key provided for fetcher: {}", fetcherViewModel.getName());
                 return false;
             }
 
@@ -320,14 +343,24 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                 URLDownload urlDownload = new URLDownload(testUrlWithoutApiKey + apiKey);
                 // The HEAD request cannot be used because its response is not 200 (maybe 404 or 596...).
                 int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
-                return (statusCode >= 200) && (statusCode < 300);
+                boolean isValid = (statusCode >= 200) && (statusCode < 300);
+                LOGGER.debug("API key validation for {} returned status code: {}, valid: {}", 
+                        fetcherViewModel.getName(), statusCode, isValid);
+                return isValid;
             } catch (IOException | UnirestException e) {
+                LOGGER.warn("Error validating API key for fetcher {}: {}", fetcherViewModel.getName(), e.getMessage());
                 return false;
             }
         };
         BackgroundTask.wrap(tester)
-                      .onSuccess(onFinished)
-                      .onFailure(_ -> onFinished.accept(false))
+                      .onSuccess(result -> {
+                          LOGGER.info("API key validation completed for {}: {}", fetcherViewModel.getName(), result);
+                          onFinished.accept(result);
+                      })
+                      .onFailure(exception -> {
+                          LOGGER.error("API key validation failed for {}: {}", fetcherViewModel.getName(), exception.getMessage());
+                          onFinished.accept(false);
+                      })
                       .executeWith(taskExecutor);
     }
 
