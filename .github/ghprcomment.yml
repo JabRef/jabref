@@ -170,7 +170,7 @@
 # PR hygiene
 
 - jobName: 'Ensure that contributor is assigned (fails if not commented on issue)'
-  workflowName: 'On PR opened/updated'
+  workflowName: 'Link PR to Issue'
   message: >
     You did not assign yourself to the issue.
     Thus, it looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.
@@ -196,7 +196,7 @@
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
 - jobName: 'Determine issue number'
-  workflowName: 'On PR opened/updated'
+  workflowName: 'Link PR to Issue'
   always: true
   message: |
     Your pull request needs to link an issue correctly.

@@ -86,7 +86,7 @@ public enum StandardActions implements Action {
     EXPORT_SELECTED(Localization.lang("Export selected entries"), KeyBinding.EXPORT_SELECTED),
     CONNECT_TO_SHARED_DB(Localization.lang("Connect to shared database"), IconTheme.JabRefIcons.CONNECT_DB),
     PULL_CHANGES_FROM_SHARED_DB(Localization.lang("Pull changes from shared database"), KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE),
-    CLOSE_LIBRARY(Localization.lang("Close library"), Localization.lang("Close the current library"), IconTheme.JabRefIcons.CLOSE, KeyBinding.CLOSE_DATABASE),
+    CLOSE_LIBRARY(Localization.lang("Close library"), Localization.lang("Close the current library"), IconTheme.JabRefIcons.CLOSE),
     CLOSE_OTHER_LIBRARIES(Localization.lang("Close others"), Localization.lang("Close other libraries"), IconTheme.JabRefIcons.CLOSE),
     CLOSE_ALL_LIBRARIES(Localization.lang("Close all"), Localization.lang("Close all libraries"), IconTheme.JabRefIcons.CLOSE),
     QUIT(Localization.lang("Quit"), Localization.lang("Quit JabRef"), IconTheme.JabRefIcons.CLOSE_JABREF, KeyBinding.QUIT_JABREF),

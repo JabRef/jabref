@@ -107,6 +107,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
     // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
 
     implementation("com.fasterxml:aalto-xml")
 
