@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -20,12 +19,13 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.controlsfx.control.SearchableComboBox;
 
 public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel> implements PreferencesTab {
 
     @FXML private TextField eMailReferenceSubject;
     @FXML private CheckBox autoOpenAttachedFolders;
-    @FXML private ComboBox<GuiPushToApplication> pushToApplicationCombo;
+    @FXML private SearchableComboBox<GuiPushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
     @FXML private Button autolinkExternalHelp;
 

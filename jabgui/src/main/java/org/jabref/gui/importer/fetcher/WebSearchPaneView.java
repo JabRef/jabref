@@ -5,7 +5,6 @@ import javafx.beans.binding.BooleanExpression;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -27,6 +26,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.SearchableComboBox;
 
 public class WebSearchPaneView extends VBox {
 
@@ -84,8 +84,8 @@ public class WebSearchPaneView extends VBox {
     /**
      * Create combo box for selecting fetcher
      */
-    private ComboBox<SearchBasedFetcher> createFetcherComboBox() {
-        ComboBox<SearchBasedFetcher> fetchers = new ComboBox<>();
+    private SearchableComboBox<SearchBasedFetcher> createFetcherComboBox() {
+        SearchableComboBox<SearchBasedFetcher> fetchers = new SearchableComboBox<>();
         new ViewModelListCellFactory<SearchBasedFetcher>()
                 .withText(SearchBasedFetcher::getName)
                 .install(fetchers);
