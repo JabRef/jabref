@@ -63,21 +63,9 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     // Timeout configuration (in milliseconds)
     private static final int CONNECT_TIMEOUT_MS = 10000; // 10 seconds
 
-    private static final String ERROR_MESSAGE_TEMPLATE =
-        "Failed to fetch from INSPIRE using %s after %d attempts.\n" +
-        "Possible causes:\n" +
-        "- Network connection issue\n" +
-        "- INSPIRE service temporarily unavailable\n" +
-        "- Invalid identifier format\n" +
-        "Please check your internet connection and try again.";
-
-    private final ImportFormatPreferences importFormatPreferences;
-
-    private static final int MAX_RETRIES = 3;
-    private static final long RETRY_DELAY_MS = 1000;
     private static final String ERROR_MESSAGE_TEMPLATE = "Failed to fetch from INSPIRE for identifier '%s' after %d attempts.";
 
-    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(INSPIREFetcher.class);
+    private final ImportFormatPreferences importFormatPreferences;
 
     public INSPIREFetcher(ImportFormatPreferences preferences) {
         this.importFormatPreferences = preferences;
@@ -129,17 +117,6 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
             entry.getCitationKey().ifPresent(citationKey ->
                 LOGGER.debug("Post-cleanup citation key: {}", citationKey)
             );
-        }
-    }
-
-    /**
-     * If the BibEntry contains a 'texkeys' field, use it as the citation key and clear the field.
-     */
-    void setTexkeys(BibEntry entry){
-        Optional<String> texkeys = entry.getField(new UnknownField("texkeys"));
-        if (texkeys.isPresent() && !texkeys.get().isBlank()) {
-            entry.setCitationKey(texkeys.get());
-            entry.clearField(new UnknownField("texkeys"));
         }
     }
 
