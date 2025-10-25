@@ -1,7 +1,7 @@
 package org.jabref.cli;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -34,8 +34,8 @@ public abstract class AbstractJabKitTest {
 
     protected CommandLine commandLine;
 
-    private StringWriter outWriter;
-    private StringWriter errWriter;
+    private ByteArrayOutputStream outWriter;
+    private ByteArrayOutputStream errWriter;
 
     @BeforeEach()
     void setup() {
@@ -57,13 +57,34 @@ public abstract class AbstractJabKitTest {
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
         commandLine = new CommandLine(argumentProcessor);
 
-        outWriter = new StringWriter();
-        PrintWriter out = new PrintWriter(outWriter);
-        errWriter = new StringWriter();
-        PrintWriter err = new PrintWriter(errWriter);
+        outWriter = new ByteArrayOutputStream();
+        errWriter = new ByteArrayOutputStream();
+    }
 
-        commandLine.setOut(out);
-        commandLine.setErr(err);
+    /**
+     * Executes the configured {@link picocli.CommandLine} command while capturing its
+     * standard output and error streams.
+     *
+     * <p>This method temporarily redirects {@code System.out} and {@code System.err} to
+     * internal buffers during the command execution, allowing the captured output to be
+     * retrieved later using {@link #getStandardOutput()} and {@link #getErrorOutput()}.</p>
+     *
+     * @param args the command line arguments to parse
+     * @return the error code
+     */
+    int executeToLog(String... args) {
+        var or = System.out;
+        var orErr = System.err;
+
+        System.setOut(new PrintStream(outWriter, true));
+        System.setErr(new PrintStream(errWriter, true));
+
+        int result = commandLine.execute(args);
+
+        System.setOut(or);
+        System.setErr(orErr);
+
+        return result;
     }
 
     /**
@@ -72,7 +93,7 @@ public abstract class AbstractJabKitTest {
      * @return The captured stdout string.
      */
     protected String getStandardOutput() {
-        return outWriter.toString();
+        return outWriter.toString().replace("\r\n", "\n");
     }
 
     /**
@@ -81,7 +102,7 @@ public abstract class AbstractJabKitTest {
      * @return The captured stderr string.
      */
     protected String getErrorOutput() {
-        return errWriter.toString();
+        return errWriter.toString().replace("\r\n", "\n");
     }
 
     /**
