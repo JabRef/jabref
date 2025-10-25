@@ -60,7 +60,7 @@ public abstract class AbstractJabKitTest {
         outWriter = new ByteArrayOutputStream();
         errWriter = new ByteArrayOutputStream();
     }
-    
+
     /**
      * Executes the configured {@link picocli.CommandLine} command while capturing its
      * standard output and error streams.
