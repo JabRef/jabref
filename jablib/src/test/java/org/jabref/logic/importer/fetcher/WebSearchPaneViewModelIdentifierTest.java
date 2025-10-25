@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class WebSearchPaneViewModel_IdentifierTest {
+class WebSearchPaneViewModelIdentifierTest {
 
     private WebSearchPaneViewModel vm() {
         GuiPreferences prefs = mock(GuiPreferences.class, RETURNS_DEEP_STUBS);

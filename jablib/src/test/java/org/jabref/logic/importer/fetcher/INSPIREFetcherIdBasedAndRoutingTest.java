@@ -12,7 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -20,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
  * Tests INSPIREFetcher's ID-based search and routing logic.
  * Does not use Mockito - instead uses testable subclasses and implementations.
  */
-class INSPIREFetcher_IdBasedAndRoutingTest {
+class INSPIREFetcherIdBasedAndRoutingTest {
 
     /**
      * Test Parser implementation that returns predetermined results.
@@ -83,15 +82,15 @@ class INSPIREFetcher_IdBasedAndRoutingTest {
 
         // Create test parser that returns a BibEntry
         Parser testParser = new TestParser(List.of(new BibEntry()));
-        
+
         TestableINSPIREFetcher fetcher = new TestableINSPIREFetcher(prefs, testParser);
 
         // Test arXiv ID - should be recognized and return result
         assertThat(fetcher.performSearchById("arXiv:2101.00001")).isPresent();
-        
+
         // Test DOI - should be recognized and return result
         assertThat(fetcher.performSearchById("10.1145/123456")).isPresent();
-        
+
         // Test invalid ID - should return empty
         assertThat(fetcher.performSearchById("not-an-id")).isEmpty();
     }
@@ -105,7 +104,7 @@ class INSPIREFetcher_IdBasedAndRoutingTest {
 
         // Create test parser that returns a BibEntry
         Parser testParser = new TestParser(List.of(new BibEntry()));
-        
+
         TestableINSPIREFetcher fetcher = new TestableINSPIREFetcher(prefs, testParser);
 
         // Test arXiv - should route successfully
