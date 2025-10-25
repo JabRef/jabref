@@ -176,6 +176,9 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         // Apply texkeys extraction - CRITICAL for Issue #12292
         results.forEach(this::setTexkeys);
 
+        // Apply post-processing
+        results.forEach(this::doPostCleanup);
+
         // Validate and log results
         validateResults(results, entry.getCitationKey().orElse("unknown"));
 
@@ -225,9 +228,6 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
                     LOGGER.info("Successfully fetched {} entries from INSPIRE for [{}]",
                                results.size(), identifier);
                 }
-
-                // Apply post-processing
-                results.forEach(this::doPostCleanup);
                 return results;
 
             } catch (ParseException | FetcherException e) {
@@ -329,22 +329,22 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
      */
     private void setTexkeys(BibEntry entry) {
         Optional<String> texkeys = entry.getField(new UnknownField("texkeys"));
-        
+
         if (texkeys.isPresent() && !texkeys.get().isBlank()) {
             // INSPIRE may return multiple texkeys separated by commas
             // Take the first one as the primary citation key
             String firstTexkey = texkeys.get().split(",")[0].trim();
-            
+
             if (!firstTexkey.isEmpty()) {
                 entry.setCitationKey(firstTexkey);
                 LOGGER.debug("Set citation key from INSPIRE texkeys: '{}'", firstTexkey);
-                
+
                 // Log if there were multiple texkeys
                 if (texkeys.get().contains(",")) {
                     LOGGER.debug("INSPIRE provided multiple texkeys, using first: '{}'", firstTexkey);
                 }
             }
-            
+
             // Clean up the temporary texkeys field to avoid showing it in the UI
             entry.clearField(new UnknownField("texkeys"));
         } else {
