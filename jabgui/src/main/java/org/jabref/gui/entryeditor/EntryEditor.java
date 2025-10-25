@@ -28,6 +28,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -177,7 +178,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 // We allow users to edit the "old" entry
             } else {
                 setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
-                Platform.runLater(() -> tabbed.requestFocus());
             }
         });
 
@@ -248,6 +248,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
                         break;
+                    case JUMP_TO_FIELD:
+                        showJumpToFieldDialog();
+                        event.consume();
+                        break;
                     case HELP:
                         new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
                         event.consume();
@@ -261,10 +265,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         close();
                         event.consume();
                         break;
-                    case JUMP_TO_FIELD:
-                        showJumpToFieldDialog();
-                        event.consume();
-                        break;
                     default:
                         // Pass other keys to parent
                 }
@@ -272,12 +272,13 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
     }
 
-    private void showJumpToFieldDialog() {
+    public void showJumpToFieldDialog() {
         if (getCurrentlyEditedEntry() == null) {
             return;
         }
         JumpToFieldDialog dialog = new JumpToFieldDialog(this);
-        dialog.showAndWait();
+        dialog.initModality(Modality.NONE);
+        dialog.show();
     }
 
     @FXML
