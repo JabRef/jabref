@@ -50,7 +50,7 @@ public class Launcher {
         FOCUS
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         initLogging(args);
 
         Injector.setModelOrService(BuildInfo.class, new BuildInfo());
