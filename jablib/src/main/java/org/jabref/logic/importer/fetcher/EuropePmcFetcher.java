@@ -37,6 +37,7 @@ import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +45,10 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
     private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);
     private static final String WILEY_TDM_API_URL = "https://api.wiley.com/onlinelibrary/tdm/v1/articles/";
     
+    @Nullable
     private final ImporterPreferences importerPreferences;
 
-    public EuropePmcFetcher(ImporterPreferences importerPreferences) {
+    public EuropePmcFetcher(@Nullable ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
     }
 
@@ -399,7 +401,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
             
             return Optional.of(new URI(apiUrl).toURL());
         } catch (IOException | URISyntaxException e) {
-            LOGGER.debug("Wiley TDM API failed: {}", e.getMessage());
+            LOGGER.debug("Wiley TDM API failed: {}", e.getMessage(), e);
             return Optional.empty();
         }
     }
@@ -431,7 +433,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
                 }
             }
         } catch (Exception e) {
-            LOGGER.debug("Europe PMC open access check failed: {}", e.getMessage());
+            LOGGER.debug("Europe PMC open access check failed: {}", e.getMessage(), e);
         }
         return Optional.empty();
     }
@@ -456,7 +458,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
                 return Optional.of(new URI(pdfUrl).toURL());
             }
         } catch (Exception e) {
-            LOGGER.debug("Direct Wiley access check failed: {}", e.getMessage());
+            LOGGER.debug("Direct Wiley access check failed: {}", e.getMessage(), e);
         }
         return Optional.empty();
     }

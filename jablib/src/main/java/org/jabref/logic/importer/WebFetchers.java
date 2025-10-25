@@ -230,6 +230,7 @@ public class WebFetchers {
         fetchers.add(new ResearchGate(importFormatPreferences));
         // OpenAlex provides OA locations and direct PDF links via its API
         fetchers.add(new OpenAlex());
+        fetchers.add(new EuropePmcFetcher(importerPreferences));
         return fetchers;
     }
 
@@ -244,6 +245,7 @@ public class WebFetchers {
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));
         fetchers.add(new MedlineFetcher(importerPreferences));
+        fetchers.add(new EuropePmcFetcher(importerPreferences));
         return fetchers;
     }
 }
