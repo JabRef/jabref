@@ -100,7 +100,7 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
             }
 
             // DOI
-            if (item.has("publication_year")) {
+            if (item.has("doi")) {
                 entry.setField(StandardField.DOI, item.optString("doi"));
             }
 

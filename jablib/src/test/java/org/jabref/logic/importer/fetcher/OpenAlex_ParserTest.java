@@ -48,4 +48,16 @@ class OpenAlex_ParserTest {
         assertThat(out).hasSize(1);
         assertThat(out.get(0).getField(StandardField.TITLE)).hasValue("Only");
     }
+
+    @Test
+    void parsesDoiWithoutYear() throws Exception {
+        // Regression test: ensure DOI field condition checks item.has("doi") instead of item.has("publication_year")
+        String json = """
+          {"type":"article","title":"T2","doi":"10.1/xyz","id":"https://openalex.org/W3"}
+        """;
+        Parser p = new OpenAlex().getParser();
+        List<BibEntry> out = p.parseEntries(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
+        assertThat(out).hasSize(1);
+        assertThat(out.get(0).getField(StandardField.DOI)).hasValue("10.1/xyz");
+    }
 }
