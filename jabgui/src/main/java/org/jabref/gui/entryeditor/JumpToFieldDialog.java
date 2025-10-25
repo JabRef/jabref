@@ -57,7 +57,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
 
         if (selectedField != null && !selectedField.isEmpty()) {
             String fieldToJumpTo = selectedField.toLowerCase();
-            entryEditor.jumpToField(fieldToJumpTo);
+            entryEditor.selectField(fieldToJumpTo);
         }
     }
 }

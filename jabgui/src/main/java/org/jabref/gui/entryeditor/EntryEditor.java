@@ -249,7 +249,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         event.consume();
                         break;
                     case JUMP_TO_FIELD:
-                        showJumpToFieldDialog();
+                        selectFieldDialog();
                         event.consume();
                         break;
                     case HELP:
@@ -272,7 +272,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
     }
 
-    public void showJumpToFieldDialog() {
+    public void selectFieldDialog() {
         if (getCurrentlyEditedEntry() == null) {
             return;
         }
@@ -520,7 +520,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(currentlyEditedEntry, fetcher);
     }
 
-    public void jumpToField(String fieldName) {
+    public void selectField(String fieldName) {
         setFocusToField(org.jabref.model.entry.field.FieldFactory.parseField(fieldName));
     }
 
