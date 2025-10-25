@@ -416,7 +416,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
         try {
             // Query Europe PMC for this DOI to check if there's an OA version
             String queryUrl = "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:" +
-                             doi.toString() + "&resultType=core&format=json";
+                    doi.toString() + "&resultType=core&format=json";
             URLDownload download = new URLDownload(queryUrl);
             String response = download.asString();
 
