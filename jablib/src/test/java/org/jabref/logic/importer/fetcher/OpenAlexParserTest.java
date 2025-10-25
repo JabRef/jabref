@@ -1,4 +1,3 @@
-// jablib/src/test/java/org/jabref/logic/importer/fetcher/OpenAlex_ParserTest.java
 package org.jabref.logic.importer.fetcher;
 
 import org.jabref.logic.importer.Parser;
@@ -9,10 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-class OpenAlex_ParserTest {
+class OpenAlexParserTest {
 
     @Test
     void parsesResultsArray() throws Exception {
@@ -25,17 +25,23 @@ class OpenAlex_ParserTest {
              "concepts":[{"display_name":"ML"},{"display_name":"NLP"}]
             }]}
         """;
+
         Parser p = new OpenAlex().getParser();
         List<BibEntry> out = p.parseEntries(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
-        assertThat(out).hasSize(1);
+
+        assertNotNull(out, "Output list should not be null");
+        assertEquals(1, out.size(), "Should parse exactly one entry");
+
         BibEntry e = out.get(0);
-        assertThat(e.getType().getName()).isEqualTo("article");
-        assertThat(e.getField(StandardField.TITLE)).hasValue("T1");
-        assertThat(e.getField(StandardField.DOI)).hasValue("10.1/abc");
-        assertThat(e.getField(StandardField.URL)).hasValue("https://openalex.org/W1");
-        assertThat(e.getField(StandardField.AUTHOR)).hasValue("A1 and A2");
-        assertThat(e.getField(StandardField.PAGES)).hasValue("1--10");
-        assertThat(e.getField(StandardField.KEYWORDS)).hasValue("ML, NLP");
+        assertNotNull(e.getType(), "Entry type should not be null");
+        assertEquals("article", e.getType().getName());
+
+        assertEquals(Optional.of("T1"), e.getField(StandardField.TITLE));
+        assertEquals(Optional.of("10.1/abc"), e.getField(StandardField.DOI));
+        assertEquals(Optional.of("https://openalex.org/W1"), e.getField(StandardField.URL));
+        assertEquals(Optional.of("A1 and A2"), e.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("1--10"), e.getField(StandardField.PAGES));
+        assertEquals(Optional.of("ML, NLP"), e.getField(StandardField.KEYWORDS));
     }
 
     @Test
@@ -43,21 +49,29 @@ class OpenAlex_ParserTest {
         String json = """
           {"type":"article","title":"Only","publication_year":2022,"id":"https://openalex.org/W2"}
         """;
+
         Parser p = new OpenAlex().getParser();
         List<BibEntry> out = p.parseEntries(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
-        assertThat(out).hasSize(1);
-        assertThat(out.get(0).getField(StandardField.TITLE)).hasValue("Only");
+
+        assertNotNull(out, "Output list should not be null");
+        assertEquals(1, out.size(), "Should parse exactly one entry");
+
+        assertEquals(Optional.of("Only"), out.get(0).getField(StandardField.TITLE));
     }
 
     @Test
     void parsesDoiWithoutYear() throws Exception {
-        // Regression test: ensure DOI field condition checks item.has("doi") instead of item.has("publication_year")
+        // Regression test: ensure DOI field is correctly set even without publication_year
         String json = """
           {"type":"article","title":"T2","doi":"10.1/xyz","id":"https://openalex.org/W3"}
         """;
+
         Parser p = new OpenAlex().getParser();
         List<BibEntry> out = p.parseEntries(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
-        assertThat(out).hasSize(1);
-        assertThat(out.get(0).getField(StandardField.DOI)).hasValue("10.1/xyz");
+
+        assertNotNull(out, "Output list should not be null");
+        assertEquals(1, out.size(), "Should parse exactly one entry");
+
+        assertEquals(Optional.of("10.1/xyz"), out.get(0).getField(StandardField.DOI));
     }
 }
