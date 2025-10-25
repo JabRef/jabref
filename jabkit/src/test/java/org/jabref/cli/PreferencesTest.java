@@ -15,7 +15,7 @@ public class PreferencesTest extends AbstractJabKitTest {
     @Test
     void preferencesWithoutSubcommandDoesNotFail() {
         int exitCode = commandLine.execute("preferences");
-        
+
         // Command executes successfully even without subcommand (just shows help)
         assertTrue(exitCode == 0 || exitCode == 1);
     }
@@ -25,7 +25,7 @@ public class PreferencesTest extends AbstractJabKitTest {
         int exitCode = commandLine.execute("preferences", "import");
 
         String error = getErrorOutput();
-        
+
         // Command fails because inner class cannot be instantiated
         assertNotEquals(0, exitCode);
         assertTrue(error.contains("Cannot instantiate"));
@@ -36,7 +36,7 @@ public class PreferencesTest extends AbstractJabKitTest {
         int exitCode = commandLine.execute("preferences", "export");
 
         String error = getErrorOutput();
-        
+
         // Command fails because inner class cannot be instantiated
         assertNotEquals(0, exitCode);
         assertTrue(error.contains("Cannot instantiate"));

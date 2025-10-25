@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParserFetcher, FulltextFetcher, CustomizableKeyFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);
     private static final String WILEY_TDM_API_URL = "https://api.wiley.com/onlinelibrary/tdm/v1/articles/";
-    
+
     @Nullable
     private final ImporterPreferences importerPreferences;
 
@@ -350,25 +350,25 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
         if (tdmResult.isPresent()) {
             return tdmResult;
         }
-        
+
         // Second try: Check Europe PMC for open access version
         Optional<URL> openAccessResult = tryEuropePmcOpenAccess(doi);
         if (openAccessResult.isPresent()) {
             LOGGER.info("Found open access version of Wiley article via Europe PMC: {}", doi);
             return openAccessResult;
         }
-        
+
         // Third try: Check if Wiley has made it freely available
         Optional<URL> directWileyResult = tryDirectWileyAccess(doi);
         if (directWileyResult.isPresent()) {
             LOGGER.info("Found freely available Wiley article: {}", doi);
             return directWileyResult;
         }
-        
+
         LOGGER.debug("No fulltext found for Wiley DOI: {}", doi);
         return Optional.empty();
     }
-    
+
     /**
      * Attempts to fetch fulltext from Wiley TDM API using authentication token.
      *
@@ -379,7 +379,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
         if (importerPreferences == null) {
             return Optional.empty();
         }
-        
+
         Optional<String> apiKey = importerPreferences.getApiKey(getName());
         if (apiKey.isEmpty()) {
             return Optional.empty();
@@ -388,24 +388,24 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
         try {
             String apiUrl = WILEY_TDM_API_URL + doi.toString();
             LOGGER.debug("Trying Wiley TDM API: {}", apiUrl);
-            
+
             URLDownload download = new URLDownload(apiUrl);
             download.addHeader("Wiley-TDM-Client-Token", apiKey.get());
             download.addHeader("Accept", "application/pdf");
-            
+
             try {
                 download.asInputStream().close(); // Test the connection
             } catch (FetcherException e) {
                 return Optional.empty();
             }
-            
+
             return Optional.of(new URI(apiUrl).toURL());
         } catch (IOException | URISyntaxException e) {
             LOGGER.debug("Wiley TDM API failed: {}", e.getMessage(), e);
             return Optional.empty();
         }
     }
-    
+
     /**
      * Searches Europe PMC for open access versions of Wiley articles.
      *
@@ -415,11 +415,11 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
     private Optional<URL> tryEuropePmcOpenAccess(DOI doi) {
         try {
             // Query Europe PMC for this DOI to check if there's an OA version
-            String queryUrl = "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:" + 
+            String queryUrl = "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:" +
                              doi.toString() + "&resultType=core&format=json";
             URLDownload download = new URLDownload(queryUrl);
             String response = download.asString();
-            
+
             // Parse and check for fulltext URLs in the response
             JSONObject json = new JSONObject(response);
             if (json.has("resultList")) {
@@ -437,7 +437,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
         }
         return Optional.empty();
     }
-    
+
     /**
      * Attempts direct access to Wiley PDF URLs for freely available articles.
      * Some Wiley articles are made freely available without requiring authentication.
@@ -451,7 +451,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
             String pdfUrl = "https://onlinelibrary.wiley.com/doi/pdf/" + doi.toString();
             URLDownload download = new URLDownload(pdfUrl);
             download.addHeader("Accept", "application/pdf");
-            
+
             // Try to check if PDF is accessible
             Optional<String> contentType = download.getMimeType();
             if (contentType.isPresent() && contentType.get().contains("pdf")) {
