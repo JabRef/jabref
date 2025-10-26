@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests INSPIREFetcher's ID-based search and routing logic.
@@ -86,13 +86,13 @@ class INSPIREFetcherIdBasedAndRoutingTest {
         TestableINSPIREFetcher fetcher = new TestableINSPIREFetcher(prefs, testParser);
 
         // Test arXiv ID - should be recognized and return result
-        assertThat(fetcher.performSearchById("arXiv:2101.00001")).isPresent();
+        assertTrue(fetcher.performSearchById("arXiv:2101.00001").isPresent());
 
         // Test DOI - should be recognized and return result
-        assertThat(fetcher.performSearchById("10.1145/123456")).isPresent();
+        assertTrue(fetcher.performSearchById("10.1145/123456").isPresent());
 
         // Test invalid ID - should return empty
-        assertThat(fetcher.performSearchById("not-an-id")).isEmpty();
+        assertTrue(fetcher.performSearchById("not-an-id").isEmpty());
     }
 
     @Test
@@ -111,16 +111,16 @@ class INSPIREFetcherIdBasedAndRoutingTest {
         var arxiv = new BibEntry();
         arxiv.setField(StandardField.ARCHIVEPREFIX, "arXiv");
         arxiv.setField(StandardField.EPRINT, "2101.00001");
-        assertThat(fetcher.performSearch(arxiv)).hasSize(1);
+        assertEquals(1, fetcher.performSearch(arxiv).size());
 
         // Test DOI - should route successfully
         var doi = new BibEntry();
         doi.setField(StandardField.DOI, "10.1000/abc");
-        assertThat(fetcher.performSearch(doi)).hasSize(1);
+        assertEquals(1, fetcher.performSearch(doi).size());
 
         // Test entry without ID - should return empty list
         var none = new BibEntry();
-        assertThat(fetcher.performSearch(none)).isEmpty();
+        assertTrue(fetcher.performSearch(none).isEmpty());
     }
 }
 

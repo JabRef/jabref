@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests the arXiv routing logic of CompositeIdFetcher.
@@ -124,8 +124,9 @@ class CompositeIdFetcherArxivRouteTest {
         var out = fetcher.performSearchById("arXiv:2101.00001");
         
         // Verify: should return INSPIRE's result, should not try ArXiv
-        assertThat(out).contains(hit);
-        assertThat(fetcher.wasArxivFetcherCreated()).isFalse();
+        assertTrue(out.isPresent());
+        assertEquals(hit, out.get());
+        assertFalse(fetcher.wasArxivFetcherCreated());
     }
 
     @Test
@@ -151,8 +152,9 @@ class CompositeIdFetcherArxivRouteTest {
         var out = fetcher.performSearchById("arXiv:2101.00001");
         
         // Verify: should return ArXiv's result (fallback)
-        assertThat(out).contains(fallback);
-        assertThat(fetcher.wasArxivFetcherCreated()).isTrue();
+        assertTrue(out.isPresent());
+        assertEquals(fallback, out.get());
+        assertTrue(fetcher.wasArxivFetcherCreated());
     }
 
     @Test
@@ -176,8 +178,9 @@ class CompositeIdFetcherArxivRouteTest {
         var out = fetcher.performSearchById("arXiv:2101.00001");
         
         // Verify: should return ArXiv's result (fallback)
-        assertThat(out).contains(fallback);
-        assertThat(fetcher.wasArxivFetcherCreated()).isTrue();
+        assertTrue(out.isPresent());
+        assertEquals(fallback, out.get());
+        assertTrue(fetcher.wasArxivFetcherCreated());
     }
 }
 

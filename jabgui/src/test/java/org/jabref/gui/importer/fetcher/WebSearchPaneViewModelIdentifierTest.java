@@ -1,4 +1,3 @@
-// src/test/java/org/jabref/gui/importer/fetcher/WebSearchPaneViewModel_IdentifierTest.java
 package org.jabref.gui.importer.fetcher;
 
 import org.jabref.gui.DialogService;
@@ -7,7 +6,7 @@ import org.jabref.logic.preferences.GuiPreferences;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class WebSearchPaneViewModelIdentifierTest {
@@ -30,8 +29,8 @@ class WebSearchPaneViewModelIdentifierTest {
     void detectsIdentifierType(String input, String expected) {
         var vm = vm();
         vm.queryProperty().set(input);
-        assertThat(vm.isIdentifierDetected()).isTrue();
-        assertThat(vm.getDetectedIdentifierType()).isEqualTo(expected);
+        assertTrue(vm.isIdentifierDetected());
+        assertEquals(expected, vm.getDetectedIdentifierType());
     }
 }
 
