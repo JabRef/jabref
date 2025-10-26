@@ -253,6 +253,7 @@ open module org.jabref.jablib {
     requires cuid;
     requires dd.plist;
     requires io.github.adr;
+    requires textFormatter;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;

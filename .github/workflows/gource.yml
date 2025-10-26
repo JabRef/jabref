@@ -73,7 +73,7 @@ jobs:
           mv ./gource/gource.mp4 ${{ matrix.file }}
 
       - name: Upload gource video
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Gource-${{ matrix.file }}
           path: ${{ matrix.file }}

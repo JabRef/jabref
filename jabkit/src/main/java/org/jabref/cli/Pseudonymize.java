@@ -41,8 +41,8 @@ public class Pseudonymize implements Runnable {
     @Option(names = {"--output"}, converter = CygWinPathConverter.class, description = "Output pseudo-bib file")
     private Path outputFile;
 
-    @Option(names = {"--key"}, description = "Output pseudo-keys file")
-    private String keyFile;
+    @Option(names = {"--key"}, converter = CygWinPathConverter.class, description = "Output pseudo-keys file")
+    private Path keyFile;
 
     @Option(names = {"-f", "--force"}, description = "Overwrite output file(s) if any exist(s)")
     private boolean force;
@@ -50,7 +50,7 @@ public class Pseudonymize implements Runnable {
     @Override
     public void run() {
         String fileName = FileUtil.getBaseName(inputPath);
-        Path pseudoBibPath = resolveOutputPath(outputFile.toString(), inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
+        Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
         Path pseudoKeyPath = resolveOutputPath(keyFile, inputPath, fileName + PSEUDO_SUFFIX + CSV_EXTENSION);
 
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
@@ -96,8 +96,8 @@ public class Pseudonymize implements Runnable {
         }
     }
 
-    private Path resolveOutputPath(String customPath, Path inputPath, String defaultFileName) {
-        return customPath != null ? Path.of(customPath) : inputPath.getParent().resolve(defaultFileName);
+    private Path resolveOutputPath(Path customPath, Path inputPath, String defaultFileName) {
+        return customPath != null ? customPath : inputPath.toAbsolutePath().getParent().resolve(defaultFileName);
     }
 
     private boolean fileOverwriteCheck(Path filePath) {

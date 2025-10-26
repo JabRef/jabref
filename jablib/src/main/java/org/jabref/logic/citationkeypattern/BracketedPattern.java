@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * <code>2017_Kitsune_123</code> when expanded using the BibTeX entry <code>@Article{ authors = {O. Kitsune}, year = {2017},
  * pages={123-6}}</code>.
  * <p>
- * The embedding in JabRef is explained at <a href="https://docs.jabref.org/setup/citationkeypattern">Customize the citation key generator</a>.
+ * The embedding in JabRef is explained at <a href="https://docs.jabref.org/setup/citationkeypatterns">Customize the citation key generator</a>.
  * </p>
  */
 public class BracketedPattern {
@@ -807,7 +807,8 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the surname of an author/editor
      */
-    private static String lastAuthor(AuthorList authorList) {
+    @VisibleForTesting
+    static String lastAuthor(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -1221,7 +1222,7 @@ public class BracketedPattern {
 
     /**
      * <p>
-     * An author or editor may be and institution not a person. In that case the key generator builds very long keys,
+     * An author or editor may be an institution not a person. In that case the key generator builds very long keys,
      * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
      * </p>
      *
