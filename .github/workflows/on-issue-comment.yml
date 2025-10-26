@@ -32,7 +32,7 @@ jobs:
 
 
             For questions on JabRef functionality, you can consult the [JabRef Guru](https://gurubase.io/g/jabref).
-            For code questions, please start using [DeepWiki](https://deepwiki.com/JabRef/jabref).
+            For questions related to the codebase, please start using [DeepWiki](https://deepwiki.com/JabRef/jabref).
 
 
             In case you encounter failing tests during development, please check our [developer FAQs](https://devdocs.jabref.org/code-howtos/faq.html)!
