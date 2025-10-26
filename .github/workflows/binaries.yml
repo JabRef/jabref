@@ -147,7 +147,7 @@ jobs:
             displayName: linux-arm
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04-arm jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04-arm/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04-arm/jabkit
-            archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04-arm jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04-arm/jabls-cli-portable_linux_arm64.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04-arm/jabls
+            archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04-arm jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04-arm/jabls-portable_linux_arm64.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04-arm/jabls
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
           - os: windows-latest
