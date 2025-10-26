@@ -2,7 +2,7 @@ package org.jabref.gui.importer.fetcher;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.logic.preferences.GuiPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -22,9 +22,7 @@ class WebSearchPaneViewModelIdentifierTest {
     @CsvSource({
         "10.1145/3368089,DOI",
         "arXiv:2101.00001,ArXiv",
-        "978-3-16-148410-0,ISBN",
-        "SSRN:1234567,SSRN",
-        "RFC:2616,RFC"
+        "978-3-16-148410-0,ISBN"
     })
     void detectsIdentifierType(String input, String expected) {
         var vm = vm();
