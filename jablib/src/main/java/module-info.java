@@ -109,7 +109,6 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git;
     exports org.jabref.logic.git.conflicts;
     exports org.jabref.logic.git.io;
-    exports org.jabref.logic.git.merge;
     exports org.jabref.logic.git.model;
     exports org.jabref.logic.git.status;
     exports org.jabref.logic.command;
@@ -117,6 +116,9 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.preferences;
     exports org.jabref.logic.icore;
     exports org.jabref.model.icore;
+    exports org.jabref.logic.git.merge.planning;
+    exports org.jabref.logic.git.merge.execution;
+    exports org.jabref.model.sciteTallies;
 
     requires java.base;
 
@@ -251,6 +253,7 @@ open module org.jabref.jablib {
     requires cuid;
     requires dd.plist;
     requires io.github.adr;
+    requires textFormatter;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;
@@ -258,5 +261,6 @@ open module org.jabref.jablib {
     requires org.jooq.jool;
     requires org.libreoffice.uno;
     requires transitive org.jspecify;
+    requires com.fasterxml.jackson.datatype.jdk8;
     // endregion
 }
