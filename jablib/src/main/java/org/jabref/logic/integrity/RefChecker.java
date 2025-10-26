@@ -15,6 +15,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.identifier.DOI;
 
+import com.google.common.base.Objects;
+
 /**
  * Validates a BibEntry depending on if it
  * is consistent with the fetched Entry
@@ -36,14 +38,13 @@ public class RefChecker {
             ArXivFetcher arXivFetcher,
             CrossRef crossRef,
             DuplicateCheck duplicateCheck) {
-        this.parser = parser;
         this.doiFetcher = doiFetcher;
         this.arxivFetcher = arXivFetcher;
         this.crossRef = crossRef;
         this.duplicateCheck = duplicateCheck;
     }
 
-    private ReferenceValidity referenceValidityOfEntry(BibEntry entry) throws FetcherException {
+    public ReferenceValidity referenceValidityOfEntry(BibEntry entry) throws FetcherException {
         return validityFromDoiFetcher(entry).lazyOr(() ->
                 validityFromCrossRef(entry)
         ).lazyOr(() -> validityFromArxiv(entry));
@@ -101,7 +102,7 @@ public class RefChecker {
         ReferenceValidity get() throws FetcherException;
     }
 
-    public abstract sealed class ReferenceValidity permits Real, Unsure, Fake {
+    public static abstract sealed class ReferenceValidity permits Real, Unsure, Fake {
 
         public ReferenceValidity or(ReferenceValidity other) {
             if (this instanceof Real || other instanceof Fake) {
@@ -122,15 +123,30 @@ public class RefChecker {
         }
     }
 
-    public final class Real extends ReferenceValidity {
+    public static final class Real extends ReferenceValidity {
         BibEntry matchingReference;
 
         public Real(BibEntry matchingReference) {
             this.matchingReference = matchingReference;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            Real real = (Real) o;
+            return Objects.equal(matchingReference, real.matchingReference);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(matchingReference);
+        }
     }
 
-    public final class Unsure extends ReferenceValidity {
+    public static final class Unsure extends ReferenceValidity {
         List<BibEntry> matchingReferences;
 
         public Unsure(BibEntry matchingReference) {
@@ -142,8 +158,26 @@ public class RefChecker {
         void addAll(Unsure other) {
             this.matchingReferences.addAll(other.matchingReferences);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            Unsure unsure = (Unsure) o;
+            return Objects.equal(matchingReferences, unsure.matchingReferences);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(matchingReferences);
+        }
     }
 
-    public final class Fake extends ReferenceValidity {
+    public static final class Fake extends ReferenceValidity {
+        public boolean equals(Object o) {
+            return o.getClass() == Fake.class;
+        }
     }
 }
