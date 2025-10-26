@@ -1,7 +1,10 @@
 package org.jabref.logic.integrity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.database.DuplicateCheck;
@@ -10,12 +13,12 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.plaincitation.PlainCitationParser;
+import org.jabref.logic.importer.plaincitation.SeveralPlainCitationParser;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.identifier.DOI;
-
-import com.google.common.base.Objects;
 
 /**
  * Validates a BibEntry depending on if it
@@ -89,6 +92,20 @@ public class RefChecker {
         ).orElse(new Fake());
     }
 
+    public Map<BibEntry, ReferenceValidity> validateListOfEntries(List<BibEntry> entries) throws FetcherException {
+
+        Map<BibEntry, ReferenceValidity> entriesToValidity = new HashMap<>();
+        for (BibEntry entry : entries) {
+            entriesToValidity.put(entry, referenceValidityOfEntry(entry));
+        }
+        return entriesToValidity;
+    }
+
+    public Map<BibEntry, ReferenceValidity> parseListAndValidate(String input, PlainCitationParser parser) throws FetcherException {
+        SeveralPlainCitationParser citationParser = new SeveralPlainCitationParser(parser);
+        return validateListOfEntries(citationParser.parseSeveralPlainCitations(input));
+    }
+
     private ReferenceValidity compareReferences(BibEntry original, BibEntry trueEntry) {
         if (duplicateCheck.isDuplicate(original, trueEntry, BibDatabaseMode.BIBTEX)) {
             return new Real(trueEntry);
@@ -137,7 +154,7 @@ public class RefChecker {
             if (o == null || getClass() != o.getClass())
                 return false;
             Real real = (Real) o;
-            return Objects.equal(matchingReference, real.matchingReference);
+            return Objects.equals(matchingReference, real.matchingReference);
         }
 
         @Override
@@ -166,7 +183,7 @@ public class RefChecker {
             if (o == null || getClass() != o.getClass())
                 return false;
             Unsure unsure = (Unsure) o;
-            return Objects.equal(matchingReferences, unsure.matchingReferences);
+            return Objects.equals(matchingReferences, unsure.matchingReferences);
         }
 
         @Override
