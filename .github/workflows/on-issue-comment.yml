@@ -25,7 +25,7 @@ jobs:
 
 
             We're excited to have you on board.
-            Start by exploring our [Contributing](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) guidelines, and don't forget to check out our [workspace setup guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) to get started smoothly.
+            Start by exploring our [Contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), and set up your local development workspace by following the steps in our [workspace setup guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) to get started smoothly.
 
 
             Remember that you can ask the [JabRef Guru](https://gurubase.io/g/jabref) or  about anything regarding JabRef.
