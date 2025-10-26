@@ -1,4 +1,4 @@
-package org.jabref.logic.git.merge.util;
+package org.jabref.logic.git.merge.planning.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import static org.jabref.logic.git.merge.util.MergeFieldUtil.isMetaField;
+import static org.jabref.logic.git.merge.planning.util.MergeFieldUtil.isMetaField;
 
 public final class FieldPatchComputer {
     private static final BibEntry EMPTY_ENTRY = new BibEntry(StandardEntryType.Article);

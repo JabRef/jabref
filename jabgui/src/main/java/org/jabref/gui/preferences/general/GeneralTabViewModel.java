@@ -285,13 +285,13 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         });
 
         UiMessageHandler uiMessageHandler = Injector.instantiateModelOrService(UiMessageHandler.class);
+        CLIMessageHandler messageHandler = new CLIMessageHandler(uiMessageHandler, preferences);
         RemoteListenerServerManager remoteListenerServerManager = Injector.instantiateModelOrService(RemoteListenerServerManager.class);
         // stop in all cases, because the port might have changed
         remoteListenerServerManager.stop();
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences),
+            remoteListenerServerManager.openAndStart(messageHandler,
                     remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
@@ -327,7 +327,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         languageServerController.stop();
         if (enableLanguageServerProperty.getValue()) {
             remotePreferences.setEnableLanguageServer(true);
-            languageServerController.start(remotePreferences.getLanguageServerPort());
+            languageServerController.start(messageHandler, remotePreferences.getLanguageServerPort());
         } else {
             remotePreferences.setEnableLanguageServer(false);
             languageServerController.stop();
