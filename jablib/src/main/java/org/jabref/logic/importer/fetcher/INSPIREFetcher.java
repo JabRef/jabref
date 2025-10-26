@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,21 +64,9 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     // Timeout configuration (in milliseconds)
     private static final int CONNECT_TIMEOUT_MS = 10000; // 10 seconds
 
-    private static final String ERROR_MESSAGE_TEMPLATE =
-        "Failed to fetch from INSPIRE using %s after %d attempts.\n" +
-        "Possible causes:\n" +
-        "- Network connection issue\n" +
-        "- INSPIRE service temporarily unavailable\n" +
-        "- Invalid identifier format\n" +
-        "Please check your internet connection and try again.";
-
-    private final ImportFormatPreferences importFormatPreferences;
-
-    private static final int MAX_RETRIES = 3;
-    private static final long RETRY_DELAY_MS = 1000;
     private static final String ERROR_MESSAGE_TEMPLATE = "Failed to fetch from INSPIRE for identifier '%s' after %d attempts.";
 
-    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(INSPIREFetcher.class);
+    private final ImportFormatPreferences importFormatPreferences;
 
     public INSPIREFetcher(ImportFormatPreferences preferences) {
         this.importFormatPreferences = preferences;
@@ -129,17 +118,6 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
             entry.getCitationKey().ifPresent(citationKey ->
                 LOGGER.debug("Post-cleanup citation key: {}", citationKey)
             );
-        }
-    }
-
-    /**
-     * If the BibEntry contains a 'texkeys' field, use it as the citation key and clear the field.
-     */
-    void setTexkeys(BibEntry entry){
-        Optional<String> texkeys = entry.getField(new UnknownField("texkeys"));
-        if (texkeys.isPresent() && !texkeys.get().isBlank()) {
-            entry.setCitationKey(texkeys.get());
-            entry.clearField(new UnknownField("texkeys"));
         }
     }
 
@@ -199,6 +177,9 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         // Apply texkeys extraction - CRITICAL for Issue #12292
         results.forEach(this::setTexkeys);
 
+        // Apply post-processing
+        results.forEach(this::doPostCleanup);
+
         // Validate and log results
         validateResults(results, entry.getCitationKey().orElse("unknown"));
 
@@ -248,9 +229,6 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
                     LOGGER.info("Successfully fetched {} entries from INSPIRE for [{}]",
                                results.size(), identifier);
                 }
-
-                // Apply post-processing
-                results.forEach(this::doPostCleanup);
                 return results;
 
             } catch (ParseException | FetcherException e) {
@@ -341,34 +319,35 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     }
 
     /**
-     * Extracts texkeys from INSPIRE API response and sets it as citation key.
-     * INSPIRE returns texkeys in a temporary field that needs to be extracted,
-     * set as the citation key, and then cleaned up.
+     * Extract texkeys and set as citation key.
      *
-     * This is a critical part of Issue #12292 fix - ensuring INSPIRE's standard
-     * texkeys are properly applied to entries fetched via arXiv identifiers.
+     * A critical part of Issue #12292 fix - ensuring INSPIRE's
+     * texkeys are used for entries fetched via arXiv identifiers.
      *
-     * @param entry The BibEntry to process
+     * @param entry The BibEntry to be processed
      */
-    private void setTexkeys(BibEntry entry) {
-        Optional<String> texkeys = entry.getField(new UnknownField("texkeys"));
-        
-        if (texkeys.isPresent() && !texkeys.get().isBlank()) {
-            // INSPIRE may return multiple texkeys separated by commas
-            // Take the first one as the primary citation key
-            String firstTexkey = texkeys.get().split(",")[0].trim();
-            
+    void setTexkeys(BibEntry entry) {
+        // Get texkeys from entry
+        Optional<String> texkey = entry.getField(new UnknownField("texkeys"));
+        if (texkey.isPresent() && !texkey.get().isBlank()) {
+            // There may be multiple texkeys separated by commas
+            // Take the first non-empty one (if any) as the citation key
+            String firstTexkey = Arrays.stream(texkey.get().split(","))
+                                       .map(String::trim)
+                                       .filter(s -> !s.isEmpty())
+                                       .findFirst()
+                                       .orElse("");
+            // If texkey exists
             if (!firstTexkey.isEmpty()) {
                 entry.setCitationKey(firstTexkey);
                 LOGGER.debug("Set citation key from INSPIRE texkeys: '{}'", firstTexkey);
-                
-                // Log if there were multiple texkeys
-                if (texkeys.get().contains(",")) {
-                    LOGGER.debug("INSPIRE provided multiple texkeys, using first: '{}'", firstTexkey);
+
+                // Log if there were multiple texkeys (yet may have empty ones)
+                if (texkey.get().contains(",")) {
+                    LOGGER.debug("INSPIRE provided multiple texkeys, using first available one: '{}'", firstTexkey);
                 }
             }
-            
-            // Clean up the temporary texkeys field to avoid showing it in the UI
+            // Clean up the temporary texkeys field
             entry.clearField(new UnknownField("texkeys"));
         } else {
             LOGGER.debug("No texkeys field found in INSPIRE response for entry");
