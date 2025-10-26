@@ -40,4 +40,12 @@ public class MarkdownEditor extends SimpleEditor {
     public void setEditable(boolean isEditable) {
         getTextInput().setEditable(isEditable);
     }
+    public TextInputControl getTextInputControl() {
+        return getTextInput();
+    }
+
+    public void insertText(int position, String text) {
+        getTextInput().insertText(position, text);
+    }
+    
 }

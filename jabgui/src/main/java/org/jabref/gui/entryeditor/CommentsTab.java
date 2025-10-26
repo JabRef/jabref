@@ -1,7 +1,9 @@
 package org.jabref.gui.entryeditor;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -13,12 +15,15 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.control.Button;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.fieldeditors.MarkdownEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -33,14 +38,24 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.entry.LinkedFile;
+
+
 public class CommentsTab extends FieldsEditorTab {
     public static final String NAME = "Comments";
+    private final GuiPreferences preferences;
 
     private final String defaultOwner;
     private final UserSpecificCommentField userSpecificCommentField;
     private final EntryEditorPreferences entryEditorPreferences;
     private boolean isFieldCurrentlyVisible;
     private boolean shouldShowHideButton;
+
 
     public CommentsTab(GuiPreferences preferences,
                        UndoManager undoManager,
@@ -58,6 +73,7 @@ public class CommentsTab extends FieldsEditorTab {
                 stateManager,
                 previewPanel);
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
+        this.preferences = preferences;
         setText(Localization.lang("Comments"));
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
 
@@ -129,6 +145,54 @@ public class CommentsTab extends FieldsEditorTab {
             boolean isDefaultOwnerComment = field.equals(userSpecificCommentField);
             boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;
             editor.setEditable(shouldBeEnabled);
+
+            editor.setOnDragOver(event -> {
+                if (event.getDragboard().hasFiles()) {
+                    event.acceptTransferModes(TransferMode.COPY);
+                }
+                event.consume();
+            });
+
+            editor.setOnDragDropped(event -> {
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+
+                if (db.hasFiles()) {
+                    List<File> files = db.getFiles();
+                    if (!files.isEmpty()) {
+                        File file = files.get(0);
+
+                        Optional<Path> fileDir = bibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+
+                        if (fileDir.isEmpty()) {
+                            System.err.println("No file directory found. Cannot copy file.");
+                        } else {
+                            Path destinationPath = fileDir.get().resolve(file.getName());
+
+                            try {
+                                FileUtil.copyFile(file.toPath(), destinationPath, false);
+
+                                List<Path> fileDirectories = bibDatabaseContext.getFileDirectories(preferences.getFilePreferences());
+                                ExternalApplicationsPreferences externalAppPrefs = preferences.getExternalApplicationsPreferences();
+
+                                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destinationPath, fileDirectories, externalAppPrefs);
+
+                                String relativePath = newLinkedFile.getLink();
+
+                                String markdownLink = "![](" + relativePath + ")";
+                                editor.insertText(editor.getTextInputControl().getCaretPosition(), markdownLink);
+                                success = true;
+
+                            } catch (IOException e) {
+                                System.err.println("Error copying file: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            });
         }
 
         if (entryEditorPreferences.shouldShowUserCommentsFields()) {
