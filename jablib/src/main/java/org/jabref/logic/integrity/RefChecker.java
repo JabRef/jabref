@@ -62,11 +62,11 @@ public class RefChecker {
                     .orElse(new Fake());
     }
 
-    private ReferenceValidity validityFromDoiFetcher(BibEntry entry) throws FetcherException {
+    public ReferenceValidity validityFromDoiFetcher(BibEntry entry) throws FetcherException {
         return validityFromFetcher(entry, doiFetcher);
     }
 
-    private ReferenceValidity validityFromCrossRef(BibEntry entry) throws FetcherException {
+    public ReferenceValidity validityFromCrossRef(BibEntry entry) throws FetcherException {
         Optional<DOI> doiFound = crossRef.findIdentifier(entry);
 
         if (doiFound.isEmpty()) {
@@ -79,7 +79,7 @@ public class RefChecker {
         }
     }
 
-    private ReferenceValidity validityFromArxiv(BibEntry entry) throws FetcherException {
+    public ReferenceValidity validityFromArxiv(BibEntry entry) throws FetcherException {
 
         var m = arxivFetcher.findIdentifier(entry);
         if (m.isEmpty()) {
