@@ -42,7 +42,7 @@
             </rowConstraints>
             <Label text="%Application to push entries to"/>
             <SearchableComboBox fx:id="pushToApplicationCombo"
-                                prefWidth="200.0" GridPane.columnIndex="1"/>
+                                prefWidth="200.0" GridPane.columnIndex="1"  editable="false"/>
             <Button styleClass="icon-button,narrow" onAction="#pushToApplicationSettings"
                     prefHeight="20.0" prefWidth="20.0" GridPane.columnIndex="2">
                 <graphic>
