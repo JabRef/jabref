@@ -48,7 +48,11 @@ class CompositeIdFetcherArxivRouteTest {
                     // ignore and fall back to arXiv fetcher
                 }
                 arxivFetcherCreated = true;
-                return testArxivFetcher.performSearchById(arXivIdentifier.get().asString());
+                try {
+                    return testArxivFetcher.performSearchById(arXivIdentifier.get().asString());
+                } catch (FetcherException e) {
+                    throw new RuntimeException(e);
+                }
             }
             return Optional.empty();
         }

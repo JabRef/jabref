@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.net.ProgressInputStream;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -46,8 +47,8 @@ class INSPIREFetcherIdBasedAndRoutingTest {
         }
 
         @Override
-        public InputStream asInputStream() {
-            return new ByteArrayInputStream(new byte[0]);
+        public ProgressInputStream asInputStream() {
+            return new ProgressInputStream(new ByteArrayInputStream(new byte[0]), 0);
         }
     }
 
