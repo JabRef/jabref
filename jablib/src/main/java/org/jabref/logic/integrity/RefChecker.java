@@ -10,7 +10,6 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -21,23 +20,22 @@ import org.jabref.model.entry.identifier.DOI;
  * is consistent with the fetched Entry
  */
 public class RefChecker {
-    PlainCitationParser parser;
     DoiFetcher doiFetcher;
     ArXivFetcher arxivFetcher;
     CrossRef crossRef;
     DuplicateCheck duplicateCheck;
 
-    public RefChecker(PlainCitationParser parser,
-                      DoiFetcher doiFetcher,
-                      ArXivFetcher arXivFetcher) {
-        this(parser, doiFetcher, arXivFetcher, new CrossRef(), new DuplicateCheck(new BibEntryTypesManager()));
+    public RefChecker(
+            DoiFetcher doiFetcher,
+            ArXivFetcher arXivFetcher) {
+        this(doiFetcher, arXivFetcher, new CrossRef(), new DuplicateCheck(new BibEntryTypesManager()));
     }
 
-    public RefChecker(PlainCitationParser parser,
-                      DoiFetcher doiFetcher,
-                      ArXivFetcher arXivFetcher,
-                      CrossRef crossRef,
-                      DuplicateCheck duplicateCheck) {
+    public RefChecker(
+            DoiFetcher doiFetcher,
+            ArXivFetcher arXivFetcher,
+            CrossRef crossRef,
+            DuplicateCheck duplicateCheck) {
         this.parser = parser;
         this.doiFetcher = doiFetcher;
         this.arxivFetcher = arXivFetcher;
