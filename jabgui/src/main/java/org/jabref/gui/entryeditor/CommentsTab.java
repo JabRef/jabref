@@ -161,7 +161,6 @@ public class CommentsTab extends FieldsEditorTab {
                     List<File> files = db.getFiles();
                     if (!files.isEmpty()) {
                         File file = files.get(0);
-
                         Optional<Path> fileDir = bibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
 
                         if (fileDir.isEmpty()) {
@@ -169,23 +168,23 @@ public class CommentsTab extends FieldsEditorTab {
                         } else {
                             Path destinationPath = fileDir.get().resolve(file.getName());
 
-                            try {
-                                FileUtil.copyFile(file.toPath(), destinationPath, false);
+                            // We will assume the method returns 'true' on success
+                            boolean copySuccessful = FileUtil.copyFile(file.toPath(), destinationPath, false);
 
+                            if (copySuccessful) {
                                 List<Path> fileDirectories = bibDatabaseContext.getFileDirectories(preferences.getFilePreferences());
                                 ExternalApplicationsPreferences externalAppPrefs = preferences.getExternalApplicationsPreferences();
 
                                 LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destinationPath, fileDirectories, externalAppPrefs);
 
                                 String relativePath = newLinkedFile.getLink();
-
                                 String markdownLink = "![](" + relativePath + ")";
+
                                 editor.insertText(editor.getTextInputControl().getCaretPosition(), markdownLink);
                                 success = true;
-
-                            } catch (IOException e) {
-                                System.err.println("Error copying file: " + e.getMessage());
-                                e.printStackTrace();
+                            } else {
+                                // The copy failed silently
+                                System.err.println("File copy failed for an unknown reason.");
                             }
                         }
                     }
@@ -194,6 +193,7 @@ public class CommentsTab extends FieldsEditorTab {
                 event.consume();
             });
         }
+
 
         if (entryEditorPreferences.shouldShowUserCommentsFields()) {
             // Show "Hide" button only if user-specific comment field is empty
