@@ -254,6 +254,7 @@ open module org.jabref.jablib {
     requires cuid;
     requires dd.plist;
     requires io.github.adr;
+    requires textFormatter;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;
@@ -261,5 +262,6 @@ open module org.jabref.jablib {
     requires org.jooq.jool;
     requires org.libreoffice.uno;
     requires transitive org.jspecify;
+    requires com.fasterxml.jackson.datatype.jdk8;
     // endregion
 }
