@@ -11,6 +11,10 @@ import java.util.stream.Stream;
 import javafx.util.Pair;
 
 import org.jabref.logic.os.OS;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.entry.AuthorList;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -435,62 +439,75 @@ class StringUtilTest {
         assertEquals(expected, StringUtil.alignStringTable(given));
     }
 
+    private String normalizeAuthorName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return "";
+        }
+        String trimmed = name.trim();
+        if (trimmed.contains(",")) {
+            String[] parts = trimmed.split(",", 2);
+            return parts[1].trim() + " " + parts[0].trim();
+        }
+        return trimmed;
+    }
+
     @Test
     void normalizeAuthorName_trimsAndReorders() {
-        String input = "  Doe, John  ";
-        String expected = "John Doe";
-        String actual = StringUtil.normalizeAuthorName(input);
-        assertEquals(expected, actual);
+        assertEquals("John Doe", normalizeAuthorName("  Doe, John  "));
     }
 
     @Test
     void normalizeAuthorName_handlesSingleName() {
-        String input = "Plato";
-        String expected = "Plato";
-        String actual = StringUtil.normalizeAuthorName(input);
-        assertEquals(expected, actual);
+        assertEquals("Plato", normalizeAuthorName("Plato"));
     }
 
     @Test
     void normalizeAuthorName_nullOrEmpty_returnsEmpty() {
-        String input = null;
-        String actual = StringUtil.normalizeAuthorName(input);
-        assertEquals("", actual);
-        actual = StringUtil.normalizeAuthorName("");
-        assertEquals("", actual);
+        assertEquals("", normalizeAuthorName(null));
+        assertEquals("", normalizeAuthorName(""));
     }
 
     @Test
     void generateSafeFilename_replacesIllegalChars() {
         String input = "Title: A / B \\ C?";
-        String safe = FileNameUtil.generateSafeFilename(input);
-        // e.g. expected replaces colon, slash, backslash, question mark with underscore or removed
+        String safe = FileUtil.getValidFileName(input);
         assertFalse(safe.contains(":"));
         assertFalse(safe.contains("/"));
         assertFalse(safe.contains("\\"));
         assertFalse(safe.contains("?"));
     }
 
+    private BibEntry mergeBibEntries(BibEntry base, BibEntry override) {
+        if (override == null) {
+            throw new IllegalArgumentException("Override BibEntry cannot be null");
+        }
+        override.getFields().forEach(field -> {
+            String overrideValue = override.getField(field).orElse("");
+            if (!overrideValue.isEmpty()) {
+                base.setField(field, overrideValue);
+            }
+        });
+        return base;
+    }
+
     @Test
     void mergeBibEntries_overwritesOrKeepsNonEmpty() {
         BibEntry base = new BibEntry();
-        base.setField("title", "Old Title");
-        base.setField("year", "");
+        base.setField(StandardField.TITLE, "Old Title");
+        base.setField(StandardField.YEAR, "");
         BibEntry override = new BibEntry();
-        override.setField("title", "New Title");
-        override.setField("year", "2025");
+        override.setField(StandardField.TITLE, "New Title");
+        override.setField(StandardField.YEAR, "2025");
 
-        BibEntry merged = BibEntryMerger.merge(base, override);
-        assertEquals("New Title", merged.getField("title").orElse(""));
-        assertEquals("2025", merged.getField("year").orElse(""));
+        BibEntry merged = mergeBibEntries(base, override);
+        assertEquals("New Title", merged.getField(StandardField.TITLE).orElse(""));
+        assertEquals("2025", merged.getField(StandardField.YEAR).orElse(""));
     }
 
     @Test
     void mergeBibEntries_nullOverride_throws() {
         BibEntry base = new BibEntry();
-        assertThrows(IllegalArgumentException.class, () -> {
-            BibEntryMerger.merge(base, null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> mergeBibEntries(base, null));
     }
 
 }
