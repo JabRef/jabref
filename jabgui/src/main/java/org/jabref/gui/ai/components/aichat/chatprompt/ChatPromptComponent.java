@@ -30,6 +30,7 @@ public class ChatPromptComponent extends HBox {
     private final ObjectProperty<Consumer<String>> sendCallback = new SimpleObjectProperty<>();
     private final ObjectProperty<Consumer<String>> retryCallback = new SimpleObjectProperty<>();
     private final ObjectProperty<Runnable> cancelCallback = new SimpleObjectProperty<>();
+    private final ObjectProperty<Runnable> regenerateCallback = new SimpleObjectProperty<>();
 
     private final ListProperty<String> history = new SimpleListProperty<>(FXCollections.observableArrayList());
 
@@ -44,6 +45,7 @@ public class ChatPromptComponent extends HBox {
 
     @FXML private ExpandingTextArea userPromptTextArea;
     @FXML private Button submitButton;
+    @FXML private Button regenerateButton;
 
     public ChatPromptComponent() {
         ViewLoader.view(this)
@@ -66,6 +68,10 @@ public class ChatPromptComponent extends HBox {
 
     public void setCancelCallback(Runnable cancelCallback) {
         this.cancelCallback.set(cancelCallback);
+    }
+
+    public void setRegenerateCallback(Runnable regenerateCallback) {
+        this.regenerateCallback.set(regenerateCallback);
     }
 
     public ListProperty<String> getHistory() {
@@ -174,6 +180,7 @@ public class ChatPromptComponent extends HBox {
         this.getChildren().clear();
         this.getChildren().add(userPromptTextArea);
         this.getChildren().add(submitButton);
+        this.getChildren().add(regenerateButton);
         requestPromptFocus();
     }
 
@@ -189,6 +196,13 @@ public class ChatPromptComponent extends HBox {
 
         if (!userPrompt.isEmpty() && sendCallback.get() != null) {
             sendCallback.get().accept(userPrompt);
+        }
+    }
+
+    @FXML
+    private void onRegenerateMessage() {
+        if (regenerateCallback.get() != null) {
+            regenerateCallback.get().run();
         }
     }
 }

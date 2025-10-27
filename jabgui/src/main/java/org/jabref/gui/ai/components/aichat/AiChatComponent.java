@@ -44,6 +44,7 @@ import com.google.common.annotations.VisibleForTesting;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.data.message.ChatMessageType;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,6 +192,21 @@ public class AiChatComponent extends VBox {
             onSendMessage(userMessage);
         });
 
+        chatPrompt.setRegenerateCallback(() -> {
+            String lastUserPrompt = "";
+            if (!aiChatLogic.getChatHistory().isEmpty()) {
+                lastUserPrompt = getLastUserMessage().singleText();
+                deleteLastMessage();
+                deleteLastMessage();
+            }
+
+            chatPrompt.switchToNormalState();
+            if (!lastUserPrompt.isEmpty()) {
+                onSendMessage(lastUserPrompt);
+            }
+        });
+
+
         chatPrompt.requestPromptFocus();
 
         updatePromptHistory();
@@ -332,6 +348,21 @@ public class AiChatComponent extends VBox {
         if (!aiChatLogic.getChatHistory().isEmpty()) {
             int index = aiChatLogic.getChatHistory().size() - 1;
             aiChatLogic.getChatHistory().remove(index);
+        }
+    }
+
+    private UserMessage getLastUserMessage() {
+        if (!aiChatLogic.getChatHistory().isEmpty() && aiChatLogic.getChatHistory().size() >= 2) {
+            int userMessageIndex = aiChatLogic.getChatHistory().size() - 2;
+            ChatMessage chat = aiChatLogic.getChatHistory().get(userMessageIndex);
+
+            if (chat.type() == ChatMessageType.USER) {
+                return (UserMessage) chat;
+            } else {
+                return new UserMessage("");
+            }
+        } else {
+            return new UserMessage("");
         }
     }
 }
