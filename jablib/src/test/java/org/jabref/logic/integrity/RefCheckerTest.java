@@ -134,6 +134,23 @@ public class RefCheckerTest {
     void findsRealFromArxiv() throws FetcherException {
         RefChecker.ReferenceValidity rv = refChecker.referenceValidityOfEntry(realEntryArxiv);
         assertEquals(RefChecker.Real.class, rv.getClass());
+        assertEquals(RefChecker.Real.class, refChecker.validityFromArxiv(realEntryArxiv).getClass());
+    }
+
+    @Test
+    void validateListOfEntriesTest() throws FetcherException {
+        List<BibEntry> entries = List.of(realEntry, realEntryNoDoi, fakeEntry);
+        var e = refChecker.validateListOfEntries(entries);
+
+        assertEquals(e.size(), 3);
+        assertEquals(e.get(realEntry).getClass(), RefChecker.Real.class);
+        assertEquals(e.get(realEntryNoDoi).getClass(), RefChecker.Real.class);
+        assertEquals(e.get(fakeEntry).getClass(), RefChecker.Fake.class);
+    }
+
+    @Test
+    void parseAndValidateTest() throws FetcherException {
+
     }
 
     @Nested
