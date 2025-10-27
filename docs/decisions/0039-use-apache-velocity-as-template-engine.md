@@ -29,6 +29,7 @@ Implementation decision drivers:
 * Thymeleaf
 * Handlebars (Mustache)
 * Jinja
+* Pebble
 
 ## Decision Outcome
 
