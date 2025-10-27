@@ -159,7 +159,7 @@ public class BooktitleCleanupPanel extends VBox {
     public BooleanProperty cleanupsDisableProperty() {
         return viewModel.cleanupsDisableProperty();
     }
-    
+
     public MapProperty<BooktitleCleanupField, BooktitleCleanupAction> selectedActionsProperty() {
         return viewModel.selectedActionsProperty();
     }
