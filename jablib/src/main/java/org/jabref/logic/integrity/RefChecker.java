@@ -45,6 +45,17 @@ public class RefChecker {
         this.duplicateCheck = duplicateCheck;
     }
 
+    /**
+     * Tries to find the best reference validity
+     * among current ways. If any of the methods signal
+     * that it is real, it returns early.
+     * <p>
+     * DoiFetcher -> CrossRef -> ArxivFetcher
+     *
+     * @param entry entry checking
+     * @return the reference validity
+     * @throws FetcherException any error from fetchers
+     */
     public ReferenceValidity referenceValidityOfEntry(BibEntry entry) throws FetcherException {
         return validityFromDoiFetcher(entry).lazyOr(() ->
                 validityFromCrossRef(entry)
@@ -62,10 +73,24 @@ public class RefChecker {
                     .orElse(new Fake());
     }
 
+    /**
+     * Tests validity only from the DoiFetcher.
+     *
+     * @param entry the entry
+     * @return the reference validity
+     * @throws FetcherException the fetcher exception
+     */
     public ReferenceValidity validityFromDoiFetcher(BibEntry entry) throws FetcherException {
         return validityFromFetcher(entry, doiFetcher);
     }
 
+    /**
+     * Validity only from the CrossRef and later from the DoiFetcher.
+     *
+     * @param entry the entry
+     * @return the reference validity
+     * @throws FetcherException the fetcher exception
+     */
     public ReferenceValidity validityFromCrossRef(BibEntry entry) throws FetcherException {
         Optional<DOI> doiFound = crossRef.findIdentifier(entry);
 
@@ -79,6 +104,13 @@ public class RefChecker {
         }
     }
 
+    /**
+     * Validity only from the arxivFetcher.
+     *
+     * @param entry the entry
+     * @return the reference validity
+     * @throws FetcherException the fetcher exception
+     */
     public ReferenceValidity validityFromArxiv(BibEntry entry) throws FetcherException {
 
         var m = arxivFetcher.findIdentifier(entry);
@@ -90,6 +122,14 @@ public class RefChecker {
         ).orElse(new Fake());
     }
 
+    /**
+     * Takes a list for entries and returns the mapping of them with their corresponding
+     * reference validity.
+     *
+     * @param entries the entries
+     * @return the map
+     * @throws FetcherException the fetcher exception
+     */
     public Map<BibEntry, ReferenceValidity> validateListOfEntries(List<BibEntry> entries) throws FetcherException {
 
         Map<BibEntry, ReferenceValidity> entriesToValidity = new HashMap<>();
