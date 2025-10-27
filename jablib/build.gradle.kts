@@ -109,6 +109,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
     // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
 
     implementation("com.fasterxml:aalto-xml")
 
@@ -191,6 +192,8 @@ dependencies {
 
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
     implementation("io.github.adr:e-adr")
+
+    api("io.github.darvil82:terminal-text-formatter")
 
     implementation("io.zonky.test:embedded-postgres")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")

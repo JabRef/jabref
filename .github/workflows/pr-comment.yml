@@ -8,7 +8,7 @@ name: Comment on PR
 on:
   workflow_run:
     # note when updating via a PR and testing - `workflow_run` executes from the `main` branch and not the PR branch
-    workflows: ["Source Code Tests", "On PR opened/updated", "Check PR Format", "Check PR Modifications", "Check PR CHANGELOG.md"]
+    workflows: ["Source Code Tests", "On PR opened/updated", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md"]
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
     types: [completed]
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Download PR number
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: pr_number
