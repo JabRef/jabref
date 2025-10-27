@@ -47,8 +47,6 @@ public class ChatPromptComponent extends HBox {
     @FXML private Button submitButton;
     @FXML private Button regenerateButton;
 
-    private String lastUserPrompt = null;
-
     public ChatPromptComponent() {
         ViewLoader.view(this)
                   .root(this)
@@ -197,7 +195,6 @@ public class ChatPromptComponent extends HBox {
         userPromptTextArea.clear();
 
         if (!userPrompt.isEmpty() && sendCallback.get() != null) {
-            lastUserPrompt = userPrompt; // 🔹 Saving last message for regeneration
             sendCallback.get().accept(userPrompt);
         }
     }
@@ -207,9 +204,5 @@ public class ChatPromptComponent extends HBox {
         if (regenerateCallback.get() != null) {
             regenerateCallback.get().run();
         }
-    }
-
-    public String getLastUserPrompt() {
-        return lastUserPrompt;
     }
 }
