@@ -46,9 +46,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
 - We added an option to search and filter the fields and formatters in the Clean up entries dialog. [#13890](https://github.com/JabRef/jabref/issues/13890)
 - We added support for managing multiple linked files via the entry context menu. [#12567](https://github.com/JabRef/jabref/issues/12567)
+- We added a "Regenerate" button for the AI chat allowing the user to make the LLM reformulate its answer to the previous prompt [#12191](https://github.com/JabRef/jabref/issues/12191)
 
 ### Changed
 
+- We moved all sorting options into a dedicated “Sort” sub-menu in the Groups menu. ([#14017](https://github.com/JabRef/jabref/issues/14017))
 - We merged `Citation information` and `Citation relations` into a singular tab. [#13618](https://github.com/JabRef/jabref/issues/13618)
 - We changed `ISSNCleanup` into `NormalizeIssn` a `ISSN` formatter. [#13748](https://github.com/JabRef/jabref/issues/13748)
 - We changed Citation Relations tab and gave tab panes more descriptive titles and tooltips. [#13619](https://github.com/JabRef/jabref/issues/13619)
@@ -102,6 +104,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved the event viewer for debugging [#13783](https://github.com/JabRef/jabref/pull/13783).
 - We improved "REDACTED" replacement of API key value in web fetcher search URL [#13796](https://github.com/JabRef/jabref/issues/13796)
 - When the pin "Keep dialog always on top" in the global search dialog is selected, the search window stays open when double-clicking on an entry. [#13840](https://github.com/JabRef/jabref/issues/13840)
+- We improved the UI of regex replacement in the citation key generator tab. [#13939](https://github.com/JabRef/jabref/pull/13939)
 - We improved the way we check for matching curly braces in BibTeX fields and made error messages easier to understand. [#12605](https://github.com/JabRef/jabref/issues/12605)
 
 ### Fixed
@@ -152,6 +155,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We prevented a brief flash of the default JavaFX (Modena) theme on startup. [#13877](https://github.com/JabRef/jabref/pull/13877)
 - We fixed an issue where button-bar buttons truncated long text with ellipsis. [#13877](https://github.com/JabRef/jabref/pull/13877)
 - We fixed an issue where ignoring of subdirectories via `.gitingore` patterns did not work in the "Find unlinked files dialog". [forum#5425](https://discourse.jabref.org/t/set-list-of-ignored-folders-paths/5425/6)
+- We fixed an issue where CTRL+W does not close the current tab [#12530](https://github.com/JabRef/jabref/issues/12530)
 - We fixed an issue where the "Applications to push entries to" list in the preferences was not sorted alphabetically. [#14058](https://github.com/JabRef/jabref/issues/14058)
 - We fixed an issue where notice text in AI chat was not automatically refreshed when the user changed preferences.[#13855](https://github.com/JabRef/jabref/issues/13855)
 - We fixed an issue where the user could add custom entry types with spaces in their names. [#14088](https://github.com/JabRef/jabref/issues/14088)
