@@ -1,15 +1,12 @@
-A problem was found with the configuration of task ':pitest' (type 'PitestTask').
-- In plugin 'info.solidsoft.pitest' type 'info.solidsoft.gradle.pitest.PitestTask' property 'targetClasses' doesn't have a configured value.
+### Testing Setup
+Since there was no mutation testing tool prior, we have added PIT to this project
 
-  Reason: This property isn't marked as optional and no value has been configured.
 
-  Possible solutions:
-    1. Assign a value to 'targetClasses'.
-    2. Mark property 'targetClasses' as optional.
+### Inital Score Report
 
-  For more information, please refer to https://docs.gradle.org/9.1.0/userguide/validation_problems.html#value_not_set in the Gradle documentation.
+### Final Score Report
 
-* Try:
-> Assign a value to 'targetClasses'
-> Mark property 'targetClasses' as optional
-> Run with --scan to generate a Build Scan (Powered by Develocity).
+### Mutation killed/survived report
+
+### Group contributions
+
