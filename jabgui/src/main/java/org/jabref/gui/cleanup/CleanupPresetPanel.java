@@ -121,7 +121,7 @@ public class CleanupPresetPanel extends VBox {
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
         booktitleCleanupPanel.cleanupsDisableProperty().setValue(!preset.getBooktitleCleanups().isEnabled());
-        booktitleCleanupPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getBooktitleCleanups().getConfiguredActions()));
+        booktitleCleanupPanel.selectedActionsProperty().setValue(FXCollections.observableMap(preset.getBooktitleCleanups().getConfiguredActions()));
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFieldFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFieldFormatterCleanups().getConfiguredActions()));
     }

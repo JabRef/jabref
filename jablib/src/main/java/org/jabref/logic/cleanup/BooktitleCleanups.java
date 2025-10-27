@@ -2,7 +2,9 @@ package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -13,6 +15,7 @@ import org.jabref.logic.util.LocationDetector;
 import org.jabref.logic.util.RegexPatterns;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.BooktitleCleanupAction;
+import org.jabref.model.cleanup.BooktitleCleanupField;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
@@ -62,8 +65,13 @@ public class BooktitleCleanups implements CleanupJob {
         return enabled;
     }
 
-    public List<BooktitleCleanupAction> getConfiguredActions() {
-        return List.of(yearAction, monthAction, pageRangeAction, locationAction);
+    public Map<BooktitleCleanupField, BooktitleCleanupAction> getConfiguredActions() {
+        Map<BooktitleCleanupField, BooktitleCleanupAction> actionMap = new HashMap<>();
+        actionMap.put(BooktitleCleanupField.YEAR, yearAction);
+        actionMap.put(BooktitleCleanupField.MONTH, monthAction);
+        actionMap.put(BooktitleCleanupField.PAGE_RANGE, pageRangeAction);
+        actionMap.put(BooktitleCleanupField.LOCATION, locationAction);
+        return actionMap;
     }
 
     @Override

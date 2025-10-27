@@ -3,10 +3,8 @@ package org.jabref.gui.commonfxcontrols;
 import java.util.EnumMap;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
 
@@ -18,7 +16,6 @@ import org.jabref.model.cleanup.BooktitleCleanupField;
 public class BooktitleCleanupPanelViewModel {
 
     private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
-    private final ListProperty<BooktitleCleanupAction> cleanupsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     /*
      * Map Property mapping each cleanup field to its corresponding cleanup action.
      * Each field corresponds to a ToggleGroup in the Cleanup Panel with each Radio Button representing
@@ -57,9 +54,5 @@ public class BooktitleCleanupPanelViewModel {
 
     public BooleanProperty cleanupsDisableProperty() {
         return cleanupsDisableProperty;
-    }
-
-    public ListProperty<BooktitleCleanupAction> cleanupsListProperty() {
-        return cleanupsListProperty;
     }
 }

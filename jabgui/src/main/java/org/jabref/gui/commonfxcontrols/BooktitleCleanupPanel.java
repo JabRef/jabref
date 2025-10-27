@@ -4,7 +4,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
+import javafx.beans.property.MapProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
@@ -159,8 +159,8 @@ public class BooktitleCleanupPanel extends VBox {
     public BooleanProperty cleanupsDisableProperty() {
         return viewModel.cleanupsDisableProperty();
     }
-
-    public ListProperty<BooktitleCleanupAction> cleanupsProperty() {
-        return viewModel.cleanupsListProperty();
+    
+    public MapProperty<BooktitleCleanupField, BooktitleCleanupAction> selectedActionsProperty() {
+        return viewModel.selectedActionsProperty();
     }
 }

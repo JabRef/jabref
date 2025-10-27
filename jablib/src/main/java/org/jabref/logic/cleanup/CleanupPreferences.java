@@ -78,6 +78,10 @@ public class CleanupPreferences {
         return booktitleCleanups;
     }
 
+    public void setBooktitleCleanups(BooktitleCleanups newBooktitleCleanups) {
+        booktitleCleanups.setValue(newBooktitleCleanups);
+    }
+
     public FieldFormatterCleanups getFieldFormatterCleanups() {
         return fieldFormatterCleanups.get();
     }
