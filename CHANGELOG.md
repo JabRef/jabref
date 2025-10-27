@@ -157,7 +157,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Applications to push entries to" list in the preferences was not sorted alphabetically. [#14058](https://github.com/JabRef/jabref/issues/14058)
 - We fixed an issue where notice text in AI chat was not automatically refreshed when the user changed preferences.[#13855](https://github.com/JabRef/jabref/issues/13855)
 - We fixed an issue where the user could add custom entry types with spaces in their names. [#14088](https://github.com/JabRef/jabref/issues/14088)
-- We fixed various issues that triggered `IndexOutOfBoundsException`s, when editing entries. [#8012](https://github.com/JabRef/jabref/issues/8012), [#8826](https://github.com/JabRef/jabref/issues/8826), [#8217](https://github.com/JabRef/jabref/issues/8217)
+- We fixed various issues that triggered `IndexOutOfBoundsException`s, when editing entries. [#8012](https://github.com/JabRef/jabref/issues/8012), [#8826](https://github.com/JabRef/jabref/issues/8826), [#8217](https://github.com/JabRef/jabref/issues/8217), [#8281](https://github.com/JabRef/jabref/issues/8281)
 
 ### Removed
 
