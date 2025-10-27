@@ -37,13 +37,22 @@ rewrite {
 }
 
 pitest {
-    targetClasses.set(listOf("org.jabref.*"))  //by default "${project.group}.*"
-    targetTests.set(listOf("org.jabref.*Test"))
-    junit5PluginVersion.set("1.2.0")
+    targetClasses.set(setOf("org.jabref.logic.citationstyle.CitationStyle"))
+    targetTests.set(setOf("org.jabref.logic.citationstyle.*Test"))
     threads.set(4)
-    outputFormats.set(listOf("XML", "HTML"))
+    outputFormats.set(setOf("XML", "HTML"))
     timestampedReports.set(false)
 }
+
+
+//pitest {
+//    targetClasses.set(listOf("org.jabref.*"))  //by default "${project.group}.*"
+//    targetTests.set(listOf("org.jabref.*Test"))
+//    junit5PluginVersion.set("1.2.0")
+//    threads.set(4)
+//    outputFormats.set(listOf("XML", "HTML"))
+//    timestampedReports.set(false)
+//}
 requirementTracing {
     inputDirectories.setFrom(files("docs",
             "jablib/src/main/java", "jablib/src/test/java",

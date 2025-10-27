@@ -54,9 +54,6 @@ dependencies {
     // api(platform(project(":versions")))
 
     implementation("org.openjfx:javafx-base")
-    implementation(
-        "org.mockito:mockito-junit-jupiter:5.11.0"
-    )
     implementation("com.ibm.icu:icu4j")
 
     // Fix "error: module not found: javafx.controls" during compilation
