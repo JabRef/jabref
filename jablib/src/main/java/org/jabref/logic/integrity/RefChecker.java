@@ -13,8 +13,6 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.plaincitation.PlainCitationParser;
-import org.jabref.logic.importer.plaincitation.SeveralPlainCitationParser;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -99,11 +97,6 @@ public class RefChecker {
             entriesToValidity.put(entry, referenceValidityOfEntry(entry));
         }
         return entriesToValidity;
-    }
-
-    public Map<BibEntry, ReferenceValidity> parseListAndValidate(String input, PlainCitationParser parser) throws FetcherException {
-        SeveralPlainCitationParser citationParser = new SeveralPlainCitationParser(parser);
-        return validateListOfEntries(citationParser.parseSeveralPlainCitations(input));
     }
 
     private ReferenceValidity compareReferences(BibEntry original, BibEntry trueEntry) {
