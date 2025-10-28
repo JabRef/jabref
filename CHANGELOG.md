@@ -114,6 +114,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved the citations relations caching by implementing an offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - A space is now added by default after citations inserted via the Libre/OpenOffice integration. [#13559](https://github.com/JabRef/jabref/issues/13559)
 - We replaced the standard ComboBox with a SearchableComboBox in custom Entry Types [#14082](https://github.com/JabRef/jabref/issues/14082)
+- We replaced the standard ComboBox with a SearchableComboBox and added a free text field in custom Entry Types [#14082](https://github.com/JabRef/jabref/issues/14082)
 
 ### Fixed
 
