@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -35,6 +36,9 @@ import org.slf4j.LoggerFactory;
 
 public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);
+
+    // Prefer a full ISO date if provided
+    private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
@@ -101,13 +105,12 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
             if (result.has("journalInfo") && result.getJSONObject("journalInfo").has("issn")) {
                 entry.setField(StandardField.ISSN, result.getJSONObject("journalInfo").getString("issn"));
             }
-            // Prefer a full ISO date if provided
-            final String datePattern = "\\d{4}-\\d{2}-\\d{2}";
+
             String printPubDate = result.optString("printPublicationDate");
             String dateOfPublication = result.optString("dateOfPublication");
-            if (printPubDate != null && printPubDate.matches(datePattern)) {
+            if (printPubDate != null && DATE_PATTERN.matcher(printPubDate).matches()) {
                 entry.setField(StandardField.DATE, printPubDate);
-            } else if (dateOfPublication != null && dateOfPublication.matches(datePattern)) {
+            } else if (dateOfPublication != null && DATE_PATTERN.matcher(dateOfPublication).matches()) {
                 entry.setField(StandardField.DATE, dateOfPublication);
             }
 
