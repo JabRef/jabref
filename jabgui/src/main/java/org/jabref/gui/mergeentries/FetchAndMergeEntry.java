@@ -16,6 +16,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -23,6 +24,8 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.ArXivFetcher;
+import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -172,6 +175,14 @@ public class FetchAndMergeEntry {
                           if (fetchedEntry.isPresent()) {
                               ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
                               cleanup.doPostCleanup(fetchedEntry.get());
+
+                              // Generate a new citation key for entries fetched by INSPIREFetcher or ArXivFetcher
+                              // to avoid long key
+                              if (fetcher instanceof INSPIREFetcher || fetcher instanceof ArXivFetcher) {
+                                  CitationKeyGenerator keyGen = new CitationKeyGenerator(bibDatabaseContext, preferences.getCitationKeyPatternPreferences());
+                                  keyGen.generateAndSetKey(fetchedEntry.get());
+                              }
+
                               showMergeDialog(entry, fetchedEntry.get(), fetcher);
                           } else {
                               dialogService.notify(Localization.lang("Could not find any bibliographic information."));

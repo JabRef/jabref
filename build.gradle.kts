@@ -66,3 +66,4 @@ tasks.cyclonedxBom {
     componentVersion = project.version.toString()
     componentGroup = "org.jabref"
 }
+

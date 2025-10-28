@@ -6,6 +6,7 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -52,6 +53,7 @@ public class WebSearchPaneView extends VBox {
         getChildren().addAll(
                 fetcherContainer,
                 createQueryField(),
+                createIdentifierHint(),
                 createSearchButton()
         );
         this.disableProperty().bind(searchDisabledProperty());
@@ -106,6 +108,34 @@ public class WebSearchPaneView extends VBox {
         enableEnterToTriggerSearch(query);
         ClipBoardManager.addX11Support(query);
         return query;
+    }
+
+    /**
+     * Create identifier hint label
+     */
+    private Label createIdentifierHint() {
+        Label identifierHint = new Label();
+        identifierHint.getStyleClass().add("identifier-hint");
+        identifierHint.visibleProperty().bind(viewModel.identifierDetectedProperty());
+        
+        // Use EasyBind to create dynamic text binding
+        EasyBind.subscribe(viewModel.identifierDetectedProperty(), detected -> {
+            if (detected) {
+                String identifierType = viewModel.getDetectedIdentifierType();
+                identifierHint.setText(Localization.lang("Detected identifier: %0", identifierType));
+            } else {
+                identifierHint.setText("");
+            }
+        });
+        
+        // Also listen to identifier type changes
+        EasyBind.subscribe(viewModel.detectedIdentifierTypeProperty(), identifierType -> {
+            if (viewModel.isIdentifierDetected()) {
+                identifierHint.setText(Localization.lang("Detected identifier: %0", identifierType));
+            }
+        });
+        
+        return identifierHint;
     }
 
     /**

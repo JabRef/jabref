@@ -6,6 +6,7 @@ import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
+import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
@@ -31,6 +32,15 @@ public class CompositeIdFetcher {
         }
         Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
         if (arXivIdentifier.isPresent()) {
+            INSPIREFetcher inspireFetcher = new INSPIREFetcher(importFormatPreferences);
+            try {
+                Optional<BibEntry> inspireResult = inspireFetcher.performSearchById(arXivIdentifier.get().asString());
+                if (inspireResult.isPresent()) {
+                    return inspireResult;
+                }
+            } catch (FetcherException ignored) {
+                // ignore and fall back to arXiv fetcher
+            }
             return new ArXivFetcher(importFormatPreferences).performSearchById(arXivIdentifier.get().asString());
         }
         Optional<ISBN> isbn = ISBN.parse(identifier);
