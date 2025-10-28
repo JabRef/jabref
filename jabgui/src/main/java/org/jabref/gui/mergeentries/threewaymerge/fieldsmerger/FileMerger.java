@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.strings.StringUtil;
 
 /// A merger for the {@link org.jabref.model.entry.field.StandardField#FILE} field
 public class FileMerger implements FieldMerger {

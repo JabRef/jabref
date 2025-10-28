@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;

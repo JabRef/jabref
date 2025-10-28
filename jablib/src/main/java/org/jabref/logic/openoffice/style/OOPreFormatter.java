@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * This formatter preprocesses JabRef fields before they are run through the layout of the bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.

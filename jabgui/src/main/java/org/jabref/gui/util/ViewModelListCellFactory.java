@@ -20,7 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;

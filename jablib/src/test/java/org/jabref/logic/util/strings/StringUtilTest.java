@@ -1,4 +1,4 @@
-package org.jabref.model.strings;
+package org.jabref.logic.util.strings;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
