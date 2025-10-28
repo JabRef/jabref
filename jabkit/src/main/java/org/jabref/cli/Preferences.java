@@ -37,12 +37,15 @@ class Preferences implements Runnable {
     }
 
     @Command(name = "reset", description = "Reset preferences.")
-    class PreferencesReset implements Callable<Integer> {
+    static class PreferencesReset implements Callable<Integer> {
+        @ParentCommand
+        private Preferences parent;
+
         @Override
         public Integer call() {
             try {
                 System.out.println(Localization.lang("Setting all preferences to default values."));
-                argumentProcessor.cliPreferences.clear();
+                parent.argumentProcessor.cliPreferences.clear();
                 new SharedDatabasePreferences().clear();
             } catch (BackingStoreException e) {
                 System.err.println(Localization.lang("Unable to clear preferences."));
@@ -53,16 +56,19 @@ class Preferences implements Runnable {
     }
 
     @Command(name = "import", description = "Import preferences from a file.")
-    class PreferencesImport implements Callable<Integer> {
+    static class PreferencesImport implements Callable<Integer> {
 
         @Parameters(index = "0", arity = "1", description = "The file to import preferences from.")
         Path inputFile;
 
+        @ParentCommand
+        private Preferences parent;
+
         @Override
         public Integer call() {
             try {
-                argumentProcessor.cliPreferences.importPreferences(inputFile);
-                argumentProcessor.cliPreferences.flush();
+                parent.argumentProcessor.cliPreferences.importPreferences(inputFile);
+                parent.argumentProcessor.cliPreferences.flush();
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot import preferences", ex);
             }
@@ -71,15 +77,18 @@ class Preferences implements Runnable {
     }
 
     @Command(name = "export", description = "Export preferences to a file.")
-    class PreferencesExport implements Callable<Integer> {
+    static class PreferencesExport implements Callable<Integer> {
 
         @Parameters(index = "0", arity = "1", description = "The file to export preferences to.")
         Path outputFile;
 
+        @ParentCommand
+        private Preferences parent;
+
         @Override
         public Integer call() {
             try {
-                argumentProcessor.cliPreferences.exportPreferences(outputFile);
+                parent.argumentProcessor.cliPreferences.exportPreferences(outputFile);
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
             }
