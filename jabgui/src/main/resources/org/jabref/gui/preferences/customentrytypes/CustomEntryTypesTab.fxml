@@ -30,7 +30,7 @@
                 </columnResizePolicy>
             </TableView>
             <HBox spacing="10.0">
-                <TextField fx:id="addNewEntryType"/>
+                <TextField fx:id="addNewEntryType" promptText="Type new entry type..."/>
                 <Button fx:id="addNewEntryTypeButton"
                         prefHeight="20.0" prefWidth="20.0"
                         styleClass="icon-button,narrow" onAction="#addEntryType">
@@ -60,18 +60,37 @@
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
-            <HBox spacing="10.0" alignment="BASELINE_CENTER">
-                <SearchableComboBox fx:id="addNewField" editable="true" prefWidth="150.0"/>
-                <Button fx:id="addNewFieldButton"
-                        prefHeight="20.0" prefWidth="20.0"
-                        styleClass="icon-button,narrow" onAction="#addNewField">
-                    <graphic>
-                        <JabRefIconView glyph="ADD_NOBOX"/>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="%Add new Field"/>
-                    </tooltip>
-                </Button>
+            <HBox spacing="10.0" alignment="BASELINE_LEFT">
+                <VBox spacing="5.0">
+                    <HBox spacing="10.0" alignment="BASELINE_CENTER">
+                        <SearchableComboBox fx:id="addNewField" editable="true" prefWidth="150.0"/>
+                        <Button fx:id="addNewFieldButton"
+                                prefHeight="20.0" prefWidth="20.0"
+                                styleClass="icon-button,narrow" onAction="#addNewField">
+                            <graphic>
+                                <JabRefIconView glyph="ADD_NOBOX"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%Add new Field"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+
+                    <HBox spacing="10.0" alignment="BASELINE_CENTER">
+                        <TextField fx:id="addNewCustomFieldText" prefWidth="150.0" promptText="%Type new custom field..."/>
+                        <Button fx:id="addNewCustomFieldButton"
+                                prefHeight="20.0" prefWidth="20.0"
+                                styleClass="icon-button,narrow" onAction="#addNewCustomField">
+                            <graphic>
+                                <JabRefIconView glyph="ADD_NOBOX"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%Add new custom field"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+                </VBox>
+
                 <Region HBox.hgrow="ALWAYS" />
                 <Button text="%Reset to default" onAction="#resetEntryTypes">
                     <graphic>
