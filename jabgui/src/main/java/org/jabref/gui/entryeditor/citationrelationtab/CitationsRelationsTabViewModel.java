@@ -18,7 +18,7 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.fetcher.CrossRef;
-import org.jabref.logic.importer.fetcher.ScienceAiFetcher;
+import org.jabref.logic.importer.fetcher.SciteAiFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -47,7 +47,7 @@ public class CitationsRelationsTabViewModel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
-    private final ScienceAiFetcher scienceAiFetcher;
+    private final SciteAiFetcher sciteAiFetcher;
 
     private final ObjectProperty<SciteStatus> status;
     private final StringProperty searchError;
@@ -64,7 +64,7 @@ public class CitationsRelationsTabViewModel {
 
         this.status = new SimpleObjectProperty<>(SciteStatus.IN_PROGRESS);
         this.searchError = new SimpleStringProperty("");
-        this.scienceAiFetcher = new ScienceAiFetcher();
+        this.sciteAiFetcher = new SciteAiFetcher();
     }
 
     public void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
@@ -154,7 +154,7 @@ public class CitationsRelationsTabViewModel {
             return;
         }
 
-        searchTask = BackgroundTask.wrap(() -> scienceAiFetcher.fetchTallies(entry.getDOI().get()))
+        searchTask = BackgroundTask.wrap(() -> sciteAiFetcher.fetchTallies(entry.getDOI().get()))
                                    .onRunning(() -> status.set(SciteStatus.IN_PROGRESS))
                                    .onSuccess(result -> {
                                        currentResult = Optional.of(result);
