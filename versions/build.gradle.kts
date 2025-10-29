@@ -38,10 +38,9 @@ dependencies.constraints {
     // from JavaFX25 onwards
     api("org.openjfx:jdk-jsobject:$javafx")
 
-    api("com.ibm.icu:icu4j:72.0.1!!")
-
     api("com.dlsc.gemsfx:gemsfx:3.5.7")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
+    api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
     api("com.fasterxml.jackson-datatype-jdk8:2.20.0")
