@@ -229,6 +229,11 @@ dependencies {
     testImplementation("org.testfx:testfx-core")
     testImplementation("org.testfx:testfx-junit5")
 
+    // Highly recommended builder generator - https://github.com/skinny85/jilt
+    testCompileOnly("cc.jilt:jilt")
+    testAnnotationProcessor("cc.jilt:jilt")
+    // testImplementation("com.github.koppor:jilt:jitpack-SNAPSHOT")
+
     errorprone("com.google.errorprone:error_prone_core")
     errorprone("com.uber.nullaway:nullaway")
 }
@@ -577,6 +582,10 @@ publishing.publications.withType<MavenPublication>().configureEach {
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("io.github.classgraph")
+
+    requires.add("jilt")
+    requires.add("java.compiler")
+
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")

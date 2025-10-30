@@ -31,6 +31,8 @@ dependencies.constraints {
     // from JavaFX25 onwards
     api("org.openjfx:jdk-jsobject:$javafx")
 
+    api("cc.jilt:jilt:1.8.3")
+
     api("com.ibm.icu:icu4j:72.0.1!!")
 
     api("com.dlsc.gemsfx:gemsfx:3.5.7")

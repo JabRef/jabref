@@ -36,14 +36,14 @@ class LinkedFileTransferHelperTest {
 
     @Test
     void pathDiffersShouldAdjustPath(@TempDir Path tempDir) throws Exception {
-        sourceDir = tempDir.resolve("source/subdir");
-        targetDir = tempDir.resolve("source");
-
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
-
-        Files.createDirectories(sourceDir);
-        Files.createDirectories(targetDir);
+        FileTestConfigurationBuilder.fileTestConfiguration()
+                                    .tempDir(tempDir)
+                                    .filePreferences(filePreferences)
+                                    .sourceDir("source/subdir")
+                                    .sourceFile("sourcefiles/test.pdf")
+                                    .targetDir("source")
+                                    .shouldStoreFilesRelativeToBibFile(true)
+                                    .shouldAdjustOrCopyLinkedFilesOnTransfer(true);
 
         testFile = sourceDir.resolve("sourcefiles/test.pdf");
         Files.createDirectories(testFile.getParent());
