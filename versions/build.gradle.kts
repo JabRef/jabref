@@ -6,8 +6,11 @@ javaPlatform {
     allowDependencies()
 }
 
+// in case this is updated, also .github/workflows/binaries.yml (look for "eaJdkJmodsUrl" and its use)
 val javafx = "25"
+
 val lucene = "10.3.1"
+
 val pdfbox = "3.0.5"
 
 dependencies {
@@ -35,8 +38,6 @@ dependencies.constraints {
     api("org.openjfx:javafx-graphics:${javafx}")
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
-    // from JavaFX25 onwards
-    api("org.openjfx:jdk-jsobject:$javafx")
 
     api("com.dlsc.gemsfx:gemsfx:3.5.7")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
