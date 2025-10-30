@@ -14,11 +14,12 @@ import kong.unirest.core.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ScienceAiFetcher {
+/// Fetches citation information from <https://scite.ai/>
+public class SciteAiFetcher {
     private static final String BASE_URL = "https://api.scite.ai/";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScienceAiFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SciteAiFetcher.class);
 
-    public ScienceAiFetcher() {
+    public SciteAiFetcher() {
     }
 
     public TalliesResponse fetchTallies(DOI doi) throws FetcherException {
