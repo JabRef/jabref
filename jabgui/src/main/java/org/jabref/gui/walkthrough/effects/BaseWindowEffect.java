@@ -25,7 +25,7 @@ public sealed abstract class BaseWindowEffect permits Spotlight, FullScreenDarke
     /// pane until [#attach(Node)] is called.
     ///
     /// @param pane The pane where the effect will be applied. Usually obtained from [Window#getScene()] and
-    ///             [Scene#getRoot()]
+    ///                         [Scene#getRoot()]
     protected BaseWindowEffect(@NonNull Pane pane) {
         this.pane = pane;
         this.debouncedUpdater = WalkthroughUtils.debounced(_ -> this.updateLayout());
@@ -64,13 +64,13 @@ public sealed abstract class BaseWindowEffect permits Spotlight, FullScreenDarke
             setupWindowListeners(scene.getWindow());
         }
 
-        node.sceneProperty().addListener((_, _, newScene) -> {
+        subscriptions.add(EasyBind.listen(node.sceneProperty(), (_, _, newScene) -> {
             if (newScene != null) {
                 subscriptions.add(EasyBind.listen(newScene.widthProperty(), debouncedUpdater));
                 subscriptions.add(EasyBind.listen(newScene.heightProperty(), debouncedUpdater));
                 setupWindowListeners(newScene.getWindow());
             }
-        });
+        }));
     }
 
     protected void setupPaneListeners() {

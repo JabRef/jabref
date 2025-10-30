@@ -127,9 +127,9 @@ public class ChatPromptComponent extends HBox {
                     // The easy way to get rid of this ambiguity is to disallow scrolling when there are new lines in the prompt.
                     // But the exception to this situation is when the caret position is at the beginning of the prompt.
                     history.get().stream()
-                            .skip(newValue.intValue())
-                            .findFirst()
-                            .ifPresent(message -> userPromptTextArea.setText(message));
+                           .skip(newValue.intValue())
+                           .findFirst()
+                           .ifPresent(message -> userPromptTextArea.setText(message));
                 }
             } else {
                 // When currentUserMessageScroll is set to NEW_NON_EXISTENT_MESSAGE, then we should:

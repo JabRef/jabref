@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -70,6 +69,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +93,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;
-    private final ClipBoardManager clipBoardManager;
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
@@ -103,7 +102,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
-                     BibDatabaseContext database,
+                     @NonNull BibDatabaseContext database,
                      GuiPreferences preferences,
                      DialogService dialogService,
                      StateManager stateManager,
@@ -115,7 +114,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         super();
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
-        this.database = Objects.requireNonNull(database);
+        this.database = database;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.model = model;
@@ -124,7 +123,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
         this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-        this.clipBoardManager = clipBoardManager;
 
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
@@ -181,10 +179,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // force match category column to be the first sort order, (match_category column is always the first column)
         this.getSortOrder().addFirst(getColumns().getFirst());
         this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
-                if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
-                    this.getSortOrder().addFirst(getColumns().getFirst());
-                }
-            });
+            if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
+                this.getSortOrder().addFirst(getColumns().getFirst());
+            }
+        });
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
@@ -386,10 +384,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager, clipBoardManager);
-        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager, clipBoardManager);
-        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager, clipBoardManager);
-        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager, clipBoardManager);
+        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager);
+        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager);
+        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
+        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
@@ -436,7 +434,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case SCROLL_TO_PREVIOUS_MATCH_CATEGORY:
-                         scrollToPreviousMatchCategory();
+                        scrollToPreviousMatchCategory();
                         event.consume();
                         break;
                     case OPEN_URL_OR_DOI:
@@ -542,7 +540,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
                 // Different actions depending on where the user releases the drop in the target row
                 // - Bottom + top -> import entries
-                case TOP, BOTTOM -> importHandler.importFilesInBackground(files, database, filePreferences, transferMode).executeWith(taskExecutor);
+                case TOP,
+                     BOTTOM ->
+                        importHandler.importFilesInBackground(files, database, filePreferences, transferMode).executeWith(taskExecutor);
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
@@ -602,13 +602,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void updatePlaceholder(VBox placeholderBox) {
-       if (database.getDatabase().getEntries().isEmpty()) {
-           this.setPlaceholder(placeholderBox);
-           // [impl->req~maintable.focus~1]
-           requestFocus();
-       } else {
-           this.setPlaceholder(null);
-       }
+        if (database.getDatabase().getEntries().isEmpty()) {
+            this.setPlaceholder(placeholderBox);
+            // [impl->req~maintable.focus~1]
+            requestFocus();
+        } else {
+            this.setPlaceholder(null);
+        }
     }
 
     private BibEntry addExampleEntry() {

@@ -13,7 +13,6 @@ import javafx.scene.input.KeyCode;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -40,7 +39,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
-    @Inject private ThemeManager themeManager;
 
     private PreferencesDialogViewModel viewModel;
     private final Class<? extends PreferencesTab> preferencesTabToSelectClass;
@@ -61,8 +59,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 event.consume();
             }
         });
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     public PreferencesDialogViewModel getViewModel() {

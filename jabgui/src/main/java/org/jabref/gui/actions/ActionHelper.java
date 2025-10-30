@@ -10,6 +10,7 @@ import javafx.beans.binding.BooleanExpression;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.io.FileUtil;
@@ -18,6 +19,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 
@@ -103,5 +105,21 @@ public class ActionHelper {
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
                 entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));
+    }
+
+    public static BooleanExpression needsGitRemoteConfigured(StateManager stateManager) {
+        return BooleanExpression.booleanExpression(
+                EasyBind.map(stateManager.activeDatabaseProperty(), contextOptional -> {
+                    if (contextOptional.isPresent()) {
+                        return contextOptional.get().getDatabasePath()
+                                              .flatMap(path -> Injector.instantiateModelOrService(GitHandlerRegistry.class).fromAnyPath(path))
+                                              .map(handler -> handler.hasRemote("origin")
+                                              )
+                                              .orElse(false);
+                    } else {
+                        return false;
+                    }
+                })
+        );
     }
 }

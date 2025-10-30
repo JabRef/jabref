@@ -17,6 +17,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public class MrDLibImporter extends Importer {
     private String recommendationSetId;
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         String recommendationsAsString = convertToString(input);
         try {
             JSONObject jsonObject = new JSONObject(recommendationsAsString);
@@ -46,7 +47,7 @@ public class MrDLibImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader input) throws IOException {
         parse(input);
         return parserResult;
     }

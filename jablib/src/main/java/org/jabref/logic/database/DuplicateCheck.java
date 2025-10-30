@@ -102,8 +102,8 @@ public class DuplicateCheck {
     private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
         final Set<OrFields> requiredFields = type.getRequiredFields();
         return requiredFields.isEmpty()
-                ? new double[] {0., 0.}
-                : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
+               ? new double[] {0., 0.}
+               : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
     }
 
     private static boolean isFarFromThreshold(double value) {
@@ -289,42 +289,16 @@ public class DuplicateCheck {
         final String[] w1 = s1.split("\\s");
         final String[] w2 = s2.split("\\s");
         final int n = Math.min(w1.length, w2.length);
+        final StringSimilarity match = new StringSimilarity();
         int misses = 0;
         for (int i = 0; i < n; i++) {
-            double corr = similarity(w1[i], w2[i]);
+            double corr = match.similarity(w1[i], w2[i]);
             if (corr < 0.75) {
                 misses++;
             }
         }
         final double missRate = (double) misses / (double) n;
         return 1 - missRate;
-    }
-
-    /**
-     * Calculates the similarity (a number within 0 and 1) between two strings.
-     * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
-     */
-    private static double similarity(final String first, final String second) {
-        final String longer;
-        final String shorter;
-
-        if (first.length() < second.length()) {
-            longer = second;
-            shorter = first;
-        } else {
-            longer = first;
-            shorter = second;
-        }
-
-        final int longerLength = longer.length();
-        // both strings are zero length
-        if (longerLength == 0) {
-            return 1.0;
-        }
-        final double distanceIgnoredCase = new StringSimilarity().editDistanceIgnoreCase(longer, shorter);
-        final double similarity = (longerLength - distanceIgnoredCase) / longerLength;
-        LOGGER.trace("Longer string: {} Shorter string: {} Similarity: {}", longer, shorter, similarity);
-        return similarity;
     }
 
     /**

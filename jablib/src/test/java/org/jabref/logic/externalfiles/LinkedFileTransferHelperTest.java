@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -35,13 +36,14 @@ class LinkedFileTransferHelperTest {
 
     @Test
     void pathDiffersShouldAdjustPath(@TempDir Path tempDir) throws Exception {
-        sourceDir = tempDir.resolve("source/subdir");
-        targetDir = tempDir.resolve("source");
-
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-
-        Files.createDirectories(sourceDir);
-        Files.createDirectories(targetDir);
+        FileTestConfigurationBuilder.fileTestConfiguration()
+                                    .tempDir(tempDir)
+                                    .filePreferences(filePreferences)
+                                    .sourceDir("source/subdir")
+                                    .sourceFile("sourcefiles/test.pdf")
+                                    .targetDir("source")
+                                    .shouldStoreFilesRelativeToBibFile(true)
+                                    .shouldAdjustOrCopyLinkedFilesOnTransfer(true);
 
         testFile = sourceDir.resolve("sourcefiles/test.pdf");
         Files.createDirectories(testFile.getParent());
@@ -63,7 +65,7 @@ class LinkedFileTransferHelperTest {
         targetContext.getDatabase().insertEntry(targetEntry);
 
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-          filePreferences);
+                filePreferences);
 
         BibEntry expectedEntry = new BibEntry();
         LinkedFile expectedLinkedFile = new LinkedFile("Test", "subdir/sourcefiles/test.pdf", "PDF");
@@ -84,6 +86,7 @@ class LinkedFileTransferHelperTest {
         targetDir = tempDir.resolve("target/sourcefiles");
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(sourceDir);
         Files.createDirectories(targetDir);
@@ -108,7 +111,7 @@ class LinkedFileTransferHelperTest {
         targetContext.getDatabase().insertEntry(targetEntry);
 
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-          filePreferences);
+                filePreferences);
 
         BibEntry expectedEntry = new BibEntry();
         LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
@@ -129,6 +132,7 @@ class LinkedFileTransferHelperTest {
         targetDir = tempDir.resolve("target");
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(sourceDir);
         Files.createDirectories(targetDir);
@@ -153,7 +157,7 @@ class LinkedFileTransferHelperTest {
         targetContext.getDatabase().insertEntry(targetEntry);
 
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-          filePreferences);
+                filePreferences);
 
         BibEntry expectedEntry = new BibEntry();
         LinkedFile expectedLinkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
@@ -177,6 +181,7 @@ class LinkedFileTransferHelperTest {
         targetDir = tempDir.resolve("target");
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(sourceDir);
         Files.createDirectories(targetDir);
@@ -200,7 +205,7 @@ class LinkedFileTransferHelperTest {
         targetContext.getDatabase().insertEntry(targetEntry);
 
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-          filePreferences);
+                filePreferences);
 
         BibEntry expectedEntry = new BibEntry();
         LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
@@ -226,6 +231,7 @@ class LinkedFileTransferHelperTest {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         when(filePreferences.getMainFileDirectory()).thenReturn(java.util.Optional.of(globalLatexDir));
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(globalLatexDir);
@@ -258,6 +264,7 @@ class LinkedFileTransferHelperTest {
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(librarySpecificDir);
@@ -292,6 +299,7 @@ class LinkedFileTransferHelperTest {
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(userSpecificDir);
@@ -327,6 +335,7 @@ class LinkedFileTransferHelperTest {
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(librarySpecificDir);
@@ -357,6 +366,7 @@ class LinkedFileTransferHelperTest {
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(librarySpecificDir);
@@ -385,6 +395,7 @@ class LinkedFileTransferHelperTest {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(globalLatexDir));
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(globalLatexDir);
@@ -399,6 +410,49 @@ class LinkedFileTransferHelperTest {
         List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
         assertEquals(1, fileDirectories.size());
         assertTrue(fileDirectories.getFirst().toString().contains("global_latex"));
+    }
+
+    // endregion
+
+    // region adjustOrCopyLinkedFilesOnTransfer disabled tests
+
+    @Test
+    void shouldReturnEmptySetWhenLinkedFileTransferDisabled(@TempDir Path tempDir) throws Exception {
+        sourceDir = tempDir.resolve("source");
+        targetDir = tempDir.resolve("target");
+
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(false);
+
+        Files.createDirectories(sourceDir);
+        Files.createDirectories(targetDir);
+
+        testFile = sourceDir.resolve("sourcefiles/test.pdf");
+        Files.createDirectories(testFile.getParent());
+        Files.createFile(testFile);
+
+        sourceContext = new BibDatabaseContext(new BibDatabase());
+        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+
+        sourceEntry = new BibEntry();
+        LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
+
+        sourceEntry.setFiles(List.of(linkedFile));
+        targetEntry = new BibEntry(sourceEntry);
+        targetEntry.setFiles(List.of(linkedFile));
+
+        sourceContext.getDatabase().insertEntry(sourceEntry);
+        targetContext.getDatabase().insertEntry(targetEntry);
+
+        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+                filePreferences);
+
+        Path expectedFile = targetDir.resolve("sourcefiles/test.pdf");
+
+        assertTrue(returnedEntries.isEmpty());
+        assertFalse(Files.exists(expectedFile));
     }
 
     // endregion

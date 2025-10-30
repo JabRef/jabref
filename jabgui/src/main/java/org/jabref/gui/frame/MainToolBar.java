@@ -18,6 +18,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
@@ -57,6 +58,8 @@ public class MainToolBar extends ToolBar {
     private final TaskExecutor taskExecutor;
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
+    private SimpleCommand backCommand;
+    private SimpleCommand forwardCommand;
     private final CountingUndoManager undoManager;
 
     private PopOver entryFromIdPopOver;
@@ -99,6 +102,7 @@ public class MainToolBar extends ToolBar {
 
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
         pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
+        initNavigationCommands();
 
         // Setup Toolbar
 
@@ -117,16 +121,22 @@ public class MainToolBar extends ToolBar {
                 new HBox(
                         factory.createIconButton(StandardActions.ADD_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.ADD_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager, clipBoardManager))),
+                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        factory.createIconButton(StandardActions.BACK, backCommand),
+                        factory.createIconButton(StandardActions.FORWARD, forwardCommand)),
 
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
                         factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
                         factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager, clipBoardManager)),
-                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager, clipBoardManager)),
-                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager, clipBoardManager))),
+                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 
@@ -207,5 +217,33 @@ public class MainToolBar extends ToolBar {
         });
 
         return new Group(indicator);
+    }
+
+    private void initNavigationCommands() {
+        backCommand = new SimpleCommand() {
+            {
+                executable.bind(stateManager.canGoBackProperty());
+            }
+
+            @Override
+            public void execute() {
+                if (frame.getCurrentLibraryTab() != null) {
+                    frame.getCurrentLibraryTab().back();
+                }
+            }
+        };
+
+        forwardCommand = new SimpleCommand() {
+            {
+                executable.bind(stateManager.canGoForwardProperty());
+            }
+
+            @Override
+            public void execute() {
+                if (frame.getCurrentLibraryTab() != null) {
+                    frame.getCurrentLibraryTab().forward();
+                }
+            }
+        };
     }
 }

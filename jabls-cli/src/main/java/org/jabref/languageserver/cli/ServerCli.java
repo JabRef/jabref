@@ -3,7 +3,7 @@ package org.jabref.languageserver.cli;
 import java.util.concurrent.Callable;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
-import org.jabref.languageserver.LSPLauncher;
+import org.jabref.languageserver.LspLauncher;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
 import org.slf4j.Logger;
@@ -16,6 +16,9 @@ import picocli.CommandLine;
 public class ServerCli implements Callable<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerCli.class);
 
+    @CommandLine.Option(names = {"-p", "--port"}, description = "the port")
+    private Integer port = 2087;
+
     public static void main(final String[] args) throws InterruptedException {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
@@ -25,8 +28,8 @@ public class ServerCli implements Callable<Void> {
 
     @Override
     public Void call() throws InterruptedException {
-        LSPLauncher lspLauncher = new LSPLauncher();
-        lspLauncher.run(JabRefCliPreferences.getInstance());
+        LspLauncher lspLauncher = new LspLauncher(JabRefCliPreferences.getInstance(), port);
+        lspLauncher.run();
 
         // Keep the server running until user kills the process (e.g., presses Ctrl+C)
         Thread.currentThread().join();

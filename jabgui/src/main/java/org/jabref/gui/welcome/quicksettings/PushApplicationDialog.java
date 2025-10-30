@@ -9,7 +9,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplication;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.gui.welcome.components.PushToApplicationCell;
@@ -31,9 +30,8 @@ public class PushApplicationDialog extends FXDialog {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
-    public PushApplicationDialog(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor, ThemeManager themeManager) {
+    public PushApplicationDialog(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {
         super(AlertType.NONE, Localization.lang("Configure push to applications"), true);
-        themeManager.updateFontStyle(this.getDialogPane().getScene());
 
         this.preferences = preferences;
         this.dialogService = dialogService;

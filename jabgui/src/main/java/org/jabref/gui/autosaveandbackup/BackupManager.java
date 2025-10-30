@@ -137,11 +137,10 @@ public class BackupManager {
     /**
      * Checks whether a backup file exists for the given database file. If it exists, it is checked whether it is
      * newer and different from the original.
-     *
+     * <p>
      * In case a discarded file is present, the method also returns <code>false</code>, See also {@link #discardBackup(Path)}.
      *
      * @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
-     *
      * @return <code>true</code> if backup file exists AND differs from originalPath. <code>false</code> is the
      * "default" return value in the good case. In case a discarded file exists, <code>false</code> is returned, too.
      * In the case of an exception <code>true</code> is returned to ensure that the user checks the output.
@@ -303,7 +302,7 @@ public class BackupManager {
 
     /**
      * Marks the backups as discarded.
-     *
+     * <p>
      * We do not delete any files, because the user might want to recover old backup files.
      * Therefore, we mark discarded backups by a --discarded file.
      */
@@ -340,11 +339,11 @@ public class BackupManager {
         fillQueue(backupDir);
 
         executor.scheduleAtFixedRate(
-                                     // We need to determine the backup path on each action, because we use the timestamp in the filename
-                                     () -> determineBackupPathForNewBackup(backupDir).ifPresent(this::performBackup),
-                                     DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
-                                     DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
-                                     TimeUnit.SECONDS);
+                // We need to determine the backup path on each action, because we use the timestamp in the filename
+                () -> determineBackupPathForNewBackup(backupDir).ifPresent(this::performBackup),
+                DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
+                DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
+                TimeUnit.SECONDS);
     }
 
     private void fillQueue(Path backupDir) {
@@ -370,7 +369,7 @@ public class BackupManager {
      * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
      * This method should only be used when closing a database/JabRef in a normal way.
      *
-     * @param backupDir The backup directory
+     * @param backupDir    The backup directory
      * @param createBackup If the backup manager should still perform a backup
      */
     private void shutdown(Path backupDir, boolean createBackup) {

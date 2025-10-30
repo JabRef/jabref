@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.auxparser.AuxParserStatisticsProvider;
@@ -35,8 +36,9 @@ class GenerateBibFromAux implements Runnable {
     @Option(names = "--aux", required = true)
     private Path auxFile;
 
-    @Option(names = "--input", required = true)
-    private String inputFile;
+    // [impl->req~jabkit.cli.input-flag~1]
+    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
+    private Path inputFile;
 
     @Option(names = "--output")
     private Path outputFile;

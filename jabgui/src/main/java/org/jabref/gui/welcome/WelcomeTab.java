@@ -34,7 +34,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
@@ -74,7 +73,6 @@ public class WelcomeTab extends Tab {
     private final BuildInfo buildInfo;
     private final Stage stage;
     private final WorkspacePreferences workspacePreferences;
-    private final ThemeManager themeManager;
 
     private final VBox main;
     private Walkthroughs walkthroughs;
@@ -94,8 +92,7 @@ public class WelcomeTab extends Tab {
                       TaskExecutor taskExecutor,
                       FileHistoryMenu fileHistoryMenu,
                       BuildInfo buildInfo,
-                      WorkspacePreferences workspacePreferences,
-                      ThemeManager themeManager) {
+                      WorkspacePreferences workspacePreferences) {
         super(Localization.lang("Welcome"));
         setClosable(true);
         this.tabContainer = tabContainer;
@@ -112,7 +109,6 @@ public class WelcomeTab extends Tab {
         this.buildInfo = buildInfo;
         this.stage = stage;
         this.workspacePreferences = workspacePreferences;
-        this.themeManager = themeManager;
         this.recentLibrariesBox = new VBox();
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
@@ -182,7 +178,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createRightColumn() {
-        this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor, themeManager);
+        this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
         VBox rightColumn = new VBox(quickSettings, walkthroughs);
         rightColumn.getStyleClass().add("welcome-content-column");
@@ -214,16 +210,6 @@ public class WelcomeTab extends Tab {
             grid.add(leftColumn, 0, 0);
             grid.add(rightColumn, 1, 0);
         }
-//
-//        Node parent = getContent() != null ? getContent().getParent() : null;
-//        if (parent != null) {
-//            double parentHeight = parent.getBoundsInParent().getHeight();
-//            double topTitleHeight = main.getChildren().get(0).getBoundsInParent().getHeight();
-//            double communityLinksHeight = main.getChildren().get(2).getBoundsInParent().getHeight();
-//            double space = main.getSpacing() * 2 + main.getPadding().getTop() + main.getPadding().getBottom();
-//            double requiredHeight = topTitleHeight + communityLinksHeight + leftColumn.getBoundsInParent().getHeight() + space;
-//            scrollNeeded = parentHeight < requiredHeight;
-//        }
 
         if (!scrollNeeded) {
             if (!(main.getChildren().get(1) instanceof GridPane)) {
@@ -372,15 +358,24 @@ public class WelcomeTab extends Tab {
         Hyperlink link = new Hyperlink(text);
         link.getStyleClass().add("welcome-community-link");
         String url = switch (action) {
-            case HELP -> URLs.HELP_URL;
-            case OPEN_FORUM -> URLs.FORUM_URL;
-            case OPEN_MASTODON -> URLs.MASTODON_URL;
-            case OPEN_LINKEDIN -> URLs.LINKEDIN_URL;
-            case DONATE -> URLs.DONATE_URL;
-            case OPEN_DEV_VERSION_LINK -> URLs.DEV_VERSION_LINK_URL;
-            case OPEN_CHANGELOG -> URLs.CHANGELOG_URL;
-            case OPEN_PRIVACY_POLICY -> URLs.PRIVACY_POLICY_URL;
-            default -> null;
+            case HELP ->
+                    URLs.HELP_URL;
+            case OPEN_FORUM ->
+                    URLs.FORUM_URL;
+            case OPEN_MASTODON ->
+                    URLs.MASTODON_URL;
+            case OPEN_LINKEDIN ->
+                    URLs.LINKEDIN_URL;
+            case DONATE ->
+                    URLs.DONATE_URL;
+            case OPEN_DEV_VERSION_LINK ->
+                    URLs.DEV_VERSION_LINK_URL;
+            case OPEN_CHANGELOG ->
+                    URLs.CHANGELOG_URL;
+            case OPEN_PRIVACY_POLICY ->
+                    URLs.PRIVACY_POLICY_URL;
+            default ->
+                    null;
         };
         if (url != null) {
             link.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());

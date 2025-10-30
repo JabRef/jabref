@@ -3,7 +3,6 @@ package org.jabref.model.openoffice.uno;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -13,6 +12,7 @@ import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.beans.XPropertySetInfo;
 import com.sun.star.lang.WrappedTargetException;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Utilities for properties.
@@ -28,18 +28,17 @@ public class UnoProperties {
 
     public static Optional<XPropertySetInfo> getPropertySetInfo(XPropertySet propertySet) {
         return Optional.ofNullable(propertySet)
-                        .flatMap(e -> Optional.ofNullable(e.getPropertySetInfo()));
+                       .flatMap(e -> Optional.ofNullable(e.getPropertySetInfo()));
     }
 
     public static Optional<XPropertySetInfo> getPropertySetInfo(XPropertyContainer propertyContainer) {
         return Optional.ofNullable(propertyContainer).flatMap(UnoProperties::getPropertySetInfo);
     }
 
-    public static List<String> getPropertyNames(Property[] properties) {
-        Objects.requireNonNull(properties);
+    public static List<String> getPropertyNames(Property @NonNull [] properties) {
         return Arrays.stream(properties)
-                      .map(p -> p.Name)
-                      .collect(Collectors.toList());
+                     .map(p -> p.Name)
+                     .collect(Collectors.toList());
     }
 
     public static List<String> getPropertyNames(XPropertySetInfo propertySetInfo) {
@@ -56,11 +55,8 @@ public class UnoProperties {
                 .orElse(new ArrayList<>());
     }
 
-    public static Optional<Object> getValueAsObject(XPropertySet propertySet, String property)
-            throws
-            WrappedTargetException {
-        Objects.requireNonNull(propertySet);
-        Objects.requireNonNull(property);
+    public static Optional<Object> getValueAsObject(@NonNull XPropertySet propertySet, @NonNull String property)
+            throws WrappedTargetException {
         try {
             return Optional.ofNullable(propertySet.getPropertyValue(property));
         } catch (UnknownPropertyException e) {
@@ -69,8 +65,7 @@ public class UnoProperties {
     }
 
     public static Optional<Object> getValueAsObject(XPropertyContainer propertyContainer, String property)
-            throws
-            WrappedTargetException {
+            throws WrappedTargetException {
         Optional<XPropertySet> propertySet = asPropertySet(propertyContainer);
         if (propertySet.isEmpty()) {
             return Optional.empty();

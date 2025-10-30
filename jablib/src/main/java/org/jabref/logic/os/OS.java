@@ -91,7 +91,7 @@ public class OS {
                     ShellLink link = new ShellLink(texworksLinkPath);
                     return link.resolveTarget();
                 } catch (IOException |
-                        ShellLinkException e) {
+                         ShellLinkException e) {
                     // Static logger instance cannot be used. See the class comment.
                     Logger logger = LoggerFactory.getLogger(OS.class);
                     logger.warn("Error while reading .lnk file for TeXworks", e);

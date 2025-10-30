@@ -20,6 +20,8 @@ import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.errors.NoRemoteRepositoryException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryState;
@@ -307,8 +309,8 @@ public class GitHandler {
             String branch = repo.getBranch();
 
             PushCommand pushCommand = git.push()
-                                 .setRemote("origin")
-                                 .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch));
+                                         .setRemote("origin")
+                                         .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch));
 
             if (credsOpt.isPresent()) {
                 pushCommand.setCredentialsProvider(credsOpt.get());
@@ -317,23 +319,19 @@ public class GitHandler {
         }
     }
 
+    /// Pulls from the current branch’s upstream.
+    /// If no remote is configured, silently performs local merge.
+    /// This ensures SLR repositories without remotes still initialize correctly.
     public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
             Optional<CredentialsProvider> credsOpt = resolveCredentials();
-
-            boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
-            if (needCreds && credsOpt.isEmpty()) {
-                throw new IOException("Missing Git credentials (username and Personal Access Token).");
-            }
-
             PullCommand pullCommand = git.pull();
             if (credsOpt.isPresent()) {
                 pullCommand.setCredentialsProvider(credsOpt.get());
             }
             pullCommand.call();
         } catch (GitAPIException e) {
-            throw new IOException("Failed to pull from remote: " + e.getMessage(), e);
+            LOGGER.info("Failed to push");
         }
     }
 
@@ -357,6 +355,16 @@ public class GitHandler {
                 fetchCommand.setCredentialsProvider(credsOpt.get());
             }
             fetchCommand.call();
+        } catch (TransportException e) {
+            Throwable throwable = e;
+            while (throwable != null) {
+                if (throwable instanceof NoRemoteRepositoryException) {
+                    throw new IOException("No repository found at the configured remote. Please check the URL or your token settings.", e);
+                }
+                throwable = throwable.getCause();
+            }
+            String message = e.getMessage();
+            throw new IOException("Failed to fetch from remote: " + (message == null ? "unknown transport error" : message), e);
         } catch (GitAPIException e) {
             throw new IOException("Failed to fetch from remote: " + e.getMessage(), e);
         }

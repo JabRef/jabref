@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +107,7 @@ public class Date {
     /**
      * Creates a Date from date and endDate.
      *
-     * @param date the start date
+     * @param date    the start date
      * @param endDate the start date
      */
     public Date(TemporalAccessor date, TemporalAccessor endDate) {
@@ -127,9 +128,7 @@ public class Date {
      * @param dateString the string to extract the date information
      * @throws DateTimeParseException if dataString is mal-formatted
      */
-    public static Optional<Date> parse(String dateString) {
-        Objects.requireNonNull(dateString);
-
+    public static Optional<Date> parse(@NonNull String dateString) {
         dateString = dateString.strip();
 
         if (dateString.isEmpty()) {
@@ -139,15 +138,15 @@ public class Date {
         // if dateString has range format, treat as date range
         if (dateString.matches(
                 "\\d{4}/\\d{4}|" + // uuuu/uuuu
-                "\\d{4}-\\d{2}/\\d{4}-\\d{2}|" + // uuuu-mm/uuuu-mm
-                "\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd/uuuu-mm-dd
-                "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
-                "( |\\-)(\\d{1,4})/(January|February|March|April|May|June|July|August|September|October|November" +
-                "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
-                "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
-                "( |\\-)(\\d{1,4})/(\\d{1,2})( )" +
-                "(January|February|March|April|May|June|July|August|September|October|November|December)" +
-                "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
+                        "\\d{4}-\\d{2}/\\d{4}-\\d{2}|" + // uuuu-mm/uuuu-mm
+                        "\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd/uuuu-mm-dd
+                        "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4})/(January|February|March|April|May|June|July|August|September|October|November" +
+                        "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
+                        "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4})/(\\d{1,2})( )" +
+                        "(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
         )) {
             try {
                 String[] strDates = dateString.split("/");
@@ -160,15 +159,15 @@ public class Date {
             }
         } else if (dateString.matches(
                 "\\d{4} / \\d{4}|" + // uuuu / uuuu
-                "\\d{4}-\\d{2} / \\d{4}-\\d{2}|" + // uuuu-mm / uuuu-mm
-                "\\d{4}-\\d{2}-\\d{2} / \\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd / uuuu-mm-dd
-                "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
-                "( |\\-)(\\d{1,4}) / (January|February|March|April|May|June|July|August|September|October|November" +
-                "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
-                "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
-                "( |\\-)(\\d{1,4}) / (\\d{1,2})( )" +
-                "(January|February|March|April|May|June|July|August|September|October|November|December)" +
-                "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
+                        "\\d{4}-\\d{2} / \\d{4}-\\d{2}|" + // uuuu-mm / uuuu-mm
+                        "\\d{4}-\\d{2}-\\d{2} / \\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd / uuuu-mm-dd
+                        "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4}) / (January|February|March|April|May|June|July|August|September|October|November" +
+                        "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
+                        "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4}) / (\\d{1,2})( )" +
+                        "(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
         )) {
             try {
                 String[] strDates = dateString.split(" / ");
@@ -181,11 +180,11 @@ public class Date {
             }
         } else if (dateString.matches(
                 "\\d{1,4} BC/\\d{1,4} AD|" + // 30 BC/5 AD and 0030 BC/0005 AD
-                "\\d{1,4} BC/\\d{1,4} BC|" + // 30 BC/10 BC and 0030 BC/0010 BC
-                "\\d{1,4} AD/\\d{1,4} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} AD/\\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4} BC/\\d{1,4} BC|" + // 30 BC/10 BC and 0030 BC/0010 BC
+                        "\\d{1,4} AD/\\d{1,4} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} AD/\\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
         )) {
             try {
                 String[] strDates = dateString.split("/");
@@ -198,11 +197,11 @@ public class Date {
             }
         } else if (dateString.matches(
                 "\\d{1,4} BC / \\d{1,4} AD|" + // 30 BC / 5 AD and 0030 BC / 0005 AD
-                "\\d{1,4} BC / \\d{1,4} BC|" + // 30 BC / 10 BC and 0030 BC / 0010 BC
-                "\\d{1,4} AD / \\d{1,4} AD|" + // 5 AD / 10 AD and 0005 AD / 0010 AD
-                "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} AD / \\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4} BC / \\d{1,4} BC|" + // 30 BC / 10 BC and 0030 BC / 0010 BC
+                        "\\d{1,4} AD / \\d{1,4} AD|" + // 5 AD / 10 AD and 0005 AD / 0010 AD
+                        "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} AD / \\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
         )) {
             try {
                 String[] strDates = dateString.split(" / ");
@@ -230,9 +229,9 @@ public class Date {
         // handle the new date formats with era indicators
         if (dateString.matches(
                 "\\d{1,4} BC|" + // covers 1 BC
-                "\\d{1,4} AD|" + // covers 1 BC
-                "\\d{1,4}-\\d{1,2} BC|" +  // covers 0030-01 BC
-                "\\d{1,4}-\\d{1,2} AD" // covers 0005-01 AD
+                        "\\d{1,4} AD|" + // covers 1 BC
+                        "\\d{1,4}-\\d{1,2} BC|" +  // covers 0030-01 BC
+                        "\\d{1,4}-\\d{1,2} AD" // covers 0005-01 AD
         )) {
             try {
                 // Parse the date with era indicator

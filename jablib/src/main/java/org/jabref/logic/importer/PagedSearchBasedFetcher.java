@@ -3,22 +3,22 @@ package org.jabref.logic.importer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
+import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.search.query.SearchQuery;
 
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
 
     /**
-     * @param luceneQuery the root node of the lucene query
-     * @param pageNumber       requested site number indexed from 0
+     * @param queryNode  first search node
+     * @param pageNumber requested site number indexed from 0
      * @return Page with search results
      */
-    Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException;
+    Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException;
 
     /**
      * @param searchQuery query string that can be parsed into a lucene query
@@ -29,12 +29,12 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
         if (searchQuery.isBlank()) {
             return new Page<>(searchQuery, pageNumber, List.of());
         }
-        SyntaxParser parser = new StandardSyntaxParser();
-        final String NO_EXPLICIT_FIELD = "default";
+        SearchQuery searchQueryObject = new SearchQuery(searchQuery);
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
         try {
-            return this.performSearchPaged(parser.parse(searchQuery, NO_EXPLICIT_FIELD), pageNumber);
-        } catch (QueryNodeParseException e) {
-            throw new FetcherException("An error occurred during parsing of the query.");
+            return this.performSearchPaged(visitor.visitStart(searchQueryObject.getContext()), pageNumber);
+        } catch (ParseCancellationException e) {
+            throw new FetcherException("A syntax error occurred during parsing of the query");
         }
     }
 
@@ -48,11 +48,11 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     /**
      * This method is used to send complex queries using fielded search.
      *
-     * @param luceneQuery the root node of the lucene query
+     * @param queryNode the first search node
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
     @Override
-    default List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
-        return new ArrayList<>(performSearchPaged(luceneQuery, 0).getContent());
+    default List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+        return new ArrayList<>(performSearchPaged(queryNode, 0).getContent());
     }
 }

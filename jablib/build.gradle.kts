@@ -1,7 +1,8 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.SonatypeHost
 import dev.jbang.gradle.tasks.JBangTask
+import net.ltgt.gradle.errorprone.errorprone
+import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.net.URI
 import java.util.*
@@ -14,12 +15,15 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.32.0"
+    id("com.vanniktech.maven.publish") version "0.34.0"
 
     // id("dev.jbang") version "0.2.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
     // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
     id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
+
+    id("net.ltgt.errorprone") version "4.3.0"
+    id("net.ltgt.nullaway") version "2.3.0"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -163,6 +167,8 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-mistral-ai")
     implementation("dev.langchain4j:langchain4j-google-ai-gemini")
     implementation("dev.langchain4j:langchain4j-hugging-face")
+    implementation("dev.langchain4j:langchain4j-http-client")
+    implementation("dev.langchain4j:langchain4j-http-client-jdk")
 
     implementation("org.apache.velocity:velocity-engine-core")
     implementation("ai.djl:api")
@@ -201,7 +207,7 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core")
     // TODO: Use versions of versions/build.gradle.kts
-    mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
+    mockitoAgent("org.mockito:mockito-core:5.20.0") { isTransitive = false }
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.xmlunit:xmlunit-core")
@@ -222,6 +228,14 @@ dependencies {
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core")
     testImplementation("org.testfx:testfx-junit5")
+
+    // Highly recommended builder generator - https://github.com/skinny85/jilt
+    testCompileOnly("cc.jilt:jilt")
+    testAnnotationProcessor("cc.jilt:jilt")
+    // testImplementation("com.github.koppor:jilt:jitpack-SNAPSHOT")
+
+    errorprone("com.google.errorprone:error_prone_core")
+    errorprone("com.uber.nullaway:nullaway")
 }
 /*
 jacoco {
@@ -350,6 +364,7 @@ val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
+val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(extractMaintainers)
@@ -368,6 +383,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("scienceDirectApiKey", scienceDirectApiKey)
     inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
+    inputs.property("medlineApiKey", medlineApiKey)
 
     filesMatching("build.properties") {
         expand(
@@ -381,7 +397,8 @@ tasks.named<ProcessResources>("processResources") {
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
-                "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"]
+                "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
+                "medlineApiKey" to inputs.properties["medlineApiKey"]
             )
         )
     }
@@ -403,6 +420,16 @@ tasks.withType<JavaCompile>().configureEach {
 
     // Hint from https://docs.gradle.org/current/userguide/performance.html#run_the_compiler_as_a_separate_process
     options.isFork = true
+
+    options.errorprone {
+        disableAllChecks.set(true)
+        enable("NullAway")
+    }
+
+    options.errorprone.nullaway {
+        warn()
+        annotatedPackages.add("org.jabref")
+    }
 }
 
 tasks.javadoc {
@@ -420,7 +447,8 @@ tasks.test {
     jvmArgs = listOf(
         "-javaagent:${mockitoAgent.asPath}",
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io"
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
 }
 
@@ -431,25 +459,30 @@ jmh {
     zip64  = true
 }
 
+val testSourceSet = sourceSets["test"]
+
 tasks.register<Test>("fetcherTest") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("FetcherTest")
     }
-
     maxParallelForks = 1
 }
 
 tasks.register<Test>("databaseTest") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("DatabaseTest")
     }
-
     testLogging {
         // set options for log level LIFECYCLE
         events("FAILED")
         exceptionFormat = TestExceptionFormat.FULL
     }
-
     maxParallelForks = 1
 }
 
@@ -496,8 +529,7 @@ mavenPublishing {
     sourcesJar = true,
   ))
 
-  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
+  publishToMavenCentral()
   signAllPublications()
 
   coordinates("org.jabref", "jablib", version)
@@ -550,6 +582,10 @@ publishing.publications.withType<MavenPublication>().configureEach {
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("io.github.classgraph")
+
+    requires.add("jilt")
+    requires.add("java.compiler")
+
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")

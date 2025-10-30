@@ -224,12 +224,21 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    void yearInRangeShouldBeSelected() {
+    void selectRightYearWhenInRange() {
         BibEntry leftEntry = new BibEntry().withField(StandardField.YEAR, "1700");
         BibEntry rightEntry = new BibEntry().withField(StandardField.YEAR, "2000");
         FieldRowViewModel yearField = new FieldRowViewModel(StandardField.YEAR, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
         yearField.autoSelectBetterValue();
         assertEquals(FieldRowViewModel.Selection.RIGHT, yearField.getSelection());
+    }
+
+    @Test
+    void selectLeftYearWhenInRange() {
+        BibEntry leftEntry = new BibEntry().withField(StandardField.YEAR, "2005");
+        BibEntry rightEntry = new BibEntry().withField(StandardField.YEAR, "1700");
+        FieldRowViewModel yearField = new FieldRowViewModel(StandardField.YEAR, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
+        yearField.autoSelectBetterValue();
+        assertEquals(FieldRowViewModel.Selection.LEFT, yearField.getSelection());
     }
 
     public FieldRowViewModel createViewModelForField(Field field) {

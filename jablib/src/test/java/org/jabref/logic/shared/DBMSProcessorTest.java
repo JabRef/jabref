@@ -419,7 +419,7 @@ class DBMSProcessorTest {
         Map<Integer, Map<String, String>> expectedFieldMap = entries.stream()
                                                                     .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedID(),
                                                                             bibEntry -> bibEntry.getFieldMap().entrySet().stream()
-                                                                                                  .collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue))));
+                                                                                                .collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue))));
 
         assertEquals(expectedFieldMap, actualFieldMap);
     }

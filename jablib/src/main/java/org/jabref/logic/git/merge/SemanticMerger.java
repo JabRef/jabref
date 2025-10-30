@@ -19,31 +19,31 @@ public class SemanticMerger {
      * does not check for "modifications" or "conflicts"
      * all decisions should be handled in advance by the {@link SemanticConflictDetector}
      */
-    public static void applyMergePlan(BibDatabaseContext local, MergePlan plan) {
-        applyPatchToDatabase(local, plan.fieldPatches());
+    public static void applyMergePlan(BibDatabaseContext localCopy, MergePlan plan) {
+        applyPatchToDatabase(localCopy, plan.fieldPatches());
 
         for (BibEntry newEntry : plan.newEntries()) {
             BibEntry clone = new BibEntry(newEntry);
 
             clone.getCitationKey().ifPresent(citationKey ->
-                    local.getDatabase().getEntryByCitationKey(citationKey).ifPresent(existing -> {
-                        local.getDatabase().removeEntry(existing);
+                    localCopy.getDatabase().getEntryByCitationKey(citationKey).ifPresent(existing -> {
+                        localCopy.getDatabase().removeEntry(existing);
                         LOGGER.debug("Removed existing entry '{}' before re-inserting", citationKey);
                     })
             );
 
-            local.getDatabase().insertEntry(clone);
+            localCopy.getDatabase().insertEntry(clone);
             LOGGER.debug("Inserted (or replaced) entry '{}', fields={}, marked as changed",
                     clone.getCitationKey().orElse("?"),
                     clone.getFieldMap());
         }
     }
 
-    public static void applyPatchToDatabase(BibDatabaseContext local, Map<String, Map<Field, String>> patchMap) {
+    public static void applyPatchToDatabase(BibDatabaseContext localCopy, Map<String, Map<Field, String>> patchMap) {
         for (Map.Entry<String, Map<Field, String>> entry : patchMap.entrySet()) {
             String key = entry.getKey();
             Map<Field, String> fieldPatch = entry.getValue();
-            Optional<BibEntry> localEntryOpt = local.getDatabase().getEntryByCitationKey(key);
+            Optional<BibEntry> localEntryOpt = localCopy.getDatabase().getEntryByCitationKey(key);
 
             if (localEntryOpt.isEmpty()) {
                 LOGGER.warn("Skip patch: local does not contain entry '{}'", key);

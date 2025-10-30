@@ -3,7 +3,7 @@ package org.jabref.gui.edit.automaticfiededitor;
 import java.util.List;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -14,13 +14,13 @@ public class MoveFieldValueAction extends SimpleCommand {
     private final Field toField;
     private final List<BibEntry> entries;
 
-    private final NamedCompound edits;
+    private final NamedCompoundEdit edits;
 
     private int affectedEntriesCount;
 
     private final boolean overwriteToFieldContent;
 
-    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, NamedCompound edits, boolean overwriteToFieldContent) {
+    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, NamedCompoundEdit edits, boolean overwriteToFieldContent) {
         this.fromField = fromField;
         this.toField = toField;
         this.entries = entries;
@@ -28,7 +28,7 @@ public class MoveFieldValueAction extends SimpleCommand {
         this.overwriteToFieldContent = overwriteToFieldContent;
     }
 
-    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, NamedCompound edits) {
+    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, NamedCompoundEdit edits) {
         this(fromField, toField, entries, edits, true);
     }
 
@@ -53,9 +53,7 @@ public class MoveFieldValueAction extends SimpleCommand {
         edits.end();
     }
 
-    /**
-     * @return the number of affected entries
-     * */
+    /// @return the number of affected entries
     public int executeAndGetAffectedEntriesCount() {
         execute();
         return affectedEntriesCount;

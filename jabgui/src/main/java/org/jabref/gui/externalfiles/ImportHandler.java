@@ -114,7 +114,7 @@ public class ImportHandler {
             @Override
             public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
-                CompoundEdit ce = new CompoundEdit();
+                CompoundEdit compoundEdit = new CompoundEdit();
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
@@ -195,10 +195,10 @@ public class ImportHandler {
                     }
                     allEntriesToAdd.addAll(entriesToAdd);
 
-                    ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
-                    ce.end();
+                    compoundEdit.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
+                    compoundEdit.end();
                     // prevent fx thread exception in undo manager
-                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(ce));
+                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(compoundEdit));
 
                     counter++;
                 }
@@ -250,8 +250,20 @@ public class ImportHandler {
         importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK, new EntryImportHandlerTracker());
     }
 
+    /**
+     * Imports an entry into the database with duplicate checking and handling.
+     * Creates a copy of the entry for processing - the original entry parameter is not modified.
+     * The copied entry may be modified during cleanup and duplicate handling.
+     *
+     * @param bibDatabaseContext the database context to import into
+     * @param entry the entry to import (original will not be modified)
+     * @param decision the duplicate resolution strategy to apply
+     * @param tracker tracks the import status of the entry
+     */
     private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
-        BibEntry entryToInsert = new BibEntry(cleanUpEntry(bibDatabaseContext, entry));
+        // The original entry should not be modified
+        BibEntry entryCopy = new BibEntry(entry);
+        BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entryCopy);
 
         BackgroundTask.wrap(() -> findDuplicate(bibDatabaseContext, entryToInsert))
                       .onFailure(e -> {
@@ -263,7 +275,7 @@ public class ImportHandler {
                           if (existingDuplicateInLibrary.isPresent()) {
                               Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
                               if (duplicateHandledEntry.isEmpty()) {
-                                    tracker.markSkipped();
+                                  tracker.markSkipped();
                                   return;
                               }
                               finalEntry = duplicateHandledEntry.get();
@@ -350,7 +362,7 @@ public class ImportHandler {
                 List<FieldChange> undo = entryChanger.add(entries);
                 // TODO: Add undo
                 // if (!undo.isEmpty()) {
-                //    ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
+                //    compoundEdit.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
                 //            undo));
                 // }
             }

@@ -14,6 +14,7 @@ env:
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+  MedlineAPiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 
@@ -22,10 +23,14 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  # required for publish.yml
+  actions: write
+  contents: read
   pull-requests: write
 
 jobs:
   upload-pr-number:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt
@@ -49,6 +54,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
         with:
@@ -56,7 +62,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -88,8 +94,9 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -108,6 +115,18 @@ jobs:
         run: |
           ./gradlew --no-configuration-cache :rewriteDryRun
 
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: koppor/intellij-idea-format@update-to-latest-intellij
+        with:
+          file-mask: "*.java"
+          settings-file: ".idea/codeStyles/Project.xml"
+      # job should fail in case there are changes
+      - name: Check if any files changed
+        run: git diff --exit-code
+
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
@@ -122,8 +141,9 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -239,8 +259,9 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -274,6 +295,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -289,7 +311,7 @@ jobs:
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Run ${{ matrix.module }} tests
         run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -322,8 +344,9 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -371,8 +394,9 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -393,10 +417,20 @@ jobs:
           CI: "true"
           DBMS: "postgresql"
 
+  publish:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/publish.yml
+    secrets:
+      KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
+      KOPPOR_SIGNING_KEYID: ${{ secrets.KOPPOR_SIGNING_KEYID }}
+      KOPPOR_SIGNING_PASSWORD: ${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+      KOPPOR_MAVENCENTRALUSERNAME: ${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
+      KOPPOR_MAVENCENTRALPASSWORD: ${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
+
   jbang:
-    name: JBang
+    name: JBang (main)
     runs-on: ubuntu-latest
-    # JBang scripts depend on main-SNAPSHOT; thus, we can only test fully when main is updated
+    needs: publish
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
@@ -409,6 +443,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -426,7 +461,66 @@ jobs:
       - run: jbang build .jbang/CheckoutPR.java
       - run: jbang build .jbang/CloneJabRef.java
       - run: jbang build --fresh .jbang/JabKitLauncher.java
+      - run: jbang build --fresh .jbang/JabLsLauncher.java
       - run: jbang build --fresh .jbang/JabSrvLauncher.java
+      - run: jbang run .jbang/JabKitLauncher.java --help
+      - run: jbang run .jbang/JabLsLauncher.java --help
+      - run: jbang run .jbang/JabSrvLauncher.java --help
+
+  jbang-pr:
+    name: JBang (PR)
+    runs-on: ubuntu-latest
+    # does not need publish, because the JBang scripts are modified
+    if: github.ref != 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        launcher: [JabKitLauncher, JabLsLauncher, JabSrvLauncher]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 24
+          distribution: 'corretto'
+          check-latest: true
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Detect changed jablib classes
+        id: changed-jablib-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            jablib/src/main/java/**/*.java
+          files_ignore: |
+            jablib/src/main/java/**/*-*.java
+      - name: Build ${{ matrix.launcher }} launcher including changed classes
+        shell: bash
+        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
+        run: |
+          # We modify the JBang scripts directly to avoid issues with relative paths
+          for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
+            echo "//SOURCES ../$f" >> ".jbang/${{ matrix.launcher }}.java"
+          done
+          jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
+      - run: jbang ".jbang/${{ matrix.launcher }}.java" --help
+        shell: bash
 
   codecoverage:
     if: false
@@ -470,8 +564,9 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -515,8 +610,9 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - run: ./gradlew traceRequirements
       - if: always()
         run: cat build/reports/tracing.txt
@@ -530,4 +626,4 @@ jobs:
       - uses: actions/checkout@v5
         with:
           show-progress: 'false'
-      - uses: gradle/actions/wrapper-validation@v4
+      - uses: gradle/actions/wrapper-validation@v5

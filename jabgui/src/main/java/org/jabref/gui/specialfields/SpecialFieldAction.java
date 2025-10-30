@@ -2,7 +2,6 @@ package org.jabref.gui.specialfields;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -13,7 +12,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -22,6 +21,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,21 +70,22 @@ public class SpecialFieldAction extends SimpleCommand {
             if ((bes == null) || bes.isEmpty()) {
                 return;
             }
-            NamedCompound ce = new NamedCompound(undoText);
+            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(undoText);
             List<BibEntry> besCopy = new ArrayList<>(bes);
             for (BibEntry bibEntry : besCopy) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
                 Optional<FieldChange> change = UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame);
 
-                change.ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                change.ifPresent(fieldChange -> compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));
             }
-            ce.end();
-            if (ce.hasEdits()) {
-                undoManager.addEdit(ce);
+            compoundEdit.end();
+            if (compoundEdit.hasEdits()) {
+                undoManager.addEdit(compoundEdit);
                 tabSupplier.get().markBaseChanged();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {
                     outText = getTextDone(specialField, Integer.toString(bes.size()));
+                    getTextDone(specialField);
                 } else {
                     outText = getTextDone(specialField, value, Integer.toString(bes.size()));
                 }
@@ -97,18 +98,19 @@ public class SpecialFieldAction extends SimpleCommand {
         }
     }
 
-    private String getTextDone(SpecialField field, String... params) {
-        Objects.requireNonNull(params);
+    // @formatter:off
+    private String getTextDone(SpecialField field, String @NonNull... params) {
+    // @formatter:on
 
         SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, preferences, undoManager);
 
-        if (field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
+        if (field.isSingleValueField() && (params.length == 1)) {
             // Single value fields can be toggled only
             return Localization.lang("Toggled '%0' for %1 entries", viewModel.getLocalization(), params[0]);
-        } else if (!field.isSingleValueField() && (params.length == 2) && (params[0] != null) && (params[1] != null)) {
+        } else if (!field.isSingleValueField() && (params.length == 2)) {
             // setting a multi value special field - the set value is displayed, too
             return Localization.lang("Set '%0' to '%1' for %2 entries", viewModel.getLocalization(), params[0], params[1]);
-        } else if (!field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
+        } else if (!field.isSingleValueField() && (params.length == 1)) {
             // clearing a multi value specialfield
             return Localization.lang("Cleared '%0' for %1 entries", viewModel.getLocalization(), params[0]);
         } else {

@@ -168,8 +168,10 @@ public class WalkthroughRenderer {
         contentBox.getStyleClass().add("walkthrough-content");
         contentBox.getChildren().addAll(component.content().stream().map(block ->
                 switch (block) {
-                    case TextBlock textBlock -> render(textBlock);
-                    case InfoBlock infoBlock -> render(infoBlock);
+                    case TextBlock textBlock ->
+                            render(textBlock);
+                    case InfoBlock infoBlock ->
+                            render(infoBlock);
                     case ArbitraryJFXBlock arbitraryBlock ->
                             render(arbitraryBlock, walkthrough, beforeNavigate);
                 }

@@ -357,9 +357,12 @@ public class NewEntryViewModel {
             }
 
             final PlainCitationParser parser = switch (parserChoice) {
-                case PlainCitationParserChoice.RULE_BASED -> new RuleBasedPlainCitationParser();
-                case PlainCitationParserChoice.GROBID -> new GrobidPlainCitationParser(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
-                case PlainCitationParserChoice.LLM -> new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
+                case PlainCitationParserChoice.RULE_BASED ->
+                        new RuleBasedPlainCitationParser();
+                case PlainCitationParserChoice.GROBID ->
+                        new GrobidPlainCitationParser(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
+                case PlainCitationParserChoice.LLM ->
+                        new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
             };
 
             final SeveralPlainCitationParser setParser = new SeveralPlainCitationParser(parser);

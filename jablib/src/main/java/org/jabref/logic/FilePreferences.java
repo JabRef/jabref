@@ -13,7 +13,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.model.strings.StringUtil;
 
 /**
- *  Preferences for the linked files
+ * Preferences for the linked files
  */
 public class FilePreferences {
 
@@ -32,6 +32,7 @@ public class FilePreferences {
     private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
+    private final BooleanProperty adjustOrCopyLinkedFilesOnTransfer = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
     private final ObjectProperty<Path> lastUsedDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
@@ -50,6 +51,7 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
+                           boolean adjustOrCopyLinkedFilesOnTransfer,
                            boolean shouldKeepDownloadUrl,
                            Path lastUsedDirectory,
                            boolean openFileExplorerInFileDirectory,
@@ -67,6 +69,7 @@ public class FilePreferences {
         this.backupDirectory.setValue(backupDirectory);
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
+        this.adjustOrCopyLinkedFilesOnTransfer.setValue(adjustOrCopyLinkedFilesOnTransfer);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
         this.lastUsedDirectory.setValue(lastUsedDirectory);
         this.openFileExplorerInFileDirectory.set(openFileExplorerInFileDirectory);
@@ -227,6 +230,18 @@ public class FilePreferences {
 
     public void moveToTrash(boolean moveToTrash) {
         this.moveToTrash.set(moveToTrash);
+    }
+
+    public boolean shouldAdjustOrCopyLinkedFilesOnTransfer() {
+        return adjustOrCopyLinkedFilesOnTransfer.get();
+    }
+
+    public BooleanProperty adjustOrCopyLinkedFilesOnTransferProperty() {
+        return adjustOrCopyLinkedFilesOnTransfer;
+    }
+
+    public void setAdjustOrCopyLinkedFilesOnTransfer(boolean adjustOrCopyLinkedFilesOnTransfer) {
+        this.adjustOrCopyLinkedFilesOnTransfer.set(adjustOrCopyLinkedFilesOnTransfer);
     }
 
     public boolean shouldKeepDownloadUrl() {

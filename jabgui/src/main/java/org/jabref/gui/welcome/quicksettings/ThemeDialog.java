@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.component.HelpButton;
@@ -37,9 +36,8 @@ public class ThemeDialog extends FXDialog {
     private final GuiPreferences preferences;
     private final DialogService dialogService;
 
-    public ThemeDialog(GuiPreferences preferences, DialogService dialogService, ThemeManager themeManager) {
+    public ThemeDialog(GuiPreferences preferences, DialogService dialogService) {
         super(Alert.AlertType.NONE, Localization.lang("Change visual theme"));
-        themeManager.updateFontStyle(this.getDialogPane().getScene());
 
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -88,9 +86,12 @@ public class ThemeDialog extends FXDialog {
 
     private void selectInitialTheme() {
         switch (viewModel.getSelectedTheme()) {
-            case LIGHT -> lightRadio.setSelected(true);
-            case DARK -> darkRadio.setSelected(true);
-            case CUSTOM -> customRadio.setSelected(true);
+            case LIGHT ->
+                    lightRadio.setSelected(true);
+            case DARK ->
+                    darkRadio.setSelected(true);
+            case CUSTOM ->
+                    customRadio.setSelected(true);
         }
     }
 

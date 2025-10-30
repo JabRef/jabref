@@ -16,7 +16,6 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -24,6 +23,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -31,6 +31,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,9 @@ public class FileUtil {
     private static final String ELLIPSIS = "...";
     private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();
     private static final RemoveLatexCommandsFormatter REMOVE_LATEX_COMMANDS_FORMATTER = new RemoveLatexCommandsFormatter();
+    private static final String CYGDRIVE_PREFIX = "/cygdrive/";
+    private static final String MNT_PREFIX = "/mnt/";
+    private static final Pattern ROOT_DRIVE_PATTERN = Pattern.compile("^/[a-zA-Z]/.*");
 
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
@@ -141,29 +145,23 @@ public class FileUtil {
         return path.resolveSibling(path.getFileName() + extension);
     }
 
-    /**
-     * Looks for the unique directory, if any, different to the provided paths
-     *
-     * @param paths       List of paths as Strings
-     * @param comparePath The to be tested path
-     */
+    /// Looks for the shortest unique path of the parent directory in the list of paths
+    ///
+    /// @param paths       List of paths as Strings
+    /// @param comparePath The to be tested path
+    /// @return Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
-        String fileName = comparePath.getFileName().toString();
-
-        List<String> uniquePathParts = uniquePathSubstrings(paths);
-        return uniquePathParts.stream()
-                              .filter(part -> comparePath.toString().contains(part)
-                                      && !part.equals(fileName) && part.contains(File.separator))
-                              .findFirst()
-                              .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
+        // Difference to getUniquePathFragment: We want the parent directory, so we cut off the last path fragment
+        return getUniquePathFragment(paths, comparePath)
+                .filter(part -> part.contains(File.separator))
+                .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
 
-    /**
-     * Looks for the shortest unique path of in a list of paths
-     *
-     * @param paths       List of paths as Strings
-     * @param comparePath The to be shortened path
-     */
+    /// Looks for the shortest unique path in the list of paths
+    ///
+    /// @param paths       List of paths as Strings
+    /// @param comparePath The to be shortened path
+    /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
                                           .filter(part -> comparePath.toString().contains(part))
@@ -326,18 +324,15 @@ public class FileUtil {
     /**
      * Returns the list of linked files. The files have the absolute filename
      *
-     * @param bes      list of BibTeX entries
+     * @param entries      list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
      * @return list of files. May be empty
      */
-    public static List<Path> getListOfLinkedFiles(List<BibEntry> bes, List<Path> fileDirs) {
-        Objects.requireNonNull(bes);
-        Objects.requireNonNull(fileDirs);
-
-        return bes.stream()
-                  .flatMap(entry -> entry.getFiles().stream())
-                  .flatMap(file -> file.findIn(fileDirs).stream())
-                  .toList();
+    public static List<Path> getListOfLinkedFiles(@NonNull List<BibEntry> entries, @NonNull List<Path> fileDirs) {
+        return entries.stream()
+                      .flatMap(entry -> entry.getFiles().stream())
+                      .flatMap(file -> file.findIn(fileDirs).stream())
+                      .toList();
     }
 
     /**
@@ -348,11 +343,15 @@ public class FileUtil {
      * @param fileNamePattern the filename pattern
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
-        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+    public static Optional<String> createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
-        if (targetName.isEmpty()) {
+        if (targetName.isEmpty() || "-".equals(targetName)) {
             targetName = entry.getCitationKey().orElse("default");
+        }
+
+        if ("default".equals(targetName)) {
+            return Optional.empty();
         }
 
         // Remove LaTeX commands (e.g., \mkbibquote{}) from expanded fields before cleaning filename
@@ -361,7 +360,7 @@ public class FileUtil {
         // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
 
-        return targetName;
+        return Optional.of(targetName);
     }
 
     /**
@@ -404,8 +403,9 @@ public class FileUtil {
         return Optional.empty();
     }
 
-    public static Optional<Path> find(final BibDatabaseContext databaseContext, String fileName, FilePreferences filePreferences) {
-        Objects.requireNonNull(fileName, "fileName");
+    public static Optional<Path> find(final BibDatabaseContext databaseContext,
+                                      @NonNull String fileName,
+                                      FilePreferences filePreferences) {
         return find(fileName, databaseContext.getFileDirectories(filePreferences));
     }
 
@@ -439,10 +439,7 @@ public class FileUtil {
      * @param directory the directory which should be search starting point
      * @return an empty optional if the file does not exist, otherwise, the absolute path
      */
-    public static Optional<Path> find(String fileName, Path directory) {
-        Objects.requireNonNull(fileName);
-        Objects.requireNonNull(directory);
-
+    public static Optional<Path> find(@NonNull String fileName, @NonNull Path directory) {
         if (detectBadFileName(fileName)) {
             LOGGER.error("Invalid characters in path for file {}", fileName);
             return Optional.empty();
@@ -609,5 +606,49 @@ public class FileUtil {
 
     public static boolean isCharLegal(char c) {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
+    }
+
+    /// Converts a Cygwin-style file path to a Windows-style path if the operating system is Windows.
+    ///
+    /// Supported formats:
+    /// - /cygdrive/c/Users/... → C:\Users\...
+    /// - /mnt/c/Users/...      → C:\Users\...
+    /// - /c/Users/...          → C:\Users\...
+    ///
+    /// @param filePath the input file path
+    /// @return the converted path if running on Windows and path is in Cygwin format; otherwise, returns the original path
+    public static Path convertCygwinPathToWindows(String filePath) {
+        if (filePath == null) {
+            return null;
+        }
+
+        if (!OS.WINDOWS) {
+            return Path.of(filePath);
+        }
+
+        if (filePath.startsWith(MNT_PREFIX) && filePath.length() > 5) {
+            return buildWindowsPathWithDriveLetterIndex(filePath, 5);
+        }
+
+        if (filePath.startsWith(CYGDRIVE_PREFIX) && filePath.length() > 10) {
+            return buildWindowsPathWithDriveLetterIndex(filePath, 10);
+        }
+
+        if (ROOT_DRIVE_PATTERN.matcher(filePath).matches()) {
+            return buildWindowsPathWithDriveLetterIndex(filePath, 1);
+        }
+
+        return Path.of(filePath);
+    }
+
+    /// Builds a Windows-style path from a Cygwin-style path using a known prefix index.
+    ///
+    /// @param path        the input file path
+    /// @param letterIndex the index driver letter, zero-based indexing
+    /// @return a windows-style path
+    private static Path buildWindowsPathWithDriveLetterIndex(String path, int letterIndex) {
+        String driveLetter = path.substring(letterIndex, letterIndex + 1).toUpperCase();
+        String windowsPath = path.substring(letterIndex + 1).replace("/", "\\\\");
+        return Path.of(driveLetter + ":" + windowsPath);
     }
 }

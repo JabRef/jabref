@@ -102,15 +102,15 @@ public class AiDefaultPreferences {
                     #end""",
 
             AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, """
-                Please provide an overview of the following text. It is a part of a scientific paper.
-                The summary should include the main objectives, methodologies used, key findings, and conclusions.
-                Mention any significant experiments, data, or discussions presented in the paper.""",
+                    Please provide an overview of the following text. It is a part of a scientific paper.
+                    The summary should include the main objectives, methodologies used, key findings, and conclusions.
+                    Mention any significant experiments, data, or discussions presented in the paper.""",
 
             AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, "$text",
 
             AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, """
-                You have written an overview of a scientific paper. You have been collecting notes from various parts
-                of the paper. Now your task is to combine all of the notes in one structured message.""",
+                    You have written an overview of a scientific paper. You have been collecting notes from various parts
+                    of the paper. Now your task is to combine all of the notes in one structured message.""",
 
             AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, "$chunks",
 

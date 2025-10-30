@@ -113,7 +113,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else if (laTexFileDirectoryStatus().isValid()) {
-            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), Path.of(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
 
         databaseContext.setMetaData(newMetaData);
@@ -271,7 +271,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             if (!currPath.isAbsolute()) {
                 newPath = parentPath.resolve(fileDirectory.get()).toAbsolutePath().toString();
             } else if (currPath.isAbsolute()) {
-                newPath = parentPath.relativize(currPath).toString();
+                Path rel = parentPath.relativize(currPath);
+                newPath = rel.toString().isEmpty() ? "." : rel.toString();
             } else {
                 // case: convert to relative path and currPath is relative
                 return;
@@ -286,7 +287,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     /**
      * For a saved library, any directory relative to the library path will be set as relative; otherwise, it will be set as absolute.
      *
-     * @param fileDirectory file directory to be updated (lib/user/laTex)
+     * @param fileDirectory   file directory to be updated (lib/user/laTex)
      * @param selectedDirPath path of directory (selected by user)
      */
     private void setDirectory(StringProperty fileDirectory, Path selectedDirPath) {
@@ -300,7 +301,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         // set relative path
         fileDirectory.setValue(libPath.get()
-                .getParent()
-                .relativize(selectedDirPath).toString());
+                                      .getParent()
+                                      .relativize(selectedDirPath).toString());
     }
 }

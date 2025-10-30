@@ -70,13 +70,13 @@ public class RightClickMenu {
         MenuItem extractFileReferencesOffline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_OFFLINE, extractReferencesAction);
 
         contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager, clipBoardManager)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
                 createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
                 createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager, clipBoardManager)),
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager, clipBoardManager)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager, clipBoardManager)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
 
@@ -152,8 +152,7 @@ public class RightClickMenu {
                     factory.createCustomMenuItem(
                             StandardActions.COPY_TO,
                             new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
-                                    preferences.getFilePreferences(), importHandler, sourceDatabaseContext,
-                                targetDatabaseContext),
+                                    preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext),
                             targetDatabaseName
                     )
             );
@@ -163,12 +162,12 @@ public class RightClickMenu {
     }
 
     public static Menu createCopySubMenu(ActionFactory factory,
-                                          DialogService dialogService,
-                                          StateManager stateManager,
-                                          GuiPreferences preferences,
-                                          ClipBoardManager clipBoardManager,
-                                          JournalAbbreviationRepository abbreviationRepository,
-                                          TaskExecutor taskExecutor) {
+                                         DialogService dialogService,
+                                         StateManager stateManager,
+                                         GuiPreferences preferences,
+                                         ClipBoardManager clipBoardManager,
+                                         JournalAbbreviationRepository abbreviationRepository,
+                                         TaskExecutor taskExecutor) {
         Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);
 
         copySpecialMenu.getItems().addAll(
@@ -204,11 +203,11 @@ public class RightClickMenu {
     }
 
     static Menu createCopyFieldContentSubMenu(ActionFactory factory,
-                                                      DialogService dialogService,
-                                                      StateManager stateManager,
-                                                      ClipBoardManager clipBoardManager,
-                                                      GuiPreferences preferences,
-                                                      JournalAbbreviationRepository abbreviationRepository) {
+                                              DialogService dialogService,
+                                              StateManager stateManager,
+                                              ClipBoardManager clipBoardManager,
+                                              GuiPreferences preferences,
+                                              JournalAbbreviationRepository abbreviationRepository) {
         Menu copyFieldContentMenu = factory.createMenu(StandardActions.COPY_FIELD_CONTENT);
 
         copyFieldContentMenu.getItems().addAll(

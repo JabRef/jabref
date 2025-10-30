@@ -12,16 +12,16 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
+import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -102,7 +102,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFindByArXiv() throws URISyntaxException, IOException, FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.EPRINT, "1407.3561")
-                              .withField(StandardField.ARCHIVEPREFIX, "arXiv");
+                                       .withField(StandardField.ARCHIVEPREFIX, "arXiv");
         assertEquals(
                 Optional.of(new URI("https://arxiv.org/pdf/1407.3561.pdf").toURL()),
                 fetcher.findFullText(entry)
@@ -127,8 +127,9 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     void getURLForQueryWithLucene() throws QueryNodeParseException, MalformedURLException, URISyntaxException {
         String query = "Software engineering";
-        SyntaxParser parser = new StandardSyntaxParser();
-        URL url = fetcher.getURLForQuery(parser.parse(query, "default"), 0);
+        SearchQuery searchQueryObject = new SearchQuery(query);
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+        URL url = fetcher.getURLForQuery(visitor.visitStart(searchQueryObject.getContext()), 0);
         assertEquals("https://api.semanticscholar.org/graph/v1/paper/search?query=Software%20engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors", url.toString());
     }
 

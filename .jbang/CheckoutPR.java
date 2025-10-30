@@ -1,3 +1,5 @@
+////usr/bin/env jbang "$0" "$@" ; exit $?
+
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -15,13 +17,11 @@ import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.PagedIterator;
 
-///usr/bin/env jbang "$0" "$@" ; exit $?
-
 //JAVA 21+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
-//DEPS org.kohsuke:github-api:2.0-rc.4
-//DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.3.0.202506031305-r
+//DEPS org.kohsuke:github-api:2.0-rc.5
+//DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.4.0.202509020913-r
 
 public class CheckoutPR {
     public static void main(String[] args) throws Exception {
@@ -62,7 +62,7 @@ public class CheckoutPR {
             while (prIterator.hasNext()) {
                 pr = prIterator.next();
                 if ((contributor.isEmpty() || pr.getHead().getUser().getLogin().equals(contributor)) &&
-                    pr.getHead().getRef().equals(branchName)) {
+                        pr.getHead().getRef().equals(branchName)) {
                     found = true;
                     System.out.println("Found pull request #" + pr.getNumber());
                     break;
@@ -165,9 +165,9 @@ public class CheckoutPR {
             // Check if a remote pointing to JabRef/jabref already exists
             List<RemoteConfig> remotes = git.remoteList().call();
             Optional<RemoteConfig> jabrefRemote = remotes.stream()
-                // We use "contains", because there could be SSH remote URLs
-                .filter(r -> r.getURIs().stream().anyMatch(uri -> uri.toString().contains("JabRef/jabref")))
-                .findFirst();
+                                                         // We use "contains", because there could be SSH remote URLs
+                                                         .filter(r -> r.getURIs().stream().anyMatch(uri -> uri.toString().contains("JabRef/jabref")))
+                                                         .findFirst();
 
             String remoteToUse;
             if (jabrefRemote.isPresent()) {
@@ -176,9 +176,9 @@ public class CheckoutPR {
             } else {
                 System.out.println("Adding remote 'upstream' pointing to " + jabrefRepoUrl);
                 git.remoteAdd()
-                    .setName(upstreamName)
-                    .setUri(new URIish(jabrefRepoUrl))
-                    .call();
+                   .setName(upstreamName)
+                   .setUri(new URIish(jabrefRepoUrl))
+                   .call();
                 remoteToUse = upstreamName;
             }
 

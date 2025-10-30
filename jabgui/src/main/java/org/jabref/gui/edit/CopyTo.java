@@ -8,10 +8,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -19,6 +17,8 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.util.CopyUtil.copyEntriesWithFeedback;
 
 public class CopyTo extends SimpleCommand {
 
@@ -80,39 +80,28 @@ public class CopyTo extends SimpleCommand {
                                                             .flatMap(entry -> getCrossRefEntry(entry, sourceDatabaseContext).stream()).toList();
         entriesToAdd.addAll(entriesWithCrossRef);
 
-        copyEntriesWithFeedback(entriesToAdd, targetDatabaseContext,
+        copyEntriesWithFeedback(
+                sourceDatabaseContext,
+                entriesToAdd,
+                targetDatabaseContext,
                 Localization.lang("Copied %0 entry(s) to %1, including cross-references"),
-                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"));
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"),
+                dialogService,
+                filePreferences,
+                importHandler
+        );
     }
 
     public void copyEntriesWithoutCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
-        copyEntriesWithFeedback(selectedEntries, targetDatabaseContext,
-                Localization.lang("Copied %0 entry(s) to %1 without cross-references"),
-                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"));
-    }
-
-    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd, BibDatabaseContext targetDatabaseContext, String successMessage, String partialMessage) {
-        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(entriesToAdd.size());
-        tracker.setOnFinish(() -> {
-            int importedCount = tracker.getImportedCount();
-            int skippedCount = tracker.getSkippedCount();
-
-            String targetName = targetDatabaseContext.getDatabasePath()
-                                                     .map(path -> path.getFileName().toString())
-                                                     .orElse(Localization.lang("target library"));
-
-            if (importedCount == entriesToAdd.size()) {
-                dialogService.notify(Localization.lang(successMessage, String.valueOf(importedCount), targetName));
-            } else if (importedCount == 0) {
-                dialogService.notify(Localization.lang("No entry was copied to %0", targetName));
-            } else {
-                dialogService.notify(Localization.lang(partialMessage, String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
-            }
-        });
-
-        importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
-        tracker.setOnFinish(() -> LinkedFileTransferHelper
-          .adjustLinkedFilesForTarget(sourceDatabaseContext, targetDatabaseContext, filePreferences)
+        copyEntriesWithFeedback(
+                sourceDatabaseContext,
+                selectedEntries,
+                targetDatabaseContext,
+                Localization.lang("Copied %0 entry(s) to %1, without cross-references"),
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"),
+                dialogService,
+                filePreferences,
+                importHandler
         );
     }
 
