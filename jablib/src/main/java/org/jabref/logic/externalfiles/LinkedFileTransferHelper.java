@@ -39,6 +39,8 @@ public class LinkedFileTransferHelper {
      * @param sourceContext The source database context where files are currently located
      * @param targetContext The target database context where files should be accessible
      * @param filePreferences File preferences for both contexts
+     *
+     * @return set of modified entries. Used for testing.
      */
     public static Set<BibEntry> adjustLinkedFilesForTarget(
             BibDatabaseContext sourceContext,
