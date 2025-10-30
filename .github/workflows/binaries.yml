@@ -338,7 +338,7 @@ jobs:
           name: JabRef-${{ matrix.os }}-tbn
           path: |
             jabgui/build/packages/${{ matrix.os }}
-            jabkit/build/packages/${{ matrix.os }}
+            jabls-cli/build/packages/${{ matrix.os }}
           compression-level: 0 # no compression
       # endregion
 
@@ -411,9 +411,23 @@ jobs:
         include:
           - os: macos-15
             displayName: macOS (ARM64)
+            path: 'jabgui'
+            prefix: 'JabRef'
             suffix: '_arm64'
-          - os: macos-15-intel  # intel image
+          - os: macos-15-intel
             displayName: macOS
+            path: 'jabgui'
+            prefix: 'JabRef'
+            suffix: ''
+          - os: macos-15
+            displayName: macOS (ARM64)
+            path: 'jabls'
+            prefix: 'jabls'
+            suffix: '_arm64'
+          - os: macos-15-intel
+            displayName: macOS
+            path: 'jabls'
+            prefix: 'jabls'
             suffix: ''
     runs-on: ${{ matrix.os }}
     steps:
@@ -424,21 +438,21 @@ jobs:
       - name: Notarize dmg
         shell: bash
         run: |
-          cd jabgui
+          cd ${{ matrix.path }}
           find . -type f
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
+          xcrun notarytool submit packages/${{ matrix.os }}/${{ matrix.prefix }}-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple packages/${{ matrix.os }}/${{ matrix.prefix }}-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
       - name: Notarize pkg
         shell: bash
         run: |
-          cd jabgui
+          cd ${{ matrix.path }}
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
+          xcrun stapler staple packages/${{ matrix.os }}/${{ matrix.prefix }}-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
       - name: Upload to builds.jabref.org
         shell: bash
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ matrix.path }}/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
