@@ -50,7 +50,7 @@ public class RelatedWorkAnnotatorTest {
         );
 
         Optional<String> value = entry.getField(FieldFactory.parseField("comment-koppor"));
-        
+
         String expected =
                 "[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.\n\n" +
                         "[CIA_2021]: Colombia has ~50 million people.";

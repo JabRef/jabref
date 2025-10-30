@@ -324,7 +324,7 @@ public class FileUtil {
     /**
      * Returns the list of linked files. The files have the absolute filename
      *
-     * @param entries      list of BibTeX entries
+     * @param entries  list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
      * @return list of files. May be empty
      */

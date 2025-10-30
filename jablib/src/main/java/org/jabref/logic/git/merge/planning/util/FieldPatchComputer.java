@@ -20,8 +20,8 @@ public final class FieldPatchComputer {
     /// - If both sides changed to the same value, no patch needed;
     /// - Fallback: if a divergence is still observed, do not override local; skip this field,
     ///
-    /// @param base base version
-    /// @param local local version
+    /// @param base   base version
+    /// @param local  local version
     /// @param remote remote version
     /// @return A map from field to new value
     public static Map<Field, String> compute(BibEntry base, BibEntry local, BibEntry remote) {

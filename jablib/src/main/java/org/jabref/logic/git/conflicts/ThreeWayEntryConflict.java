@@ -1,5 +1,6 @@
 package org.jabref.logic.git.conflicts;
 
+import org.jabref.logic.git.io.RevisionTriple;
 import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NullMarked;
