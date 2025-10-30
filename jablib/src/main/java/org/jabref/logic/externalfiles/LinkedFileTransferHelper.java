@@ -65,11 +65,15 @@ public class LinkedFileTransferHelper {
                     continue;
                 }
 
-                // In case the file wasn't found at the source or the target - just re-use the existing link
                 Optional<Path> sourcePathOpt = linkedFile.findIn(sourceContext, filePreferences);
-                Optional<Path> targetPrimaryOpt = getPrimaryPath(targetContext, filePreferences);
+                if (sourcePathOpt.isEmpty()) {
+                    // In case file does not exist, just keep the broken link
+                    linkedFiles.add(linkedFile);
+                }
 
-                if (sourcePathOpt.isEmpty() || targetPrimaryOpt.isEmpty()) {
+                // TODO: This condition is strange
+                Optional<Path> targetPrimaryOpt = getPrimaryPath(targetContext, filePreferences);
+                if (targetPrimaryOpt.isEmpty()) {
                     linkedFiles.add(linkedFile);
                     continue;
                 }
