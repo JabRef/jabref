@@ -453,6 +453,10 @@ tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
     }
+    testLogging {
+        events("started", "passed", "skipped", "failed")
+    }
+    include("**/PdfImporterMockTest.class")
     jvmArgs = listOf(
         "-javaagent:${mockitoAgent.asPath}",
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
