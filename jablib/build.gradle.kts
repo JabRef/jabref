@@ -24,6 +24,7 @@ plugins {
 
     id("net.ltgt.errorprone") version "4.3.0"
     id("net.ltgt.nullaway") version "2.3.0"
+    id("info.solidsoft.pitest") version "1.19.0-rc.2"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -202,6 +203,7 @@ dependencies {
     testImplementation(project(":jabgui"))
 
     testImplementation("io.github.classgraph:classgraph")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
@@ -233,7 +235,14 @@ dependencies {
 
     errorprone("com.google.errorprone:error_prone_core")
     errorprone("com.uber.nullaway:nullaway")
+
+    pitest("org.pitest:pitest-junit5-plugin:1.2.1")
 }
+
+extraJavaModuleInfo {
+    failOnAutomaticModules.set(false)
+}
+
 /*
 jacoco {
     toolVersion = "0.8.13"
@@ -595,4 +604,27 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")
+}
+
+tasks.withType<Test> {
+    exclude("**/org/jabref/logic/importer/fileformat/pdf/**")
+}
+
+
+repositories {
+    mavenCentral()
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
+}
+
+pitest {
+    pitestVersion.set("1.19.0")
+    targetClasses.set(listOf("org.jabref.logic.util.*")) // mutate only util package
+    targetTests.set(listOf("org.jabref.logic.util.*Test"))
+    outputFormats.set(listOf("HTML", "XML"))
+    timestampedReports.set(false)
+    threads.set(4)
+    verbose.set(true)
+    failWhenNoMutations.set(false)
+    useClasspathFile.set(true)
+    junit5PluginVersion.set("1.2.1")
 }

@@ -175,6 +175,10 @@ public class ParserResult {
         return articleRanges;
     }
 
+    public boolean isError() {
+        return false;
+    }
+
     public record Range(
             int startLine,
             int startColumn,
