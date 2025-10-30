@@ -60,7 +60,7 @@ public class LinkedFileTransferHelper {
             List<LinkedFile> linkedFiles = new ArrayList<>();
 
             for (LinkedFile linkedFile : entry.getFiles()) {
-                if (linkedFile.getLink().isEmpty()) {
+                if (linkedFile.getLink().isEmpty() || linkedFile.isOnlineLink()) {
                     linkedFiles.add(linkedFile);
                     continue;
                 }
