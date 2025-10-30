@@ -32,51 +32,28 @@ class LinkedFileTransferHelperTest {
     private BibEntry targetEntry;
     private final FilePreferences filePreferences = mock(FilePreferences.class);
 
-    // region Case 1: Directory reachable - path adjustment needed
-
     @Test
     void pathDiffersShouldAdjustPath(@TempDir Path tempDir) throws Exception {
-        FileTestConfigurationBuilder.fileTestConfiguration()
+        FileTestConfiguration fileTestConfiguration = FileTestConfigurationBuilder.fileTestConfiguration()
                                     .tempDir(tempDir)
                                     .filePreferences(filePreferences)
-                                    .sourceDir("source/subdir")
-                                    .sourceFile("sourcefiles/test.pdf")
-                                    .targetDir("source")
+                                    .sourceDir("lit/subdir")
+                                    .sourceFile("test.pdf")
+                                    .targetDir("lit")
                                     .shouldStoreFilesRelativeToBibFile(true)
-                                    .shouldAdjustOrCopyLinkedFilesOnTransfer(true);
+                                    .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                    .build();
 
-        testFile = sourceDir.resolve("sourcefiles/test.pdf");
-        Files.createDirectories(testFile.getParent());
-        Files.createFile(testFile);
-
-        sourceContext = new BibDatabaseContext(new BibDatabase());
-        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
-        targetContext = new BibDatabaseContext(new BibDatabase());
-        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
-
-        sourceEntry = new BibEntry();
-        LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
-
-        sourceEntry.setFiles(List.of(linkedFile));
-        targetEntry = new BibEntry(sourceEntry);
-        targetEntry.setFiles(List.of(linkedFile));
-
-        sourceContext.getDatabase().insertEntry(sourceEntry);
-        targetContext.getDatabase().insertEntry(targetEntry);
-
-        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(
+                fileTestConfiguration.sourceContext,
+                fileTestConfiguration.targetContext,
                 filePreferences);
 
-        BibEntry expectedEntry = new BibEntry();
-        LinkedFile expectedLinkedFile = new LinkedFile("Test", "subdir/sourcefiles/test.pdf", "PDF");
-        expectedEntry.setFiles(List.of(expectedLinkedFile));
+        BibEntry expectedEntry = new BibEntry()
+                .withFiles(List.of(new LinkedFile("Test", "lit/subdir/test.pdf", "PDF")));
 
-        Set<BibEntry> expectedEntries = Set.of(expectedEntry);
-
-        assertEquals(expectedEntries, returnedEntries);
+        assertEquals(Set.of(expectedEntry), returnedEntries);
     }
-
-    // endregion
 
     // region Case 2: Directory not reachable - file copying with same relative paths
 
