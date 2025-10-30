@@ -6,8 +6,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.http.SimpleHttpResponse;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
