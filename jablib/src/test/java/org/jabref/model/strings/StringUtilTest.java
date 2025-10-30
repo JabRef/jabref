@@ -219,9 +219,9 @@ class StringUtilTest {
 
     static Stream<Arguments> provideDecodeStringDoubleArrayData() {
         return Stream.of(
-                Arguments.of("a:b;c:d", new String[][]{{"a", "b"}, {"c", "d"}}),
-                Arguments.of("a:;c:d", new String[][]{{"a", ""}, {"c", "d"}}),
-                Arguments.of("a:\\:b;c\\;:d", new String[][]{{"a", ":b"}, {"c;", "d"}})
+                Arguments.of("a:b;c:d", new String[][] {{"a", "b"}, {"c", "d"}}),
+                Arguments.of("a:;c:d", new String[][] {{"a", ""}, {"c", "d"}}),
+                Arguments.of("a:\\:b;c\\;:d", new String[][] {{"a", ":b"}, {"c;", "d"}})
         );
     }
 
