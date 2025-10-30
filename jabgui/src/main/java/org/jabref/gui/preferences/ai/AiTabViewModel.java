@@ -460,9 +460,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         });
                     }
                 })
-                .exceptionally(_ -> {
-                    return null;
-                });
+                .exceptionally(_ -> null);
     }
 
     @Override
