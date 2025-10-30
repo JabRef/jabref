@@ -9,13 +9,16 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
+import org.jabref.logic.util.LocationDetector;
+
 public class CleanupPreferences {
 
     private final ObservableSet<CleanupStep> activeJobs;
     private final ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanups;
+    private final ObjectProperty<BooktitleCleanups> booktitleCleanups;
 
     public CleanupPreferences(EnumSet<CleanupStep> activeJobs) {
-        this(activeJobs, new FieldFormatterCleanups(false, new ArrayList<>()));
+        this(activeJobs, new FieldFormatterCleanups(false, new ArrayList<>()), new BooktitleCleanups(false, LocationDetector.getInstance()));
     }
 
     public CleanupPreferences(CleanupStep activeJob) {
@@ -23,12 +26,19 @@ public class CleanupPreferences {
     }
 
     public CleanupPreferences(FieldFormatterCleanups formatterCleanups) {
-        this(EnumSet.noneOf(CleanupStep.class), formatterCleanups);
+        this(EnumSet.noneOf(CleanupStep.class), formatterCleanups, new BooktitleCleanups(false, LocationDetector.getInstance()));
     }
 
     public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
         this.activeJobs = FXCollections.observableSet(activeJobs);
         this.fieldFormatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
+        this.booktitleCleanups = new SimpleObjectProperty<>(new BooktitleCleanups(false, LocationDetector.getInstance()));
+    }
+
+    public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups, BooktitleCleanups booktitleCleanups) {
+        this.activeJobs = FXCollections.observableSet(activeJobs);
+        this.fieldFormatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
+        this.booktitleCleanups = new SimpleObjectProperty<>(booktitleCleanups);
     }
 
     public EnumSet<CleanupStep> getActiveJobs() {
@@ -58,6 +68,18 @@ public class CleanupPreferences {
 
     public Boolean isActive(CleanupStep step) {
         return activeJobs.contains(step);
+    }
+
+    public BooktitleCleanups getBooktitleCleanups() {
+        return booktitleCleanups.get();
+    }
+
+    public ObjectProperty<BooktitleCleanups> booktitleCleanupsProperty() {
+        return booktitleCleanups;
+    }
+
+    public void setBooktitleCleanups(BooktitleCleanups newBooktitleCleanups) {
+        booktitleCleanups.setValue(newBooktitleCleanups);
     }
 
     public FieldFormatterCleanups getFieldFormatterCleanups() {

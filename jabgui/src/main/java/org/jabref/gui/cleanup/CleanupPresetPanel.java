@@ -10,6 +10,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.commonfxcontrols.BooktitleCleanupPanel;
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -39,6 +40,7 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpBibtex;
     @FXML private CheckBox cleanUpTimestampToCreationDate;
     @FXML private CheckBox cleanUpTimestampToModificationDate;
+    @FXML private BooktitleCleanupPanel booktitleCleanupPanel;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(@NonNull BibDatabaseContext databaseContext,
@@ -118,6 +120,8 @@ public class CleanupPresetPanel extends VBox {
         cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
+        booktitleCleanupPanel.cleanupsDisableProperty().setValue(!preset.getBooktitleCleanups().isEnabled());
+        booktitleCleanupPanel.selectedActionsProperty().setValue(FXCollections.observableMap(preset.getBooktitleCleanups().getConfiguredActions()));
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFieldFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFieldFormatterCleanups().getConfiguredActions()));
     }
@@ -168,8 +172,13 @@ public class CleanupPresetPanel extends VBox {
 
         activeJobs.add(CleanupPreferences.CleanupStep.FIX_FILE_LINKS);
 
-        return new CleanupPreferences(activeJobs, new FieldFormatterCleanups(
-                !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
-                formatterCleanupsPanel.cleanupsProperty()));
+        return new CleanupPreferences(
+                activeJobs,
+                new FieldFormatterCleanups(
+                        !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
+                        formatterCleanupsPanel.cleanupsProperty()
+                ),
+                booktitleCleanupPanel.createCleanupAction()
+        );
     }
 }

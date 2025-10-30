@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<fx:root spacing="10.0" type="VBox"
+         xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.commonfxcontrols.BooktitleCleanupPanel">
+    <CheckBox fx:id="cleanupsEnabled" text="%Clean up 'booktitle' and move extracted fields" />
+    <!-- Main Grid Table -->
+    <GridPane fx:id="cleanupGrid" hgap="4.0" vgap="4.0" styleClass="grid-table" disable="${!cleanupsEnabled.selected}">
+        <columnConstraints>
+            <ColumnConstraints minWidth="80.0" prefWidth="100.0" />
+            <ColumnConstraints minWidth="80.0" prefWidth="100.0" halignment="CENTER" />
+            <ColumnConstraints minWidth="80.0" prefWidth="100.0" halignment="CENTER" />
+            <ColumnConstraints minWidth="80.0" prefWidth="100.0" halignment="CENTER" />
+            <ColumnConstraints minWidth="80.0" prefWidth="100.0" halignment="CENTER" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="15.0" prefHeight="20.0" />
+        </rowConstraints>
+
+        <!--Only table headers; Radio Buttons are populated dynamically-->
+        <Label text="Field" styleClass="table-header" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <Label text="Remove Only" styleClass="table-header" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <Label text="Replace" styleClass="table-header" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+        <Label text="Move if Empty" styleClass="table-header" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+        <Label text="Skip Cleanup" styleClass="table-header" GridPane.columnIndex="4" GridPane.rowIndex="0" />
+
+        <padding>
+            <Insets left="20.0" />
+        </padding>
+    </GridPane>
+
+</fx:root>
