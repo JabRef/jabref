@@ -9,8 +9,8 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.strings.StringUtil;
 
 public class JournalEditorViewModel extends AbstractEditorViewModel {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
