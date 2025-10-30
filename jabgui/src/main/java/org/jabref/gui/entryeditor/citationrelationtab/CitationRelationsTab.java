@@ -627,8 +627,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         citationsRelationsTabViewModel.bindToEntry(entry);
-        // Create a resizable layout where the lists occupy the center and the metrics (sciteResultsPane)
-        // are always visible at the bottom
+
         SplitPane splitPane = getPaneAndStartSearch(entry);
         splitPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         splitPane.setMinSize(0, 0);
