@@ -11,7 +11,7 @@ import javafx.scene.control.TextInputControl;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 
