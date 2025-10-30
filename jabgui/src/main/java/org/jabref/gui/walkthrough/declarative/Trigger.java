@@ -38,9 +38,9 @@ public interface Trigger {
     /// Attaches the navigation triggers to the target node. `beforeNavigate` and `onNavigate` are guaranteed to run at
     /// most once.
     ///
-    /// @param node           the node to attach the listeners to
+    /// @param node the node to attach the listeners to
     /// @param beforeNavigate the runnable to execute before navigation
-    /// @param onNavigate     the runnable to execute when navigation occurs
+    /// @param onNavigate the runnable to execute when navigation occurs
     /// @return a runnable to clean up the listeners
     Runnable attach(@NonNull Node node, Runnable beforeNavigate, Runnable onNavigate);
 
@@ -94,9 +94,9 @@ public interface Trigger {
             /// Modify the node's event dispatch chain or register custom logic to trigger [Trigger] when desired
             /// conditions are met.
             ///
-            /// @param node       The node to attach the trigger to.
+            /// @param node The node to attach the trigger to.
             /// @param onNavigate A function that wraps the original event handler. It takes a Supplier representing the
-            ///                                                                                                             original action and returns the result of that action.
+            /// original action and returns the result of that action.
             /// @return A cleanup runnable that detaches the trigger.
             Runnable create(Node node, Function<Supplier<?>, ?> onNavigate);
         }
