@@ -437,15 +437,15 @@ jobs:
           cd jabgui
           find . -type f
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
+          xcrun notarytool submit build/packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple build/packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
       - name: Notarize pkg
         shell: bash
         run: |
           cd jabgui
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
+          xcrun notarytool submit build/packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple build/packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
       - name: Upload to builds.jabref.org
         shell: bash
         run: |
