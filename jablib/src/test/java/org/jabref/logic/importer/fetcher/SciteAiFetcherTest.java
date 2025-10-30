@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ScienceAiFetcherTest {
+public class SciteAiFetcherTest {
     @Test
     void sciteTallyDTO() {
         JSONObject jsonObject = new JSONObject();
@@ -36,7 +36,7 @@ public class ScienceAiFetcherTest {
 
     @Test
     void fetchTallies() throws FetcherException {
-        ScienceAiFetcher viewModel = new ScienceAiFetcher();
+        SciteAiFetcher viewModel = new SciteAiFetcher();
         DOI doi = new DOI("10.1109/ICECS.2010.5724443");
         Optional<DOI> actual = DOI.parse(viewModel.fetchTallies(doi).doi());
         assertEquals(Optional.of(doi), actual);

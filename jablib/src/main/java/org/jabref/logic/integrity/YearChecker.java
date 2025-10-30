@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class YearChecker implements ValueChecker {
 
