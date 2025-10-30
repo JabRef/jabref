@@ -85,7 +85,7 @@ parts:
       - jabref-launcher
     plugin: nil
     build-snaps:
-      - gnome-42-2204
+      - gnome-46-2404
     override-prime: |
       set -eux
       for snap in "gnome-46-2404"; do  # List all content-snaps you're using here
