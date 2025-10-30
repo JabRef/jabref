@@ -1,12 +1,14 @@
 package org.jabref.model.openoffice.ootext;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Helper functions to produce some of the markup as understood by OOTextIntoOO.write
  * <p>
  * These do not cover all tags, only those needed to embed markup from Layout and citation marker formatters into citation markers and bibliography.
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class OOFormat {
 
     private OOFormat() {
