@@ -38,10 +38,9 @@ dependencies.constraints {
     // from JavaFX25 onwards
     api("org.openjfx:jdk-jsobject:$javafx")
 
-    api("com.ibm.icu:icu4j:72.0.1!!")
-
     api("com.dlsc.gemsfx:gemsfx:3.5.7")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
+    api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
     api("com.fasterxml.jackson-datatype-jdk8:2.20.0")
@@ -57,6 +56,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
+    api("com.google.errorprone:error_prone_core:2.42.0")
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.28")
     api("com.h2database:h2-mvstore:2.3.232")
@@ -69,6 +69,7 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
+    api("com.uber.nullaway:nullaway:0.12.10")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.20.0")
@@ -96,6 +97,8 @@ dependencies.constraints {
     api("net.harawata:appdirs:1.4.0")
     api("net.java.dev.jna:jna-jpms:5.18.1")
     api("net.java.dev.jna:jna-platform:5.18.1")
+    api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
+    api("net.ltgt.nullaway:nullaway:2.3.0")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.0")
@@ -126,7 +129,7 @@ dependencies.constraints {
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
     api("org.glassfish.jersey.core:jersey-server:3.1.11")
     api("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
-    api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
+    api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.11")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
     api("org.hisp.dhis:json-tree:1.8.1")
@@ -156,8 +159,4 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.10.4")
     api("org.yaml:snakeyaml:2.5")
     api("tech.units:indriya:2.2.3")
-    api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
-    api("com.google.errorprone:error_prone_core:2.42.0")
-    api("net.ltgt.nullaway:nullaway:2.3.0")
-    api("com.uber.nullaway:nullaway:0.12.10")
 }
