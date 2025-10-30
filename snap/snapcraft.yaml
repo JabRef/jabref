@@ -10,7 +10,7 @@ description: |
   `snap connect jabref:removable-media`
 grade: stable
 confinement: strict
-base: core22
+base: core24
 compression: lzo
 architectures:
   - build-on: [amd64]
@@ -88,7 +88,7 @@ parts:
       - gnome-42-2204
     override-prime: |
       set -eux
-      for snap in "gnome-42-2204"; do  # List all content-snaps you're using here
+      for snap in "gnome-46-2404"; do  # List all content-snaps you're using here
           cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" "$SNAPCRAFT_PRIME/usr/{}" \;
       done
       for CRUFT in bug lintian man; do
