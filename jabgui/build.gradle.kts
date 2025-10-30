@@ -152,6 +152,24 @@ tasks.named<JavaExec>("run") {
     enableAssertions = true
 }
 
+// region: Generate JabRef-post-image.wsf based on template
+val processedText: Provider<String> =
+    providers.fileContents(layout.projectDirectory.file("${projectDir}/buildres/windows/JabRef-post-image.wsf"))
+        .asText
+        .map { it.replace("@jabRefRoot@", "$projectDir").replace('\\', '/') }
+
+abstract class WriteTinyFile : DefaultTask() {
+    @get:Input abstract val content: Property<String>
+    @get:OutputFile abstract val outputFile: RegularFileProperty
+    @TaskAction fun run() = outputFile.get().asFile.writeText(content.get())
+}
+
+val genPostImageWsf = tasks.register<WriteTinyFile>("genPostImageWsf") {
+    content.set(processedText)
+    outputFile.set(layout.buildDirectory.file("generated/JabRef-post-image.wsf"))
+}
+// endregion
+
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     applicationName = "JabRef"
@@ -174,6 +192,7 @@ javaModulePackaging {
             include("JabRefHost.bat")
             include("JabRefHost.ps1")
         })
+        targetResources.from(genPostImageWsf.flatMap { it.outputFile })
     }
     targetsWithOs("linux") {
         options.addAll(
@@ -191,7 +210,7 @@ javaModulePackaging {
     }
     targetsWithOs("macos") {
         options.addAll(
-            "--icon", "$projectDir/src/main/resources/icons/jabref.icns",
+            "--icon", "$projectDir/buildres/macos/JabRef.icns",
             "--mac-package-identifier", "JabRef",
             "--mac-package-name", "JabRef",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
@@ -200,7 +219,7 @@ javaModulePackaging {
             options.addAll(
                 "--mac-sign",
                 "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",
-                "--mac-package-signing-prefix", "org.jabref",
+                "--mac-package-signing-prefix", "org.jabref.",
             )
         }
         targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
