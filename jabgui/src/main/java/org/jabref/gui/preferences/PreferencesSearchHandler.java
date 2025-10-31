@@ -65,7 +65,7 @@ class PreferencesSearchHandler {
     /**
      * Checks if a tab matches the given search query either by its name or by its controls.
      *
-     * @param tab   The preferences tab to check.
+     * @param tab The preferences tab to check.
      * @param query The search query.
      * @return True if the tab matches the query.
      */
@@ -93,7 +93,7 @@ class PreferencesSearchHandler {
      * </ul>
      *
      * @param control The control to check.
-     * @param query   The search query.
+     * @param query The search query.
      * @return true if the control contains the query, otherwise false.
      */
     private boolean controlMatchesQuery(Control control, String query) {
@@ -161,9 +161,9 @@ class PreferencesSearchHandler {
     /**
      * Recursively scans nodes and collects all controls.
      *
-     * @param node       The current node being scanned.
+     * @param node The current node being scanned.
      * @param controlMap Map storing tabs and their corresponding controls.
-     * @param tab        The PreferencesTab associated with the current node.
+     * @param tab The PreferencesTab associated with the current node.
      */
     private void scanControls(Node node, ArrayListMultimap<PreferencesTab, Control> controlMap, PreferencesTab tab) {
         if (node instanceof Control control) {

@@ -15,17 +15,25 @@
     <content>
         <VBox spacing="15">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="20"
+                        right="20"
+                        bottom="20"
+                        left="20"/>
             </padding>
 
-            <TextArea fx:id="commitMessage"
-                      prefRowCount="6"
-                      wrapText="true"
-                      VBox.vgrow="ALWAYS"/>
+            <TextArea
+                    fx:id="commitMessage"
+                    prefRowCount="6"
+                    wrapText="true"
+                    VBox.vgrow="ALWAYS"/>
         </VBox>
     </content>
     <buttonTypes>
-        <ButtonType fx:id="commitButton" text="%Commit" buttonData="OK_DONE"/>
-        <ButtonType fx:constant="CANCEL"/>
+        <ButtonType
+                fx:id="commitButton"
+                text="%Commit"
+                buttonData="OK_DONE"/>
+        <ButtonType
+                fx:constant="CANCEL"/>
     </buttonTypes>
 </DialogPane>

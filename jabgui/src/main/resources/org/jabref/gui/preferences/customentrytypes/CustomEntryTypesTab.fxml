@@ -11,74 +11,122 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root spacing="10.0" type="VBox"
-         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-         fx:controller="org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab">
-    <Label styleClass="titleHeader" text="%Custom entry types"/>
+<fx:root
+        spacing="10.0"
+        type="VBox"
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab">
+    <Label styleClass="titleHeader"
+           text="%Custom entry types"/>
     <HBox spacing="10.0">
-        <VBox prefWidth="100.0" spacing="10.0">
-            <Label styleClass="sectionHeader" text="%Entry types"/>
-            <TableView fx:id="entryTypesTable" minWidth="-Infinity" VBox.vgrow="ALWAYS">
+        <VBox prefWidth="100.0"
+              spacing="10.0">
+            <Label styleClass="sectionHeader"
+                   text="%Entry types"/>
+            <TableView
+                    fx:id="entryTypesTable"
+                    minWidth="-Infinity"
+                    VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="entryTypColumn"
-                                 minWidth="100.0" prefWidth="100.0" text="%Entry Type"/>
-                    <TableColumn fx:id="entryTypeActionsColumn"
-                                 maxWidth="40.0" minWidth="40.0" resizable="false"/>
+                    <TableColumn
+                            fx:id="entryTypColumn"
+                            minWidth="100.0"
+                            prefWidth="100.0"
+                            text="%Entry Type"/>
+                    <TableColumn
+                            fx:id="entryTypeActionsColumn"
+                            maxWidth="40.0"
+                            minWidth="40.0"
+                            resizable="false"/>
                 </columns>
                 <columnResizePolicy>
-                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    <TableView
+                            fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
             <HBox spacing="10.0">
-                <TextField fx:id="addNewEntryType"/>
+                <TextField
+                        fx:id="addNewEntryType"/>
                 <Button fx:id="addNewEntryTypeButton"
-                        prefHeight="20.0" prefWidth="20.0"
-                        styleClass="icon-button,narrow" onAction="#addEntryType">
+                        prefHeight="20.0"
+                        prefWidth="20.0"
+                        styleClass="icon-button,narrow"
+                        onAction="#addEntryType">
                     <graphic>
-                        <JabRefIconView glyph="ADD_NOBOX"/>
+                        <JabRefIconView
+                                glyph="ADD_NOBOX"/>
                     </graphic>
                     <tooltip>
-                        <Tooltip text="%Add new entry type"/>
+                        <Tooltip
+                                text="%Add new entry type"/>
                     </tooltip>
                 </Button>
             </HBox>
         </VBox>
-        <VBox spacing="10.0" HBox.hgrow="ALWAYS">
-            <Label styleClass="sectionHeader" text="%Required and optional fields"/>
-            <TableView fx:id="fields" minWidth="-Infinity" VBox.vgrow="ALWAYS">
+        <VBox spacing="10.0"
+              HBox.hgrow="ALWAYS">
+            <Label styleClass="sectionHeader"
+                   text="%Required and optional fields"/>
+            <TableView
+                    fx:id="fields"
+                    minWidth="-Infinity"
+                    VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="fieldNameColumn"
-                                 minWidth="120.0" text="%Field"/>
-                    <TableColumn fx:id="fieldTypeColumn"
-                                 minWidth="40.0" maxWidth="40.0"/>
-                    <TableColumn fx:id="fieldTypeMultilineColumn"
-                                 maxWidth="40.0" minWidth="40.0" resizable="false"/>
-                    <TableColumn fx:id="fieldTypeActionColumn"
-                                 maxWidth="40.0" minWidth="40.0" resizable="false"/>
+                    <TableColumn
+                            fx:id="fieldNameColumn"
+                            minWidth="120.0"
+                            text="%Field"/>
+                    <TableColumn
+                            fx:id="fieldTypeColumn"
+                            minWidth="40.0"
+                            maxWidth="40.0"/>
+                    <TableColumn
+                            fx:id="fieldTypeMultilineColumn"
+                            maxWidth="40.0"
+                            minWidth="40.0"
+                            resizable="false"/>
+                    <TableColumn
+                            fx:id="fieldTypeActionColumn"
+                            maxWidth="40.0"
+                            minWidth="40.0"
+                            resizable="false"/>
                 </columns>
                 <columnResizePolicy>
-                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    <TableView
+                            fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
-            <HBox spacing="10.0" alignment="BASELINE_CENTER">
-                <ComboBox fx:id="addNewField" editable="true" prefWidth="150.0"/>
+            <HBox spacing="10.0"
+                  alignment="BASELINE_CENTER">
+                <ComboBox
+                        fx:id="addNewField"
+                        editable="true"
+                        prefWidth="150.0"/>
                 <Button fx:id="addNewFieldButton"
-                        prefHeight="20.0" prefWidth="20.0"
-                        styleClass="icon-button,narrow" onAction="#addNewField">
+                        prefHeight="20.0"
+                        prefWidth="20.0"
+                        styleClass="icon-button,narrow"
+                        onAction="#addNewField">
                     <graphic>
-                        <JabRefIconView glyph="ADD_NOBOX"/>
+                        <JabRefIconView
+                                glyph="ADD_NOBOX"/>
                     </graphic>
                     <tooltip>
-                        <Tooltip text="%Add new Field"/>
+                        <Tooltip
+                                text="%Add new Field"/>
                     </tooltip>
                 </Button>
-                <Region HBox.hgrow="ALWAYS" />
-                <Button text="%Reset to default" onAction="#resetEntryTypes">
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="%Reset to default"
+                        onAction="#resetEntryTypes">
                     <graphic>
-                        <JabRefIconView glyph="REFRESH"/>
+                        <JabRefIconView
+                                glyph="REFRESH"/>
                     </graphic>
                     <tooltip>
-                        <Tooltip text="%Reset entry types and fields to defaults"/>
+                        <Tooltip
+                                text="%Reset entry types and fields to defaults"/>
                     </tooltip>
                 </Button>
             </HBox>

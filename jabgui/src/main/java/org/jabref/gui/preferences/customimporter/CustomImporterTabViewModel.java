@@ -60,7 +60,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
      * Converts a path relative to a base-path into a class name.
      *
      * @param basePath base path
-     * @param path     path that includes base-path as a prefix
+     * @param path path that includes base-path as a prefix
      * @return class name
      */
     private static String pathToClass(String basePath, Path path) {

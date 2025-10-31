@@ -102,7 +102,7 @@ public class MainTableColumnModel {
     /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
      *
-     * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
+     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
      */
     public MainTableColumnModel(@NonNull Type type, @NonNull String qualifier) {
@@ -131,9 +131,9 @@ public class MainTableColumnModel {
     /**
      * This is used by the preference migrations.
      *
-     * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
+     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
-     * @param width     the stored width of the column
+     * @param width the stored width of the column
      */
     public MainTableColumnModel(Type type, String qualifier, double width) {
         this(type, qualifier);

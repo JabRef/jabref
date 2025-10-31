@@ -1102,7 +1102,7 @@ TextFlow > .tooltip-text-monospaced {
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
     /* `!important` is override library's default font size */
-    -fx-font-size: 1.7em!important;
+    -fx-font-size: 1.7em !important;
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
     -fx-icon-color: -jr-theme-text;
@@ -1590,35 +1590,45 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:matching-search-and-groups {
     -fx-background-color: -jr-match-1-even;
 }
+
 .main-table .table-row-cell:matching-search-and-groups > .table-cell {
     -fx-text-fill: -jr-match-1-text-color;
 }
+
 .main-table .table-row-cell:matching-search-and-groups:focused > .table-cell {
     -fx-text-fill: -fx-focused-text-base-color;
 }
+
 .main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell {
     -fx-text-fill: -jr-maintable-focused-hover-text;
 }
+
 .main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-maintable-focused-hover-text;
 }
+
 .main-table .table-row-cell:matching-search-and-groups:hover > .table-cell {
     -fx-text-fill: -jr-hover-text;
 }
+
 .main-table .table-row-cell:matching-search-and-groups > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-match-1-text-color;
 }
+
 .main-table .table-row-cell:matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-hover-text;
 }
+
 .main-table .table-row-cell:matching-search-and-groups:odd {
     -fx-background-color: -jr-match-1-odd;
 }
+
 .main-table .table-row-cell:matching-search-and-groups:selected,
 .main-table .table-row-cell:matching-search-and-groups:focused,
 .main-table .table-row-cell:matching-search-and-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
+
 .main-table .table-row-cell:matching-search-and-groups:hover {
     -fx-background-color: -jr-hover;
 }
@@ -1626,36 +1636,46 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:matching-search-not-groups {
     -fx-background-color: -jr-match-2-even;
 }
+
 .main-table .table-row-cell:matching-search-not-groups > .table-cell {
     -fx-text-fill: -jr-match-2-text-color;
 }
+
 .main-table .table-row-cell:matching-search-not-groups:focused > .table-cell {
     -fx-text-fill: -fx-focused-text-base-color;
 }
+
 .main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell {
     -fx-text-fill: -jr-maintable-focused-hover-text;
 }
+
 .main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-maintable-focused-hover-text;
 }
+
 .main-table .table-row-cell:matching-search-not-groups:hover > .table-cell {
     -fx-text-fill: -jr-hover-text;
 }
+
 .main-table .table-row-cell:matching-search-not-groups > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-match-2-text-color;
 }
+
 .main-table .table-row-cell:matching-search-not-groups:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-hover-text;
 }
+
 .main-table .table-row-cell:matching-search-not-groups:odd {
     -fx-background-color: -jr-match-2-odd;
 }
+
 .main-table .table-row-cell:matching-search-not-groups:selected,
 .main-table .table-row-cell:matching-search-not-groups:focused,
 .main-table .table-row-cell:matching-search-not-groups:focused:hover,
 .main-table .table-row-cell:matching-search-not-groups:hover {
     -fx-background-color: -jr-selected;
 }
+
 .main-table .table-row-cell:matching-search-not-groups:hover {
     -fx-background-color: -jr-hover;
 }
@@ -1663,36 +1683,46 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:matching-groups-not-search {
     -fx-background-color: -jr-match-3-even;
 }
+
 .main-table .table-row-cell:matching-groups-not-search > .table-cell {
     -fx-text-fill: -jr-match-3-text-color;
 }
+
 .main-table .table-row-cell:matching-groups-not-search:focused > .table-cell {
     -fx-text-fill: -fx-focused-text-base-color;
 }
+
 .main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell {
     -fx-text-fill: -jr-maintable-focused-hover-text;
 }
+
 .main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-maintable-focused-hover-text;
 }
+
 .main-table .table-row-cell:matching-groups-not-search:hover > .table-cell {
     -fx-text-fill: -jr-hover-text;
 }
+
 .main-table .table-row-cell:matching-groups-not-search > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-match-3-text-color;
 }
+
 .main-table .table-row-cell:matching-groups-not-search:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-hover-text;
 }
+
 .main-table .table-row-cell:matching-groups-not-search:odd {
     -fx-background-color: -jr-match-3-odd;
 }
+
 .main-table .table-row-cell:matching-groups-not-search:selected,
 .main-table .table-row-cell:matching-groups-not-search:focused,
 .main-table .table-row-cell:matching-groups-not-search:focused:hover,
 .main-table .table-row-cell:matching-groups-not-search:hover {
     -fx-background-color: -jr-selected;
 }
+
 .main-table .table-row-cell:matching-groups-not-search:hover {
     -fx-background-color: -jr-hover;
 }
@@ -1700,35 +1730,45 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:not-matching-search-and-groups {
     -fx-background-color: -jr-match-4-even;
 }
+
 .main-table .table-row-cell:not-matching-search-and-groups > .table-cell {
     -fx-text-fill: -jr-match-4-text-color;
 }
+
 .main-table .table-row-cell:not-matching-search-and-groups:focused > .table-cell {
     -fx-text-fill: -fx-focused-text-base-color;
 }
+
 .main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell {
     -fx-text-fill: -jr-maintable-focused-hover-text;
 }
+
 .main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-maintable-focused-hover-text;
 }
+
 .main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell {
     -fx-text-fill: -jr-hover-text;
 }
+
 .main-table .table-row-cell:not-matching-search-and-groups > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-match-4-text-color;
 }
+
 .main-table.table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-hover-text;
 }
+
 .main-table .table-row-cell:not-matching-search-and-groups:odd {
     -fx-background-color: -jr-match-4-odd;
 }
+
 .main-table .table-row-cell:not-matching-search-and-groups:selected,
 .main-table .table-row-cell:not-matching-search-and-groups:focused,
 .main-table .table-row-cell:not-matching-search-and-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
+
 .main-table .table-row-cell:not-matching-search-and-groups:hover {
     -fx-background-color: -jr-hover;
 }
@@ -2192,8 +2232,7 @@ We want to have a look that matches our icons in the tool-bar */
 #errorConsole .info-section .glyph-icon,
 #errorConsole .exception .glyph-icon,
 #errorConsole .output .glyph-icon,
-#errorConsole .log .glyph-icon
-{
+#errorConsole .log .glyph-icon {
     -fx-font-size: 1.5em;
 }
 
@@ -2990,8 +3029,8 @@ journalInfo .grid-cell-b {
 
 .walkthrough-tooltip-title > *,
 .walkthrough-title > * {
-    -fx-text-fill: -jr-theme!important;
-    -fx-fill: -jr-theme!important;
+    -fx-text-fill: -jr-theme !important;
+    -fx-fill: -jr-theme !important;
     -fx-font-weight: bold;
     -fx-font-size: 1.75em;
     -fx-line-spacing: -0.25em;

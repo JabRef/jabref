@@ -126,8 +126,8 @@ public class BackupManager {
      * Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
-     * @param backupDir          The path to the backup directory
-     * @param createBackup       True, if a backup should be created
+     * @param backupDir The path to the backup directory
+     * @param createBackup True, if a backup should be created
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
         RUNNING_INSTANCES.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdown(backupDir, createBackup));
@@ -369,7 +369,7 @@ public class BackupManager {
      * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
      * This method should only be used when closing a database/JabRef in a normal way.
      *
-     * @param backupDir    The backup directory
+     * @param backupDir The backup directory
      * @param createBackup If the backup manager should still perform a backup
      */
     private void shutdown(Path backupDir, boolean createBackup) {

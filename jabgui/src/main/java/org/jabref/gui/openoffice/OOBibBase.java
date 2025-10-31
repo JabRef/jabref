@@ -531,14 +531,14 @@ public class OOBibBase {
      * <p>
      * Note: Undo does not remove or reestablish custom properties.
      *
-     * @param entries            The entries to cite.
+     * @param entries The entries to cite.
      * @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
-     *                           <p>
-     *                           Consistency: for each entry in {@code entries}: looking it up in {@code syncOptions.get().databases} (if present) should yield {@code database}.
-     * @param style              The bibliography style we are using.
-     * @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
-     * @param pageInfo           A single page-info for these entries. Attributed to the last entry.
-     * @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise provides options for refreshing the reference list.
+     * <p>
+     * Consistency: for each entry in {@code entries}: looking it up in {@code syncOptions.get().databases} (if present) should yield {@code database}.
+     * @param style The bibliography style we are using.
+     * @param citationType Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
+     * @param pageInfo A single page-info for these entries. Attributed to the last entry.
+     * @param syncOptions Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise provides options for refreshing the reference list.
      */
     public void guiActionInsertEntry(List<BibEntry> entries,
                                      BibDatabaseContext bibDatabaseContext,
@@ -841,7 +841,7 @@ public class OOBibBase {
      * GUI action, refreshes citation markers and bibliography.
      *
      * @param databases Must have at least one.
-     * @param style     Style.
+     * @param style Style.
      */
     public void guiActionUpdateDocument(List<BibDatabase> databases, OOStyle style) {
         final String errorTitle = Localization.lang("Unable to synchronize bibliography");

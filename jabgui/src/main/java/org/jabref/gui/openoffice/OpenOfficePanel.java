@@ -509,7 +509,7 @@ public class OpenOfficePanel {
     /**
      * Given the withText and inParenthesis options, return the corresponding citationType.
      *
-     * @param withText      False means invisible citation (no text).
+     * @param withText False means invisible citation (no text).
      * @param inParenthesis True means "(Au and Thor 2000)". False means "Au and Thor (2000)".
      */
     private static CitationType citationTypeFromOptions(boolean withText, boolean inParenthesis) {

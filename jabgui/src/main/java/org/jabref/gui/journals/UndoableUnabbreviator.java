@@ -22,8 +22,8 @@ public class UndoableUnabbreviator {
     /**
      * Unabbreviate the journal name of the given entry.
      *
-     * @param entry        The entry to be treated.
-     * @param field        The field
+     * @param entry The entry to be treated.
+     * @param field The field
      * @param compoundEdit If the entry is changed, add an edit to this compound.
      * @return true if the entry was changed, false otherwise.
      */
