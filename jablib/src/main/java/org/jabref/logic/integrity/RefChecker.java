@@ -1,11 +1,12 @@
 package org.jabref.logic.integrity;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.FetcherException;
@@ -199,10 +200,10 @@ public class RefChecker {
     }
 
     public static final class Unsure extends ReferenceValidity {
-        List<BibEntry> matchingReferences;
+        Set<BibEntry> matchingReferences;
 
         public Unsure(BibEntry matchingReference) {
-            List<BibEntry> matchingReferences = new ArrayList<>();
+            Set<BibEntry> matchingReferences = new HashSet<>();
             matchingReferences.add(matchingReference);
             this.matchingReferences = matchingReferences;
         }

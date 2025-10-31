@@ -69,7 +69,7 @@ public class RefCheckerTest {
             .withField(StandardField.MONTH, "#jul#")
             .withField(StandardField.PUBLISHER, "IEEE")
             .withField(StandardField.TITLE, "BPEL4Chor: Extending BPEL for Modeling Choreographies")
-            .withField(StandardField.YEAR, "2008")
+            .withField(StandardField.YEAR, "2008") // Incorrect Field
             .withField(StandardField.PAGES, "296--303")
             .withField(StandardField.DOI, "10.1109/icws.2007.59");
     public BibEntry fakeEntry = new BibEntry(StandardEntryType.InProceedings)
@@ -116,6 +116,13 @@ public class RefCheckerTest {
     void findsRealEntryFromDoi() throws FetcherException {
         RefChecker.ReferenceValidity rv = refChecker.validityFromDoiFetcher(realEntry);
         assertEquals(RefChecker.Real.class, rv.getClass());
+    }
+
+    @Test
+    void closeToRealEntry() throws FetcherException {
+        RefChecker.ReferenceValidity rv = refChecker.referenceValidityOfEntry(closeToRealEntry);
+        System.out.println(((RefChecker.Unsure) rv).matchingReferences);
+        assertEquals(RefChecker.Unsure.class, rv.getClass());
     }
 
     @Test
@@ -181,6 +188,16 @@ public class RefCheckerTest {
             assertEquals(t1, t1.or(t2));
             assertEquals(t1, t1.or(t3));
             assertEquals(t2, t3.or(t2));
+        }
+
+        @Test
+        void unsureTest() {
+            var t1 = new RefChecker.Unsure(realEntry);
+            var t2 = new RefChecker.Unsure(fakeEntry);
+            assertNotEquals(t1, t2);
+            t1.or(t2);
+            t2.or(t1);
+            assertEquals(t1, t2);
         }
     }
 }
