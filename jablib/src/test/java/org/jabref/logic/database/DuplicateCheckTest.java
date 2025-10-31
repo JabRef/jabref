@@ -7,6 +7,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -610,5 +611,52 @@ public class DuplicateCheckTest {
                 .withField(StandardField.ISBN, "978-1-4684-8585-1");
 
         assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void degreeOfSimilarityOfSameEntryIsOne() {
+
+        assertEquals(1.0, duplicateChecker.degreeOfSimilarity(getSimpleArticle(), getSimpleArticle()));
+        assertEquals(1.0, duplicateChecker.degreeOfSimilarity(getSimpleInCollection(), getSimpleInCollection()));
+    }
+
+    @Test
+    void differentEntriesHaveSmallDegreeOfSimilarity() {
+        assertTrue(0.3 >
+                duplicateChecker.degreeOfSimilarity(
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.TITLE, "Some Article"),
+                        new BibEntry(StandardEntryType.InCollection)
+                                .withField(StandardField.TITLE, "Other Collection")
+                )
+        );
+    }
+
+    @Test
+    void entriesWithNoMatchingFieldHaveNoSimilarity() {
+        assertEquals(0.0, duplicateChecker.degreeOfSimilarity(
+                new BibEntry(StandardEntryType.Article)
+                        .withField(StandardField.TITLE, "Some Article"),
+                new BibEntry(StandardEntryType.Article)
+                        .withField(StandardField.AUTHOR, "Some Author")
+        ));
+    }
+
+    @Test
+    void moreFieldsDoesNotAffectTheSimilarity() {
+        assertEquals(1.0, duplicateChecker.degreeOfSimilarity(
+                getSimpleArticle(),
+                getSimpleArticle().withField(new UnknownField("secret"), "Something")
+        ));
+    }
+
+    @Test
+    void similarEntriesHaveAHighDegreeOfSimilarity() {
+        double similarity = duplicateChecker.degreeOfSimilarity(
+                getSimpleArticle().withField(StandardField.YEAR, "2018"),
+                getSimpleArticle()
+        );
+        assertTrue(0.8 < similarity);
+        assertTrue(1.0 > similarity);
     }
 }
