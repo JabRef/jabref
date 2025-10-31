@@ -62,8 +62,8 @@ parts:
   jabref:
     plugin: dump
     source:
-      - on amd64 to amd64: https://builds.jabref.org/main/JabRef-6.0-portable_linux.tar.gz
-      - on arm64 to arm64: https://builds.jabref.org/main/JabRef-6.0_arm64-portable_linux_arm64.tar.gz
+      - on amd64 to amd64: https://builds.jabref.org/main/JabRef-portable_linux.tar.gz
+      - on arm64 to arm64: https://builds.jabref.org/main/JabRef-portable_linux_arm64.tar.gz
     stage-packages:
       - x11-utils
     override-build: |
