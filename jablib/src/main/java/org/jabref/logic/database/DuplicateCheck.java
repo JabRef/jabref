@@ -370,8 +370,16 @@ public class DuplicateCheck {
      * Checks across all fields of the entries,
      * any matching ones get compared.
      * If they are not the same the score goes down.
-     *
-     *
+     * The score goes down depending on the
+     * Levenshtein distance between the two entries.
+     * <p>
+     * If the result is zero, it means that either no common fields were found
+     * or that all common fields were very far apart lexically.
+     * <p>
+     * If the result is one, it means that there was at least one common field
+     * and all the common fields were the same.
+     * <p>
+     * Similar entries have a score of above 0.8
      *
      * @param one The first entry
      * @param two The second entry
