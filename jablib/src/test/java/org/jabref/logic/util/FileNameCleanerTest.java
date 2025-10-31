@@ -46,7 +46,7 @@ class FileNameCleanerTest {
     }
 
     @Test
-    void mutation_kill_test() { // destroys mutate in Dir.getFullTextIndexBaseDir()
+    void DirectoryPathValidate() { // destroys mutate in Dir.getFullTextIndexBaseDir()
         Path expected = Path.of(""); // expected C:/users/laptop/appdata/local/org.jabref/jabref/lucene/5
         Path actual = Directories.getFulltextIndexBaseDirectory();
         assertFalse(actual.endsWith(expected));
