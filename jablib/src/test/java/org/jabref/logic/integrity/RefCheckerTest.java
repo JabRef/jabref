@@ -149,10 +149,10 @@ public class RefCheckerTest {
         List<BibEntry> entries = List.of(realEntry, realEntryNoDoi, fakeEntry);
         var e = refChecker.validateListOfEntries(entries);
 
-        assertEquals(e.size(), 3);
-        assertEquals(e.get(realEntry).getClass(), RefChecker.Real.class);
-        assertEquals(e.get(realEntryNoDoi).getClass(), RefChecker.Real.class);
-        assertEquals(e.get(fakeEntry).getClass(), RefChecker.Fake.class);
+        assertEquals(3, e.size());
+        assertEquals(RefChecker.Real.class, e.get(realEntry).getClass());
+        assertEquals(RefChecker.Real.class, e.get(realEntryNoDoi).getClass());
+        assertEquals(RefChecker.Fake.class, e.get(fakeEntry).getClass());
     }
 
     @Nested
