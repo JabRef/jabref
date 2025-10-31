@@ -25,6 +25,23 @@ plugins {
     id("net.ltgt.errorprone") version "4.3.0"
     id("net.ltgt.nullaway") version "2.3.0"
     id("info.solidsoft.pitest") version "1.19.0-rc.2"
+    id("org.sonarqube") version "6.3.1.5724"
+}
+sonar {
+        properties {
+            property(
+                "sonar.projectKey",
+                "jabref"
+            )
+            property(
+                "sonar.sources",
+                "src"
+            )
+            property(
+                "sonar.host.url",
+                "http://localhost:9000"
+            )
+        }
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
