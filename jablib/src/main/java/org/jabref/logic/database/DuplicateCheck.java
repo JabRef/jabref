@@ -28,6 +28,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -363,5 +364,27 @@ public class DuplicateCheck {
                                                 final BibDatabaseMode bibDatabaseMode) {
 
         return database.getEntries().stream().filter(other -> isDuplicate(entry, other, bibDatabaseMode)).findFirst();
+    }
+
+    /**
+     * Checks across all fields of the entries,
+     * any matching ones get compared.
+     * If they are not the same the score goes down.
+     *
+     *
+     *
+     * @param one The first entry
+     * @param two The second entry
+     * @return number [0,1] 1 representing the same (one potentially having more fields), 0 representing completely different
+     */
+    public double degreeOfSimilarity(final BibEntry one, final BibEntry two) {
+        return one.getFields((f) -> two.getField(f).isPresent())
+                  .stream().mapToDouble((field) -> {
+                    String first = one.getField(field).get();
+                    String second = two.getField(field).get();
+                    int maxLength = Math.max(first.length(), second.length());
+                    Integer levenshteinDistance = LevenshteinDistance.getDefaultInstance().apply(first, second);
+                    return 1 - levenshteinDistance / (double) maxLength;
+                }).average().orElse(0.0);
     }
 }
