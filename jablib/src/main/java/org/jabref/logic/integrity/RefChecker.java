@@ -185,10 +185,12 @@ public class RefChecker {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+            if (o == null || getClass() != o.getClass()) {
                 return false;
+            }
             Real real = (Real) o;
             return Objects.equals(matchingReference, real.matchingReference);
         }
@@ -214,10 +216,12 @@ public class RefChecker {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+            if (o == null || getClass() != o.getClass()) {
                 return false;
+            }
             Unsure unsure = (Unsure) o;
             return Objects.equals(matchingReferences, unsure.matchingReferences);
         }
@@ -231,6 +235,10 @@ public class RefChecker {
     public static final class Fake extends ReferenceValidity {
         public boolean equals(Object o) {
             return o.getClass() == Fake.class;
+        }
+
+        public int hashCode() {
+            return Objects.hashCode(Fake.class);
         }
     }
 }

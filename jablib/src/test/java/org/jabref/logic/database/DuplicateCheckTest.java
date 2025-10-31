@@ -615,7 +615,6 @@ public class DuplicateCheckTest {
 
     @Test
     void degreeOfSimilarityOfSameEntryIsOne() {
-
         assertEquals(1.0, duplicateChecker.degreeOfSimilarity(getSimpleArticle(), getSimpleArticle()));
         assertEquals(1.0, duplicateChecker.degreeOfSimilarity(getSimpleInCollection(), getSimpleInCollection()));
     }

@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class RefCheckerTest {
-    private static final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    private static final ImportFormatPreferences IMPORT_FORMAT_PREFERENCES = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
     public BibEntry realEntry = new BibEntry(StandardEntryType.InProceedings)
             .withCitationKey("Decker_2007")
@@ -86,9 +86,9 @@ public class RefCheckerTest {
 
     @BeforeAll
     public static void setUpAll() {
-        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(IMPORT_FORMAT_PREFERENCES.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         // Used during DOI fetch process
-        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(
+        when(IMPORT_FORMAT_PREFERENCES.fieldPreferences().getNonWrappableFields()).thenReturn(
                 FXCollections.observableArrayList(List.of(
                         StandardField.PDF,
                         StandardField.PS,
@@ -101,8 +101,8 @@ public class RefCheckerTest {
 
     @BeforeEach
     public void setUp() {
-        ArXivFetcher af = new ArXivFetcher(importFormatPreferences);
-        DoiFetcher df = new DoiFetcher(importFormatPreferences);
+        ArXivFetcher af = new ArXivFetcher(IMPORT_FORMAT_PREFERENCES);
+        DoiFetcher df = new DoiFetcher(IMPORT_FORMAT_PREFERENCES);
         this.refChecker = new RefChecker(df, af);
     }
 
@@ -153,11 +153,6 @@ public class RefCheckerTest {
         assertEquals(e.get(realEntry).getClass(), RefChecker.Real.class);
         assertEquals(e.get(realEntryNoDoi).getClass(), RefChecker.Real.class);
         assertEquals(e.get(fakeEntry).getClass(), RefChecker.Fake.class);
-    }
-
-    @Test
-    void parseAndValidateTest() throws FetcherException {
-
     }
 
     @Nested
