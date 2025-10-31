@@ -75,3 +75,13 @@ Generated 918 mutations Killed 337 (37%)
 Mutations with no coverage 538. Test strength 89%  
 Ran 700 tests (0.76 tests per mutation)  
 Enhanced functionality available at https://www.arcmutate.com/  
+
+____________________
+
+### Group Contributions
+
+| Member | Task | Notes           |
+| -------- | ------- |-----------------|
+| Lucille | pitest setup/config | tba notess         |
+| Geoffrey | pitest config | notes here             |
+| Vanessa | Tested and killed 1 mutant | In .util.Directories |
