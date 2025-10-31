@@ -13,7 +13,6 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.identifier.DOI;
@@ -140,8 +139,11 @@ public class RefChecker {
     }
 
     private ReferenceValidity compareReferences(BibEntry original, BibEntry trueEntry) {
-        if (duplicateCheck.isDuplicate(original, trueEntry, BibDatabaseMode.BIBTEX)) {
+        double similarity = duplicateCheck.degreeOfSimilarity(original, trueEntry);
+        if (similarity >= 0.999) {
             return new Real(trueEntry);
+        } else if (similarity > 0.8) {
+            return new Unsure(trueEntry);
         } else {
             return new Fake();
         }
