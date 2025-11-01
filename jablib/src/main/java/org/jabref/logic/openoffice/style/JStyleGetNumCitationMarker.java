@@ -160,22 +160,22 @@ class JStyleGetNumCitationMarker {
     /**
      * Format a number-based citation marker for the given number or numbers.
      *
-     * @param entries          Provide the citation numbers.
-     *                         <p>
-     *                         An Optional.empty() number means: could not look this up
-     *                         in the databases. Positive integers are the valid numbers.
-     *                         <p>
-     *                         Duplicate citation numbers are allowed:
-     *                         <p>
-     *                         - If their pageInfos are identical, only a
-     *                         single instance is emitted.
-     *                         <p>
-     *                         - If their pageInfos differ, the number is emitted with each
-     *                         distinct pageInfo.
-     *                         <p>
-     *                         pageInfos are expected to be normalized
+     * @param entries Provide the citation numbers.
+     * <p>
+     * An Optional.empty() number means: could not look this up
+     * in the databases. Positive integers are the valid numbers.
+     * <p>
+     * Duplicate citation numbers are allowed:
+     * <p>
+     * - If their pageInfos are identical, only a
+     * single instance is emitted.
+     * <p>
+     * - If their pageInfos differ, the number is emitted with each
+     * distinct pageInfo.
+     * <p>
+     * pageInfos are expected to be normalized
      * @param minGroupingCount Zero and negative means never group.
-     *                         Only used by tests to override the value in style.
+     * Only used by tests to override the value in style.
      * @return The text for the citation.
      *
      */

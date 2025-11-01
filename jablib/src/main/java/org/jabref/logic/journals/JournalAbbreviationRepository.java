@@ -36,7 +36,7 @@ public class JournalAbbreviationRepository {
     /**
      * Initializes the internal data based on the abbreviations found in the given MV file
      *
-     * @param journalList    The path to the MV file containing the journal abbreviations.
+     * @param journalList The path to the MV file containing the journal abbreviations.
      * @param ltwaRepository The LTWA repository to use for abbreviations.
      */
     public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {

@@ -16,12 +16,12 @@ public class OOFormat {
      * Mark {@code ootext} as using a character locale known to OO.
      *
      * @param locale language[-country[-territory]]
-     *               <p>
-     *               https://www.openoffice.org/api/docs/common/ref/com/sun/star/lang/Locale.html
-     *               <p>
-     *               The country part is optional.
-     *               <p>
-     *               The territory part is not only optional, the allowed "codes are vendor and browser-specific", so probably best to avoid them if possible.
+     * <p>
+     * https://www.openoffice.org/api/docs/common/ref/com/sun/star/lang/Locale.html
+     * <p>
+     * The country part is optional.
+     * <p>
+     * The territory part is not only optional, the allowed "codes are vendor and browser-specific", so probably best to avoid them if possible.
      */
     public static OOText setLocale(OOText ootext, String locale) {
         return OOText.fromString("<span lang=\"%s\">".formatted(locale) + ootext.toString() + "</span>");

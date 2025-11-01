@@ -140,10 +140,10 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     /**
-     * @param candidate         The BibEntry to look for the field
-     * @param field             The field to look for
-     * @param fetcher           The fetcher to use
-     * @param fetchedIds        The already fetched ids (will be updated)
+     * @param candidate The BibEntry to look for the field
+     * @param field The field to look for
+     * @param fetcher The fetcher to use
+     * @param fetchedIds The already fetched ids (will be updated)
      * @param fetchedCandidates New candidate (will be updated)
      */
     private void fetchData(BibEntry candidate, StandardField field, IdBasedFetcher fetcher, Set<String> fetchedIds, List<BibEntry> fetchedCandidates) {

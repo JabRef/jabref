@@ -355,7 +355,7 @@ public class DuplicateCheck {
      * The search is terminated when the first duplicate is found.
      *
      * @param database The database to search.
-     * @param entry    The entry of which we are looking for duplicates.
+     * @param entry The entry of which we are looking for duplicates.
      * @return The first duplicate entry found. Empty Optional if no duplicates are found.
      */
     public Optional<BibEntry> containsDuplicate(final BibDatabase database,

@@ -137,7 +137,7 @@ public class FileUtil {
      * <p>
      * <em>Warning: If "ext" is passed, this is literally added. Thus {@code addExtension("tmp.txt", "ext")} leads to "tmp.txtext".</em>
      *
-     * @param path      the path to add the extension to
+     * @param path the path to add the extension to
      * @param extension the extension to add
      * @return the modified file name
      */
@@ -147,7 +147,7 @@ public class FileUtil {
 
     /// Looks for the shortest unique path of the parent directory in the list of paths
     ///
-    /// @param paths       List of paths as Strings
+    /// @param paths List of paths as Strings
     /// @param comparePath The to be tested path
     /// @return Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
@@ -159,7 +159,7 @@ public class FileUtil {
 
     /// Looks for the shortest unique path in the list of paths
     ///
-    /// @param paths       List of paths as Strings
+    /// @param paths List of paths as Strings
     /// @param comparePath The to be shortened path
     /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
@@ -214,9 +214,9 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param pathToSourceFile      Path Source file
+     * @param pathToSourceFile Path Source file
      * @param pathToDestinationFile Path Destination file
-     * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
+     * @param replaceExisting boolean Determines whether the copy goes on even if the file exists.
      * @return boolean Whether the copy succeeded or was stopped due to the file already existing.
      */
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
@@ -246,7 +246,7 @@ public class FileUtil {
      * This method works correctly only if directories are sorted decent in their length i.e.
      * /home/user/literature/important before /home/user/literature.
      *
-     * @param file        the file to be shortened
+     * @param file the file to be shortened
      * @param directories directories to check
      */
     public static Path relativize(Path file, List<Path> directories) {
@@ -324,7 +324,7 @@ public class FileUtil {
     /**
      * Returns the list of linked files. The files have the absolute filename
      *
-     * @param entries  list of BibTeX entries
+     * @param entries list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
      * @return list of files. May be empty
      */
@@ -338,8 +338,8 @@ public class FileUtil {
     /**
      * Determines filename provided by an entry in a database
      *
-     * @param database        the database, where the entry is located
-     * @param entry           the entry to which the file should be linked to
+     * @param database the database, where the entry is located
+     * @param entry the entry to which the file should be linked to
      * @param fileNamePattern the filename pattern
      * @return a suggested fileName
      */
@@ -366,8 +366,8 @@ public class FileUtil {
     /**
      * Determines directory name provided by an entry in a database
      *
-     * @param database             the database, where the entry is located
-     * @param entry                the entry to which the directory should be linked to
+     * @param database the database, where the entry is located
+     * @param entry the entry to which the directory should be linked to
      * @param directoryNamePattern the dirname pattern
      * @return a suggested dirName
      */
@@ -387,7 +387,7 @@ public class FileUtil {
     /**
      * Finds a file inside a directory structure. Will also look for the file inside nested directories.
      *
-     * @param filename      the name of the file that should be found
+     * @param filename the name of the file that should be found
      * @param rootDirectory the rootDirectory that will be searched
      * @return the path to the first file that matches the defined conditions
      */
@@ -435,7 +435,7 @@ public class FileUtil {
     /**
      * Converts a relative filename to an absolute one, if necessary.
      *
-     * @param fileName  the filename (e.g., a .pdf file), may contain path separators
+     * @param fileName the filename (e.g., a .pdf file), may contain path separators
      * @param directory the directory which should be search starting point
      * @return an empty optional if the file does not exist, otherwise, the absolute path
      */
@@ -473,7 +473,7 @@ public class FileUtil {
     /**
      * Finds a file inside a list of directory structures. Will also look for the file inside nested directories.
      *
-     * @param filename    the name of the file that should be found
+     * @param filename the name of the file that should be found
      * @param directories the directories that will be searched
      * @return a list including all found paths to files that match the defined conditions
      */
@@ -552,7 +552,7 @@ public class FileUtil {
     /// Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
     /// with maxLength = 20 is shortened into verylo...isthis.pdf
     ///
-    /// @param fileName  the given file name to be shortened
+    /// @param fileName the given file name to be shortened
     /// @param maxLength the maximum number of characters in the string after shortening (including the extension)
     /// @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
     public static String shortenFileName(String fileName, Integer maxLength) {
@@ -643,7 +643,7 @@ public class FileUtil {
 
     /// Builds a Windows-style path from a Cygwin-style path using a known prefix index.
     ///
-    /// @param path        the input file path
+    /// @param path the input file path
     /// @param letterIndex the index driver letter, zero-based indexing
     /// @return a windows-style path
     private static Path buildWindowsPathWithDriveLetterIndex(String path, int letterIndex) {

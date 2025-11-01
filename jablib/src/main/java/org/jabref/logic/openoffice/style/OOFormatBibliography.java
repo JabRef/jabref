@@ -111,9 +111,9 @@ public class OOFormatBibliography {
     /**
      * Format the reference part of a bibliography entry using a Layout.
      *
-     * @param layout     The Layout to format the reference with.
-     * @param entry      The entry to insert.
-     * @param database   The database the entry belongs to.
+     * @param layout The Layout to format the reference with.
+     * @param entry The entry to insert.
+     * @param database The database the entry belongs to.
      * @param uniquefier Uniqiefier letter, if any, to append to the entry's year.
      * @return OOText The reference part of a bibliography entry formatted as OOText
      */

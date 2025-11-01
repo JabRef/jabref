@@ -18,7 +18,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
 
     /**
      * @param bibEntry Affected BibEntry object
-     * @param field    Name of field which has been changed
+     * @param field Name of field which has been changed
      * @param oldValue old field value
      * @param newValue new field value
      * @param location Location affected by this event
@@ -34,7 +34,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
 
     /**
      * @param bibEntry Affected BibEntry object
-     * @param field    Name of field which has been changed
+     * @param field Name of field which has been changed
      * @param newValue new field value
      */
     public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue) {

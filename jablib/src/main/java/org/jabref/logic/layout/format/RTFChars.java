@@ -161,8 +161,8 @@ public class RTFChars implements LayoutFormatter {
     }
 
     /**
-     * @param text                  the text to extract the part from
-     * @param i                     the position to start
+     * @param text the text to extract the part from
+     * @param i the position to start
      * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
      * @return a tuple of number of added characters and the extracted part
      */

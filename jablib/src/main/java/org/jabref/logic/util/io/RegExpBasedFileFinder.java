@@ -78,8 +78,8 @@ class RegExpBasedFileFinder implements FileFinder {
      * Method for searching for files using regexp. A list of extensions and directories can be
      * given.
      *
-     * @param entry       The entry to search for.
-     * @param extensions  The extensions that are acceptable.
+     * @param entry The entry to search for.
+     * @param extensions The extensions that are acceptable.
      * @param directories The root directories to search.
      * @return A list of files paths matching the given criteria.
      */
@@ -112,10 +112,10 @@ class RegExpBasedFileFinder implements FileFinder {
      * </ul>
      *
      * @param entry non-null
-     * @param dirs  A set of root directories to start the search from. Paths are
-     *              returned relative to these directories if relative is set to
-     *              true. These directories will not be expanded or anything. Use
-     *              the file attribute for this.
+     * @param dirs A set of root directories to start the search from. Paths are
+     * returned relative to these directories if relative is set to
+     * true. These directories will not be expanded or anything. Use
+     * the file attribute for this.
      * @return Will return the first file found to match the given criteria or
      * null if none was found.
      */

@@ -55,8 +55,8 @@ public class StringUtil {
     /**
      * Quote special characters.
      *
-     * @param toQuote   The String which may contain special characters.
-     * @param specials  A String containing all special characters except the quoting character itself, which is automatically quoted.
+     * @param toQuote The String which may contain special characters.
+     * @param specials A String containing all special characters except the quoting character itself, which is automatically quoted.
      * @param quoteChar The quoting character.
      * @return A String with every special character (including the quoting character itself) quoted.
      */
@@ -192,9 +192,9 @@ public class StringUtil {
      * Formats field contents for output. Must be "symmetric" with the parse method above, so stored and reloaded fields
      * are not mangled.
      *
-     * @param in         the string to wrap
+     * @param in the string to wrap
      * @param wrapAmount the number of characters belonging to a line of text
-     * @param newline    the newline character(s)
+     * @param newline the newline character(s)
      * @return the wrapped string
      */
     public static String wrap(String in, int wrapAmount, String newline) {
@@ -223,8 +223,8 @@ public class StringUtil {
      * Appends a text to a string builder. Wraps the text so that each line is approx wrapAmount characters long.
      * Wrapping is done using newline and tab character.
      *
-     * @param line          the line of text to be wrapped and appended
-     * @param wrapAmount    the number of characters belonging to a line of text
+     * @param line the line of text to be wrapped and appended
+     * @param wrapAmount the number of characters belonging to a line of text
      * @param newlineString a string containing the newline character(s)
      */
     private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newlineString) {
