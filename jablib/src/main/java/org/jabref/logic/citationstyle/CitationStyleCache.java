@@ -42,6 +42,7 @@ public class CitationStyleCache {
 
     /**
      * Set a new citation style and invalidate all cached styles
+     *
      * @param citationStyle The new citation style
      */
     public void setCitationStyle(@NonNull PreviewLayout citationStyle) {
