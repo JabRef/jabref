@@ -22,7 +22,7 @@ public class FileNameUniqueness {
      * Returns a file name such that it does not match any existing files in targetDirectory
      *
      * @param targetDirectory The directory in which filename should be unique
-     * @param fileName        Suggested name for the file
+     * @param fileName Suggested name for the file
      * @return a file name such that it does not match any existing files in targetDirectory
      */
     public static String getNonOverWritingFileName(Path targetDirectory, String fileName) {
@@ -57,8 +57,8 @@ public class FileNameUniqueness {
      * This function decide whether the newly downloaded file has the same content with other files
      * It returns ture when the content is duplicate, while returns false if it is not
      *
-     * @param directory         The directory which saves the files (.pdf, for example)
-     * @param fileName          Suggest name for the newly downloaded file
+     * @param directory The directory which saves the files (.pdf, for example)
+     * @param fileName Suggest name for the newly downloaded file
      * @param messageOnDeletion To display the error and success message
      * @return true when the content of the newly downloaded file is same as the file with "similar" name,
      * false when there is no "similar" file name or the content is different from that of files with "similar" name

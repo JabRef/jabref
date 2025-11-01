@@ -53,7 +53,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// Constructs a tree node without parent and no children.
     ///
     /// @param derivingClass class deriving from TreeNode<T>. It should always be "T.class".
-    ///                                           We need this parameter since it is hard to get this information by other means.
+    /// We need this parameter since it is hard to get this information by other means.
     public TreeNode(Class<T> derivingClass) {
         parent = null;
         children = FXCollections.observableArrayList();
@@ -88,8 +88,8 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * an empty Optional will be returned.
      *
      * @param indexedPath sequence of child indices that describe a path from this node to one of its descendants.
-     *                    Be aware that if indexedPath was obtained by getIndexedPathFromRoot(), this node should
-     *                    usually be the root node.
+     * Be aware that if indexedPath was obtained by getIndexedPathFromRoot(), this node should
+     * usually be the root node.
      * @return descendant found by evaluating indexedPath
      */
     public Optional<T> getDescendant(List<Integer> indexedPath) {
@@ -167,9 +167,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * In this way the whole subtree based at this node is moved to the given node.
      *
      * @param target the new parent
-     * @throws NullPointerException           if target is null
+     * @throws NullPointerException if target is null
      * @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
-     * @throws UnsupportedOperationException  if target is an descendant of this node
+     * @throws UnsupportedOperationException if target is an descendant of this node
      */
     public void moveTo(@NonNull T target) {
         Optional<T> oldParent = getParent();
@@ -473,11 +473,11 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * Removes all children from this node and makes them a child of the specified node
      * by adding it to the specified position in the children list.
      *
-     * @param target      the new parent
+     * @param target the new parent
      * @param targetIndex the position where the children should be inserted
-     * @throws NullPointerException           if target is null
+     * @throws NullPointerException if target is null
      * @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
-     * @throws UnsupportedOperationException  if target is an descendant of one of the children of this node
+     * @throws UnsupportedOperationException if target is an descendant of one of the children of this node
      */
     public void moveAllChildrenTo(T target, int targetIndex) {
         while (getNumberOfChildren() > 0) {
@@ -493,7 +493,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * for any children {@code e1} and {@code e2} in the list).
      *
      * @param comparator the comparator used to compare the child nodes
-     * @param recursive  if true the whole subtree is sorted
+     * @param recursive if true the whole subtree is sorted
      * @throws NullPointerException if the comparator is null
      */
     public void sortChildren(@NonNull Comparator<? super T> comparator, boolean recursive) {
@@ -527,11 +527,11 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * by adding it to the specified position in the children list.
      * In this way the whole subtree based at this node is moved to the given node.
      *
-     * @param target      the new parent
+     * @param target the new parent
      * @param targetIndex the position where the children should be inserted
-     * @throws NullPointerException           if target is null
+     * @throws NullPointerException if target is null
      * @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
-     * @throws UnsupportedOperationException  if target is an descendant of this node
+     * @throws UnsupportedOperationException if target is an descendant of this node
      */
     public void moveTo(@NonNull T target, int targetIndex) {
         // Check that the target node is not an ancestor of this node, because this would create loops in the tree

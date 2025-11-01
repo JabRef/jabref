@@ -172,7 +172,7 @@ public abstract class NativeDesktop {
      * If the "file" is an online link, instead open it with the browser
      *
      * @param databaseContext The database this file belongs to.
-     * @param link            The filename.
+     * @param link The filename.
      * @return false if the link couldn't be resolved, true otherwise.
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
@@ -337,7 +337,7 @@ public abstract class NativeDesktop {
     /**
      * Opens a file on an Operating System, using the given application.
      *
-     * @param filePath    The filename.
+     * @param filePath The filename.
      * @param application Link to the app that opens the file.
      */
     public abstract void openFileWithApplication(String filePath, String application) throws IOException;

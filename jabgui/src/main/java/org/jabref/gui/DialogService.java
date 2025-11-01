@@ -91,7 +91,7 @@ public interface DialogService extends NotificationService {
     /**
      * Create and display error dialog displaying the given exception.
      *
-     * @param message   the error message
+     * @param message the error message
      * @param exception the exception causing the error
      */
     void showErrorDialogAndWait(String message, Throwable exception);
@@ -233,7 +233,7 @@ public interface DialogService extends NotificationService {
      * Shows a custom dialog and returns the result.
      *
      * @param dialog dialog to show
-     * @param <R>    type of result
+     * @param <R> type of result
      */
     <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
 
@@ -241,9 +241,9 @@ public interface DialogService extends NotificationService {
      * Constructs and shows a cancelable {@link ProgressDialog}.
      * Clicking cancel will cancel the underlying service and close the dialog
      *
-     * @param title   title of the dialog
+     * @param title title of the dialog
      * @param content message to show above the progress bar
-     * @param task    The {@link Task} which executes the work and for which to show the dialog
+     * @param task The {@link Task} which executes the work and for which to show the dialog
      */
     <V> void showProgressDialog(String title, String content, Task<V> task);
 
@@ -252,9 +252,9 @@ public interface DialogService extends NotificationService {
      * Clicking cancel will cancel the underlying service and close the dialog,
      * otherwise will wait for the task to finish.
      *
-     * @param title   title of the dialog
+     * @param title title of the dialog
      * @param content message to show above the progress bar
-     * @param task    The {@link Task} which executes the work and for which to show the dialog
+     * @param task The {@link Task} which executes the work and for which to show the dialog
      */
     <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
 
@@ -263,8 +263,8 @@ public interface DialogService extends NotificationService {
      * Clicking cancel will cancel the underlying service and close the dialog.
      * The dialog will exit as soon as none of the background tasks are running
      *
-     * @param title        title of the dialog
-     * @param content      message to show below the list of background tasks
+     * @param title title of the dialog
+     * @param content message to show below the list of background tasks
      * @param stateManager The {@link StateManager} which contains the background tasks
      */
     <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);

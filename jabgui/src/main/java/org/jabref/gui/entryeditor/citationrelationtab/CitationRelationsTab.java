@@ -588,7 +588,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * Method to style heading labels
      *
-     * @param label       label to style
+     * @param label label to style
      * @param tooltipText tooltip text
      */
     private void styleLabel(Label label, String tooltipText) {
@@ -827,7 +827,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * Function to open possible duplicate entries window to compare duplicate entries
      *
      * @param citationRelationItem duplicate in the citation relations tab
-     * @param listView             CheckListView to display citations
+     * @param listView CheckListView to display citations
      */
     private void openPossibleDuplicateEntriesWindow(CitationRelationItem citationRelationItem, CheckListView<CitationRelationItem> listView) {
         BibEntry libraryEntry = citationRelationItem.localEntry();

@@ -131,7 +131,7 @@ public interface NodeResolver {
     /// content in the node and the node's LabeledText children. The returned node is
     /// guaranteed to be visible.
     ///
-    /// @param selector    the style class to match
+    /// @param selector the style class to match
     /// @param textMatcher predicate to match text content in LabeledText children
     /// @return a resolver that finds the node by style class and text content
     static NodeResolver selectorWithText(@NonNull String selector, @NonNull Predicate<String> textMatcher) {

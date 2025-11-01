@@ -49,7 +49,7 @@ public class EditInsert {
     }
 
     /**
-     * @param cursor   Where to insert.
+     * @param cursor Where to insert.
      * @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
      */
     public static void insertCitationGroup(XTextDocument doc,

@@ -75,7 +75,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     /**
      * @param databaseContext the database to import into
-     * @param task            the task executed for parsing the selected files(s).
+     * @param task the task executed for parsing the selected files(s).
      */
     public ImportEntriesViewModel(BackgroundTask<ParserResult> task,
                                   TaskExecutor taskExecutor,

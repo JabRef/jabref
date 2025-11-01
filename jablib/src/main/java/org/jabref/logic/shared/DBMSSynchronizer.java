@@ -145,7 +145,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Sets the table structure of shared database if needed and pulls all shared entries to the new local database.
      *
      * @throws DatabaseNotSupportedException if the version of shared database does not match the version of current
-     *                                       shared database support ({@link DBMSProcessor}).
+     * shared database support ({@link DBMSProcessor}).
      */
     public void initializeDatabases() throws DatabaseNotSupportedException {
         try {
@@ -229,7 +229,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Removes all local entries which are not present on shared database.
      *
      * @param localEntries List of {@link BibEntry} the entries should be removed from
-     * @param sharedIDs    Set of all IDs which are present on shared database
+     * @param sharedIDs Set of all IDs which are present on shared database
      */
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         List<BibEntry> entriesToRemove =

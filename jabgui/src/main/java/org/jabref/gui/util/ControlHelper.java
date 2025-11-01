@@ -103,11 +103,11 @@ public class ControlHelper {
     /**
      * If needed, truncates a given string to <code>maxCharacters</code>, adding <code>ellipsisString</code> instead.
      *
-     * @param text             text which should be truncated, if needed
-     * @param maxCharacters    maximum amount of characters which the resulting text should have, including the
-     *                         <code>ellipsisString</code>; if set to -1, then the default length of 75 characters will be
-     *                         used
-     * @param ellipsisString   string which should be used for indicating the truncation
+     * @param text text which should be truncated, if needed
+     * @param maxCharacters maximum amount of characters which the resulting text should have, including the
+     * <code>ellipsisString</code>; if set to -1, then the default length of 75 characters will be
+     * used
+     * @param ellipsisString string which should be used for indicating the truncation
      * @param ellipsisPosition location in the given text where the truncation should be performed
      * @return the new, truncated string
      */

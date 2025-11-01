@@ -63,7 +63,7 @@ public class WalkthroughUtils {
     /// there is a chance that this listener will run your methods after you removed it
     /// from all the properties that it is attached to.
     ///
-    /// @param listener   the listener to debounce
+    /// @param listener the listener to debounce
     /// @param intervalMs the minimum interval between executions in milliseconds
     /// @return a debounced listener
     public static DebouncedInvalidationListener debounced(InvalidationListener listener, long intervalMs) {
@@ -116,7 +116,7 @@ public class WalkthroughUtils {
     /// when you clean up. Otherwise, there is a chance that this listener will run your
     /// methods after you removed it from all the properties that it is attached to.
     ///
-    /// @param runnable   the runnable to debounce
+    /// @param runnable the runnable to debounce
     /// @param intervalMs the minimum interval between executions in milliseconds
     /// @return a debounced runnable
     public static DebouncedRunnable debounced(Runnable runnable, long intervalMs) {
@@ -145,8 +145,8 @@ public class WalkthroughUtils {
     /// until a stop condition is met.
     ///
     /// @param stopCondition A supplier that should return true when the listener should
-    ///                                           be detached (as well as run anything interesting for the
-    ///                                           actual callee).
+    /// be detached (as well as run anything interesting for the
+    /// actual callee).
     /// @return A runnable that can be used to detach the listener prematurely.
     public static Runnable onWindowChangedUntil(@NonNull BooleanSupplier stopCondition) {
         ListChangeListener<Window> listener = new ListChangeListener<>() {
