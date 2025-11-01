@@ -50,7 +50,7 @@
 // REPOS mavencentral,jitpack=https://jitpack.io
 
 // TODO: ASCII things won't work, but we accept for now to keep things going
-//DEPS com.ibm.icu:icu4j:77.1
+//DEPS com.ibm.icu:icu4j:78.1
 
 // Choose one - both should work
 // https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/jabref/jablib/

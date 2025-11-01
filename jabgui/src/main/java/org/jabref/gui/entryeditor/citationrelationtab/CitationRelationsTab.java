@@ -369,6 +369,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
         CheckListView<CitationRelationItem> citedByListView = new CheckListView<>();
+        // Allow the list views to expand/shrink with the window size
+        citingListView.setMaxHeight(Double.MAX_VALUE);
+        citingListView.setMinHeight(0);
+        citedByListView.setMaxHeight(Double.MAX_VALUE);
+        citedByListView.setMinHeight(0);
 
         // Create refresh Buttons for both sides
         Button refreshCitingButton = IconTheme.JabRefIcons.REFRESH.asButton();
@@ -622,8 +627,17 @@ public class CitationRelationsTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         citationsRelationsTabViewModel.bindToEntry(entry);
-        VBox entirePanel = new VBox(getPaneAndStartSearch(entry), sciteResultsPane);
-        setContent(entirePanel);
+
+        SplitPane splitPane = getPaneAndStartSearch(entry);
+        splitPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        splitPane.setMinSize(0, 0);
+
+        BorderPane root = new BorderPane();
+        root.setCenter(splitPane);
+        root.setBottom(sciteResultsPane);
+        root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        setContent(root);
     }
 
     private void searchForRelations(CitationComponents citationComponents,
