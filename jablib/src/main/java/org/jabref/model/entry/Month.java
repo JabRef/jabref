@@ -2,12 +2,14 @@ package org.jabref.model.entry;
 
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Represents a Month of the Year.
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public enum Month {
 
     JANUARY("January", "jan", 1),

@@ -10,7 +10,6 @@ import org.jabref.model.study.Study;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 /**
  * Example use: <code>new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile);</code>
@@ -22,7 +21,6 @@ public class StudyYamlParser {
      */
     public Study parseStudyYamlFile(Path studyYamlFile) throws IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        yamlMapper.registerModule(new Jdk8Module());
         try (InputStream fileInputStream = Files.newInputStream(studyYamlFile)) {
             return yamlMapper.readValue(fileInputStream, Study.class);
         }
@@ -34,7 +32,6 @@ public class StudyYamlParser {
     public void writeStudyYamlFile(Study study, Path studyYamlFile) throws IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
                                                                     .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
-        yamlMapper.registerModule(new Jdk8Module());
         yamlMapper.writeValue(studyYamlFile.toFile(), study);
     }
 }

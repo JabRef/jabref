@@ -1,4 +1,4 @@
-package org.jabref.model.strings;
+package org.jabref.logic.util.strings;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.os.OS;
+import org.jabref.model.strings.UnicodeToReadableCharMap;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;

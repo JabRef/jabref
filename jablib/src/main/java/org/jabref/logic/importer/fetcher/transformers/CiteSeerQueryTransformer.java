@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher.transformers;
 import java.util.Calendar;
 import java.util.Optional;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;

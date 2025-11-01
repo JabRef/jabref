@@ -8,7 +8,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.crawler.StudyRepository;
-import org.jabref.logic.crawler.StudyYamlService;
+import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.study.Study;
@@ -51,7 +51,7 @@ public class EditExistingStudyAction extends SimpleCommand {
 
         Study study;
         try {
-            study = new StudyYamlService().parseStudyYamlFile(studyDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
+            study = new StudyYamlParser().parseStudyYamlFile(studyDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), e);
             return;

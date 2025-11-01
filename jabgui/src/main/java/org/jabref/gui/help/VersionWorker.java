@@ -19,11 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This worker checks if there is a new version of JabRef available. If there is it will display a dialog to the user
+ * This worker checks if there is a new version of JabRef available. If there is, it will display a dialog to the user
  * offering him multiple options to proceed (see changelog, go to the download page, ignore this version, and remind
  * later).
  * <p>
- * If the versions check is executed manually and this is the latest version it will also display a dialog to inform the
+ * If the version check is executed manually and this is the latest version, it will also display a dialog to inform the
  * user.
  */
 public class VersionWorker {

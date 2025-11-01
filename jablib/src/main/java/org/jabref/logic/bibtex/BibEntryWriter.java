@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -25,7 +26,6 @@ import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.Range;
 
 import io.github.adr.linked.ADR;

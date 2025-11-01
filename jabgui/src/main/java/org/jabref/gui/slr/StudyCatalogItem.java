@@ -7,12 +7,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.model.study.StudyCatalog;
+import org.jabref.model.study.StudyDatabase;
 
 import org.jspecify.annotations.NonNull;
 
 /**
- * View representation of {@link StudyCatalog}
+ * View representation of {@link StudyDatabase}
  */
 public class StudyCatalogItem {
     private final StringProperty name;

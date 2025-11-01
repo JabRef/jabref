@@ -4,12 +4,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.strings.StringUtil;
 
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class AutomaticKeywordGroup extends AutomaticGroup {
 
     private final Character keywordDelimiter;

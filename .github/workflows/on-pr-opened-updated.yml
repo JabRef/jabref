@@ -17,7 +17,7 @@ jobs:
       - name: Check PR mergeability
         id: check_mergeable
         run: |
-          MERGEABLE=$(gh pr view --json mergeable ${{ github.event.number }} --template '{{.mergeable}}')
+          MERGEABLE=$(gh pr view --json mergeable ${{ github.event.pull_request.number }} --template '{{.mergeable}}')
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
             exit 1
@@ -25,23 +25,13 @@ jobs:
           echo "✅ No merge conflicts"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  remove_label:
-    if: >
-      (github.repository == 'JabRef/jabref')
-    name: 'Remove label "status: changes-required"'
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --remove-label "status: changes-required"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   upload-pr-number:
     if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt
-        run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v4
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v5
         with:
           name: pr_number
           path: pr_number.txt

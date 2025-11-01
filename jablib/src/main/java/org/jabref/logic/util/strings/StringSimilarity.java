@@ -97,4 +97,27 @@ public class StringSimilarity {
         }
         return (double) longestSubstringLength / Math.min(firstLength, secondLength);
     }
+
+    /**
+     * Compare two strings on the basis of word-by-word correlation analysis.
+     *
+     * @param s1 The first string
+     * @param s2 The second string
+     * @return a value in the interval [0, 1] indicating the degree of match.
+     */
+    public static double correlateByWords(final String s1, final String s2) {
+        final String[] w1 = s1.split("\\s");
+        final String[] w2 = s2.split("\\s");
+        final int n = Math.min(w1.length, w2.length);
+        final StringSimilarity match = new StringSimilarity();
+        int misses = 0;
+        for (int i = 0; i < n; i++) {
+            double corr = match.similarity(w1[i], w2[i]);
+            if (corr < 0.75) {
+                misses++;
+            }
+        }
+        final double missRate = (double) misses / (double) n;
+        return 1 - missRate;
+    }
 }
