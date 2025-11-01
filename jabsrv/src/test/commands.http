@@ -7,11 +7,11 @@ Accept: application/json
 {
   "commandId": "selectentries",
   "libraryId": "Chocolate.bib-670214c9",
-  "citationKeys":[
+  "citationKeys": [
     "Corti_2009",
     "Keen_2001"
   ],
-  "entryIds":[
+  "entryIds": [
     "00000010"
   ]
 }

@@ -39,7 +39,7 @@ public class EntryResource {
      * <p>
      * Combines attributes of a given BibEntry into a basic entry preview for as plain text.
      *
-     * @param id      The name of the library
+     * @param id The name of the library
      * @param entryId The CitationKey of the BibEntry
      * @return a basic entry preview as plain text
      * @throws IOException
@@ -87,7 +87,7 @@ public class EntryResource {
      * <p>
      * Combines attributes of a given BibEntry into a basic entry preview for as HTML text.
      *
-     * @param id      The name of the library
+     * @param id The name of the library
      * @param entryId The CitationKey of the BibEntry
      * @return a basic entry preview as HTML text
      * @throws IOException
