@@ -28,7 +28,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.collect.Sets;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -390,9 +389,7 @@ public class DuplicateCheck {
                   .stream().mapToDouble((field) -> {
                     String first = one.getField(field).get();
                     String second = two.getField(field).get();
-                    int maxLength = Math.max(first.length(), second.length());
-                    Integer levenshteinDistance = LevenshteinDistance.getDefaultInstance().apply(first, second);
-                    return 1 - levenshteinDistance / (double) maxLength;
+                    return new StringSimilarity().similarity(first, second);
                 }).average().orElse(0.0);
     }
 }
