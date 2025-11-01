@@ -84,15 +84,15 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "aa,bib,aa.bib",
-            ".login,bib,.login.bib",
-            "a.bib,bib,a.bib",
-            "a.bib,BIB,a.bib",
-            "a,bib,a.bib",
-            "a.bb,bib,a.bb",
-            ",bib,''"
-    })
+    @CsvSource(nullValues = "NULL", textBlock = """
+    aa,     bib, aa.bib
+    .login, bib, .login.bib
+    a.bib,  bib, a.bib
+    a.bib,  BIB, a.bib
+    a,      bib, a.bib
+    a.bb,   bib, a.bb
+    '',     bib, .bib
+    """)
     void getCorrectFileName(String filename, String extension, String expected) {
         assertEquals(expected, StringUtil.getCorrectFileName(filename, extension));
     }
