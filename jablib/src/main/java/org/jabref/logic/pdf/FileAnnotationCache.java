@@ -9,9 +9,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,7 @@ public class FileAnnotationCache {
     private static final int CACHE_SIZE = 1024;
 
     // the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
-    private LoadingCache<BibEntry, Map<Path, List<FileAnnotation>>> annotationCache;
+    private LoadingCache<BibEntry,Map<Path, List<FileAnnotation>>> annotationCache;
 
     /// Creates an empty file annotation cache. Required to allow the annotation cache to be injected into views without
     /// hitting the bug <https://github.com/AdamBien/afterburner.fx/issues/71>.
@@ -30,12 +29,9 @@ public class FileAnnotationCache {
     }
 
     public FileAnnotationCache(BibDatabaseContext context, FilePreferences filePreferences) {
-        annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<>() {
-            @Override
-            public Map<Path, List<FileAnnotation>> load(BibEntry entry) {
-                return new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context, filePreferences);
-            }
-        });
+        annotationCache = Caffeine.newBuilder()
+                                  .maximumSize(CACHE_SIZE)
+                                  .build(entry -> new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context, filePreferences));
     }
 
     /**
@@ -46,7 +42,7 @@ public class FileAnnotationCache {
      */
     public Map<Path, List<FileAnnotation>> getFromCache(BibEntry entry) {
         LOGGER.debug("Loading BibEntry '{}' from cache.", entry.getCitationKey().orElse(entry.getId()));
-        return annotationCache.getUnchecked(entry);
+        return annotationCache.get(entry);
     }
 
     public void remove(BibEntry entry) {
