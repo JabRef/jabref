@@ -181,6 +181,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     // endregion
 
+    implementation("com.github.ben-manes.caffeine:caffeine")
+
     implementation("commons-io:commons-io")
 
     implementation("com.github.tomtung:latex2unicode_2.13")
