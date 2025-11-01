@@ -385,11 +385,12 @@ public class DuplicateCheck {
      * @return number [0,1] 1 representing the same (one potentially having more fields), 0 representing completely different
      */
     public double degreeOfSimilarity(final BibEntry one, final BibEntry two) {
-        return one.getFields((f) -> two.getField(f).isPresent())
+        StringSimilarity stringSimilarity = new StringSimilarity();
+        return one.getFields((field) -> two.getField(field).isPresent())
                   .stream().mapToDouble((field) -> {
                     String first = one.getField(field).get();
                     String second = two.getField(field).get();
-                    return new StringSimilarity().similarity(first, second);
+                    return stringSimilarity.similarity(first, second);
                 }).average().orElse(0.0);
     }
 }
