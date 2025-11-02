@@ -13,7 +13,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a "Regenerate" button for the AI chat allowing the user to make the LLM reformulate its answer to the previous prompt [#12191](https://github.com/JabRef/jabref/issues/12191)
-- We added a "Regenerate" button to the AI chat allowing the user to make the LLM reformulate its answer to the previous prompt [#12191](https://github.com/JabRef/jabref/issues/12191)
 
 ### Changed
 
