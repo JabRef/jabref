@@ -83,6 +83,9 @@ public class DuplicateSearch extends SimpleCommand {
         libraryAnalyzed.set(false);
         autoRemoveExactDuplicates.set(false);
         duplicateCount.set(0);
+        
+        // Reset the stored decision for "Treat all duplicates the same way"
+        preferences.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(null);
 
         if (entries.size() < 2) {
             return;
@@ -156,32 +159,60 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, stateManager, dialogService, preferences);
+        DuplicateResolverResult resolverResult;
 
-        dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
+        // Check if "Treat all duplicates the same way" is enabled and we have a stored decision
+        if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()
+                && preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision() != null) {
+            // Reuse the stored decision
+            resolverResult = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
+        } else {
+            // Show the dialog to get user input
+            DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, stateManager, dialogService, preferences);
+            dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
+            resolverResult = dialogService.showCustomDialogAndWait(dialog)
+                                          .orElse(DuplicateResolverResult.BREAK);
 
-        DuplicateResolverResult resolverResult = dialogService.showCustomDialogAndWait(dialog)
-                                                              .orElse(DuplicateResolverResult.BREAK);
+            // If "Treat all duplicates the same way" is enabled, store the decision
+            if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries() && resolverResult != DuplicateResolverResult.BREAK) {
+                preferences.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(resolverResult);
+            }
 
+            // Handle actions that need dialog results
+            if (resolverResult == DuplicateResolverResult.KEEP_LEFT || resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT) {
+                result.remove(second);
+                result.replace(first, dialog.getNewLeftEntry());
+                if (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT) {
+                    autoRemoveExactDuplicates.set(true);
+                }
+            } else if (resolverResult == DuplicateResolverResult.KEEP_RIGHT) {
+                result.remove(first);
+                result.replace(second, dialog.getNewRightEntry());
+            } else if (resolverResult == DuplicateResolverResult.KEEP_MERGE) {
+                result.replace(first, second, dialog.getMergedEntry());
+            } else if (resolverResult == DuplicateResolverResult.KEEP_BOTH) {
+                result.replace(first, dialog.getNewLeftEntry());
+                result.replace(second, dialog.getNewRightEntry());
+            }
+            return;
+        }
+
+        // Apply stored decision (without dialog modifications)
         if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)
                 || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
             result.remove(second);
-            result.replace(first, dialog.getNewLeftEntry());
             if (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT) {
-                autoRemoveExactDuplicates.set(true); // Remember choice
+                autoRemoveExactDuplicates.set(true);
             }
         } else if (resolverResult == DuplicateResolverResult.KEEP_RIGHT) {
             result.remove(first);
-            result.replace(second, dialog.getNewRightEntry());
         } else if (resolverResult == DuplicateResolverResult.BREAK) {
             libraryAnalyzed.set(true);
             duplicates.clear();
-        } else if (resolverResult == DuplicateResolverResult.KEEP_MERGE) {
-            result.replace(first, second, dialog.getMergedEntry());
         } else if (resolverResult == DuplicateResolverResult.KEEP_BOTH) {
-            result.replace(first, dialog.getNewLeftEntry());
-            result.replace(second, dialog.getNewRightEntry());
+            // Keep both as-is, no action needed
         }
+        // Note: KEEP_MERGE is not supported when applying to all entries automatically
     }
 
     private void handleDuplicates(DuplicateSearchResult result) {
