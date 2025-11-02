@@ -1,6 +1,7 @@
 package org.jabref.logic.integrity;
 
 import java.util.List;
+import java.util.Map;
 
 import javafx.collections.FXCollections;
 
@@ -121,7 +122,6 @@ public class RefCheckerTest {
     @Test
     void closeToRealEntry() throws FetcherException {
         RefChecker.ReferenceValidity rv = refChecker.referenceValidityOfEntry(closeToRealEntry);
-        System.out.println(((RefChecker.Unsure) rv).matchingReferences);
         assertEquals(RefChecker.Unsure.class, rv.getClass());
     }
 
@@ -147,7 +147,7 @@ public class RefCheckerTest {
     @Test
     void validateListOfEntriesTest() throws FetcherException {
         List<BibEntry> entries = List.of(realEntry, realEntryNoDoi, fakeEntry);
-        var e = refChecker.validateListOfEntries(entries);
+        Map<BibEntry, RefChecker.ReferenceValidity> e = refChecker.validateListOfEntries(entries);
 
         assertEquals(3, e.size());
         assertEquals(RefChecker.Real.class, e.get(realEntry).getClass());
@@ -159,16 +159,16 @@ public class RefCheckerTest {
     public class ReferenceValidityTest {
         @Test
         void realEquals() {
-            var t1 = new RefChecker.Real(realEntry);
-            var t2 = new RefChecker.Real(realEntry);
+            RefChecker.ReferenceValidity t1 = new RefChecker.Real(realEntry);
+            RefChecker.ReferenceValidity t2 = new RefChecker.Real(realEntry);
             assertEquals(t1, t2);
             assertNotEquals(t1, new RefChecker.Real(fakeEntry));
         }
 
         @Test
         void fakeEquals() {
-            var t1 = new RefChecker.Real(null);
-            var t2 = new RefChecker.Fake();
+            RefChecker.ReferenceValidity t1 = new RefChecker.Real(null);
+            RefChecker.ReferenceValidity t2 = new RefChecker.Fake();
 
             assertNotEquals(t1, t2);
 
@@ -177,9 +177,9 @@ public class RefCheckerTest {
 
         @Test
         void orTest() {
-            var t1 = new RefChecker.Real(realEntry);
-            var t2 = new RefChecker.Real(fakeEntry);
-            var t3 = new RefChecker.Fake();
+            RefChecker.ReferenceValidity t1 = new RefChecker.Real(realEntry);
+            RefChecker.ReferenceValidity t2 = new RefChecker.Real(fakeEntry);
+            RefChecker.ReferenceValidity t3 = new RefChecker.Fake();
             assertEquals(t1, t1.or(t2));
             assertEquals(t1, t1.or(t3));
             assertEquals(t2, t3.or(t2));
@@ -187,11 +187,11 @@ public class RefCheckerTest {
 
         @Test
         void unsureTest() {
-            var t1 = new RefChecker.Unsure(realEntry);
-            var t2 = new RefChecker.Unsure(fakeEntry);
+            RefChecker.ReferenceValidity t1 = new RefChecker.Unsure(realEntry);
+            RefChecker.ReferenceValidity t2 = new RefChecker.Unsure(fakeEntry);
             assertNotEquals(t1, t2);
-            var result = t1.or(t2);
-            var otherResult = t2.or(t1);
+            RefChecker.ReferenceValidity result = t1.or(t2);
+            RefChecker.ReferenceValidity otherResult = t2.or(t1);
             assertEquals(result, otherResult);
         }
     }
