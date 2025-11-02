@@ -41,7 +41,7 @@
 //DEPS org.jspecify:jspecify:1.0.0
 
 // from jabls
-//DEPS com.fasterxml.jackson.core:jackson-databind:2.20.0
+//DEPS com.fasterxml.jackson.core:jackson-databind:2.20.1
 //DEPS com.github.eclipse:lsp4j:0.24.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.2
@@ -50,6 +50,7 @@
 //DEPS org.slf4j:slf4j-api:2.0.17
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabLsLauncher {
