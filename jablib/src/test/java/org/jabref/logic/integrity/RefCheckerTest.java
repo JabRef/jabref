@@ -190,9 +190,9 @@ public class RefCheckerTest {
             var t1 = new RefChecker.Unsure(realEntry);
             var t2 = new RefChecker.Unsure(fakeEntry);
             assertNotEquals(t1, t2);
-            t1.or(t2);
-            t2.or(t1);
-            assertEquals(t1, t2);
+            var result = t1.or(t2);
+            var otherResult = t2.or(t1);
+            assertEquals(result, otherResult);
         }
     }
 }

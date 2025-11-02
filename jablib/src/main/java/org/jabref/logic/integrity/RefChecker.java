@@ -16,7 +16,10 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
+
+import com.airhacks.afterburner.injection.Injector;
 
 /**
  * Validates a BibEntry depending on if it
@@ -28,10 +31,8 @@ public class RefChecker {
     CrossRef crossRef;
     DuplicateCheck duplicateCheck;
 
-    public RefChecker(
-            DoiFetcher doiFetcher,
-            ArXivFetcher arXivFetcher) {
-        this(doiFetcher, arXivFetcher, new CrossRef(), new DuplicateCheck(new BibEntryTypesManager()));
+    public RefChecker(DoiFetcher doiFetcher, ArXivFetcher arXivFetcher) {
+        this(doiFetcher, arXivFetcher, new CrossRef(), new DuplicateCheck(Injector.instantiateModelOrService(BibEntryTypesManager.class)));
     }
 
     public RefChecker(
@@ -69,7 +70,7 @@ public class RefChecker {
         }
 
         Optional<BibEntry> other = fetcher.performSearchById(doi.get().asString());
-        return other.map(o -> compareReferences(entry, o))
+        return other.map(foundEntry -> compareReferences(entry, foundEntry))
                     .orElse(new Fake());
     }
 
@@ -113,12 +114,12 @@ public class RefChecker {
      */
     public ReferenceValidity validityFromArxiv(BibEntry entry) throws FetcherException {
 
-        var m = arxivFetcher.findIdentifier(entry);
-        if (m.isEmpty()) {
+        Optional<ArXivIdentifier> foundIdentifier = arxivFetcher.findIdentifier(entry);
+        if (foundIdentifier.isEmpty()) {
             return new Fake();
         }
-        return arxivFetcher.performSearchById(m.get().asString()).map(
-                found -> compareReferences(entry, found)
+        return arxivFetcher.performSearchById(foundIdentifier.get().asString()).map(
+                foundEntry -> compareReferences(entry, foundEntry)
         ).orElse(new Fake());
     }
 
@@ -139,12 +140,12 @@ public class RefChecker {
         return entriesToValidity;
     }
 
-    private ReferenceValidity compareReferences(BibEntry original, BibEntry trueEntry) {
-        double similarity = duplicateCheck.degreeOfSimilarity(original, trueEntry);
+    private ReferenceValidity compareReferences(BibEntry localEntry, BibEntry validFoundEntry) {
+        double similarity = duplicateCheck.degreeOfSimilarity(localEntry, validFoundEntry);
         if (similarity >= 0.999) {
-            return new Real(trueEntry);
+            return new Real(validFoundEntry);
         } else if (similarity > 0.8) {
-            return new Unsure(trueEntry);
+            return new Unsure(validFoundEntry);
         } else {
             return new Fake();
         }
@@ -162,7 +163,10 @@ public class RefChecker {
                 return this;
             }
             if (other instanceof Unsure otherUnsure && this instanceof Unsure thisUnsure) {
-                otherUnsure.addAll(thisUnsure);
+                Unsure merge = new Unsure();
+                merge.addAll(thisUnsure);
+                merge.addAll(otherUnsure);
+                return merge;
             }
             return other;
         }
@@ -199,15 +203,21 @@ public class RefChecker {
         public int hashCode() {
             return Objects.hashCode(matchingReference);
         }
+
+        public BibEntry getMatchingReference() {
+            return matchingReference;
+        }
     }
 
     public static final class Unsure extends ReferenceValidity {
         Set<BibEntry> matchingReferences;
 
         public Unsure(BibEntry matchingReference) {
-            Set<BibEntry> matchingReferences = new HashSet<>();
-            matchingReferences.add(matchingReference);
-            this.matchingReferences = matchingReferences;
+            this.matchingReferences = new HashSet<>(Set.of(matchingReference));
+        }
+
+        private Unsure() {
+            this.matchingReferences = new HashSet<>();
         }
 
         void addAll(Unsure other) {
@@ -229,6 +239,10 @@ public class RefChecker {
         @Override
         public int hashCode() {
             return Objects.hashCode(matchingReferences);
+        }
+
+        public Set<BibEntry> getMatchingReferences() {
+            return matchingReferences;
         }
     }
 
