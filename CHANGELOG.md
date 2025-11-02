@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed the checkbox in merge dialog "Treat duplicates the same way". Now it works
+
 ### Removed
 
 ## [6.0-alpha.3] – 2025-10-30
