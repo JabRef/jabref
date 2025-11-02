@@ -81,13 +81,13 @@ class Codec52 {
     /**
      * Produce a reference mark name for JabRef for the given citationType and list citation keys that does not yet appear among the reference marks of the document.
      *
-     * @param usedNames    Reference mark names already in use.
+     * @param usedNames Reference mark names already in use.
      * @param citationKeys Identifies the cited sources.
      * @param citationType Encodes the effect of withText and inParenthesis options.
-     *                     <p>
-     *                     The first occurrence of citationKeys gets no serial number, the second gets 0, the third 1 ...
-     *                     <p>
-     *                     Or the first unused in this series, after removals.
+     * <p>
+     * The first occurrence of citationKeys gets no serial number, the second gets 0, the third 1 ...
+     * <p>
+     * Or the first unused in this series, after removals.
      */
     public static String getUniqueMarkName(Set<String> usedNames,
                                            List<String> citationKeys,

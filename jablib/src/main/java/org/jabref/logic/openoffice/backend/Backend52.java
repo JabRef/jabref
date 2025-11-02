@@ -159,9 +159,9 @@ public class Backend52 {
      * <p>
      * On return {@code position} is collapsed, and is after the inserted space, or at the end of the reference mark.
      *
-     * @param citationKeys     Keys to be cited.
-     * @param pageInfos        An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
-     * @param position         Collapsed to its end.
+     * @param citationKeys Keys to be cited.
+     * @param pageInfos An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
+     * @param position Collapsed to its end.
      * @param insertSpaceAfter We insert a space after the mark, that carries on format of characters from the original position.
      */
     public CitationGroup createCitationGroup(XTextDocument doc,

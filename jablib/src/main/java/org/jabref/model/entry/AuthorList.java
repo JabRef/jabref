@@ -362,7 +362,7 @@ public class AuthorList implements Iterable<Author> {
      * Smith, J. and Black Brown, P.".</li>
      * </ul>
      *
-     * @param abbreviate  whether to abbreivate first names.
+     * @param abbreviate whether to abbreivate first names.
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
@@ -430,7 +430,7 @@ public class AuthorList implements Iterable<Author> {
      * Smith and P. Black Brown" </li>
      * </ul>
      *
-     * @param abbreviate  whether to abbreivate first names.
+     * @param abbreviate whether to abbreivate first names.
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the

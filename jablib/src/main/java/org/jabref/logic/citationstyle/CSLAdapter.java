@@ -61,7 +61,7 @@ public class CSLAdapter {
     /**
      * Initialized the static CSL instance if needed.
      *
-     * @param newStyle  journal style of the output
+     * @param newStyle journal style of the output
      * @param newFormat usually HTML or RTF.
      * @throws IOException An error occurred in the underlying framework
      */

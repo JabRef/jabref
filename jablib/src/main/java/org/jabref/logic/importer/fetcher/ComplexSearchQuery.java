@@ -290,7 +290,7 @@ public class ComplexSearchQuery {
          *
          * @return ComplexSearchQuery instance with the fields set to the values defined in the building instance.
          * @throws IllegalStateException An IllegalStateException is thrown in case all text search fields are empty.
-         *                               See: https://softwareengineering.stackexchange.com/questions/241309/builder-pattern-when-to-fail/241320#241320
+         * See: https://softwareengineering.stackexchange.com/questions/241309/builder-pattern-when-to-fail/241320#241320
          */
         public ComplexSearchQuery build() throws IllegalStateException {
             if (textSearchFieldsAndYearFieldsAreEmpty()) {

@@ -14,7 +14,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
 
     /**
-     * @param queryNode  first search node
+     * @param queryNode first search node
      * @param pageNumber requested site number indexed from 0
      * @return Page with search results
      */
@@ -22,7 +22,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
 
     /**
      * @param searchQuery query string that can be parsed into a lucene query
-     * @param pageNumber  requested site number indexed from 0
+     * @param pageNumber requested site number indexed from 0
      * @return Page with search results
      */
     default Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws FetcherException {

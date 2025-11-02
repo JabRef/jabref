@@ -61,10 +61,10 @@ public class BibEntryWriter {
 
     /// Writes the given BibEntry using the given writer
     ///
-    /// @param entry           The entry to write
-    /// @param out             The writer to use
+    /// @param entry The entry to write
+    /// @param out The writer to use
     /// @param bibDatabaseMode The database mode (bibtex or biblatex)
-    /// @param reformat        Should the entry be in any case, even if no change occurred?
+    /// @param reformat Should the entry be in any case, even if no change occurred?
     public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode, boolean reformat) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!reformat && !entry.hasChanged()) {
@@ -160,7 +160,7 @@ public class BibEntryWriter {
     /// Write a single field, if it has any content.
     ///
     /// @param entry the entry to write
-    /// @param out   the target of the write
+    /// @param out the target of the write
     /// @param field the field
     /// @throws IOException In case of an IO error
     private void writeField(BibEntry entry, BibWriter out, Field field, int indent) throws IOException {

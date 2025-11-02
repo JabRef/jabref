@@ -59,9 +59,9 @@ public class TemplateExporter extends Exporter {
      *
      * @param displayName Name to display to the user.
      * @param consoleName Name to call this format in the console.
-     * @param lfFileName  Name of the main layout file.
-     * @param directory   Directory in which to find the layout file.
-     * @param extension   Should contain the . (for instance .txt).
+     * @param lfFileName Name of the main layout file.
+     * @param directory Directory in which to find the layout file.
+     * @param extension Should contain the . (for instance .txt).
      */
     public TemplateExporter(String displayName,
                             String consoleName,
@@ -74,9 +74,9 @@ public class TemplateExporter extends Exporter {
     /**
      * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
      *
-     * @param name       to display to the user and to call this format in the console.
+     * @param name to display to the user and to call this format in the console.
      * @param lfFileName Name of the main layout file.
-     * @param extension  May or may not contain the . (for instance .txt).
+     * @param extension May or may not contain the . (for instance .txt).
      */
     public TemplateExporter(String name,
                             String lfFileName,
@@ -97,9 +97,9 @@ public class TemplateExporter extends Exporter {
      *
      * @param displayName Name to display to the user.
      * @param consoleName Name to call this format in the console.
-     * @param lfFileName  Name of the main layout file.
-     * @param directory   Directory in which to find the layout file.
-     * @param extension   Should contain the . (for instance .txt).
+     * @param lfFileName Name of the main layout file.
+     * @param directory Directory in which to find the layout file.
+     * @param extension Should contain the . (for instance .txt).
      */
     public TemplateExporter(String displayName,
                             String consoleName,
@@ -114,12 +114,12 @@ public class TemplateExporter extends Exporter {
     /**
      * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
      *
-     * @param displayName        Name to display to the user.
-     * @param consoleName        Name to call this format in the console.
-     * @param lfFileName         Name of the main layout file.
-     * @param directory          Directory in which to find the layout file.
-     * @param extension          Should contain the . (for instance .txt).
-     * @param layoutPreferences  Preferences for layout
+     * @param displayName Name to display to the user.
+     * @param consoleName Name to call this format in the console.
+     * @param lfFileName Name of the main layout file.
+     * @param directory Directory in which to find the layout file.
+     * @param extension Should contain the . (for instance .txt).
+     * @param layoutPreferences Preferences for layout
      * @param blankLineBehaviour how to behave regarding blank lines.
      */
     public TemplateExporter(String displayName,
