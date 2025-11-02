@@ -369,8 +369,7 @@ public class DuplicateCheck {
      * Checks across all fields of the entries,
      * any matching ones get compared.
      * If they are not the same the score goes down.
-     * The score goes down depending on the
-     * Levenshtein distance between the two entries.
+     * The score goes down depending on the StringSimilarity score.
      * <p>
      * If the result is zero, it means that either no common fields were found
      * or that all common fields were very far apart lexically.
