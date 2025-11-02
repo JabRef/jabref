@@ -1,3 +1,4 @@
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -10,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
+
+- We added a "Regenerate" button for the AI chat allowing the user to make the LLM reformulate its answer to the previous prompt [#12191](https://github.com/JabRef/jabref/issues/12191)
 
 ### Changed
 
@@ -47,27 +50,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added chronological navigation for entries in each library. [#6352](https://github.com/JabRef/jabref/issues/6352)
 - We added support for using Medline/Pubmed fetcher with an API key. [#11296](https://github.com/JabRef/jabref/issues/11296#issuecomment-3289005011)
 - We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
-- We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
-- We added an option to search and filter the fields and formatters in the Clean up entries dialog. [#13890](https://github.com/JabRef/jabref/issues/13890)
-- We added support for managing multiple linked files via the entry context menu. [#12567](https://github.com/JabRef/jabref/issues/12567)
-- We added a "Regenerate" button for the AI chat allowing the user to make the LLM reformulate its answer to the previous prompt [#12191](https://github.com/JabRef/jabref/issues/12191)
-
-### Changed
-
-- We moved all sorting options into a dedicated “Sort” sub-menu in the Groups menu. ([#14017](https://github.com/JabRef/jabref/issues/14017))
-- We merged `Citation information` and `Citation relations` into a singular tab. [#13618](https://github.com/JabRef/jabref/issues/13618)
-- We changed `ISSNCleanup` into `NormalizeIssn` a `ISSN` formatter. [#13748](https://github.com/JabRef/jabref/issues/13748)
-- We changed Citation Relations tab and gave tab panes more descriptive titles and tooltips. [#13619](https://github.com/JabRef/jabref/issues/13619)
-- We changed the name from Open AI Provider to Open AI (or API compatible). [#13585](https://github.com/JabRef/jabref/issues/13585)
-- We improved the citations relations caching by implementing an offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
-- We added a tooltip to keywords that resemble Math Subject Classification (MSC) codes. [#12944](https://github.com/JabRef/jabref/issues/12944)
-- We added a formatter to convert keywords that resemble MSC codes to their descriptions. [#12944](https://github.com/JabRef/jabref/issues/12944)
-- We introduced a new command line application called `jabkit`. [#13012](https://github.com/JabRef/jabref/pull/13012) [#110](https://github.com/JabRef/jabref/issues/110)
-- We added a new "Add JabRef suggested groups" option in the context menu of "All entries". [#12659](https://github.com/JabRef/jabref/issues/12659)
-- We added an option to create entries directly from Bib(La)TeX sources to the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
-- We added the provision to choose different CSL bibliography body formats (e.g. First Line Indent, Hanging Indent, Bibliography 1, etc.) in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
-- We use `https` to connect to [shortDOI](https://shortdoi.org/) service. [#13637](https://github.com/JabRef/jabref/pull/13637)
-- We added "Bibliography Heading" to the available CSL bibliography header formats in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
 - We added [LOBID](https://lobid.org/) as an alternative ISBN-Fetcher. [#13076](https://github.com/JabRef/jabref/issues/13076)
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
 - We added an option to search and filter the fields and formatters in the clean up entries dialog. [#13890](https://github.com/JabRef/jabref/issues/13890)
@@ -1641,10 +1623,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where some importers used the field `pubstatus` instead of the standard BibTeX field `pubstate`.
 - We changed the latex command removal for docbook exporter. [#3838](https://github.com/JabRef/jabref/issues/3838)
 - We changed the location of some fields in the entry editor (you might need to reset your preferences for these changes to come into effect)
-  - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
-  - DOI/URL: General -> Optional
-  - Internal fields like ranking, read status and priority: Other -> General
-  - Moreover, empty deprecated fields are no longer shown
+    - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
+    - DOI/URL: General -> Optional
+    - Internal fields like ranking, read status and priority: Other -> General
+    - Moreover, empty deprecated fields are no longer shown
 - Added server timezone parameter when connecting to a shared database.
 - We updated the dialog for setting up general fields.
 - URL field formatting is updated. All whitespace chars, located at the beginning/ending of the URL, are trimmed automatically
@@ -1776,12 +1758,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the coloring of cells in the main table according to whether the field is optional/required.
 - We removed the feature to find and resolve duplicate BibTeX keys (as this use case is already covered by the integrity check).
 - We removed a few commands from the right-click menu that are not needed often and thus don't need to be placed that prominently:
-  - Print entry preview: available through entry preview
-  - All commands related to marking: marking is not yet reimplemented
-  - Set/clear/append/rename fields: available through Edit menu
-  - Manage keywords: available through the Edit menu
-  - Copy linked files to folder: available through File menu
-  - Add/move/remove from group: removed completely (functionality still available through group interface)
+    - Print entry preview: available through entry preview
+    - All commands related to marking: marking is not yet reimplemented
+    - Set/clear/append/rename fields: available through Edit menu
+    - Manage keywords: available through the Edit menu
+    - Copy linked files to folder: available through File menu
+    - Add/move/remove from group: removed completely (functionality still available through group interface)
 - We removed the option to change the column widths in the preferences dialog. [#4546](https://github.com/JabRef/jabref/issues/4546)
 
 ## Older versions
