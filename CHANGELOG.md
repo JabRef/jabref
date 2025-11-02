@@ -11,6 +11,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a "Regenerate" button to the AI chat allowing the user to make the LLM reformulate its answer to the previous prompt [#12191](https://github.com/JabRef/jabref/issues/12191)
+
+
 ### Changed
 
 ### Fixed
@@ -51,7 +54,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
 - We added an option to search and filter the fields and formatters in the clean up entries dialog. [#13890](https://github.com/JabRef/jabref/issues/13890)
 - We added support for managing multiple linked files via the entry context menu. [#12567](https://github.com/JabRef/jabref/issues/12567)
-- We added a "Regenerate" button for the AI chat allowing the user to make the LLM reformulate its answer to the previous prompt [#12191](https://github.com/JabRef/jabref/issues/12191)
 
 ### Changed
 
