@@ -320,7 +320,7 @@ public class BibEntry {
      * Also, if a database is given, this function will try to find values for
      * unset fields in the entry linked by the "crossref" ({@link StandardField#CROSSREF} field, if any.
      *
-     * @param field The field to return the value of.
+     * @param field    The field to return the value of.
      * @param database The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
@@ -511,7 +511,7 @@ public class BibEntry {
      * <p>
      * Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
      *
-     * @param field the field
+     * @param field         the field
      * @param getFieldValue the method to get the value of a given field in a given entry
      * @return determined field value
      */
@@ -615,8 +615,8 @@ public class BibEntry {
     /**
      * Set a field, and notify listeners about the change.
      *
-     * @param field The field to set
-     * @param value The value to set
+     * @param field       The field to set
+     * @param value       The value to set
      * @param eventSource Source the event is sent from
      */
     public Optional<FieldChange> setField(@NonNull Field field,
@@ -669,7 +669,7 @@ public class BibEntry {
      * Remove the mapping for the field name, and notify listeners about
      * the change including the {@link EntriesEventSource}.
      *
-     * @param field the field to clear.
+     * @param field       the field to clear.
      * @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
      */
     public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
@@ -693,9 +693,9 @@ public class BibEntry {
      * database argument is given, this method will try to look up missing fields in
      * entries linked by the "crossref" field, if any.
      *
-     * @param fields An array of field names to be checked.
+     * @param fields   An array of field names to be checked.
      * @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning
-     * that no attempt will be made to follow crossrefs.
+     *                 that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     public boolean allFieldsPresent(Collection<OrFields> fields, BibDatabase database) {
@@ -735,7 +735,7 @@ public class BibEntry {
      * If <code>0</code> is passed as <code>maxCharacters</code>, the description is not truncated.
      *
      * @param maxCharacters The maximum number of characters (additional
-     * characters are replaced with "..."). Set to 0 to disable truncation.
+     *                      characters are replaced with "..."). Set to 0 to disable truncation.
      * @return A short textual description of the entry in the format:
      * Author1, Author2: Title (Year)
      */
@@ -1190,7 +1190,7 @@ public class BibEntry {
      * This method. adds the given path (as file) to the entry and removes the url.
      *
      * @param linkToDownloadedFile the link to the file, which was downloaded
-     * @param downloadedFile the path to be added to the entry
+     * @param downloadedFile       the path to be added to the entry
      */
     public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
         List<LinkedFile> linkedFiles = this.getFiles();
@@ -1228,7 +1228,7 @@ public class BibEntry {
      * Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
      * intersection, priority is given to THIS entry's field value, UNLESS specified otherwise in the arguments.
      *
-     * @param other another BibEntry from which fields are sourced from
+     * @param other                  another BibEntry from which fields are sourced from
      * @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
      */
     public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {

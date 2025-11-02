@@ -60,7 +60,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      *
      * @param entry The Bibtex entry
      * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
-     * @throws IOException if a page could not be fetched correctly
+     * @throws IOException      if a page could not be fetched correctly
      * @throws FetcherException if the received page differs from what was expected
      */
     @Override

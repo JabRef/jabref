@@ -139,7 +139,7 @@ public class URLUtil {
      * @param url the URL string to be converted into a {@link URI}.
      * @return the {@link URI} object created from the string URL.
      * @throws IllegalArgumentException if the string URL is not a valid URI or if the URI format is incorrect.
-     * @throws URISyntaxException if the string URL has an invalid syntax and cannot be converted into a {@link URI}.
+     * @throws URISyntaxException       if the string URL has an invalid syntax and cannot be converted into a {@link URI}.
      */
     public static URI createUri(String url) {
         try {

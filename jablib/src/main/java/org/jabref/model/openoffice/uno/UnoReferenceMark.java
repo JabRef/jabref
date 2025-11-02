@@ -24,8 +24,8 @@ public class UnoReferenceMark {
 
     /**
      * @throws NoDocumentException If cannot get reference marks
-     * <p>
-     * Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
+     *                             <p>
+     *                             Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
      */
     public static XNameAccess getNameAccess(XTextDocument doc)
             throws

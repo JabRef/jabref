@@ -115,7 +115,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     /**
      * A letter will be appended to the key based on the user's preferences, either always or to prevent duplicated keys.
      *
-     * @param key the new key
+     * @param key    the new key
      * @param oldKey the old key
      * @return a key, if needed, with an appended letter
      */

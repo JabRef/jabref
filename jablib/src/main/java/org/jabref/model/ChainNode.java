@@ -40,7 +40,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
      * Constructs a chain node without parent and no child.
      *
      * @param derivingClass class deriving from TreeNode&lt;T>. It should always be "T.class".
-     * We need this parameter since it is hard to get this information by other means.
+     *                      We need this parameter since it is hard to get this information by other means.
      */
     public ChainNode(Class<T> derivingClass) {
         parent = null;
@@ -105,7 +105,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
      * In this way the whole subchain based at this node is moved to the given node.
      *
      * @param target the new parent
-     * @throws NullPointerException if target is null
+     * @throws NullPointerException          if target is null
      * @throws UnsupportedOperationException if target is an descendant of this node
      */
     public void moveTo(@NonNull T target) {

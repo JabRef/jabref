@@ -26,9 +26,9 @@ public class StringManipulator {
     /**
      * Change word casing in a string from the given position to the next word boundary.
      *
-     * @param text The text to manipulate.
+     * @param text          The text to manipulate.
      * @param caretPosition The index to start from.
-     * @param targetCase The case mode the string should be changed to.
+     * @param targetCase    The case mode the string should be changed to.
      * @return The resulting text and caret position.
      */
     private static ResultingStringState setWordCase(String text, int caretPosition, LetterCase targetCase) {
@@ -58,8 +58,8 @@ public class StringManipulator {
      * Delete all characters in a string from the given position to the next word boundary.
      *
      * @param caretPosition The index to start from.
-     * @param text The text to manipulate.
-     * @param direction The direction to search.
+     * @param text          The text to manipulate.
+     * @param direction     The direction to search.
      * @return The resulting text and caret position.
      */
     static ResultingStringState deleteUntilWordBoundary(int caretPosition, String text, Direction direction) {
@@ -83,8 +83,8 @@ public class StringManipulator {
      * Utility method to find the next whitespace position in string after text
      *
      * @param caretPosition The current caret position
-     * @param text The string to search in
-     * @param direction The direction to move through string
+     * @param text          The string to search in
+     * @param direction     The direction to move through string
      * @return The position of the next whitespace after a word
      */
     static int getNextWordBoundary(int caretPosition, String text, Direction direction) {
@@ -119,7 +119,7 @@ public class StringManipulator {
      * Capitalize the word on the right side of the cursor.
      *
      * @param caretPosition The position of the cursor
-     * @param text The string to manipulate
+     * @param text          The string to manipulate
      * @return String       The resulting text and caret position.
      */
     public static ResultingStringState capitalize(int caretPosition, String text) {
@@ -130,7 +130,7 @@ public class StringManipulator {
      * Make all characters in the word uppercase.
      *
      * @param caretPosition The position of the cursor
-     * @param text The string to manipulate
+     * @param text          The string to manipulate
      * @return String       The resulting text and caret position.
      */
     public static ResultingStringState uppercase(int caretPosition, String text) {
@@ -141,7 +141,7 @@ public class StringManipulator {
      * Make all characters in the word lowercase.
      *
      * @param caretPosition The position of the cursor
-     * @param text The string to manipulate
+     * @param text          The string to manipulate
      * @return String       The resulting text and caret position.
      */
     public static ResultingStringState lowercase(int caretPosition, String text) {
@@ -152,7 +152,7 @@ public class StringManipulator {
      * Remove the next word on the right side of the cursor.
      *
      * @param caretPosition The position of the cursor
-     * @param text The string to manipulate
+     * @param text          The string to manipulate
      * @return String       The resulting text and caret position.
      */
     public static ResultingStringState killWord(int caretPosition, String text) {
@@ -163,7 +163,7 @@ public class StringManipulator {
      * Remove the previous word on the left side of the cursor.
      *
      * @param caretPosition The position of the cursor
-     * @param text The string to manipulate
+     * @param text          The string to manipulate
      * @return String       The resulting text and caret position.
      */
     public static ResultingStringState backwardKillWord(int caretPosition, String text) {

@@ -51,7 +51,7 @@ public class KeywordList implements Iterable<Keyword> {
      * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
      *
      * @param keywordString a String of keywordChains
-     * @param delimiter The delimiter used for separating the keywords
+     * @param delimiter     The delimiter used for separating the keywords
      * @return a parsed list containing the keywordChains
      */
     public static KeywordList parse(@NonNull String keywordString, @NonNull Character delimiter) {

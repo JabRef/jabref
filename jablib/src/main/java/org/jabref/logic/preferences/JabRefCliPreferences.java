@@ -1026,7 +1026,7 @@ public class JabRefCliPreferences implements CliPreferences {
      * Clear all preferences.
      *
      * @throws BackingStoreException if JabRef is unable to write to the registry/the
-     * preferences storage
+     *                               preferences storage
      */
     @Override
     public void clear() throws BackingStoreException {
@@ -1171,7 +1171,7 @@ public class JabRefCliPreferences implements CliPreferences {
      *
      * @param file Path of file to import from
      * @throws JabRefException thrown if importing the preferences failed due to an
-     * InvalidPreferencesFormatException or an IOException
+     *                         InvalidPreferencesFormatException or an IOException
      */
     @Override
     public void importPreferences(Path file) throws JabRefException {

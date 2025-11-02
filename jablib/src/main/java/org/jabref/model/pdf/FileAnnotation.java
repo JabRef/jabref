@@ -29,10 +29,10 @@ public class FileAnnotation {
     /**
      * A flexible constructor, mainly used as dummy if there is actually no annotation.
      *
-     * @param author The authors of the annotation
-     * @param timeModified The last time this annotation was modified
-     * @param pageNumber The page of the pdf where the annotation occurs
-     * @param content the actual content of the annotation
+     * @param author         The authors of the annotation
+     * @param timeModified   The last time this annotation was modified
+     * @param pageNumber     The page of the pdf where the annotation occurs
+     * @param content        the actual content of the annotation
      * @param annotationType the type of the annotation
      */
     public FileAnnotation(final String author, final LocalDateTime timeModified, final int pageNumber,
@@ -61,8 +61,8 @@ public class FileAnnotation {
      * For creating a FileAnnotation that has a connection to another FileAnnotation. Needed when creating a text
      * highlighted or underlined annotation with a sticky note.
      *
-     * @param annotation The actual annotation that holds the information
-     * @param pageNumber The page of the pdf where the annotation occurs
+     * @param annotation           The actual annotation that holds the information
+     * @param pageNumber           The page of the pdf where the annotation occurs
      * @param linkedFileAnnotation The corresponding note of a marked text area.
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {

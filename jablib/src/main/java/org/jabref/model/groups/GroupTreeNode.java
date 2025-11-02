@@ -67,10 +67,10 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /**
      * Associates the specified group with this node while also providing the possibility to modify previous matched entries so that they are now matched by the new group.
      *
-     * @param newGroup the new group (has to be non-null)
-     * @param shouldKeepPreviousAssignments specifies whether previous matched entries should be added to the new group
+     * @param newGroup                        the new group (has to be non-null)
+     * @param shouldKeepPreviousAssignments   specifies whether previous matched entries should be added to the new group
      * @param shouldRemovePreviousAssignments specifies whether previous matched entries should be removed from the old group
-     * @param entriesInDatabase list of entries in the database
+     * @param entriesInDatabase               list of entries in the database
      */
     public List<FieldChange> setGroup(@NonNull AbstractGroup newGroup,
                                       boolean shouldKeepPreviousAssignments,
@@ -146,7 +146,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /**
      * Get only groups containing all the entries or just groups containing any of the
      *
-     * @param entries List of {@link BibEntry} to search for
+     * @param entries    List of {@link BibEntry} to search for
      * @param requireAll Whether to return only groups that must contain all entries
      * @return List of {@link GroupTreeNode} containing the matches. {@link AllEntriesGroup} is always contained}
      */

@@ -32,7 +32,7 @@ public class NormalizeWhitespaceFormatter {
      * Also depends on the caller whether strings have been resolved.
      *
      * @param fieldContent the content to format.
-     * @param field the name of the bibtex field
+     * @param field        the name of the bibtex field
      * @return the formatted field content.
      */
     public String format(String fieldContent, Field field) {
@@ -53,7 +53,7 @@ public class NormalizeWhitespaceFormatter {
      * content. This allows for things like <code>jan { - } feb</code> to be passed.
      *
      * @param fieldContent the content to format.
-     * @param field the name of the bibtex field
+     * @param field        the name of the bibtex field
      * @return the formatted field content.
      */
     public String format(StringBuilder fieldContent, Field field) {

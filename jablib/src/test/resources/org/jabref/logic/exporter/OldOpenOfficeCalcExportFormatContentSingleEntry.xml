@@ -1,680 +1,409 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<office:document-content
-        xmlns:office="http://openoffice.org/2000/office"
-        xmlns:fo="http://www.w3.org/1999/XSL/Format"
-        xmlns:style="http://openoffice.org/2000/style"
-        xmlns:table="http://openoffice.org/2000/table"
-        xmlns:text="http://openoffice.org/2000/text">
-    <office:script/>
+<office:document-content xmlns:office="http://openoffice.org/2000/office"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:class="spreadsheet" xmlns:version="1.0"
+    xmlns:style="http://openoffice.org/2000/style" xmlns:table="http://openoffice.org/2000/table"
+    xmlns:text="http://openoffice.org/2000/text">
+    <office:script />
     <office:automatic-styles>
-        <style:style
-                style:family="table-row"
-                style:name="ro1">
-            <style.properties
-                    fo:break-before="auto"
-                    style:row-height="0.1681inch"
-                    style:use-optimal-row-height="true"/>
+        <style:style style:family="table-row" style:name="ro1">
+            <style.properties fo:break-before="auto" style:row-height="0.1681inch"
+                style:use-optimal-row-height="true" />
         </style:style>
-        <style:style
-                style:family="table"
-                style:master-page-name="Default"
-                style:name="ta1">
-            <style:properties
-                    table:display="true"/>
+        <style:style style:family="table" style:master-page-name="Default" style:name="ta1">
+            <style:properties table:display="true" />
         </style:style>
     </office:automatic-styles>
     <office:body>
-        <table:table
-                table.style-name="ta1"
-                table:name="biblio">
-            <table:table-row
-                    table.style-name="ro1">
+        <table:table table.style-name="ta1" table:name="biblio">
+            <table:table-row table.style-name="ro1">
                 <table:table-cell>
-                    <text:p>
-                        Type
-                    </text:p>
+                    <text:p>Type</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Citationkey
-                    </text:p>
+                    <text:p>Citationkey</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Abstract
-                    </text:p>
+                    <text:p>Abstract</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Addendum
-                    </text:p>
+                    <text:p>Addendum</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Address
-                    </text:p>
+                    <text:p>Address</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Afterword
-                    </text:p>
+                    <text:p>Afterword</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Annote
-                    </text:p>
+                    <text:p>Annote</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Annotation
-                    </text:p>
+                    <text:p>Annotation</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Annotator
-                    </text:p>
+                    <text:p>Annotator</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Archiveprefix
-                    </text:p>
+                    <text:p>Archiveprefix</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Assignee
-                    </text:p>
+                    <text:p>Assignee</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Author
-                    </text:p>
+                    <text:p>Author</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Bookauthor
-                    </text:p>
+                    <text:p>Bookauthor</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Bookpagination
-                    </text:p>
+                    <text:p>Bookpagination</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Booksubtitle
-                    </text:p>
+                    <text:p>Booksubtitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Booktitle
-                    </text:p>
+                    <text:p>Booktitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Booktitleaddon
-                    </text:p>
+                    <text:p>Booktitleaddon</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Chapter
-                    </text:p>
+                    <text:p>Chapter</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Commentator
-                    </text:p>
+                    <text:p>Commentator</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Comment
-                    </text:p>
+                    <text:p>Comment</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Crossref
-                    </text:p>
+                    <text:p>Crossref</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Cites
-                    </text:p>
+                    <text:p>Cites</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Date
-                    </text:p>
+                    <text:p>Date</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Day
-                    </text:p>
+                    <text:p>Day</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Dayfiled
-                    </text:p>
+                    <text:p>Dayfiled</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        DOI
-                    </text:p>
+                    <text:p>DOI</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Edition
-                    </text:p>
+                    <text:p>Edition</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Editor
-                    </text:p>
+                    <text:p>Editor</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Editora
-                    </text:p>
+                    <text:p>Editora</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Editorb
-                    </text:p>
+                    <text:p>Editorb</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Editorc
-                    </text:p>
+                    <text:p>Editorc</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Editortype
-                    </text:p>
+                    <text:p>Editortype</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Editoratype
-                    </text:p>
+                    <text:p>Editoratype</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Editorbtype
-                    </text:p>
+                    <text:p>Editorbtype</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Editorctype
-                    </text:p>
+                    <text:p>Editorctype</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Eid
-                    </text:p>
+                    <text:p>Eid</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Entryset
-                    </text:p>
+                    <text:p>Entryset</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Eprint
-                    </text:p>
+                    <text:p>Eprint</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Eprintclass
-                    </text:p>
+                    <text:p>Eprintclass</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Eprinttype
-                    </text:p>
+                    <text:p>Eprinttype</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Eventdate
-                    </text:p>
+                    <text:p>Eventdate</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Eventtitle
-                    </text:p>
+                    <text:p>Eventtitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Eventtitleaddon
-                    </text:p>
+                    <text:p>Eventtitleaddon</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        File
-                    </text:p>
+                    <text:p>File</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Foreword
-                    </text:p>
+                    <text:p>Foreword</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Folder
-                    </text:p>
+                    <text:p>Folder</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Gender
-                    </text:p>
+                    <text:p>Gender</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Holder
-                    </text:p>
+                    <text:p>Holder</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Howpublished
-                    </text:p>
+                    <text:p>Howpublished</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Ids
-                    </text:p>
+                    <text:p>Ids</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Institution
-                    </text:p>
+                    <text:p>Institution</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Introduction
-                    </text:p>
+                    <text:p>Introduction</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        ISBN
-                    </text:p>
+                    <text:p>ISBN</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        ISRN
-                    </text:p>
+                    <text:p>ISRN</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        ISSN
-                    </text:p>
+                    <text:p>ISSN</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Issue
-                    </text:p>
+                    <text:p>Issue</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Issuetitle
-                    </text:p>
+                    <text:p>Issuetitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Issuesubtitle
-                    </text:p>
+                    <text:p>Issuesubtitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Journal
-                    </text:p>
+                    <text:p>Journal</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Journalsubtitle
-                    </text:p>
+                    <text:p>Journalsubtitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Journaltitle
-                    </text:p>
+                    <text:p>Journaltitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Key
-                    </text:p>
+                    <text:p>Key</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Keywords
-                    </text:p>
+                    <text:p>Keywords</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Language
-                    </text:p>
+                    <text:p>Language</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Langid
-                    </text:p>
+                    <text:p>Langid</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Label
-                    </text:p>
+                    <text:p>Label</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Library
-                    </text:p>
+                    <text:p>Library</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Location
-                    </text:p>
+                    <text:p>Location</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Mainsubtitle
-                    </text:p>
+                    <text:p>Mainsubtitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Maintitle
-                    </text:p>
+                    <text:p>Maintitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Maintitleaddon
-                    </text:p>
+                    <text:p>Maintitleaddon</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Month
-                    </text:p>
+                    <text:p>Month</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Monthfiled
-                    </text:p>
+                    <text:p>Monthfiled</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Nameaddon
-                    </text:p>
+                    <text:p>Nameaddon</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Nationality
-                    </text:p>
+                    <text:p>Nationality</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Note
-                    </text:p>
+                    <text:p>Note</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Number
-                    </text:p>
+                    <text:p>Number</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Organization
-                    </text:p>
+                    <text:p>Organization</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Origdate
-                    </text:p>
+                    <text:p>Origdate</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Origlanguage
-                    </text:p>
+                    <text:p>Origlanguage</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Pages
-                    </text:p>
+                    <text:p>Pages</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Pagetotal
-                    </text:p>
+                    <text:p>Pagetotal</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Pagination
-                    </text:p>
+                    <text:p>Pagination</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Part
-                    </text:p>
+                    <text:p>Part</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        PDF
-                    </text:p>
+                    <text:p>PDF</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        PMID
-                    </text:p>
+                    <text:p>PMID</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        PS
-                    </text:p>
+                    <text:p>PS</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Publisher
-                    </text:p>
+                    <text:p>Publisher</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Pubstate
-                    </text:p>
+                    <text:p>Pubstate</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Primaryclass
-                    </text:p>
+                    <text:p>Primaryclass</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Related
-                    </text:p>
+                    <text:p>Related</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Reportno
-                    </text:p>
+                    <text:p>Reportno</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Review
-                    </text:p>
+                    <text:p>Review</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Revision
-                    </text:p>
+                    <text:p>Revision</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        School
-                    </text:p>
+                    <text:p>School</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Series
-                    </text:p>
+                    <text:p>Series</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Shortauthor
-                    </text:p>
+                    <text:p>Shortauthor</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Shorteditor
-                    </text:p>
+                    <text:p>Shorteditor</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Shorttitle
-                    </text:p>
+                    <text:p>Shorttitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Sortkey
-                    </text:p>
+                    <text:p>Sortkey</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Sortname
-                    </text:p>
+                    <text:p>Sortname</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Subtitle
-                    </text:p>
+                    <text:p>Subtitle</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Title
-                    </text:p>
+                    <text:p>Title</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Titleaddon
-                    </text:p>
+                    <text:p>Titleaddon</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Translator
-                    </text:p>
+                    <text:p>Translator</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Type
-                    </text:p>
+                    <text:p>Type</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        URI
-                    </text:p>
+                    <text:p>URI</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        URL
-                    </text:p>
+                    <text:p>URL</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Urldate
-                    </text:p>
+                    <text:p>Urldate</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Venue
-                    </text:p>
+                    <text:p>Venue</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Version
-                    </text:p>
+                    <text:p>Version</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Volume
-                    </text:p>
+                    <text:p>Volume</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Volumes
-                    </text:p>
+                    <text:p>Volumes</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Year
-                    </text:p>
+                    <text:p>Year</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Yeardivision
-                    </text:p>
+                    <text:p>Yeardivision</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Yearfiled
-                    </text:p>
+                    <text:p>Yearfiled</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Mrnumber
-                    </text:p>
+                    <text:p>Mrnumber</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Zbl
-                    </text:p>
+                    <text:p>Zbl</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Xdata
-                    </text:p>
+                    <text:p>Xdata</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Xref
-                    </text:p>
+                    <text:p>Xref</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Citationcount
-                    </text:p>
+                    <text:p>Citationcount</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Groups
-                    </text:p>
+                    <text:p>Groups</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Icore
-                    </text:p>
+                    <text:p>Icore</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Owner
-                    </text:p>
+                    <text:p>Owner</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Creationdate
-                    </text:p>
+                    <text:p>Creationdate</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Modificationdate
-                    </text:p>
+                    <text:p>Modificationdate</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Timestamp
-                    </text:p>
+                    <text:p>Timestamp</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Reporttype
-                    </text:p>
+                    <text:p>Reporttype</text:p>
                 </table:table-cell>
             </table:table-row>
             <table:table-row>
                 <table:table-cell>
-                    <text:p>
-                        7
-                    </text:p>
+                    <text:p>7</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -686,12 +415,7 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        New
-                        York,
-                        NY,
-                        USA
-                    </text:p>
+                    <text:p>New York, NY, USA</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -712,10 +436,7 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Tony
-                        Clear
-                    </text:p>
+                    <text:p>Tony Clear</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -757,9 +478,7 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        http://doi.acm.org/10.1145/820127.820136
-                    </text:p>
+                    <text:p>http://doi.acm.org/10.1145/820127.820136</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -846,9 +565,7 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        0097-8418
-                    </text:p>
+                    <text:p>0097-8418</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -860,10 +577,7 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        SIGCSE
-                        Bull.
-                    </text:p>
+                    <text:p>SIGCSE Bull.</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -917,9 +631,7 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        4
-                    </text:p>
+                    <text:p>4</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -931,9 +643,7 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        13--14
-                    </text:p>
+                    <text:p>13--14</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -954,9 +664,7 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        ACM
-                    </text:p>
+                    <text:p>ACM</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -1001,21 +709,7 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        Design
-                        and
-                        usability
-                        in
-                        security
-                        systems:
-                        daily
-                        life
-                        as
-                        a
-                        context
-                        of
-                        use?
-                    </text:p>
+                    <text:p>Design and usability in security systems: daily life as a context of use?</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -1042,17 +736,13 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        34
-                    </text:p>
+                    <text:p>34</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>
-                        2002
-                    </text:p>
+                    <text:p>2002</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>

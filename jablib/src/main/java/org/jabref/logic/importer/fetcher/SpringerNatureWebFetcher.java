@@ -175,7 +175,7 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
     /**
      * Gets the query URL
      *
-     * @param queryNode the search query
+     * @param queryNode  the search query
      * @param pageNumber the number of the page indexed from 0
      * @return URL
      */

@@ -107,7 +107,7 @@ public class Date {
     /**
      * Creates a Date from date and endDate.
      *
-     * @param date the start date
+     * @param date    the start date
      * @param endDate the start date
      */
     public Date(TemporalAccessor date, TemporalAccessor endDate) {

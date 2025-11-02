@@ -28,7 +28,7 @@ public class TreeCollector<T> implements Collector<T, ObservableList<T>, Observa
 
     /**
      * @param getChildren a function that returns a list of children of the specified node
-     * @param addChild a function that adds the second argument as a child to the first-specified node
+     * @param addChild    a function that adds the second argument as a child to the first-specified node
      * @param equivalence a function that tells us whether two nodes are equivalent
      */
     private TreeCollector(Function<T, List<T>> getChildren, BiConsumer<T, T> addChild, BiPredicate<T, T> equivalence) {

@@ -172,9 +172,9 @@ public class BracketedPattern {
     /**
      * Expands the current pattern using the given bibentry, keyword delimiter, and database.
      *
-     * @param bibentry The bibentry to expand.
+     * @param bibentry         The bibentry to expand.
      * @param keywordDelimiter The keyword delimiter to use.
-     * @param database The database to use for string-lookups and cross-refs. May be null.
+     * @param database         The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
     public String expand(@NonNull BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
@@ -184,10 +184,10 @@ public class BracketedPattern {
     /**
      * Expands a pattern
      *
-     * @param pattern The pattern to expand
+     * @param pattern          The pattern to expand
      * @param keywordDelimiter The keyword delimiter to use
-     * @param entry The bibEntry to use for expansion
-     * @param database The database for field resolving. May be null.
+     * @param entry            The bibEntry to use for expansion
+     * @param database         The database for field resolving. May be null.
      * @return The expanded pattern. Not null.
      */
     public static String expandBrackets(@NonNull String pattern, Character keywordDelimiter, @NonNull BibEntry entry, BibDatabase database) {
@@ -199,8 +199,8 @@ public class BracketedPattern {
      * expanding it.
      *
      * @param keywordDelimiter The keyword delimiter to use
-     * @param entry The {@link BibEntry} to use for expansion
-     * @param database The {@link BibDatabase} for field resolving. May be null.
+     * @param entry            The {@link BibEntry} to use for expansion
+     * @param database         The {@link BibDatabase} for field resolving. May be null.
      * @return a function accepting a bracketed expression and returning the result of expanding it
      */
     public static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
@@ -220,9 +220,9 @@ public class BracketedPattern {
     /**
      * Expands a pattern.
      *
-     * @param pattern The pattern to expand
+     * @param pattern               The pattern to expand
      * @param bracketContentHandler A function taking the string representation of the content of a bracketed pattern
-     * and expanding it
+     *                              and expanding it
      * @return The expanded pattern. Not null.
      */
     public static String expandBrackets(@NonNull String pattern, Function<String, String> bracketContentHandler) {
@@ -260,7 +260,7 @@ public class BracketedPattern {
      * Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
      * is encountered, and has been consumed, by the {@code StringTokenizer}.
      *
-     * @param pattern pattern used by {@code expandBrackets}, used for logging
+     * @param pattern   pattern used by {@code expandBrackets}, used for logging
      * @param tokenizer the tokenizer producing the tokens
      * @return the content enclosed by brackets
      */
@@ -306,7 +306,7 @@ public class BracketedPattern {
      * encountered by the StringTokenizer.
      *
      * @param stringBuilder the <code>StringBuilder</code> to which tokens will be appended
-     * @param tokenizer the tokenizer producing the tokens
+     * @param tokenizer     the tokenizer producing the tokens
      */
     private static void appendQuote(StringBuilder stringBuilder, StringTokenizer tokenizer) {
         stringBuilder.append("\"");  // We know that the previous token was \"
@@ -320,10 +320,10 @@ public class BracketedPattern {
     /**
      * Evaluates the given pattern to the given bibentry and database
      *
-     * @param entry The entry to get the field value from
-     * @param pattern A pattern string (such as auth, pureauth, authorLast)
+     * @param entry            The entry to get the field value from
+     * @param pattern          A pattern string (such as auth, pureauth, authorLast)
      * @param keywordDelimiter The de
-     * @param database The database to use for field resolving. May be null.
+     * @param database         The database to use for field resolving. May be null.
      * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
      */
     public static String getFieldValue(BibEntry entry, String pattern, Character keywordDelimiter, BibDatabase database) {
@@ -561,9 +561,9 @@ public class BracketedPattern {
     /**
      * Applies modifiers to a label generated based on a field marker.
      *
-     * @param label The generated label.
-     * @param parts String array containing the modifiers.
-     * @param offset The number of initial items in the modifiers array to skip.
+     * @param label                The generated label.
+     * @param parts                String array containing the modifiers.
+     * @param offset               The number of initial items in the modifiers array to skip.
      * @param expandBracketContent a function to expand the content in the parentheses.
      * @return The modified label.
      */
@@ -951,8 +951,8 @@ public class BracketedPattern {
      *
      * @param authorList the list of authors
      * @param maxAuthors the maximum number of authors in the string
-     * @param delimiter delimiter separating the last names of the authors
-     * @param suffix to replace excess authors with. Also used to replace <code>and others</code>.
+     * @param delimiter  delimiter separating the last names of the authors
+     * @param suffix     to replace excess authors with. Also used to replace <code>and others</code>.
      * @return a string consisting of authors' last names separated by a `delimiter` and with any authors excess of
      * `maxAuthors` replaced with `suffix`
      */
@@ -979,7 +979,7 @@ public class BracketedPattern {
      * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      *
      * @param authorList an {@link AuthorList}
-     * @param n the number of desired authors
+     * @param n          the number of desired authors
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
     private static String nAuthors(AuthorList authorList, int n) {
@@ -1081,8 +1081,8 @@ public class BracketedPattern {
      * authIniN format
      *
      * @param authorList The authors to format.
-     * @param n The maximum number of characters this string will be long. A negative number or zero will lead
-     * to "" be returned.
+     * @param n          The maximum number of characters this string will be long. A negative number or zero will lead
+     *                   to "" be returned.
      */
     static String authIniN(AuthorList authorList, int n) {
         if ((n <= 0) || authorList.isEmpty()) {

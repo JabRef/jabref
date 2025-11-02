@@ -228,7 +228,7 @@ public class URLDownload {
     /**
      * Downloads the web resource to a String.
      *
-     * @param encoding the desired String encoding
+     * @param encoding   the desired String encoding
      * @param connection an existing connection
      * @return the downloaded string
      */

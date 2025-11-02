@@ -67,7 +67,7 @@ public class UnoUserDefinedProperty {
 
     /**
      * @param property Name of a custom document property in the current document. Created if does not exist yet.
-     * @param value The value to be stored.
+     * @param value    The value to be stored.
      */
     public static void setStringProperty(XTextDocument doc, @NonNull String property, @NonNull String value)
             throws
@@ -105,8 +105,8 @@ public class UnoUserDefinedProperty {
 
     /**
      * @param property Name of a custom document property in the current document.
-     * <p>
-     * Logs warning if does not exist.
+     *                 <p>
+     *                 Logs warning if does not exist.
      */
     public static void remove(XTextDocument doc, @NonNull String property)
             throws
@@ -126,8 +126,8 @@ public class UnoUserDefinedProperty {
 
     /**
      * @param property Name of a custom document property in the current document.
-     * <p>
-     * Keep silent if property did not exist.
+     *                 <p>
+     *                 Keep silent if property did not exist.
      */
     public static void removeIfExists(XTextDocument doc, @NonNull String property)
             throws

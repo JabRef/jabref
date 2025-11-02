@@ -73,7 +73,7 @@ public final class BstCaseChanger {
     /**
      * Changes case of the given string s
      *
-     * @param s the string to handle
+     * @param s      the string to handle
      * @param format the format
      */
     public static String changeCase(String s, FormatMode format) {
@@ -261,7 +261,7 @@ public final class BstCaseChanger {
      * <p>
      * Also used by BibtexPurify
      *
-     * @param c the current "String"
+     * @param c   the current "String"
      * @param pos the position
      * @return the special LaTeX character or null
      */

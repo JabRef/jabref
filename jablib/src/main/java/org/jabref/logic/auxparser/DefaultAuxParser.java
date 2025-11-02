@@ -145,7 +145,7 @@ public class DefaultAuxParser implements AuxParser {
      * Resolves and adds CrossRef entries to insert them in addition to the original entries
      *
      * @param entries Entries to check for CrossRefs
-     * @param result AUX file
+     * @param result  AUX file
      */
     private void resolveCrossReferences(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> entriesToInsert = new ArrayList<>();
@@ -172,7 +172,7 @@ public class DefaultAuxParser implements AuxParser {
      * Insert a clone of each given entry. The clones are each given a new unique ID.
      *
      * @param entries Entries to be cloned
-     * @param result the parser result (representing the AUX file)
+     * @param result  the parser result (representing the AUX file)
      */
     private void insertEntries(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> clonedEntries = new ArrayList<>();

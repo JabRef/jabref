@@ -14,7 +14,7 @@ public interface TaskExecutor {
     /**
      * Runs the given task and returns a Future representing that task.
      *
-     * @param <V> type of return value of the task
+     * @param <V>  type of return value of the task
      * @param task the task to run
      */
     <V> Future<V> execute(BackgroundTask<V> task);
@@ -22,9 +22,9 @@ public interface TaskExecutor {
     /**
      * Submits a one-shot task that becomes enabled after the given delay.
      *
-     * @param task the task to execute
+     * @param task  the task to execute
      * @param delay the time from now to delay execution
-     * @param unit the time unit of the delay parameter
+     * @param unit  the time unit of the delay parameter
      * @return a ScheduledFuture representing pending completion of
      * the task and whose {@code get()} method will return
      * {@code null} upon completion

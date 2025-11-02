@@ -59,7 +59,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
      *
      * @param entry The Bibtex entry
      * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
-     * @throws IOException if an IO operation has failed
+     * @throws IOException      if an IO operation has failed
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
     @Override

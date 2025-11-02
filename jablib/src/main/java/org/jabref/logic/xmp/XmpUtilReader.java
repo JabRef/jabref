@@ -73,7 +73,7 @@ public class XmpUtilReader {
      * Looks at the DocumentInformation and the XMP metadata.
      * Regarding the XMP metadata, only Dublin Core is supported.
      *
-     * @param path the path to the PDF file
+     * @param path     the path to the PDF file
      * @param document the PDF document to read from (should have been created from <code>path</code>
      */
     public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {

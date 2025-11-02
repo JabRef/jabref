@@ -86,7 +86,7 @@ public class RangeSortVisual {
      * <p>
      * In particular: when viewing pages side-by-side, the top half of the right page is higher than the lower half of the left page. Again, top-down/left-to-right does not match reading order.
      *
-     * @param range Location.
+     * @param range  Location.
      * @param cursor To get the position, we need az XTextViewCursor. It will be moved to the range.
      */
     private static Point findPositionOfTextRange(XTextRange range, XTextViewCursor cursor) {

@@ -44,7 +44,7 @@ public class Localization {
     /**
      * Public access to all messages that are not menu-entries
      *
-     * @param key The key of the message in unescaped form like "All fields"
+     * @param key    The key of the message in unescaped form like "All fields"
      * @param params Replacement strings for parameters %0, %1, etc.
      * @return The message with replaced parameters
      */
@@ -135,7 +135,7 @@ public class Localization {
      * the keys are the "unescaped" strings from the bundle property files.
      *
      * @param bundle The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
-     * @param key The lookup key.
+     * @param key    The lookup key.
      * @param params The parameters that should be inserted into the message
      * @return The final message with replaced parameters.
      */

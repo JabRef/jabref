@@ -90,7 +90,7 @@ public class FieldWriter {
      * Checks if the character at the specified index in the given text is escaped.
      * A character is considered escaped if it is preceded by an odd number of backslashes (\).
      *
-     * @param text the input string to check for escaped characters
+     * @param text  the input string to check for escaped characters
      * @param index the index of the character in the text to check for escaping
      * @return true if the character at the specified index is escaped, false otherwise
      */
@@ -109,7 +109,7 @@ public class FieldWriter {
     /**
      * Formats the content of a field.
      *
-     * @param field the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
+     * @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
      * @param content the content of the field
      * @return a formatted string suitable for output
      * @throws InvalidFieldValueException if content is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
@@ -225,7 +225,7 @@ public class FieldWriter {
 
     /**
      * @param stringBuilder the StringBuilder to append the text to
-     * @param text the text to append
+     * @param text          the text to append
      */
     private void writeText(StringBuilder stringBuilder, String text, int startPos, int endPos) {
         stringBuilder.append(FIELD_START);
@@ -235,11 +235,11 @@ public class FieldWriter {
 
     /**
      * @param stringBuilder the StringBuilder to append the text to
-     * @param text the text use as basis to get the text to append
-     * @param startPos the position in text where the text to add starts
-     * @param endPos the position in text where the text to add ends
-     * @param isFirst true if the label to write is the first one to write
-     * @param isLast true if the label to write is the last one to write
+     * @param text          the text use as basis to get the text to append
+     * @param startPos      the position in text where the text to add starts
+     * @param endPos        the position in text where the text to add ends
+     * @param isFirst       true if the label to write is the first one to write
+     * @param isLast        true if the label to write is the last one to write
      */
     private void writeStringLabel(StringBuilder stringBuilder, String text, int startPos, int endPos, boolean isFirst, boolean isLast) {
         String line = (isFirst ? "" : " # ") + text.substring(startPos, endPos) + (isLast ? "" : " # ");

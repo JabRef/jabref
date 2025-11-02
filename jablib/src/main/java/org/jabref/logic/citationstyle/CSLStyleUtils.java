@@ -114,7 +114,7 @@ public final class CSLStyleUtils {
      * Parses the style information from a style content using StAX.
      *
      * @param filename The filename of the style (for logging)
-     * @param content The XML content of the style
+     * @param content  The XML content of the style
      * @return Optional containing the StyleInfo if valid, empty otherwise
      */
     public static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
