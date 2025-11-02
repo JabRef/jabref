@@ -154,7 +154,8 @@ jobs:
             archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04 jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04/jabls-portable_linux.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04/jabls
             suffix: ''
             archForDebianRepack: '_amd64'
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_linux-x64_bin-jmods.zip
+            # Browse at https://gluonhq.com/products/javafx/ for latest version
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_linux-x64_bin-jmods.zip
           - os: ubuntu-22.04-arm
             displayName: linux-arm
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef
@@ -162,7 +163,7 @@ jobs:
             archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04-arm jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04-arm/jabls-portable_linux_arm64.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04-arm/jabls
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_linux-aarch64_bin-jmods.zip
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_linux-aarch64_bin-jmods.zip
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef
@@ -170,7 +171,7 @@ jobs:
             archivePortableJabLS: 7z a -r jabls-cli/build/packages/windows-latest/jabls-portable_windows.zip ./jabls-cli/build/packages/windows-latest/jabls && rm -R jabls-cli/build/packages/windows-latest/jabls
             suffix: ''
             archForDebianRepack: ''
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_windows-x64_bin-jmods.zip
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_windows-x64_bin-jmods.zip
           - os: macos-15-intel  # intel image
             displayName: macOS
             archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
@@ -178,7 +179,7 @@ jobs:
             archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app
             suffix: ''
             archForDebianRepack: ''
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-x64_bin-jmods.zip
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_osx-x64_bin-jmods.zip
           - os: macos-15
             displayName: macOS-arm
             archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
@@ -186,7 +187,7 @@ jobs:
             archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-arm.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
             suffix: '_arm64'
             archForDebianRepack: ''
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+10_osx-aarch64_bin-jmods.zip
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_osx-aarch64_bin-jmods.zip
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
