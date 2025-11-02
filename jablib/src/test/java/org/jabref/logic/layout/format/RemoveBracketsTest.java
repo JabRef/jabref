@@ -17,23 +17,17 @@ class RemoveBracketsTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            // Brace pair correctly removed
-            "{some text}, some text",
-
-            // Single opening brace correctly removed
-            "{some text, some text",
-
-            // Single closing brace correctly removed
-            "some text}, some text",
-
-            // Brace pair with escaped backslash correctly removed
-            "'\\\\{some text\\\\}', '\\\\some text\\\\'",
-
-            // Without brackets unmodified
-            "some text, some text"
-    })
-    void format(String input, String expected) {
+    @CsvSource(
+            delimiterString = "->",
+            textBlock = """
+                        some text -> '{some text}'
+                        some text -> '{some text'
+                        some text -> 'some text}'
+                        '\\some text\\' -> '\\{some text\\}'
+                        some text -> some text
+                    """
+    )
+    void format(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 }

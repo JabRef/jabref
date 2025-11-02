@@ -13,21 +13,17 @@ class AuthorFirstLastOxfordCommasTest {
      * Test method for {@link org.jabref.logic.layout.format.AuthorFirstLastOxfordCommas#format(java.lang.String)}.
      */
     @ParameterizedTest
-    @CsvSource({
-            // Empty case
-            "'', ''",
-
-            // Single Names
-            "'Someone, Van Something', Van Something Someone",
-
-            // Two names
-            "John von Neumann and Peter Black Brown, John von Neumann and Peter Black Brown",
-
-            // Three names
-            "'von Neumann, John and Smith, John and Black Brown, Peter', 'John von Neumann, John Smith, and Peter Black Brown'",
-            "'John von Neumann and John Smith and Black Brown, Peter', 'John von Neumann, John Smith, and Peter Black Brown'"
-    })
-    void format(String input, String expected) {
+    @CsvSource(
+            delimiterString = "->",
+            textBlock = """
+                        '' -> ''
+                        'Van Something Someone' -> 'Someone, Van Something'
+                        'John von Neumann and Peter Black Brown' -> 'John von Neumann and Peter Black Brown'
+                        'John von Neumann, John Smith, and Peter Black Brown' -> 'von Neumann, John and Smith, John and Black Brown, Peter'
+                        'John von Neumann, John Smith, and Peter Black Brown' -> 'John von Neumann and John Smith and Black Brown, Peter'
+                    """
+    )
+    void format(String expected, String input) {
         LayoutFormatter formatter = new AuthorFirstLastOxfordCommas();
         assertEquals(expected, formatter.format(input));
     }

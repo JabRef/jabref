@@ -13,23 +13,17 @@ class AuthorAndsReplacerTest {
      * Test method for {@link org.jabref.logic.layout.format.AuthorAndsReplacer#format(java.lang.String)}.
      */
     @ParameterizedTest
-    @CsvSource({
-            // Empty case
-            "'', ''",
-
-            // Single name (unchanged)
-            "'Someone, Van Something', 'Someone, Van Something'",
-
-            // 'and' replaced with '&' in two names
-            "'John Smith and Black Brown, Peter', 'John Smith & Black Brown, Peter'",
-
-            // 'and' replaced with ';' and '&' for three names
-            "'von Neumann, John and Smith, John and Black Brown, Peter', 'von Neumann, John; Smith, John & Black Brown, Peter'",
-
-            // 'and' replaced with ';' and '&' for three names
-            "'John von Neumann and John Smith and Peter Black Brown', 'John von Neumann; John Smith & Peter Black Brown'"
-    })
-    void format(String input, String expected) {
+    @CsvSource(
+            delimiterString = "->",
+            textBlock = """
+                        '' -> ''
+                        'Someone, Van Something' -> 'Someone, Van Something'
+                        'John Smith & Black Brown, Peter' -> 'John Smith and Black Brown, Peter'
+                        'von Neumann, John; Smith, John & Black Brown, Peter' -> 'von Neumann, John and Smith, John and Black Brown, Peter'
+                        'John von Neumann; John Smith & Peter Black Brown' -> 'John von Neumann and John Smith and Peter Black Brown'
+                    """
+    )
+    void format(String expected, String input) {
         LayoutFormatter a = new AuthorAndsReplacer();
         assertEquals(expected, a.format(input));
     }

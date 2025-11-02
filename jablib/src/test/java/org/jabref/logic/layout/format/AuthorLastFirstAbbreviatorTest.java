@@ -6,39 +6,27 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Test case  that verifies the functionalities of the formater AuthorLastFirstAbbreviator.
+ * Test case that verifies the functionalities of the formatter AuthorLastFirstAbbreviator.
  */
 class AuthorLastFirstAbbreviatorTest {
 
     private final AuthorLastFirstAbbreviator abbreviator = new AuthorLastFirstAbbreviator();
 
     @ParameterizedTest
-    @CsvSource({
-            // One author, simple name
-            "'Lastname, Name', 'Lastname, N.'",
-
-            // One author, common name with middle name
-            "'Lastname, Name Middlename', 'Lastname, N. M.'",
-
-            // Two authors with common names
-            "'Lastname, Name Middlename and Sobrenome, Nome Nomedomeio', 'Lastname, N. M. and Sobrenome, N. N.'",
-
-            // Author with Jr. suffix
-            "'Other, Jr., Anthony N.', 'Other, Jr., A. N.'",
-
-            // Empty input returns empty
-            "'', ''",
-
-            // Author with prefix like Van
-            "'Someone, Van Something', 'Someone, V. S.'",
-
-            // Single author
-            "'Smith, John', 'Smith, J.'",
-
-            // Multiple authors with complex last names
-            "'von Neumann, John and Smith, John and Black Brown, Peter', 'von Neumann, J. and Smith, J. and Black Brown, P.'"
-    })
-    void abbreviate(String input, String expected) {
+    @CsvSource(
+            delimiterString = "->",
+            textBlock = """
+                        'Lastname, N.' -> 'Lastname, Name'
+                        'Lastname, N. M.' -> 'Lastname, Name Middlename'
+                        'Lastname, N. M. and Sobrenome, N. N.' -> 'Lastname, Name Middlename and Sobrenome, Nome Nomedomeio'
+                        'Other, Jr., A. N.' -> 'Other, Jr., Anthony N.'
+                        '' -> ''
+                        'Someone, V. S.' -> 'Someone, Van Something'
+                        'Smith, J.' -> 'Smith, John'
+                        'von Neumann, J. and Smith, J. and Black Brown, P.' -> 'von Neumann, John and Smith, John and Black Brown, Peter'
+                    """
+    )
+    void abbreviate(String expected, String input) {
         assertEquals(expected, abbreviator.format(input));
     }
 }
