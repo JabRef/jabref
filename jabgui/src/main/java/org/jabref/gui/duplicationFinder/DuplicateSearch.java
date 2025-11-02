@@ -174,7 +174,10 @@ public class DuplicateSearch extends SimpleCommand {
                                           .orElse(DuplicateResolverResult.BREAK);
 
             // If "Treat all duplicates the same way" is enabled, store the decision
-            if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries() && resolverResult != DuplicateResolverResult.BREAK) {
+            // Note: KEEP_MERGE is not stored as it requires manual merging for each pair
+            if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries() 
+                    && resolverResult != DuplicateResolverResult.BREAK 
+                    && resolverResult != DuplicateResolverResult.KEEP_MERGE) {
                 preferences.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(resolverResult);
             }
 
