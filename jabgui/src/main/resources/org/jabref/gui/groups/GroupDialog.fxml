@@ -99,6 +99,12 @@
                             <Tooltip text="%Group containing entries cited in a given TeX file"/>
                         </tooltip>
                     </RadioButton>
+                    <RadioButton fx:id="directoryRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Directory structure">
+                        <tooltip>
+                            <Tooltip text="%Mirror the directory structure"/>
+                        </tooltip>
+                    </RadioButton>
                 </VBox>
                 <Separator orientation="VERTICAL"/>
                 <StackPane HBox.hgrow="ALWAYS">
@@ -176,11 +182,25 @@
                             <TextField fx:id="autoGroupPersonsField" disable="${!autoGroupPersonsOption.selected}"/>
                         </VBox>
                     </VBox>
-                    <VBox visible="${texRadioButton.selected}">
+                    <VBox visible="${texRadioButton.selected}" spacing="10.0">
                         <Label text="%Aux file"/>
                         <HBox spacing="10.0">
                             <TextField fx:id="texGroupFilePath" HBox.hgrow="ALWAYS" prefHeight="30.0"/>
                             <Button onAction="#texGroupBrowse" text="%Browse" prefHeight="30.0"/>
+                        </HBox>
+                    </VBox>
+                    <VBox visible="${directoryRadioButton.selected}">
+                        <HBox spacing="10.0">
+                            <TextField fx:id="rootPathField" promptText="%Root path"
+                                       HBox.hgrow="ALWAYS"/>
+                            <Button styleClass="icon-button" onAction="#browseDirectory">
+                                <graphic>
+                                    <JabRefIconView glyph="OPEN"/>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="%Browse"/>
+                                </tooltip>
+                            </Button>
                         </HBox>
                     </VBox>
                 </StackPane>
