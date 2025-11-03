@@ -19,6 +19,7 @@ import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
+import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
  */
 @AllowedToUseApacheCommonsLang3("Fastest method to count spaces in a string")
-public class BibliographyFromPdfImporter extends Importer {
+public class BibliographyFromPdfImporter extends Importer implements PlainCitationParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyFromPdfImporter.class);
 
@@ -143,15 +144,12 @@ public class BibliographyFromPdfImporter extends Importer {
     record IntermediateData(String number, String reference) {
     }
 
-    /**
-     * In: <code>"[1] ...\n...\n...[2]...\n...\n...\n[3]..."</code><br>
-     * Out: <code>List&lt;String> = ["[1] ...", "[2]...", "[3]..."]</code>
-     */
-    private List<BibEntry> getEntriesFromPDFContent(String contents) {
+    /// In: `[1] ...\n...\n...[2]...\n...\n...\n[3]...`
+    public List<BibEntry> getEntriesFromPDFContent(String contents) {
         List<IntermediateData> referencesStrings = getIntermediateData(contents);
 
         return referencesStrings.stream()
-                                .map(data -> parseReference(data.number(), data.reference()))
+                                .map(data -> parsePlainCitation(data.number(), data.reference()))
                                 .toList();
     }
 
@@ -207,13 +205,16 @@ public class BibliographyFromPdfImporter extends Importer {
         return writer.toString();
     }
 
+    @Override
+    public Optional<BibEntry> parsePlainCitation(String reference) {
+        return Optional.of(parsePlainCitation("0", reference));
+    }
+
     /**
      * Example: <code>J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017. doi:10.1088/ 1741-4326/aa6a6a</code>
-     *
-     * @param number The number of the reference - used for logging only
      */
     @VisibleForTesting
-    BibEntry parseReference(String number, String reference) {
+    BibEntry parsePlainCitation(String number, String reference) {
         reference = normalizeUnicodeFormatter.format(reference);
         String originalReference = "[" + number + "] " + reference;
         BibEntry result = new BibEntry(StandardEntryType.Article)
@@ -411,7 +412,8 @@ public class BibliographyFromPdfImporter extends Importer {
     /**
      * @param pattern A pattern matching two groups: The first one to take, the second one to leave at the end of the string
      */
-    private static EntryUpdateResult updateEntryAndReferenceIfMatches(String reference, Pattern pattern, BibEntry result, Field field) {
+    private static EntryUpdateResult updateEntryAndReferenceIfMatches(String reference, Pattern pattern, BibEntry result, Field
+        field) {
         Matcher matcher;
         matcher = pattern.matcher(reference);
         if (!matcher.find()) {
