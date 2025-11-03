@@ -32,6 +32,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -87,17 +88,19 @@ public class BibDatabaseWriter {
         assert saveConfiguration.getSaveOrder().getOrderType() != SaveOrder.OrderType.TABLE;
     }
 
+    /// Convenience constructor. One can directly call [#writeDatabase(BibDatabaseContext)] afterward.
+    ///
+    /// @param writer the output to use
+    /// @param bibDatabaseContext - used to get the newline
+    /// @param  preferences - used to read all the preferences
     public BibDatabaseWriter(Writer writer,
-                             String newline,
-                             SelfContainedSaveConfiguration saveConfiguration,
-                             FieldPreferences fieldPreferences,
-                             CitationKeyPatternPreferences citationKeyPatternPreferences,
-                             BibEntryTypesManager entryTypesManager) {
-        this(new BibWriter(writer, newline),
-                saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+                             BibDatabaseContext bibDatabaseContext,
+                             JabRefCliPreferences preferences) {
+        this(new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator()),
+                preferences.getSelfContainedExportConfiguration(),
+                preferences.getFieldPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getCustomEntryTypesRepository());
     }
 
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData, FieldPreferences fieldPreferences) {
