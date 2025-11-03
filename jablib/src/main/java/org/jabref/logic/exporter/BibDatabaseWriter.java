@@ -93,9 +93,9 @@ public class BibDatabaseWriter {
     /// @param writer the output to use
     /// @param bibDatabaseContext - used to get the newline
     /// @param  preferences - used to read all the preferences
-    public BibDatabaseWriter(Writer writer,
-                             BibDatabaseContext bibDatabaseContext,
-                             JabRefCliPreferences preferences) {
+    public BibDatabaseWriter(@NonNull Writer writer,
+                             @NonNull BibDatabaseContext bibDatabaseContext,
+                             @NonNull JabRefCliPreferences preferences) {
         this(new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator()),
                 preferences.getSelfContainedExportConfiguration(),
                 preferences.getFieldPreferences(),
