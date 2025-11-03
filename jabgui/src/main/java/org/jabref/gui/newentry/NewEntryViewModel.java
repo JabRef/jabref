@@ -38,7 +38,7 @@ import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser;
-import org.jabref.logic.importer.plaincitation.SeveralPlainCitationParser;
+import org.jabref.logic.importer.plaincitation.MultiplePlainCitationsParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
@@ -365,7 +365,7 @@ public class NewEntryViewModel {
                         new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
             };
 
-            final SeveralPlainCitationParser setParser = new SeveralPlainCitationParser(parser);
+            final MultiplePlainCitationsParser setParser = new MultiplePlainCitationsParser(parser);
             final List<BibEntry> entries = setParser.parseSeveralPlainCitations(text);
 
             if (entries.isEmpty()) {

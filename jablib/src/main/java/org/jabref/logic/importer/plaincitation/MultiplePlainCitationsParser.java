@@ -12,10 +12,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.UncheckedException;
 
-public class SeveralPlainCitationParser {
+public class MultiplePlainCitationsParser {
     private final PlainCitationParser parser;
 
-    public SeveralPlainCitationParser(PlainCitationParser parser) {
+    public MultiplePlainCitationsParser(PlainCitationParser parser) {
         this.parser = parser;
     }
 

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SeveralCitationsParsingTest {
-    static SeveralPlainCitationParser parser = new SeveralPlainCitationParser(new RuleBasedPlainCitationParser());
+    static MultiplePlainCitationsParser parser = new MultiplePlainCitationsParser(new RuleBasedPlainCitationParser());
 
     @Test
     void correctlySplitTexts() {
