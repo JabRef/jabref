@@ -4,7 +4,7 @@ plugins {
     id("org.openrewrite.rewrite") version "7.19.0"
     id("org.itsallcode.openfasttrace") version "3.1.0"
     id("org.cyclonedx.bom") version "3.0.1"
-    id("info.solidsoft.pitest") version "1.19.0-rc.2"
+
 }
 
 // OpenRewrite should rewrite all sources
@@ -36,23 +36,7 @@ rewrite {
     failOnDryRunResults = true
 }
 
-pitest {
-    targetClasses.set(setOf("org.jabref.logic.citationstyle.CitationStyle"))
-    targetTests.set(setOf("org.jabref.logic.citationstyle.*Test"))
-    threads.set(4)
-    outputFormats.set(setOf("XML", "HTML"))
-    timestampedReports.set(false)
-}
 
-
-//pitest {
-//    targetClasses.set(listOf("org.jabref.*"))  //by default "${project.group}.*"
-//    targetTests.set(listOf("org.jabref.*Test"))
-//    junit5PluginVersion.set("1.2.0")
-//    threads.set(4)
-//    outputFormats.set(listOf("XML", "HTML"))
-//    timestampedReports.set(false)
-//}
 requirementTracing {
     inputDirectories.setFrom(files("docs",
             "jablib/src/main/java", "jablib/src/test/java",
@@ -84,6 +68,10 @@ tasks.cyclonedxBom {
     componentVersion = project.version.toString()
     componentGroup = "org.jabref"
 }
+
+
+
+
 
 
 

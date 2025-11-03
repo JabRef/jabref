@@ -7,6 +7,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.nio.file.Path;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.junit.jupiter.api.Test;
+
 class FileNameCleanerTest {
 
     @ParameterizedTest
@@ -39,5 +43,12 @@ class FileNameCleanerTest {
     })
     void cleanDirectoryNameForWindows(String expected, String input) {
         assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
+    }
+
+    @Test
+    void DirectoryPathValidate() { // destroys mutate in Dir.getFullTextIndexBaseDir()
+        Path expected = Path.of(""); // expected C:/users/laptop/appdata/local/org.jabref/jabref/lucene/5
+        Path actual = Directories.getFulltextIndexBaseDirectory();
+        assertFalse(actual.endsWith(expected));
     }
 }

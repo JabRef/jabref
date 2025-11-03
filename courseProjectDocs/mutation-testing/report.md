@@ -22,11 +22,6 @@ To generate a mutation report, run:
 ```bash
 ./gradlew :jablib:pitest
 ```
-| Member   | Task / Contribution                                                                                                                                   | Notes                                                          |
-|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|
-| Geoffrey | Fixed failing unit tests in `PdfImporterMockTest`, configured PIT mutation testing, and added new mutation-killing tests for `QuotedStringTokenizer`. | Increased test coverage by 2% and killed 24 surviving mutants. |
-| Lucille  | X                                                                                                                                                     | X                                                              |
-| Vanessa  | X                                                                                                                                                     | X                                                              |
 
 # 2. Mutations Before
 
@@ -181,3 +176,12 @@ Line Coverage (for mutated classes only): 687/1571 (44%)
 Generated 921 mutations Killed 361 (39%)  
 Mutations with no coverage 517. Test strength 89%  
 Ran 750 tests (0.81 tests per mutation)  
+---
+
+### Group Contributions
+
+| Member | Task | Notes           |
+| -------- | ------- |-----------------|
+| Lucille | pitest setup/config | tba notess         |
+| Geoffrey | Fixed failing unit tests in `PdfImporterMockTest`, configured PIT mutation testing, and added new mutation-killing tests for `QuotedStringTokenizer`. | Increased test coverage by 2% and killed 24 surviving mutants. |
+| Vanessa | Tested and killed 1 mutant | In .util.Directories |
