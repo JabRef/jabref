@@ -173,12 +173,12 @@ public class BibDatabaseWriter {
     /**
      * Saves the complete database.
      */
-    public void saveDatabase(BibDatabaseContext bibDatabaseContext) throws IOException {
+    public void writeDatabase(@NonNull BibDatabaseContext bibDatabaseContext) throws IOException {
         List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntries()
                                                    .stream()
                                                    .filter(entry -> !entry.isEmpty())
                                                    .toList();
-        savePartOfDatabase(bibDatabaseContext, entries);
+        writePartOfDatabase(bibDatabaseContext, entries);
     }
 
     /**
@@ -186,7 +186,7 @@ public class BibDatabaseWriter {
      *
      * @param entries A list of entries to save. The list itself is not modified in this code
      */
-    public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
+    public void writePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
         sharedDatabaseIDOptional.ifPresent(Unchecked.consumer(this::writeDatabaseID));
 
