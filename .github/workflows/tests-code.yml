@@ -438,13 +438,23 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
+      - name: Detect changed jablib classes
+        id: changed-jablib-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            jablib/src/main/java/**/*.java
+          files_ignore: |
+            jablib/src/main/java/**/*-*.java
       - name: Set up JDK
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: actions/setup-java@v5
         with:
           java-version: 24
           distribution: 'corretto'
           check-latest: true
       - name: Generate JBang cache key
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
         id: cache-key
         shell: bash
         run: |
@@ -457,15 +467,26 @@ jobs:
           restore-keys:
             jbang-
       - name: Setup JBang
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: jbangdev/setup-jbang@main
       - run: jbang build .jbang/CheckoutPR.java
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang build .jbang/CloneJabRef.java
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang build --fresh .jbang/JabKitLauncher.java
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang build --fresh .jbang/JabLsLauncher.java
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang build --fresh .jbang/JabSrvLauncher.java
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+      - run: jbang build --fresh jablib-examples/*.java
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang run .jbang/JabKitLauncher.java --help
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang run .jbang/JabLsLauncher.java --help
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang run .jbang/JabSrvLauncher.java --help
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
 
   jbang-pr:
     name: JBang (PR)
@@ -475,13 +496,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        launcher: [JabKitLauncher, JabLsLauncher, JabSrvLauncher]
+        script: [.jbang/JabKitLauncher.java.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/ieee_pdf_references_to_bibtex.java]
     steps:
       - name: Checkout source
         uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
+      - name: Detect changed jablib classes
+        id: changed-jablib-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            jablib/src/main/java/**/*.java
+          files_ignore: |
+            jablib/src/main/java/**/*-*.java
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -502,24 +531,16 @@ jobs:
             jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
-      - name: Detect changed jablib classes
-        id: changed-jablib-files
-        uses: tj-actions/changed-files@v47
-        with:
-          files: |
-            jablib/src/main/java/**/*.java
-          files_ignore: |
-            jablib/src/main/java/**/*-*.java
-      - name: Build ${{ matrix.launcher }} launcher including changed classes
+      - name: Build ${{ matrix.script }} including changed classes
         shell: bash
         # We always run, because changes in jabls, jabsrv also could cause JBang to fail
         run: |
           # We modify the JBang scripts directly to avoid issues with relative paths
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
-            echo "//SOURCES ../$f" >> ".jbang/${{ matrix.launcher }}.java"
+            echo "//SOURCES ../$f" >> "${{ matrix.script }}.java"
           done
-          jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
-      - run: jbang ".jbang/${{ matrix.launcher }}.java" --help
+          jbang build --fresh "${{ matrix.script }}.java"
+      - run: jbang "${{ matrix.script }}.java" --help
         shell: bash
 
   codecoverage:
