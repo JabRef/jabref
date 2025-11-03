@@ -1,8 +1,6 @@
 package org.jabref.cli;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -99,17 +97,12 @@ class ArgumentProcessorTest extends AbstractJabKitTest {
 
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--output-format", "txt");
 
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent, true));
+        int executionResult = executeToLog(args.toArray(String[]::new));
 
-        int executionResult = commandLine.execute(args.toArray(String[]::new));
-
-        String output = outContent.toString().replace("\r\n", "\n");
+        String output = getStandardOutput();
         assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"), "Expected output to contain sentence: Checking consistency for entry type 1 of 1");
         assertTrue(output.contains("Consistency check completed"), "Expected output to contain sentence: Consistency check completed");
         assertEquals(0, executionResult);
-
-        System.setOut(System.out);
     }
 
     @Test
@@ -120,15 +113,10 @@ class ArgumentProcessorTest extends AbstractJabKitTest {
         // "txt" is the default output format; thus not provided here
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--porcelain");
 
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
+        int executionResult = executeToLog(args.toArray(String[]::new));
 
-        int executionResult = commandLine.execute(args.toArray(String[]::new));
-
-        String output = outContent.toString();
+        String output = getStandardOutput();
         assertEquals("", output);
         assertEquals(0, executionResult);
-
-        System.setOut(System.out);
     }
 }

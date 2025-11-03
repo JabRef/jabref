@@ -187,6 +187,10 @@ open module org.jabref.jablib {
     requires org.apache.commons.logging;
     // endregion
 
+    // region: caching
+    requires com.github.benmanes.caffeine;
+    // endregion
+
     // region: latex2unicode
     requires com.github.tomtung.latex2unicode;
     requires fastparse;
@@ -261,6 +265,5 @@ open module org.jabref.jablib {
     requires org.jooq.jool;
     requires org.libreoffice.uno;
     requires transitive org.jspecify;
-    requires com.fasterxml.jackson.datatype.jdk8;
     // endregion
 }

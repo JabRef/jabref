@@ -17,11 +17,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class FieldFactory {
 
     /**

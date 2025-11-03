@@ -27,7 +27,7 @@
 // REPOS mavencentral,jitpack=https://jitpack.io
 
 // TODO: ASCII things won't work, but we accept for now to keep things going
-//DEPS com.ibm.icu:icu4j:77.1
+//DEPS com.ibm.icu:icu4j:78.1
 
 // Choose one - both should work
 // https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/jabref/jablib/
@@ -36,6 +36,7 @@
 // DEPS com.github.jabref:jabref:main-SNAPSHOT
 //DEPS io.github.darvil82:terminal-text-formatter:2.2.0
 //DEPS info.picocli:picocli:4.7.7
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 
 import org.jabref.JabKit;
 
