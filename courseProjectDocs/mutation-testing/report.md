@@ -177,11 +177,88 @@ Generated 921 mutations Killed 361 (39%)
 Mutations with no coverage 517. Test strength 89%  
 Ran 750 tests (0.81 tests per mutation)  
 ---
-
+# 4. Mutations After CitationKeyBaseFileFinderTest.java
+---
+## Mutators
+---
+## org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator
+### Generated 42 Killed 26 (62%)
+ KILLED 26 SURVIVED 11 TIMED_OUT 0 NON_VIABLE 0
+ MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0
+ NO_COVERAGE 5
+---
+## org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator
+### Generated 20 Killed 13 (65%)
+ KILLED 13 SURVIVED 0 TIMED_OUT 0 NON_VIABLE 0
+ MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0
+ NO_COVERAGE 7
+---
+## org.pitest.mutationtest.engine.gregor.mutators.IncrementsMutator
+### Generated 2 Killed 1 (50%)
+ KILLED 1 SURVIVED 0 TIMED_OUT 0 NON_VIABLE 0
+ MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0
+ NO_COVERAGE 1
+---
+## org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator
+### Generated 284 Killed 8 (3%)
+ KILLED 8 SURVIVED 4 TIMED_OUT 0 NON_VIABLE 0
+ MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0
+ NO_COVERAGE 272
+---
+## org.pitest.mutationtest.engine.gregor.mutators.returns.BooleanTrueReturnValsMutator
+### Generated 55 Killed 27 (49%)
+ KILLED 27 SURVIVED 4 TIMED_OUT 0 NON_VIABLE 0
+ MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0
+ NO_COVERAGE 24
+---
+## org.pitest.mutationtest.engine.gregor.mutators.returns.NullReturnValsMutator
+### Generated 109 Killed 31 (28%)
+ KILLED 31 SURVIVED 1 TIMED_OUT 0 NON_VIABLE 0
+ MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0
+ NO_COVERAGE 77
+---
+## org.pitest.mutationtest.engine.gregor.mutators.MathMutator
+### Generated 48 Killed 36 (75%)
+ KILLED 35 SURVIVED 2 TIMED_OUT 1 NON_VIABLE 0 
+ MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0 
+ NO_COVERAGE 10
+---
+## org.pitest.mutationtest.engine.gregor.mutators.returns.EmptyObjectReturnValsMutator
+### Generated 99 Killed 44 (44%)
+KILLED 44 SURVIVED 5 TIMED_OUT 0 NON_VIABLE 0
+MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0
+NO_COVERAGE 50
+---
+## org.pitest.mutationtest.engine.gregor.mutators.returns.BooleanFalseReturnValsMutator
+### Generated 35 Killed 18 (51%)
+KILLED 18 SURVIVED 2 TIMED_OUT 0 NON_VIABLE 0
+MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0
+NO_COVERAGE 15
+---
+## org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator
+### Generated 227 Killed 160 (70%)
+ KILLED 159 SURVIVED 11 TIMED_OUT 1 NON_VIABLE 0
+ MEMORY_ERROR 0 NOT_STARTED 0 STARTED 0 RUN_ERROR 0
+ NO_COVERAGE 56
+---
+## Timings
+ pre-scan for mutations : `< 1 second`
+ scan classpath : `< 1 second`
+ coverage and dependency analysis : `5 seconds`
+ build mutation tests : `< 1 second`
+ run mutation analysis : `24 seconds`
+ Total  : `30 seconds`
+---
+## Statistics
+ Line Coverage (for mutated classes only): 687/1571 (44%)
+ 17 tests examined
+ Generated 921 mutations Killed 364 (40%)
+ Mutations with no coverage 517. Test strength 90%
+ Ran 736 tests (0.8 tests per mutation)
 ### Group Contributions
 
-| Member | Task | Notes           |
-| -------- | ------- |-----------------|
-| Lucille | pitest setup/config | tba notess         |
+| Member | Task                                                                                                                                                  | Notes                                                         |
+| -------- |-------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
+| Lucille | pitest setup/config, added tests in `CitationKeyBasedFileFinderTest`                                                                                  | Killed only 2 surviving mutants                                |
 | Geoffrey | Fixed failing unit tests in `PdfImporterMockTest`, configured PIT mutation testing, and added new mutation-killing tests for `QuotedStringTokenizer`. | Increased test coverage by 2% and killed 24 surviving mutants. |
-| Vanessa | Tested and killed 1 mutant | In .util.Directories |
+| Vanessa | Tested and killed 1 mutant                                                                                                                            | In .util.Directories                                          |

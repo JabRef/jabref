@@ -125,4 +125,19 @@ class CitationKeyBasedFileFinderTest {
 
         assertNotEquals(List.of(testFile), results);
     }
+
+    @Test
+    void findAssociatedFilesShouldIncludeOnlyExactMatchingFiles() throws IOException {
+
+        Path validFile = Files.createFile(pdfsDir.resolve("HipKro03.pdf"));
+
+        Files.createFile(pdfsDir.resolve("HipKro03a.pdf"));
+
+        FileFinder finder = new CitationKeyBasedFileFinder(true);
+
+        List<Path> results = finder.findAssociatedFiles(entry, List.of(pdfsDir), List.of("pdf"));
+
+        assertEquals(List.of(validFile), results,
+                "FileFinder should not include files where the character after the citation key is an appendix character (e.g. 'a')");
+    }
 }
