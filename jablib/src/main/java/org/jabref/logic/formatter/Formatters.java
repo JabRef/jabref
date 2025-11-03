@@ -142,6 +142,9 @@ public class Formatters {
                 return Optional.of(new VeryShortTitleFormatter());
             case "shorttitle":
                 return Optional.of(new ShortTitleFormatter());
+            default:
+                // No matching explicit case found; handled below
+                break;
         }
 
         if (modifier.contains("camel")) {
