@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,14 +70,14 @@ public class BibliographyFromPdfImporter extends Importer {
     private static final Pattern AUTHORS_AND_TITLE_AT_BEGINNING = Pattern.compile("^([^“]+), “(.*?)(”,|,”) ");
     private static final Pattern TITLE = Pattern.compile("“(.*?)”, (.*)");
 
-    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    @Nullable private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final NormalizeUnicodeFormatter normalizeUnicodeFormatter = new NormalizeUnicodeFormatter();
 
     public BibliographyFromPdfImporter() {
         this.citationKeyPatternPreferences = null;
     }
 
-    public BibliographyFromPdfImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {
+    public BibliographyFromPdfImporter(@NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
     }
 
