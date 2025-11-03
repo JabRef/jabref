@@ -72,25 +72,22 @@ import org.xml.sax.SAXException;
 import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_QUOTE_CHAR;
 import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYPE_SUFFIX;
 
-/**
- * Class for importing BibTeX-files.
- * <p>
- * Use:
- * <p>
- * <code>BibtexParser parser = new BibtexParser(reader);</code>
- * <p>
- * <code>ParserResult result = parser.parse();</code>
- * <p>
- * or
- * <p>
- * <code>ParserResult result = BibtexParser.parse(reader);</code>
- * <p>
- * Can be used stand-alone.
- * <p>
- * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
- * <p>
- * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
- */
+/// Class for importing BibTeX files.
+///
+/// **Usage**
+///
+/// ```java
+/// BibtexParser parser = new BibtexParser(importFormatPreferences);
+/// ParserResult result = parser.parse();
+/// ```
+///
+/// Can be used stand-alone.
+///
+/// **Main using method:**
+/// [`OpenDatabase.loadDatabase`](org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor))
+///
+/// **Opposite class:**
+/// [`BibDatabaseWriter`](org.jabref.logic.exporter.BibDatabaseWriter)
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
     private static final int LOOKAHEAD = 1024;

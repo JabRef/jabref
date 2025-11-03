@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +19,11 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
+import org.jabref.logic.importer.plaincitation.ReferencesBlockFromPdfFinder;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
-import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -34,8 +33,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -55,7 +52,6 @@ public class BibliographyFromPdfImporter extends Importer implements PlainCitati
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyFromPdfImporter.class);
 
-    private static final Pattern REFERENCES = Pattern.compile("References", Pattern.CASE_INSENSITIVE);
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\[(\\d+)\\](.*?)(?=\\[|$)", Pattern.DOTALL);
     private static final Pattern YEAR_AT_END = Pattern.compile(", (\\d{4})\\.$");
     private static final Pattern YEAR = Pattern.compile(", (\\d{4})(.*)");
@@ -118,14 +114,15 @@ public class BibliographyFromPdfImporter extends Importer implements PlainCitati
     public ParserResult importDatabase(Path filePath) {
         List<BibEntry> result;
 
-        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
-            String contents = getReferencesPagesText(document);
-            result = getEntriesFromPDFContent(contents);
+        String contents;
+        try {
+            contents = ReferencesBlockFromPdfFinder.getReferencesPagesText(filePath);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch (IOException exception) {
             return ParserResult.fromError(exception);
         }
+        result = getEntriesFromPDFContent(contents);
 
         ParserResult parserResult = new ParserResult(result);
 
@@ -162,47 +159,6 @@ public class BibliographyFromPdfImporter extends Importer implements PlainCitati
             referencesStrings.add(new IntermediateData(matcher.group(1), reference));
         }
         return referencesStrings;
-    }
-
-    /**
-     * Extracts the text from all pages containing references. It simply goes from the last page backwards until there is probably no reference anymore.
-     */
-    private String getReferencesPagesText(PDDocument document) throws IOException {
-        int lastPage = document.getNumberOfPages();
-        String result = prependToResult("", document, new PDFTextStripper(), lastPage);
-
-        // Same matcher uses as in {@link containsWordReferences}
-        Matcher matcher = REFERENCES.matcher(result);
-        if (!matcher.find()) {
-            // Ensure that not too much is returned
-            LOGGER.warn("Could not found 'References'. Returning last page only.");
-            return getPageContents(document, new PDFTextStripper(), lastPage);
-        }
-
-        int end = matcher.end();
-        return result.substring(end);
-    }
-
-    private static boolean containsWordReferences(String result) {
-        Matcher matcher = REFERENCES.matcher(result);
-        return matcher.find();
-    }
-
-    private String prependToResult(String currentText, PDDocument document, PDFTextStripper stripper, int pageNumber) throws IOException {
-        String pageContents = getPageContents(document, stripper, pageNumber);
-        String result = pageContents + currentText;
-        if (!containsWordReferences(pageContents) && (pageNumber > 0)) {
-            return prependToResult(result, document, stripper, pageNumber - 1);
-        }
-        return result;
-    }
-
-    private static String getPageContents(PDDocument document, PDFTextStripper stripper, int lastPage) throws IOException {
-        stripper.setStartPage(lastPage);
-        stripper.setEndPage(lastPage);
-        StringWriter writer = new StringWriter();
-        stripper.writeText(document, writer);
-        return writer.toString();
     }
 
     @Override
