@@ -7,6 +7,13 @@ plugins {
     id("org.sonarqube") version "6.3.1.5724"
 }
 
+subprojects{
+    sonar {
+        properties {
+            property("sonar.sources", "src")
+        }
+    }
+}
 // OpenRewrite should rewrite all sources
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
