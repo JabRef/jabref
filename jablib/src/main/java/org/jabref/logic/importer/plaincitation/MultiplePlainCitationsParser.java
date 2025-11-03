@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 
+import org.jetbrains.annotations.VisibleForTesting;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.UncheckedException;
 
@@ -19,7 +20,7 @@ public class MultiplePlainCitationsParser {
         this.parser = parser;
     }
 
-    public List<BibEntry> parseSeveralPlainCitations(String text) throws FetcherException {
+    public List<BibEntry> parseMultiplePlainCitations(String text) throws FetcherException {
         try {
             return splitCitations(text)
                     .map(Unchecked.function(parser::parsePlainCitation))
@@ -30,7 +31,8 @@ public class MultiplePlainCitationsParser {
         }
     }
 
-    public Stream<String> splitCitations(String text) {
+    @VisibleForTesting
+    Stream<String> splitCitations(String text) {
         return Arrays.stream(text.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                      .map(String::trim)
                      .filter(str -> !str.isBlank());

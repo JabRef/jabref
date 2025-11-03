@@ -369,7 +369,7 @@ public class NewEntryViewModel {
             };
 
             final MultiplePlainCitationsParser setParser = new MultiplePlainCitationsParser(parser);
-            final List<BibEntry> entries = setParser.parseSeveralPlainCitations(text);
+            final List<BibEntry> entries = setParser.parseMultiplePlainCitations(text);
 
             if (entries.isEmpty()) {
                 return Optional.empty();
