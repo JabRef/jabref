@@ -19,7 +19,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
@@ -739,7 +739,7 @@ class BibDatabaseWriterTest {
 
     @Test
     void writeSaveActions() throws IOException {
-        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
+        FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
                 Arrays.asList(
                         new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()),
                         new FieldFormatterCleanup(StandardField.JOURNAL, new TitleCaseFormatter()),

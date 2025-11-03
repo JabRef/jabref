@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.os.OS;
@@ -59,7 +59,7 @@ public class MetaDataSerializerTest {
 
     @Test
     void serializeSingleSaveAction() {
-        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
+        FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
 

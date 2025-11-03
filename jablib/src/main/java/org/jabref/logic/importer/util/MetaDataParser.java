@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -255,15 +255,15 @@ public class MetaDataParser {
         return Optional.empty();
     }
 
-    public static FieldFormatterCleanups fieldFormatterCleanupsParse(List<String> formatterMetaList) {
+    public static FieldFormatterCleanupActions fieldFormatterCleanupsParse(List<String> formatterMetaList) {
         if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
-            boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.getFirst());
+            boolean enablementStatus = FieldFormatterCleanupActions.ENABLED.equals(formatterMetaList.getFirst());
             String formatterString = formatterMetaList.get(1);
 
-            return new FieldFormatterCleanups(enablementStatus, FieldFormatterCleanups.parse(formatterString));
+            return new FieldFormatterCleanupActions(enablementStatus, FieldFormatterCleanupActions.parse(formatterString));
         } else {
             // return default actions
-            return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);
+            return new FieldFormatterCleanupActions(false, DEFAULT_SAVE_ACTIONS);
         }
     }
 
