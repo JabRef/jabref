@@ -18,12 +18,19 @@ public class QuotedStringTokenizer {
      * @param quoteCharacter The quoting character. Every character (including, but not limited to, delimiters) that is preceded by this character is not treated as a delimiter, but as a token component.
      */
     public QuotedStringTokenizer(String content, String delimiters, char quoteCharacter) {
-        this.content = content;
-        this.delimiters = delimiters;
-        quoteChar = quoteCharacter;
-        contentLength = this.content.length();
+        this.content = (content != null) ? content : "";
+        this.delimiters = (delimiters != null) ? delimiters : "";
+        this.quoteChar = quoteCharacter;
+        this.contentLength = this.content.length();
+        this.index = 0;
+
+        // Guard against empty or null content before calling charAt
+        if (this.contentLength == 0) {
+            return;
+        }
+
         // skip leading delimiters
-        while (isDelimiter(this.content.charAt(index)) && index < contentLength) {
+        while (index < contentLength && isDelimiter(this.content.charAt(index))) {
             ++index;
         }
     }

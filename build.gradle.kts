@@ -4,6 +4,7 @@ plugins {
     id("org.openrewrite.rewrite") version "7.19.0"
     id("org.itsallcode.openfasttrace") version "3.1.0"
     id("org.cyclonedx.bom") version "3.0.1"
+
 }
 
 // OpenRewrite should rewrite all sources
@@ -34,6 +35,7 @@ rewrite {
     plainTextMask("**/*.md")
     failOnDryRunResults = true
 }
+
 
 requirementTracing {
     inputDirectories.setFrom(files("docs",
@@ -66,3 +68,11 @@ tasks.cyclonedxBom {
     componentVersion = project.version.toString()
     componentGroup = "org.jabref"
 }
+
+
+
+
+
+
+
+
