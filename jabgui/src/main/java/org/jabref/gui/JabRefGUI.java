@@ -28,6 +28,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DefaultDirectoryUpdateMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -54,6 +55,7 @@ import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -78,6 +80,7 @@ public class JabRefGUI extends Application {
     private static SearchCitationsRelationsService citationsAndRelationsSearchService;
 
     private static FileUpdateMonitor fileUpdateMonitor;
+    private static DirectoryUpdateMonitor directoryUpdateMonitor;
     private static StateManager stateManager;
     private static ThemeManager themeManager;
     private static CountingUndoManager countingUndoManager;
@@ -135,6 +138,13 @@ public class JabRefGUI extends Application {
                             "with this session."));
         }
 
+        if (!directoryUpdateMonitor.isActive()) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Unable to monitor directory changes. Please close directories " +
+                            "and processes and restart. You may encounter errors if you continue " +
+                            "with this session."));
+        }
+
         BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
         EasyBind.subscribe(preferences.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
@@ -156,6 +166,11 @@ public class JabRefGUI extends Application {
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
+
+        DefaultDirectoryUpdateMonitor directoryUpdateMonitor = new DefaultDirectoryUpdateMonitor();
+        JabRefGUI.directoryUpdateMonitor = directoryUpdateMonitor;
+        HeadlessExecutorService.INSTANCE.executeInterruptableTask(directoryUpdateMonitor, "DirectoryUpdateMonitor");
+        Injector.setModelOrService(DirectoryUpdateMonitor.class, directoryUpdateMonitor);
 
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
@@ -505,6 +520,12 @@ public class JabRefGUI extends Application {
                 LOGGER.trace("Shutting down fileUpdateMonitor");
                 fileUpdateMonitor.shutdown();
                 LOGGER.trace("FileUpdateMonitor shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Shutting down directoryUpdateMonitor");
+                directoryUpdateMonitor.shutdown();
+                LOGGER.trace("DirectoryUpdateMonitor shut down");
             });
 
             executor.submit(() -> {

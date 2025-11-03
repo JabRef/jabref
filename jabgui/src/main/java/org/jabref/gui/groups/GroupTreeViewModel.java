@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -225,7 +227,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 // TODO: Expand parent to make new group visible
                 // parent.expand();
-                dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
+                if (group instanceof DirectoryGroup directoryStructureRoot) {
+                    try {
+                        writeGroupChangesToMetaData();
+                        directoryStructureRoot.addDescendants();
+                    } catch (IOException e) {
+                        dialogService.showErrorDialogAndWait(e.getMessage(), Localization.lang("Cannot create directory structure."));
+                    }
+                    dialogService.notify(Localization.lang("Added directory structure \"%0\".", group.getName()));
+                } else {
+                    dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
+                }
                 writeGroupChangesToMetaData();
             });
         });
