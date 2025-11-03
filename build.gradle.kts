@@ -4,16 +4,28 @@ plugins {
     id("org.openrewrite.rewrite") version "7.19.0"
     id("org.itsallcode.openfasttrace") version "3.1.0"
     id("org.cyclonedx.bom") version "3.0.1"
-    id("org.sonarqube") version "6.3.1.5724"
+    id("org.sonarqube") version "6.3.1.5724" // "7.0.1.6134"
 }
-
-subprojects{
+//subprojects {
+//        sonar {
+//            properties {
+//                property("sonar.working.directory", "${buildDir}/sonar")
+//        }
+//}
+project(":jablib") {
     sonar {
         properties {
-            property("sonar.sources", "src")
+            property(
+                "sonar.java.binaries",
+                layout.buildDirectory.dir("/classes/java/main").get().asFile.absolutePath
+            )
+            property("sonar.sources", "src/main")
+            property ("sonar.exclusions", "src/test/**")
         }
     }
 }
+
+
 // OpenRewrite should rewrite all sources
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
@@ -67,6 +79,7 @@ tasks.register("run") {
 allprojects {
     tasks.cyclonedxDirectBom {
     }
+
 }
 
 tasks.cyclonedxBom {
@@ -76,6 +89,7 @@ tasks.cyclonedxBom {
     componentVersion = project.version.toString()
     componentGroup = "org.jabref"
 }
+
 
 
 
