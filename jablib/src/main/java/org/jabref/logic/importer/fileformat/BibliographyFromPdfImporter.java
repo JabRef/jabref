@@ -112,6 +112,7 @@ public class BibliographyFromPdfImporter extends Importer {
         return StandardFileType.PDF;
     }
 
+    /// Online Grobid implementation: [org.jabref.logic.importer.util.GrobidService#processReferences(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences)]
     @Override
     public ParserResult importDatabase(Path filePath) {
         List<BibEntry> result;
