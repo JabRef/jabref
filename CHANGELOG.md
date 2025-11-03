@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added "IEEE" as another option for parsing plain text citations.
+
 ### Changed
 
 ### Fixed
