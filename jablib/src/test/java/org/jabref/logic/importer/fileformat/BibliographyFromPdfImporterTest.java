@@ -297,6 +297,6 @@ class BibliographyFromPdfImporterTest {
         List<BibliographyFromPdfImporter.IntermediateData> intermediateDataList = BibliographyFromPdfImporter.getIntermediateData(expectedEntry.getField(StandardField.COMMENT).get());
         assertEquals(1, intermediateDataList.size());
         BibliographyFromPdfImporter.IntermediateData intermediateData = intermediateDataList.getFirst();
-        assertEquals(expectedEntry, bibliographyFromPdfImporter.parseReference(intermediateData.number(), intermediateData.reference()));
+        assertEquals(expectedEntry, bibliographyFromPdfImporter.parsePlainCitation(intermediateData.number(), intermediateData.reference()));
     }
 }
