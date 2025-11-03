@@ -46,7 +46,7 @@ public class BibEntryWriter {
         this.entryTypesManager = entryTypesManager;
     }
 
-    public String serializeAll(List<BibEntry> entries, BibDatabaseMode databaseMode) throws IOException {
+    public String writeAll(List<BibEntry> entries, BibDatabaseMode databaseMode) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         for (BibEntry entry : entries) {
