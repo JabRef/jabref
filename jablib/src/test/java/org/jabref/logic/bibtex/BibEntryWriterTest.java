@@ -749,7 +749,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void writeAll() throws IOException {
+    void write() throws IOException {
         BibEntry entry1 = new BibEntry(StandardEntryType.Article)
                 // required fields
                 .withField(StandardField.AUTHOR, "Journal Author")
@@ -780,7 +780,7 @@ class BibEntryWriterTest {
                 .withField(StandardField.CHAPTER, "chapter")
                 .withChanged(true);
 
-        String output = bibEntryWriter.writeAll(List.of(entry1, entry2), BibDatabaseMode.BIBLATEX);
+        String output = bibEntryWriter.write(List.of(entry1, entry2), BibDatabaseMode.BIBLATEX);
 
         String expected1 = """
                 @Article{,

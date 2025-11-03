@@ -168,6 +168,6 @@ public class ClipBoardManager {
         // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
         // Furthermore, storing a string also enables other applications to work with the data
         BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferences.getFieldPreferences()), entryTypesManager);
-        return writer.writeAll(entries, BibDatabaseMode.BIBTEX);
+        return writer.write(entries, BibDatabaseMode.BIBTEX);
     }
 }
