@@ -50,7 +50,7 @@
 // REPOS mavencentral,jitpack=https://jitpack.io
 
 // TODO: ASCII things won't work, but we accept for now to keep things going
-//DEPS com.ibm.icu:icu4j:77.1
+//DEPS com.ibm.icu:icu4j:78.1
 
 // Choose one - both should work
 // https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/jabref/jablib/
@@ -87,7 +87,8 @@
 //DEPS com.google.guava:guava:33.5.0-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.5.0
-//DEPS de.undercouch:citeproc-java:3.3.0
+//DEPS de.undercouch:citeproc-java:3.4.0
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabSrvLauncher {

@@ -11,7 +11,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class NameFormatterTabViewModel implements PreferenceTabViewModel {
 
