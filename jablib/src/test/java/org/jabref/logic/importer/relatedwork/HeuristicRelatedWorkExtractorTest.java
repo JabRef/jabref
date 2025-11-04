@@ -15,11 +15,11 @@ public class HeuristicRelatedWorkExtractorTest {
     @Test
     void extractsSentencesWithAuthorYearCitations() {
         String text = """
-            1.3 Related work: environmental and social assessments of chocolate production
-            Existing environmental LCAs include Italian chocolate production (Vesce et al., 2016),
-            and Italian dark chocolate production from cradle-to-grave (Bianchi et al. 2021).
-            Further studies assessed Colombian supply chains (Ramirez et al. 2016).
-            """;
+                1.3 Related work: environmental and social assessments of chocolate production
+                Existing environmental LCAs include Italian chocolate production (Vesce et al., 2016),
+                and Italian dark chocolate production from cradle-to-grave (Bianchi et al. 2021).
+                Further studies assessed Colombian supply chains (Ramirez et al. 2016).
+                """;
 
         BibEntry vesce = new BibEntry();
         vesce.setCitationKey("Vesce2016");

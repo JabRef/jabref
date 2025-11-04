@@ -24,10 +24,10 @@ public class RelatedWorkHarvesterTest {
     void harvestAndAnnotateAppendsSummaries() {
         // --- Arrange ---
         String text = """
-            1.3 Related work: environmental and social assessments of chocolate production
-            Existing environmental LCAs include Italian chocolate production (Vesce et al., 2016),
-            and Italian dark chocolate production from cradle-to-grave (Bianchi et al. 2021).
-            """;
+                1.3 Related work: environmental and social assessments of chocolate production
+                Existing environmental LCAs include Italian chocolate production (Vesce et al., 2016),
+                and Italian dark chocolate production from cradle-to-grave (Bianchi et al. 2021).
+                """;
 
         // Create sample bibliography
         BibEntry vesce = new BibEntry();
