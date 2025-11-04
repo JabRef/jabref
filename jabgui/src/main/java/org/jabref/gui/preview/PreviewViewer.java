@@ -211,12 +211,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         LOGGER.error("Error generating preview for entry: {}", entry.getCitationKey(), exception);
 
         return """
-            <div class="error">
-                <h3>%s</h3>
-                <p>%s</p>
-                <p><small>Check the event logs for details.</small></p>
-            </div>
-            """.formatted(
+                <div class="error">
+                    <h3>%s</h3>
+                    <p>%s</p>
+                    <p><small>Check the event logs for details.</small></p>
+                </div>
+                """.formatted(
                 Localization.lang("Error while generating citation style"),
                 exception.getLocalizedMessage() != null ? exception.getLocalizedMessage() : "Unknown error");
     }
