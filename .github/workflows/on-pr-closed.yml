@@ -30,8 +30,8 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          echo "PR Number: $PR_NUMBER"
-          echo "PR URL: $PR_URL"
+          echo "PR Number: ${PR_NUMBER}"
+          echo "PR URL: ${PR_URL}"
           cat <<EOF
           PR Body:
           $PR_BODY
