@@ -32,7 +32,7 @@ import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;

@@ -23,7 +23,7 @@ import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.ReferImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;

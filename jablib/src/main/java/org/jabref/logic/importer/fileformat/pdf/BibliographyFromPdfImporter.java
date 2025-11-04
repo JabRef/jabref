@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,8 +16,6 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.ReferencesBlockFromPdfFinder;
 import org.jabref.logic.l10n.Localization;

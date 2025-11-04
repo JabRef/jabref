@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;

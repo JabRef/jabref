@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,12 +20,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
-import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;

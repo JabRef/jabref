@@ -15,7 +15,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;

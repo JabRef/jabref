@@ -14,8 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;

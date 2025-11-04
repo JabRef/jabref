@@ -23,7 +23,7 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
