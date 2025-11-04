@@ -231,7 +231,7 @@ public class TrustStoreManager {
 
     private static void setSystemTrustManager(X509TrustManager mergedTrustManager)
             throws NoSuchAlgorithmException, KeyManagementException {
-        SSLContext sslContext = SSLContext.getInstance("TLS");
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
         sslContext.init(null, new TrustManager[] {mergedTrustManager}, null);
 
         // You don't have to set this as the default context,
