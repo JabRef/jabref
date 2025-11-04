@@ -39,8 +39,6 @@ import org.slf4j.LoggerFactory;
 
 @Path("libraries/{id}")
 public class LibraryResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);
-
     @Inject
     CliPreferences preferences;
 
@@ -60,56 +58,6 @@ public class LibraryResource {
      * @return specified library in JSON format
      * @throws IOException
      */
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getJson(@PathParam("id") String id) throws IOException {
-        BibDatabaseContext databaseContext = getDatabaseContext(id);
-        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-        List<BibEntryDTO> list = databaseContext.getDatabase().getEntries().stream()
-                                                .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
-                                                .map(entry -> new BibEntryDTO(entry, databaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager))
-                                                .toList();
-        return gson.toJson(list);
-    }
-
-    @GET
-    @Produces(JabrefMediaType.JSON_CSL_ITEM)
-    public String getClsItemJson(@PathParam("id") String id) throws IOException {
-        BibDatabaseContext databaseContext = getDatabaseContext(id);
-        JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
-        jabRefItemDataProvider.setData(databaseContext, new BibEntryTypesManager());
-        return jabRefItemDataProvider.toJson();
-    }
-
-    @GET
-    @Produces(JabrefMediaType.BIBTEX)
-    public Response getBibtex(@PathParam("id") String id) {
-        if ("demo".equals(id)) {
-            StreamingOutput stream = output -> {
-                try (InputStream in = getChocolateBibAsStream()) {
-                    in.transferTo(output);
-                }
-            };
-
-            return Response.ok(stream)
-                           // org.glassfish.jersey.media would be required for a "nice" Java to create ContentDisposition; we avoid this
-                           .header("Content-Disposition", "attachment; filename=\"Chocolate.bib\"")
-                           .build();
-        }
-
-        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, srvStateManager);
-        String libraryAsString;
-        try {
-            libraryAsString = Files.readString(library);
-        } catch (IOException e) {
-            LOGGER.error("Could not read library {}", library, e);
-            throw new InternalServerErrorException("Could not read library " + library, e);
-        }
-        return Response.ok()
-                       .header("Content-Disposition", "attachment; filename=\"" + library.getFileName() + "\"")
-                       .entity(libraryAsString)
-                       .build();
-    }
 
     /// Loops through all entries in the specified library and adds attached files of type "PDF" to
     /// a list and JSON serialises it.
@@ -144,12 +92,6 @@ public class LibraryResource {
         return gson.toJson(response);
     }
 
-    /**
-     * @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
-     */
-    private @Nullable InputStream getChocolateBibAsStream() {
-        return BibDatabase.class.getResourceAsStream("/Chocolate.bib");
-    }
 
     /// @param id - also "demo" for the Chocolate.bib file
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
