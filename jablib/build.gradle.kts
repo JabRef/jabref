@@ -25,11 +25,26 @@ plugins {
     id("net.ltgt.errorprone") version "4.3.0"
     id("net.ltgt.nullaway") version "2.3.0"
     id("info.solidsoft.pitest") version "1.19.0-rc.2"
+    id("org.sonarqube") version "6.3.1.5724" // "7.0.1.6134"
 }
+
+project(":jablib") {
+    sonar {
+        properties {
+            property(
+                "sonar.java.binaries",
+                layout.buildDirectory.dir("/classes/java/main").get().asFile.absolutePath
+            )
+            property("sonar.sources", "src/main")
+            property ("sonar.exclusions", "src/test/**")
+        }
+    }
+}
+
 sonar {
     properties {
-        property ("sonar.projectName", "jablib")
-        property ("sonar.projectKey", "org.sonarqube:jablib")
+        property ("sonar.projectName", "jabref")
+        property ("sonar.projectKey", "jabref")
     }
 }
 
@@ -40,6 +55,7 @@ subprojects {
         }
     }
 }
+
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
 if (project.findProperty("tagbuild")?.toString() != "true") {
     version += "-SNAPSHOT"
