@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabls - start a bibtex languageserver
 
-//JAVA 24
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //SOURCES ../jabls-cli/src/main/java/org/jabref/languageserver/cli/ServerCli.java
@@ -54,7 +54,7 @@
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabLsLauncher {
-    public static void main(String[] args) throws Exception {
+    static void main(String[] args) throws Exception {
         org.jabref.languageserver.cli.ServerCli.main(args);
     }
 }
