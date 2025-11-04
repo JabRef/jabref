@@ -11,6 +11,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -71,7 +72,7 @@ public class RelatedWorkHarvesterTest {
         String vesceComment = vesce.getField(commentField).orElse("");
         String bianchiComment = bianchi.getField(commentField).orElse("");
 
-        assertTrue(!vesceComment.equals(bianchiComment));
+        assertNotEquals(vesceComment, bianchiComment);
         assertTrue(vesceComment.contains("Vesce"));
         assertTrue(bianchiComment.contains("Bianchi"));
     }
