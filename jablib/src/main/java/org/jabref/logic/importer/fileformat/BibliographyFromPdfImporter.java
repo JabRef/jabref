@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,14 +14,13 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.cleanup.URLCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
 import org.jabref.logic.importer.AuthorListParser;
-import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.ReferencesBlockFromPdfFinder;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -33,6 +31,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
  */
 @AllowedToUseApacheCommonsLang3("Fastest method to count spaces in a string")
-public class BibliographyFromPdfImporter extends Importer implements PlainCitationParser {
+public class BibliographyFromPdfImporter extends PdfImporter implements PlainCitationParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyFromPdfImporter.class);
 
@@ -79,17 +78,6 @@ public class BibliographyFromPdfImporter extends Importer implements PlainCitati
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
-        return input.readLine().startsWith("%PDF");
-    }
-
-    @Override
-    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
-        throw new UnsupportedOperationException("BibliopgraphyFromPdfImporter does not support importDatabase(BufferedReader reader)."
-                + "Instead use importDatabase(Path filePath).");
-    }
-
-    @Override
     public String getId() {
         return "pdfBibiliography";
     }
@@ -102,11 +90,6 @@ public class BibliographyFromPdfImporter extends Importer implements PlainCitati
     @Override
     public String getDescription() {
         return Localization.lang("Reads the references from the 'References' section of a PDF file.");
-    }
-
-    @Override
-    public FileType getFileType() {
-        return StandardFileType.PDF;
     }
 
     /// Online Grobid implementation: [org.jabref.logic.importer.util.GrobidService#processReferences(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences)]
@@ -135,6 +118,11 @@ public class BibliographyFromPdfImporter extends Importer implements PlainCitati
         parserResult.getDatabase().getEntries().forEach(citationKeyGenerator::generateAndSetKey);
 
         return parserResult;
+    }
+
+    @Override
+    public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
+        return importDatabase(filePath);
     }
 
     @VisibleForTesting

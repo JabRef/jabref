@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -29,7 +28,7 @@ import org.jspecify.annotations.NonNull;
 /// Note, that this step should not add PDF file to [BibEntry], it will be finally added either in
 /// [#importDatabase(Path)] or [org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter].
 public abstract class PdfImporter extends Importer {
-    public abstract List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
+    public abstract ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
 
     @Override
     public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
@@ -51,7 +50,7 @@ public abstract class PdfImporter extends Importer {
     @Override
     public ParserResult importDatabase(Path filePath) {
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
-            return new ParserResult(importDatabase(filePath, document));
+            return importDatabase(filePath, document);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch (IOException | ParseException exception) {
