@@ -54,7 +54,7 @@ public class ExporterFactory {
         exporters.add(new TemplateExporter("MIS Quarterly", "misq", "misq", "misq", StandardFileType.RTF, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("CSL YAML", "yaml", "yaml", null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
         exporters.add(new TemplateExporter("Hayagriva YAML", "hayagrivayaml", "hayagrivayaml", null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
-        exporters.add(new TemplateExporter(Localization.lang("Markdown academicpages"), "academicpages", "academicpages.article", "academicpages", StandardFileType.MARKDOWN, layoutPreferences, saveOrder));
+        exporters.add(new TemplateExporter(Localization.lang("Markdown academicpages"), "academicpages", "academicpages", "academicpages", StandardFileType.MARKDOWN, layoutPreferences, saveOrder));
         exporters.add(new OpenOfficeDocumentCreator());
         exporters.add(new OpenDocumentSpreadsheetCreator());
         exporters.add(new MSBibExporter());
