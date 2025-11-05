@@ -12,13 +12,14 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.fileformat.pdf.PdfImporterWithPlainCitationParser;
 import org.jabref.model.entry.BibEntry;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
 
-public class LlmPlainCitationParser implements PlainCitationParser {
+public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser implements PlainCitationParser {
     private final AiTemplatesService aiTemplatesService;
     private final ImportFormatPreferences importFormatPreferences;
     private final ChatModel llm;
@@ -36,10 +37,6 @@ public class LlmPlainCitationParser implements PlainCitationParser {
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX returned from LLM", e);
         }
-    }
-
-    public List<BibEntry> parsePlainCitations(Path pdf) throws FetcherException, IOException {
-        return parsePlainCitations(ReferencesBlockFromPdfFinder.getReferencesPagesText(pdf));
     }
 
     public List<BibEntry> parsePlainCitations(String text) throws FetcherException {
