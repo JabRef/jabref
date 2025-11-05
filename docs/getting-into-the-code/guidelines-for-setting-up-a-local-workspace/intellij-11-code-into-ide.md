@@ -24,6 +24,9 @@ In case gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg)
 4. Wait several minutes until JabRef comes up. On an Intel(R) Core(TM) i5-1350, it took more than 15 minutes.
 5. Close JabRef.
 
+When the command line hangs at `:jablib:processResources`, you need to keep waiting there.
+However, in parallel, you can continue setting up IntelliJ below, because the initial Gradle setup succeeded.
+
 {: .note }
 > Background
 >
