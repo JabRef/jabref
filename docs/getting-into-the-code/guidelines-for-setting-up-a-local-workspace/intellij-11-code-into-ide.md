@@ -22,12 +22,15 @@ In case gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg)
   - Windows: `.\gg.cmd run-gui`
   - Linux: `sh -x ./gg.cmd run-gui`
 
-Background: This is a workaround for following error:
-
-```
-Could not apply requested plugin [id: 'org.jabref.gradle.module'] as it does not provide a plugin with id 'org.jabref.gradle.module'. This is caused by an incorrect plugin implementation. Please contact the plugin author(s).
-> Plugin with id 'org.jabref.gradle.module' not found.
-```
+{: .note }
+> Background
+>
+> This is a workaround for following error:
+>
+> ```
+> Could not apply requested plugin [id: 'org.jabref.gradle.module'] as it does not provide a plugin with id 'org.jabref.gradle.module'. This is caused by an incorrect plugin implementation. Please contact the plugin author(s).
+> > Plugin with id 'org.jabref.gradle.module' not found.
+> ```
 
 ## IntelliJ Startup
 
