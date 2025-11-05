@@ -14,6 +14,23 @@ import org.jabref.logic.util.NotificationService;
 /// We deliberately opt for passing whole [JabRefCliPreferences] to ease calling this helper methods
 public class CitationsFromPdf {
 
+    /// As NoticationService, one can pass `LOGGER::info`
+    public static ParserResult extractCitations(Class<? extends BibliographyFromPdfImporter> importer, JabRefCliPreferences preferences, NotificationService notificationService, Path path) {
+        return switch (importer.getSimpleName()) {
+            case "RuleBasedBibliographyPdfImporter" ->
+                    extractCitationsUsingTextMatching(preferences, path);
+
+            case "PdfGrobidImporter" ->
+                    extractCitationsUsingGrobid(preferences, path);
+
+            case "LlmPlainCitationParser" ->
+                    extractCitationsUsingLLM(preferences, notificationService, path);
+
+            default ->
+                    throw new IllegalArgumentException("Unsupported importer: " + importer.getName());
+        };
+    }
+
     public static ParserResult extractCitationsUsingTextMatching(JabRefCliPreferences preferences, Path path) {
         RuleBasedBibliographyPdfImporter importer = new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
         return importer.importDatabase(path);

@@ -10,7 +10,7 @@ import org.jabref.model.entry.BibEntry;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
-public abstract class PdfImporterWithPlainCitationParser extends PdfImporter implements PlainCitationParser {
+public abstract class PdfImporterWithPlainCitationParser extends BibliographyFromPdfImporter implements PlainCitationParser {
 
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) {

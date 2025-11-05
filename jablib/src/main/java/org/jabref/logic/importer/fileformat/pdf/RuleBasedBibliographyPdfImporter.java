@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
  */
 @AllowedToUseApacheCommonsLang3("Fastest method to count spaces in a string")
-public class RuleBasedBibliographyPdfImporter extends PdfImporter implements PlainCitationParser {
+public class RuleBasedBibliographyPdfImporter extends BibliographyFromPdfImporter implements PlainCitationParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleBasedBibliographyPdfImporter.class);
 

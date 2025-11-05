@@ -14,7 +14,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 /**
  * Wraps the GrobidService function to be used as a {@link PdfImporter}.
  */
-public class PdfGrobidImporter extends PdfImporter {
+public class PdfGrobidImporter extends BibliographyFromPdfImporter {
 
     private final GrobidService grobidService;
     private final ImportFormatPreferences importFormatPreferences;
