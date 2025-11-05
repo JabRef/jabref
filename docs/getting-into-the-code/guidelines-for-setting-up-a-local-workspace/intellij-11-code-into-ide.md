@@ -6,6 +6,29 @@ nav_order: 11
 
 # Step 1: Get the code into IntelliJ
 
+## Pre-condition: Gradle caches filled
+
+On Linux, with IntelliJ IDEA 2025.2.4 (Ultimate Edition), there are issues with importing.
+The workaround is to run JabRef once from the command line.
+
+- Linux: Execute `./gradlew :jabgui:run`
+- Windows (Powershell): Execute `.\gradlew :jabgui:run`
+
+In case gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg) as follows:
+
+1. Download <https://github.com/eirikb/gg/releases/latest/download/gg.cmd>
+2. Move the file into your JabRef code
+3. Run the GUI
+  - Windows: `.\gg.cmd run-gui`
+  - Linux: `sh -x ./gg.cmd run-gui`
+
+Background: This is a workaround for following error:
+
+```
+Could not apply requested plugin [id: 'org.jabref.gradle.module'] as it does not provide a plugin with id 'org.jabref.gradle.module'. This is caused by an incorrect plugin implementation. Please contact the plugin author(s).
+> Plugin with id 'org.jabref.gradle.module' not found.
+```
+
 ## IntelliJ Startup
 
 Start IntelliJ IDEA.
