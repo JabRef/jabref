@@ -34,6 +34,7 @@ public class ReferencesBlockFromPdfFinder {
         return result.substring(end);
     }
 
+    /// This simply goes from the given page backwards until there is probably no reference anymore.
     private static String prependToResult(String currentText, PDDocument document, int pageNumber) throws IOException {
         String pageContents = PdfUtils.getPageContents(document, pageNumber);
         String result = pageContents + currentText;
