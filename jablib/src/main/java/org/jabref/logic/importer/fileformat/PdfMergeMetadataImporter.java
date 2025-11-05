@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
@@ -161,15 +162,104 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     private static BibEntry mergeCandidates(Stream<BibEntry> candidates) {
-        final BibEntry entry = new BibEntry();
-        candidates.forEach(entry::mergeWith);
+        // Collect all candidate entries
+        List<BibEntry> allCandidates = candidates.toList();
 
-        // Retain online links only
+        // Merge all fields from candidates into one entry
+        final BibEntry entry = new BibEntry();
+        allCandidates.forEach(entry::mergeWith);
+
+        // Retain only online links
         List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();
         entry.clearField(StandardField.FILE);
         entry.addFiles(onlineLinks);
 
+        // === NEW PART ===
+        // Step 1: get the current merged title
+        Optional<String> currentTitle = entry.getField(StandardField.TITLE);
+
+        // Step 2: find any other "better" title from the candidates
+        Optional<String> betterTitle = allCandidates.stream()
+                                                    .map(e -> e.getField(StandardField.TITLE))
+                                                    .flatMap(Optional::stream)
+                                                    .filter(t -> isBetterTitle(t, currentTitle.orElse("")))
+                                                    .findFirst();
+
+        // Step 3: replace the title if a better one was found
+        betterTitle.ifPresent(title -> {
+            entry.setField(StandardField.TITLE, title);
+            LOGGER.debug("Replaced title with better one: {}", title);
+        });
+
         return entry;
+    }
+
+    /**
+     * Decide if a new title looks "better" than the old one.
+     * Very basic heuristic: longer, contains spaces, and not a generic filename.
+     */
+    public static boolean isBetterTitle(String newTitle, String oldTitle) {
+        if (newTitle == null || newTitle.isBlank()) {
+            return false;
+        }
+
+        newTitle = newTitle.trim();
+        oldTitle = oldTitle == null ? "" : oldTitle.trim();
+
+        String lower = newTitle.toLowerCase();
+
+        // 1. Exclude parasites titles
+        if (lower.matches(".*(microsoft word|adobe acrobat|document|untitled|journal template).*")) {
+            return false;
+        }
+        if (lower.matches(".*\\.(pdf|docx?|tex|rtf|zip|txt)$")) {
+            return false;
+        }
+
+        // 2. Exclude titles too short or with blank
+        if (newTitle.split("\\s+").length < 3) {
+            return false;
+        }
+
+        // 3. Exclude titles that could be path of the file
+        if (newTitle.contains(":\\") || newTitle.contains("/") || newTitle.contains("\\")) {
+            return false;
+        }
+
+        // 4. Check if there is a title style
+        boolean hasCapitalizedWords = Pattern.compile("\\b[A-Z][a-z]+").matcher(newTitle).find();
+        boolean allUppercase = newTitle.equals(newTitle.toUpperCase());
+        boolean allLowercase = newTitle.equals(newTitle.toLowerCase());
+
+        if (!hasCapitalizedWords || allUppercase || allLowercase) {
+            // Exclude if everything is upper case or lower case
+            return false;
+        }
+
+        // 5. Better grade if it uses punctuation ("-", ":", ",")
+        int punctuationScore = 0;
+        for (char c : newTitle.toCharArray()) {
+            if (c == ':' || c == '-' || c == ',') {
+                punctuationScore++;
+            }
+        }
+
+        // 6. Evaluate with a longer size (with a certain limit)
+        boolean longer = newTitle.length() > oldTitle.length() + 5 && newTitle.length() < 300;
+
+        // 7. Choose the better one
+        int score = 0;
+        if (longer) {
+            score++;
+        }
+        if (punctuationScore > 0) {
+            score++;
+        }
+        if (Character.isUpperCase(newTitle.charAt(0))) {
+            score++;
+        }
+
+        return score >= 2;
     }
 
     /**

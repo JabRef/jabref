@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.util.AuthorHeuristics;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;
@@ -382,30 +383,55 @@ public class PdfContentImporter extends PdfImporter {
         arXivId = getArXivId(arXivId);
         // start: title
         fillCurStringWithNonEmptyLines();
-        title = streamlineTitle(curString);
-        // i points to the next non-empty line
+        String contentTitle = streamlineTitle(curString);
         curString = "";
+
+        String finalTitle = contentTitle;
+
         if (titleByFontSize.isPresent() && !isNullOrEmpty(titleByFontSize.get())) {
-            title = titleByFontSize.get();
+            String fontSizeTitle = titleByFontSize.get();
+
+            // Better heuristics
+            if (PdfMergeMetadataImporter.isBetterTitle(contentTitle, fontSizeTitle)) {
+                finalTitle = contentTitle;
+            } else {
+                finalTitle = fontSizeTitle;
+            }
         }
 
-        // after title: authors
-        author = null;
-        while ((lineIndex < lines.length) && !"".equals(lines[lineIndex])) {
-            // author names are unlikely to be lines among different lines
-            // treat them line by line
-            curString = streamlineNames(lines[lineIndex]);
-            if (author == null) {
-                author = curString;
-            } else {
-                if (!"".equals(curString)) {
-                    author = author.concat(" and ").concat(curString);
-                }  // if lines[i] is "and" then "" is returned by streamlineNames -> do nothing
+        title = finalTitle;
+        // Start the analysis after the title block
+        StringBuilder collectedAuthors = new StringBuilder();
+
+        while (lineIndex < lines.length) {
+            String line = lines[lineIndex].trim();
+            String lower = line.toLowerCase(Locale.ROOT);
+
+            // Stop if we reach Abstract / Introduction
+            if (lower.contains("abstract") || lower.startsWith("i.")) {
+                break;
             }
+
+            if (AuthorHeuristics.looksLikeAuthors(line)) {
+                // Check if the line isn't part of the title
+                if (!title.toLowerCase(Locale.ROOT).contains(line.toLowerCase(Locale.ROOT))) {
+                    if (!collectedAuthors.isEmpty()) {
+                        collectedAuthors.append(" and ");
+                    }
+                    collectedAuthors.append(line);
+                }
+            }
+
             lineIndex++;
         }
-        curString = "";
-        lineIndex++;
+
+        // Clean the names, and add "and"
+        author = AuthorHeuristics.cleanAuthors(collectedAuthors.toString().trim());
+
+        // Fallback if nothing's found
+        if (author.isBlank()) {
+            author = "Unknown";
+        }
 
         // then, abstract and keywords follow
         while (lineIndex < lines.length) {
@@ -528,9 +554,8 @@ public class PdfContentImporter extends PdfImporter {
 
         // TODO: institution parsing missing
 
-        if (author != null) {
-            entry.setField(StandardField.AUTHOR, author);
-        }
+        entry.setField(StandardField.AUTHOR, author);
+
         if (editor != null) {
             entry.setField(StandardField.EDITOR, editor);
         }
@@ -703,3 +728,4 @@ public class PdfContentImporter extends PdfImporter {
         return Localization.lang("This importer parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.");
     }
 }
+
