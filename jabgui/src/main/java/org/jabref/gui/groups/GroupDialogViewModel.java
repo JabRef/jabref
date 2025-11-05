@@ -293,14 +293,8 @@ public class GroupDialogViewModel {
         typeDirectoryProperty.addListener((_, _, isSelected) -> {
             if (Boolean.TRUE.equals(isSelected)) {
                 validator.addValidators(directoryGroupFilePathValidator);
-                validator.removeValidators(nameValidator,
-                        nameContainsDelimiterValidator,
-                        sameNameValidator);
             } else {
                 validator.removeValidators(directoryGroupFilePathValidator);
-                validator.addValidators(nameValidator,
-                        nameContainsDelimiterValidator,
-                        sameNameValidator);
             }
         });
 
