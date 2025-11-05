@@ -6,19 +6,26 @@ javaPlatform {
     allowDependencies()
 }
 
-val javafx = "25"
-val lucene = "10.3.0"
+val javafx = "25.0.1"
+val lucene = "10.3.1"
 val pdfbox = "3.0.5"
 
 dependencies {
     api(platform("ai.djl:bom:0.34.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.4.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.7.1"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.6.0"))
+
+    api(platform("org.junit:junit-bom:6.0.0"))
+    api("org.junit.jupiter:junit-jupiter-api")
+    api("org.junit.jupiter:junit-jupiter-params")
+    api("org.junit.jupiter:junit-jupiter")
+    api("org.junit.platform:junit-platform-launcher")
+
 }
 
 dependencies.constraints {
@@ -31,17 +38,17 @@ dependencies.constraints {
     // from JavaFX25 onwards
     api("org.openjfx:jdk-jsobject:$javafx")
 
-    api("com.ibm.icu:icu4j:72.0.1!!")
-
     api("com.dlsc.gemsfx:gemsfx:3.5.7")
-    api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
+    api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
+    api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
     api("com.fasterxml:aalto-xml:1.3.3")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket:0.24.0")
+    api("com.github.ben-manes.caffeine:caffeine:3.2.3")
     api("com.github.javakeyring:java-keyring:1.0.4")
-    api("com.github.javaparser:javaparser-symbol-solver-core:3.27.0")
+    api("com.github.javaparser:javaparser-symbol-solver-core:3.27.1")
     api("com.github.jknack:handlebars-helpers:4.3.1") // Required by Wiremock - and our patching of Wiremock
     api("com.github.jknack:handlebars:4.3.1") // Required by Wiremock - and our patching of Wiremock
     api("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
@@ -49,7 +56,8 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
-    api("com.google.guava:guava:33.4.8-jre")
+    api("com.google.errorprone:error_prone_core:2.42.0")
+    api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.28")
     api("com.h2database:h2-mvstore:2.3.232")
     api("com.konghq:unirest-java-core:4.5.1")
@@ -61,6 +69,7 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
+    api("com.uber.nullaway:nullaway:0.12.10")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.20.0")
@@ -71,7 +80,8 @@ dependencies.constraints {
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
-    api("io.github.adr:e-adr:2.0.0-SNAPSHOT")
+    api("io.github.adr:e-adr:2.0.0")
+    api("io.github.darvil82:terminal-text-formatter:2.2.0")
     api("io.github.classgraph:classgraph:4.8.181")
     api("io.github.java-diff-utils:java-diff-utils:4.15")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
@@ -85,8 +95,10 @@ dependencies.constraints {
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     api("net.bytebuddy:byte-buddy:1.17.6")
     api("net.harawata:appdirs:1.4.0")
-    api("net.java.dev.jna:jna-jpms:5.18.0")
-    api("net.java.dev.jna:jna-platform:5.18.0")
+    api("net.java.dev.jna:jna-jpms:5.18.1")
+    api("net.java.dev.jna:jna-platform:5.18.1")
+    api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
+    api("net.ltgt.nullaway:nullaway:2.3.0")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.0")
@@ -117,26 +129,22 @@ dependencies.constraints {
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
     api("org.glassfish.jersey.core:jersey-server:3.1.11")
     api("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
-    api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
+    api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.11")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
     api("org.hisp.dhis:json-tree:1.8.1")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jetbrains:annotations:26.0.2-1")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.20.1")
     api("org.jspecify:jspecify:1.0.0")
-    api("org.junit.jupiter:junit-jupiter-api:5.13.4")
-    api("org.junit.jupiter:junit-jupiter-params:5.13.4")
-    api("org.junit.jupiter:junit-jupiter:5.13.4")
-    api("org.junit.platform:junit-platform-launcher:1.13.4")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
-    api("org.mockito:mockito-core:5.19.0")
+    api("org.mockito:mockito-core:5.20.0")
     api("org.ow2.asm:asm:9.8")
     api("org.postgresql:postgresql:42.7.7")
     api("org.slf4j:jul-to-slf4j:2.0.17")

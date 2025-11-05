@@ -34,11 +34,7 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.fieldeditors.contextmenu.ContextAction;
 import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory;
-import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.MultiContextCommandFactory;
-import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.SingleContextCommandFactory;
-import org.jabref.gui.fieldeditors.contextmenu.MultiContextAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
@@ -65,26 +61,34 @@ import jakarta.inject.Inject;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
-    @FXML private ListView<LinkedFileViewModel> listView;
-    @FXML private JabRefIconView fulltextFetcher;
-    @FXML private ProgressIndicator progressIndicator;
+    @FXML
+    private ListView<LinkedFileViewModel> listView;
+    @FXML
+    private JabRefIconView fulltextFetcher;
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     private final Field field;
     private final BibDatabaseContext databaseContext;
     private final SuggestionProvider<?> suggestionProvider;
     private final FieldCheckers fieldCheckers;
 
-    @Inject private DialogService dialogService;
-    @Inject private GuiPreferences preferences;
-    @Inject private BibEntryTypesManager bibEntryTypesManager;
-    @Inject private JournalAbbreviationRepository abbreviationRepository;
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private UndoManager undoManager;
+    @Inject
+    private DialogService dialogService;
+    @Inject
+    private GuiPreferences preferences;
+    @Inject
+    private BibEntryTypesManager bibEntryTypesManager;
+    @Inject
+    private JournalAbbreviationRepository abbreviationRepository;
+    @Inject
+    private TaskExecutor taskExecutor;
+    @Inject
+    private UndoManager undoManager;
 
     private LinkedFilesEditorViewModel viewModel;
 
     private ObservableOptionalValue<BibEntry> bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>());
-    private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
 
     private ContextMenu activeContextMenu = null;
     private ContextMenuFactory contextMenuFactory;
@@ -102,7 +106,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
+        UiThreadObservableList<LinkedFileViewModel> decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
     }
 
@@ -116,7 +120,16 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 taskExecutor,
                 fieldCheckers,
                 preferences,
-                undoManager);
+                undoManager
+        );
+
+        this.contextMenuFactory = new ContextMenuFactory(
+                dialogService,
+                preferences,
+                databaseContext,
+                bibEntry,
+                viewModel
+        );
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
@@ -184,7 +197,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         PseudoClass opacity = PseudoClass.getPseudoClass("opacity");
 
         Node icon = linkedFile.getTypeIcon().getGraphicNode();
-        icon.setOnMouseClicked(event -> linkedFile.open());
+        icon.setOnMouseClicked(_ -> linkedFile.open());
 
         Text link = new Text();
         link.textProperty().bind(linkedFile.linkProperty());
@@ -215,7 +228,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
-        acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
+        acceptAutoLinkedFile.setOnAction(_ -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
         Button writeMetadataToPdf = IconTheme.JabRefIcons.PDF_METADATA_WRITE.asButton();
@@ -230,12 +243,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 taskExecutor
         );
         writeMetadataToPdf.disableProperty().bind(writeMetadataToSinglePdfAction.executableProperty().not());
-        writeMetadataToPdf.setOnAction(event -> writeMetadataToSinglePdfAction.execute());
+        writeMetadataToPdf.setOnAction(_ -> writeMetadataToSinglePdfAction.execute());
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
-        parsePdfMetadata.setOnAction(event -> {
+        parsePdfMetadata.setOnAction(_ -> {
             GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
             linkedFile.parsePdfMetadataAndShowMergeDialog();
         });
@@ -301,36 +314,31 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
-        if (event.getButton() == MouseButton.PRIMARY && (event.getClickCount() == 2)) {
-            linkedFile.open(); // Double-click: open file
-        } else if (activeContextMenu != null && event.getButton() == MouseButton.PRIMARY) {
-            activeContextMenu.hide(); // Hide context menu if left-click
-            activeContextMenu = null;
+        if (event.getButton() == MouseButton.PRIMARY) {
+            if (event.getClickCount() == 2) {
+                linkedFile.open();
+                event.consume();
+                return;
+            }
+            if (activeContextMenu != null) {
+                activeContextMenu.hide();
+                activeContextMenu = null;
+            }
         } else if (event.getButton() == MouseButton.SECONDARY) {
             if (activeContextMenu != null) {
-                activeContextMenu.hide(); // Hide any existing context menu
+                activeContextMenu.hide();
                 activeContextMenu = null;
             }
 
-            SingleContextCommandFactory contextCommandFactory = (action, file) ->
-                    new ContextAction(action, file, databaseContext, bibEntry, preferences, viewModel);
+            ContextMenu menu = contextMenuFactory.createMenuForSelection(
+                    listView.getSelectionModel().getSelectedItems());
 
-            MultiContextCommandFactory multiContextCommandFactory = (action, files) ->
-                    new MultiContextAction(action, files, databaseContext, bibEntry, preferences, viewModel);
+            menu.setOnHidden(_ -> activeContextMenu = null);
 
-            contextMenuFactory = new ContextMenuFactory(
-                    dialogService,
-                    preferences,
-                    databaseContext,
-                    bibEntry,
-                    viewModel,
-                    contextCommandFactory,
-                    multiContextCommandFactory
-            );
+            menu.show(listView, event.getScreenX(), event.getScreenY());
+            activeContextMenu = menu;
 
-            ContextMenu contextMenu = contextMenuFactory.createForSelection(listView.getSelectionModel().getSelectedItems());
-            contextMenu.show(listView, event.getScreenX(), event.getScreenY());
-            activeContextMenu = contextMenu;
+            event.consume();
         }
     }
 

@@ -18,11 +18,11 @@ import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabVi
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -65,28 +65,6 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
 
     public BooleanBinding canAppendProperty() {
         return canAppend;
-    }
-
-    public void clearSelectedField() {
-        NamedCompoundEdit clearFieldEdit = new NamedCompoundEdit("CLEAR_SELECTED_FIELD");
-        int affectedEntriesCount = 0;
-        for (BibEntry entry : selectedEntries) {
-            Optional<String> oldFieldValue = entry.getField(selectedField.get());
-            if (oldFieldValue.isPresent()) {
-                entry.clearField(selectedField.get())
-                     .ifPresent(fieldChange -> clearFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
-                affectedEntriesCount++;
-            }
-        }
-
-        if (clearFieldEdit.hasEdits()) {
-            clearFieldEdit.end();
-        }
-        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(
-                affectedEntriesCount,
-                TAB_INDEX,
-                clearFieldEdit
-        ));
     }
 
     public void setFieldValue() {
@@ -148,10 +126,6 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
 
     public Field getSelectedField() {
         return selectedFieldProperty().get();
-    }
-
-    public String getFieldValue() {
-        return fieldValue.get();
     }
 
     public StringProperty fieldValueProperty() {

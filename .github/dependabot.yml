@@ -3,6 +3,7 @@ updates:
   - package-ecosystem: gradle
     directories:
       - "/build-logic"   # versions of 3rd party gradle plugins
+      - "jablib"
       - "/versions"      # versions of 3rd party dependencies of all JabRef modules
       - "/"              # plugins
     schedule:

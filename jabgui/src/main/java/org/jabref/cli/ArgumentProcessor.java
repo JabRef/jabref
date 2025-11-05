@@ -9,7 +9,7 @@ import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class ArgumentProcessor {
             return uiCommands;
         }
 
-        if (StringUtil.isBlank(guiCli.jumpToKey)) {
+        if (StringUtil.isNotBlank(guiCli.jumpToKey)) {
             uiCommands.add(new UiCommand.JumpToEntryKey(guiCli.jumpToKey));
         }
 
