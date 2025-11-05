@@ -34,6 +34,7 @@ public class PdfVerbatimBibtexImporter extends PdfImporter {
         result = parser.parseEntries(firstPageContents);
 
         // TODO: Check if it's needed in {@link PdfImporter}.
+        //       Note: Needed if BibTeX is prepended with text
         result.forEach(entry -> entry.setCommentsBeforeEntry(""));
 
         return new ParserResult(result);

@@ -1,15 +1,14 @@
 package org.jabref.logic.importer.plaincitation;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.util.PdfUtils;
 import org.jabref.logic.xmp.XmpUtilReader;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,35 +28,27 @@ public class ReferencesBlockFromPdfFinder {
      */
     private static String getReferencesPagesText(PDDocument document) throws IOException {
         int lastPage = document.getNumberOfPages();
-        String result = prependToResult("", document, new PDFTextStripper(), lastPage);
+        String result = prependToResult("", document, lastPage);
 
         // Same matcher uses as in {@link containsWordReferences}
         Matcher matcher = ReferencesBlockFromPdfFinder.REFERENCES.matcher(result);
         if (!matcher.find()) {
             // Ensure that not too much is returned
             LOGGER.warn("Could not found 'References'. Returning last page only.");
-            return getPageContents(document, new PDFTextStripper(), lastPage);
+            return PdfUtils.getPageContents(document, lastPage);
         }
 
         int end = matcher.end();
         return result.substring(end);
     }
 
-    private static String prependToResult(String currentText, PDDocument document, PDFTextStripper stripper, int pageNumber) throws IOException {
-        String pageContents = getPageContents(document, stripper, pageNumber);
+    private static String prependToResult(String currentText, PDDocument document, int pageNumber) throws IOException {
+        String pageContents = PdfUtils.getPageContents(document, pageNumber);
         String result = pageContents + currentText;
         if (!ReferencesBlockFromPdfFinder.containsWordReferences(pageContents) && (pageNumber > 0)) {
-            return prependToResult(result, document, stripper, pageNumber - 1);
+            return prependToResult(result, document, pageNumber - 1);
         }
         return result;
-    }
-
-    private static String getPageContents(PDDocument document, PDFTextStripper stripper, int lastPage) throws IOException {
-        stripper.setStartPage(lastPage);
-        stripper.setEndPage(lastPage);
-        StringWriter writer = new StringWriter();
-        stripper.writeText(document, writer);
-        return writer.toString();
     }
 
     private static boolean containsWordReferences(String result) {
