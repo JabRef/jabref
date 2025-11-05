@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      actions: read
+      actions: write
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
