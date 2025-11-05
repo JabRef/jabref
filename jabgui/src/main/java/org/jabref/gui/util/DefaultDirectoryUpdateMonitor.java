@@ -9,14 +9,14 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.WatchServiceUnavailableException;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.util.DirectoryUpdateListener;
 import org.jabref.model.util.DirectoryUpdateMonitor;
 
@@ -55,20 +55,41 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
 
                 for (WatchEvent<?> event : key.pollEvents()) {
                     WatchEvent.Kind<?> kind = event.kind();
+                    System.out.println(kind);
 
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
                         Thread.yield();
                         continue;
-                    } else if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                        // We only handle "ENTRY_CREATE" and "ENTRY_MODIFY" here, so the context is always a Path
+                    } else if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                        // We only handle "ENTRY_CREATE" here, so the context is always a Path
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
                         if (Files.isDirectory(path)) {
-                            notifyAboutDirectoryChange(path);
+                            System.out.println("Create a directory : " + path + " : " + ev.context());
+                            // notifyAboutDirectoryCreation(path);
+                        } else {
+                            if (FileUtil.isPDFFile(path)) {
+                                // notifyAboutPDFCreation(path);
+                            }
+                        }
+                    } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                        // We only handle "ENTRY_MODIFY" here, so the context is always a Path
+                        @SuppressWarnings("unchecked")
+                        WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                        Path path = ((Path) key.watchable()).resolve(ev.context());
+                        if (Files.isDirectory(path)) {
+                            System.out.println("Probably a useless call : " + path + " : " + ev.context());
                         } else {
                             notifyAboutFileChange(path);
                         }
+                    } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+                        // We only handle "ENTRY_DELETE" here, so the context is always a Path
+                        @SuppressWarnings("unchecked")
+                        WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                        Path path = ((Path) key.watchable()).resolve(ev.context());
+                        System.out.println("Delete a directory : " + path + " : " + ev.context());
+                        // notifyAboutDirectoryDeletion(path);
                     }
                     key.reset();
                 }
@@ -87,39 +108,34 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         return filesystemMonitorFailure.get().isEmpty();
     }
 
-    private void notifyAboutDirectoryChange(Path newPath) {
-        // Either there is a new directory or a directory has been renamed: the path given is not linked with a listener
-        Boolean directoryRenamed = false;
-        List<DirectoryUpdateListener> oldListeners = new ArrayList<>();
-        List<Path> oldPaths = new ArrayList<>();
-        for (Path registeredPath : listeners.keys()) {
-            if (!Files.exists(registeredPath)) {
-                // The registeredPath is no longer linked to an existing directory: this is the old path of a renamed directory
-                for (DirectoryUpdateListener listener : listeners.get(registeredPath)) {
-                    oldListeners.add(listener);
-                    oldPaths.add(registeredPath);
-                    directoryRenamed = true;
-                    System.out.println("Directory Renamed: " + registeredPath + " -> " + newPath);
+    private void notifyAboutDirectoryCreation(Path newPath) {
+        Path parentPath = newPath.toAbsolutePath().getParent();
+        for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
+            if (listener instanceof DirectoryGroup parentGroup) {
+                try {
+                    parentGroup.directoryCreated(newPath);
+                } catch (IOException e) {
+                    LOGGER.error("Error while creating directory {}", newPath, e);
                 }
             }
         }
-        if (directoryRenamed) {
-            for (int i = 0; i < oldListeners.size(); i++) {
-                listeners.remove(oldPaths.get(i), oldListeners.get(i));
-                listeners.put(newPath, oldListeners.get(i));
-                oldListeners.get(i).directoryRenamed(newPath);
+        System.out.println("New directory: " + newPath);
+    }
+
+    private void notifyAboutDirectoryDeletion(Path deletedPath) {
+        for (DirectoryUpdateListener listener : listeners.get(deletedPath)) {
+            if (listener instanceof DirectoryGroup deletedGroup) {
+                deletedGroup.directoryDeleted();
             }
-        } else {
-            // This case occurs if there is a new directory within the structure
-            Path parentPath = newPath.toAbsolutePath().getParent();
-            for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
-                try {
-                    listener.directoryCreated(newPath);
-                } catch (IOException e) {
-                    LOGGER.error("Error while creating directory", e);
-                }
+        }
+    }
+
+    private void notifyAboutPDFCreation(Path pdfPath) {
+        Path parentPath = pdfPath.toAbsolutePath().getParent();
+        for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
+            if (listener instanceof DirectoryGroup pdfGroup) {
+                // TODO : import the PDF
             }
-            System.out.println("New directory: " + newPath);
         }
     }
 
@@ -130,10 +146,10 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     @Override
     public void addListenerForDirectory(Path directory, DirectoryUpdateListener listener) throws IOException {
         if (isActive()) {
-            directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
+            directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
             listeners.put(directory, listener);
         } else {
-            LOGGER.warn("Not adding listener {} to file {} because the directory update monitor isn't active", listener, directory);
+            LOGGER.warn("Not adding listener {} to directory {} because the directory update monitor isn't active", listener, directory);
         }
     }
 

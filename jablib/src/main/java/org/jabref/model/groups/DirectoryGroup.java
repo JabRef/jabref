@@ -41,7 +41,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         super(name, context);
         this.metaData = metaData;
         this.user = user;
-        this.directoryPath = expandPath(directoryPath);
+        this.directoryPath = directoryPath;
         this.directoryMonitor = directoryMonitor;
     }
 
@@ -112,13 +112,11 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         rootNode.ifPresent(groupNodesToParse::add);
         while (groupNode.isEmpty() && !groupNodesToParse.isEmpty()) {
             GroupTreeNode groupNodeToParse = groupNodesToParse.getFirst();
-            if (groupNodeToParse.getName().equals(name.getValue())) {
+            if (groupNodeToParse.getGroup().equals(this)) {
                 groupNode = Optional.of(groupNodeToParse);
             } else {
                 groupNodesToParse.remove(groupNodeToParse);
-                for (GroupTreeNode group : groupNodeToParse.getChildren()) {
-                    groupNodesToParse.add(group);
-                }
+                groupNodesToParse.addAll(groupNodeToParse.getChildren());
             }
         }
         return groupNode;
@@ -179,31 +177,27 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
     }
 
     @Override
-    public void directoryRenamed(Path newPath) {
-        System.out.println(metaData.getGroups());
-        name.setValue(newPath.getFileName().toString());
-        directoryPath = newPath;
-        getNode().ifPresent(groupNode -> {
-                    groupNode.setGroup(this);
-                    System.out.println(groupNode.getGroup());
-                }
-        );
-        System.out.println("Directory renamed: " + newPath);
-        metaData.getGroups().ifPresent(group -> {
-            if (group.getName().equals("All entries")) {
-                metaData.setGroups(group);
-                System.out.println(group.getChildren());
-                System.out.println(getNode().get().getName());
-            }
-        });
+    public void directoryCreated(Path newPath) throws IOException {
+        Optional<GroupTreeNode> groupNode = getNode();
+        if (groupNode.isPresent()) {
+            DirectoryGroup newSubgroup = this.createDescendantGroup(newPath.toFile());
+            groupNode.get().addSubgroup(newSubgroup);
+            newSubgroup.addDescendants();
+            System.out.println("Directory created: " + newPath.toString());
+        } else {
+            LOGGER.error("Directory {} could not be created because its parent is not linked with a GroupTreeNode", newPath);
+        }
     }
 
     @Override
-    public void directoryCreated(Path newPath) throws IOException {
-        DirectoryGroup newSubgroup = this.createDescendantGroup(newPath.toFile());
-        getNode().ifPresent(group -> group.addSubgroup(newSubgroup));
-        newSubgroup.addDescendants();
-        System.out.println("Directory created: " + newPath.toString());
+    public void directoryDeleted() {
+        Optional<GroupTreeNode> groupNode = getNode();
+        if (groupNode.isPresent()) {
+            groupNode.get().removeFromParent();
+            // TODO : finish the deletion
+        } else {
+            LOGGER.error("Directory {} could not be deleted because it is not linked with a GroupTreeNode", directoryPath);
+        }
     }
 
     @Override
@@ -221,11 +215,6 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
     private Path relativize(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
         return FileUtil.relativize(path, fileDirectories);
-    }
-
-    private Path expandPath(Path path) {
-        List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        return FileUtil.find(path.toString(), fileDirectories).orElse(path);
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
