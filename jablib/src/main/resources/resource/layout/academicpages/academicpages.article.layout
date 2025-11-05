@@ -2,12 +2,12 @@
 title: "\format[RemoveLatexCommands,HTMLChars]{\title}"
 collection: publications
 category: article
-permalink: /publication/\format{\year}-\begin{\month}\format{\month}\end{\month}\begin{!month}\format{(01)}\end{!month}-\begin{\day}\format{\day}\end{\day}\begin{!day}\format{(01)}\end{!day}-\format[RemoveLatexCommands,HTMLChars]{\title}
+permalink: /publication/\format{\year}-\begin{\month}\format{\month}\end{\month}\begin{!month}01\end{!month}-\begin{\day}\format{\day}\end{\day}\begin{!day}01\end{!day}-\format[RemoveLatexCommands,HTMLChars]{\title}
 excerpt: '\begin{\note}\format[RemoveLatexCommands,HTMLChars]{\note}\end{\note}'
-date: \format{\year}-\begin{\month}\format{\month}\end{\month}\begin{!month}\format{(01)}\end{!month}-\begin{\day}\format{\day}\end{\day}\begin{!day}\format{(01)}\end{!day}
+date: \format{\year}-\begin{\month}\format{\month}\end{\month}\begin{!month}\format{\month}\end{!month}-\begin{\day}\format{\day}\end{\day}\begin{!day}\format{(01)}\end{!day}
 venue: '\format[RemoveLatexCommands,HTMLChars]{\journal}'
 slidesurl: ''
-paperurl: '\begin{\url}\format[RemoveLatexCommands,HTMLChars]{\url}\end{\url} \begin{!url}\format{\doi}\end{!url}'
+paperurl: '\begin{\url}\format[RemoveLatexCommands,HTMLChars]{\url}\end{\url}\begin{!url}\format{\doi}\end{!url}'
 bibtexurl: ''
 citation: '\format[HTMLChars]{\author}. (\format{\year}). "&quot;\format[RemoveLatexCommands,HTMLChars]{\title}.&quot; <i>\format[RemoveLatexCommands,HTMLChars]{\journal}</i>.'
 ---
