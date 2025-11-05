@@ -1,0 +1,9 @@
+apply plugin: "org.sonarqube"
+sonar {
+    properties {
+        property 'sonar.projectName', 'JabRef'
+        property "sonar.projectKey", "jabref"
+        property "sonar.host.url", "http://localhost:9000"
+//        property "sonar.token", "token"
+    }
+}

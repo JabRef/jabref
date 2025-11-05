@@ -296,28 +296,34 @@ public class XmpUtilWriter {
         // Read from another file
         // Reason: Apache PDFBox does not support writing while the file is opened
         // See https://issues.apache.org/jira/browse/PDFBOX-4028
-        Path newFile = Files.createTempFile("JabRef", "pdf");
-        try (PDDocument document = Loader.loadPDF(path.toFile())) {
-            if (document.isEncrypted()) {
-                throw new EncryptedPdfsNotSupportedException();
-            }
+        try {
+            Path newFile = Files.createTempFile("JabRef", "pdf");
 
-            // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
-            if (!resolvedEntries.isEmpty()) {
-                writeDocumentInformation(document, resolvedEntries.getFirst(), null);
-                writeDublinCore(document, resolvedEntries, null);
-            }
+            try (PDDocument document = Loader.loadPDF(path.toFile())) {
+                if (document.isEncrypted()) {
+                    throw new EncryptedPdfsNotSupportedException();
+                }
 
-            // Save updates to original file
-            try {
-                document.save(newFile.toFile());
-                FileUtil.copyFile(newFile, path, true);
-            } catch (IOException e) {
-                LOGGER.debug("Could not write XMP metadata", e);
-                throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
+                // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
+                if (!resolvedEntries.isEmpty()) {
+                    writeDocumentInformation(document, resolvedEntries.getFirst(), null);
+                    writeDublinCore(document, resolvedEntries, null);
+                }
+
+                // Save updates to original file
+                try {
+                    document.save(newFile.toFile());
+                    FileUtil.copyFile(newFile, path, true);
+                } catch (IOException e) {
+                    LOGGER.debug("Could not write XMP metadata", e);
+                    throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
+                }
+            } finally {
+                Files.delete(newFile);
             }
+        } finally {
+            // file safety
         }
-        Files.delete(newFile);
     }
 
     private BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {
