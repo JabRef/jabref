@@ -2,7 +2,6 @@ package org.jabref.logic.importer.plaincitation;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,14 +11,14 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.importer.fileformat.pdf.PdfImporterWithPlainCitationParser;
+import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
 import org.jabref.model.entry.BibEntry;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
 
-public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser implements PlainCitationParser {
+public class LlmPlainCitationParser extends PdfImporter implements PlainCitationParser {
     private final AiTemplatesService aiTemplatesService;
     private final ImportFormatPreferences importFormatPreferences;
     private final ChatModel llm;
@@ -39,7 +38,8 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser i
         }
     }
 
-    public List<BibEntry> parsePlainCitations(String text) throws FetcherException {
+    @Override
+    public List<BibEntry> parseMultiplePlainCitations(String text) throws FetcherException {
         String systemMessage = aiTemplatesService.makeCitationParsingSystemMessage();
         String userMessage = aiTemplatesService.makeCitationParsingUserMessage(text);
 

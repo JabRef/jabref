@@ -24,6 +24,7 @@ public class PdfGrobidImporter extends PdfImporter {
         this.importFormatPreferences = importFormatPreferences;
     }
 
+    /// Extracts the citation list of the PDF
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
         return new ParserResult(grobidService.processPDF(filePath, importFormatPreferences));

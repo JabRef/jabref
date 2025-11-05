@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SeveralCitationsParsingTest {
-    static MultiplePlainCitationsParser parser = new MultiplePlainCitationsParser(new RuleBasedPlainCitationParser());
+class CitationSplitterTest {
 
     @Test
     void correctlySplitTexts() {
@@ -17,7 +16,7 @@ public class SeveralCitationsParsingTest {
 
         String input = part1 + "\n\n" + part2 + "\n\n" + part3;
 
-        List<String> output = parser.splitCitations(input).toList();
+        List<String> output = CitationSplitter.splitCitations(input).toList();
 
         assertEquals(List.of(part1, part2, part3), output);
     }

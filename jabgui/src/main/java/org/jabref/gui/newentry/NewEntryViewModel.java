@@ -32,11 +32,10 @@ import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fileformat.pdf.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.fileformat.pdf.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
-import org.jabref.logic.importer.plaincitation.MultiplePlainCitationsParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser;
@@ -368,8 +367,7 @@ public class NewEntryViewModel {
                         new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
             };
 
-            final MultiplePlainCitationsParser setParser = new MultiplePlainCitationsParser(parser);
-            final List<BibEntry> entries = setParser.parseMultiplePlainCitations(text);
+            final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
 
             if (entries.isEmpty()) {
                 return Optional.empty();

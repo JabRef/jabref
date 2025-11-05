@@ -26,6 +26,8 @@ import org.jspecify.annotations.NonNull;
 ///
 /// Note, that this step should not add PDF file to [org.jabref.model.entry.BibEntry], it will be finally added either in
 /// [#importDatabase(Path)] or [PdfMergeMetadataImporter].
+///
+/// The result might be the metadata of the given PDF *or* the list of references in the references section (also called "citations"). Each implementation should denote which of these two it supports.
 public abstract class PdfImporter extends Importer {
     public abstract ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
 
