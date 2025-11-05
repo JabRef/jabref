@@ -21,6 +21,8 @@ In case gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg)
 3. Run the GUI
   - Windows: `.\gg.cmd run-gui`
   - Linux: `sh -x ./gg.cmd run-gui`
+4. Wait several minutes until JabRef comes up. On an Intel(R) Core(TM) i5-1350, it took more than 15 minutes.
+5. Close JabRef.
 
 {: .note }
 > Background
