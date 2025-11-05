@@ -6,6 +6,7 @@ java {
     toolchain {
         // If this is updated, also update
         // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
+        // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-11-code-into-ide.md -> java version provided to `gg.cmd`
         // - jitpack.yml
         // - .devcontainer/devcontainer.json#L34 - there, also check if the gradleVersion matches the one of gradle/wrapper/gradle-wrapper.properties
         // - .moderne/moderne.yml

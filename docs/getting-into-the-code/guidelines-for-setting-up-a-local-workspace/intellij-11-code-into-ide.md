@@ -19,10 +19,12 @@ In case gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg)
 1. Download <https://github.com/eirikb/gg/releases/latest/download/gg.cmd>
 2. Move the file into your JabRef code
 3. Run the GUI
-  - Windows: `.\gg.cmd run-gui`
-  - Linux: `sh -x ./gg.cmd run-gui`
-4. Wait several minutes until JabRef comes up. On an Intel(R) Core(TM) i5-1350, it took more than 15 minutes.
-5. Close JabRef.
+
+   - Windows: `.\gg.cmd gradle:java@24 jabgui:compileJava`
+   - Linux: `sh -x ./gg.cmd gradle:java@24 jabgui:compileJava`
+
+4. Wait several minutes until command completes.
+   On an Intel(R) Core(TM) i5-1350 (16 GB RAM), it took more than 15 minutes.
 
 When the command line hangs at `:jablib:processResources`, you need to keep waiting there.
 However, in parallel, you can continue setting up IntelliJ below, because the initial Gradle setup succeeded.
@@ -32,7 +34,7 @@ However, in parallel, you can continue setting up IntelliJ below, because the in
 >
 > This is a workaround for following error:
 >
-> ```
+> ```text
 > Could not apply requested plugin [id: 'org.jabref.gradle.module'] as it does not provide a plugin with id 'org.jabref.gradle.module'. This is caused by an incorrect plugin implementation. Please contact the plugin author(s).
 > > Plugin with id 'org.jabref.gradle.module' not found.
 > ```
@@ -90,7 +92,7 @@ Allow also access for both cases and click "Allow access".
 
 ## Wait for IntelliJ IDEA to import the gradle project
 
-IntelliJ shows "Importing 'jabref' Gradle Project" at the lower right corner.
+IntelliJ shows "Importing 'jabref' Gradle Project" in the lower right corner.
 This will take several minutes.
 Wait until this disappears.
 
