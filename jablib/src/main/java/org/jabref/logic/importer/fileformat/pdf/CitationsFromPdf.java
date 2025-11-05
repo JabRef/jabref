@@ -15,7 +15,7 @@ import org.jabref.logic.util.NotificationService;
 public class CitationsFromPdf {
 
     public static ParserResult extractCitationsUsingTextMatching(JabRefCliPreferences preferences, Path path) {
-        BibliographyFromPdfImporter importer = new BibliographyFromPdfImporter(preferences.getCitationKeyPatternPreferences());
+        RuleBasedBibliographyPdfImporter importer = new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
         return importer.importDatabase(path);
     }
 

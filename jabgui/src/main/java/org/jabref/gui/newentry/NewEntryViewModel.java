@@ -33,7 +33,7 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.importer.fileformat.pdf.BibliographyFromPdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter;
 import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
@@ -360,7 +360,7 @@ public class NewEntryViewModel {
                 case PlainCitationParserChoice.RULE_BASED_SIMPLE ->
                         new RuleBasedPlainCitationParser();
                 case PlainCitationParserChoice.RULE_BASED_IEEE ->
-                        new BibliographyFromPdfImporter(preferences.getCitationKeyPatternPreferences());
+                        new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
                 case PlainCitationParserChoice.GROBID ->
                         new GrobidPlainCitationParser(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
                 case PlainCitationParserChoice.LLM ->

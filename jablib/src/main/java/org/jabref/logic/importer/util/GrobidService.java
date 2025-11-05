@@ -101,7 +101,7 @@ public class GrobidService {
         return entries;
     }
 
-    /// Offline content-based implementation: [org.jabref.logic.importer.fileformat.pdf.BibliographyFromPdfImporter#importDatabase(java.nio.file.Path)]
+    /// Offline content-based implementation: [org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter#importDatabase(java.nio.file.Path)]
     public List<BibEntry> processReferences(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
         Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + "/api/processReferences")
                                             .header("Accept", MediaTypes.APPLICATION_BIBTEX)

@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class BibliographyFromPdfImporterTest {
+class RuleBasedBibliographyPdfImporterTest {
 
     private static final BibEntry KNASTER_2017 = new BibEntry(StandardEntryType.Article)
             .withCitationKey("1")
@@ -136,17 +136,17 @@ class BibliographyFromPdfImporterTest {
             .withField(StandardField.YEAR, "2023")
             .withField(StandardField.COMMENT, "[5] S. König et al., “BPMN4Cars: A car-tailored workflow engine,” in INDIN. IEEE, 2023.");
 
-    private BibliographyFromPdfImporter bibliographyFromPdfImporter;
+    private RuleBasedBibliographyPdfImporter ruleBasedBibliographyPdfImporter;
 
     @BeforeEach
     void setup() {
-        bibliographyFromPdfImporter = new BibliographyFromPdfImporter();
+        ruleBasedBibliographyPdfImporter = new RuleBasedBibliographyPdfImporter();
     }
 
     @Test
     void tua3i2refpage() throws URISyntaxException {
-        Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("/pdfs/IEEE/tua3i2refpage.pdf").toURI());
-        ParserResult parserResult = bibliographyFromPdfImporter.importDatabase(file);
+        Path file = Path.of(RuleBasedBibliographyPdfImporterTest.class.getResource("/pdfs/IEEE/tua3i2refpage.pdf").toURI());
+        ParserResult parserResult = ruleBasedBibliographyPdfImporter.importDatabase(file);
         BibEntry entry02 = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("2")
                 .withField(StandardField.AUTHOR, "K. Kondo and others")
@@ -264,8 +264,8 @@ class BibliographyFromPdfImporterTest {
 
     @Test
     void ieeePaper() throws URISyntaxException {
-        Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("/pdfs/IEEE/ieee-paper.pdf").toURI());
-        ParserResult parserResult = bibliographyFromPdfImporter.importDatabase(file);
+        Path file = Path.of(RuleBasedBibliographyPdfImporterTest.class.getResource("/pdfs/IEEE/ieee-paper.pdf").toURI());
+        ParserResult parserResult = ruleBasedBibliographyPdfImporter.importDatabase(file);
         assertEquals(List.of(ALVER2007, ALVER2007A, KOPP2012, KOPPP2018, KOENIG2023), parserResult.getDatabase().getEntries());
     }
 
@@ -294,9 +294,9 @@ class BibliographyFromPdfImporterTest {
     @ParameterizedTest
     @MethodSource
     void references(BibEntry expectedEntry) {
-        List<BibliographyFromPdfImporter.IntermediateData> intermediateDataList = BibliographyFromPdfImporter.getIntermediateData(expectedEntry.getField(StandardField.COMMENT).get());
+        List<RuleBasedBibliographyPdfImporter.IntermediateData> intermediateDataList = RuleBasedBibliographyPdfImporter.getIntermediateData(expectedEntry.getField(StandardField.COMMENT).get());
         assertEquals(1, intermediateDataList.size());
-        BibliographyFromPdfImporter.IntermediateData intermediateData = intermediateDataList.getFirst();
-        assertEquals(expectedEntry, bibliographyFromPdfImporter.parsePlainCitation(intermediateData.number(), intermediateData.reference()));
+        RuleBasedBibliographyPdfImporter.IntermediateData intermediateData = intermediateDataList.getFirst();
+        assertEquals(expectedEntry, ruleBasedBibliographyPdfImporter.parsePlainCitation(intermediateData.number(), intermediateData.reference()));
     }
 }

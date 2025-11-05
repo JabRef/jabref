@@ -43,9 +43,9 @@ import org.slf4j.LoggerFactory;
  * TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
  */
 @AllowedToUseApacheCommonsLang3("Fastest method to count spaces in a string")
-public class BibliographyFromPdfImporter extends PdfImporter implements PlainCitationParser {
+public class RuleBasedBibliographyPdfImporter extends PdfImporter implements PlainCitationParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyFromPdfImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuleBasedBibliographyPdfImporter.class);
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\[(\\d+)\\](.*?)(?=\\[|$)", Pattern.DOTALL);
     private static final Pattern YEAR_AT_END = Pattern.compile(", (\\d{4})\\.$");
@@ -65,11 +65,11 @@ public class BibliographyFromPdfImporter extends PdfImporter implements PlainCit
     @Nullable private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final NormalizeUnicodeFormatter normalizeUnicodeFormatter = new NormalizeUnicodeFormatter();
 
-    public BibliographyFromPdfImporter() {
+    public RuleBasedBibliographyPdfImporter() {
         this.citationKeyPatternPreferences = null;
     }
 
-    public BibliographyFromPdfImporter(@NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
+    public RuleBasedBibliographyPdfImporter(@NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
     }
 

@@ -40,7 +40,7 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
  * Currently, Springer, and IEEE formats are supported.
  * <p>
  * In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
- * please see {@link BibliographyFromPdfImporter}.
+ * please see {@link RuleBasedBibliographyPdfImporter}.
  * <p>
  * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
