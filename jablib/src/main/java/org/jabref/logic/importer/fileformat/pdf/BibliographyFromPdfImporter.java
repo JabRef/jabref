@@ -14,12 +14,10 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.cleanup.URLCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
 import org.jabref.logic.importer.AuthorListParser;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.ReferencesBlockFromPdfFinder;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -92,18 +90,10 @@ public class BibliographyFromPdfImporter extends PdfImporter implements PlainCit
 
     /// Online Grobid implementation: [org.jabref.logic.importer.util.GrobidService#processReferences(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences)]
     @Override
-    public ParserResult importDatabase(Path filePath) {
-        List<BibEntry> result;
-
+    public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
         String contents;
-        try {
-            contents = ReferencesBlockFromPdfFinder.getReferencesPagesText(filePath);
-        } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch (IOException exception) {
-            return ParserResult.fromError(exception);
-        }
-        result = getEntriesFromPDFContent(contents);
+        contents = ReferencesBlockFromPdfFinder.getReferencesPagesText(document);
+        List<BibEntry> result = getEntriesFromPDFContent(contents);
 
         ParserResult parserResult = new ParserResult(result);
 
@@ -116,11 +106,6 @@ public class BibliographyFromPdfImporter extends PdfImporter implements PlainCit
         parserResult.getDatabase().getEntries().forEach(citationKeyGenerator::generateAndSetKey);
 
         return parserResult;
-    }
-
-    @Override
-    public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
-        return importDatabase(filePath);
     }
 
     @VisibleForTesting

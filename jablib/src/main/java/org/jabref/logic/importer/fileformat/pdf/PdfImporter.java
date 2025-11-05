@@ -29,8 +29,6 @@ import org.jspecify.annotations.NonNull;
 ///
 /// The result might be the metadata of the given PDF *or* the list of references in the references section (also called "citations"). Each implementation should denote which of these two it supports.
 public abstract class PdfImporter extends Importer {
-    public abstract ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
-
     @Override
     public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         return input.readLine().startsWith("%PDF");
@@ -58,6 +56,9 @@ public abstract class PdfImporter extends Importer {
             return ParserResult.fromError(exception);
         }
     }
+
+    /// Note: The "throws" clause is for "developer convenience" - it is turned into a ParserResult at [#importDatabase(Path)].
+    public abstract ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
 
     @Override
     public StandardFileType getFileType() {

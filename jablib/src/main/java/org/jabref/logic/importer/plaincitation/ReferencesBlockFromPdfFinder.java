@@ -1,12 +1,10 @@
 package org.jabref.logic.importer.plaincitation;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.util.PdfUtils;
-import org.jabref.logic.xmp.XmpUtilReader;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
@@ -17,16 +15,10 @@ public class ReferencesBlockFromPdfFinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferencesBlockFromPdfFinder.class);
     private static final Pattern REFERENCES = Pattern.compile("References", Pattern.CASE_INSENSITIVE);
 
-    public static String getReferencesPagesText(Path filePath) throws IOException {
-        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
-            return getReferencesPagesText(document);
-        }
-    }
-
     /**
      * Extracts the text from all pages containing references. It simply goes from the last page backwards until there is probably no reference anymore.
      */
-    private static String getReferencesPagesText(PDDocument document) throws IOException {
+    public static String getReferencesPagesText(PDDocument document) throws IOException {
         int lastPage = document.getNumberOfPages();
         String result = prependToResult("", document, lastPage);
 

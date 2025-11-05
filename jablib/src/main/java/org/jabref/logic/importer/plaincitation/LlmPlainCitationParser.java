@@ -11,14 +11,15 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfImporterWithPlainCitationParser;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
 
-public class LlmPlainCitationParser extends PdfImporter implements PlainCitationParser {
+public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser implements PlainCitationParser {
     private final AiTemplatesService aiTemplatesService;
     private final ImportFormatPreferences importFormatPreferences;
     private final ChatModel llm;
@@ -27,6 +28,22 @@ public class LlmPlainCitationParser extends PdfImporter implements PlainCitation
         this.aiTemplatesService = aiTemplatesService;
         this.importFormatPreferences = importFormatPreferences;
         this.llm = llm;
+    }
+
+    @Override
+    public String getId() {
+        return "llm";
+    }
+
+    @Override
+    public String getName() {
+        return "LLM";
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang(
+        "LLM");
     }
 
     @Override
