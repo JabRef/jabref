@@ -530,7 +530,7 @@ public class GroupDialogViewModel {
                 typeDirectoryProperty.setValue(true);
 
                 DirectoryGroup group = (DirectoryGroup) editedGroup;
-                directoryGroupFilePathProperty.setValue(group.getDirectoryPath().toString());
+                directoryGroupFilePathProperty.setValue(group.getAbsoluteDirectoryPath().toString());
             }
         }
     }

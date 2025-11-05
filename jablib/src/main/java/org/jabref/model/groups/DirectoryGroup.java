@@ -27,46 +27,46 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryGroup.class);
 
-    private Path directoryPath;
+    private final Path absoluteDirectoryPath;
     private final DirectoryUpdateMonitor directoryMonitor;
     private final MetaData metaData;
     private final String user;
 
     DirectoryGroup(String name,
                    GroupHierarchyType context,
-                   @NonNull Path directoryPath,
+                   @NonNull Path absoluteDirectoryPath,
                    DirectoryUpdateMonitor directoryMonitor,
                    MetaData metaData,
                    String user) {
         super(name, context);
         this.metaData = metaData;
         this.user = user;
-        this.directoryPath = directoryPath;
+        this.absoluteDirectoryPath = absoluteDirectoryPath;
         this.directoryMonitor = directoryMonitor;
     }
 
     public static DirectoryGroup create(String name,
                                         GroupHierarchyType context,
-                                        Path directoryPath,
+                                        Path absoluteDirectoryPath,
                                         DirectoryUpdateMonitor directoryMonitor,
                                         MetaData metaData,
                                         String userAndHost) throws IOException {
-        DirectoryGroup group = new DirectoryGroup(name, context, directoryPath, directoryMonitor, metaData, userAndHost);
-        directoryMonitor.addListenerForDirectory(group.getDirectoryPathResolved(), group);
+        DirectoryGroup group = new DirectoryGroup(name, context, absoluteDirectoryPath, directoryMonitor, metaData, userAndHost);
+        directoryMonitor.addListenerForDirectory(absoluteDirectoryPath, group);
         return group;
     }
 
     // without DirectoryUpdateMonitor
     public static DirectoryGroup create(String name,
                                         GroupHierarchyType context,
-                                        Path directoryPath,
+                                        Path absoluteDirectoryPath,
                                         MetaData metaData,
                                         String userAndHost) throws IOException {
-        return new DirectoryGroup(name, context, directoryPath, new DummyDirectoryUpdateMonitor(), metaData, userAndHost);
+        return new DirectoryGroup(name, context, absoluteDirectoryPath, new DummyDirectoryUpdateMonitor(), metaData, userAndHost);
     }
 
     public void addDescendants() throws IOException {
-        File parentFolder = directoryPath.toFile();
+        File parentFolder = absoluteDirectoryPath.toFile();
         Optional<GroupTreeNode> parentNode = getNode();
         File[] folders = parentFolder.listFiles(File::isDirectory);
         for (File folder : folders) {
@@ -101,10 +101,6 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         return PDFEntries;
     }
 
-    public Path getDirectoryPathResolved() {
-        return this.directoryPath;
-    }
-
     public Optional<GroupTreeNode> getNode() {
         Optional<GroupTreeNode> groupNode = Optional.empty();
         List<GroupTreeNode> groupNodesToParse = new ArrayList<>();
@@ -127,7 +123,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         List<LinkedFile> entryFiles = entry.getFiles();
         for (LinkedFile linkedFile : entryFiles) {
             Path filePath = Path.of(linkedFile.getLink());
-            if (directoryPath.toString().endsWith(filePath.getParent().toString())) {
+            if (absoluteDirectoryPath.toString().endsWith(filePath.getParent().toString())) {
                 return true;
             }
         }
@@ -141,7 +137,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     @Override
     public AbstractGroup deepCopy() {
-        return new DirectoryGroup(name.getValue(), context, directoryPath, directoryMonitor, metaData, user);
+        return new DirectoryGroup(name.getValue(), context, absoluteDirectoryPath, directoryMonitor, metaData, user);
     }
 
     @Override
@@ -156,24 +152,24 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
             return false;
         }
         DirectoryGroup group = (DirectoryGroup) o;
-        return Objects.equals(directoryPath, group.directoryPath);
+        return Objects.equals(absoluteDirectoryPath, group.absoluteDirectoryPath);
     }
 
     @Override
     public String toString() {
         return "DirectoryGroup{" +
-                "directoryPath=" + directoryPath +
+                "directoryPath=" + absoluteDirectoryPath +
                 ", fileMonitor=" + directoryMonitor +
                 "} " + super.toString();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), directoryPath);
+        return Objects.hash(super.hashCode(), absoluteDirectoryPath);
     }
 
-    public Path getDirectoryPath() {
-        return relativize(directoryPath);
+    public Path getAbsoluteDirectoryPath() {
+        return absoluteDirectoryPath;
     }
 
     @Override
@@ -183,7 +179,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
             DirectoryGroup newSubgroup = this.createDescendantGroup(newPath.toFile());
             groupNode.get().addSubgroup(newSubgroup);
             newSubgroup.addDescendants();
-            System.out.println("Directory created: " + newPath.toString());
+            System.out.println("Directory created: " + newPath);
         } else {
             LOGGER.error("Directory {} could not be created because its parent is not linked with a GroupTreeNode", newPath);
         }
@@ -196,30 +192,12 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
             groupNode.get().removeFromParent();
             // TODO : finish the deletion
         } else {
-            LOGGER.error("Directory {} could not be deleted because it is not linked with a GroupTreeNode", directoryPath);
+            LOGGER.error("Directory {} could not be deleted because it is not linked with a GroupTreeNode", absoluteDirectoryPath);
         }
     }
 
     @Override
     public void fileUpdated() {
-        System.out.println("File updated in " + directoryPath.toString());
-    }
-
-    /**
-     * Relativizes the given path to the file directories.
-     * The getLatexFileDirectory must be absolute to correctly relativize because we do not have a bibdatabasecontext
-     *
-     * @param path The path to relativize
-     * @return A relative path or the original one if it could not be made relative
-     */
-    private Path relativize(Path path) {
-        List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        return FileUtil.relativize(path, fileDirectories);
-    }
-
-    private List<Path> getFileDirectoriesAsPaths() {
-        return metaData.getLatexFileDirectory(user)
-                       .map(List::of)
-                       .orElse(List.of());
+        System.out.println("File updated in " + absoluteDirectoryPath.toString());
     }
 }
