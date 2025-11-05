@@ -477,6 +477,11 @@ public class GroupNodeViewModel {
                  AutomaticPersonsGroup _,
                  TexGroup _ ->
                     true;
+            case DirectoryGroup _ ->
+                    groupNode.getParent()
+                             .map(GroupTreeNode::getGroup)
+                             .map(groupParent -> !(groupParent instanceof DirectoryGroup))
+                             .orElse(false);
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
                     groupNode.getParent()
