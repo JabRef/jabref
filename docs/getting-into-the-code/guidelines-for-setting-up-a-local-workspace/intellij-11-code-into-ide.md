@@ -14,7 +14,7 @@ The workaround is to run JabRef once from the command line.
 - Linux: Execute `./gradlew :jabgui:run`
 - Windows (Powershell): Execute `.\gradlew :jabgui:run`
 
-In case gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg) as follows:
+In case Gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg) as follows:
 
 1. Download <https://github.com/eirikb/gg/releases/latest/download/gg.cmd>
 2. Move the file into your JabRef code
