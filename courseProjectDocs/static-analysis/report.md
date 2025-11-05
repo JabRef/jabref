@@ -11,6 +11,124 @@ The analysis detected several code quality issues categorized as **Code Smells**
 
 ---
 ## Fix summary
+
+###
+**Module:** java/org/jabref/logic
+**File:** ModsImporter.java
+
+**Type:**: XML External Entity (XXE) Injection & High code complexity
+**Description:**: Since there is not garntee that the XMLStream Reader interpates the files correctly,explotation could cause local files to be exposed or corrupted.Similar there is a lot of reputition in event handle and some redunant reader.next() calls cause for a high complexity in the function.  
+
+**Before**
+```java
+private void parseOriginInfo(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        List<String> places = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            reader.next();
+
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "issuance" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, new UnknownField("issuance"), reader.getText());
+                        }
+                    }
+                    case "placeTerm" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            appendIfValueNotNullOrBlank(places, reader.getText());
+                        }
+                    }
+                    case "publisher" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, StandardField.PUBLISHER, reader.getText());
+                        }
+                    }
+                    case "edition" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, StandardField.EDITION, reader.getText());
+                        }
+                    }
+                    case "dateIssued",
+                         "dateCreated",
+                         "dateCaptured",
+                         "dateModified" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putDate(fields, elementName, reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && "originInfo".equals(reader.getName().getLocalPart())) {
+                break;
+            }
+        }
+
+        putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
+    }
+```
+
+**After:**
+```java
+    private void parseOriginInfo(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    List<String> places = new ArrayList<>();
+
+    while (reader.hasNext()) {
+        reader.next();
+
+        if (isStartXMLEvent(reader)) {
+            String elementName = reader.getName().getLocalPart();
+
+
+            if (isCharacterXMLEvent(reader)) {
+                continue;
+            }
+            String text = getElementTextSafely(reader);
+            switch (elementName) {
+                case "issuance" ->
+                        putIfValueNotNull(fields, new UnknownField("issuance"), text);
+                case "placeTerm" ->
+                        appendIfValueNotNullOrBlank(places, text);
+                case "publisher" ->
+                        putIfValueNotNull(fields, StandardField.PUBLISHER, text);
+                case "edition" ->
+                        putIfValueNotNull(fields, StandardField.EDITION, text);
+                case "dateIssued", "dateCreated", "dateCaptured", "dateModified" ->
+                        putDate(fields, elementName, text);
+            }
+        }
+
+        if (isEndXMLEvent(reader) && "originInfo".equals(reader.getLocalName())) {
+            break;
+        }
+    }
+
+    putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
+}
+
+private String getElementTextSafely(XMLStreamReader reader) throws XMLStreamException {
+    while (reader.hasNext()) {
+        reader.next();
+
+        if (isCharacterXMLEvent(reader)) {
+            return reader.getText();
+        }
+
+        if (isEndXMLEvent(reader)) {
+            return null;
+        }
+    }
+    return null;
+}
+```
+**Fix:** Reduce overall code complexity making use of java's XML library, and spilt getting the election to its own function. 
 ### Added security checks
 
 **Module:** Jablib /java/org/jabref/logic/xmp
@@ -154,11 +272,11 @@ Due to the complexity of the project, no major changes in SonarQube result as co
 ---
 ## Group Contributions
 
-| Member | Task | Notes                          |
-| -------- | ------- |--------------------------------|
-| Lucille | tba | tba                            |
-| Geoffrey | Fixed Code Smell: Missing Default Clause in Switch Statement | Added simple comment and break |
-| Vanessa | Setup SonarQ configurations | In Config files (build.gradle) |
+| Member | Task                                                         | Notes                                                                 |
+| -------- |--------------------------------------------------------------|-----------------------------------------------------------------------|
+| Lucille | Fix Code Smell: Code Complexity and possibl XML Injection    | Removed redunacy and added helper function to safely get the xml text |
+| Geoffrey | Fixed Code Smell: Missing Default Clause in Switch Statement | Added simple comment and break                                        |
+| Vanessa | Setup SonarQ configurations                                  | In Config files (build.gradle)                                        |
 
 
 On Unix-like systems:
