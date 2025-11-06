@@ -12,8 +12,11 @@ import java.util.function.Function;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 
 import org.eclipse.lsp4j.jsonrpc.Launcher;
+import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,21 +28,29 @@ public class LspLauncher extends Thread {
     private final CliPreferences cliPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final ExecutorService threadPool;
+    private final RemoteMessageHandler messageHandler;
 
     private final int port;
+    private boolean standalone = false;
     private volatile boolean running;
     private ServerSocket serverSocket;
 
-    public LspLauncher(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository, int port) {
+    public LspLauncher(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository, int port) {
         this.cliPreferences = cliPreferences;
         this.abbreviationRepository = abbreviationRepository;
         this.threadPool = Executors.newCachedThreadPool();
         this.port = port;
         this.setName("JabLs - JabRef Language Server on: " + port);
+        this.messageHandler = messageHandler;
     }
 
-    public LspLauncher(CliPreferences cliPreferences, int port) {
-        this(cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences()), port);
+    public LspLauncher(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, int port) {
+        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences()), port);
+    }
+
+    public LspLauncher(JabRefCliPreferences instance, Integer port) {
+        this(_ -> LOGGER.warn("LSP cannot handle UICommands in standalone mode."), instance, port);
+        this.standalone = true;
     }
 
     @Override
@@ -69,12 +80,13 @@ public class LspLauncher extends Thread {
     }
 
     private void handleClient(Socket socket) {
-        LspClientHandler clientHandler = new LspClientHandler(cliPreferences, abbreviationRepository);
+        LspClientHandler clientHandler = new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository);
+        clientHandler.setStandalone(standalone);
         LOGGER.debug("LSP clientHandler started.");
         try (socket; // socket should be closed on error
              InputStream in = socket.getInputStream();
              OutputStream out = socket.getOutputStream()) {
-            Launcher<LanguageClient> launcher = org.eclipse.lsp4j.launch.LSPLauncher.createServerLauncher(clientHandler, in, out, Executors.newCachedThreadPool(), Function.identity());
+            Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(clientHandler, in, out, Executors.newCachedThreadPool(), Function.identity());
             LOGGER.debug("LSP clientHandler launched.");
             clientHandler.connect(launcher.getRemoteProxy());
             LOGGER.debug("LSP clientHandler connected.");
@@ -104,5 +116,9 @@ public class LspLauncher extends Thread {
 
     public boolean isRunning() {
         return running;
+    }
+
+    public boolean isStandalone() {
+        return standalone;
     }
 }

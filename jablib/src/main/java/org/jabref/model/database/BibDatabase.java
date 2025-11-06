@@ -23,7 +23,9 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -37,7 +39,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -49,6 +50,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A bibliography database. This is the "bib" file (or the library stored in a shared SQL database)
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
@@ -231,9 +233,7 @@ public class BibDatabase {
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from
      */
-    public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
-        Objects.requireNonNull(toBeDeleted);
-
+    public synchronized void removeEntries(@NonNull List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Collection<String> idsToBeDeleted;
         if (toBeDeleted.size() > 10) {
             idsToBeDeleted = new HashSet<>();
@@ -454,9 +454,7 @@ public class BibDatabase {
      * @param inPlace          If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
      * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
-    public List<BibEntry> resolveForStrings(Collection<BibEntry> entriesToResolve, boolean inPlace) {
-        Objects.requireNonNull(entriesToResolve, "entries must not be null.");
-
+    public List<BibEntry> resolveForStrings(@NonNull Collection<BibEntry> entriesToResolve, boolean inPlace) {
         List<BibEntry> results = new ArrayList<>(entriesToResolve.size());
 
         for (BibEntry entry : entriesToResolve) {
@@ -498,11 +496,7 @@ public class BibDatabase {
      * care not to follow a circular reference pattern.
      * If the string is undefined, returns null.
      */
-    private String resolveString(String label, Set<String> usedIds, Set<String> allUsedIds) {
-        Objects.requireNonNull(label);
-        Objects.requireNonNull(usedIds);
-        Objects.requireNonNull(allUsedIds);
-
+    private String resolveString(@NonNull String label, @NonNull Set<String> usedIds, @NonNull Set<String> allUsedIds) {
         for (BibtexString string : bibtexStrings.values()) {
             if (string.getName().equalsIgnoreCase(label)) {
                 // First check if this string label has been resolved

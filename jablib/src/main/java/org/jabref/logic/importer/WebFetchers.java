@@ -39,6 +39,7 @@ import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.logic.importer.fetcher.Medra;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
+import org.jabref.logic.importer.fetcher.OpenAlex;
 import org.jabref.logic.importer.fetcher.ResearchGate;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScholarArchiveFetcher;
@@ -121,6 +122,7 @@ public class WebFetchers {
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerNatureWebFetcher(importerPreferences));
         set.add(new CrossRef());
+        set.add(new OpenAlex());
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences, importerPreferences));
@@ -133,6 +135,7 @@ public class WebFetchers {
         set.add(new BiodiversityLibrary(importerPreferences));
         set.add(new LOBIDFetcher());
         set.add(new ScholarArchiveFetcher());
+        set.add(new EuropePmcFetcher());
         return set;
     }
 
@@ -180,6 +183,7 @@ public class WebFetchers {
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new SemanticScholar(importerPreferences));
+        set.add(new OpenAlex());
         set.add(new ResearchGate(importFormatPreferences));
 
         // Uses the PDFs - and then uses the parsed DOI. Makes it 10% a web fetcher.
@@ -224,6 +228,8 @@ public class WebFetchers {
         fetchers.add(new OpenAccessDoi());
         fetchers.add(new SemanticScholar(importerPreferences));
         fetchers.add(new ResearchGate(importFormatPreferences));
+        // OpenAlex provides OA locations and direct PDF links via its API
+        fetchers.add(new OpenAlex());
         return fetchers;
     }
 

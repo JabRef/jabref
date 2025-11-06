@@ -2,7 +2,6 @@ package org.jabref.model.openoffice.uno;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.sun.star.beans.IllegalTypeException;
@@ -19,6 +18,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,15 +69,11 @@ public class UnoUserDefinedProperty {
      * @param property Name of a custom document property in the current document. Created if does not exist yet.
      * @param value    The value to be stored.
      */
-    public static void setStringProperty(XTextDocument doc, String property, String value)
+    public static void setStringProperty(XTextDocument doc, @NonNull String property, @NonNull String value)
             throws
             IllegalTypeException,
             PropertyVetoException,
             WrappedTargetException {
-
-        Objects.requireNonNull(property);
-        Objects.requireNonNull(value);
-
         Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
@@ -112,12 +108,9 @@ public class UnoUserDefinedProperty {
      *                 <p>
      *                 Logs warning if does not exist.
      */
-    public static void remove(XTextDocument doc, String property)
+    public static void remove(XTextDocument doc, @NonNull String property)
             throws
             NotRemoveableException {
-
-        Objects.requireNonNull(property);
-
         Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
@@ -136,12 +129,9 @@ public class UnoUserDefinedProperty {
      *                 <p>
      *                 Keep silent if property did not exist.
      */
-    public static void removeIfExists(XTextDocument doc, String property)
+    public static void removeIfExists(XTextDocument doc, @NonNull String property)
             throws
             NotRemoveableException {
-
-        Objects.requireNonNull(property);
-
         Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
