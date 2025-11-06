@@ -443,7 +443,9 @@ jobs:
         uses: tj-actions/changed-files@v47
         with:
           files: |
+            .jbang/*.java
             jablib/src/main/java/**/*.java
+            jablib-examples/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
       - name: Set up JDK
@@ -508,7 +510,9 @@ jobs:
         uses: tj-actions/changed-files@v47
         with:
           files: |
+            .jbang/*.java
             jablib/src/main/java/**/*.java
+            jablib-examples/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
       - name: Set up JDK
