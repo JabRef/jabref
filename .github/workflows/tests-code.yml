@@ -516,8 +516,10 @@ jobs:
           files_ignore: |
             jablib/src/main/java/**/*-*.java
           base_sha: ${{ github.event.pull_request.base.sha }}
-          write_output_files: true
-      - run: cat .github/outputs/*.txt
+      - run: |
+          cat <<EOF
+          ${{ steps.changed-jablib-files.outputs.all_changed_files }}
+          EOF
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
