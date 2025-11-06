@@ -345,7 +345,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         interpretParser.valueProperty().bindBidirectional(viewModel.interpretParserProperty());
         PlainCitationParserChoice initialParser = parserFromName(preferences.getLatestInterpretParser(), interpretParser.getItems());
         if (initialParser == null) {
-            final PlainCitationParserChoice defaultParser = PlainCitationParserChoice.RULE_BASED_SIMPLE;
+            final PlainCitationParserChoice defaultParser = PlainCitationParserChoice.RULE_BASED_GENERAL;
             initialParser = parserFromName(defaultParser.getLocalizedName(), interpretParser.getItems());
         }
         interpretParser.setValue(initialParser);

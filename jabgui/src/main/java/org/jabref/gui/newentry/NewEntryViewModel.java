@@ -357,7 +357,7 @@ public class NewEntryViewModel {
             }
 
             final PlainCitationParser parser = switch (parserChoice) {
-                case PlainCitationParserChoice.RULE_BASED_SIMPLE ->
+                case PlainCitationParserChoice.RULE_BASED_GENERAL ->
                         new RuleBasedPlainCitationParser();
                 case PlainCitationParserChoice.RULE_BASED_IEEE ->
                         new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
