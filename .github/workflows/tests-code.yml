@@ -471,6 +471,8 @@ jobs:
       - name: Setup JBang
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: jbangdev/setup-jbang@main
+
+      # Build all JBang scripts
       - run: jbang build .jbang/CheckoutPR.java
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang build .jbang/CloneJabRef.java
@@ -483,6 +485,8 @@ jobs:
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang build --fresh jablib-examples/*.java
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
+
+      # *Launcher.java should support "--help"
       - run: jbang run .jbang/JabKitLauncher.java --help
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: jbang run .jbang/JabLsLauncher.java --help
