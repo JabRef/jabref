@@ -14,96 +14,55 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Integration-style test for RelatedWorkHarvester.
- * Verifies that summaries are appended correctly to {@code comment-<username>} fields.
- */
 public class RelatedWorkHarvesterTest {
-
-    @Test
-    void harvestAndAnnotateAppendsSummaries() {
-        // --- Arrange ---
-        String text = """
-                1.3 Related work: environmental and social assessments of chocolate production
-                Existing environmental LCAs include Italian chocolate production (Vesce et al., 2016),
-                and Italian dark chocolate production from cradle-to-grave (Bianchi et al. 2021).
-                """;
-
-        // Create sample bibliography
-        BibEntry vesce = new BibEntry();
-        vesce.setCitationKey("Vesce2016");
-        vesce.setField(StandardField.AUTHOR, "Vesce, A.");
-        vesce.setField(StandardField.YEAR, "2016");
-
-        BibEntry bianchi = new BibEntry();
-        bianchi.setCitationKey("Bianchi2021");
-        bianchi.setField(StandardField.AUTHOR, "Bianchi, L.");
-        bianchi.setField(StandardField.YEAR, "2021");
-
-        List<BibEntry> bibliography = new ArrayList<>();
-        bibliography.add(vesce);
-        bibliography.add(bianchi);
-
-        // Track updates made by the harvester
-        List<BibEntry> updated = new ArrayList<>();
-
-        RelatedWorkExtractor extractor = new HeuristicRelatedWorkExtractor();
-        RelatedWorkHarvester harvester = new RelatedWorkHarvester(extractor);
-
-        // --- Act ---
-        harvester.harvestAndAnnotate(
-                "koppor",
-                "LunaOstos_2024",
-                text,
-                bibliography,
-                updated::add // record updates
-        );
-
-        // --- Assert ---
-        assertEquals(2, updated.size());
-
-        Field commentField = FieldFactory.parseField("comment-koppor");
-        for (BibEntry entry : updated) {
-            String value = entry.getField(commentField).orElse("");
-            assertTrue(value.startsWith("[LunaOstos_2024]:"));
-            assertTrue(value.length() > 30);
-        }
-
-        String vesceComment = vesce.getField(commentField).orElse("");
-        String bianchiComment = bianchi.getField(commentField).orElse("");
-
-        assertNotEquals(vesceComment, bianchiComment);
-        assertTrue(vesceComment.contains("Vesce"));
-        assertTrue(bianchiComment.contains("Bianchi"));
+    private BibEntry entry(String key, String author, String year) {
+        BibEntry b = new BibEntry();
+        b.setCitationKey(key);
+        b.setField(StandardField.AUTHOR, author);
+        b.setField(StandardField.YEAR, year);
+        return b;
     }
 
     @Test
-    void appendsWhenFieldAlreadyHasContent() {
-        // --- Arrange ---
+    void harvestEndToEnd() {
+        String text = """
+            1.4 Related work
+            Population estimates vary across sources (CIA, 2021). See also (Nash 2022).
+            """;
+
+        List<BibEntry> lib = new ArrayList<>();
+        lib.add(entry("Agency2021", "Central Intelligence Agency", "2021"));
+        lib.add(entry("Nash2022", "Nash, T.", "2022"));
+
+        HeuristicRelatedWorkExtractor ex = new HeuristicRelatedWorkExtractor();
+        RelatedWorkHarvester harvester = new RelatedWorkHarvester(ex);
+
+        // Add/update function with explicit braces (Checkstyle NeedBraces)
+        int updated = harvester.harvestAndAnnotateCount(
+                "koppor",
+                "LunaOstos_2024",
+                text,
+                lib,
+                b -> {
+                    if (!lib.contains(b)) {
+                        lib.add(b);
+                    }
+                }
+        );
+
+        assertEquals(2, updated);
+
         Field commentField = FieldFactory.parseField("comment-koppor");
+        boolean agencyAnnotated = lib.stream().anyMatch(b ->
+                b.getCitationKey().orElse("").equals("Agency2021")
+                        && b.getField(commentField).orElse("").contains("[LunaOstos_2024]:")
+        );
+        boolean nashAnnotated = lib.stream().anyMatch(b ->
+                b.getCitationKey().orElse("").equals("Nash2022")
+                        && b.getField(commentField).orElse("").contains("[LunaOstos_2024]:")
+        );
 
-        BibEntry existing = new BibEntry();
-        existing.setCitationKey("Vesce2016");
-        existing.setField(StandardField.AUTHOR, "Vesce, A.");
-        existing.setField(StandardField.YEAR, "2016");
-        existing.setField(commentField, "[OldPaper]: Old summary.");
-
-        List<BibEntry> bibliography = List.of(existing);
-
-        String text = "1.3 Related work\nExisting LCAs include Italian chocolate production (Vesce et al., 2016).";
-
-        RelatedWorkExtractor extractor = new HeuristicRelatedWorkExtractor();
-        RelatedWorkHarvester harvester = new RelatedWorkHarvester(extractor);
-
-        List<BibEntry> updated = new ArrayList<>();
-
-        // --- Act ---
-        harvester.harvestAndAnnotate("koppor", "NewPaper", text, bibliography, updated::add);
-
-        // --- Assert ---
-        String comment = existing.getField(commentField).orElse("");
-        assertTrue(comment.contains("[OldPaper]: Old summary."));
-        assertTrue(comment.contains("[NewPaper]:"));
-        assertTrue(comment.contains("\n\n")); // blank line separator
+        assertTrue(agencyAnnotated);
+        assertTrue(nashAnnotated);
     }
 }

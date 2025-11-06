@@ -15,23 +15,27 @@ import org.jabref.model.entry.field.StandardField;
 
 /**
  * Deterministic extractor for author–year style citations in "Related Work" sections.
- * Scans the whole section for patterns like (Vesce et al., 2016) and captures a context
- * span around each match to use as the descriptive snippet.
+ * Handles single and multi-citation parentheticals, including diacritics and all-caps acronyms (e.g., CIA, Šimić).
  */
 public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
 
-    // Headings like "1.3 Related work", "RELATED WORK", etc. (case-insensitive)
+    // Headings like "1.4 Related work", "RELATED WORK", etc. (case-insensitive)
     private static final Pattern RELATED_WORK_HEADING =
-            Pattern.compile("(?im)^(\\d+(?:\\.\\d+)*)?\\s*related\\s+work[s]?\\s*[:\\-]?");
+            Pattern.compile("(?im)^(\\d+(?:\\.\\d+)*)?\\s*related\\s+work[s]?\\s*[:\\-]?$");
 
-    // Author–year patterns inside parentheses:
-    // (Vesce et al., 2016)  (Vesce et al. 2016)  (Vesce, 2016)  (Vesce 2016)
-    private static final Pattern AUTHOR_YEAR_PATTERN = Pattern.compile(
-            "\\(([A-Z][A-Za-z\\-\\p{L}\\p{M}]+)"     // 1 = first Author token
-                    + "(?:\\s+et\\s+al\\.)?"         // optional 'et al.'
-                    + "(?:,)?\\s+"                   // optional comma + space
-                    + "(\\d{4})\\)",                 // 2 = year
-            Pattern.UNICODE_CASE);
+    // Any parenthetical block; author-year pairs are mined inside it.
+    private static final Pattern PAREN_BLOCK = Pattern.compile("\\(([^)]+)\\)");
+
+    // Unicode-aware author–year inside a parenthetical.
+    // Allows all-caps acronyms like "CIA" and Unicode surnames like "Šimić".
+    // \p{Lu} = uppercase letter, \p{L} = any letter, \p{M} = combining mark.
+    private static final Pattern AUTHOR_YEAR_INNER = Pattern.compile(
+            "(?U)"                               // enable Unicode character classes
+                    + "(\\p{Lu}[\\p{L}\\p{M}'\\-]*)"       // 1: first author token (can be acronym or surname)
+                    + "(?:\\s+(?:et\\s+al\\.)|\\s*(?:&|and)\\s+\\p{Lu}[\\p{L}\\p{M}'\\-]+)?"
+                    + "\\s*,?\\s*"
+                    + "(\\d{4})([a-z]?)"                  // 2: year, 3: optional trailing letter
+    );
 
     @Override
     public Map<String, String> extract(String fullText, List<BibEntry> bibliography) {
@@ -39,36 +43,51 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         Map<String, BibEntry> index = buildIndex(bibliography);
         Map<String, String> out = new LinkedHashMap<>();
 
-        Matcher m = AUTHOR_YEAR_PATTERN.matcher(related);
-        while (m.find()) {
-            String citedSurname = normalizeSurname(m.group(1));
-            String year = m.group(2);
-            String citedKey = findKeyFor(citedSurname, year, index);
-            if (citedKey == null || out.containsKey(citedKey)) {
-                continue;
-            }
+        Matcher paren = PAREN_BLOCK.matcher(related);
+        while (paren.find()) {
+            String inner = paren.group(1);
+            Matcher cite = AUTHOR_YEAR_INNER.matcher(inner);
 
-            // Derive a descriptive snippet: expand to nearest sentence-ish boundaries.
-            String snippet = expandToSentenceLikeSpan(related, m.start(), m.end());
-            snippet = snippet.trim();
-            if (snippet.length() > 300) {
-                snippet = snippet.substring(0, 300) + "...";
+            while (cite.find()) {
+                String citedToken = normalizeSurname(cite.group(1)); // e.g., "cia" or "nash"
+                String yearDigits = cite.group(2);                   // ignore group(3) letter
+                String citedKey = findKeyFor(citedToken, yearDigits, index);
+                if (citedKey == null || out.containsKey(citedKey)) {
+                    continue;
+                }
+
+                String snippet = expandToSentenceLikeSpan(related, paren.start(), paren.end());
+                snippet = pruneTrailingCitationTail(snippet).trim();
+
+                if (!snippet.endsWith(".")) {
+                    snippet = snippet + ".";
+                }
+                if (snippet.length() > 300) {
+                    snippet = snippet.substring(0, 300) + "...";
+                }
+
+                out.put(citedKey, snippet);
             }
-            out.put(citedKey, snippet);
         }
 
         return out;
     }
 
+    /** Try to isolate the "Related work" section; fallback to full text. */
     private String sliceRelatedWorkSection(String text) {
         Matcher start = RELATED_WORK_HEADING.matcher(text);
-        if (!start.find()) {
+        int begin = -1;
+        while (start.find()) {
+            begin = start.end();
+            break;
+        }
+        if (begin < 0) {
             return text; // fallback: whole text
         }
-        int begin = start.end();
 
-        // Cut at next numbered or ALL-CAPS heading
-        Pattern nextSection = Pattern.compile("(?m)^(?:\\d+(?:\\.\\d+)*)\\s+[A-Z][A-Z\\s\\-]{3,}|^[A-Z][A-Z\\s\\-]{3,}$");
+        // Next likely section heading AFTER begin (numbered or ALL-CAPS)
+        Pattern nextSection = Pattern.compile(
+                "(?m)^(?:\\d+(?:\\.\\d+)*)\\s+[A-Z][A-Z\\s\\-]{3,}$|^[A-Z][A-Z\\s\\-]{3,}$");
         Matcher end = nextSection.matcher(text);
         int stop = text.length();
         while (end.find()) {
@@ -80,45 +99,95 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return text.substring(begin, stop);
     }
 
+    /**
+     * Build index keyed by:
+     *  - normalized first-author surname + year, e.g., "nash2022"
+     *  - AND (when applicable) a corporate/phrase acronym + year, e.g., "cia2021"
+     */
     private Map<String, BibEntry> buildIndex(List<BibEntry> bibs) {
         Map<String, BibEntry> idx = new HashMap<>();
         for (BibEntry b : bibs) {
             Optional<String> y = b.getField(StandardField.YEAR);
+            if (y.isEmpty()) {
+                Optional<String> date = b.getField(StandardField.DATE);
+                if (date.isPresent()) {
+                    Matcher m = Pattern.compile("(\\d{4})").matcher(date.get());
+                    if (m.find()) {
+                        y = Optional.of(m.group(1));
+                    }
+                }
+            }
             Optional<String> a = b.getField(StandardField.AUTHOR);
             if (y.isEmpty() || a.isEmpty()) {
                 continue;
             }
-            String firstSurname = extractFirstSurname(a.get());
+            String yearDigits = y.get().replaceAll("[^0-9]", "");
+            if (yearDigits.isEmpty()) {
+                continue;
+            }
+
+            String firstAuthor = firstAuthorRaw(a.get());
+            String firstSurname = extractFirstSurnameFromRaw(firstAuthor);
             if (!firstSurname.isEmpty()) {
-                String k = normalizeSurname(firstSurname) + y.get();
-                idx.put(k, b);
+                idx.put(normalizeSurname(firstSurname) + yearDigits, b);
+            }
+
+            // Also index acronym for corporate/multi-word first author without comma.
+            String acronym = maybeAcronym(firstAuthor);
+            if (!acronym.isEmpty()) {
+                idx.put(acronym + yearDigits, b);
             }
         }
         return idx;
     }
 
-    private String extractFirstSurname(String authorField) {
-        // Split authors by ' and ' (BibTeX style)
-        String firstAuthor = authorField.split("\\s+and\\s+")[0].trim();
+    /** Get the raw first author string (before surname extraction). */
+    private String firstAuthorRaw(String authorField) {
+        return authorField.split("\\s+and\\s+")[0].trim();
+    }
 
-        // Handle "Surname, Given" vs "Given Middle Surname"
+    /** Extract the first author surname from a raw first-author token. */
+    private String extractFirstSurnameFromRaw(String firstAuthor) {
         if (firstAuthor.contains(",")) {
-            // e.g., "Vesce, A." → "Vesce"
             return firstAuthor.substring(0, firstAuthor.indexOf(',')).trim();
         }
-
-        // Braced corporate authors: "{Company Name}" → take last token as a fallback
         if (firstAuthor.startsWith("{") && firstAuthor.endsWith("}")) {
             String inner = firstAuthor.substring(1, firstAuthor.length() - 1).trim();
             String[] parts = inner.split("\\s+");
             return parts.length == 0 ? "" : parts[parts.length - 1];
         }
-
-        // "Given Middle Surname" → take the last token as surname
         String[] parts = firstAuthor.split("\\s+");
         return parts.length == 0 ? "" : parts[parts.length - 1];
     }
 
+    /**
+     * Produce an acronym (e.g., "Central Intelligence Agency" -> "cia") when the first author
+     * looks like a corporate/multi-word name. We avoid personal-name forms with a comma.
+     */
+    private String maybeAcronym(String firstAuthor) {
+        if (firstAuthor.contains(",")) {
+            return ""; // likely "Surname, Given" → skip acronym
+        }
+        String unbraced = firstAuthor;
+        if (unbraced.startsWith("{") && unbraced.endsWith("}")) {
+            unbraced = unbraced.substring(1, unbraced.length() - 1);
+        }
+        String[] parts = unbraced.trim().split("\\s+");
+        if (parts.length < 2) {
+            return ""; // single token → not helpful
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String p : parts) {
+            if (p.isEmpty()) continue;
+            char c = p.charAt(0);
+            if (Character.isLetter(c)) {
+                sb.append(Character.toLowerCase(c));
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Normalize token: remove braces, strip diacritics, lowercase. */
     private String normalizeSurname(String s) {
         String noBraces = s.replace("{", "").replace("}", "");
         String normalized = Normalizer.normalize(noBraces, Normalizer.Form.NFD)
@@ -126,17 +195,13 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return normalized.toLowerCase(Locale.ROOT);
     }
 
-    private String findKeyFor(String lowerSurname, String year, Map<String, BibEntry> index) {
-        BibEntry entry = index.get(lowerSurname + year);
-        // Return null when not found; caller guards against null.
-        return (entry != null) ? entry.getCitationKey().orElse(null) : null;
+    /** Lookup by normalized token (surname or acronym) + 4-digit year. */
+    private String findKeyFor(String lowerToken, String yearDigits, Map<String, BibEntry> index) {
+        BibEntry entry = index.get(lowerToken + yearDigits);
+        return (entry != null) ? entry.getCitationKey().orElse(null) : null; // ok to return null to signal "not found"
     }
 
-    /**
-     * Return a context span that looks like a sentence around a match.
-     * We expand left to the previous '.', '!' or '?' (or a line break),
-     * and right to the next '.', '!' or '?' (or a line break).
-     */
+    /** Expand to a sentence-like span around the parenthetical match. */
     private String expandToSentenceLikeSpan(String text, int matchStart, int matchEnd) {
         int left = matchStart;
         while (left > 0) {
@@ -156,10 +221,28 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
             }
             right++;
         }
-        // Clamp in case no right boundary found
         if (right > len) {
             right = len;
         }
         return text.substring(left, right);
+    }
+
+    /**
+     * Heuristically remove trailing citation trains at the end of a snippet,
+     * e.g., "... (Smith, 2019; Doe 2020)." → keep text up to the ')'.
+     */
+    private String pruneTrailingCitationTail(String s) {
+        int lastParen = s.lastIndexOf(')');
+        if (lastParen > -1 && lastParen >= s.length() - 3) {
+            String head = s.substring(0, lastParen + 1).trim();
+            if (head.endsWith(").")) {
+                return head;
+            }
+            if (head.endsWith(")")) {
+                return head + ".";
+            }
+            return head;
+        }
+        return s;
     }
 }
