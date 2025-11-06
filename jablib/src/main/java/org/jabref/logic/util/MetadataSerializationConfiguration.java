@@ -74,6 +74,11 @@ public class MetadataSerializationConfiguration {
      */
     public static final String TEX_GROUP_ID = "TexGroup:";
 
+    /**
+     * Identifier for AutomaticDateGroup.
+     */
+    public static final String AUTOMATIC_DATE_GROUP_ID = "AutomaticDateGroup:";
+
     private MetadataSerializationConfiguration() {
     }
 }
