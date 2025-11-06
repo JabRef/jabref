@@ -554,7 +554,7 @@ jobs:
                 ;;
               jabkit/*)
                 # only JabKit needs its modified sources
-                if [ "${{ matrix.script }}" != "JabKitLauncher" ]; then
+                if [ "${{ matrix.script }}" != ".jbang/JabKitLauncher.java" ]; then
                   continue
                 fi
                 ;;
