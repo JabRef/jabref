@@ -50,6 +50,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added BibLaTeX datamodel validation support in order to improve error message quality in entries' fields validation. [#13318](https://github.com/JabRef/jabref/issues/13318)
 - We added chronological navigation for entries in each library. [#6352](https://github.com/JabRef/jabref/issues/6352)
 - We added support for using Medline/Pubmed fetcher with an API key. [#11296](https://github.com/JabRef/jabref/issues/11296#issuecomment-3289005011)
+- We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
+- We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
+- We added an option to search and filter the fields and formatters in the Clean up entries dialog. [#13890](https://github.com/JabRef/jabref/issues/13890)
+- We added support for managing multiple linked files via the entry context menu. [#12567](https://github.com/JabRef/jabref/issues/12567)
 - We added support for transliteration of citation keys. [#11377](https://github.com/JabRef/jabref/issues/11377) [#9605](https://github.com/JabRef/jabref/issues/9605)
 
 ### Changed
