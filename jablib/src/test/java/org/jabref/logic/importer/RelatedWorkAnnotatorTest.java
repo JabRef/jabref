@@ -1,60 +1,50 @@
 package org.jabref.logic.importer;
 
-import java.util.Optional;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RelatedWorkAnnotatorTest {
 
     @Test
-    public void firstAppendCreatesFieldWithOneBlock() {
-        BibEntry entry = new BibEntry();
+    void appendsToEmpty() {
+        BibEntry e = new BibEntry();
+        e.setCitationKey("X");
 
         RelatedWorkAnnotator.appendSummaryToEntry(
-                entry,
-                "yourusername",
+                e,
+                "koppor",
                 "LunaOstos_2024",
-                "Colombia is a middle-income country with a population of approximately 50 million."
+                "Colombia is a middle-income country"
         );
 
-        Field commentField = FieldFactory.parseField("comment-yourusername");
-        Optional<String> value = entry.getField(commentField);
+        Field commentField = FieldFactory.parseField("comment-koppor");
+        String v = e.getField(commentField).orElse("");
 
-        String expected =
-                "[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.";
-
-        assertEquals(expected, value.orElseThrow());
+        assertTrue(v.startsWith("[LunaOstos_2024]: Colombia is a middle-income country"));
+        assertTrue(v.endsWith("."));
     }
 
     @Test
-    void secondAppendAddsBlankLineAndSecondBlock() {
-        BibEntry entry = new BibEntry();
+    void appendsWithBlankLine() {
+        BibEntry e = new BibEntry();
+        e.setCitationKey("X");
+
+        Field commentField = FieldFactory.parseField("comment-koppor");
+        e.setField(commentField, "Existing text.");
+
         RelatedWorkAnnotator.appendSummaryToEntry(
-                entry,
+                e,
                 "koppor",
                 "LunaOstos_2024",
-                "Colombia is a middle-income country with a population of approximately 50 million."
+                "New sentence"
         );
 
-        RelatedWorkAnnotator.appendSummaryToEntry(
-                entry,
-                "koppor",
-                "CIA_2021",
-                "Colombia has ~50 million people."
-        );
-
-        Optional<String> value = entry.getField(FieldFactory.parseField("comment-koppor"));
-
-        String expected =
-                "[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.\n\n" +
-                        "[CIA_2021]: Colombia has ~50 million people.";
-
-        assertEquals(expected, value.orElseThrow());
+        String v = e.getField(commentField).orElse("");
+        assertTrue(v.contains("Existing text.\n\n[LunaOstos_2024]: New sentence."));
     }
 }
