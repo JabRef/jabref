@@ -119,10 +119,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: koppor/intellij-idea-format@update-to-latest-intellij
+      - uses: koppor/intellij-idea-format@intellij-version-as-parameter
         with:
           file-mask: "*.java"
           settings-file: ".idea/codeStyles/Project.xml"
+          idea-version: "2025.2.4"
       # job should fail in case there are changes
       - name: Check if any files changed
         run: git diff --exit-code
