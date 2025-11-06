@@ -48,6 +48,7 @@ To write a localized string in FXML file, prepend it with `%`, like in this code
 * Use `%x`-variables where appropriate: `Localization.lang("Exported %0 entry(s).", number)` instead of `Localization.lang("Exported ") + number + Localization.lang(" entry(s).");`
 * Use a full stop/period (".") to end full sentences
 * For pluralization, use a combined form. E.g., `Localization.lang("checked %0 entry(s)")`.
+  See [Pluralization: A Guide to Localizing Plurals](https://phrase.com/blog/posts/pluralization/) for background information why there is not only singular and plural world-wide.
 
 ## Checking for correctness
 
