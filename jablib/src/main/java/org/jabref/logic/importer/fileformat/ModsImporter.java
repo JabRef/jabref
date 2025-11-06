@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -306,50 +307,49 @@ public class ModsImporter extends Importer implements Parser {
 
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
+
+
+                if (isCharacterXMLEvent(reader)) {
+                    continue;
+                }
+                String text = getElementTextSafely(reader);
                 switch (elementName) {
-                    case "issuance" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, new UnknownField("issuance"), reader.getText());
-                        }
-                    }
-                    case "placeTerm" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            appendIfValueNotNullOrBlank(places, reader.getText());
-                        }
-                    }
-                    case "publisher" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, StandardField.PUBLISHER, reader.getText());
-                        }
-                    }
-                    case "edition" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, StandardField.EDITION, reader.getText());
-                        }
-                    }
-                    case "dateIssued",
-                         "dateCreated",
-                         "dateCaptured",
-                         "dateModified" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            putDate(fields, elementName, reader.getText());
-                        }
-                    }
+                    case "issuance" ->
+                            putIfValueNotNull(fields, new UnknownField("issuance"), text);
+                    case "placeTerm" ->
+                            appendIfValueNotNullOrBlank(places, text);
+                    case "publisher" ->
+                            putIfValueNotNull(fields, StandardField.PUBLISHER, text);
+                    case "edition" ->
+                            putIfValueNotNull(fields, StandardField.EDITION, text);
+                    case "dateIssued", "dateCreated", "dateCaptured", "dateModified" ->
+                            putDate(fields, elementName, text);
                 }
             }
 
-            if (isEndXMLEvent(reader) && "originInfo".equals(reader.getName().getLocalPart())) {
+            if (isEndXMLEvent(reader) && "originInfo".equals(reader.getLocalName())) {
                 break;
             }
         }
 
         putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
     }
+
+    private String getElementTextSafely(XMLStreamReader reader) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+
+            if (isCharacterXMLEvent(reader)) {
+                return reader.getText();
+            }
+
+            if (isEndXMLEvent(reader)) {
+                return null;
+            }
+        }
+        return null;
+    }
+
 
     private void parseSubject(XMLStreamReader reader, Map<Field, String> fields, List<String> keywords) throws XMLStreamException {
         while (reader.hasNext()) {
