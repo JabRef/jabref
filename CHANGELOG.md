@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added automatic date-based groups that create year/month/day subgroups from an entry’s date fields. [#10822](https://github.com/JabRef/jabref/issues/10822)
+- We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377) [#9605](https://github.com/JabRef/jabref/issues/9605)
 
 ### Changed
 
@@ -54,7 +55,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
 - We added an option to search and filter the fields and formatters in the Clean up entries dialog. [#13890](https://github.com/JabRef/jabref/issues/13890)
 - We added support for managing multiple linked files via the entry context menu. [#12567](https://github.com/JabRef/jabref/issues/12567)
-- We added support for transliteration of citation keys. [#11377](https://github.com/JabRef/jabref/issues/11377) [#9605](https://github.com/JabRef/jabref/issues/9605)
 
 ### Changed
 
