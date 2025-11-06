@@ -209,7 +209,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
         // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
         // since the enabled/disabled state of addNewFieldButton won't update otherwise
-        // EasyBind.subscribe(addNewField.getEditor().textProperty(), text -> addNewField.setValue(FieldsUtil.FIELD_STRING_CONVERTER.fromString(text)));
     }
 
     private void makeRotatedColumnHeader(TableColumn<?, ?> column, String text) {
