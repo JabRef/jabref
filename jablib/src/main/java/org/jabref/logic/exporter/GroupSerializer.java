@@ -3,10 +3,9 @@ package org.jabref.logic.exporter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.paint.Color;
-
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticGroup;
@@ -20,7 +19,6 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.strings.StringUtil;
 
 public class GroupSerializer {
     private static String serializeAllEntriesGroup() {
@@ -97,7 +95,7 @@ public class GroupSerializer {
     private void appendGroupDetails(StringBuilder builder, AbstractGroup group) {
         builder.append(StringUtil.booleanToBinaryString(group.isExpanded()));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        builder.append(group.getColor().map(Color::toString).orElse(""));
+        builder.append(group.getColor().orElse(""));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         builder.append(group.getIconName().orElse(""));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);

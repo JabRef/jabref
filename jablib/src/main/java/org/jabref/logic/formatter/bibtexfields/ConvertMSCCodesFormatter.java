@@ -18,7 +18,7 @@ import org.jabref.model.entry.KeywordList;
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.eclipse.jgit.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,7 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
 
     @NonNull
     @Override
-    public String format(String text) {
+    public String format(@NonNull String text) {
         if (text.isEmpty() || !conversionPossible) {
             return text;
         }
@@ -70,10 +70,9 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
         // get preferences for BibEntry
         BibEntryPreferences bibPreferences = cliPreferences.getBibEntryPreferences();
         Character dlim = bibPreferences.getKeywordSeparator();
-        Character hdlim = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
 
         // create KeywordList to tokenize
-        KeywordList keyList = KeywordList.parse(text, dlim, hdlim);
+        KeywordList keyList = KeywordList.parse(text, dlim);
         Iterator<Keyword> list = keyList.iterator();
         List<Keyword> modifiedList = new ArrayList<>();
         while (list.hasNext()) {

@@ -4,7 +4,9 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class TitleCaseFormatter extends Formatter {
 
@@ -24,7 +26,7 @@ public class TitleCaseFormatter extends Formatter {
      * Does not change words starting with "{"
      */
     @Override
-    public String format(String input) {
+    public String format(@NonNull String input) {
         return StringUtil.getStringAsSentences(input)
                          .stream()
                          .map(sentence -> {

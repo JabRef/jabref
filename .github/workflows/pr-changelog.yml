@@ -1,0 +1,80 @@
+name: Check PR CHANGELOG.md
+
+# Separate check PR, because of triggers both at code update and at comment update
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+
+jobs:
+  changelog_modification_consistency:
+    name: CHANGELOG.md needs to be modified if indicated
+    if: (github.event.pull_request.user.login != 'dependabot[bot]') && (github.event.pull_request.user.login != 'renovate-bot')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Check PR body for changelog note
+        id: changelog_check
+        run: |
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
+          echo "Body: $BODY"
+
+          if echo "$BODY" | grep -q '\- \[x\] I described the change in `CHANGELOG.md`'; then
+            echo "found"
+            echo "found=yes" >> $GITHUB_OUTPUT
+          else
+            echo "not found"
+            echo "found=no" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: CHANGELOG.md modified
+        id: changelog_modified
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        with:
+          files: |
+            CHANGELOG.md
+      - name: Check for CHANGELOG.md modifications
+        id: check_changelog_modification
+        run: |
+          set -euo pipefail
+          found="${{ steps.changelog_check.outputs.found }}"
+          any_changed="${{ steps.changelog_modified.outputs.any_changed }}"
+
+          echo "found=${found}"
+          echo "any_changed=${any_changed}"
+
+          if [[ "${any_changed}" == "true" && "${found}" != "yes" ]]; then
+            echo "❌ CHANGELOG.md modified, but not indicated in checklist"
+            exit 1
+          fi
+
+          if [[ "${any_changed}" != "true" && "${found}" == "yes" ]]; then
+            echo "❌ CHANGELOG.md NOT modified, but indicated in checklist"
+            exit 1
+          fi
+
+          if [[ "${any_changed}" == "true" && "${found}" == "yes" ]]; then
+            echo "✅ CHANGELOG.md was modified and indicated in checklist"
+          else
+            echo "✅ CHANGELOG.md was NOT modified and NOT indicated in checklist"
+          fi
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v5
+        with:
+          name: pr_number
+          path: pr_number.txt
+

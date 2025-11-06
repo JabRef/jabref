@@ -7,9 +7,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.apache.lucene.index.Term;
+import org.jspecify.annotations.NonNull;
 
 public class ComplexSearchQuery {
     // Field for non-fielded search
@@ -180,8 +181,8 @@ public class ComplexSearchQuery {
         private ComplexSearchQueryBuilder() {
         }
 
-        public ComplexSearchQueryBuilder defaultFieldPhrase(String defaultFieldPhrase) {
-            if (Objects.requireNonNull(defaultFieldPhrase).isBlank()) {
+        public ComplexSearchQueryBuilder defaultFieldPhrase(@NonNull String defaultFieldPhrase) {
+            if (defaultFieldPhrase.isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
@@ -192,8 +193,8 @@ public class ComplexSearchQuery {
         /**
          * Adds author and wraps it in quotes
          */
-        public ComplexSearchQueryBuilder author(String author) {
-            if (Objects.requireNonNull(author).isBlank()) {
+        public ComplexSearchQueryBuilder author(@NonNull String author) {
+            if (author.isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
@@ -204,8 +205,8 @@ public class ComplexSearchQuery {
         /**
          * Adds title phrase and wraps it in quotes
          */
-        public ComplexSearchQueryBuilder titlePhrase(String titlePhrase) {
-            if (Objects.requireNonNull(titlePhrase).isBlank()) {
+        public ComplexSearchQueryBuilder titlePhrase(@NonNull String titlePhrase) {
+            if (titlePhrase.isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
@@ -216,8 +217,8 @@ public class ComplexSearchQuery {
         /**
          * Adds abstract phrase and wraps it in quotes
          */
-        public ComplexSearchQueryBuilder abstractPhrase(String abstractPhrase) {
-            if (Objects.requireNonNull(abstractPhrase).isBlank()) {
+        public ComplexSearchQueryBuilder abstractPhrase(@NonNull String abstractPhrase) {
+            if (abstractPhrase.isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
@@ -225,33 +226,33 @@ public class ComplexSearchQuery {
             return this;
         }
 
-        public ComplexSearchQueryBuilder fromYearAndToYear(Integer fromYear, Integer toYear) {
+        public ComplexSearchQueryBuilder fromYearAndToYear(@NonNull Integer fromYear, @NonNull Integer toYear) {
             if (singleYear != null) {
                 throw new IllegalArgumentException("You can not use single year and year range search.");
             }
-            this.fromYear = Objects.requireNonNull(fromYear);
-            this.toYear = Objects.requireNonNull(toYear);
+            this.fromYear = fromYear;
+            this.toYear = toYear;
             return this;
         }
 
-        public ComplexSearchQueryBuilder singleYear(Integer singleYear) {
+        public ComplexSearchQueryBuilder singleYear(@NonNull Integer singleYear) {
             if (fromYear != null || toYear != null) {
                 throw new IllegalArgumentException("You can not use single year and year range search.");
             }
-            this.singleYear = Objects.requireNonNull(singleYear);
+            this.singleYear = singleYear;
             return this;
         }
 
-        public ComplexSearchQueryBuilder journal(String journal) {
-            if (Objects.requireNonNull(journal).isBlank()) {
+        public ComplexSearchQueryBuilder journal(@NonNull String journal) {
+            if (journal.isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             this.journal = "\"%s\"".formatted(journal.replace("\"", ""));
             return this;
         }
 
-        public ComplexSearchQueryBuilder DOI(String doi) {
-            if (Objects.requireNonNull(doi).isBlank()) {
+        public ComplexSearchQueryBuilder DOI(@NonNull String doi) {
+            if (doi.isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             this.doi = doi.replace("\"", "");

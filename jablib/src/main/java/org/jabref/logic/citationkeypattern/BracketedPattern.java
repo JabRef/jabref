@@ -23,6 +23,7 @@ import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -33,7 +34,6 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jabref.model.strings.StringUtil;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * <code>2017_Kitsune_123</code> when expanded using the BibTeX entry <code>@Article{ authors = {O. Kitsune}, year = {2017},
  * pages={123-6}}</code>.
  * <p>
- * The embedding in JabRef is explained at <a href="https://docs.jabref.org/setup/citationkeypattern">Customize the citation key generator</a>.
+ * The embedding in JabRef is explained at <a href="https://docs.jabref.org/setup/citationkeypatterns">Customize the citation key generator</a>.
  * </p>
  */
 public class BracketedPattern {
@@ -164,8 +164,7 @@ public class BracketedPattern {
      * @param database The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
-    public String expand(BibEntry bibentry, BibDatabase database) {
-        Objects.requireNonNull(bibentry);
+    public String expand(@NonNull BibEntry bibentry, BibDatabase database) {
         Character keywordDelimiter = ';';
         return expand(bibentry, keywordDelimiter, database);
     }
@@ -178,8 +177,7 @@ public class BracketedPattern {
      * @param database         The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
-    public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
-        Objects.requireNonNull(bibentry);
+    public String expand(@NonNull BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 
@@ -809,7 +807,8 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the surname of an author/editor
      */
-    private static String lastAuthor(AuthorList authorList) {
+    @VisibleForTesting
+    static String lastAuthor(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -1223,7 +1222,7 @@ public class BracketedPattern {
 
     /**
      * <p>
-     * An author or editor may be and institution not a person. In that case the key generator builds very long keys,
+     * An author or editor may be an institution not a person. In that case the key generator builds very long keys,
      * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
      * </p>
      *

@@ -1,7 +1,6 @@
 package org.jabref.gui.groups;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,6 +30,7 @@ import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -52,12 +52,12 @@ import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
-import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import io.github.adr.linked.ADR;
+import org.jspecify.annotations.NonNull;
 
 public class GroupNodeViewModel {
 
@@ -81,12 +81,17 @@ public class GroupNodeViewModel {
     @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
-        this.databaseContext = Objects.requireNonNull(databaseContext);
-        this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.stateManager = Objects.requireNonNull(stateManager);
-        this.groupNode = Objects.requireNonNull(groupNode);
-        this.localDragBoard = Objects.requireNonNull(localDragBoard);
+    public GroupNodeViewModel(@NonNull BibDatabaseContext databaseContext,
+                              @NonNull StateManager stateManager,
+                              @NonNull TaskExecutor taskExecutor,
+                              @NonNull GroupTreeNode groupNode,
+                              @NonNull CustomLocalDragboard localDragBoard,
+                              @NonNull GuiPreferences preferences) {
+        this.databaseContext = databaseContext;
+        this.taskExecutor = taskExecutor;
+        this.stateManager = stateManager;
+        this.groupNode = groupNode;
+        this.localDragBoard = localDragBoard;
         this.preferences = preferences;
 
         displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(groupNode.getName()));
@@ -235,7 +240,7 @@ public class GroupNodeViewModel {
     }
 
     private JabRefIcon createDefaultIcon() {
-        Color color = groupNode.getGroup().getColor().orElse(IconTheme.getDefaultGroupColor());
+        Color color = groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor());
         return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(color);
     }
 
@@ -328,7 +333,7 @@ public class GroupNodeViewModel {
     }
 
     public Color getColor() {
-        return groupNode.getGroup().getColor().orElse(IconTheme.getDefaultGroupColor());
+        return groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor());
     }
 
     public String getPath() {

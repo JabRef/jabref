@@ -21,6 +21,7 @@ dependencies {
     implementation("info.picocli:picocli")
     annotationProcessor("info.picocli:picocli-codegen")
 
+    implementation("com.github.ben-manes.caffeine:caffeine")
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify")
 
@@ -47,6 +48,8 @@ dependencies {
 
     implementation("io.github.adr:e-adr")
 
+    implementation("io.github.darvil82:terminal-text-formatter")
+
     testImplementation(project(":test-support"))
     testImplementation("org.mockito:mockito-core")
     testImplementation("net.bytebuddy:byte-buddy")
@@ -54,6 +57,7 @@ dependencies {
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.api")
+    requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")
     requires.add("org.mockito")
 }

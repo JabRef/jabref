@@ -4,18 +4,18 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Equivalence;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Delivers possible completions as a list of {@link Author}s.
@@ -25,14 +25,14 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> {
     private final Collection<Field> fields;
     private final BibDatabase database;
 
-    PersonNameSuggestionProvider(Field field, BibDatabase database) {
-        this(List.of(Objects.requireNonNull(field)), database);
+    PersonNameSuggestionProvider(@NonNull Field field, BibDatabase database) {
+        this(List.of(field), database);
     }
 
-    public PersonNameSuggestionProvider(Collection<Field> fields, BibDatabase database) {
+    public PersonNameSuggestionProvider(@NonNull Collection<Field> fields, BibDatabase database) {
         super();
 
-        this.fields = Objects.requireNonNull(fields);
+        this.fields = fields;
         this.database = database;
     }
 

@@ -3,7 +3,6 @@ package org.jabref.gui.frame;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -380,6 +379,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
                         event.consume();
                         break;
+                    case CLOSE_DATABASE:
+                        new CloseDatabaseAction(this, stateManager).execute();
+                        event.consume();
+                        break;
                     default:
                 }
             }
@@ -554,7 +557,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
-        Objects.requireNonNull(databaseContext);
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
                 this,

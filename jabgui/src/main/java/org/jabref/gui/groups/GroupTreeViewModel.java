@@ -48,6 +48,7 @@ import org.jabref.model.metadata.MetaData;
 
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
+import org.jspecify.annotations.NonNull;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -80,21 +81,21 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager,
-                              DialogService dialogService,
-                              AiService aiService,
-                              GuiPreferences preferences,
-                              AdaptVisibleTabs adaptVisibleTabs,
-                              TaskExecutor taskExecutor,
-                              CustomLocalDragboard localDragboard
+    public GroupTreeViewModel(@NonNull StateManager stateManager,
+                              @NonNull DialogService dialogService,
+                              @NonNull AiService aiService,
+                              @NonNull GuiPreferences preferences,
+                              @NonNull AdaptVisibleTabs adaptVisibleTabs,
+                              @NonNull TaskExecutor taskExecutor,
+                              @NonNull CustomLocalDragboard localDragboard
     ) {
-        this.stateManager = Objects.requireNonNull(stateManager);
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.aiService = Objects.requireNonNull(aiService);
-        this.preferences = Objects.requireNonNull(preferences);
+        this.stateManager = stateManager;
+        this.dialogService = dialogService;
+        this.aiService = aiService;
+        this.preferences = preferences;
         this.adaptVisibleTabs = adaptVisibleTabs;
-        this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.localDragboard = Objects.requireNonNull(localDragboard);
+        this.taskExecutor = taskExecutor;
+        this.localDragboard = localDragboard;
 
         // Register listener
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);

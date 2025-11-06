@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -62,6 +61,7 @@ import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
 import io.github.adr.linked.ADR;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -118,8 +118,8 @@ public class BibtexParser implements Parser {
 
     private GroupTreeNode bibDeskGroupTreeNode;
 
-    public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
-        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
+    public BibtexParser(@NonNull ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+        this.importFormatPreferences = importFormatPreferences;
         this.metaDataParser = new MetaDataParser(fileMonitor);
         this.parsedBibDeskGroups = new HashMap<>();
     }
@@ -171,8 +171,7 @@ public class BibtexParser implements Parser {
      * <p>
      * Handling of encoding is done at {@link BibtexImporter}
      */
-    public ParserResult parse(Reader in) throws IOException {
-        Objects.requireNonNull(in);
+    public ParserResult parse(@NonNull Reader in) throws IOException {
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
 
         String newLineSeparator = determineNewLineSeparator();

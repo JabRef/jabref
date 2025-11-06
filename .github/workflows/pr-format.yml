@@ -1,4 +1,4 @@
-name: PR Format
+name: Check PR Format
 
 on:
   pull_request:
@@ -10,7 +10,17 @@ permissions:
 jobs:
   check_title_format:
     name: PR title must not contain "issue <number>"
-    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -34,8 +44,9 @@ jobs:
 
   mandatory-checks-section-exists:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') && !(
-        (github.actor == 'dependabot[bot]') ||
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
@@ -72,7 +83,7 @@ jobs:
     if: >
       (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
-        (github.actor == 'dependabot[bot]') ||
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
@@ -122,3 +133,13 @@ jobs:
           echo "✅ All checkboxes are present and in the correct format."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v5
+        with:
+          name: pr_number
+          path: pr_number.txt
