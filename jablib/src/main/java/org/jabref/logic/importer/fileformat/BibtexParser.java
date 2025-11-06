@@ -76,10 +76,10 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
 ///
 /// **Usage**
 ///
-/// ```java
+/// <code><pre>
 /// BibtexParser parser = new BibtexParser(importFormatPreferences);
 /// ParserResult result = parser.parse();
-/// ```
+/// </pre></code>
 ///
 /// Can be used standalone.
 ///
