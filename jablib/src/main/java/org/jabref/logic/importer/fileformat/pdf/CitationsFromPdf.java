@@ -24,7 +24,7 @@ public class CitationsFromPdf {
         return importer.importDatabase(path);
     }
 
-    /// As NoticationService, one can pass `LOGGER::info`
+    /// As [NotificationService], one can pass `LOGGER::info`
     public static ParserResult extractCitationsUsingLLM(JabRefCliPreferences preferences, NotificationService notificationService, Path path) {
         try (AiService aiService = new AiService(
                 preferences.getAiPreferences(),
