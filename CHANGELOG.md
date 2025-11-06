@@ -15,7 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional.
+- We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional. [#14224](https://github.com/JabRef/jabref/pull/14224)
 
 ### Removed
 
