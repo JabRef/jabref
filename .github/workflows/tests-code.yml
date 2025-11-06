@@ -516,7 +516,7 @@ jobs:
           files_ignore: |
             jablib/src/main/java/**/*-*.java
           base_sha: ${{ github.event.pull_request.base.sha }}
-          rite_output_files: true
+          write_output_files: true
       - run:  |
           for f in .github/outputs/*.txt; do
             echo "=== $f ==="
