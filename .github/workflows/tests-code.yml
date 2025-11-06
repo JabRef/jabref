@@ -516,6 +516,7 @@ jobs:
         with:
           files: |
             .jbang/*.java
+            jabkit/src/main/java/**/*.java
             jablib/src/main/java/**/*.java
             jablib-examples/**/*.java
           files_ignore: |
@@ -559,7 +560,16 @@ jobs:
           # We modify the JBang scripts directly to avoid issues with relative paths
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
             case "$f" in
-              jablib-examples/*) continue ;; # skip scripts
+              jablib-examples/*)
+                # skip scripts
+                continue
+                ;;
+              JabKit/*)
+                # only JabKit needs its modified sources
+                if [ "${{ matrix.script }}" != "JabKitLauncher" ]; then
+                  continue
+                fi
+                ;;
             esac
             echo "//SOURCES ../$f" >> "${{ matrix.script }}"
           done
