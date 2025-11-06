@@ -7,17 +7,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
-import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -423,8 +419,9 @@ public class StudyRepository {
         // Merge new entries into study result file
         merger.merge(existingStudyResultEntries.getDatabase(), newStudyResultEntries);
 
-        LOGGER.info("Removing duplicates...");
+        LOGGER.info("Removing duplicates from study results (initially {} entries)", existingStudyResultEntries.getEntries().size());
         new AutomaticDuplicateRemover(bibEntryTypesManager).removeDuplicates(existingStudyResultEntries);
+        LOGGER.info("Removed {} entries", existingStudyResultEntries.getEntries().size());
 
         writeResultToFile(getPathToStudyResultFile(), existingStudyResultEntries);
     }
@@ -470,5 +467,4 @@ public class StudyRepository {
     private Path getPathToQueryDirectory(String query) {
         return repositoryPath.resolve(trimNameAndAddID(query));
     }
-
 }
