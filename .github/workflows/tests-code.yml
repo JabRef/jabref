@@ -516,6 +516,12 @@ jobs:
           files_ignore: |
             jablib/src/main/java/**/*-*.java
           base_sha: ${{ github.event.pull_request.base.sha }}
+      - run:  |
+          for f in .github/outputs/*.txt; do
+            echo "=== $f ==="
+            cat "$f"
+            echo
+          done
       - run: |
           cat <<EOF
           ${{ steps.changed-jablib-files.outputs.all_changed_files }}
