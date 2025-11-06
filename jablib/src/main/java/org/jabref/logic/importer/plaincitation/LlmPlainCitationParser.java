@@ -42,8 +42,7 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser i
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-        "LLM");
+        return Localization.lang("LLM");
     }
 
     @Override

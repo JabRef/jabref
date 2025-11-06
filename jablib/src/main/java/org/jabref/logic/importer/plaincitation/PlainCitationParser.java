@@ -17,9 +17,9 @@ public interface PlainCitationParser {
     default List<BibEntry> parseMultiplePlainCitations(String text) throws FetcherException {
         try {
             return CitationSplitter.splitCitations(text)
-                    .map(Unchecked.function(this::parsePlainCitation))
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toList());
+                                   .map(Unchecked.function(this::parsePlainCitation))
+                                   .flatMap(Optional::stream)
+                                   .collect(Collectors.toList());
         } catch (UncheckedException e) {
             throw (FetcherException) e.getCause();
         }

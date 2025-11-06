@@ -340,7 +340,7 @@ public class RuleBasedBibliographyPdfImporter extends BibliographyFromPdfImporte
      * @param pattern A pattern matching two groups: The first one to take, the second one to leave at the end of the string
      */
     private static EntryUpdateResult updateEntryAndReferenceIfMatches(String reference, Pattern pattern, BibEntry result, Field
-        field) {
+            field) {
         Matcher matcher;
         matcher = pattern.matcher(reference);
         if (!matcher.find()) {
