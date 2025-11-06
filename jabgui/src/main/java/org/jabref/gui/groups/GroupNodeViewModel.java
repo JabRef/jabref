@@ -36,6 +36,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -461,6 +462,8 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof TexGroup) {
             return false;
+        } else if (group instanceof AutomaticDateGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -476,6 +479,7 @@ public class GroupNodeViewModel {
                  SearchGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -503,6 +507,7 @@ public class GroupNodeViewModel {
                     true;
             case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
                  SmartGroup _ ->
                     false;
             case KeywordGroup _ ->
@@ -528,6 +533,7 @@ public class GroupNodeViewModel {
                  SearchGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -553,6 +559,7 @@ public class GroupNodeViewModel {
                  SearchGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
