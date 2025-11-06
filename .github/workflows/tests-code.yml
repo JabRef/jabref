@@ -56,7 +56,7 @@ jobs:
           distribution: 'corretto'
           check-latest: true
       - name: Run checkstyle reporter
-        uses: dbelyaev/action-checkstyle@master
+        uses: dbelyaev/action-checkstyle@v3
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
