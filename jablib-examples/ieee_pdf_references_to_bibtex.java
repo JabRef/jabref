@@ -22,7 +22,7 @@ void main() throws Exception {
 
     // This is PDF to BibTeX
     // Choose one
-    var result = CitationsFromPdf.extractCitationsUsingTextMatching(preferences, Path.of("pdfs", "test.pdf"));
+    var result = CitationsFromPdf.extractCitationsUsingRuleBasedAlgorithm(preferences, Path.of("pdfs", "test.pdf"));
     // var result = CitationsFromPdf.extractCitationsUsingGrobid(preferences, Path.of("pdfs", "test.pdf"));
     // var result = CitationsFromPdf.extractCitationsUsingLLM(preferences, Logger::info, Path.of("pdfs", "test.pdf"));
 
