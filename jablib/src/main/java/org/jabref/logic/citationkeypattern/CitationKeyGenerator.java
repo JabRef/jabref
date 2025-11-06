@@ -7,8 +7,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
-import org.jabref.logic.util.strings.Transliteration;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.logic.util.strings.Transliteration;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -149,7 +149,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     public String transliterateIfNeeded(String key) {
-        if (!citationKeyPatternPreferences.shouldTransliterateFields()) {
+        if (!citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKey()) {
             return key;
         }
 

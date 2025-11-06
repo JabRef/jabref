@@ -24,6 +24,6 @@ public class Transliteration {
             pattern.append("\\").append(c);
         }
 
-        return "Any-Latin; Latin-ASCII; Title; [" + pattern + "] Remove";
+        return "Any-Latin; Latin-ASCII; [" + pattern + "] Remove";
     }
 }
