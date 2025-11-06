@@ -124,7 +124,7 @@ jobs:
           path: /home/runner/work/_temp/_github_workflow/idea-cache
           key: ${{ runner.os }}-idea-2025.2.4-cache
       - uses: actions/checkout@v5
-      - uses: notdevcody/intellij-format-action@v3.1
+      - uses: koppor/intellij-format-action@intellij-version-as-parameter
         with:
           idea-version: "2025.2.4"
           include-glob: "*.java"
