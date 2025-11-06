@@ -5,6 +5,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.importer.fileformat.pdf.CitationsFromPdf;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+
 import org.tinylog.Logger;
 
 //DESCRIPTION Opens the given PDF file, parses the references and outputs BibTeX
