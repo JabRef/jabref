@@ -462,6 +462,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
       - name: Use cache
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: actions/cache@v4
         with:
           path: ~/.jbang
