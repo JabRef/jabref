@@ -9,6 +9,8 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -56,6 +58,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                 for (WatchEvent<?> event : key.pollEvents()) {
                     WatchEvent.Kind<?> kind = event.kind();
                     System.out.println(kind);
+                    System.out.println(listeners.keys());
 
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
                         Thread.yield();
@@ -65,12 +68,14 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
-                        if (Files.isDirectory(path)) {
-                            System.out.println("Create a directory : " + path + " : " + ev.context());
-                            // notifyAboutDirectoryCreation(path);
-                        } else {
-                            if (FileUtil.isPDFFile(path)) {
-                                // notifyAboutPDFCreation(path);
+                        if (Files.exists(path)) {
+                            if (Files.isDirectory(path)) {
+                                System.out.println("Create a directory : " + path + " : " + ev.context());
+                                notifyAboutDirectoryCreation(path);
+                            } else {
+                                if (FileUtil.isPDFFile(path)) {
+                                    // notifyAboutPDFCreation(path);
+                                }
                             }
                         }
                     } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
@@ -78,10 +83,12 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
-                        if (Files.isDirectory(path)) {
-                            System.out.println("Probably a useless call : " + path + " : " + ev.context());
-                        } else {
-                            notifyAboutFileChange(path);
+                        if (Files.exists(path)) {
+                            if (Files.isDirectory(path)) {
+                                System.out.println("Probably a useless call : " + path + " : " + ev.context());
+                            } else {
+                                notifyAboutFileChange(path);
+                            }
                         }
                     } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
                         // We only handle "ENTRY_DELETE" here, so the context is always a Path
@@ -89,7 +96,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
                         System.out.println("Delete a directory : " + path + " : " + ev.context());
-                        // notifyAboutDirectoryDeletion(path);
+                        notifyAboutDirectoryDeletion(path);
                     }
                     key.reset();
                 }
@@ -128,10 +135,11 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                 deletedGroup.directoryDeleted();
             }
         }
+        cleanupListeners();
     }
 
-    private void notifyAboutPDFCreation(Path pdfPath) {
-        Path parentPath = pdfPath.toAbsolutePath().getParent();
+    private void notifyAboutPDFCreation(Path PDFPath) {
+        Path parentPath = PDFPath.toAbsolutePath().getParent();
         for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
             if (listener instanceof DirectoryGroup pdfGroup) {
                 // TODO : import the PDF
@@ -156,6 +164,18 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     @Override
     public void removeListener(Path path, DirectoryUpdateListener listener) {
         listeners.remove(path, listener);
+    }
+
+    public void cleanupListeners() {
+        List<Path> pathsToRemove = new ArrayList<>();
+        for (Path registeredPath : listeners.keys()) {
+            if (registeredPath != null && !Files.exists(registeredPath) && !pathsToRemove.contains(registeredPath)) {
+                pathsToRemove.add(registeredPath);
+            }
+        }
+        for (Path pathToRemove : pathsToRemove) {
+            listeners.removeAll(pathToRemove);
+        }
     }
 
     @Override
