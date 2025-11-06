@@ -720,7 +720,8 @@ public class GroupTreeView extends BorderPane {
                         case GROUP_SUBGROUP_REMOVE ->
                                 group.isEditable() && group.hasSubgroups() && group.canRemove()
                                         || group.isRoot();
-                        case GROUP_SUBGROUP_SORT ->
+                        case GROUP_SUBGROUP_SORT,
+                             GROUP_SUBGROUP_SORT_REVERSE ->
                                 group.isEditable() && group.hasSubgroups() && group.canAddEntriesIn()
                                         || group.isRoot();
                         case GROUP_ENTRIES_ADD,
