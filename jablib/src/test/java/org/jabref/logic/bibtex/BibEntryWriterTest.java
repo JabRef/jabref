@@ -39,15 +39,17 @@ import static org.mockito.Mockito.mock;
 
 class BibEntryWriterTest {
 
-    private static ImportFormatPreferences importFormatPreferences;
-    private final StringWriter stringWriter = new StringWriter();
-    private BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
+    private StringWriter stringWriter;
+    private ImportFormatPreferences importFormatPreferences;
+    private BibWriter bibWriter;
     private BibEntryWriter bibEntryWriter;
 
     @BeforeEach
     void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), List.of());
+        stringWriter = new StringWriter();
+        bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), new BibEntryTypesManager());
     }
 
