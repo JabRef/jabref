@@ -38,7 +38,7 @@ public class DoiToBibtex implements Callable<Integer> {
         var fetcher = new CrossRef();
         List<BibEntry> entries = new ArrayList<>(dois.length);
 
-        for (DOI doi: dois) {
+        for (DOI doi : dois) {
             Optional<BibEntry> entry;
             try {
                 entry = fetcher.performSearchById(doi.asString());
