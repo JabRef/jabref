@@ -25,7 +25,7 @@ import picocli.CommandLine.Parameters;
 @Command(name = "doi-to-bibtex", description = "Converts a DOI to BibTeX")
 public class DoiToBibtex implements Callable<Integer> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CheckIntegrity.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DoiToBibtex.class);
 
     @CommandLine.ParentCommand
     private ArgumentProcessor argumentProcessor;
