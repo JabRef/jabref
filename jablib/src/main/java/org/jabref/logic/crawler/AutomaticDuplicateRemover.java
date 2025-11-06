@@ -1,6 +1,5 @@
 package org.jabref.logic.crawler;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,28 +21,25 @@ public class AutomaticDuplicateRemover {
         DuplicateCheck duplicateCheck = new DuplicateCheck(bibEntryTypesManager);
         BibDatabase database = databaseContext.getDatabase();
         List<BibEntry> entries = database.getEntries();
-        List<BibEntry> entriesToRemove = new ArrayList<>();
-        Set<BibEntry> handledEntries = new HashSet<>();
+        Set<BibEntry> entriesToRemove = new HashSet<>();
 
         for (int i = 0; i < entries.size(); i++) {
             BibEntry entry1 = entries.get(i);
-            if (handledEntries.contains(entry1)) {
+            if (entriesToRemove.contains(entry1)) {
                 continue;
             }
 
             for (int j = i + 1; j < entries.size(); j++) {
                 BibEntry entry2 = entries.get(j);
-                if (handledEntries.contains(entry2)) {
+                if (entriesToRemove.contains(entry2)) {
                     continue;
                 }
 
                 if (duplicateCheck.isDuplicate(entry1, entry2, databaseContext.getMode())) {
                     entry1.mergeWith(entry2);
                     entriesToRemove.add(entry2);
-                    handledEntries.add(entry2);
                 }
             }
-            handledEntries.add(entry1);
         }
 
         for (BibEntry entry : entriesToRemove) {
