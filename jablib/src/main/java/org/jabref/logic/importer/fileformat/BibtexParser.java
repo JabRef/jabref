@@ -81,7 +81,7 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
 /// ParserResult result = parser.parse();
 /// ```
 ///
-/// Can be used stand-alone.
+/// Can be used standalone.
 ///
 /// **Main using method:**
 /// [`OpenDatabase.loadDatabase`](org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor))

@@ -14,7 +14,7 @@ import org.jabref.logic.util.NotificationService;
 /// We deliberately opt for passing whole [JabRefCliPreferences] to ease calling this helper methods
 public class CitationsFromPdf {
 
-    public static ParserResult extractCitationsUsingTextMatching(JabRefCliPreferences preferences, Path path) {
+    public static ParserResult extractCitationsUsingRuleBasedAlgorithm(JabRefCliPreferences preferences, Path path) {
         RuleBasedBibliographyPdfImporter importer = new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
         return importer.importDatabase(path);
     }
