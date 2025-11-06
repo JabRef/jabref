@@ -1,3 +1,5 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
 plugins {
     id("java-platform")
 }
@@ -6,11 +8,10 @@ javaPlatform {
     allowDependencies()
 }
 
-// JavaFX 25.0.1 is not available for Linux-ARM64
-val isLinux = providers.systemProperty("os.name").map { it.contains("linux", true) }
-val isArm64 = providers.systemProperty("os.arch").map { it.contains("aarch64", true) || it.contains("arm64", true) }
-val javafxProvider = isLinux.zip(isArm64) { linux, arm -> if (linux && arm) "25.0.1" else "25" }
-val javafx = javafxProvider.get()
+// Based on https://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle
+val os = DefaultNativePlatform.getCurrentOperatingSystem()
+val arch = DefaultNativePlatform.getCurrentArchitecture()
+val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
 
 val lucene = "10.3.1"
 val pdfbox = "3.0.5"
