@@ -11,7 +11,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RelatedWorkHarvesterTest {
@@ -26,9 +25,9 @@ public class RelatedWorkHarvesterTest {
     @Test
     void harvestEndToEnd() {
         String text = """
-            1.4 Related work
-            Population estimates vary across sources (CIA, 2021). See also (Nash 2022).
-            """;
+                1.4 Related work
+                Population estimates vary across sources (CIA, 2021). See also (Nash 2022).
+                """;
 
         List<BibEntry> lib = new ArrayList<>();
         lib.add(entry("Agency2021", "Central Intelligence Agency", "2021"));
@@ -54,11 +53,11 @@ public class RelatedWorkHarvesterTest {
 
         Field commentField = FieldFactory.parseField("comment-koppor");
         boolean agencyAnnotated = lib.stream().anyMatch(b ->
-                b.getCitationKey().orElse("").equals("Agency2021")
+                "Agency2021".equals(b.getCitationKey().orElse(""))
                         && b.getField(commentField).orElse("").contains("[LunaOstos_2024]:")
         );
         boolean nashAnnotated = lib.stream().anyMatch(b ->
-                b.getCitationKey().orElse("").equals("Nash2022")
+                "Nash2022".equals(b.getCitationKey().orElse(""))
                         && b.getField(commentField).orElse("").contains("[LunaOstos_2024]:")
         );
 

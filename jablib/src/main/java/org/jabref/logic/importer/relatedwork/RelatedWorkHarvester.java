@@ -16,7 +16,9 @@ public class RelatedWorkHarvester {
         this.extractor = extractor;
     }
 
-    /** Existing API */
+    /**
+     * Existing API
+     */
     public void harvestAndAnnotate(
             String username,
             String citingPaperKey,
@@ -27,7 +29,9 @@ public class RelatedWorkHarvester {
         annotateInternal(username, citingPaperKey, fullText, bibliography, addOrUpdateFn);
     }
 
-    /** Test-friendly: returns number of entries annotated. */
+    /**
+     * Test-friendly: returns number of entries annotated.
+     */
     public int harvestAndAnnotateCount(
             String username,
             String citingPaperKey,

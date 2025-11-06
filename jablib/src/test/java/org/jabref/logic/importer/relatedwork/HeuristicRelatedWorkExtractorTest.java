@@ -8,7 +8,8 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HeuristicRelatedWorkExtractorTest {
 
@@ -23,9 +24,9 @@ public class HeuristicRelatedWorkExtractorTest {
     @Test
     void singleCitationExtracts() {
         String text = """
-            1.4 Related work
-            Prior literature reports similar findings (Vesce et al., 2016). Additional details follow.
-            """;
+                1.4 Related work
+                Prior literature reports similar findings (Vesce et al., 2016). Additional details follow.
+                """;
 
         BibEntry vesce = entry("Vesce2016Key", "Vesce, A.", "2016");
         HeuristicRelatedWorkExtractor ex = new HeuristicRelatedWorkExtractor();
@@ -39,9 +40,9 @@ public class HeuristicRelatedWorkExtractorTest {
     @Test
     void multiCitationBlockExtractsAll() {
         String text = """
-            RELATED WORK
-            Approaches vary by context (Bianchi, 2021; López & Perez 2020; Doe et al. 2019a), yet converge later.
-            """;
+                RELATED WORK
+                Approaches vary by context (Bianchi, 2021; López & Perez 2020; Doe et al. 2019a), yet converge later.
+                """;
 
         BibEntry bianchi = entry("Bianchi2021", "Bianchi, M.", "2021");
         BibEntry lopez = entry("Lopez2020", "López and Perez", "2020");
@@ -59,9 +60,9 @@ public class HeuristicRelatedWorkExtractorTest {
     @Test
     void diacriticsAreNormalized() {
         String text = """
-            Related work
-            See also prior synthesis (Šimić, 2022).
-            """;
+                Related work
+                See also prior synthesis (Šimić, 2022).
+                """;
 
         BibEntry simic = entry("Simic2022", "Šimić, Ana", "2022");
         HeuristicRelatedWorkExtractor ex = new HeuristicRelatedWorkExtractor();

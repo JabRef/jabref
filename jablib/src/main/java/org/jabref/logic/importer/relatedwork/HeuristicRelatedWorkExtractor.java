@@ -73,7 +73,9 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return out;
     }
 
-    /** Try to isolate the "Related work" section; fallback to full text. */
+    /**
+     * Try to isolate the "Related work" section; fallback to full text.
+     */
     private String sliceRelatedWorkSection(String text) {
         Matcher start = RELATED_WORK_HEADING.matcher(text);
         int begin = -1;
@@ -101,8 +103,8 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
 
     /**
      * Build index keyed by:
-     *  - normalized first-author surname + year, e.g., "nash2022"
-     *  - AND (when applicable) a corporate/phrase acronym + year, e.g., "cia2021"
+     * - normalized first-author surname + year, e.g., "nash2022"
+     * - AND (when applicable) a corporate/phrase acronym + year, e.g., "cia2021"
      */
     private Map<String, BibEntry> buildIndex(List<BibEntry> bibs) {
         Map<String, BibEntry> idx = new HashMap<>();
@@ -141,12 +143,16 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return idx;
     }
 
-    /** Get the raw first author string (before surname extraction). */
+    /**
+     * Get the raw first author string (before surname extraction).
+     */
     private String firstAuthorRaw(String authorField) {
         return authorField.split("\\s+and\\s+")[0].trim();
     }
 
-    /** Extract the first author surname from a raw first-author token. */
+    /**
+     * Extract the first author surname from a raw first-author token.
+     */
     private String extractFirstSurnameFromRaw(String firstAuthor) {
         if (firstAuthor.contains(",")) {
             return firstAuthor.substring(0, firstAuthor.indexOf(',')).trim();
@@ -178,7 +184,9 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         }
         StringBuilder sb = new StringBuilder();
         for (String p : parts) {
-            if (p.isEmpty()) continue;
+            if (p.isEmpty()) {
+                continue;
+            }
             char c = p.charAt(0);
             if (Character.isLetter(c)) {
                 sb.append(Character.toLowerCase(c));
@@ -187,7 +195,9 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return sb.toString();
     }
 
-    /** Normalize token: remove braces, strip diacritics, lowercase. */
+    /**
+     * Normalize token: remove braces, strip diacritics, lowercase.
+     */
     private String normalizeSurname(String s) {
         String noBraces = s.replace("{", "").replace("}", "");
         String normalized = Normalizer.normalize(noBraces, Normalizer.Form.NFD)
@@ -195,13 +205,17 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return normalized.toLowerCase(Locale.ROOT);
     }
 
-    /** Lookup by normalized token (surname or acronym) + 4-digit year. */
+    /**
+     * Lookup by normalized token (surname or acronym) + 4-digit year.
+     */
     private String findKeyFor(String lowerToken, String yearDigits, Map<String, BibEntry> index) {
         BibEntry entry = index.get(lowerToken + yearDigits);
         return (entry != null) ? entry.getCitationKey().orElse(null) : null; // ok to return null to signal "not found"
     }
 
-    /** Expand to a sentence-like span around the parenthetical match. */
+    /**
+     * Expand to a sentence-like span around the parenthetical match.
+     */
     private String expandToSentenceLikeSpan(String text, int matchStart, int matchEnd) {
         int left = matchStart;
         while (left > 0) {
