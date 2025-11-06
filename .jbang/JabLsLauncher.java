@@ -50,6 +50,7 @@
 //DEPS org.slf4j:slf4j-api:2.0.17
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabLsLauncher {
