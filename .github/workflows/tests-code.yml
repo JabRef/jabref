@@ -535,7 +535,7 @@ jobs:
             jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
-      - name: Build ${{ matrix.script }} including changed classes
+      - name: Modify ${{ matrix.script }} to include changed classes
         shell: bash
         # We always run, because changes in jabls, jabsrv also could cause JBang to fail
         run: |
@@ -543,7 +543,6 @@ jobs:
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
             echo "//SOURCES ../$f" >> "${{ matrix.script }}"
           done
-          jbang build --fresh "${{ matrix.script }}"
       - run: jbang "${{ matrix.script }}" --help
         shell: bash
 
