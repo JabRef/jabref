@@ -520,6 +520,18 @@ jobs:
             jablib-examples/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
+          base_sha: ${{ github.event.pull_request.base.sha }}
+          write_output_files: true
+      - run:  |
+          for f in .github/outputs/*.txt; do
+            echo "=== $f ==="
+            cat "$f"
+            echo
+          done
+      - run: |
+          cat <<EOF
+          ${{ steps.changed-jablib-files.outputs.all_changed_files }}
+          EOF
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
