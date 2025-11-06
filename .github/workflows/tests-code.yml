@@ -541,6 +541,9 @@ jobs:
         run: |
           # We modify the JBang scripts directly to avoid issues with relative paths
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
+            case "$f" in
+              jablib-examples/*) continue ;; # skip scripts
+            esac
             echo "//SOURCES ../$f" >> "${{ matrix.script }}"
           done
       - run: jbang "${{ matrix.script }}" --help
