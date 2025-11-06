@@ -49,20 +49,20 @@ public class AutomaticDateGroup extends AutomaticGroup {
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
         var out = new LinkedHashSet<GroupTreeNode>();
 
-        DateGroup.extractDate(field, entry).ifPresent(d -> {
+        DateGroup.extractDate(field, entry).ifPresent(dates -> {
             switch (granularity) {
                 case YEAR -> {
-                    DateGroup.extractYear(field, entry).ifPresent(y -> {
-                        String key = "%04d".formatted(y);
+                    dates.getYear().ifPresent(year -> {
+                        String key = "%04d".formatted(year);
                         out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
                     });
                 }
                 case MONTH ->
-                        DateGroup.getDateKey(d, "YYYY-MM").ifPresent(key -> {
+                        DateGroup.getDateKey(dates, "YYYY-MM").ifPresent(key -> {
                             out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
                         });
                 case FULL_DATE ->
-                        DateGroup.getDateKey(d, "YYYY-MM-DD").ifPresent(key -> {
+                        DateGroup.getDateKey(dates, "YYYY-MM-DD").ifPresent(key -> {
                             out.add(new GroupTreeNode(new DateGroup(key, GroupHierarchyType.INDEPENDENT, field, key)));
                         });
             }
