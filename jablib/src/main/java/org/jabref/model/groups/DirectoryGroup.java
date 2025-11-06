@@ -11,7 +11,6 @@ import java.util.Optional;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.TreeNode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.MetaData;
@@ -103,16 +102,11 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     public Optional<GroupTreeNode> getNode() {
         Optional<GroupTreeNode> groupNode = Optional.empty();
-        List<GroupTreeNode> groupNodesToParse = new ArrayList<>();
-        Optional<GroupTreeNode> rootNode = metaData.getGroups().filter(TreeNode::isRoot);
-        rootNode.ifPresent(groupNodesToParse::add);
-        while (groupNode.isEmpty() && !groupNodesToParse.isEmpty()) {
-            GroupTreeNode groupNodeToParse = groupNodesToParse.getFirst();
-            if (groupNodeToParse.getGroup().equals(this)) {
-                groupNode = Optional.of(groupNodeToParse);
-            } else {
-                groupNodesToParse.remove(groupNodeToParse);
-                groupNodesToParse.addAll(groupNodeToParse.getChildren());
+        Optional<GroupTreeNode> rootNode = metaData.getGroups();
+        if (rootNode.isPresent()) {
+            List<GroupTreeNode> groupNodeCandidates = rootNode.get().findChildrenSatisfying(groupTreeNode -> groupTreeNode.getGroup().equals(this));
+            if (groupNodeCandidates.size() == 1) {
+                groupNode = Optional.of(groupNodeCandidates.getFirst());
             }
         }
         return groupNode;
