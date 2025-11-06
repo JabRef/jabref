@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.plaincitation;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +66,7 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser i
                 )
         ).aiMessage().text();
 
-        StringReader reader = new StringReader(llmResult);
+        Reader reader = Reader.of(llmResult);
         BibtexParser parser = new BibtexParser(importFormatPreferences);
         ParserResult result;
         try {
