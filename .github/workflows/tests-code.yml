@@ -515,6 +515,7 @@ jobs:
             jablib-examples/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
+          base_sha: ${{ github.event.pull_request.base.sha }
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
