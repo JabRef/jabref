@@ -32,6 +32,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -72,7 +73,8 @@ public class JabKit {
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
-            CommandLine commandLine = new CommandLine(argumentProcessor);
+            CommandLine commandLine = new CommandLine(argumentProcessor)
+                    .registerConverter(DOI.class, DOI::new);
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,
