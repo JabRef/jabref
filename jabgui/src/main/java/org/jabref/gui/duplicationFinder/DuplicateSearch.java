@@ -58,7 +58,7 @@ public class DuplicateSearch extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     // For "apply to all entries" functionality.
-    private DuplicateResolverResult rememberedDecision = null;
+    private DuplicateResolverResult rememberedDecision;
 
     public DuplicateSearch(Supplier<LibraryTab> tabSupplier,
                            DialogService dialogService,
