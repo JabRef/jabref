@@ -10,7 +10,7 @@ javaPlatform {
 val isLinux = providers.systemProperty("os.name").map { it.contains("linux", true) }
 val isArm64 = providers.systemProperty("os.arch").map { it.contains("aarch64", true) || it.contains("arm64", true) }
 val javafxProvider = isLinux.zip(isArm64) { linux, arm -> if (linux && arm) "25.0.1" else "25" }
-val javafx = javafxProvider.get() // if you need the String at config time
+val javafx = javafxProvider.get()
 
 val lucene = "10.3.1"
 val pdfbox = "3.0.5"
