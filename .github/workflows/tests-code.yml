@@ -555,6 +555,7 @@ jobs:
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
             echo "//SOURCES ../$f" >> "${{ matrix.script }}.java"
           done
+          cat "${{ matrix.script }}"
           jbang build --fresh "${{ matrix.script }}"
       - run: jbang "${{ matrix.script }}" --help
         shell: bash
