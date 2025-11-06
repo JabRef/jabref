@@ -193,6 +193,10 @@ public class FieldFactory {
         return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.PERSON_NAMES));
     }
 
+    public static Set<Field> getDateFields() {
+        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.DATE));
+    }
+
     private static Set<Field> getFieldsFiltered(Predicate<Field> selector) {
         return getAllFields().stream()
                              .filter(selector)
