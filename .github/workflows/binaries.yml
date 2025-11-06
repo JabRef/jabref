@@ -375,12 +375,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: echo PR data
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          echo "PR Number: ${{ github.event.pull_request.number }}"
-          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+          echo "PR Number: $PR_NUMBER"
+          echo "PR URL: $PR_URL"
           cat <<EOF
           PR Body:
-          ${{ github.event.pull_request.body }}
+          $PR_BODY
           EOF
       - name: Determine issue number
         id: get_issue_number
@@ -421,10 +425,6 @@ jobs:
         include:
           - os: macos-15
             displayName: macOS (ARM64)
-            suffix: '_arm64'
-          - os: macos-15-intel  # intel image
-            displayName: macOS
-            suffix: ''
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
