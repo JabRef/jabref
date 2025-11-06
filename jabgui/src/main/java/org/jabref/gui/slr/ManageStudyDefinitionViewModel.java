@@ -135,41 +135,41 @@ public class ManageStudyDefinitionViewModel {
 
     private void initializeValidationBindings() {
         titleValidationMessage.bind(Bindings.when(title.isEmpty())
-                .then(Localization.lang("Study title is required"))
-                .otherwise(""));
+                                            .then(Localization.lang("Study title is required"))
+                                            .otherwise(""));
 
         authorsValidationMessage.bind(Bindings.when(Bindings.isEmpty(authors))
-                .then(Localization.lang("At least one author is required"))
-                .otherwise(""));
+                                              .then(Localization.lang("At least one author is required"))
+                                              .otherwise(""));
 
         questionsValidationMessage.bind(Bindings.when(Bindings.isEmpty(researchQuestions))
-                .then(Localization.lang("At least one research question is required"))
-                .otherwise(""));
+                                                .then(Localization.lang("At least one research question is required"))
+                                                .otherwise(""));
 
         queriesValidationMessage.bind(Bindings.when(Bindings.isEmpty(queries))
-                .then(Localization.lang("At least one query is required"))
-                .otherwise(""));
+                                              .then(Localization.lang("At least one query is required"))
+                                              .otherwise(""));
 
         catalogsValidationMessage.bind(Bindings.when(
-                Bindings.createBooleanBinding(() ->
-                    databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases))
-                .then(Localization.lang("At least one catalog must be selected"))
-                .otherwise(""));
+                                                       Bindings.createBooleanBinding(() ->
+                                                               databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases))
+                                               .then(Localization.lang("At least one catalog must be selected"))
+                                               .otherwise(""));
 
         validationHeaderMessage.bind(Bindings.when(
-                Bindings.or(
-                    Bindings.or(
-                        Bindings.or(
-                            Bindings.or(title.isEmpty(), Bindings.isEmpty(authors)),
-                            Bindings.isEmpty(researchQuestions)
-                        ),
-                        Bindings.isEmpty(queries)
-                    ),
-                    Bindings.createBooleanBinding(() ->
-                        databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases)
-                ))
-                .then(Localization.lang("In order to proceed:"))
-                .otherwise(""));
+                                                     Bindings.or(
+                                                             Bindings.or(
+                                                                     Bindings.or(
+                                                                             Bindings.or(title.isEmpty(), Bindings.isEmpty(authors)),
+                                                                             Bindings.isEmpty(researchQuestions)
+                                                                     ),
+                                                                     Bindings.isEmpty(queries)
+                                                             ),
+                                                             Bindings.createBooleanBinding(() ->
+                                                                     databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases)
+                                                     ))
+                                             .then(Localization.lang("In order to proceed:"))
+                                             .otherwise(""));
     }
 
     public StringProperty getTitle() {
