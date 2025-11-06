@@ -118,20 +118,11 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - name: Cache IDEA
-        uses: actions/cache@v3
-        with:
-          path: /home/runner/work/_temp/_github_workflow/idea-cache
-          key: ${{ runner.os }}-idea-2025.2.4-cache
       - uses: actions/checkout@v5
-      - uses: koppor/intellij-format-action@intellij-version-as-parameter
+      - uses: leventeBajczi/intellij-idea-format@master
         with:
-          idea-version: "2025.2.4"
-          include-glob: "*.java"
-          push-type: none
-          style-settings-file: ".idea/codeStyles/Project.xml"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          file-mask: "*.java"
+          settings-file: ".idea/codeStyles/Project.xml"
       # job should fail in case there are changes
       - name: Check if any files changed
         run: git diff --exit-code
