@@ -552,7 +552,7 @@ jobs:
                 # skip scripts
                 continue
                 ;;
-              JabKit/*)
+              jabkit/*)
                 # only JabKit needs its modified sources
                 if [ "${{ matrix.script }}" != "JabKitLauncher" ]; then
                   continue
