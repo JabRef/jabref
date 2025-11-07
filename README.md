@@ -155,5 +155,3 @@ please see the [LICENSE](LICENSE) file included in this repository.
 JabRef is built and maintained by a dedicated community of contributors.
 We truly appreciate the time, effort, and ideas shared by our developers,
 translators, testers, and users from around the world.
-
-We welcome contributions in **code**, **documentation**, **testing**, and **translations**.
