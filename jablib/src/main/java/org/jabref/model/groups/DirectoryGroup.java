@@ -3,14 +3,10 @@ package org.jabref.model.groups;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.MetaData;
@@ -68,15 +64,12 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         File parentFolder = absoluteDirectoryPath.toFile();
         Optional<GroupTreeNode> parentNode = getNode();
         File[] folders = parentFolder.listFiles(File::isDirectory);
-        for (File folder : folders) {
-            DirectoryGroup newSubgroup = this.createDescendantGroup(folder);
-            parentNode.ifPresent(group -> group.addSubgroup(newSubgroup));
-            newSubgroup.addDescendants();
-        }
-        File[] pdfs = parentFolder.listFiles(file -> FileUtil.isPDFFile(file.toPath()));
-        for (File pdf : pdfs) {
-            ParserResult pdfImporterResult = new PdfContentImporter().importDatabase(pdf.toPath());
-            List<BibEntry> entriesToAdd = pdfImporterResult.getDatabase().getEntries();
+        if (folders != null) {
+            for (File folder : folders) {
+                DirectoryGroup newSubgroup = this.createDescendantGroup(folder);
+                parentNode.ifPresent(group -> group.addSubgroup(newSubgroup));
+                newSubgroup.addDescendants();
+            }
         }
     }
 
@@ -90,14 +83,6 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         this.getColor().ifPresent(descendantGroup::setColor);
         this.getIconName().ifPresent(descendantGroup::setIconName);
         return descendantGroup;
-    }
-
-    public List<BibEntry> createPDFEntries(File[] pdfs) throws IOException {
-        List<BibEntry> PDFEntries = new ArrayList<>();
-        for (File pdf : pdfs) {
-            // TODO : find a way to truly import the pdf with an ImportHandler
-        }
-        return PDFEntries;
     }
 
     public Optional<GroupTreeNode> getNode() {
@@ -195,6 +180,6 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     @Override
     public void fileUpdated() {
-        System.out.println("File updated in " + absoluteDirectoryPath.toString());
+        //
     }
 }
