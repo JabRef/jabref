@@ -3,6 +3,7 @@ package org.jabref.gui.ai.components.aichat;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.beans.Observable;
@@ -193,17 +194,15 @@ public class AiChatComponent extends VBox {
         });
 
         chatPrompt.setRegenerateCallback(() -> {
-            String lastUserPrompt = "";
+            Optional<UserMessage> lastUserPrompt = Optional.empty();
             if (!aiChatLogic.getChatHistory().isEmpty()) {
-                lastUserPrompt = getLastUserMessage().singleText();
+                lastUserPrompt = getLastUserMessage();
                 deleteLastMessage();
                 deleteLastMessage();
             }
 
             chatPrompt.switchToNormalState();
-            if (!lastUserPrompt.isEmpty()) {
-                onSendMessage(lastUserPrompt);
-            }
+            lastUserPrompt.ifPresent(userMessage -> onSendMessage(userMessage.singleText()));
         });
 
         chatPrompt.requestPromptFocus();
@@ -350,18 +349,18 @@ public class AiChatComponent extends VBox {
         }
     }
 
-    private UserMessage getLastUserMessage() {
+    private Optional<UserMessage> getLastUserMessage() {
         if (!aiChatLogic.getChatHistory().isEmpty() && aiChatLogic.getChatHistory().size() >= 2) {
             int userMessageIndex = aiChatLogic.getChatHistory().size() - 2;
             ChatMessage chat = aiChatLogic.getChatHistory().get(userMessageIndex);
 
             if (chat.type() == ChatMessageType.USER) {
-                return (UserMessage) chat;
+                return Optional.of((UserMessage) chat);
             } else {
-                return new UserMessage("");
+                return Optional.empty();
             }
         } else {
-            return new UserMessage("");
+            return Optional.empty();
         }
     }
 }
