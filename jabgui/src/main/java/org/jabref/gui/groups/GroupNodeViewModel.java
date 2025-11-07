@@ -539,6 +539,7 @@ public class GroupNodeViewModel {
             case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  ExplicitGroup _,
+                 DirectoryGroup _,
                  SearchGroup _,
                  TexGroup _ ->
                     true;
