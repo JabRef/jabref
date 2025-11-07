@@ -112,6 +112,10 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         return groupNode;
     }
 
+    public Boolean isDeleted() {
+        return getNode().isEmpty();
+    }
+
     @Override
     public boolean contains(BibEntry entry) {
         List<LinkedFile> entryFiles = entry.getFiles();

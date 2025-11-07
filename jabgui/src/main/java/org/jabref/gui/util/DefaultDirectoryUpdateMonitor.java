@@ -9,8 +9,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -58,6 +57,8 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                 for (WatchEvent<?> event : key.pollEvents()) {
                     WatchEvent.Kind<?> kind = event.kind();
                     System.out.println(kind);
+                    System.out.println(listeners.keys());
+                    cleanupListeners();
                     System.out.println(listeners.keys());
 
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
@@ -135,7 +136,6 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                 deletedGroup.directoryDeleted();
             }
         }
-        cleanupListeners();
     }
 
     private void notifyAboutPDFCreation(Path PDFPath) {
@@ -167,14 +167,16 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     }
 
     public void cleanupListeners() {
-        List<Path> pathsToRemove = new ArrayList<>();
-        for (Path registeredPath : listeners.keys()) {
-            if (registeredPath != null && !Files.exists(registeredPath) && !pathsToRemove.contains(registeredPath)) {
-                pathsToRemove.add(registeredPath);
+        Multimap<Path, DirectoryUpdateListener> watchersToRemove = ArrayListMultimap.create();
+        for (Map.Entry<Path, DirectoryUpdateListener> entry : listeners.entries()) {
+            Path registeredPath = entry.getKey();
+            DirectoryUpdateListener registeredListener = entry.getValue();
+            if (!Files.exists(registeredPath) || (registeredListener instanceof DirectoryGroup directoryGroup && directoryGroup.isDeleted())) {
+                watchersToRemove.put(registeredPath, registeredListener);
             }
         }
-        for (Path pathToRemove : pathsToRemove) {
-            listeners.removeAll(pathToRemove);
+        for (Map.Entry<Path, DirectoryUpdateListener> entry : watchersToRemove.entries()) {
+            listeners.remove(entry.getKey(), entry.getValue());
         }
     }
 
