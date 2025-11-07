@@ -36,9 +36,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DateGroup;
 import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
@@ -448,12 +450,14 @@ public class GroupNodeViewModel {
                              .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
                              .orElse(false);
             case AllEntriesGroup _,
-                 SmartGroup _,
-                 SearchGroup _,
+                 AutomaticDateGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
-                 TexGroup _,
-                 DirectoryGroup _ ->
+                 DateGroup _,
+                 DirectoryGroup _,
+                 SearchGroup _,
+                 SmartGroup _,
+                 TexGroup _ ->
                     false;
             case ExplicitGroup _,
                  KeywordGroup _ ->
@@ -471,10 +475,11 @@ public class GroupNodeViewModel {
             case AllEntriesGroup _,
                  SmartGroup _ ->
                     false;
-            case ExplicitGroup _,
-                 SearchGroup _,
-                 AutomaticKeywordGroup _,
+            case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
+                 ExplicitGroup _,
+                 SearchGroup _,
                  TexGroup _ ->
                     true;
             case DirectoryGroup _ ->
@@ -505,10 +510,12 @@ public class GroupNodeViewModel {
                  SearchGroup _,
                  TexGroup _ ->
                     true;
-            case AutomaticKeywordGroup _,
+            case AutomaticDateGroup _,
+                 AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
-                 SmartGroup _,
-                 DirectoryGroup _ ->
+                 DateGroup _,
+                 DirectoryGroup _,
+                 SmartGroup _ ->
                     false;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -529,12 +536,11 @@ public class GroupNodeViewModel {
             case AllEntriesGroup _,
                  SmartGroup _ ->
                     false;
-            case ExplicitGroup _,
-                 SearchGroup _,
-                 AutomaticKeywordGroup _,
+            case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
-                 TexGroup _,
-                 DirectoryGroup _ ->
+                 ExplicitGroup _,
+                 SearchGroup _,
+                 TexGroup _ ->
                     true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -553,14 +559,16 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
             case AllEntriesGroup _,
+                 DateGroup _,
                  SmartGroup _ ->
                     false;
-            case ExplicitGroup _,
-                 SearchGroup _,
+            case AutomaticDateGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
-                 TexGroup _,
-                 DirectoryGroup _ ->
+                 DirectoryGroup _,
+                 ExplicitGroup _,
+                 SearchGroup _,
+                 TexGroup _ ->
                     true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup

@@ -50,7 +50,7 @@ jobs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
       secretspresent: ${{ steps.binary.outputs.secretspresent }}
       tagbuild: ${{ steps.binary.outputs.tagbuild }}
-      # requried to avoid obsolete builds in case of labels != "dev: binaries"
+      # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
 

@@ -40,11 +40,15 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -103,6 +107,12 @@ public class GroupDialogViewModel {
 
     private final StringProperty texGroupFilePathProperty = new SimpleStringProperty("");
     private final StringProperty directoryGroupFilePathProperty = new SimpleStringProperty("");
+
+    // Date Group Properties
+    private final BooleanProperty dateRadioButtonSelectedProperty = new SimpleBooleanProperty();
+    private final ObjectProperty<Field> dateGroupFieldProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<DateGranularity> dateGroupOptionProperty = new SimpleObjectProperty<>();
+    private final BooleanProperty dateGroupIncludeEmptyProperty = new SimpleBooleanProperty();
 
     private Validator nameValidator;
     private Validator nameContainsDelimiterValidator;
@@ -438,6 +448,13 @@ public class GroupDialogViewModel {
                         currentDatabase.getMetaData(),
                         preferences.getFilePreferences().getUserAndHost()
                 );
+            } else if (Boolean.TRUE.equals(dateRadioButtonSelectedProperty.getValue())) {
+                resultingGroup = new AutomaticDateGroup(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        dateGroupFieldProperty.getValue(),
+                        dateGroupOptionProperty.getValue()
+                );
             }
 
             if (resultingGroup != null) {
@@ -475,6 +492,11 @@ public class GroupDialogViewModel {
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferences.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
+
+            // Initialize Date Group defaults
+            dateGroupFieldProperty.setValue(StandardField.DATE);
+            dateGroupOptionProperty.setValue(DateGranularity.YEAR);
+            dateGroupIncludeEmptyProperty.setValue(false);
         } else {
             nameProperty.setValue(editedGroup.getName());
             colorUseProperty.setValue(editedGroup.getColor().isPresent());
@@ -520,6 +542,12 @@ public class GroupDialogViewModel {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
                     autoGroupPersonsOptionProperty.setValue(Boolean.TRUE);
                     autoGroupPersonsFieldProperty.setValue(group.getField().getName());
+                } else if (editedGroup.getClass() == AutomaticDateGroup.class) {
+                    AutomaticDateGroup group = (AutomaticDateGroup) editedGroup;
+                    dateRadioButtonSelectedProperty.setValue(Boolean.TRUE);
+                    dateGroupFieldProperty.setValue(group.getField());
+                    dateGroupOptionProperty.setValue(group.getGranularity());
+                    dateGroupIncludeEmptyProperty.setValue(false);
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
                 typeTexProperty.setValue(true);
@@ -737,6 +765,23 @@ public class GroupDialogViewModel {
 
     public StringProperty directoryGroupFilePathProperty() {
         return directoryGroupFilePathProperty;
+    }
+
+    // Date Group Property Getters
+    public BooleanProperty dateRadioButtonSelectedProperty() {
+        return dateRadioButtonSelectedProperty;
+    }
+
+    public ObjectProperty<Field> dateGroupFieldProperty() {
+        return dateGroupFieldProperty;
+    }
+
+    public ObjectProperty<DateGranularity> dateGroupOptionProperty() {
+        return dateGroupOptionProperty;
+    }
+
+    public BooleanProperty dateGroupIncludeEmptyProperty() {
+        return dateGroupIncludeEmptyProperty;
     }
 
     private boolean groupOrSubgroupIsSearchGroup(GroupTreeNode groupTreeNode) {

@@ -99,6 +99,12 @@
                             <Tooltip text="%Group containing entries cited in a given TeX file"/>
                         </tooltip>
                     </RadioButton>
+                    <RadioButton fx:id="dateRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Date">
+                        <tooltip>
+                            <Tooltip text="%Automatically create groups by date"/>
+                        </tooltip>
+                    </RadioButton>
                     <RadioButton fx:id="directoryRadioButton" toggleGroup="$type" wrapText="true"
                                  text="%Directory structure">
                         <tooltip>
@@ -182,7 +188,7 @@
                             <TextField fx:id="autoGroupPersonsField" disable="${!autoGroupPersonsOption.selected}"/>
                         </VBox>
                     </VBox>
-                    <VBox visible="${texRadioButton.selected}" spacing="10.0">
+                    <VBox visible="${texRadioButton.selected}">
                         <Label text="%Aux file"/>
                         <HBox spacing="10.0">
                             <TextField fx:id="texGroupFilePath" HBox.hgrow="ALWAYS" prefHeight="30.0"/>
@@ -202,6 +208,18 @@
                                 </tooltip>
                             </Button>
                         </HBox>
+                    </VBox>
+                    <VBox visible="${dateRadioButton.selected}" spacing="10.0">
+                        <VBox>
+                            <Label text="%Field to extract date from"/>
+                            <ComboBox fx:id="dateGroupFieldCombo"/>
+                        </VBox>
+                        <VBox>
+                            <Label text="%Date grouping option"/>
+                            <ComboBox fx:id="dateGroupOptionCombo"/>
+                        </VBox>
+                        <CheckBox fx:id="dateGroupIncludeEmpty"
+                                  text="%Include entries without date"/>
                     </VBox>
                 </StackPane>
             </HBox>
