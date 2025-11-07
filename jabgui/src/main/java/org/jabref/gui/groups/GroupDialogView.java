@@ -293,7 +293,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         viewModel.browseForDirectory();
         String path = viewModel.pathProperty().getValue();
         rootPathField.setText(path);
-        if (nameField.getText() == "") {
+        if ("".equals(nameField.getText())) {
             nameField.setText(path.substring(path.lastIndexOf("\\") + 1));
         }
     }
