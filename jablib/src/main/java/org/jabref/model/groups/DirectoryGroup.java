@@ -27,31 +27,31 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryGroup.class);
 
     private final Path absoluteDirectoryPath;
-    private final DirectoryUpdateMonitor directoryMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final MetaData metaData;
     private final String user;
 
     DirectoryGroup(String name,
                    GroupHierarchyType context,
                    @NonNull Path absoluteDirectoryPath,
-                   DirectoryUpdateMonitor directoryMonitor,
+                   DirectoryUpdateMonitor directoryUpdateMonitor,
                    MetaData metaData,
                    String user) {
         super(name, context);
         this.metaData = metaData;
         this.user = user;
         this.absoluteDirectoryPath = absoluteDirectoryPath;
-        this.directoryMonitor = directoryMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
     }
 
     public static DirectoryGroup create(String name,
                                         GroupHierarchyType context,
                                         Path absoluteDirectoryPath,
-                                        DirectoryUpdateMonitor directoryMonitor,
+                                        DirectoryUpdateMonitor directoryUpdateMonitor,
                                         MetaData metaData,
                                         String userAndHost) throws IOException {
-        DirectoryGroup group = new DirectoryGroup(name, context, absoluteDirectoryPath, directoryMonitor, metaData, userAndHost);
-        directoryMonitor.addListenerForDirectory(absoluteDirectoryPath, group);
+        DirectoryGroup group = new DirectoryGroup(name, context, absoluteDirectoryPath, directoryUpdateMonitor, metaData, userAndHost);
+        directoryUpdateMonitor.addListenerForDirectory(absoluteDirectoryPath, group);
         return group;
     }
 
@@ -84,7 +84,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         DirectoryGroup descendantGroup = DirectoryGroup.create(descendantDirectory.getName(),
                 this.context,
                 descendantDirectory.toPath(),
-                this.directoryMonitor,
+                this.directoryUpdateMonitor,
                 this.metaData,
                 this.user);
         this.getColor().ifPresent(descendantGroup::setColor);
@@ -131,7 +131,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     @Override
     public AbstractGroup deepCopy() {
-        return new DirectoryGroup(name.getValue(), context, absoluteDirectoryPath, directoryMonitor, metaData, user);
+        return new DirectoryGroup(name.getValue(), context, absoluteDirectoryPath, directoryUpdateMonitor, metaData, user);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
     public String toString() {
         return "DirectoryGroup{" +
                 "directoryPath=" + absoluteDirectoryPath +
-                ", fileMonitor=" + directoryMonitor +
+                ", fileMonitor=" + directoryUpdateMonitor +
                 "} " + super.toString();
     }
 
