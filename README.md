@@ -130,11 +130,11 @@ This section contains an analysis of ProductMap files. Each file has a link to i
 
 For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
 
-## 🪪 License
+## License
 
 Please see the [LICENSE](LICENSE) file included in this repository.
 
-### ❤️ Acknowledgements
+### Acknowledgements
 
 JabRef is built and maintained by a dedicated community of contributors.
 We truly appreciate the time, effort, and ideas shared by our developers,
