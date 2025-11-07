@@ -149,7 +149,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             bibtexString = URLDownload.asString(openConnection).trim();
 
             // BibTeX entry
-            fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
+            List<BibEntry> entries = new BibtexParser(preferences).parseEntries(bibtexString);
+            fetchedEntry = entries.isEmpty() ? Optional.empty() : Optional.of(entries.getFirst());
             fetchedEntry.ifPresent(this::doPostCleanup);
 
             // Crossref has a dynamic API rate limit
