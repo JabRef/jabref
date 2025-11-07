@@ -9,6 +9,8 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -58,7 +60,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                     WatchEvent.Kind<?> kind = event.kind();
                     System.out.println(kind);
                     System.out.println(listeners.keys());
-                    cleanupListeners();
+                    cleanupListenersAccordingToJabRefChanges();
                     System.out.println(listeners.keys());
 
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
@@ -98,6 +100,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         Path path = ((Path) key.watchable()).resolve(ev.context());
                         System.out.println("Delete a directory : " + path + " : " + ev.context());
                         notifyAboutDirectoryDeletion(path);
+                        cleanupListenersAccordingToLocalChanges();
                     }
                     key.reset();
                 }
@@ -166,17 +169,29 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         listeners.remove(path, listener);
     }
 
-    public void cleanupListeners() {
+    public void cleanupListenersAccordingToJabRefChanges() {
         Multimap<Path, DirectoryUpdateListener> watchersToRemove = ArrayListMultimap.create();
         for (Map.Entry<Path, DirectoryUpdateListener> entry : listeners.entries()) {
             Path registeredPath = entry.getKey();
             DirectoryUpdateListener registeredListener = entry.getValue();
-            if (!Files.exists(registeredPath) || (registeredListener instanceof DirectoryGroup directoryGroup && directoryGroup.isDeleted())) {
+            if (registeredListener instanceof DirectoryGroup directoryGroup && directoryGroup.isDeleted()) {
                 watchersToRemove.put(registeredPath, registeredListener);
             }
         }
         for (Map.Entry<Path, DirectoryUpdateListener> entry : watchersToRemove.entries()) {
             listeners.remove(entry.getKey(), entry.getValue());
+        }
+    }
+
+    public void cleanupListenersAccordingToLocalChanges() {
+        List<Path> deletedPaths = new ArrayList<>();
+        for (Path registeredPath : listeners.keys()) {
+            if (registeredPath != null && !Files.exists(registeredPath)) {
+                deletedPaths.add(registeredPath);
+            }
+        }
+        for (Path deletedPath : deletedPaths) {
+            listeners.removeAll(deletedPath);
         }
     }
 
