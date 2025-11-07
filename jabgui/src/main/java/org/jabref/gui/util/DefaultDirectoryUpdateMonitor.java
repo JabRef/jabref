@@ -70,7 +70,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
                         if (Files.exists(path)) {
-                            if (Files.isDirectory(path)) {
+                            if (Files.isDirectory(path) && !listeners.containsKey(path)) {
                                 System.out.println("Create a directory : " + path + " : " + ev.context());
                                 notifyAboutDirectoryCreation(path);
                             } else {
