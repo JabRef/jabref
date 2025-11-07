@@ -157,4 +157,3 @@ We truly appreciate the time, effort, and ideas shared by our developers,
 translators, testers, and users from around the world.
 
 We welcome contributions in **code**, **documentation**, **testing**, and **translations**.
-Every contribution, small or large, helps JabRef improve continuously.
