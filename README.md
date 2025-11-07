@@ -132,11 +132,12 @@ For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
 
 ## License
 
-Please see the [LICENSE](LICENSE) file included in this repository.
+This project is licensed under the terms described in the [LICENSE](LICENSE) file.
 
-### Acknowledgements
+JabRef is distributed under the **MIT License**,  
+which allows users to freely **use**, **modify**, and **distribute** the software  
+in accordance with the license terms.
 
-JabRef is built and maintained by a dedicated community of contributors.
-We truly appreciate the time, effort, and ideas shared by our developers,
-translators, testers, and users from around the world.
+By using JabRef, you acknowledge and accept these terms.  
+For complete details, please refer to the [LICENSE](LICENSE) file included in this repository.
 
