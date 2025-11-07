@@ -129,3 +129,34 @@ This section contains an analysis of ProductMap files. Each file has a link to i
 ### ProductMap - Contact Us
 
 For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
+
+---
+
+## 🪪 License
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+JabRef is licensed under the **MIT License**.
+
+You are free to **use**, **modify**, and **distribute** this software
+in full compliance with the terms described in the license agreement.
+
+The MIT License ensures that JabRef remains free and open for everyone. 
+It allows personal, academic, and commercial usage without restriction, 
+as long as the original copyright and license notice are retained. 
+
+For the complete details and legal terms,
+please see the [LICENSE](LICENSE) file included in this repository.
+
+---
+
+### ❤️ Acknowledgements
+
+JabRef is built and maintained by a dedicated community of contributors. 
+We truly appreciate the time, effort, and ideas shared by our developers,
+translators, testers, and users from around the world.
+
+We welcome contributions in **code**, **documentation**, **testing**, and **translations**.
+Every contribution, small or large, helps JabRef improve continuously.
+
+Join us to make JabRef even better, and be part of the open-source spirit! 💪
