@@ -157,7 +157,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
     public String toString() {
         return "DirectoryGroup{" +
                 "directoryPath=" + absoluteDirectoryPath +
-                ", fileMonitor=" + directoryUpdateMonitor +
+                ", directoryUpdateMonitor=" + directoryUpdateMonitor +
                 "} " + super.toString();
     }
 
@@ -177,7 +177,6 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
             DirectoryGroup newSubgroup = this.createDescendantGroup(newPath.toFile());
             groupNode.get().addSubgroup(newSubgroup);
             newSubgroup.addDescendants();
-            System.out.println("Directory created: " + newPath);
         } else {
             LOGGER.error("Directory {} could not be created because its parent is not linked with a GroupTreeNode", newPath);
         }

@@ -58,10 +58,8 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
 
                 for (WatchEvent<?> event : key.pollEvents()) {
                     WatchEvent.Kind<?> kind = event.kind();
-                    System.out.println(kind);
-                    System.out.println(listeners.keys());
+
                     cleanupListenersAccordingToJabRefChanges();
-                    System.out.println(listeners.keys());
 
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
                         Thread.yield();
@@ -73,7 +71,6 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         Path path = ((Path) key.watchable()).resolve(ev.context());
                         if (Files.exists(path)) {
                             if (Files.isDirectory(path) && !listeners.containsKey(path)) {
-                                System.out.println("Create a directory : " + path + " : " + ev.context());
                                 notifyAboutDirectoryCreation(path);
                             } else {
                                 if (FileUtil.isPDFFile(path)) {
@@ -87,9 +84,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
                         if (Files.exists(path)) {
-                            if (Files.isDirectory(path)) {
-                                System.out.println("Probably a useless call : " + path + " : " + ev.context());
-                            } else {
+                            if (!Files.isDirectory(path)) {
                                 notifyAboutFileChange(path);
                             }
                         }
@@ -98,7 +93,6 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
-                        System.out.println("Delete a directory : " + path + " : " + ev.context());
                         notifyAboutDirectoryDeletion(path);
                         cleanupListenersAccordingToLocalChanges();
                     }
@@ -130,7 +124,6 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                 }
             }
         }
-        System.out.println("New directory: " + newPath);
     }
 
     private void notifyAboutDirectoryDeletion(Path deletedPath) {
