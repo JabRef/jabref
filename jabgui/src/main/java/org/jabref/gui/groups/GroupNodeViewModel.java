@@ -40,6 +40,7 @@ import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DateGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
@@ -464,6 +465,8 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof AutomaticDateGroup) {
             return false;
+        } else if (group instanceof DateGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -508,6 +511,7 @@ public class GroupNodeViewModel {
             case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
+                 DateGroup _,
                  SmartGroup _ ->
                     false;
             case KeywordGroup _ ->
@@ -534,6 +538,7 @@ public class GroupNodeViewModel {
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
+                 DateGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -553,6 +558,7 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
             case AllEntriesGroup _,
+                 DateGroup _,
                  SmartGroup _ ->
                     false;
             case ExplicitGroup _,
