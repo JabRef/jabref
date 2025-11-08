@@ -32,7 +32,7 @@ public class GitFileWriter {
                         importPrefs.citationKeyPatternPreferences(),
                         new BibEntryTypesManager()
                 );
-                writer.saveDatabase(bibDatabaseContext);
+                writer.writeDatabase(bibDatabaseContext);
 
                 if (fileWriter.hasEncodingProblems()) {
                     throw new IOException("Encoding problem detected when saving .bib file: "

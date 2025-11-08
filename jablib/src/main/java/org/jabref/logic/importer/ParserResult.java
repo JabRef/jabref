@@ -27,7 +27,7 @@ import org.jspecify.annotations.NonNull;
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
     private final Multimap<Range, String> warnings;
-    private BibDatabase database;
+    @NonNull private BibDatabase database;
     private MetaData metaData;
     private Path file;
     private boolean invalid;
@@ -76,7 +76,7 @@ public class ParserResult {
         return fromErrorMessage(getErrorMessage(exception));
     }
 
-    public BibDatabase getDatabase() {
+    public @NonNull BibDatabase getDatabase() {
         return database;
     }
 

@@ -271,9 +271,9 @@ public class SaveDatabaseAction {
                         entryTypesManager);
 
                 if (selectedOnly) {
-                    databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                    databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
                 } else {
-                    databaseWriter.saveDatabase(bibDatabaseContext);
+                    databaseWriter.writeDatabase(bibDatabaseContext);
                 }
 
                 libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());

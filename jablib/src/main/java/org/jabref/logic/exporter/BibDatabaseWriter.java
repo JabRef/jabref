@@ -32,6 +32,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -87,17 +88,19 @@ public class BibDatabaseWriter {
         assert saveConfiguration.getSaveOrder().getOrderType() != SaveOrder.OrderType.TABLE;
     }
 
-    public BibDatabaseWriter(Writer writer,
-                             String newline,
-                             SelfContainedSaveConfiguration saveConfiguration,
-                             FieldPreferences fieldPreferences,
-                             CitationKeyPatternPreferences citationKeyPatternPreferences,
-                             BibEntryTypesManager entryTypesManager) {
-        this(new BibWriter(writer, newline),
-                saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+    /// Convenience constructor. One can directly call [#writeDatabase(BibDatabaseContext)] afterward.
+    ///
+    /// @param writer the output to use
+    /// @param bibDatabaseContext - used to get the newline
+    /// @param  preferences - used to read all the preferences
+    public BibDatabaseWriter(@NonNull Writer writer,
+                             @NonNull BibDatabaseContext bibDatabaseContext,
+                             @NonNull JabRefCliPreferences preferences) {
+        this(new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator()),
+                preferences.getSelfContainedExportConfiguration(),
+                preferences.getFieldPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getCustomEntryTypesRepository());
     }
 
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData, FieldPreferences fieldPreferences) {
@@ -173,12 +176,12 @@ public class BibDatabaseWriter {
     /**
      * Saves the complete database.
      */
-    public void saveDatabase(BibDatabaseContext bibDatabaseContext) throws IOException {
+    public void writeDatabase(@NonNull BibDatabaseContext bibDatabaseContext) throws IOException {
         List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntries()
                                                    .stream()
                                                    .filter(entry -> !entry.isEmpty())
                                                    .toList();
-        savePartOfDatabase(bibDatabaseContext, entries);
+        writePartOfDatabase(bibDatabaseContext, entries);
     }
 
     /**
@@ -186,7 +189,7 @@ public class BibDatabaseWriter {
      *
      * @param entries A list of entries to save. The list itself is not modified in this code
      */
-    public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
+    public void writePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
         sharedDatabaseIDOptional.ifPresent(Unchecked.consumer(this::writeDatabaseID));
 

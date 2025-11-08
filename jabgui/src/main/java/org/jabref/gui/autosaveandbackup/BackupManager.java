@@ -285,7 +285,7 @@ public class BackupManager {
                     preferences.getCitationKeyPatternPreferences(),
                     entryTypesManager)
                     // we save the clone to prevent the original database (and thus the UI) from being changed
-                    .saveDatabase(bibDatabaseContextClone);
+                    .writeDatabase(bibDatabaseContextClone);
             backupFilesQueue.add(backupPath);
 
             // We wrote the file successfully

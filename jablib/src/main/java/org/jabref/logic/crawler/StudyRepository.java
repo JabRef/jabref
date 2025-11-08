@@ -440,7 +440,7 @@ public class StudyRepository {
                     preferences.getFieldPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager);
-            databaseWriter.saveDatabase(context);
+            databaseWriter.writeDatabase(context);
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));
         } catch (IOException ex) {

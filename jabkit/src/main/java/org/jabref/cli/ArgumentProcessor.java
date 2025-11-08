@@ -173,7 +173,7 @@ public class ArgumentProcessor implements Runnable {
                         cliPreferences.getFieldPreferences(),
                         cliPreferences.getCitationKeyPatternPreferences(),
                         entryTypesManager);
-                databaseWriter.saveDatabase(bibDatabaseContext);
+                databaseWriter.writeDatabase(bibDatabaseContext);
 
                 // Show just a warning message if encoding did not work for all characters:
                 if (fileWriter.hasEncodingProblems()) {

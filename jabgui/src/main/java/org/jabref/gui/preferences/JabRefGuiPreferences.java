@@ -397,7 +397,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(CREATE_ENTRY_IMMEDIATE_TYPE, StandardEntryType.Article.getDisplayName());
         defaults.put(CREATE_ENTRY_ID_LOOKUP_GUESSING, true);
         defaults.put(CREATE_ENTRY_ID_FETCHER_NAME, DoiFetcher.NAME);
-        defaults.put(CREATE_ENTRY_INTERPRET_PARSER_NAME, PlainCitationParserChoice.RULE_BASED.getLocalizedName());
+        defaults.put(CREATE_ENTRY_INTERPRET_PARSER_NAME, PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName());
         // endregion
     }
 

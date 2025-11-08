@@ -39,15 +39,17 @@ import static org.mockito.Mockito.mock;
 
 class BibEntryWriterTest {
 
-    private static ImportFormatPreferences importFormatPreferences;
-    private final StringWriter stringWriter = new StringWriter();
-    private BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
+    private StringWriter stringWriter;
+    private ImportFormatPreferences importFormatPreferences;
+    private BibWriter bibWriter;
     private BibEntryWriter bibEntryWriter;
 
     @BeforeEach
     void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), List.of());
+        stringWriter = new StringWriter();
+        bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), new BibEntryTypesManager());
     }
 
@@ -749,7 +751,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void serializeAll() throws IOException {
+    void write() throws IOException {
         BibEntry entry1 = new BibEntry(StandardEntryType.Article)
                 // required fields
                 .withField(StandardField.AUTHOR, "Journal Author")
@@ -780,7 +782,7 @@ class BibEntryWriterTest {
                 .withField(StandardField.CHAPTER, "chapter")
                 .withChanged(true);
 
-        String output = bibEntryWriter.serializeAll(List.of(entry1, entry2), BibDatabaseMode.BIBLATEX);
+        String output = bibEntryWriter.write(List.of(entry1, entry2), BibDatabaseMode.BIBLATEX);
 
         String expected1 = """
                 @Article{,

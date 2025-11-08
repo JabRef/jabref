@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,12 +20,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
-import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
@@ -84,10 +78,10 @@ public class PdfMergeMetadataImporter extends PdfImporter {
      * 2. Run {@link PdfImporter}s, and store extracted candidates in the list.
      */
     @Override
-    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
+    public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
         List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document);
         if (extractedCandidates.isEmpty()) {
-            return List.of();
+            return new ParserResult();
         }
 
         List<BibEntry> fetchedCandidates = fetchIdsOfCandidates(extractedCandidates);
@@ -98,7 +92,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         // We use the absolute path here as we do not know the context where this import will be used.
         // The caller is responsible for making the path relative if necessary.
         entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
-        return List.of(entry);
+        return new ParserResult(List.of(entry));
     }
 
     private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {
@@ -106,7 +100,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
         for (PdfImporter metadataImporter : metadataImporters) {
             try {
-                List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, document);
+                List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, document).getDatabase().getEntries();
                 LOGGER.debug("Importer {} extracted {}", metadataImporter.getName(), extractedEntries);
                 candidates.addAll(extractedEntries);
             } catch (ParseException | IOException e) {

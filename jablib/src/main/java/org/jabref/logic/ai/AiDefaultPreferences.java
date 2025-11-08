@@ -115,7 +115,7 @@ public class AiDefaultPreferences {
             AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, "$chunks",
 
             AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, "You are a bot to convert a plain text citation to a BibTeX entry. The user you talk to understands only BibTeX code, so provide it plainly without any wrappings.",
-            AiTemplate.CITATION_PARSING_USER_MESSAGE, "Please convert this plain text citation to a BibTeX entry:\n$citation\nIn your output, please provide only BibTex code as your message."
+            AiTemplate.CITATION_PARSING_USER_MESSAGE, "Please convert this plain text citation to a BibTeX entry:\n$citation\nIn your output, please provide only BibTeX code as your message."
     );
 
     public static List<String> getAvailableModels(AiProvider aiProvider) {
