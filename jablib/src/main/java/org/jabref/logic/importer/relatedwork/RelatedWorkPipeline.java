@@ -31,7 +31,7 @@ public final class RelatedWorkPipeline {
      * @param candidateEntries entries that may be cited (must have citation keys)
      * @param citingKey        citation key of the citing paper (e.g., Smith2021)
      * @param username         username to select the {@code comment-&lt;username&gt;} field
-     * @return count of cited entries we attempted to annotate (i.e., had a target & snippet)
+     * @return count of cited entries we attempted to annotate (i.e., had a target and snippet)
      */
     public int run(String fullPlainText,
                    List<BibEntry> candidateEntries,

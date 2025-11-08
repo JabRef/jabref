@@ -16,8 +16,6 @@ import org.jabref.model.entry.field.StandardField;
 /**
  * Deterministic extractor for author–year style citations in "Related Work" sections.
  * Handles single and multi-citation parentheticals, including diacritics and all-caps acronyms (e.g., CIA, Šimić).
- *
- * Returns: Map<citedEntryKey, snippet>
  */
 public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
 
@@ -29,6 +27,8 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
     private static final Pattern PAREN_BLOCK = Pattern.compile("\\(([^)]+)\\)");
 
     // Unicode-aware author–year inside a parenthetical.
+    // Allows all-caps acronyms like "CIA" and Unicode surnames like "Šimić".
+    // \p{Lu} = uppercase letter, \p{L} = any letter, \p{M} = combining mark.
     private static final Pattern AUTHOR_YEAR_INNER = Pattern.compile(
             "(?U)"                               // enable Unicode character classes
                     + "(\\p{Lu}[\\p{L}\\p{M}'\\-]*)"       // 1: first author token (can be acronym or surname)
@@ -37,6 +37,16 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
                     + "(\\d{4})([a-z]?)"                  // 2: year, 3: optional trailing letter
     );
 
+    /**
+     * Extract a mapping from cited entry key to a short contextual snippet.
+     *
+     * <p>The returned map uses the cited entry's citation key (for example, {@code Smith2021})
+     * as the key, and a sentence-like snippet taken from around the in-text citation as the value.</p>
+     *
+     * @param fullText the full (plain) text of the paper or section to scan
+     * @param bibliography candidate entries that may be cited; used to resolve author/year to a citation key
+     * @return a {@code Map} from citation key to snippet; never {@code null}, possibly empty
+     */
     @Override
     public Map<String, String> extract(String fullText, List<BibEntry> bibliography) {
         String related = sliceRelatedWorkSection(fullText);
@@ -73,7 +83,9 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return out;
     }
 
-    /** Try to isolate the "Related work" section; fallback to full text. */
+    /**
+     * Try to isolate the "Related work" section; fallback to full text.
+     */
     private String sliceRelatedWorkSection(String text) {
         Matcher start = RELATED_WORK_HEADING.matcher(text);
         int begin = -1;
@@ -99,11 +111,6 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return text.substring(begin, stop);
     }
 
-    /**
-     * Build index keyed by:
-     * - normalized first-author surname + year, e.g., "nash2022"
-     * - AND (when applicable) a corporate/phrase acronym + year, e.g., "cia2021"
-     */
     private Map<String, BibEntry> buildIndex(List<BibEntry> bibs) {
         Map<String, BibEntry> idx = new HashMap<>();
         for (BibEntry b : bibs) {
@@ -141,12 +148,16 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return idx;
     }
 
-    /** Get the raw first author string (before surname extraction). */
+    /**
+     * Get the raw first author string (before surname extraction).
+     */
     private String firstAuthorRaw(String authorField) {
         return authorField.split("\\s+and\\s+")[0].trim();
     }
 
-    /** Extract the first author surname from a raw first-author token. */
+    /**
+     * Extract the first author surname from a raw first-author token.
+     */
     private String extractFirstSurnameFromRaw(String firstAuthor) {
         if (firstAuthor.contains(",")) {
             return firstAuthor.substring(0, firstAuthor.indexOf(',')).trim();
@@ -160,10 +171,6 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return parts.length == 0 ? "" : parts[parts.length - 1];
     }
 
-    /**
-     * Produce an acronym (e.g., "Central Intelligence Agency" -> "cia") when the first author
-     * looks like a corporate/multi-word name. We avoid personal-name forms with a comma.
-     */
     private String maybeAcronym(String firstAuthor) {
         if (firstAuthor.contains(",")) {
             return ""; // likely "Surname, Given" → skip acronym
@@ -189,7 +196,9 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return sb.toString();
     }
 
-    /** Normalize token: remove braces, strip diacritics, lowercase. */
+    /**
+     * Normalize token: remove braces, strip diacritics, lowercase.
+     */
     private String normalizeSurname(String s) {
         String noBraces = s.replace("{", "").replace("}", "");
         String normalized = Normalizer.normalize(noBraces, Normalizer.Form.NFD)
@@ -197,13 +206,17 @@ public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
         return normalized.toLowerCase(Locale.ROOT);
     }
 
-    /** Lookup by normalized token (surname or acronym) + 4-digit year. */
+    /**
+     * Lookup by normalized token (surname or acronym) + 4-digit year.
+     */
     private String findKeyFor(String lowerToken, String yearDigits, Map<String, BibEntry> index) {
         BibEntry entry = index.get(lowerToken + yearDigits);
-        return (entry != null) ? entry.getCitationKey().orElse(null) : null;
+        return (entry != null) ? entry.getCitationKey().orElse(null) : null; // null signals "not found"
     }
 
-    /** Expand to a sentence-like span around the parenthetical match. */
+    /**
+     * Expand to a sentence-like span around the parenthetical match.
+     */
     private String expandToSentenceLikeSpan(String text, int matchStart, int matchEnd) {
         int left = matchStart;
         while (left > 0) {
