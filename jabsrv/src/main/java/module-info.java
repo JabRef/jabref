@@ -58,6 +58,5 @@ module org.jabref.jabsrv {
     requires java.logging;
     requires jersey.container.grizzly2.http;
     requires jersey.server;
-    requires com.fasterxml.jackson.annotation;
-    requires com.fasterxml.jackson.databind;
+    requires tools.jackson.databind;
 }

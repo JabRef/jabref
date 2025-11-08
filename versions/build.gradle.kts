@@ -32,6 +32,10 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
 
+    api(platform("tools.jackson:jackson-bom:3.0.2"))
+    api("tools.jackson.core:jackson-core")
+    api("tools.jackson.core:jackson-databind")
+    api("tools.jackson.dataformat:jackson-dataformat-yaml")
 }
 
 dependencies.constraints {
@@ -47,8 +51,6 @@ dependencies.constraints {
     api("com.dlsc.gemsfx:gemsfx:3.5.7")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
-    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
     api("com.fasterxml:aalto-xml:1.3.3")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket:0.24.0")

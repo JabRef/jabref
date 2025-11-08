@@ -26,10 +26,12 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.HashBiMap;
 import org.jspecify.annotations.NonNull;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 public class CffImporter extends Importer {
 
@@ -263,14 +265,13 @@ public class CffImporter extends Importer {
 
     @Override
     public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
-
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        ObjectMapper mapper = new YAMLMapper(new YAMLFactory());
         CffFormat citation;
 
         try {
             citation = mapper.readValue(reader, CffFormat.class);
             return (citation != null) && (citation.values.get("title") != null);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             return false;
         }
     }
