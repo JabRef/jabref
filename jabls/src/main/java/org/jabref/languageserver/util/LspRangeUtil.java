@@ -44,6 +44,10 @@ public class LspRangeUtil {
         );
     }
 
+    public static Range convertToLspRange(int line, int colStart, int colEnd) {
+        return new Range(new Position(line - 1, colStart - 1), new Position(line - 1, colEnd - 1));
+    }
+
     public static Range convertToLspRange(String content, int startIndex, int endIndex) {
         Position start = convertToLspPosition(content, startIndex);
         Position end = convertToLspPosition(content, endIndex);
@@ -65,5 +69,18 @@ public class LspRangeUtil {
         }
 
         return new Position(line, column);
+    }
+
+    public static boolean isPositionInRange(Range range, Position position) {
+        if (range.getStart().getLine() <= position.getLine() && range.getEnd().getLine() >= position.getLine()) {
+            return true;
+        }
+        if (range.getStart().getLine() == position.getLine() && range.getStart().getCharacter() <= position.getCharacter()) {
+            return true;
+        }
+        if (range.getEnd().getLine() == position.getLine() && range.getEnd().getCharacter() >= position.getCharacter()) {
+            return true;
+        }
+        return false;
     }
 }

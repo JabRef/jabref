@@ -36,7 +36,7 @@ public abstract class DefinitionProvider {
             if (!entriesMap.isEmpty()) {
                 return entriesMap.entrySet().stream()
                                  .flatMap(listEntry -> listEntry.getValue().stream()
-                                                                .map(entry -> new Location(listEntry.getKey(), getRangeFromEntry(listEntry.getKey(), entry))))
+                                                                .map(entry -> createLocation(getRangeFromEntry(listEntry.getKey(), entry), listEntry.getKey())))
                                  .toList();
             }
         }
@@ -54,16 +54,23 @@ public abstract class DefinitionProvider {
         List<DocumentLink> links = new ArrayList<>();
         for (KeyBounds kb : findCitationKeys(content)) {
             Range range = LspRangeUtil.convertToLspRange(content, kb.start(), kb.end());
-
-            DocumentLink link = new DocumentLink();
-            link.setRange(range);
-            JsonArray data = new JsonArray();
-            data.add("--jumpToKey");
-            data.add(kb.key());
-            link.setData(data);
-            links.add(link);
+            links.add(createDocumentLink(range, kb.key()));
         }
         return links;
+    }
+
+    protected DocumentLink createDocumentLink(Range range, String key) {
+        DocumentLink link = new DocumentLink();
+        link.setRange(range);
+        JsonArray data = new JsonArray();
+        data.add("--jumpToKey");
+        data.add(key);
+        link.setData(data);
+        return link;
+    }
+
+    protected Location createLocation(Range range, String key) {
+        return new Location(key, range);
     }
 
     Range getRangeFromEntry(String fileUri, BibEntry entry) {
@@ -127,5 +134,6 @@ public abstract class DefinitionProvider {
         return result;
     }
 
-    private record KeyBounds(String key, int start, int end) { }
+    private record KeyBounds(String key, int start, int end) {
+    }
 }
