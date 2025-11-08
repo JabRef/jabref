@@ -1,11 +1,10 @@
 package org.jabref.languageserver;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.core.JacksonException;
-
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class ExtensionSettings {
 
