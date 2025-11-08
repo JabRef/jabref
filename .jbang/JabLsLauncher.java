@@ -41,7 +41,7 @@
 //DEPS org.jspecify:jspecify:1.0.0
 
 // from jabls
-//DEPS com.fasterxml.jackson.core:jackson-databind:2.20.1
+//DEPS tool.jackson.core:jackson-databind:3.0.2
 //DEPS com.github.eclipse:lsp4j:0.24.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.2
