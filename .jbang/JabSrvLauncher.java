@@ -82,7 +82,7 @@
 //DEPS org.glassfish.grizzly:grizzly-http-server:4.0.2
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
-//DEPS org.hibernate.validator:hibernate-validator:9.0.1.Final
+//DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
 //DEPS com.konghq:unirest-modules-gson:4.5.1
 //DEPS com.google.guava:guava:33.5.0-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
