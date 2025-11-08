@@ -14,6 +14,8 @@ public class DefinitionProviderFactory {
         return Optional.ofNullable(PROVIDER_MAP.computeIfAbsent(languageId.toLowerCase(), key -> switch (key) {
             case "markdown" ->
                     new MarkdownDefinitionProvider(parserHandler);
+            case "latex" ->
+                    new TexDefinitionProvider(parserHandler);
             default ->
                     null;
         }));
