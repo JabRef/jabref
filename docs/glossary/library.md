@@ -38,6 +38,7 @@ It may represent:
 
 ## Open Issues / Uncertainties
 
+* Historically, this was called `database` in JabRef and there is still work to do to rename it.
 * Encoding inconsistencies (e.g., UTF-8 vs. legacy encodings) can affect portability.
 * Some tools extend the BibTeX syntax (e.g., BibLaTeX fields), leading to partial incompatibility.
 * Synchronization between multiple libraries can cause key collisions.
