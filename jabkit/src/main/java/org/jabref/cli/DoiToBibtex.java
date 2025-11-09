@@ -60,7 +60,7 @@ public class DoiToBibtex implements Callable<Integer> {
             entries.add(entry.get());
         }
 
-       try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
             BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
             BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, context, argumentProcessor.cliPreferences);
             bibWriter.writeDatabase(context);
