@@ -49,4 +49,4 @@ Uniqueness is defined by content and context, not by file identity.
 
 ## Related Terms (Cross-References)
 
-[References](references.md), [Library](library.md), [Entry](entry.md), [Citation](citation.md)
+[References](references.md), [Library](library.md), [Citation](citation.md)
