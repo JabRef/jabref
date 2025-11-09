@@ -568,6 +568,7 @@ jobs:
             esac
             echo "//SOURCES ../$f" >> "${{ matrix.script }}"
           done
+      - run: cat ${{ matrix.script }}
       - run: jbang build "${{ matrix.script }}"
         shell: bash
       - run: jbang "${{ matrix.script }}" --help
