@@ -103,7 +103,7 @@ dependencies {
 
     implementation("org.eclipse.jgit:org.eclipse.jgit")
 
-    implementation("tools.jackson.core:jackson-dataformat-yaml")
+    implementation("tools.jackson.dataformat:jackson-dataformat-yaml")
     implementation("tools.jackson.core:jackson-databind")
     // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
     // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
