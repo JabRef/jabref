@@ -73,8 +73,7 @@ public class JabKit {
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
-            CommandLine commandLine = new CommandLine(argumentProcessor)
-                    .registerConverter(DOI.class, DOI::new);
+            CommandLine commandLine = new CommandLine(argumentProcessor);
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,

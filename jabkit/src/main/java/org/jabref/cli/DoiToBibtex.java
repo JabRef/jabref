@@ -31,17 +31,22 @@ public class DoiToBibtex implements Callable<Integer> {
     private ArgumentProcessor argumentProcessor;
 
     @Parameters(paramLabel = "DOI", description = "one or more DOIs to fetch", arity = "1..*")
-    private DOI[] dois;
+    private String[] dois;
 
     @Override
     public Integer call() {
         var fetcher = new CrossRef();
         List<BibEntry> entries = new ArrayList<>(dois.length);
 
-        for (DOI doi : dois) {
+        for (String doiString : dois) {
+            Optional<DOI> doiParsed = DOI.parse(doiString);
+            if (doiParsed.isEmpty()) {
+                LOGGER.warn("Skipped DOI {}, because it is not a valid DOI string", doiString);
+                continue;
+            }
             Optional<BibEntry> entry;
             try {
-                entry = fetcher.performSearchById(doi.asString());
+                entry = fetcher.performSearchById(doiParsed.get().asString());
             } catch (FetcherException e) {
                 LOGGER.error("Could not fetch DOI from BibTeX", e);
                 continue;
