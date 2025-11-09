@@ -68,6 +68,9 @@ application {
 
     // Also passed to launcher by java-module-packaging plugin
     applicationDefaultJvmArgs = listOf(
+        // JEP 158: Disable all java util logging
+        "-Xlog:disable",
+
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 

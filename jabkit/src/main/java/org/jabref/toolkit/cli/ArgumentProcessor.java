@@ -43,6 +43,7 @@ import static picocli.CommandLine.Option;
                 CheckConsistency.class,
                 CheckIntegrity.class,
                 Convert.class,
+                DoiToBibtex.class,
                 Fetch.class,
                 GenerateBibFromAux.class,
                 GenerateCitationKeys.class,
