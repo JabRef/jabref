@@ -42,6 +42,7 @@
 
 // from jabls
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.20
+//DEPS tools.jackson.core:jackson-core:3.0.2
 //DEPS tools.jackson.core:jackson-databind:3.0.2
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.2
 //DEPS com.github.eclipse:lsp4j:0.24.0
