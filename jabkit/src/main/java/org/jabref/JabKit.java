@@ -6,6 +6,7 @@ import java.net.Authenticator;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -145,11 +146,10 @@ public class JabKit {
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug or --porcelain
+        boolean isPorcelain = Arrays.stream(args).anyMatch("--porcelain"::equalsIgnoreCase);
         Level logLevel;
         if (Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase)) {
             logLevel = Level.DEBUG;
-        } else if (Arrays.stream(args).anyMatch("--porcelain"::equalsIgnoreCase)) {
-            logLevel = Level.ERROR;
         } else {
             logLevel = Level.INFO;
         }
@@ -167,7 +167,7 @@ public class JabKit {
 
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
-        Map<String, String> configuration = Map.of(
+        Map<String, String> configuration = new HashMap(Map.of(
                 "level", logLevel.name().toLowerCase(),
                 "writerFile", "rolling file",
                 "writerFile.logLevel", logLevel == Level.DEBUG ? "debug" : "info",
@@ -175,8 +175,11 @@ public class JabKit {
                 "writerFile.file", directory + File.separator + "log_{date:yyyy-MM-dd_HH-mm-ss}.txt",
                 "writerFile.charset", "UTF-8",
                 "writerFile.policies", "startup",
-                "writerFile.backups", "30");
+                "writerFile.backups", "30"));
         configuration.forEach(Configuration::set);
+        if (isPorcelain) {
+            configuration.put("writer", "none");
+        }
 
         LOGGER = LoggerFactory.getLogger(JabKit.class);
     }
