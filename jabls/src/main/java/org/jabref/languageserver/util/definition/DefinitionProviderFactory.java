@@ -15,7 +15,7 @@ public class DefinitionProviderFactory {
             case "markdown" ->
                     new MarkdownDefinitionProvider(parserHandler);
             case "latex" ->
-                    new TexDefinitionProvider(parserHandler);
+                    new LatexDefinitionProvider(parserHandler);
             default ->
                     null;
         }));

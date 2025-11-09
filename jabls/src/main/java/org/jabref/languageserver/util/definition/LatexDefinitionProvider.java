@@ -13,11 +13,11 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-public class TexDefinitionProvider extends DefinitionProvider {
+public class LatexDefinitionProvider extends DefinitionProvider {
 
     private LatexParser latexParser;
 
-    public TexDefinitionProvider(LspParserHandler parserHandler) {
+    public LatexDefinitionProvider(LspParserHandler parserHandler) {
         super(parserHandler);
         latexParser = new DefaultLatexParser();
     }
