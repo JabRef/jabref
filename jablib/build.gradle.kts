@@ -482,13 +482,17 @@ tasks.test {
     testLogging {
         events("started", "passed", "skipped", "failed")
     }
-    include("**/PdfImporterMockTest.class")
     jvmArgs = listOf(
         "-javaagent:${mockitoAgent.asPath}",
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
+    reports {
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/tests"))
+        junitXml.required.set(true)
+    }
 }
 
 jmh {
