@@ -1,123 +1,164 @@
 package org.jabref.logic.importer.relatedwork;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Heuristic locator for the "Related Work" (or "Literature Review") section in a paper's full plain text.
- * <p>
- * Strategy:
- * 1) Split text into lines.
- * 2) Find the first line that looks like a top-level section header for related work.
- * 3) Capture until the next top-level header (or end of text).
- * <p>
- * This does NOT parse PDFs. Feed it already-extracted plain text (from a PDF, HTML, arXiv, etc.).
+ * Finds the "Related Work" (or variants) section and returns its text span.
  */
 public final class RelatedWorkSectionLocator {
 
-    // Matches typical top-level section headers (optionally numbered).
-    // Examples: "2 Related Work", "3.1 Literature Review", "RELATED WORK", "Background and Related Work"
-    private static final Pattern TOP_LEVEL_HEADER = Pattern.compile(
-            "^(?<num>(\\d+\\s*|\\d+(?:\\.\\d+)*\\s+)?)(?<title>[A-Za-z].{0,80})$"
+    /** Immutable span describing the located section. */
+    public static final class SectionSpan {
+        public final int headerStart;
+        public final int headerEnd;
+        public final int startOffset; // body start (after header line break)
+        public final int endOffset;   // body end (before next header or EOF)
+        public final String headerText;
+
+        public SectionSpan(int headerStart, int headerEnd, int startOffset, int endOffset, String headerText) {
+            this.headerStart = headerStart;
+            this.headerEnd = headerEnd;
+            this.startOffset = startOffset;
+            this.endOffset = endOffset;
+            this.headerText = headerText;
+        }
+    }
+
+    // Header patterns (case-insensitive), allowing optional numbering like "2", "2.1", or Roman numerals.
+    private static final Pattern HEADER_PATTERN = Pattern.compile(
+            "^(?:\\s*(?:\\d+(?:\\.\\d+)*|[IVXLCDM]+)\\.?\\s+)?"
+                    + "(?:RELATED\\s+WORKS?"
+                    + "|BACKGROUND\\s+AND\\s+RELATED\\s+WORK"
+                    + "|LITERATURE\\s+REVIEW"
+                    + "|STATE\\s+OF\\s+THE\\s+ART)"
+                    + "\\s*$",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE
     );
 
-    // Titles we consider as "related work" headers (lowercased, spaces normalized).
-    private static final List<Pattern> RELATED_TITLES = List.of(
-            // exact forms
-            Pattern.compile("\\brelated\\s+work\\b"),
-            Pattern.compile("\\bliterature\\s+review\\b"),
-            // combined/variant forms
-            Pattern.compile("\\bbackground\\s+(and|&)\\s+related\\s+work\\b"),
-            Pattern.compile("\\bprior\\s+work\\b"),
-            Pattern.compile("\\bprevious\\s+work\\b"),
-            Pattern.compile("\\brelated\\s+(studies|research)\\b"),
-            // long variants often seen
-            Pattern.compile("\\bstate\\s+of\\s+the\\s+art\\b")
-    );
+    // Fragments to help detect a *generic* next header in a line-by-line scan.
+    private static final Pattern OPT_NUMBERING = Pattern.compile("^\\s*(?:\\d+(?:\\.\\d+)*|[IVXLCDM]+)\\.?\\s+");
+    private static final Pattern ALL_CAPS_BODY = Pattern.compile("^[A-Z][A-Z \\-]{2,}$");
+    private static final Pattern TITLE_CASE_WORD = Pattern.compile("[A-Z][\\p{L}\\p{M}\\-]+");
 
-    // A simple guard to identify *any* top-level header (used as end boundary)
-    // Be permissive but avoid false positives like sentence lines.
-    private static final Pattern ANY_TOP_LEVEL_HEADER = Pattern.compile(
-            "^(\\d+\\s*|\\d+(?:\\.\\d+)*\\s+)?[A-Z][A-Za-z0-9 \\-/,&()]{2,}$"
-    );
+    public RelatedWorkSectionLocator() { }
 
-    public Optional<String> locate(String fullPlainText) {
-        Objects.requireNonNull(fullPlainText, "fullPlainText");
+    /** Instance entry point (delegates to static). */
+    public Optional<SectionSpan> locate(String text) {
+        return locateStatic(text);
+    }
 
-        String[] lines = fullPlainText.replace("\r\n", "\n").replace('\r', '\n').split("\n");
-        int startLine = findRelatedHeaderLine(lines).orElse(-1);
-        if (startLine < 0) {
+    /** Static entry point for convenience in callers/tests. */
+    public static Optional<SectionSpan> locateStatic(String text) {
+        if (text == null || text.isEmpty()) {
             return Optional.empty();
         }
-        int endLine = findNextTopLevelHeader(lines, startLine + 1).orElse(lines.length);
-        String block = joinKeepingParagraphs(lines, startLine + 1, endLine); // exclude header line itself
-        String trimmed = block.strip();
-        return trimmed.isEmpty() ? Optional.empty() : Optional.of(trimmed);
+
+        Matcher headerMatcher = HEADER_PATTERN.matcher(text);
+        if (!headerMatcher.find()) {
+            return Optional.empty();
+        }
+
+        int headerStart = headerMatcher.start();
+        int headerEnd = headerMatcher.end();
+
+        // Body starts right after the header line break(s)
+        int startOffset = headerEnd;
+        if (startOffset < text.length() && text.charAt(startOffset) == '\r') {
+            startOffset++;
+        }
+        if (startOffset < text.length() && text.charAt(startOffset) == '\n') {
+            startOffset++;
+        }
+
+        // Determine end by scanning subsequent lines until a "generic header" is found.
+        int endOffset = findNextHeaderBoundary(text, startOffset);
+
+        // Trim trailing whitespace from the section body.
+        while (endOffset > startOffset && Character.isWhitespace(text.charAt(endOffset - 1))) {
+            endOffset--;
+        }
+
+        String headerText = extractHeaderLine(text, headerStart, headerEnd);
+        return Optional.of(new SectionSpan(headerStart, headerEnd, startOffset, endOffset, headerText));
     }
 
-    private Optional<Integer> findRelatedHeaderLine(String[] lines) {
-        for (int i = 0; i < lines.length; i++) {
-            String raw = lines[i].strip();
-            if (raw.isEmpty()) {
-                continue;
+    private static int findNextHeaderBoundary(String text, int startFrom) {
+        int pos = startFrom;
+        final int n = text.length();
+
+        while (pos < n) {
+            int lineEnd = indexOfNewline(text, pos);
+            String line = text.substring(pos, lineEnd);
+
+            if (looksLikeHeader(line)) {
+                return pos; // cut section before this header
             }
-            Matcher m = TOP_LEVEL_HEADER.matcher(raw);
-            if (!m.matches()) {
-                continue;
-            }
-            String title = normalizeTitle(m.group("title"));
-            if (isRelatedTitle(title)) {
-                return Optional.of(i);
+            pos = (lineEnd < n) ? lineEnd + 1 : n; // move to next line (skip '\n')
+        }
+        return n; // no later header; section runs to EOF
+    }
+
+    private static boolean looksLikeHeader(String rawLine) {
+        String line = rawLine.strip();
+        if (line.isEmpty()) {
+            return false;
+        }
+
+        // Remove optional numbering prefix for header-shape checks
+        String core = stripNumbering(line);
+
+        // 1) ALL CAPS headers (e.g., "3 METHODS", "RESULTS")
+        if (ALL_CAPS_BODY.matcher(core).matches()) {
+            return true;
+        }
+
+        // 2) Title-Case short headers: 1–6 words, each capitalized
+        //    Avoid sentences by requiring few words and no trailing punctuation.
+        if (core.length() <= 80 && !endsWithPunctuation(core)) {
+            String[] parts = core.split("\\s+");
+            if (parts.length >= 1 && parts.length <= 6) {
+                int titleLike = 0;
+                for (String p : parts) {
+                    if (TITLE_CASE_WORD.matcher(p).matches()) {
+                        titleLike++;
+                    }
+                }
+                if (titleLike == parts.length) {
+                    return true;
+                }
             }
         }
-        return Optional.empty();
-    }
 
-    private Optional<Integer> findNextTopLevelHeader(String[] lines, int fromExclusive) {
-        for (int i = fromExclusive; i < lines.length; i++) {
-            String raw = lines[i].strip();
-            if (raw.isEmpty()) {
-                continue;
-            }
-            if (ANY_TOP_LEVEL_HEADER.matcher(raw).matches() && !looksLikeFigureOrTableCaption(raw)) {
-                return Optional.of(i);
-            }
-        }
-        return Optional.empty();
-    }
-
-    private static boolean looksLikeFigureOrTableCaption(String s) {
-        String lc = s.toLowerCase(Locale.ROOT);
-        return lc.startsWith("figure ") || lc.startsWith("fig. ") || lc.startsWith("table ");
-    }
-
-    private static String normalizeTitle(String title) {
-        String t = title.toLowerCase(Locale.ROOT).trim();
-        t = t.replaceAll("\\s+", " ");
-        t = t.replaceAll("[.:–—-]+$", "");
-        return t;
-    }
-
-    private static boolean isRelatedTitle(String normalizedLowerTitle) {
-        for (Pattern p : RELATED_TITLES) {
-            if (p.matcher(normalizedLowerTitle).find()) {
-                return true;
-            }
-        }
         return false;
     }
 
-    private static String joinKeepingParagraphs(String[] lines, int startInclusive, int endExclusive) {
-        List<String> kept = new ArrayList<>(Math.max(0, endExclusive - startInclusive));
-        for (int i = startInclusive; i < endExclusive; i++) {
-            kept.add(lines[i]);
+    private static String stripNumbering(String s) {
+        Matcher m = OPT_NUMBERING.matcher(s);
+        return m.find() ? s.substring(m.end()).stripLeading() : s;
+    }
+
+    private static boolean endsWithPunctuation(String s) {
+        if (s.isEmpty()) {
+            return false;
         }
-        // Keep line breaks as-is; the extractor can handle sentence splitting downstream.
-        return String.join("\n", kept);
+        char c = s.charAt(s.length() - 1);
+        return c == '.' || c == ':' || c == ';' || c == '!' || c == '?';
+    }
+
+    private static int indexOfNewline(String text, int from) {
+        int idx = text.indexOf('\n', from);
+        return (idx == -1) ? text.length() : idx;
+    }
+
+    private static String extractHeaderLine(String text, int headerStart, int headerEnd) {
+        int lineStart = text.lastIndexOf('\n', Math.max(0, headerStart - 1));
+        lineStart = (lineStart == -1) ? 0 : lineStart + 1;
+        int lineEnd = text.indexOf('\n', headerEnd);
+        if (lineEnd == -1) {
+            lineEnd = text.length();
+        }
+        return text.substring(lineStart, lineEnd).trim();
     }
 }
