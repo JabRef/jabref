@@ -1,4 +1,4 @@
-package org.jabref.cli;
+package org.jabref.toolkit.cli;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -8,7 +8,6 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SaveException;
@@ -24,6 +23,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
