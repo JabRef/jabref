@@ -62,7 +62,7 @@ public class DoiToBibtex implements Callable<Integer> {
             }
 
             if (entry.isEmpty()) {
-                LOGGER.error("Could not fetch BibTeX based on DOI");
+                LOGGER.error("Could not fetch BibTeX based on DOI - entry is empty");
                 System.err.println(Localization.lang("No data was found for the identifier" + " - " + doiString));
                 System.err.println();
                 continue;
