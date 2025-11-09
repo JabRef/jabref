@@ -11,7 +11,7 @@ A citation is a reference to a source. More precisely, a citation is an abbrevia
 
 Example:
 
-> In their study, Ostos et al. (2024) employed interviews with both plant workers and farmers to gather data, with the aim of corroborating existing reports and gaining new insights, respectively. 
+> In their study, Ostos et al. (2024) employed interviews with both plant workers and farmers to gather data, with the aim of corroborating existing reports and gaining new insights, respectively.
 
 ## Delimitation (Scope and Exclusions)
 
