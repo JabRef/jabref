@@ -83,8 +83,8 @@ public class LspRangeUtil {
     }
 
     public static boolean isRangeInRange(Range outer, Range inner) {
-            return comparePositions(outer.getStart(), inner.getStart()) <= 0
-                    && comparePositions(outer.getEnd(), inner.getEnd()) >= 0;
+        return comparePositions(outer.getStart(), inner.getStart()) <= 0
+                && comparePositions(outer.getEnd(), inner.getEnd()) >= 0;
     }
 
     public static int comparePositions(Position p1, Position p2) {
