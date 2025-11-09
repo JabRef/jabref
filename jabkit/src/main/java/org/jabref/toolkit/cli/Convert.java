@@ -8,7 +8,6 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SaveException;
@@ -16,6 +15,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;

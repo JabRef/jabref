@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
@@ -15,6 +14,7 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

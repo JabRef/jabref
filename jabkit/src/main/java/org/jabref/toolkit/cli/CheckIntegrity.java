@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityCheckResultCsvWriter;
@@ -21,6 +20,7 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
