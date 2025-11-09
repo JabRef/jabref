@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,12 +19,15 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
@@ -38,6 +42,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -167,6 +172,9 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             EntryEditorTab activeTab = (EntryEditorTab) tab;
             if (activeTab != null) {
                 activeTab.notifyAboutFocus(currentlyEditedEntry);
+                if (activeTab instanceof FieldsEditorTab fieldsTab) {
+                    Platform.runLater(() -> setupNavigationForTab(fieldsTab));
+                }
             }
         });
 
@@ -220,6 +228,23 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             event.setDropCompleted(success);
             event.consume();
         });
+    }
+
+    private void setupNavigationForTab(FieldsEditorTab tab) {
+        Node content = tab.getContent();
+        if (content instanceof Parent parent) {
+            findAndSetupEditorTextFields(parent);
+        }
+    }
+
+    private void findAndSetupEditorTextFields(Parent parent) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof EditorTextField editor) {
+                editor.setupTabNavigation(this::isLastFieldInCurrentTab, this::moveToNextTabAndFocus);
+            } else if (child instanceof Parent childParent) {
+                findAndSetupEditorTextFields(childParent);
+            }
+        }
     }
 
     /**
@@ -443,6 +468,13 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
         }
+        Platform.runLater(() -> {
+            for (Tab tab : tabbed.getTabs()) {
+                if (tab instanceof FieldsEditorTab fieldsTab) {
+                    setupNavigationForTab(fieldsTab);
+                }
+            }
+        });
     }
 
     private EntryEditorTab getSelectedTab() {
@@ -529,5 +561,103 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     @Override
     public void previousPreviewStyle() {
         this.previewPanel.previousPreviewStyle();
+    }
+
+    /**
+     * Checks if the given TextField is the last field in the currently selected tab.
+     *
+     * @param node the Node to check
+     * @return true if this is the last field in the current tab, false otherwise
+     */
+    boolean isLastFieldInCurrentTab(Node node) {
+        if (node == null || tabbed.getSelectionModel().getSelectedItem() == null) {
+            return false;
+        }
+
+        Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+        if (!(selectedTab instanceof FieldsEditorTab currentTab)) {
+            return false;
+        }
+
+        Collection<Field> shownFields = currentTab.getShownFields();
+        if (shownFields.isEmpty() || node.getId() == null) {
+            return false;
+        }
+
+        Optional<Field> lastField = shownFields.stream()
+                                               .reduce((first, second) -> second);
+
+        if (node instanceof Button) {
+            return true;
+        }
+
+        return lastField.map(Field::getName)
+                        .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
+                        .orElse(false);
+    }
+
+    /**
+     * Moves to the next tab and focuses on its first field.
+     */
+     void moveToNextTabAndFocus() {
+        tabbed.getSelectionModel().selectNext();
+
+         Platform.runLater(() -> {
+            Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+            if (selectedTab instanceof FieldsEditorTab currentTab) {
+                focusFirstFieldInTab(currentTab);
+            }
+        });
+    }
+
+    private void focusFirstFieldInTab(FieldsEditorTab tab) {
+        Node tabContent = tab.getContent();
+        if (tabContent instanceof Parent parent) {
+            // First try to find field by ID (preferred method)
+            Collection<Field> shownFields = tab.getShownFields();
+            if (!shownFields.isEmpty()) {
+                Field firstField = shownFields.iterator().next();
+                String firstFieldId = firstField.getName();
+                Optional<TextInputControl> firstTextInput = findTextInputById(parent, firstFieldId);
+                if (firstTextInput.isPresent()) {
+                    firstTextInput.get().requestFocus();
+                    return;
+                }
+            }
+
+            Optional<TextInputControl> anyTextInput = findAnyTextInput(parent);
+            if (anyTextInput.isPresent()) {
+                anyTextInput.get().requestFocus();
+            }
+        }
+    }
+
+    /// Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
+    private Optional<TextInputControl> findTextInputById(Parent parent, String id) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof TextInputControl textInput && id.equalsIgnoreCase(textInput.getId())) {
+                return Optional.of(textInput);
+            } else if (child instanceof Parent childParent) {
+                Optional<TextInputControl> found = findTextInputById(childParent, id);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<TextInputControl> findAnyTextInput(Parent parent) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof TextInputControl textInput) {
+                return Optional.of(textInput);
+            } else if (child instanceof Parent childParent) {
+                Optional<TextInputControl> found = findAnyTextInput(childParent);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
     }
 }
