@@ -4,6 +4,14 @@ import java.nio.file.Path;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ *
+ * @param path the path to the file containing the citation
+ * @param line the line number of the citation (starting at 1)
+ * @param colStart the column number of the start of the citation (starting at 1)
+ * @param colEnd the column number of the end of the citation (starting at 1)
+ * @param lineText the text of the line containing the citation
+ */
 public record Citation(Path path, int line, int colStart, int colEnd, String lineText) {
     /**
      * The total number of characters that are shown around a cite (cite width included).

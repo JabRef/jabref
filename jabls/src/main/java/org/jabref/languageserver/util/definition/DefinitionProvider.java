@@ -69,8 +69,8 @@ public abstract class DefinitionProvider {
         return link;
     }
 
-    protected Location createLocation(Range range, String key) {
-        return new Location(key, range);
+    protected Location createLocation(Range range, String uri) {
+        return new Location(uri, range);
     }
 
     Range getRangeFromEntry(String fileUri, BibEntry entry) {

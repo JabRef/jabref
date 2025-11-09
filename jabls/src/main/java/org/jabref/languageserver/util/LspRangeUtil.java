@@ -44,8 +44,15 @@ public class LspRangeUtil {
         );
     }
 
+    /**
+     *
+     * @param line line starting at 1
+     * @param colStart column starting at 1
+     * @param colEnd column starting at 1
+     * @return the LSP4J Range of the line and columns
+     */
     public static Range convertToLspRange(int line, int colStart, int colEnd) {
-        return new Range(new Position(line - 1, colStart - 1), new Position(line - 1, colEnd - 1));
+        return new Range(new Position(line - 1, colStart), new Position(line - 1, colEnd));
     }
 
     public static Range convertToLspRange(String content, int startIndex, int endIndex) {
@@ -71,16 +78,19 @@ public class LspRangeUtil {
         return new Position(line, column);
     }
 
-    public static boolean isPositionInRange(Range range, Position position) {
-        if (range.getStart().getLine() <= position.getLine() && range.getEnd().getLine() >= position.getLine()) {
-            return true;
+    public static boolean isPositionInRange(Position position, Range range) {
+        return isRangeInRange(range, new Range(position, position));
+    }
+
+    public static boolean isRangeInRange(Range outer, Range inner) {
+            return comparePositions(outer.getStart(), inner.getStart()) <= 0
+                    && comparePositions(outer.getEnd(), inner.getEnd()) >= 0;
+    }
+
+    public static int comparePositions(Position p1, Position p2) {
+        if (p1.getLine() != p2.getLine()) {
+            return Integer.compare(p1.getLine(), p2.getLine());
         }
-        if (range.getStart().getLine() == position.getLine() && range.getStart().getCharacter() <= position.getCharacter()) {
-            return true;
-        }
-        if (range.getEnd().getLine() == position.getLine() && range.getEnd().getCharacter() >= position.getCharacter()) {
-            return true;
-        }
-        return false;
+        return Integer.compare(p1.getCharacter(), p2.getCharacter());
     }
 }
