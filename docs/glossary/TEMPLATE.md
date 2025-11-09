@@ -9,7 +9,7 @@ nav_order: 100 # remove this for the concrete term
 
 ## Meaning
 
-{{Explain the meaning of the term, ideally one or two sentences. Include what it represents, its purpose, or how it is used in context.}}
+{{Explain the meaning of the term, in ideally one or two sentences. Include what it represents, its purpose, or how it is used in context.}}
 
 ## Delimitation (Scope and Exclusions)
 
