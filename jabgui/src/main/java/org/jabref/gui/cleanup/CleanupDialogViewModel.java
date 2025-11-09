@@ -77,7 +77,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         List<BibEntry> entriesToProcess = targetEntries.isEmpty() ? List.copyOf(stateManager.getSelectedEntries()) : targetEntries;
 
         if (entriesToProcess.isEmpty()) { // None selected. Inform the user to select entries first.
-            dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up.")
+            dialogService.showInformationDialogAndWait(Localization.lang("Clean up entry"), Localization.lang("First select entries to clean up.")
             );
             return;
         }
@@ -130,7 +130,6 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                               BibEntry entry,
                               NamedCompoundEdit compoundEdit,
                               List<JabRefException> failures) {
-        // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
@@ -139,7 +138,6 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
-        // Register undo action
         for (FieldChange change : changes) {
             compoundEdit.addEdit(new UndoableFieldChange(change));
         }
@@ -150,7 +148,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     }
 
     private void showResults() {
-        if (tabSupplier != null) {
+        if (modifiedEntriesCount > 0 && tabSupplier != null) {
             tabSupplier.get().markBaseChanged();
         }
 
@@ -169,7 +167,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     private void cleanup(CleanupPreferences cleanupPreferences, List<BibEntry> entries) {
         List<JabRefException> failures = new ArrayList<>();
 
-        String editName = entries.size() == 1 ? Localization.lang("Clean up entry") : Localization.lang("Clean up entries");
+        String editName = Localization.lang("Clean up entry(s)");
         // undo granularity is on a set of all entries
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
 
