@@ -50,51 +50,56 @@ public class Launcher {
     }
 
     public static void main(String[] args) {
-        initLogging(args);
+        try {
+            initLogging(args);
 
-        Injector.setModelOrService(BuildInfo.class, new BuildInfo());
+            Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
-        final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
+            final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
 
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                args,
-                ArgumentProcessor.Mode.INITIAL_START,
-                preferences);
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(
+                    args,
+                    ArgumentProcessor.Mode.INITIAL_START,
+                    preferences);
 
-        if (!argumentProcessor.getGuiCli().usageHelpRequested) {
-            Injector.setModelOrService(CliPreferences.class, preferences);
-            Injector.setModelOrService(GuiPreferences.class, preferences);
+            if (!argumentProcessor.getGuiCli().usageHelpRequested) {
+                Injector.setModelOrService(CliPreferences.class, preferences);
+                Injector.setModelOrService(GuiPreferences.class, preferences);
 
-            // Early exit in case another instance is already running
-            MultipleInstanceAction instanceAction = handleMultipleAppInstances(args, preferences.getRemotePreferences());
-            if (instanceAction == MultipleInstanceAction.SHUTDOWN) {
-                systemExit();
-            } else if (instanceAction == MultipleInstanceAction.FOCUS) {
-                // Send focus command to running instance
-                RemotePreferences remotePreferences = preferences.getRemotePreferences();
-                RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
-                remoteClient.sendFocus();
+                // Early exit in case another instance is already running
+                MultipleInstanceAction instanceAction = handleMultipleAppInstances(args, preferences.getRemotePreferences());
+                if (instanceAction == MultipleInstanceAction.SHUTDOWN) {
+                    systemExit();
+                } else if (instanceAction == MultipleInstanceAction.FOCUS) {
+                    // Send focus command to running instance
+                    RemotePreferences remotePreferences = preferences.getRemotePreferences();
+                    RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+                    remoteClient.sendFocus();
+                    systemExit();
+                }
+
+                configureProxy(preferences.getProxyPreferences());
+                configureSSL(preferences.getSSLPreferences());
+            }
+
+            List<UiCommand> uiCommands = argumentProcessor.processArguments();
+            if (argumentProcessor.shouldShutDown()) {
                 systemExit();
             }
 
-            configureProxy(preferences.getProxyPreferences());
-            configureSSL(preferences.getSSLPreferences());
+            PreferencesMigrations.runMigrations(preferences);
+
+            PostgreServer postgreServer = new PostgreServer();
+            Injector.setModelOrService(PostgreServer.class, postgreServer);
+
+            CSLStyleLoader.loadInternalStyles();
+
+            JabRefGUI.setup(uiCommands, preferences);
+            JabRefGUI.launch(JabRefGUI.class, args);
+        } catch (Throwable throwable) {
+            LOGGER.error("Could not launch JabRef", throwable);
+            throw throwable;
         }
-
-        List<UiCommand> uiCommands = argumentProcessor.processArguments();
-        if (argumentProcessor.shouldShutDown()) {
-            systemExit();
-        }
-
-        PreferencesMigrations.runMigrations(preferences);
-
-        PostgreServer postgreServer = new PostgreServer();
-        Injector.setModelOrService(PostgreServer.class, postgreServer);
-
-        CSLStyleLoader.loadInternalStyles();
-
-        JabRefGUI.setup(uiCommands, preferences);
-        JabRefGUI.launch(JabRefGUI.class, args);
     }
 
     /**
