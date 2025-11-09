@@ -14,7 +14,7 @@ A simulated PDF import was performed using a mocked `PdfImporter` to produce a b
 The resulting `ParserResult` was validated to ensure correct data flow and entry creation.
 
 #### Test Data Preparation
-A dummy PDF path (`pdfs/fake.pdf`) was used. No actual parsing of a file occurs; the test simulates integration logic at the module interface level.
+A dummy PDF path (`build/resources/test/pdfs/test.pdf`) was used. No actual parsing of a file occurs; the test simulates integration logic at the module interface level.
 
 #### Execution
 Executed using:

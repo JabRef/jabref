@@ -13,7 +13,7 @@ From the repository root, run the following command:
 ### Viewing the Results
 After running the tests, open the report generated at:
 ```
-jablib/build/reports/tests/test/index.html
+jablib/build/reports/tests/index.html
 ```
 The report shows detailed results, including any passing or failing test cases.
 ---
