@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.toolkit;
 
 import java.io.File;
 import java.io.IOException;

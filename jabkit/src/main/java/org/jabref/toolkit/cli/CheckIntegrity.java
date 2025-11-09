@@ -1,4 +1,4 @@
-package org.jabref.cli;
+package org.jabref.toolkit.cli;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import org.jabref.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityCheckResultCsvWriter;

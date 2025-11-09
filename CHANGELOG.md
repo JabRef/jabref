@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We renamed packages in `jabkit` to start with `org.jabref.toolkit` to avoid having split packages between `jabkit` and `jabgui`. [#14052](https://github.com/JabRef/jabref/issues/14052)
 - Changed: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> now opens the terminal in the active library directory (#14130)
 
 ### Fixed

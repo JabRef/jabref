@@ -1,4 +1,4 @@
-package org.jabref.cli;
+package org.jabref.toolkit.cli;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import org.jabref.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;

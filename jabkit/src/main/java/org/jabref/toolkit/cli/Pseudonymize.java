@@ -1,11 +1,11 @@
-package org.jabref.cli;
+package org.jabref.toolkit.cli;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pseudonymization.Pseudonymization;

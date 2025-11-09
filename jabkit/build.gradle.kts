@@ -63,7 +63,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 }
 
 application {
-    mainClass.set("org.jabref.JabKit")
+    mainClass.set("org.jabref.toolkit.JabKit")
     mainModule.set("org.jabref.jabkit")
 
     // Also passed to launcher by java-module-packaging plugin

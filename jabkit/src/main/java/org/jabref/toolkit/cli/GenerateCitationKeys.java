@@ -1,10 +1,10 @@
-package org.jabref.cli;
+package org.jabref.toolkit.cli;
 
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;

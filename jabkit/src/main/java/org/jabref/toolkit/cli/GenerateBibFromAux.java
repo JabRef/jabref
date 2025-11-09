@@ -1,11 +1,11 @@
-package org.jabref.cli;
+package org.jabref.toolkit.cli;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.cli.converter.CygWinPathConverter;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.auxparser.AuxParserStatisticsProvider;
