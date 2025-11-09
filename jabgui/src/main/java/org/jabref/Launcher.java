@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.JabRefGUI;
@@ -126,16 +125,15 @@ public class Launcher {
 
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
-        Map<String, String> configuration = Map.of(
-                "level", logLevel.name().toLowerCase(),
-                "writerFile", "rolling file",
-                "writerFile.level", logLevel.name().toLowerCase(),
-                // We need to manually join the path, because ".resolve" does not work on Windows, because ":" is not allowed in file names on Windows
-                "writerFile.file", directory + File.separator + "log_{date:yyyy-MM-dd_HH-mm-ss}.txt",
-                "writerFile.charset", "UTF-8",
-                "writerFile.policies", "startup",
-                "writerFile.backups", "30");
-        configuration.forEach(Configuration::set);
+        Configuration.set("level", logLevel.name().toLowerCase());
+        Configuration.set("writerFile", "rolling file");
+        Configuration.set("writerFile.level", logLevel.name().toLowerCase());
+        // We need to manually join the path, because ".resolve" does not work on Windows,
+        // because ":" is not allowed in file names on Windows
+        Configuration.set("writerFile.file", directory + File.separator + "log_{date:yyyy-MM-dd_HH-mm-ss}.txt");
+        Configuration.set("writerFile.charset", "UTF-8");
+        Configuration.set("writerFile.policies", "startup");
+        Configuration.set("writerFile.backups", "30");
 
         LOGGER = LoggerFactory.getLogger(Launcher.class);
     }
