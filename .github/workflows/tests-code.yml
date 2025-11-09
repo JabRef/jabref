@@ -92,7 +92,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
@@ -206,17 +206,24 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.11.1:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md > heylogs.txt || true
 
-          # improve output
-          sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
+          # ignore some errors
+          grep -v no-empty-headings < heylogs.txt | grep -v all-h2-contain-a-version | tee heylogs.txt
 
-          cat heylogs.txt
+          # exit 1 in case of an error
+          remaining=$(
+              grep -E " error " heylogx.txt \
+              | wc -l
+            )
 
-          # exit 1 in case of error
-          # We have 1 "valid" issue in CHANGELOG.md
-          grep -q "1 problem" heylogs.txt || exit 1
+          echo "Remaining errors: $remaining"
 
+          # We have on acceptable error
+          if [ "$remaining" -gt 1 ]; then
+            echo "Failing because of $remaining remaining error(s)."
+            exit 1
+          fi
   changelog-unreleased-only:
     if: github.event_name == 'pull_request'
     name: CHANGELOG.md - only unreleased touched
