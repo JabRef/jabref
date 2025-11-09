@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -30,6 +31,9 @@ public class DoiToBibtex implements Callable<Integer> {
     @CommandLine.ParentCommand
     private ArgumentProcessor argumentProcessor;
 
+    @CommandLine.Mixin
+    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+
     @Parameters(paramLabel = "DOI", description = "one or more DOIs to fetch", arity = "1..*")
     private String[] dois;
 
@@ -42,18 +46,21 @@ public class DoiToBibtex implements Callable<Integer> {
             Optional<DOI> doiParsed = DOI.parse(doiString);
             if (doiParsed.isEmpty()) {
                 LOGGER.warn("Skipped DOI {}, because it is not a valid DOI string", doiString);
+                System.out.println(Localization.lang("DOI %0 is invalid", doiString));
                 continue;
             }
             Optional<BibEntry> entry;
             try {
                 entry = fetcher.performSearchById(doiParsed.get().asString());
             } catch (FetcherException e) {
-                LOGGER.error("Could not fetch DOI from BibTeX", e);
+                LOGGER.error("Could not fetch BibTeX based on DOI", e);
+                System.err.println(Localization.lang("Error"));
                 continue;
             }
 
             if (entry.isEmpty()) {
-                LOGGER.error("Could not fetch DOI from BibTeX");
+                LOGGER.error("Could not fetch BibTeX based on DOI");
+                System.err.println(Localization.lang("Error"));
                 continue;
             }
 
@@ -66,6 +73,7 @@ public class DoiToBibtex implements Callable<Integer> {
             bibWriter.writeDatabase(context);
         } catch (IOException e) {
             LOGGER.error("Could not write BibTeX", e);
+            System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
             return 1;
         }
         return 0;
