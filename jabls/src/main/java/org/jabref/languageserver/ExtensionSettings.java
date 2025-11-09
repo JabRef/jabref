@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class ExtensionSettings {
 
@@ -29,7 +30,7 @@ public class ExtensionSettings {
     }
 
     public void copyFromJsonObject(JsonObject object) {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new JsonMapper();
         try {
             JsonNode node = mapper.readTree(object.toString());
             this.consistencyCheck = node.at("/jabref/consistencyCheck/enabled").asBoolean(this.consistencyCheck);
