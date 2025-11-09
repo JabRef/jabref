@@ -12,6 +12,7 @@ In JabRef, a bibliography usually corresponds to a **.bib file** (BibTeX or BibL
 ## Delimitation (Scope and Exclusions)
 
 A bibliography is not the same as:
+
 - a **[citation](citation.md)**, which is an in-text reference to a work;
 - a **[library](library.md)**, which stores physical or digital documents;
 - a **database connection**, which may serve as a data source for bibliographic information but is not itself a bibliography.

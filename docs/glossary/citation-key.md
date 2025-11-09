@@ -17,11 +17,10 @@ Example: `LunaOstos2024`
 ## Delimitation (Scope and Exclusions)
 
 - It is **not** the same as:
-    - a database primary key,
-    - a persistent identifier (DOI, ISBN, URI),
-    - a filename.
-- It is not globally unique across all users or projects, only within the
-  scope where the bibliography is used.
+  - a database primary key,
+  - a persistent identifier (DOI, ISBN, URI),
+  - a filename.
+- It is not globally unique across all users or projects, only within the scope where the bibliography is used.
 
 ## Validity
 
@@ -32,18 +31,14 @@ Example: `LunaOstos2024`
 
 ## Naming and Uniqueness
 
-- Allowed characters and format depend on the target system (e.g. BibTeX vs.
-  BibLaTeX) but are typically ASCII without spaces.
-- JabRef and similar tools can **generate** citation keys based on patterns
-  (author, year, title, etc.).
-- Uniqueness is usually enforced by the reference manager; collisions must be
-  resolved.
+- Allowed characters and format depend on the target system (e.g. BibTeX vs. BibLaTeX) but are typically ASCII without spaces.
+- JabRef and similar tools can **generate** citation keys based on patterns (author, year, title, etc.).
+- Uniqueness is usually enforced by the reference manager; collisions must be resolved.
 
 ## Open Issues / Uncertainties
 
 - No universal standard across all tools and workflows.
-- Migration between tools or key-pattern changes can break existing documents
-  if keys are not updated consistently.
+- Migration between tools or key-pattern changes can break existing documents if keys are not updated consistently.
 
 ## Related Terms (Cross-References)
 

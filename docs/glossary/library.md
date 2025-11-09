@@ -44,5 +44,5 @@ It may represent:
 * Synchronization between multiple libraries can cause key collisions.
 
 ## Related Terms (Cross-References)
- 
+
 [Bibliography](bibliography.md), [Citation](citation.md), [Citation key](citation-key.md)
