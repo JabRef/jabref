@@ -60,5 +60,4 @@ module org.jabref.jabsrv {
     requires jersey.server;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.databind;
-    requires tools.jackson.databind;
 }
