@@ -9,7 +9,9 @@ import java.util.regex.Pattern;
  */
 public final class RelatedWorkSectionLocator {
 
-    /** Immutable span describing the located section. */
+    /**
+     * Immutable span describing the located section.
+     */
     public static final class SectionSpan {
         public final int headerStart;
         public final int headerEnd;
@@ -42,14 +44,19 @@ public final class RelatedWorkSectionLocator {
     private static final Pattern ALL_CAPS_BODY = Pattern.compile("^[A-Z][A-Z \\-]{2,}$");
     private static final Pattern TITLE_CASE_WORD = Pattern.compile("[A-Z][\\p{L}\\p{M}\\-]+");
 
-    public RelatedWorkSectionLocator() { }
+    public RelatedWorkSectionLocator() {
+    }
 
-    /** Instance entry point (delegates to static). */
+    /**
+     * Instance entry point (delegates to static).
+     */
     public Optional<SectionSpan> locate(String text) {
         return locateStatic(text);
     }
 
-    /** Static entry point for convenience in callers/tests. */
+    /**
+     * Static entry point for convenience in callers/tests.
+     */
     public static Optional<SectionSpan> locateStatic(String text) {
         if (text == null || text.isEmpty()) {
             return Optional.empty();

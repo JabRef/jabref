@@ -9,8 +9,8 @@ import org.jabref.model.entry.BibEntry;
 
 /**
  * Wires the section locator + extractor:
- *  - finds the Related Work body in the full text
- *  - extracts per-citation snippets from that section
+ * - finds the Related Work body in the full text
+ * - extracts per-citation snippets from that section
  */
 public final class RelatedWorkPipeline {
 
@@ -25,7 +25,7 @@ public final class RelatedWorkPipeline {
     /**
      * Full end-to-end step: locate section, then extract snippets.
      *
-     * @param fullText         entire plain-text of the paper
+     * @param fullText entire plain-text of the paper
      * @param candidateEntries entries we might cite
      * @return map: citationKey -> extracted snippet
      */
