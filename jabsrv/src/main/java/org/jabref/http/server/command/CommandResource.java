@@ -1,8 +1,5 @@
 package org.jabref.http.server.command;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -13,7 +10,7 @@ import jakarta.ws.rs.core.Response;
 import org.glassfish.hk2.api.ServiceLocator;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 @Path("commands")
 public class CommandResource {
