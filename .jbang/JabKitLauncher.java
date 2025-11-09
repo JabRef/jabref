@@ -10,6 +10,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/CheckIntegrity.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/Convert.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/DoiToBibtex.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/Fetch.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/GenerateBibFromAux.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/GenerateCitationKeys.java
