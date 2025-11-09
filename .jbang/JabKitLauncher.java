@@ -5,20 +5,20 @@
 //JAVA 24
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/converter/CygWinPathConverter.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/ArgumentProcessor.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/CheckConsistency.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/CheckIntegrity.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/Convert.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/Fetch.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/GenerateBibFromAux.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/GenerateCitationKeys.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/Pdf.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/PdfUpdate.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/Preferences.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/Pseudonymize.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli/Search.java
-//SOURCES ../jabkit/src/main/java/org/jabref/JabKit.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/converter/CygWinPathConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/ArgumentProcessor.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/CheckConsistency.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/CheckIntegrity.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/Convert.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/Fetch.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/GenerateBibFromAux.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/GenerateCitationKeys.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/Pdf.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/PdfUpdate.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/Preferences.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/Pseudonymize.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/Search.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/JabKit.java
 //FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties
 
 // REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
@@ -38,11 +38,9 @@
 //DEPS info.picocli:picocli:4.7.7
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 
-import org.jabref.JabKit;
-
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabKitLauncher {
     public static void main(String[] args) {
-        org.jabref.JabKit.main(args);
+        org.jabref.toolkit.JabKit.main(args);
     }
 }
