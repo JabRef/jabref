@@ -55,8 +55,8 @@ public class DoiToBibtex implements Callable<Integer> {
                 entry = fetcher.performSearchById(doiParsed.get().asString());
             } catch (FetcherException e) {
                 LOGGER.error("Could not fetch BibTeX based on DOI", e);
-                System.err.print(Localization.lang("No data was found for the identifier");
-                System.err.println(" - " + doiString));
+                System.err.print(Localization.lang("No data was found for the identifier"));
+                System.err.println(" - " + doiString);
                 System.err.println(e.getLocalizedMessage());
                 System.err.println();
                 continue;
@@ -64,8 +64,8 @@ public class DoiToBibtex implements Callable<Integer> {
 
             if (entry.isEmpty()) {
                 LOGGER.error("Could not fetch BibTeX based on DOI - entry is empty");
-                System.err.print(Localization.lang("No data was found for the identifier");
-                System.err.println(" - " + doiString));
+                System.err.print(Localization.lang("No data was found for the identifier"));
+                System.err.println(" - " + doiString);
                 System.err.println();
                 continue;
             }
