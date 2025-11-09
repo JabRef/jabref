@@ -58,6 +58,8 @@ public class JabKit {
 
     private static final String JABKIT_BRAND = "JabKit - command line toolkit for JabRef";
 
+    /// Note: To test with gradle, use jabkit -> Tasks -> application -> run
+    ///       Use `--args="..."` as parameters to "Run"
     public static void main(String[] args) {
         initLogging(args);
 
