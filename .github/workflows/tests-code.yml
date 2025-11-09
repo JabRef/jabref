@@ -469,6 +469,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
       - name: Use cache
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: actions/cache@v4
         with:
           path: ~/.jbang
@@ -522,6 +523,7 @@ jobs:
         with:
           files: |
             .jbang/*.java
+            jabkit/src/main/java/**/*.java
             jablib/src/main/java/**/*.java
             jablib-examples/**/*.java
           files_ignore: |
@@ -553,7 +555,16 @@ jobs:
           # We modify the JBang scripts directly to avoid issues with relative paths
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
             case "$f" in
-              jablib-examples/*) continue ;; # skip scripts
+              jablib-examples/*)
+                # skip scripts
+                continue
+                ;;
+              jabkit/*)
+                # only JabKit needs its modified sources
+                if [ "${{ matrix.script }}" != ".jbang/JabKitLauncher.java" ]; then
+                  continue
+                fi
+                ;;
             esac
             echo "//SOURCES ../$f" >> "${{ matrix.script }}"
           done
