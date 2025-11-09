@@ -47,6 +47,7 @@ public class DoiToBibtex implements Callable<Integer> {
             if (doiParsed.isEmpty()) {
                 LOGGER.warn("Skipped DOI {}, because it is not a valid DOI string", doiString);
                 System.out.println(Localization.lang("DOI %0 is invalid", doiString));
+                System.err.println();
                 continue;
             }
             Optional<BibEntry> entry;
@@ -54,13 +55,16 @@ public class DoiToBibtex implements Callable<Integer> {
                 entry = fetcher.performSearchById(doiParsed.get().asString());
             } catch (FetcherException e) {
                 LOGGER.error("Could not fetch BibTeX based on DOI", e);
-                System.err.println(Localization.lang("Error"));
+                System.err.println(Localization.lang("No data was found for the identifier" + " - " + doiString));
+                System.err.println(e.getLocalizedMessage());
+                System.err.println();
                 continue;
             }
 
             if (entry.isEmpty()) {
                 LOGGER.error("Could not fetch BibTeX based on DOI");
-                System.err.println(Localization.lang("Error"));
+                System.err.println(Localization.lang("No data was found for the identifier" + " - " + doiString));
+                System.err.println();
                 continue;
             }
 
