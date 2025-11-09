@@ -164,6 +164,7 @@ git push
 ### Prevention
 
 To avoid this, avoid staging using any of these commands:
+
 * `git add .`
 * `git add jablib/src/main` (or any path prefix)
 * `git commit -a`
