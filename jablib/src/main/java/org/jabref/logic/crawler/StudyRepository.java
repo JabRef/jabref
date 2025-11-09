@@ -419,6 +419,10 @@ public class StudyRepository {
         // Merge new entries into study result file
         merger.merge(existingStudyResultEntries.getDatabase(), newStudyResultEntries);
 
+        LOGGER.info("Removing duplicates from study results (initially {} entries)", existingStudyResultEntries.getEntries().size());
+        new AutomaticDuplicateRemover(bibEntryTypesManager).removeDuplicates(existingStudyResultEntries);
+        LOGGER.info("Removed {} entries", existingStudyResultEntries.getEntries().size());
+
         writeResultToFile(getPathToStudyResultFile(), existingStudyResultEntries);
     }
 
