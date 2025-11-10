@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
@@ -315,10 +316,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             this.citationMergeMode = false;
         } else {
             // select new entry
-            getSelectionModel().clearSelection();
-            findEntry(bibEntry).ifPresent(entry -> {
-                getSelectionModel().select(entry);
-                scrollTo(entry);
+            // Use Platform.runLater to avoid JavaFX bug with selection change events
+            Platform.runLater(() -> {
+                getSelectionModel().clearSelection();
+                findEntry(bibEntry).ifPresent(entry -> {
+                    getSelectionModel().select(entry);
+                    scrollTo(entry);
+                });
             });
         }
     }
@@ -329,18 +333,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // keep original entry selected and reset citation merge mode
             this.citationMergeMode = false;
         } else {
-            // select new entries
-            getSelectionModel().clearSelection();
-            List<BibEntryTableViewModel> entries = bibEntries.stream()
-                                                             .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                                             .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
-                                                             .filter(Optional::isPresent)
-                                                             .map(Optional::get)
-                                                             .toList();
-            entries.forEach(entry -> getSelectionModel().select(entry));
-            if (!entries.isEmpty()) {
-                scrollTo(entries.getFirst());
-            }
+            // Use Platform.runLater to avoid JavaFX bug with selection change events
+            Platform.runLater(() -> {
+                getSelectionModel().clearSelection();
+                List<BibEntryTableViewModel> entries = bibEntries.stream()
+                                                                 .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
+                                                                 .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
+                                                                 .filter(Optional::isPresent)
+                                                                 .map(Optional::get)
+                                                                 .toList();
+                entries.forEach(entry -> getSelectionModel().select(entry));
+                if (!entries.isEmpty()) {
+                    scrollTo(entries.getFirst());
+                }
+            });
         }
     }
 
