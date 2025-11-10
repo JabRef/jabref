@@ -3,7 +3,6 @@ package org.jabref.languageserver.util;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.languageserver.LspClientHandler;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.journals.JournalAbbreviationRepository;

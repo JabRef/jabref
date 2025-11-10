@@ -84,13 +84,6 @@ public class BibDefinitionProvider extends DefinitionProvider {
 
     @Override
     public List<DocumentLink> provideDocumentLinks(String fileUri, String content) {
-        List<DocumentLink> documentLinks = new ArrayList<>();
-        parserHandler.getParserResultForUri(fileUri).ifPresent(parserResult -> {
-            parserResult.getDatabaseContext().getEntries().getFirst().getFiles().forEach(linkedFile -> {
-
-            });
-        });
-
-        return documentLinks;
+        return List.of();
     }
 }
