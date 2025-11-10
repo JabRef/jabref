@@ -72,7 +72,7 @@ public class BibDefinitionProvider extends DefinitionProvider {
                             Optional<Path> filePath = FileUtil.find(parserResult.get().getDatabaseContext(), linkedFile.getLink(), preferences.getFilePreferences());
                             return List.of(new Location(filePath.get().toUri().toString(), EMPTY_RANGE));
                         } catch (NullPointerException e) {
-                            LOGGER.error("Error while getting file path", e);
+                            LOGGER.debug("Error while getting file path", e);
                         }
                     }
                 }
@@ -81,6 +81,7 @@ public class BibDefinitionProvider extends DefinitionProvider {
         return List.of();
     }
 
+    // Not needed when trying to resolve links to pdfs
     @Override
     public List<DocumentLink> provideDocumentLinks(String fileUri, String content) {
         return List.of();

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.jabref.languageserver.LspClientHandler;
 import org.jabref.languageserver.util.definition.DefinitionProvider;
 import org.jabref.languageserver.util.definition.DefinitionProviderFactory;
 import org.jabref.logic.preferences.CliPreferences;
@@ -20,15 +21,21 @@ public class LspLinkHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LspLinkHandler.class);
 
+    private final LspClientHandler clientHandler;
     private final LspParserHandler parserHandler;
     private final CliPreferences preferences;
 
-    public LspLinkHandler(LspParserHandler parserHandler, CliPreferences preferences) {
+    public LspLinkHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, CliPreferences preferences) {
+        this.clientHandler = clientHandler;
         this.parserHandler = parserHandler;
         this.preferences = preferences;
     }
 
     public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> provideDefinition(String languageId, String uri, String content, Position position) {
+        if (!clientHandler.isStandalone() && !"bibtex".equals(languageId)) {
+            return CompletableFuture.completedFuture(Either.forLeft(List.of()));
+        }
+
         List<Location> locations = List.of();
         Optional<DefinitionProvider> provider = DefinitionProviderFactory.getDefinitionProvider(preferences, parserHandler, languageId);
         if (provider.isPresent()) {
@@ -39,6 +46,9 @@ public class LspLinkHandler {
     }
 
     public CompletableFuture<List<DocumentLink>> provideDocumentLinks(String fileUri, String languageId, String content) {
+        if (clientHandler.isStandalone()) {
+            return CompletableFuture.completedFuture(List.of());
+        }
         List<DocumentLink> documentLinks = List.of();
         Optional<DefinitionProvider> provider = DefinitionProviderFactory.getDefinitionProvider(preferences, parserHandler, languageId);
         if (provider.isPresent()) {

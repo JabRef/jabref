@@ -44,7 +44,7 @@ public class LspIntegrityCheck {
                     }
                 });
             } catch (NullPointerException nullPointerException) {
-                LOGGER.error("Error while performing integrity check.", nullPointerException);
+                LOGGER.debug("Error while performing integrity check.", nullPointerException);
             }
             return Stream.of();
         }).toList();

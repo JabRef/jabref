@@ -94,9 +94,6 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     @Override
     public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> definition(DefinitionParams params) {
-        if (!clientHandler.isStandalone()) {
-            return CompletableFuture.completedFuture(Either.forLeft(List.of()));
-        }
         if (fileUriToLanguageId.containsKey(params.getTextDocument().getUri())) {
             String fileUri = params.getTextDocument().getUri();
             return linkHandler.provideDefinition(fileUriToLanguageId.get(fileUri), fileUri, contentCache.get(fileUri), params.getPosition());
@@ -106,9 +103,6 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     @Override
     public CompletableFuture<List<DocumentLink>> documentLink(DocumentLinkParams params) {
-        if (clientHandler.isStandalone()) {
-            return CompletableFuture.completedFuture(List.of());
-        }
         String fileUri = params.getTextDocument().getUri();
         return linkHandler.provideDocumentLinks(fileUri, fileUriToLanguageId.get(fileUri), contentCache.get(fileUri));
     }
