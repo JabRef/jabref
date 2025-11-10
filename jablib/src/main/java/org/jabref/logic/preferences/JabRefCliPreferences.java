@@ -524,7 +524,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 SpringerNatureWebFetcher.FETCHER_NAME,
                 DBLPFetcher.FETCHER_NAME,
                 IEEE.FETCHER_NAME)));
-        defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());
+        defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED_GENERAL.name());
         defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(CITATIONS_RELATIONS_STORE_TTL, 30);

@@ -1,3 +1,5 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
 plugins {
     id("java-platform")
 }
@@ -6,7 +8,11 @@ javaPlatform {
     allowDependencies()
 }
 
-val javafx = "25"
+// Based on https://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle
+val os = DefaultNativePlatform.getCurrentOperatingSystem()
+val arch = DefaultNativePlatform.getCurrentArchitecture()
+val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
+
 val lucene = "10.3.1"
 val pdfbox = "3.0.5"
 
@@ -44,11 +50,11 @@ dependencies.constraints {
     api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
-    api("com.fasterxml.jackson-datatype-jdk8:2.20.0")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
     api("com.fasterxml:aalto-xml:1.3.3")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket:0.24.0")
+    api("com.github.ben-manes.caffeine:caffeine:3.2.3")
     api("com.github.javakeyring:java-keyring:1.0.4")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.27.1")
     api("com.github.jknack:handlebars-helpers:4.3.1") // Required by Wiremock - and our patching of Wiremock
@@ -58,7 +64,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
-    api("com.google.errorprone:error_prone_core:2.42.0")
+    api("com.google.errorprone:error_prone_core:2.44.0")
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.28")
     api("com.h2database:h2-mvstore:2.3.232")
@@ -87,7 +93,7 @@ dependencies.constraints {
     api("io.github.classgraph:classgraph:4.8.181")
     api("io.github.java-diff-utils:java-diff-utils:4.15")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
-    api("io.github.thibaultmeyer:cuid:2.0.3")
+    api("io.github.thibaultmeyer:cuid:2.0.4")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     api("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
     api("io.zonky.test:embedded-postgres:2.1.1")
@@ -138,7 +144,7 @@ dependencies.constraints {
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jetbrains:annotations:26.0.2-1")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.20.1")
     api("org.jspecify:jspecify:1.0.0")
