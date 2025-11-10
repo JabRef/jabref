@@ -204,5 +204,6 @@ public class FileFieldParser {
         return field;
     }
 
-    private record LinkedFilePosition(LinkedFile linkedFile, Range range) { }
+    private record LinkedFilePosition(LinkedFile linkedFile, Range range) {
+    }
 }
