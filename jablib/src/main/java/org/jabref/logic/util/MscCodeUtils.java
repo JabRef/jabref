@@ -15,6 +15,7 @@ import tools.jackson.core.exc.StreamReadException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class MscCodeUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MscCodeUtils.class);
@@ -29,7 +30,7 @@ public class MscCodeUtils {
     @NonNull
     public static Optional<HashBiMap<String, String>> loadMscCodesFromJson(URL resourceUrl) throws MscCodeLoadingException {
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new JsonMapper();
         try {
             Map<String, String> mapping =
                     mapper.readValue(resourceUrl.openStream(), new TypeReference<>() {
