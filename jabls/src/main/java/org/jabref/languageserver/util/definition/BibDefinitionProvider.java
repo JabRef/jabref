@@ -19,9 +19,11 @@ import org.eclipse.lsp4j.DocumentLink;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class BibDefinitionProvider extends DefinitionProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDefinitionProvider.class);
@@ -36,17 +38,18 @@ public class BibDefinitionProvider extends DefinitionProvider {
 
     @Override
     public List<Location> provideDefinition(String uri, String content, Position position) {
-        Optional<ParserResult> parserResult = parserHandler.getParserResultForUri(uri);
-
-        if (parserResult.isEmpty()) {
+        Optional<ParserResult> parserResultOpt = parserHandler.getParserResultForUri(uri);
+        if (parserResultOpt.isEmpty()) {
             return List.of();
         }
 
-        for (Map.Entry<BibEntry, ParserResult.Range> entry : parserResult.get().getArticleRanges().entrySet()) {
+        ParserResult parserResult = parserResultOpt.get();
+
+        for (Map.Entry<BibEntry, ParserResult.Range> entry : parserResult.getArticleRanges().entrySet()) {
             BibEntry bibEntry = entry.getKey();
             ParserResult.Range range = entry.getValue();
             if (bibEntry.getField(StandardField.FILE).isPresent() && LspRangeUtil.isPositionInRange(position, LspRangeUtil.convertToLspRange(range))) {
-                Range fileFieldRange = LspRangeUtil.convertToLspRange(parserResult.get().getFieldRange(bibEntry, StandardField.FILE));
+                Range fileFieldRange = LspRangeUtil.convertToLspRange(parserResult.getFieldRange(bibEntry, StandardField.FILE));
                 if (!LspRangeUtil.isPositionInRange(position, fileFieldRange)) {
                     return List.of();
                 }
@@ -68,7 +71,7 @@ public class BibDefinitionProvider extends DefinitionProvider {
                     int end = start + rangeInFileString.end();
                     Range linkRange = LspRangeUtil.convertToLspRange(content, start, end);
                     if (LspRangeUtil.isPositionInRange(position, linkRange)) {
-                        Optional<Path> filePath = FileUtil.find(parserResult.get().getDatabaseContext(), linkedFile.getLink(), preferences.getFilePreferences());
+                        Optional<Path> filePath = FileUtil.find(parserResult.getDatabaseContext(), linkedFile.getLink(), preferences.getFilePreferences());
                         if (LOGGER.isDebugEnabled() && filePath.isEmpty()) {
                             LOGGER.debug("filePath is empty");
                         }
