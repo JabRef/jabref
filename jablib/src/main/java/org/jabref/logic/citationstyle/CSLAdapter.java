@@ -71,7 +71,6 @@ public class CSLAdapter {
             // lang and forceLang are set to the default values of other CSL constructors
             cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
                     new DefaultAbbreviationProvider(), newStyle, "en-US");
-            cslInstance.setConvertLinks(true);
             style = newStyle;
         }
 
