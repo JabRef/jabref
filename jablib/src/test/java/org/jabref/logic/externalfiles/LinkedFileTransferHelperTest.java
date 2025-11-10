@@ -33,7 +33,7 @@ class LinkedFileTransferHelperTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
 
     @Test
-    void pathDiffersShouldAdjustPath(@TempDir Path tempDir) throws Exception {
+    void targetDirIsParentOfSourceDir(@TempDir Path tempDir) throws Exception {
         FileTestConfiguration fileTestConfiguration = FileTestConfigurationBuilder.fileTestConfiguration()
                                     .tempDir(tempDir)
                                     .filePreferences(filePreferences)
@@ -50,7 +50,7 @@ class LinkedFileTransferHelperTest {
                 filePreferences);
 
         BibEntry expectedEntry = new BibEntry()
-                .withFiles(List.of(new LinkedFile("Test", "lit/subdir/test.pdf", "PDF")));
+                .withFiles(List.of(new LinkedFile("", "subdir/test.pdf", "PDF")));
 
         assertEquals(Set.of(expectedEntry), returnedEntries);
     }
