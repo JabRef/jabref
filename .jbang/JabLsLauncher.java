@@ -23,7 +23,7 @@
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspRangeUtil.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/DefinitionProvider.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/DefinitionProviderFactory.java
-//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/LatexDefinitonProvider.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/LatexDefinitionProvider.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/MarkdownDefinitionProvider.java
 
 // REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
