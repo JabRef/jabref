@@ -49,7 +49,7 @@ public class FileFieldParser {
     public static List<LinkedFile> parse(String value) {
         // We need state to have a more clean code. Thus, we instantiate the class and then return the result
         FileFieldParser fileFieldParser = new FileFieldParser(value);
-        return fileFieldParser.parse().stream().map(LinkedFilePosition::linkedFile).toList();
+        return new ArrayList<>(fileFieldParser.parse().stream().map(LinkedFilePosition::linkedFile).toList());
     }
 
     public static Map<LinkedFile, Range> parseToPosition(String value) {
