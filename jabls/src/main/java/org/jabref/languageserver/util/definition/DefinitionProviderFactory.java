@@ -5,13 +5,13 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.languageserver.util.LspParserHandler;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.FilePreferences;
 
 public class DefinitionProviderFactory {
 
     private static final Map<String, DefinitionProvider> PROVIDER_MAP = new HashMap<>();
 
-    public static Optional<DefinitionProvider> getDefinitionProvider(CliPreferences preferences, LspParserHandler parserHandler, String languageId) {
+    public static Optional<DefinitionProvider> getDefinitionProvider(FilePreferences preferences, LspParserHandler parserHandler, String languageId) {
         return Optional.ofNullable(PROVIDER_MAP.computeIfAbsent(languageId.toLowerCase(), key -> switch (key) {
             case "markdown" ->
                     new MarkdownDefinitionProvider(parserHandler);

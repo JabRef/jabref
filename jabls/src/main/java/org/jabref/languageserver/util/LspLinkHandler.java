@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import org.jabref.languageserver.LspClientHandler;
 import org.jabref.languageserver.util.definition.DefinitionProvider;
 import org.jabref.languageserver.util.definition.DefinitionProviderFactory;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.FilePreferences;
 
 import org.eclipse.lsp4j.DocumentLink;
 import org.eclipse.lsp4j.Location;
@@ -23,9 +23,9 @@ public class LspLinkHandler {
 
     private final LspClientHandler clientHandler;
     private final LspParserHandler parserHandler;
-    private final CliPreferences preferences;
+    private final FilePreferences preferences;
 
-    public LspLinkHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, CliPreferences preferences) {
+    public LspLinkHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, FilePreferences preferences) {
         this.clientHandler = clientHandler;
         this.parserHandler = parserHandler;
         this.preferences = preferences;

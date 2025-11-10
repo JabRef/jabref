@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import org.jabref.languageserver.util.LspParserHandler;
 import org.jabref.languageserver.util.LspRangeUtil;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -29,9 +29,9 @@ public class BibDefinitionProvider extends DefinitionProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDefinitionProvider.class);
     private static final Range EMPTY_RANGE = new Range(new Position(0, 0), new Position(0, 0));
 
-    private final CliPreferences preferences;
+    private final FilePreferences preferences;
 
-    public BibDefinitionProvider(CliPreferences preferences, LspParserHandler parserHandler) {
+    public BibDefinitionProvider(FilePreferences preferences, LspParserHandler parserHandler) {
         super(parserHandler);
         this.preferences = preferences;
     }
@@ -71,7 +71,7 @@ public class BibDefinitionProvider extends DefinitionProvider {
                     int end = start + rangeInFileString.end();
                     Range linkRange = LspRangeUtil.convertToLspRange(content, start, end);
                     if (LspRangeUtil.isPositionInRange(position, linkRange)) {
-                        Optional<Path> filePath = FileUtil.find(parserResult.getDatabaseContext(), linkedFile.getLink(), preferences.getFilePreferences());
+                        Optional<Path> filePath = FileUtil.find(parserResult.getDatabaseContext(), linkedFile.getLink(), preferences);
                         if (LOGGER.isDebugEnabled() && filePath.isEmpty()) {
                             LOGGER.debug("filePath is empty");
                         }
