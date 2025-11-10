@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedCollection;
 import java.util.UUID;
 
 import org.jabref.architecture.AllowedToUseLogic;
@@ -169,7 +170,7 @@ public class BibDatabaseContext {
      */
     public @NonNull List<@NonNull Path> getFileDirectories(@NonNull FilePreferences preferences) {
         // Paths are a) ordered and b) should be contained only once in the result
-        LinkedHashSet<Path> fileDirs = new LinkedHashSet<>(3);
+        SequencedCollection<Path> fileDirs = new LinkedHashSet<>(3);
 
         Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(this::getFileDirectoryPath);
         userFileDirectory.ifPresent(fileDirs::add);
