@@ -4,10 +4,13 @@ import java.net.MalformedURLException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.util.Range;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +24,7 @@ public class FileFieldParser {
 
     private boolean windowsPath;
 
-    public FileFieldParser(String value) {
+    private FileFieldParser(String value) {
         if (value == null) {
             this.value = null;
         } else {
@@ -46,11 +49,16 @@ public class FileFieldParser {
     public static List<LinkedFile> parse(String value) {
         // We need state to have a more clean code. Thus, we instantiate the class and then return the result
         FileFieldParser fileFieldParser = new FileFieldParser(value);
-        return fileFieldParser.parse();
+        return fileFieldParser.parse().stream().map(LinkedFilePosition::linkedFile).toList();
     }
 
-    public List<LinkedFile> parse() {
-        List<LinkedFile> files = new ArrayList<>();
+    public static Map<LinkedFile, Range> parseToPosition(String value) {
+        FileFieldParser fileFieldParser = new FileFieldParser(value);
+        return fileFieldParser.parse().stream().collect(HashMap::new, (map, position) -> map.put(position.linkedFile(), position.range()), HashMap::putAll);
+    }
+
+    private List<LinkedFilePosition> parse() {
+        List<LinkedFilePosition> files = new ArrayList<>();
 
         if ((value == null) || value.trim().isEmpty()) {
             return files;
@@ -59,7 +67,7 @@ public class FileFieldParser {
         if (LinkedFile.isOnlineLink(value.trim())) {
             // needs to be modifiable
             try {
-                return List.of(new LinkedFile(URLUtil.create(value), ""));
+                return List.of(new LinkedFilePosition(new LinkedFile(URLUtil.create(value), ""), new Range(0, value.length() - 1)));
             } catch (MalformedURLException e) {
                 LOGGER.error("invalid url", e);
                 return files;
@@ -72,6 +80,7 @@ public class FileFieldParser {
         resetDataStructuresForNextElement();
         boolean inXmlChar = false;
         boolean escaped = false;
+        int startColumn = 0;
 
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -114,7 +123,8 @@ public class FileFieldParser {
                 }
             } else if (!escaped && (c == ';') && !inXmlChar) {
                 linkedFileData.add(charactersOfCurrentElement.toString());
-                files.add(convert(linkedFileData));
+                files.add(new LinkedFilePosition(convert(linkedFileData), new Range(startColumn, i)));
+                startColumn = i + 1;
 
                 // next iteration
                 resetDataStructuresForNextElement();
@@ -127,7 +137,7 @@ public class FileFieldParser {
             linkedFileData.add(charactersOfCurrentElement.toString());
         }
         if (!linkedFileData.isEmpty()) {
-            files.add(convert(linkedFileData));
+            files.add(new LinkedFilePosition(convert(linkedFileData), new Range(startColumn, value.length() - 1)));
         }
         return files;
     }
@@ -193,4 +203,6 @@ public class FileFieldParser {
         entry.clear();
         return field;
     }
+
+    private record LinkedFilePosition(LinkedFile linkedFile, Range range) { }
 }

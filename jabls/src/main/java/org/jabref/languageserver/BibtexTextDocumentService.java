@@ -65,9 +65,8 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
         if ("bibtex".equals(textDocument.getLanguageId())) {
             diagnosticHandler.computeAndPublishDiagnostics(client, textDocument.getUri(), textDocument.getText(), textDocument.getVersion());
-        } else {
-            contentCache.put(textDocument.getUri(), textDocument.getText());
         }
+        contentCache.put(textDocument.getUri(), textDocument.getText());
     }
 
     @Override
@@ -79,9 +78,8 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
         if ("bibtex".equalsIgnoreCase(languageId)) {
             diagnosticHandler.computeAndPublishDiagnostics(client, textDocument.getUri(), contentChange.getText(), textDocument.getVersion());
-        } else {
-            contentCache.put(textDocument.getUri(), contentChange.getText());
         }
+        contentCache.put(textDocument.getUri(), contentChange.getText());
     }
 
     @Override
@@ -112,7 +110,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
             return CompletableFuture.completedFuture(List.of());
         }
         String fileUri = params.getTextDocument().getUri();
-        return linkHandler.provideDocumentLinks(fileUriToLanguageId.get(fileUri), contentCache.get(fileUri));
+        return linkHandler.provideDocumentLinks(fileUri, fileUriToLanguageId.get(fileUri), contentCache.get(fileUri));
     }
 
     @Override
