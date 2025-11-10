@@ -21,6 +21,7 @@
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspLinkHandler.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspParserHandler.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspRangeUtil.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/BibDefinitionProvider.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/DefinitionProvider.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/DefinitionProviderFactory.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/LatexDefinitonProvider.java
