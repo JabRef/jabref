@@ -416,7 +416,7 @@ public class FileUtil {
      * Will look in each of the given directories starting from the beginning and
      * returning the first found file to match if any.
      */
-    public static Optional<Path> find(@NonNull String fileName, @NonNull List<Path> directories) {
+    public static Optional<Path> find(@NonNull String fileName, @NonNull List<@NonNull Path> directories) {
         if (directories.isEmpty()) {
             // Fallback, if no directories to resolve are passed
             Path path = Path.of(fileName);

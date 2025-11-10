@@ -167,7 +167,7 @@ public class BibDatabaseContext {
      * @param preferences The fileDirectory preferences
      * @return List of existing absolute paths
      */
-    public List<Path> getFileDirectories(FilePreferences preferences) {
+    public @NonNull List<@NonNull Path> getFileDirectories(@NonNull FilePreferences preferences) {
         // Paths are a) ordered and b) should be contained only once in the result
         LinkedHashSet<Path> fileDirs = new LinkedHashSet<>(3);
 
