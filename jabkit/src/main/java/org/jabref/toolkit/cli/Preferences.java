@@ -1,4 +1,4 @@
-package org.jabref.cli;
+package org.jabref.toolkit.cli;
 
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
