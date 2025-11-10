@@ -16,6 +16,9 @@ import org.tinylog.Logger;
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+//DEPS tools.jackson.core:jackson-core:3.0.2
+//DEPS tools.jackson.core:jackson-databind:3.0.2
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.2
 
 void main() throws Exception {
     var preferences = JabRefCliPreferences.getInstance();
