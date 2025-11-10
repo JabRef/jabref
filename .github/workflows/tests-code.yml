@@ -469,6 +469,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
       - name: Use cache
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: actions/cache@v4
         with:
           path: ~/.jbang
@@ -480,17 +481,17 @@ jobs:
         uses: jbangdev/setup-jbang@main
 
       # Build all JBang scripts
-      - run: jbang build .jbang/CheckoutPR.java
+      - run: |
+          for f in .jbang/*.java; do
+            echo "Building $f..."
+            jbang build --fresh "$f"
+          done
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build .jbang/CloneJabRef.java
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build --fresh .jbang/JabKitLauncher.java
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build --fresh .jbang/JabLsLauncher.java
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build --fresh .jbang/JabSrvLauncher.java
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build --fresh jablib-examples/*.java
+      - run: |
+          for f in jablib-examples/*.java; do
+            echo "Building $f..."
+            jbang build --fresh "$f"
+          done
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
 
       # *Launcher.java should support "--help"
@@ -522,6 +523,7 @@ jobs:
         with:
           files: |
             .jbang/*.java
+            jabkit/src/main/java/**/*.java
             jablib/src/main/java/**/*.java
             jablib-examples/**/*.java
           files_ignore: |
@@ -553,7 +555,20 @@ jobs:
           # We modify the JBang scripts directly to avoid issues with relative paths
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
             case "$f" in
-              jablib-examples/*) continue ;; # skip scripts
+              .jbang/*)
+                # skip scripts
+                continue
+                ;;
+              jablib-examples/*)
+                # skip scripts
+                continue
+                ;;
+              jabkit/*)
+                # only JabKit needs its modified sources if jabkit was modified
+                if [ "${{ matrix.script }}" != ".jbang/JabKitLauncher.java" ]; then
+                  continue
+                fi
+                ;;
             esac
             echo "//SOURCES ../$f" >> "${{ matrix.script }}"
           done

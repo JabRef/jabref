@@ -32,7 +32,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
-import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -95,7 +95,7 @@ public class BibDatabaseWriter {
     /// @param  preferences - used to read all the preferences
     public BibDatabaseWriter(@NonNull Writer writer,
                              @NonNull BibDatabaseContext bibDatabaseContext,
-                             @NonNull JabRefCliPreferences preferences) {
+                             @NonNull CliPreferences preferences) {
         this(new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator()),
                 preferences.getSelfContainedExportConfiguration(),
                 preferences.getFieldPreferences(),

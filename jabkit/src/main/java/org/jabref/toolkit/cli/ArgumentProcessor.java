@@ -1,4 +1,4 @@
-package org.jabref.cli;
+package org.jabref.toolkit.cli;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -43,6 +43,7 @@ import static picocli.CommandLine.Option;
                 CheckConsistency.class,
                 CheckIntegrity.class,
                 Convert.class,
+                DoiToBibtex.class,
                 Fetch.class,
                 GenerateBibFromAux.class,
                 GenerateCitationKeys.class,
