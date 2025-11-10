@@ -44,7 +44,7 @@ dependencies.constraints {
     // from JavaFX25 onwards
     api("org.openjfx:jdk-jsobject:$javafx")
 
-    api("cc.jilt:jilt:1.8.3")
+    api("cc.jilt:jilt:1.8.4")
 
     api("com.dlsc.gemsfx:gemsfx:3.5.7")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
