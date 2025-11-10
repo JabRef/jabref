@@ -68,12 +68,13 @@ public class BibDefinitionProvider extends DefinitionProvider {
                     int end = start + rangeInFileString.end();
                     Range linkRange = LspRangeUtil.convertToLspRange(content, start, end);
                     if (LspRangeUtil.isPositionInRange(position, linkRange)) {
-                        try {
-                            Optional<Path> filePath = FileUtil.find(parserResult.get().getDatabaseContext(), linkedFile.getLink(), preferences.getFilePreferences());
-                            return List.of(new Location(filePath.get().toUri().toString(), EMPTY_RANGE));
-                        } catch (NullPointerException e) {
-                            LOGGER.debug("Error while getting file path", e);
+                        Optional<Path> filePath = FileUtil.find(parserResult.get().getDatabaseContext(), linkedFile.getLink(), preferences.getFilePreferences());
+                        if (LOGGER.isDebugEnabled() && filePath.isEmpty()) {
+                            LOGGER.debug("filePath is empty");
                         }
+                        return filePath
+                                .map(p -> List.of(new Location(p.toUri().toString(), EMPTY_RANGE)))
+                                .orElse(List.of());
                     }
                 }
             }
