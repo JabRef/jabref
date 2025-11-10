@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
@@ -317,12 +316,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         } else {
             // select new entry
             // Use Platform.runLater to avoid JavaFX bug with selection change events
-            Platform.runLater(() -> {
-                getSelectionModel().clearSelection();
-                findEntry(bibEntry).ifPresent(entry -> {
-                    getSelectionModel().select(entry);
-                    scrollTo(entry);
-                });
+            findEntry(bibEntry).ifPresent(entry -> {
+                int index = getItems().indexOf(entry);
+                if (index >= 0) {
+                    // Use clearAndSelect(index) instead of separate clear() + select()
+                    // to avoid JavaFX bug with selection change events
+                    getSelectionModel().clearAndSelect(index);
+                    scrollTo(index);
+                }
             });
         }
     }
@@ -333,20 +334,26 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // keep original entry selected and reset citation merge mode
             this.citationMergeMode = false;
         } else {
-            // Use Platform.runLater to avoid JavaFX bug with selection change events
-            Platform.runLater(() -> {
+            // select new entries
+            List<Integer> indices = bibEntries.stream()
+                                              .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
+                                              .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
+                                              .filter(Optional::isPresent)
+                                              .map(Optional::get)
+                                              .map(entry -> getItems().indexOf(entry))
+                                              .filter(index -> index >= 0)
+                                              .toList();
+
+            if (!indices.isEmpty()) {
+                // For multiple selections, clear once then select all
                 getSelectionModel().clearSelection();
-                List<BibEntryTableViewModel> entries = bibEntries.stream()
-                                                                 .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                                                 .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
-                                                                 .filter(Optional::isPresent)
-                                                                 .map(Optional::get)
-                                                                 .toList();
-                entries.forEach(entry -> getSelectionModel().select(entry));
-                if (!entries.isEmpty()) {
-                    scrollTo(entries.getFirst());
-                }
-            });
+                indices.forEach(index -> {
+                    if (index < getItems().size()) {
+                        getSelectionModel().select(index);
+                    }
+                });
+                scrollTo(indices.getFirst());
+            }
         }
     }
 
