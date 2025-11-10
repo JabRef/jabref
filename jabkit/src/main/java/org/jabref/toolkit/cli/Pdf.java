@@ -1,4 +1,4 @@
-package org.jabref.cli;
+package org.jabref.toolkit.cli;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
