@@ -173,7 +173,7 @@ public class CffImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        ObjectMapper mapper = new YAMLMapper(new YAMLFactory());
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
         List<BibEntry> entriesList = new ArrayList<>();
 
