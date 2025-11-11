@@ -38,12 +38,12 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents everything related to a BIB file.
  *
- * <p> The entries are stored in BibDatabase, the other data in MetaData
- * and the options relevant for this file in Defaults.
- * </p>
- * <p>
- * To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
- * </p>
+ * <p>The entries are stored in BibDatabase, the other data in MetaData
+ * and the options relevant for this file in Defaults.</p>
+ *
+ * <p>To create instances with custom configurations, use {@link Builder}.</p>
+ * <p>To get an instance for a .bib file, use
+ * {@link org.jabref.logic.importer.fileformat.BibtexParser}.</p>
  */
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
@@ -72,22 +72,24 @@ public class BibDatabaseContext {
         this(new BibDatabase());
     }
 
-    public BibDatabaseContext(@NonNull BibDatabase database) {
+    public BibDatabaseContext(BibDatabase database) {
         this(database, new MetaData());
     }
 
-    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData) {
-        this.database = database;
-        this.metaData = metaData;
+    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
+        this.database = Objects.requireNonNull(database);
+        this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path) {
+    @Deprecated
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
-    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path, @NonNull DatabaseLocation location) {
+    private BibDatabaseContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
         this(database, metaData);
+        Objects.requireNonNull(location);
         this.path = path;
 
         if (location == DatabaseLocation.LOCAL) {
@@ -99,7 +101,7 @@ public class BibDatabaseContext {
         return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
     }
 
-    public void setMode(@NonNull BibDatabaseMode bibDatabaseMode) {
+    public void setMode(BibDatabaseMode bibDatabaseMode) {
         metaData.setMode(bibDatabaseMode);
     }
 
@@ -128,8 +130,8 @@ public class BibDatabaseContext {
         return metaData;
     }
 
-    public void setMetaData(@NonNull MetaData metaData) {
-        this.metaData = metaData;
+    public void setMetaData(MetaData metaData) {
+        this.metaData = Objects.requireNonNull(metaData);
     }
 
     public boolean isBiblatexMode() {
@@ -264,7 +266,8 @@ public class BibDatabaseContext {
     /**
      * @return The path to store the lucene index files. One directory for each library.
      */
-    public @NonNull Path getFulltextIndexPath() {
+    @NonNull
+    public Path getFulltextIndexPath() {
         Path appData = Directories.getFulltextIndexBaseDirectory();
         Path indexPath;
 
@@ -348,5 +351,74 @@ public class BibDatabaseContext {
      */
     public String getUid() {
         return uid;
+    }
+
+    /**
+     * Builder for creating BibDatabaseContext instances.
+     */
+    public static class Builder {
+        private BibDatabase database = new BibDatabase();
+        private MetaData metaData = new MetaData();
+        private Path path = null;
+        private DatabaseLocation location = DatabaseLocation.LOCAL;
+
+        /**
+         * Creates a builder with default values.
+         */
+        public Builder() {
+        }
+
+        /**
+         * Sets the database.
+         *
+         * @param database the database to use
+         * @return this builder
+         */
+        public Builder withDatabase(BibDatabase database) {
+            this.database = Objects.requireNonNull(database);
+            return this;
+        }
+
+        /**
+         * Sets the metadata.
+         *
+         * @param metaData the metadata to use
+         * @return this builder
+         */
+        public Builder withMetaData(MetaData metaData) {
+            this.metaData = Objects.requireNonNull(metaData);
+            return this;
+        }
+
+        /**
+         * Sets the database path.
+         *
+         * @param path the path to the database file
+         * @return this builder
+         */
+        public Builder withDatabasePath(Path path) {
+            this.path = path;
+            return this;
+        }
+
+        /**
+         * Sets the database location.
+         *
+         * @param location the database location
+         * @return this builder
+         */
+        public Builder withLocation(DatabaseLocation location) {
+            this.location = Objects.requireNonNull(location);
+            return this;
+        }
+
+        /**
+         * Builds the BibDatabaseContext.
+         *
+         * @return the created context
+         */
+        public BibDatabaseContext build() {
+            return new BibDatabaseContext(database, metaData, path, location);
+        }
     }
 }

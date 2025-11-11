@@ -127,7 +127,7 @@ public class AutoSetFileLinksUtil {
 
                 String strType = type.map(ExternalFileType::getName).orElse("");
                 Path relativeFilePath = FileUtil.relativize(foundFile, directories);
-                LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
+                LinkedFile linkedFile = LinkedFile.of("", relativeFilePath, strType);
                 linkedFiles.add(linkedFile);
                 LOGGER.debug("Found file {} for entry {}", linkedFile, entry.getCitationKey());
             }

@@ -129,7 +129,7 @@ public class DownloadFullTextAction extends SimpleCommand {
      * @param entry           the entry "value"
      */
     private void addLinkedFileFromURL(BibDatabaseContext databaseContext, URL url, BibEntry entry) {
-        LinkedFile newLinkedFile = new LinkedFile(url, "");
+        LinkedFile newLinkedFile = LinkedFile.fromUrl(url, "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
