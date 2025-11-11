@@ -25,6 +25,6 @@ class PushToWinEdtTest {
 
     @Test
     void jumpToLineCommandlineArguments() {
-        assertNotNull(new PushToWinEdt(dialogService, preferences).jumpToLineCommandlineArguments(Path.of("test.tex"), 1, 5));
+        assertNotNull(new GuiPushToWinEdt(dialogService, preferences.getPushToApplicationPreferences()).jumpToLineCommandlineArguments(Path.of("test.tex"), 1, 5));
     }
 }

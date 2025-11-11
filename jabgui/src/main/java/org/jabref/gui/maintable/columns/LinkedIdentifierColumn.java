@@ -25,6 +25,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 /**
  * A clickable icons column for DOIs, URLs, URIs and EPrints.
@@ -62,7 +63,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
                 .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                     // If we only have one identifer, open directly
                     if ((linkedFiles.size() == 1) && (event.getButton() == MouseButton.PRIMARY)) {
-                       new OpenUrlAction(dialogService, stateManager, preferences).execute();
+                        new OpenUrlAction(dialogService, stateManager, preferences).execute();
                     }
                 })
                 .install(this);
@@ -80,7 +81,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
 
     private String createIdentifierTooltip(Map<Field, String> values) {
         StringBuilder identifiers = new StringBuilder();
-        values.keySet().forEach(field -> identifiers.append(field.getDisplayName()).append(": ").append(values.get(field)).append("\n"));
+        values.keySet().forEach(field -> identifiers.append(FieldTextMapper.getDisplayName(field)).append(": ").append(values.get(field)).append("\n"));
         return identifiers.toString();
     }
 
@@ -92,7 +93,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
         }
 
         values.keySet().forEach(field -> {
-            MenuItem menuItem = new MenuItem(field.getDisplayName() + ": " +
+            MenuItem menuItem = new MenuItem(FieldTextMapper.getDisplayName(field) + ": " +
                     ControlHelper.truncateString(values.get(field), -1, "...", ControlHelper.EllipsisPosition.CENTER),
                     cellFactory.getTableIcon(field));
             menuItem.setOnAction(event -> {

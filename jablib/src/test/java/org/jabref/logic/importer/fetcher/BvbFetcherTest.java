@@ -6,19 +6,17 @@ import java.net.URL;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.Test;
 
-import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -53,29 +51,31 @@ class BvbFetcherTest {
 
     @Test
     void performTest() throws FetcherException {
-        String searchquery = "effective java author:bloch";
+        String searchquery = "effective java author=bloch";
         List<BibEntry> result = fetcher.performSearch(searchquery);
         assertFalse(result.isEmpty());
 
-//        System.out.println("Query:\n");
-//        System.out.println(fetcher.getURLForQuery(new StandardSyntaxParser().parse(searchquery, NO_EXPLICIT_FIELD)));
-//        System.out.println("Test result:\n");
-//        result.forEach(entry -> System.out.println(entry.toString()));
+        //        System.out.println("Query:\n");
+        //        System.out.println(fetcher.getURLForQuery(new StandardSyntaxParser().parse(searchquery, NO_EXPLICIT_FIELD)));
+        //        System.out.println("Test result:\n");
+        //        result.forEach(entry -> System.out.println(entry.toString()));
     }
 
     @Test
-    void simpleSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException, QueryNodeParseException {
+    void simpleSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException {
         String query = "java jdk";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
-        URL url = fetcher.getURLForQuery(luceneQuery);
+        SearchQuery searchQueryObject = new SearchQuery(query);
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+        URL url = fetcher.getURLForQuery(visitor.visitStart(searchQueryObject.getContext()));
         assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=java%20jdk&maximumRecords=30", url.toString());
     }
 
     @Test
-    void complexSearchQueryURLCorrect() throws QueryNodeParseException, MalformedURLException, URISyntaxException {
-        String query = "title:jdk";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
-        URL url = fetcher.getURLForQuery(luceneQuery);
+    void complexSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException {
+        String query = "title=jdk";
+        SearchQuery searchQueryObject = new SearchQuery(query);
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+        URL url = fetcher.getURLForQuery(visitor.visitStart(searchQueryObject.getContext()));
         assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=jdk&maximumRecords=30", url.toString());
     }
 

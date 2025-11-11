@@ -1,13 +1,14 @@
 package org.jabref.logic.integrity;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class HowPublishedChecker implements ValueChecker {
 
@@ -15,15 +16,15 @@ public class HowPublishedChecker implements ValueChecker {
 
     private final BibDatabaseContext databaseContext;
 
-    public HowPublishedChecker(BibDatabaseContext databaseContext) {
-        this.databaseContext = Objects.requireNonNull(databaseContext);
+    public HowPublishedChecker(@NonNull BibDatabaseContext databaseContext) {
+        this.databaseContext = databaseContext;
     }
 
     /**
      * Official BibTeX specification:
-     *  HowPublished: How something strange has been published. The first word should be capitalized.
+     * HowPublished: How something strange has been published. The first word should be capitalized.
      * biblatex package documentation (Section 4.9.1):
-     *  The biblatex package will automatically capitalize the first word when required at the beginning of a sentence.
+     * The biblatex package will automatically capitalize the first word when required at the beginning of a sentence.
      */
     @Override
     public Optional<String> checkValue(String value) {

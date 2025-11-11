@@ -21,13 +21,14 @@ public class CoarseChangeFilter {
 
     private Optional<Field> lastFieldChanged;
     private Optional<BibEntry> lastEntryChanged;
-    private int totalDelta;
 
     public CoarseChangeFilter(BibDatabaseContext bibDatabaseContext) {
-        // Listen for change events
         this.context = bibDatabaseContext;
+
+        // Listen for change events
         context.getDatabase().registerListener(this);
         context.getMetaData().registerListener(this);
+
         this.lastFieldChanged = Optional.empty();
         this.lastEntryChanged = Optional.empty();
     }

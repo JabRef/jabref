@@ -11,14 +11,14 @@ This folder contains directories making use of [Vagrant](https://www.vagrantup.c
 2. [Install Vagrant](https://developer.hashicorp.com/vagrant/install?product_intent=vagrant)
     - Windows: `winget install  -e --id Hashicorp.Vagrant`
 3. [Install Vagrant Virtual Box Guest Additions Plugin](https://subscription.packtpub.com/book/cloud-and-networking/9781786464910/1/ch01lvl1sec12/enabling-virtualbox-guest-additions-in-vagrant).
-   This helps ensururing that the guest additions of each box are automatically updated.
+   This helps ensuring that the guest additions of each box are automatically updated.
     - `vagrant plugin install vagrant-vbguest`
 
 ### Setup VM
 
-1. `cd` into `{vmdir}`, e..g, `cd ubuntu`
-2. Start the vm `vagrant up`
-3. Restart the vm
+1. `cd` into `{vmdir}`, e.g., `cd ubuntu`
+2. Start the VM: `vagrant up`
+3. Restart the VM
 4. Linux virtual machines: Store ssh configuration: `vagrant ssh-config > vagrant-ssh`
 
 ### Use VM
@@ -30,13 +30,13 @@ If asked for a password, this is `vagrant`.
 
 #### Multiple Screens
 
-One can configure mulitple screen as the virtual machine settings of Virtual Box:
+One can configure multiple screen as the virtual machine settings of VirtualBox:
 Navigate to "Display" (1), set "Video Memory" to the maximum value (2), and then adjust the number of displays (3).
 
 ![Virtual Box settings for multiple screens at VM settings](virtualbox-multiple-screens-1.png)
 
-In case you want to have a fixed resoltuion, one can pin the screen resolution as follows:
-During running of Virutal Box,
+In case you want to have a fixed resolution, one can pin the screen resolution as follows:
+During running of VirtualBox,
 (1) unselect "Auto-size Guest Display" and
 (2) adjust the screen resolution to full HD
 
@@ -71,7 +71,7 @@ More info on snaps is available at <https://snapcraft.io/docs/quickstart-tour>.
 
 > `An error occurred during installation of VirtualBox Guest Additions 7.0.20. Some functionality may not work as intended.`
 
-Install the guest additions manually by "Devices" > "Install Virtual Box Gueat Additions".
+Install the guest additions manually by "Devices" > "Install Virtual Box Guest Additions".
 
 > I get a strange installation error.
 

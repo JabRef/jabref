@@ -90,7 +90,7 @@ public class LocalizationParser {
 
     private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type) throws IOException {
         try {
-            return List.of("jablib", "jabkit", "jabsrv", "jabgui")
+            return List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls")
                        .stream()
                        .map(path -> Path.of("..", path, "src", "main", "java").normalize())
                        .flatMap(Unchecked.function(path -> Files.walk(path)))
@@ -104,7 +104,7 @@ public class LocalizationParser {
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTest type) throws IOException {
         try {
-            return List.of("jablib", "jabkit", "jabsrv", "jabgui")
+            return List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls")
                        .stream()
                        .map(path -> Path.of("..", path, "src", "main", "resources").normalize())
                        .filter(Files::isDirectory)

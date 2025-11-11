@@ -33,12 +33,22 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Remove all assignees
         run: |
           ASSIGNEES=$(gh issue view ${{ github.event.issue.number }} --json assignees --template '{{range .assignees}}{{.login}} {{end}}')
           for user in $ASSIGNEES; do
             gh issue edit ${{ github.event.issue.number }} --remove-assignee "$user"
           done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
+        run: |
+          set -e
+
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "🔔 reminder-sent"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📌 Pinned"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

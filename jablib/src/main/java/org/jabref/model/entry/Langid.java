@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldWriter;
+
 /**
  * Language identifiers based on BibLaTeX manual specifications.
  * See the BibLaTeX documentation for full details:
@@ -58,7 +59,6 @@ public enum Langid {
     SWEDISH("Swedish", "swedish"),
     TURKISH("Turkish", "turkish"),
     UKRAINIAN("Ukrainian", "ukrainian");
-
 
     private final String name;
     private final String langid;

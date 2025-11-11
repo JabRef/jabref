@@ -23,6 +23,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
@@ -88,7 +89,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     }
 
     private void setupTagsField(TagsField<Field> tagsField) {
-        tagsField.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
+        tagsField.setCellFactory(new ViewModelListCellFactory<Field>().withText(FieldTextMapper::getDisplayName));
         tagsField.setTagViewFactory(field -> createTag(tagsField, field));
 
         tagsField.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
@@ -110,9 +111,9 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
     private Node createTag(TagsField<Field> tagsField, Field field) {
         Label tagLabel = new Label();
-        tagLabel.setText(field.getDisplayName());
+        tagLabel.setText(FieldTextMapper.getDisplayName(field));
         tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
-        tagLabel.getGraphic().setOnMouseClicked(event -> tagsField.removeTags(field));
+        tagLabel.getGraphic().setOnMouseClicked(_ -> tagsField.removeTags(field));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         return tagLabel;
     }

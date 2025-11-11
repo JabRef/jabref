@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -104,15 +104,15 @@ public class ManageKeywordsViewModel {
             return;
         }
 
-        NamedCompound ce = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
-        // TODO: bp.getUndoManager().addEdit(ce);
+        NamedCompoundEdit compoundEdit = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
+        // TODO: bp.getUndoManager().addEdit(compoundEdit);
     }
 
-    private NamedCompound updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
-                                         KeywordList keywordsToRemove) {
+    private NamedCompoundEdit updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
+                                             KeywordList keywordsToRemove) {
         Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
+        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Update keywords"));
         for (BibEntry entry : entries) {
             KeywordList keywords = entry.getKeywords(keywordSeparator);
 
@@ -122,9 +122,9 @@ public class ManageKeywordsViewModel {
 
             // put keywords back
             Optional<FieldChange> change = entry.putKeywords(keywords, keywordSeparator);
-            change.ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+            change.ifPresent(fieldChange -> compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));
         }
-        ce.end();
-        return ce;
+        compoundEdit.end();
+        return compoundEdit;
     }
 }

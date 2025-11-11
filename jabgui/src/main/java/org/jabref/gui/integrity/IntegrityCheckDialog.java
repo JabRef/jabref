@@ -21,13 +21,13 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.airhacks.afterburner.views.ViewLoaderResult;
@@ -49,7 +49,6 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     @FXML private VBox dialogVBox;
 
     @Inject private EntryEditor entryEditor;
-    @Inject private ThemeManager themeManager;
     @Inject private StateManager stateManager;
     private final List<IntegrityMessage> messages;
     private final LibraryTab libraryTab;
@@ -58,6 +57,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private TableFilter<IntegrityMessage> tableFilter;
     private BibLogSettingsPane bibLogSettingsPane;
     private final List<IntegrityMessage> blgWarnings = new ArrayList<>();
+
     public IntegrityCheckDialog(List<IntegrityMessage> messages, LibraryTab libraryTab, DialogService dialogService) {
         this.messages = messages;
         this.libraryTab = libraryTab;
@@ -69,8 +69,6 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     private void handleRowClick(IntegrityMessage message, MouseEvent event) {
@@ -100,7 +98,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                 .install(messagesTable);
         messagesTable.setItems(viewModel.getMessages());
         keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().entry().getCitationKey().orElse("")));
-        fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().field().getDisplayName()));
+        fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(FieldTextMapper.getDisplayName(row.getValue().field())));
         messageColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().message()));
 
         new ValueTableCellFactory<IntegrityMessage, String>()
@@ -178,7 +176,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
      * Called on:
      * (1) Dialog initialization (default load)
      * (2) User triggers Browse or Reset in BibLogSettingsPane
-     *
+     * <p>
      * This reloads .blg warnings and merges them into the main message list.
      */
     private void reloadBlgWarnings() {

@@ -53,6 +53,16 @@ class ReferenceMarkTest {
                 Arguments.of(
                         "JABREF_PGF/TikZTeam2023 CID_8 kyu75a4s",
                         List.of("PGF/TikZTeam2023"), List.of(8), "kyu75a4s"
+                ),
+
+                // Unicode citation keys (Cyrillic)
+                Arguments.of(
+                        "JABREF_Ты2025 CID_1 abc123",
+                        List.of("Ты2025"), List.of(1), "abc123"
+                ),
+                Arguments.of(
+                        "JABREF_Я2025 CID_2 def456",
+                        List.of("Я2025"), List.of(2), "def456"
                 )
         );
     }

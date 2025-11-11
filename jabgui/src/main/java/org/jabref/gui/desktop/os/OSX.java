@@ -47,7 +47,7 @@ public class OSX extends NativeDesktop {
 
     @Override
     public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
-         new ProcessBuilder("open", "-a", "Terminal", absolutePath).start();
+        new ProcessBuilder("open", "-a", "Terminal", absolutePath).start();
     }
 
     @Override

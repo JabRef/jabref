@@ -2,7 +2,7 @@ package org.jabref.gui.mergeentries;
 
 import java.util.stream.Stream;
 
-import org.jabref.gui.mergeentries.newmergedialog.cell.ThreeWayMergeCellViewModel;
+import org.jabref.gui.mergeentries.threewaymerge.cell.ThreeWayMergeCellViewModel;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;

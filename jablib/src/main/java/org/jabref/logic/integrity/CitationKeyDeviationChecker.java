@@ -11,14 +11,17 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 
+import org.jspecify.annotations.NonNull;
+
 public class CitationKeyDeviationChecker implements EntryChecker {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
-    public CitationKeyDeviationChecker(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
-        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
+    public CitationKeyDeviationChecker(@NonNull BibDatabaseContext bibDatabaseContext,
+                                       @NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this.bibDatabaseContext = bibDatabaseContext;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
     }
 
     @Override

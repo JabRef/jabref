@@ -69,6 +69,9 @@ public enum KeyBinding {
     IMPORT_INTO_NEW_DATABASE("Import into new library", Localization.lang("Import into new library"), "ctrl+alt+I", KeyBindingCategory.FILE),
     MERGE_ENTRIES("Merge entries", Localization.lang("Merge entries"), "ctrl+M", KeyBindingCategory.TOOLS),
 
+    BACK("Back", Localization.lang("Back"), "alt+LEFT", KeyBindingCategory.VIEW),
+    FORWARD("Forward", Localization.lang("Forward"), "alt+RIGHT", KeyBindingCategory.VIEW),
+
     ADD_ENTRY("Add entry", Localization.lang("Add entry"), "ctrl+N", KeyBindingCategory.BIBTEX),
     ADD_ENTRY_IDENTIFIER("Enter identifier", Localization.lang("Enter identifier"), "ctrl+alt+shift+N", KeyBindingCategory.BIBTEX),
     ADD_ENTRY_PLAINTEXT("Interpret citations", Localization.lang("Interpret citations"), "ctrl+shift+N", KeyBindingCategory.BIBTEX),

@@ -10,6 +10,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.comparator.NumericFieldComparator;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.UnknownField;
 
@@ -55,7 +56,7 @@ public class FieldColumn extends MainTableColumn<String> {
      */
     @Override
     public String getDisplayName() {
-        return fields.getDisplayName();
+        return FieldTextMapper.getDisplayName(fields);
     }
 
     private ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {

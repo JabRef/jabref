@@ -14,11 +14,11 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.strings.StringUtil;
 
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;

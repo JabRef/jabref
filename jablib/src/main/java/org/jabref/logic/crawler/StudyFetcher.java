@@ -3,7 +3,6 @@ package org.jabref.logic.crawler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
@@ -40,7 +39,7 @@ class StudyFetcher {
     public List<QueryResult> crawl() {
         return searchQueries.parallelStream()
                             .map(this::getQueryResult)
-                            .collect(Collectors.toList());
+                            .toList();
     }
 
     private QueryResult getQueryResult(String searchQuery) {
@@ -57,7 +56,7 @@ class StudyFetcher {
         return activeFetchers.parallelStream()
                              .map(fetcher -> performSearchOnQueryForFetcher(searchQuery, fetcher))
                              .filter(Objects::nonNull)
-                             .collect(Collectors.toList());
+                             .toList();
     }
 
     private FetchResult performSearchOnQueryForFetcher(String searchQuery, SearchBasedFetcher fetcher) {
@@ -73,7 +72,7 @@ class StudyFetcher {
             }
             return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
         } catch (FetcherException e) {
-            LOGGER.warn("%s API request failed".formatted(fetcher.getName()), e);
+            LOGGER.warn("{} API request failed", fetcher.getName(), e);
             return null;
         }
     }

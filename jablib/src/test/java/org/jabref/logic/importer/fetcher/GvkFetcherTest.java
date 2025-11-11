@@ -7,16 +7,14 @@ import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer;
+import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -68,37 +66,39 @@ class GvkFetcherTest {
     }
 
     @Test
-    void simpleSearchQueryURLCorrect() throws QueryNodeParseException, MalformedURLException, URISyntaxException {
+    void simpleSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException {
         String query = "java jdk";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        URL url = fetcher.getURLForQuery(luceneQuery);
+        SearchQuery searchQueryObject = new SearchQuery(query);
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+        URL url = fetcher.getURLForQuery(visitor.visitStart(searchQueryObject.getContext()));
         assertEquals("https://sru.k10plus.de/opac-de-627?version=1.1&operation=searchRetrieve&query=pica.all%3Djava%20and%20pica.all%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
-    void complexSearchQueryURLCorrect() throws QueryNodeParseException, MalformedURLException, URISyntaxException {
-        String query = "kon:java tit:jdk";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        URL url = fetcher.getURLForQuery(luceneQuery);
+    void complexSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException {
+        String query = "kon=java tit=jdk";
+        SearchQuery searchQueryObject = new SearchQuery(query);
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+        URL url = fetcher.getURLForQuery(visitor.visitStart(searchQueryObject.getContext()));
         assertEquals("https://sru.k10plus.de/opac-de-627?version=1.1&operation=searchRetrieve&query=pica.kon%3Djava%20and%20pica.tit%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
     void performSearchMatchingMultipleEntries() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch("title:\"effective java\"");
+        List<BibEntry> searchResult = fetcher.performSearch("title=\"effective java\"");
         assertTrue(searchResult.contains(bibEntryPPN591166003));
         assertTrue(searchResult.contains(bibEntryPPN66391437X));
     }
 
     @Test
     void performSearch591166003() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch("ppn:591166003");
+        List<BibEntry> searchResult = fetcher.performSearch("ppn=591166003");
         assertEquals(List.of(bibEntryPPN591166003), searchResult);
     }
 
     @Test
     void performSearch66391437X() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch("ppn:66391437X");
+        List<BibEntry> searchResult = fetcher.performSearch("ppn=66391437X");
         assertEquals(List.of(bibEntryPPN66391437X), searchResult);
     }
 

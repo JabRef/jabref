@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
@@ -17,6 +16,8 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Importer for COPAC format.
@@ -48,7 +49,7 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         String str;
         while ((str = reader.readLine()) != null) {
             if (CopacImporter.COPAC_PATTERN.matcher(str).find()) {
@@ -67,9 +68,7 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<String> entries = new LinkedList<>();
         StringBuilder sb = new StringBuilder();
 

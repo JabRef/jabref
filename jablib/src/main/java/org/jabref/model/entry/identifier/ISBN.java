@@ -11,14 +11,16 @@ import java.util.regex.Pattern;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NonNull;
+
 public class ISBN implements Identifier {
 
     private static final Pattern ISBN_PATTERN = Pattern.compile("^(\\d{9}[\\dxX]|\\d{13})$");
 
     private final String isbnString;
 
-    public ISBN(String isbnString) {
-        this.isbnString = Objects.requireNonNull(isbnString).trim().replace("-", "");
+    public ISBN(@NonNull String isbnString) {
+        this.isbnString = isbnString.trim().replace("-", "");
     }
 
     public static Optional<ISBN> parse(String input) {

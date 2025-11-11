@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Extracts a subset of BibTeX entries from a BibDatabase that are included in an AUX file. Also supports nested AUX
  * files (latex \\include).
- *
+ * <p>
  * There exists no specification of the AUX file. Every package, class or document can write to the AUX file. The AUX
  * file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
- *
+ * <p>
  * BibTeX citation: \citation{x,y,z} Biblatex citation: \abx@aux@cite{x,y,z} Nested AUX files: \@input{x}
  */
 public class DefaultAuxParser implements AuxParser {
@@ -145,7 +145,7 @@ public class DefaultAuxParser implements AuxParser {
      * Resolves and adds CrossRef entries to insert them in addition to the original entries
      *
      * @param entries Entries to check for CrossRefs
-     * @param result AUX file
+     * @param result  AUX file
      */
     private void resolveCrossReferences(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> entriesToInsert = new ArrayList<>();
@@ -172,12 +172,12 @@ public class DefaultAuxParser implements AuxParser {
      * Insert a clone of each given entry. The clones are each given a new unique ID.
      *
      * @param entries Entries to be cloned
-     * @param result the parser result (representing the AUX file)
+     * @param result  the parser result (representing the AUX file)
      */
     private void insertEntries(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> clonedEntries = new ArrayList<>();
         for (BibEntry entry : entries) {
-            BibEntry bibEntryToAdd = (BibEntry) entry.clone();
+            BibEntry bibEntryToAdd = new BibEntry(entry);
             // ensure proper "rendering" of the BibTeX code
             bibEntryToAdd.setChanged(true);
             clonedEntries.add(bibEntryToAdd);

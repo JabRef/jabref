@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
  *     <li>Let the user input meta data for the study.</li>
  *     <li>Let JabRef do the crawling afterwards.</li>
  * </ol>
- *
+ * <p>
  * Needs to inherit {@link ExistingStudySearchAction}, because that action implements the real crawling.
- *
+ * <p>
  * There is the hook {@link StartNewStudyAction#crawlPreparation(Path)}, which is used by {@link ExistingStudySearchAction#crawl()}.
  */
 public class StartNewStudyAction extends ExistingStudySearchAction {
@@ -64,7 +64,9 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
         // The GitHandler is already called to initialize the repository with one single commit "Initial commit".
         // The "Initial commit" should also contain the created YAML.
         // Thus, we append to that commit.
-        new GitHandler(studyRepositoryRoot).createCommitOnCurrentBranch("Initial commit", true);
+        GitHandler gitHandler = new GitHandler(studyRepositoryRoot);
+        gitHandler.initIfNeeded();
+        gitHandler.createCommitOnCurrentBranch("Initial commit", true);
     }
 
     @Override

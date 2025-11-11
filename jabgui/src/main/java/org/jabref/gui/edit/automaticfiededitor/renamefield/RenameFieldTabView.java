@@ -56,7 +56,7 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
         fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
-        EasyBind.listen(fieldComboBox.getEditor().textProperty(), observable -> fieldComboBox.commitValue());
+        EasyBind.listen(fieldComboBox.getEditor().textProperty(), _ -> fieldComboBox.commitValue());
 
         renameButton.disableProperty().bind(viewModel.canRenameProperty().not());
 

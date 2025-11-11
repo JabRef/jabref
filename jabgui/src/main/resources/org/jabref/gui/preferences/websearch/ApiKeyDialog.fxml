@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<DialogPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jabref.gui.preferences.websearch.ApiKeyDialog" prefWidth="500">
+    <content>
+        <VBox spacing="10" styleClass="api-key-dialog-content">
+            <padding>
+                <Insets top="10"/>
+            </padding>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="%API Key"/>
+                <TextField fx:id="apiKeyField" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="testButton" onAction="#testApiKey" text="%Test connection"/>
+            </HBox>
+            <CheckBox fx:id="persistApiKeysCheckBox" text="%Save API key to use in future?">
+                <tooltip>
+                    <Tooltip
+                            text="%Save the API key to your system's credential manager for future use. If unchecked, the key is only valid for the current session."/>
+                </tooltip>
+            </CheckBox>
+        </VBox>
+    </content>
+    <ButtonType fx:constant="OK"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

@@ -64,6 +64,8 @@ jobs:
     if: ${{ needs.unassign_issues.outputs.unassigned_issues != '[]' }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
+      max-parallel: 1
       matrix:
         issue_number: ${{ fromJson(needs.unassign_issues.outputs.unassigned_issues) }}
     steps:

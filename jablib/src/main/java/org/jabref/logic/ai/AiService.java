@@ -27,9 +27,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
- *  The main class for the AI functionality.
- *  <p>
- *  Holds all the AI components: LLM and embedding model, chat history and embeddings cache.
+ * The main class for the AI functionality.
+ * <p>
+ * Holds all the AI components: LLM and embedding model, chat history and embeddings cache.
  */
 public class AiService implements AutoCloseable {
     public static final String VERSION = "1";

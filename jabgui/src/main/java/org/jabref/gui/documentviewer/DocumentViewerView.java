@@ -103,7 +103,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     private void setupViewer() {
         viewModel.currentDocumentProperty().addListener((_, _, newDocument) -> {
-                viewer.show(newDocument);
+            viewer.show(newDocument);
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
         viewModel.highlightTextProperty().bindBidirectional(viewer.highlightTextProperty());

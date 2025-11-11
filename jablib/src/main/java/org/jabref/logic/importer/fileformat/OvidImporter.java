@@ -23,6 +23,8 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Imports an Ovid file.
  */
@@ -69,7 +71,7 @@ public class OvidImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < MAX_ITEMS)) {
@@ -82,7 +84,7 @@ public class OvidImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String line;
@@ -93,129 +95,19 @@ public class OvidImporter extends Importer {
             sb.append(line);
             sb.append('\n');
         }
-
         String[] items = sb.toString().split(OVID_PATTERN_STRING);
-
         for (int i = 1; i < items.length; i++) {
             Map<Field, String> h = new HashMap<>();
             String[] fields = items[i].split("__NEWFIELD__");
             for (String field : fields) {
-                int linebreak = field.indexOf('\n');
-                String fieldName = field.substring(0, linebreak).trim();
-                String content = field.substring(linebreak).trim();
-
-                // Check if this is the author field (due to a minor special treatment for this field):
-                boolean isAuthor = (fieldName.indexOf("Author") == 0)
-                        && !fieldName.contains("Author Keywords")
-                        && !fieldName.contains("Author e-mail");
-
-                // Remove unnecessary dots at the end of lines, unless this is the author field,
-                // in which case a dot at the end could be significant:
-                if (!isAuthor && content.endsWith(".")) {
-                    content = content.substring(0, content.length() - 1);
-                }
-                if (isAuthor) {
-                    h.put(StandardField.AUTHOR, content);
-                } else if (fieldName.startsWith("Title")) {
-                    content = content.replaceAll("\\[.+\\]", "").trim();
-                    if (content.endsWith(".")) {
-                        content = content.substring(0, content.length() - 1);
-                    }
-                    h.put(StandardField.TITLE, content);
-                } else if (fieldName.startsWith("Chapter Title")) {
-                    h.put(new UnknownField("chaptertitle"), content);
-                } else if (fieldName.startsWith("Source")) {
-                    Matcher matcher;
-                    if ((matcher = OvidImporter.OVID_SOURCE_PATTERN.matcher(content)).find()) {
-                        h.put(StandardField.JOURNAL, matcher.group(1));
-                        h.put(StandardField.VOLUME, matcher.group(2));
-                        h.put(StandardField.ISSUE, matcher.group(3));
-                        h.put(StandardField.PAGES, matcher.group(4));
-                        h.put(StandardField.YEAR, matcher.group(5));
-                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) { // may be missing the issue
-                        h.put(StandardField.JOURNAL, matcher.group(1));
-                        h.put(StandardField.VOLUME, matcher.group(2));
-                        h.put(StandardField.PAGES, matcher.group(3));
-                        h.put(StandardField.YEAR, matcher.group(4));
-                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_2.matcher(content)).find()) {
-                        h.put(StandardField.JOURNAL, matcher.group(1));
-                        h.put(StandardField.VOLUME, matcher.group(2));
-                        h.put(StandardField.ISSUE, matcher.group(3));
-                        h.put(StandardField.MONTH, matcher.group(4));
-                        h.put(StandardField.YEAR, matcher.group(5));
-                        h.put(StandardField.PAGES, matcher.group(6));
-                    } else if ((matcher = OvidImporter.INCOLLECTION_PATTERN.matcher(content)).find()) {
-                        h.put(StandardField.EDITOR, matcher.group(1).replace(" (Ed)", ""));
-                        h.put(StandardField.YEAR, matcher.group(2));
-                        h.put(StandardField.BOOKTITLE, matcher.group(3));
-                        h.put(StandardField.PAGES, matcher.group(4));
-                        h.put(StandardField.ADDRESS, matcher.group(5));
-                        h.put(StandardField.PUBLISHER, matcher.group(6));
-                    } else if ((matcher = OvidImporter.BOOK_PATTERN.matcher(content)).find()) {
-                        h.put(StandardField.YEAR, matcher.group(1));
-                        h.put(StandardField.PAGES, matcher.group(2));
-                        h.put(StandardField.ADDRESS, matcher.group(3));
-                        h.put(StandardField.PUBLISHER, matcher.group(4));
-                    }
-                    // Add double hyphens to page ranges:
-                    if (h.get(StandardField.PAGES) != null) {
-                        h.put(StandardField.PAGES, h.get(StandardField.PAGES).replace("-", "--"));
-                    }
-                } else if ("Abstract".equals(fieldName)) {
-                    h.put(StandardField.ABSTRACT, content);
-                } else if ("Publication Type".equals(fieldName)) {
-                    if (content.contains("Book")) {
-                        h.put(InternalField.TYPE_HEADER, "book");
-                    } else if (content.contains("Journal")) {
-                        h.put(InternalField.TYPE_HEADER, "article");
-                    } else if (content.contains("Conference Paper")) {
-                        h.put(InternalField.TYPE_HEADER, "inproceedings");
-                    }
-                } else if (fieldName.startsWith("Language")) {
-                    h.put(StandardField.LANGUAGE, content);
-                } else if (fieldName.startsWith("Author Keywords")) {
-                    content = content.replace(";", ",").replace("  ", " ");
-                    h.put(StandardField.KEYWORDS, content);
-                } else if (fieldName.startsWith("ISSN")) {
-                    h.put(StandardField.ISSN, content);
-                } else if (fieldName.startsWith("DOI Number")) {
-                    h.put(StandardField.DOI, content);
-                }
+                parseField(field, h);
             }
-
-            // Now we need to check if a book entry has given editors in the author field;
-            // if so, rearrange:
-            String auth = h.get(StandardField.AUTHOR);
-            if ((auth != null) && auth.contains(" [Ed]")) {
-                h.remove(StandardField.AUTHOR);
-                h.put(StandardField.EDITOR, auth.replace(" [Ed]", ""));
-            }
-
-            // Rearrange names properly:
-            auth = h.get(StandardField.AUTHOR);
-            if (auth != null) {
-                h.put(StandardField.AUTHOR, fixNames(auth));
-            }
-            auth = h.get(StandardField.EDITOR);
-            if (auth != null) {
-                h.put(StandardField.EDITOR, fixNames(auth));
-            }
-
-            // Set the entrytype properly:
-            EntryType entryType = h.containsKey(InternalField.TYPE_HEADER) ? EntryTypeFactory.parse(h.get(InternalField.TYPE_HEADER)) : BibEntry.DEFAULT_TYPE;
-            h.remove(InternalField.TYPE_HEADER);
-            if (entryType.equals(StandardEntryType.Book) && h.containsKey(new UnknownField("chaptertitle"))) {
-                // This means we have an "incollection" entry.
-                entryType = StandardEntryType.InCollection;
-                // Move the "chaptertitle" to just "title":
-                h.put(StandardField.TITLE, h.remove(new UnknownField("chaptertitle")));
-            }
+            normalizeContributors(h);
+            EntryType entryType = resolveEntryType(h);
             BibEntry b = new BibEntry(entryType);
             b.setField(h);
-
             bibitems.add(b);
         }
-
         return new ParserResult(bibitems);
     }
 
@@ -243,5 +135,128 @@ public class OvidImporter extends Importer {
             names = content;
         }
         return AuthorList.fixAuthorLastNameFirst(names);
+    }
+
+    private void parseField(String field, Map<Field, String> fieldMap) {
+        int linebreak = field.indexOf('\n');
+        String fieldName = field.substring(0, linebreak).trim();
+        String content = field.substring(linebreak).trim();
+
+        // Check if this is the author field (due to a minor special treatment for this field):
+        boolean isAuthor = (fieldName.indexOf("Author") == 0)
+                && !fieldName.contains("Author Keywords")
+                && !fieldName.contains("Author e-mail");
+
+        // Remove unnecessary dots at the end of lines, unless this is the author field,
+        // in which case a dot at the end could be significant:
+        if (!isAuthor && content.endsWith(".")) {
+            content = content.substring(0, content.length() - 1);
+        }
+        if (isAuthor) {
+            fieldMap.put(StandardField.AUTHOR, content);
+        } else if (fieldName.startsWith("Title")) {
+            content = content.replaceAll("\\[.+\\]", "").trim();
+            if (content.endsWith(".")) {
+                content = content.substring(0, content.length() - 1);
+            }
+            fieldMap.put(StandardField.TITLE, content);
+        } else if (fieldName.startsWith("Chapter Title")) {
+            fieldMap.put(new UnknownField("chaptertitle"), content);
+        } else if (fieldName.startsWith("Source")) {
+            parseSource(content, fieldMap);
+        } else if ("Abstract".equals(fieldName)) {
+            fieldMap.put(StandardField.ABSTRACT, content);
+        } else if ("Publication Type".equals(fieldName)) {
+            if (content.contains("Book")) {
+                fieldMap.put(InternalField.TYPE_HEADER, "book");
+            } else if (content.contains("Journal")) {
+                fieldMap.put(InternalField.TYPE_HEADER, "article");
+            } else if (content.contains("Conference Paper")) {
+                fieldMap.put(InternalField.TYPE_HEADER, "inproceedings");
+            }
+        } else if (fieldName.startsWith("Language")) {
+            fieldMap.put(StandardField.LANGUAGE, content);
+        } else if (fieldName.startsWith("Author Keywords")) {
+            content = content.replace(";", ",").replace("  ", " ");
+            fieldMap.put(StandardField.KEYWORDS, content);
+        } else if (fieldName.startsWith("ISSN")) {
+            fieldMap.put(StandardField.ISSN, content);
+        } else if (fieldName.startsWith("DOI Number")) {
+            fieldMap.put(StandardField.DOI, content);
+        }
+    }
+
+    private void parseSource(String content, Map<Field, String> fieldMap) {
+        Matcher matcher;
+        if ((matcher = OvidImporter.OVID_SOURCE_PATTERN.matcher(content)).find()) {
+            fieldMap.put(StandardField.JOURNAL, matcher.group(1));
+            fieldMap.put(StandardField.VOLUME, matcher.group(2));
+            fieldMap.put(StandardField.ISSUE, matcher.group(3));
+            fieldMap.put(StandardField.PAGES, matcher.group(4));
+            fieldMap.put(StandardField.YEAR, matcher.group(5));
+        } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) { // may be missing the issue
+            fieldMap.put(StandardField.JOURNAL, matcher.group(1));
+            fieldMap.put(StandardField.VOLUME, matcher.group(2));
+            fieldMap.put(StandardField.PAGES, matcher.group(3));
+            fieldMap.put(StandardField.YEAR, matcher.group(4));
+        } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_2.matcher(content)).find()) {
+            fieldMap.put(StandardField.JOURNAL, matcher.group(1));
+            fieldMap.put(StandardField.VOLUME, matcher.group(2));
+            fieldMap.put(StandardField.ISSUE, matcher.group(3));
+            fieldMap.put(StandardField.MONTH, matcher.group(4));
+            fieldMap.put(StandardField.YEAR, matcher.group(5));
+            fieldMap.put(StandardField.PAGES, matcher.group(6));
+        } else if ((matcher = OvidImporter.INCOLLECTION_PATTERN.matcher(content)).find()) {
+            fieldMap.put(StandardField.EDITOR, matcher.group(1).replace(" (Ed)", ""));
+            fieldMap.put(StandardField.YEAR, matcher.group(2));
+            fieldMap.put(StandardField.BOOKTITLE, matcher.group(3));
+            fieldMap.put(StandardField.PAGES, matcher.group(4));
+            fieldMap.put(StandardField.ADDRESS, matcher.group(5));
+            fieldMap.put(StandardField.PUBLISHER, matcher.group(6));
+        } else if ((matcher = OvidImporter.BOOK_PATTERN.matcher(content)).find()) {
+            fieldMap.put(StandardField.YEAR, matcher.group(1));
+            fieldMap.put(StandardField.PAGES, matcher.group(2));
+            fieldMap.put(StandardField.ADDRESS, matcher.group(3));
+            fieldMap.put(StandardField.PUBLISHER, matcher.group(4));
+        }
+        // Add double hyphens to page ranges:
+        if (fieldMap.get(StandardField.PAGES) != null) {
+            fieldMap.put(StandardField.PAGES, fieldMap.get(StandardField.PAGES).replace("-", "--"));
+        }
+    }
+
+    private void normalizeContributors(Map<Field, String> fieldMap) {
+        // Now we need to check if a book entry has given editors in the author field;
+        // if so, rearrange:
+        String auth = fieldMap.get(StandardField.AUTHOR);
+        if ((auth != null) && auth.contains(" [Ed]")) {
+            fieldMap.remove(StandardField.AUTHOR);
+            fieldMap.put(StandardField.EDITOR, auth.replace(" [Ed]", ""));
+        }
+
+        // Rearrange names properly:
+        auth = fieldMap.get(StandardField.AUTHOR);
+        if (auth != null) {
+            fieldMap.put(StandardField.AUTHOR, fixNames(auth));
+        }
+        auth = fieldMap.get(StandardField.EDITOR);
+        if (auth != null) {
+            fieldMap.put(StandardField.EDITOR, fixNames(auth));
+        }
+    }
+
+    private EntryType resolveEntryType(Map<Field, String> fieldMap) {
+        // Set the entrytype properly:
+        EntryType entryType = fieldMap.containsKey(InternalField.TYPE_HEADER)
+                              ? EntryTypeFactory.parse(fieldMap.get(InternalField.TYPE_HEADER))
+                              : BibEntry.DEFAULT_TYPE;
+        fieldMap.remove(InternalField.TYPE_HEADER);
+        if (entryType.equals(StandardEntryType.Book) && fieldMap.containsKey(new UnknownField("chaptertitle"))) {
+            // This means we have an "incollection" entry.
+            entryType = StandardEntryType.InCollection;
+            // Move the "chaptertitle" to just "title":
+            fieldMap.put(StandardField.TITLE, fieldMap.remove(new UnknownField("chaptertitle")));
+        }
+        return entryType;
     }
 }

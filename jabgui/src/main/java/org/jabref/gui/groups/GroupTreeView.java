@@ -98,7 +98,6 @@ public class GroupTreeView extends BorderPane {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final KeyBindingRepository keyBindingRepository;
 
-
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
@@ -615,10 +614,15 @@ public class GroupTreeView extends BorderPane {
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group)),
+                new Menu(Localization.lang("Sort"), null,
+                        factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT,
+                                new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
+                        factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE,
+                                new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
+                        factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES,
+                                new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, group)),
+                        factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE,
+                                new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group))),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
@@ -701,9 +705,12 @@ public class GroupTreeView extends BorderPane {
 
             this.executable.bind(BindingsHelper.constantOf(
                     switch (command) {
-                        case GROUP_EDIT, GROUP_SUBGROUP_RENAME ->
+                        case GROUP_EDIT,
+                             GROUP_SUBGROUP_RENAME ->
                                 group.isEditable();
-                        case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
+                        case GROUP_REMOVE,
+                             GROUP_REMOVE_WITH_SUBGROUPS,
+                             GROUP_REMOVE_KEEP_SUBGROUPS ->
                                 group.isEditable() && group.canRemove();
                         case GROUP_SUGGESTED_GROUPS_ADD ->
                                 !group.hasAllSuggestedGroups();
@@ -716,7 +723,8 @@ public class GroupTreeView extends BorderPane {
                         case GROUP_SUBGROUP_SORT ->
                                 group.isEditable() && group.hasSubgroups() && group.canAddEntriesIn()
                                         || group.isRoot();
-                        case GROUP_ENTRIES_ADD, GROUP_ENTRIES_REMOVE ->
+                        case GROUP_ENTRIES_ADD,
+                             GROUP_ENTRIES_REMOVE ->
                                 group.canAddEntriesIn();
                         default ->
                                 true;
@@ -732,7 +740,8 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeGroupKeepSubgroups(group);
                 case GROUP_REMOVE_WITH_SUBGROUPS ->
                         viewModel.removeGroupAndSubgroups(group);
-                case GROUP_EDIT, GROUP_SUBGROUP_RENAME ->
+                case GROUP_EDIT,
+                     GROUP_SUBGROUP_RENAME ->
                         viewModel.editGroup(group);
                 case GROUP_GENERATE_EMBEDDINGS ->
                         viewModel.generateEmbeddings(group);

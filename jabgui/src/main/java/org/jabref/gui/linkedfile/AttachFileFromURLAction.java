@@ -63,11 +63,11 @@ public class AttachFileFromURLAction extends SimpleCommand {
         try {
             URL url = URLUtil.create(urlforDownload.get());
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
-                             new LinkedFile(url, ""),
-                             entry,
-                             databaseContext,
-                             taskExecutor,
-                             dialogService,
+                    new LinkedFile(url, ""),
+                    entry,
+                    databaseContext,
+                    taskExecutor,
+                    dialogService,
                     preferences);
             onlineFile.download(true);
         } catch (MalformedURLException exception) {

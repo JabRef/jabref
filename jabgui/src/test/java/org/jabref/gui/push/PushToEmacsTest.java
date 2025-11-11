@@ -1,5 +1,6 @@
 package org.jabref.gui.push;
 
+import java.util.List;
 import java.util.Map;
 
 import javafx.beans.property.SimpleMapProperty;
@@ -7,9 +8,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.push.PushToApplicationPreferences;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -21,12 +22,11 @@ import static org.mockito.Mockito.when;
 
 @Disabled("Needs running emacs daemon. Start emacs with --daemon")
 class PushToEmacsTest {
-    PushToEmacs pushToEmacs;
+    GuiPushToEmacs pushToEmacs;
 
     @BeforeEach
     void setup() {
         DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
-        GuiPreferences preferences = mock(GuiPreferences.class);
 
         PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
 
@@ -37,17 +37,17 @@ class PushToEmacsTest {
 
         when(pushToApplicationPreferences.getEmacsArguments()).thenReturn("-n -e");
 
-        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
+        when(pushToApplicationPreferences.getCiteCommand().toString()).thenReturn("\\cite{key1,key2}");
 
-        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-        when(externalApplicationsPreferences.getCiteCommand().toString()).thenReturn("\\cite{key1,key2}");
-        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
-
-        pushToEmacs = new PushToEmacs(dialogService, preferences);
+        pushToEmacs = new GuiPushToEmacs(dialogService, pushToApplicationPreferences);
     }
 
     @Test
     void pushEntries() {
-        pushToEmacs.pushEntries(null, null, "key1,key2");
+        pushToEmacs.pushEntries(
+                List.of(
+                        new BibEntry().withCitationKey("key1"),
+                        new BibEntry().withCitationKey("key2"))
+        );
     }
 }

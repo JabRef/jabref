@@ -3,9 +3,11 @@ package org.jabref.logic.util;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -24,7 +26,8 @@ import ai.djl.util.Progress;
  */
 public class ProgressCounter implements Progress {
 
-    private record ProgressMessage(int maxTime, String message) { }
+    private record ProgressMessage(int maxTime, String message) {
+    }
 
     // The list should be sorted by ProgressMessage.maxTime, smaller first.
     private static final List<ProgressMessage> PROGRESS_MESSAGES = List.of(
@@ -46,13 +49,19 @@ public class ProgressCounter implements Progress {
     // 1) When workDone or workMax changes: this in normal behavior.
     // 2) When PERIODIC_UPDATE_DURATION passes: it is used in situations where one piece of work takes too much time
     //    (and so there are no events 1), and so the message could be "approx. 5 seconds", while it should be more.
-    private final Timeline periodicUpdate = new Timeline(new KeyFrame(new javafx.util.Duration(PERIODIC_UPDATE_DURATION.getSeconds() * 1000), e -> update()));
+    private final ScheduledExecutorService periodicUpdate;
 
     private final Instant workStartTime = Instant.now();
 
     public ProgressCounter() {
-        periodicUpdate.setCycleCount(Timeline.INDEFINITE);
-        periodicUpdate.play();
+        ThreadFactory tf = r -> {
+            Thread t = new Thread(r, "ProgressCounter-PeriodicUpdate");
+            t.setDaemon(true);
+            return t;
+        };
+        periodicUpdate = Executors.newSingleThreadScheduledExecutor(tf);
+        long periodSeconds = PERIODIC_UPDATE_DURATION.getSeconds();
+        periodicUpdate.scheduleAtFixedRate(this::update, periodSeconds, periodSeconds, TimeUnit.SECONDS);
 
         workDone.addListener(obs -> update());
         workMax.addListener(obs -> update());
@@ -142,6 +151,6 @@ public class ProgressCounter implements Progress {
     }
 
     public void stop() {
-        periodicUpdate.stop();
+        periodicUpdate.shutdownNow();
     }
 }

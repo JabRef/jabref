@@ -20,26 +20,26 @@ public class OOProcess {
 
     private static Comparator<BibEntry> makeAuthorYearTitleComparator() {
         List<Comparator<BibEntry>> ayt = List.of(new FieldComparator(StandardField.AUTHOR),
-                                                 new FieldComparator(StandardField.YEAR),
-                                                 new FieldComparator(StandardField.TITLE));
+                new FieldComparator(StandardField.YEAR),
+                new FieldComparator(StandardField.TITLE));
         return new FieldComparatorStack<>(ayt);
     }
 
     private static Comparator<BibEntry> makeYearAuthorTitleComparator() {
         List<Comparator<BibEntry>> yat = List.of(new FieldComparator(StandardField.YEAR),
-                                                 new FieldComparator(StandardField.AUTHOR),
-                                                 new FieldComparator(StandardField.TITLE));
+                new FieldComparator(StandardField.AUTHOR),
+                new FieldComparator(StandardField.TITLE));
         return new FieldComparatorStack<>(yat);
     }
 
     /**
-     *  The comparator used to sort within a group of merged
-     *  citations.
-     *
-     *  The term used here is "multicite". The option controlling the
-     *  order is "MultiCiteChronological" in style files.
-     *
-     *  Yes, they are always sorted one way or another.
+     * The comparator used to sort within a group of merged
+     * citations.
+     * <p>
+     * The term used here is "multicite". The option controlling the
+     * order is "MultiCiteChronological" in style files.
+     * <p>
+     * Yes, they are always sorted one way or another.
      */
     public static Comparator<BibEntry> comparatorForMulticite(JStyle style) {
         if (style.getMultiCiteChronological()) {
@@ -50,8 +50,8 @@ public class OOProcess {
     }
 
     /**
-     *  Fill citationGroups.bibliography and cgs.citationGroupsUnordered//CitationMarker
-     *  according to style.
+     * Fill citationGroups.bibliography and cgs.citationGroupsUnordered//CitationMarker
+     * according to style.
      */
     public static void produceCitationMarkers(CitationGroups citationGroups, List<BibDatabase> databases, JStyle style) {
         if (!citationGroups.hasGlobalOrder()) {

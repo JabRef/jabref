@@ -3,7 +3,6 @@ package org.jabref.gui.documentviewer;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +28,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +44,12 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final StringProperty highlightText = new SimpleStringProperty();
     private final DialogService dialogService;
 
-    public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences, DialogService dialogService) {
-        this.stateManager = Objects.requireNonNull(stateManager);
-        this.preferences = Objects.requireNonNull(preferences);
-        this.dialogService = Objects.requireNonNull(dialogService);
+    public DocumentViewerViewModel(@NonNull StateManager stateManager,
+                                   @NonNull CliPreferences preferences,
+                                   @NonNull DialogService dialogService) {
+        this.stateManager = stateManager;
+        this.preferences = preferences;
+        this.dialogService = dialogService;
 
         this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) _ -> {
             // Switch to currently selected entry in live mode

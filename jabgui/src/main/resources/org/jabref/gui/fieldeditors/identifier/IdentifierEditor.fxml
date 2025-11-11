@@ -10,6 +10,15 @@
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.identifier.IdentifierEditor">
     <EditorTextField fx:id="textField" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
+    <Button fx:id="shortenDOIButton" disable="${controller.viewModel.isInvalidIdentifier}"
+            onAction="#shortenID"
+            styleClass="icon-button"
+            managed="${controller.viewModel.canShortenIdentifier}"
+            visible="${controller.viewModel.canShortenIdentifier}">
+        <graphic>
+            <JabRefIconView glyph="SHORTEN_DOI"/>
+        </graphic>
+    </Button>
     <Button disable="${controller.viewModel.isInvalidIdentifier}" onAction="#openExternalLink"
             styleClass="icon-button">
         <graphic>

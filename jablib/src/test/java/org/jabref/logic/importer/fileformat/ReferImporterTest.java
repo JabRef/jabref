@@ -106,9 +106,9 @@ public class ReferImporterTest {
                 """;
 
         BibEntry entry = referImporter.importDatabase(new BufferedReader(Reader.of(refEntry)))
-                                                   .getDatabase()
-                                                   .getEntries()
-                                                   .getFirst();
+                                      .getDatabase()
+                                      .getEntries()
+                                      .getFirst();
 
         assertEquals(StandardEntryType.Book, entry.getType());
         assertEquals(Optional.empty(), entry.getField(StandardField.AUTHOR));

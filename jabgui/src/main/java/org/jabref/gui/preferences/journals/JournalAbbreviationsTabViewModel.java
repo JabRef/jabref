@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.journals;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -26,6 +25,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,12 +58,12 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private boolean shouldWriteLists;
 
     public JournalAbbreviationsTabViewModel(JournalAbbreviationPreferences abbreviationsPreferences,
-                                            DialogService dialogService,
-                                            TaskExecutor taskExecutor,
-                                            JournalAbbreviationRepository journalAbbreviationRepository) {
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
+                                            @NonNull DialogService dialogService,
+                                            @NonNull TaskExecutor taskExecutor,
+                                            @NonNull JournalAbbreviationRepository journalAbbreviationRepository) {
+        this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.abbreviationsPreferences = abbreviationsPreferences;
 
         abbreviationsCount.bind(abbreviations.sizeProperty());
@@ -293,9 +293,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         }
     }
 
-    public void removeAbbreviation(AbbreviationViewModel abbreviation) {
-        Objects.requireNonNull(abbreviation);
-
+    public void removeAbbreviation(@NonNull AbbreviationViewModel abbreviation) {
         if (abbreviation.isPseudoAbbreviation()) {
             return;
         }

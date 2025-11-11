@@ -65,29 +65,29 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
     private void redownloadMissing(BibDatabaseContext databaseContext) {
         LOGGER.info("Redownloading missing files");
         databaseContext.getEntries().forEach(entry ->
-            entry.getFiles().forEach(linkedFile -> {
-            if (linkedFile.isOnlineLink() || linkedFile.getSourceUrl().isEmpty()) {
-                return;
-            }
+                entry.getFiles().forEach(linkedFile -> {
+                    if (linkedFile.isOnlineLink() || linkedFile.getSourceUrl().isEmpty()) {
+                        return;
+                    }
 
-            Optional<Path> path = FileUtil.find(this.databaseContext, linkedFile.getLink(), filePreferences);
-            if (path.isPresent() && Files.exists(path.get())) {
-                return;
-            }
-            String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
+                    Optional<Path> path = FileUtil.find(this.databaseContext, linkedFile.getLink(), filePreferences);
+                    if (path.isPresent() && Files.exists(path.get())) {
+                        return;
+                    }
+                    String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
-            DownloadLinkedFileAction downloadAction = new DownloadLinkedFileAction(
-                    this.databaseContext,
-                    entry,
-                    linkedFile,
-                    linkedFile.getSourceUrl(),
-                    dialogService,
-                    externalApplicationsPreferences,
-                    filePreferences,
-                    taskExecutor,
-                    fileName,
-                    true);
-            downloadAction.execute();
-        }));
+                    DownloadLinkedFileAction downloadAction = new DownloadLinkedFileAction(
+                            this.databaseContext,
+                            entry,
+                            linkedFile,
+                            linkedFile.getSourceUrl(),
+                            dialogService,
+                            externalApplicationsPreferences,
+                            filePreferences,
+                            taskExecutor,
+                            fileName,
+                            true);
+                    downloadAction.execute();
+                }));
     }
 }

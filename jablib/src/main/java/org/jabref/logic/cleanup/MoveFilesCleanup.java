@@ -3,7 +3,6 @@ package org.jabref.logic.cleanup;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -17,6 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +31,10 @@ public class MoveFilesCleanup implements CleanupJob {
     private final FilePreferences filePreferences;
     private final List<JabRefException> ioExceptions;
 
-    public MoveFilesCleanup(Supplier<BibDatabaseContext> databaseContext, FilePreferences filePreferences) {
-        this.databaseContext = Objects.requireNonNull(databaseContext);
-        this.filePreferences = Objects.requireNonNull(filePreferences);
+    public MoveFilesCleanup(@NonNull Supplier<BibDatabaseContext> databaseContext,
+                            @NonNull FilePreferences filePreferences) {
+        this.databaseContext = databaseContext;
+        this.filePreferences = filePreferences;
         this.ioExceptions = new ArrayList<>();
     }
 

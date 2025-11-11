@@ -12,7 +12,6 @@ import javafx.application.Platform;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseButton;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -30,9 +29,6 @@ import org.slf4j.LoggerFactory;
 
 @AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
 public class ClipBoardManager {
-
-    public static final DataFormat XML = new DataFormat("application/xml");
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
 
     private static Clipboard clipboard;
@@ -172,6 +168,6 @@ public class ClipBoardManager {
         // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
         // Furthermore, storing a string also enables other applications to work with the data
         BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferences.getFieldPreferences()), entryTypesManager);
-        return writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
+        return writer.write(entries, BibDatabaseMode.BIBTEX);
     }
 }

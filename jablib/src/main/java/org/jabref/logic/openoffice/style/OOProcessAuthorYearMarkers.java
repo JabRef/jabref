@@ -25,7 +25,7 @@ class OOProcessAuthorYearMarkers {
     }
 
     /**
-     *  Fills {@code sortedCitedKeys//normCitMarker}
+     * Fills {@code sortedCitedKeys//normCitMarker}
      */
     private static void createNormalizedCitationMarkers(CitedKeys sortedCitedKeys, JStyle style) {
         for (CitedKey ck : sortedCitedKeys.values()) {
@@ -34,19 +34,19 @@ class OOProcessAuthorYearMarkers {
     }
 
     /**
-     *  For each cited source make the citation keys unique by setting
-     *  the uniqueLetter fields to letters ("a", "b") or Optional.empty()
-     *
+     * For each cited source make the citation keys unique by setting
+     * the uniqueLetter fields to letters ("a", "b") or Optional.empty()
+     * <p>
      * precondition: sortedCitedKeys already has normalized citation markers.
      * precondition: sortedCitedKeys is sorted (according to the order we want the letters to be assigned)
-     *
+     * <p>
      * Expects to see data for all cited sources here.
      * Clears uniqueLetters before filling.
-     *
+     * <p>
      * On return: Each citedKey in sortedCitedKeys has uniqueLetter set as needed.
-     *            The same values are copied to the corresponding citations in citationGroups.
-     *
-     *  Depends on: style, citations and their order.
+     * The same values are copied to the corresponding citations in citationGroups.
+     * <p>
+     * Depends on: style, citations and their order.
      */
     private static void createUniqueLetters(CitedKeys sortedCitedKeys, CitationGroups citationGroups) {
         // The entries in the clashingKeys lists preserve
@@ -102,7 +102,7 @@ class OOProcessAuthorYearMarkers {
 
     /**
      * Set isFirstAppearanceOfSource in each citation.
-     *
+     * <p>
      * Preconditions: globalOrder, localOrder
      */
     private static void setIsFirstAppearanceOfSourceInCitations(CitationGroups citationGroups) {
@@ -124,7 +124,7 @@ class OOProcessAuthorYearMarkers {
      * Produce citMarkers for normal
      * (!isCitationKeyCiteMarkers &amp;&amp; !isNumberEntries) styles.
      *
-     * @param style              Bibliography style.
+     * @param style Bibliography style.
      */
     static void produceCitationMarkers(CitationGroups citationGroups, JStyle style) {
         assert !style.isCitationKeyCiteMarkers();
@@ -147,8 +147,8 @@ class OOProcessAuthorYearMarkers {
             List<Citation> cits = group.getCitationsInLocalOrder();
             List<CitationMarkerEntry> citationMarkerEntries = OOListUtil.map(cits, e -> e);
             OOText citMarker = style.createCitationMarker(citationMarkerEntries,
-                                                          inParenthesis,
-                                                          strictlyUnique);
+                    inParenthesis,
+                    strictlyUnique);
             group.setCitationMarker(Optional.of(citMarker));
         }
     }

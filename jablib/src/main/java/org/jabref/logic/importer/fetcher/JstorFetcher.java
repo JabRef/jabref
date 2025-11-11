@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
@@ -25,12 +26,13 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Fetcher for jstor.org
@@ -42,6 +44,8 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     private static final String CITE_HOST = HOST + "/citation/text/";
     private static final String URL_QUERY_REGEX = "(?<=\\?).*";
 
+    private static final Pattern URL_QUERY_PATTERN = Pattern.compile(URL_QUERY_REGEX);
+
     private final ImportFormatPreferences importFormatPreferences;
 
     public JstorFetcher(ImportFormatPreferences importFormatPreferences) {
@@ -49,9 +53,9 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
-        uriBuilder.addParameter("Query", new JstorQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        uriBuilder.addParameter("Query", new JstorQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         return uriBuilder.build().toURL();
     }
 
@@ -62,10 +66,10 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
             identifier = identifier.replace("https://www.jstor.org/stable", "");
             identifier = identifier.replace("http://www.jstor.org/stable", "");
         }
-        identifier = identifier.replaceAll(URL_QUERY_REGEX, "");
+        identifier = URL_QUERY_PATTERN.matcher(identifier).replaceAll("");
 
         if (identifier.contains("/")) {
-            // if identifier links to a entry with a valid doi
+            // if identifier links to an entry with a valid doi
             return URLUtil.create(start + identifier);
         }
         // else use default doi start.
@@ -111,7 +115,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws FetcherException, IOException {
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws FetcherException, IOException {
         if (entry.getField(StandardField.URL).isEmpty()) {
             return Optional.empty();
         }

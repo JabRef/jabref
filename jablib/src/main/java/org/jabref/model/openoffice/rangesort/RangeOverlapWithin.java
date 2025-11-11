@@ -98,8 +98,8 @@ public class RangeOverlapWithin {
                     valuesForOverlappingRanges.add(aHolder);
                     valuesForOverlappingRanges.add(bHolder);
                     result.add(new RangeOverlap<>(cmpResult == 0
-                            ? RangeOverlapKind.TOUCH
-                            : RangeOverlapKind.OVERLAP,
+                                                  ? RangeOverlapKind.TOUCH
+                                                  : RangeOverlapKind.OVERLAP,
                             valuesForOverlappingRanges));
                 }
                 if (atMost > 0 && result.size() >= atMost) {

@@ -8,7 +8,7 @@ import org.jabref.logic.l10n.Localization;
 public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
 
     public GroupChangeDetailsView(GroupChange groupChange) {
-        String labelValue = "";
+        String labelValue;
         if (groupChange.getGroupDiff().getNewGroupRoot() == null) {
             labelValue = groupChange.getName() + '.';
         } else {

@@ -29,6 +29,7 @@ import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.SpecialField;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -87,11 +88,10 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                 message.message().getFirst().equals(viewModel.selectedEntryTypeProperty().get())
         );
 
-        viewModel.selectedEntryTypeProperty().addListener((obs, oldValue, newValue) -> {
-            filteredData.setPredicate(message ->
-                    message.message().getFirst().equals(newValue)
-            );
-        });
+        viewModel.selectedEntryTypeProperty().addListener((_, _, newValue) ->
+                filteredData.setPredicate(message ->
+                        message.message().getFirst().equals(newValue)
+                ));
 
         tableView.setItems(filteredData);
 
@@ -169,11 +169,11 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         );
 
         targetSymbols.stream()
-            .map(ConsistencySymbol::getText)
-            .forEach(this::removeColumnWithUniformValue);
+                     .map(ConsistencySymbol::getText)
+                     .forEach(this::removeColumnWithUniformValue);
 
         Arrays.stream(SpecialField.values())
-              .map(SpecialField::getDisplayName)
+              .map(FieldTextMapper::getDisplayName)
               .forEach(this::removeColumnByTitle);
     }
 

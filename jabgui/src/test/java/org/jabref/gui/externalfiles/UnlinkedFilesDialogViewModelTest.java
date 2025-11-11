@@ -46,8 +46,8 @@ public class UnlinkedFilesDialogViewModelTest {
     @Mock
     private BibDatabaseContext bibDatabaseContext;
 
-
     private UnlinkedFilesDialogViewModel viewModel;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);

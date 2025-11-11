@@ -99,6 +99,12 @@
                             <Tooltip text="%Group containing entries cited in a given TeX file"/>
                         </tooltip>
                     </RadioButton>
+                    <RadioButton fx:id="dateRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Date">
+                        <tooltip>
+                            <Tooltip text="%Automatically create groups by date"/>
+                        </tooltip>
+                    </RadioButton>
                 </VBox>
                 <Separator orientation="VERTICAL"/>
                 <StackPane HBox.hgrow="ALWAYS">
@@ -182,6 +188,18 @@
                             <TextField fx:id="texGroupFilePath" HBox.hgrow="ALWAYS" prefHeight="30.0"/>
                             <Button onAction="#texGroupBrowse" text="%Browse" prefHeight="30.0"/>
                         </HBox>
+                    </VBox>
+                    <VBox visible="${dateRadioButton.selected}" spacing="10.0">
+                        <VBox>
+                            <Label text="%Field to extract date from"/>
+                            <ComboBox fx:id="dateGroupFieldCombo"/>
+                        </VBox>
+                        <VBox>
+                            <Label text="%Date grouping option"/>
+                            <ComboBox fx:id="dateGroupOptionCombo"/>
+                        </VBox>
+                        <CheckBox fx:id="dateGroupIncludeEmpty"
+                                  text="%Include entries without date"/>
                     </VBox>
                 </StackPane>
             </HBox>

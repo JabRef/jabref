@@ -15,20 +15,29 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 
 ## Decision Drivers
 
-* It should be fast.
-* It should be possible to provide templates out of `String`s (required by the AI feature).
 * It should have short and understandable syntax. Especially, it should work well with unset fields and empty `Optional`s.
+
+Implementation decision drivers:
+
+* It should be possible to provide templates out of `String`s (required by the AI feature).
+* It should be fast.
 
 ## Considered Options
 
 * Apache Velocity
 * Apache FreeMarker
 * Thymeleaf
+* Handlebars (Mustache)
+* Jinja
+* Pebble
 
 ## Decision Outcome
 
 Chosen option: "Apache Velocity", because "Velocity's goal is to keep templates as simple as possible" ([source](https://stackoverflow.com/a/1984458/873282)). It is sufficient for our use case.
 Furthermore, Apache Velocity is lightweight, and it allows to generate text output. This is a good fit for the AI feature.
+
+Update from 01.10.2025: more promising options were added (Handlebars and Jinja), but the final decision was not discussed and updated.
+Update from 20.10.2025: added pebble
 
 ## Pros and Cons of the Options
 
@@ -73,6 +82,8 @@ ${CanonicalBibEntry.getCanonicalRepresentation(entry)}
 </#list>
 ```
 
+Note: There is a modern implementation [FreshMarker](https://gitlab.com/schegge/freshmarker) keeping the same syntax.
+
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
 * Good, because in active development.
@@ -103,6 +114,81 @@ Here are the papers you are analyzing:
 * Good, because it is powerful and flexible.
 * Neutral, because the API is a bit more complex than the other options.
 * Bad, because the syntax is more complex than the other options. Especially for text output.
+
+### Handlebars (Mustache)
+
+Because Handlebars and Mustache have similar syntax, and library mentioned below supports both languages, we decided to merge Handlebars and Mustache into one option.
+
+- Main page: <https://handlebarsjs.com/>.
+- Java port repository and developer guide: <https://github.com/jknack/handlebars.java>.
+- User guide: <https://handlebarsjs.com/guide/>.
+
+Example:
+
+```text
+You are an AI assistant that analyses research papers. You answer questions about papers.
+
+Here are the papers you are analyzing:
+{{#each entries}}
+  {{canonicalRep this}}
+{{/each}}
+```
+
+* Good, because supports plain text templating.
+* Good, because it is possible to use `String` as a template.
+* Good, because it is powerful and flexible.
+* Good, because it has a simple API.
+* Neutral, as custom functions needs to be added manually. You cannot pass an ordinary Java object and use it as you want.
+* Bad, because as a Java port it lacks behind mainline development.
+
+### Jinja
+
+- Main page: <https://palletsprojects.com/projects/jinja/>.
+- Java port repository and developer guide: <https://github.com/HubSpot/jinjava>.
+- User guide: <https://jinja.palletsprojects.com/en/stable/templates/>.
+
+```text
+You are an AI assistant that analyses research papers. You answer questions about papers.
+
+Here are the papers you are analyzing:
+{% for entry in entries %}
+  {{ canonicalRep(entry) }}
+{% endfor %}
+```
+
+* Good, because supports plain text templating.
+* Good, because it is possible to use `String` as a template.
+* Good, because it is powerful and flexible. It supports extension and inheritance.
+* Good, as it is widely used and has great tooling support (linters, formatters, etc.).
+* Good, as it has easy to read syntax.
+* Neutral, as it was developed for web and Python, not for Java.
+* Neutral, as the Java port is quite young (in comparison to other options).
+* Neutral, as custom functions needs to be added manually. You cannot pass an ordinary Java object and use it as you want.
+* Bad, because as a Java port it lacks behind mainline development.
+
+### Pebble
+
+- Main page: <https://pebbletemplates.io/>
+- Repository and developer guide: <https://github.com/PebbleTemplates/pebble>
+- User guide: <https://pebbletemplates.io/wiki/>
+
+```text
+{% for entry in entries %}
+    {{ entry.title }}
+    {{ entry.author }}
+{% else %}
+    There are no entries.
+{% endfor %}
+```
+
+* Good, because supports plain text templating.
+* Good, because it is possible to use `String` as a template.
+* Good, because it supports template inheritance, includes, and custom functions (`macros`).
+* Good, because it is actively maintained.
+* Good, because it provides a simple API that integrates easily with Java.
+* Good, because has tooling support for common IDEs.
+* Neutral, because its feature set is smaller than FreeMarker’s, but sufficient for text-based generation.
+* Neutral, because it is less widely adopted than Thymeleaf or FreeMarker.
 
 ## More Information
 

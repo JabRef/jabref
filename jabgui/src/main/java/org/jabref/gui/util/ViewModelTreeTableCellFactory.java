@@ -9,7 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.

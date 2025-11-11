@@ -46,7 +46,7 @@ public class ZipFileChooser extends BaseDialog<Path> {
             try {
                 return new ReadOnlyStringWrapper(
                         ZonedDateTime.ofInstant(Files.getLastModifiedTime(data.getValue()).toInstant(),
-                                ZoneId.systemDefault())
+                                             ZoneId.systemDefault())
                                      .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
             } catch (IOException e) {
                 // Ignore

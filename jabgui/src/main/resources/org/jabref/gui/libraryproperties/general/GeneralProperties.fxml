@@ -10,7 +10,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<?import org.controlsfx.control.ToggleSwitch?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.general.GeneralPropertiesView">
@@ -35,7 +34,11 @@
         <Label text="%Library-specific file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         <TextField fx:id="librarySpecificFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <tooltip>
+                <Tooltip fx:id="librarySpecificFileDirectoryTooltip"/>
+            </tooltip>
+        </TextField>
         <Button fx:id="libSpecificFileDirSwitchId" onAction="#libSpecificFileDirPathSwitch"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="1">
@@ -45,6 +48,7 @@
             <tooltip>
                 <Tooltip fx:id ="libSpecificFileDirSwitchTooltip" text="%Switch to absolute path: converts the path to an absolute path."/>
             </tooltip>
+
         </Button>
         <Button onAction="#browseLibrarySpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
@@ -60,7 +64,12 @@
         <Label text="%User-specific file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="2"/>
         <TextField fx:id="userSpecificFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <tooltip>
+                <Tooltip fx:id="userSpecificFileDirectoryTooltip"/>
+            </tooltip>
+        </TextField>
+
         <Button fx:id="userSpecificFileDirSwitchId" onAction="#userSpecificFileDirPathSwitch"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="2">
@@ -84,8 +93,12 @@
 
         <Label text="%LaTeX file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-        <TextField fx:id="laTexFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <TextField fx:id="latexFileDirectory"
+                   GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <tooltip>
+                <Tooltip fx:id="latexFileDirectoryTooltip"/>
+            </tooltip>
+        </TextField>
         <Button fx:id="laTexSpecificFileDirSwitchId" onAction="#laTexSpecificFileDirPathSwitch"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="3">

@@ -3,7 +3,8 @@ package org.jabref.logic.layout.format;
 import org.jabref.logic.layout.LayoutFormatter;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,28 +16,18 @@ class RemoveBracketsTest {
         formatter = new RemoveBrackets();
     }
 
-    @Test
-    void bracePairCorrectlyRemoved() {
-        assertEquals("some text", formatter.format("{some text}"));
-    }
-
-    @Test
-    void singleOpeningBraceCorrectlyRemoved() {
-        assertEquals("some text", formatter.format("{some text"));
-    }
-
-    @Test
-    void singleClosingBraceCorrectlyRemoved() {
-        assertEquals("some text", formatter.format("some text}"));
-    }
-
-    @Test
-    void bracePairWithEscapedBackslashCorrectlyRemoved() {
-        assertEquals("\\some text\\", formatter.format("\\{some text\\}"));
-    }
-
-    @Test
-    void withoutBracketsUnmodified() {
-        assertEquals("some text", formatter.format("some text"));
+    @ParameterizedTest
+    @CsvSource(
+            delimiterString = "->",
+            textBlock = """
+                        some text -> '{some text}'
+                        some text -> '{some text'
+                        some text -> 'some text}'
+                        '\\some text\\' -> '\\{some text\\}'
+                        some text -> some text
+                    """
+    )
+    void format(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 }

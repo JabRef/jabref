@@ -8,7 +8,7 @@ import org.jabref.model.entry.BibEntry;
 
 /**
  * Detect any Unicode characters that is not in NFC format. NFC:  <a href="https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms">Normal form "Normalization Form Canonical Composition" (NFC)</a>: Characters are decomposed and then recomposed by canonical equivalence.
- *
+ * <p>
  * Normalizer: {@link org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter}
  */
 public class UnicodeNormalFormCanonicalCompositionCheck implements EntryChecker {

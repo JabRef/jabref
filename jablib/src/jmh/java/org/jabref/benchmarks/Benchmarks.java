@@ -88,7 +88,7 @@ public class Benchmarks {
                 fieldPreferences,
                 citationKeyPatternPreferences,
                 new BibEntryTypesManager());
-        databaseWriter.savePartOfDatabase(new BibDatabaseContext(database, new MetaData()), database.getEntries());
+        databaseWriter.writePartOfDatabase(new BibDatabaseContext(database, new MetaData()), database.getEntries());
         return outputWriter;
     }
 

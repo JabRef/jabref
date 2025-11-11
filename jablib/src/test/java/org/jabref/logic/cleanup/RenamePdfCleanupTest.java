@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -63,8 +65,13 @@ class RenamePdfCleanupTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         cleanup.cleanup(entry);
 
-        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.tmp"), "");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
+        /* This special handling is for Windows. Window file system is case-insensitive,
+        so renaming "toot.tmp" to "Toot.tmp" would overwrite the original file.
+        Therefore, the file is renamed to `Toot (1).tmp` in Windows. Prior to testing,
+        delete `AppData/Local/Temp/junit-*` folders, as the test doesn't clean up the
+        renamed file and could potentially interfere with subsequent test runs. */
+        assertTrue(Pattern.matches("^:Toot(?:\\s+\\(\\d+\\))?\\.tmp:$",
+                entry.getField(StandardField.FILE).get()));
     }
 
     @Test
@@ -83,10 +90,10 @@ class RenamePdfCleanupTest {
         cleanup.cleanup(entry);
 
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(
-                Arrays.asList(
-                        new LinkedFile("", Path.of(""), ""),
-                        new LinkedFile("", Path.of("Toot - test title.tmp"), ""),
-                        new LinkedFile("", Path.of(""), "")))),
+                        Arrays.asList(
+                                new LinkedFile("", Path.of(""), ""),
+                                new LinkedFile("", Path.of("Toot - test title.tmp"), ""),
+                                new LinkedFile("", Path.of(""), "")))),
                 entry.getField(StandardField.FILE));
     }
 

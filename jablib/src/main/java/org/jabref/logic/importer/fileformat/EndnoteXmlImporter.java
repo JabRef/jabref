@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.StringJoiner;
 
 import javax.xml.stream.XMLInputFactory;
@@ -33,6 +32,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +125,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
@@ -138,9 +138,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
-        Objects.requireNonNull(input);
-
+    public ParserResult importDatabase(@NonNull BufferedReader input) throws IOException {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
@@ -181,12 +179,18 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                                                 .orElse(StandardEntryType.Misc);
                         entry.setType(entryType);
                     }
-                    case "contributors" -> parseContributors(reader, entry);
-                    case "titles" -> parseTitles(reader, entry);
-                    case "periodical" -> parsePeriodical(reader, entry);
-                    case "keywords" -> parseKeywords(reader, entry);
-                    case "urls" -> parseUrls(reader, entry);
-                    case "dates" -> parseDates(reader, entry);
+                    case "contributors" ->
+                            parseContributors(reader, entry);
+                    case "titles" ->
+                            parseTitles(reader, entry);
+                    case "periodical" ->
+                            parsePeriodical(reader, entry);
+                    case "keywords" ->
+                            parseKeywords(reader, entry);
+                    case "urls" ->
+                            parseUrls(reader, entry);
+                    case "dates" ->
+                            parseDates(reader, entry);
                     // TODO: Left for future work -- test files need to be adpated
                     // case "accession-num" -> {
                     //    String accessionNumber = parseElementContent(reader, "accession-num");
@@ -271,10 +275,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                             entry.setField(StandardField.BOOKTITLE, secondaryTitle);
                         }
                     }
-                     case "alt-title" -> {
+                    case "alt-title" -> {
                         String altTitle = parseElementContent(reader, "alt-title");
                         entry.setField(FIELD_ALT_TITLE, altTitle);
-                     }
+                    }
                 }
             }
         }
@@ -296,7 +300,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     private void parseJournalOrBookTitle(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
         String elementName = reader.getName().getLocalPart();
         switch (elementName) {
-            case "full-title", "abbr-2", "abbr-1", "abbr-3" -> {
+            case "full-title",
+                 "abbr-2",
+                 "abbr-1",
+                 "abbr-3" -> {
                 String title = parseElementContent(reader, elementName);
                 if (entry.getType().equals(StandardEntryType.Article)) {
                     entry.setField(StandardField.JOURNAL, title);
@@ -388,7 +395,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (isStartElement(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
-                    case "year", "month", "day" -> {
+                    case "year",
+                         "month",
+                         "day" -> {
                         String date = parseElementContent(reader, elementName);
                         entry.setField(StandardField.fromName(elementName).get(), date);
                     }

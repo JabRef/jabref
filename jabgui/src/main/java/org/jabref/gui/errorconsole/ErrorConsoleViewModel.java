@@ -3,7 +3,6 @@ package org.jabref.gui.errorconsole;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
@@ -23,6 +22,7 @@ import org.jabref.logic.util.BuildInfo;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +36,17 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     private final BuildInfo buildInfo;
     private final ListProperty<LogEventViewModel> allMessagesData;
 
-    public ErrorConsoleViewModel(DialogService dialogService, GuiPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferences = Objects.requireNonNull(preferences);
-        this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
-        this.buildInfo = Objects.requireNonNull(buildInfo);
-        ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(BindingsHelper.forUI(LogMessages.getInstance().getMessages()), LogEventViewModel::new);
+    public ErrorConsoleViewModel(@NonNull DialogService dialogService,
+                                 @NonNull GuiPreferences preferences,
+                                 @NonNull ClipBoardManager clipBoardManager,
+                                 @NonNull BuildInfo buildInfo) {
+        this.dialogService = dialogService;
+        this.preferences = preferences;
+        this.clipBoardManager = clipBoardManager;
+        this.buildInfo = buildInfo;
+        ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(
+                BindingsHelper.forUI(LogMessages.getInstance().getMessages()),
+                LogEventViewModel::new);
         allMessagesData = new ReadOnlyListWrapper<>(eventViewModels);
     }
 

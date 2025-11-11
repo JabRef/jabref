@@ -17,7 +17,6 @@ import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
-import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.LOBIDIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.OpenLibraryIsbnFetcher;
@@ -57,14 +56,14 @@ class WebFetchersTest {
 
     private Set<Class<?>> getIgnoredInaccessibleClasses() {
         return IGNORED_INACCESSIBLE_FETCHERS.stream()
-                     .map(classPath -> {
-                         try {
-                             return Class.forName(classPath);
-                         } catch (ClassNotFoundException e) {
-                             LOGGER.error("Some of the ignored classes were not found", e);
-                             return null;
-                         }
-                     }).filter(Objects::nonNull).collect(Collectors.toSet());
+                                            .map(classPath -> {
+                                                try {
+                                                    return Class.forName(classPath);
+                                                } catch (ClassNotFoundException e) {
+                                                    LOGGER.error("Some of the ignored classes were not found", e);
+                                                    return null;
+                                                }
+                                            }).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     @Test
@@ -86,7 +85,6 @@ class WebFetchersTest {
             expected.remove(LOBIDIsbnFetcher.class);
             expected.remove(EbookDeIsbnFetcher.class);
             expected.remove(GvkFetcher.class);
-            expected.remove(DoiToBibtexConverterComIsbnFetcher.class);
             // Remove special ISSN fetcher only suitable for journal lookup
             expected.remove(IssnFetcher.class);
             // Remove the following, because they don't work at the moment

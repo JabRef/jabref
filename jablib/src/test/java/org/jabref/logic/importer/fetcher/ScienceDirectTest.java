@@ -26,6 +26,7 @@ class ScienceDirectTest {
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     private ScienceDirect finder;
     private BibEntry entry;
+
     @BeforeEach
     void setUp() {
         Optional<String> apiKey = Optional.of(new BuildInfo().scienceDirectApiKey);

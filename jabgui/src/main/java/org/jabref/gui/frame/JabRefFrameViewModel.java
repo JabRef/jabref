@@ -120,10 +120,10 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
         // Read the opened and focused databases before closing them
         List<Path> openedLibraries = tabContainer.getLibraryTabs().stream()
-                                          .map(LibraryTab::getBibDatabaseContext)
-                                          .map(BibDatabaseContext::getDatabasePath)
-                                          .flatMap(Optional::stream)
-                                          .toList();
+                                                 .map(LibraryTab::getBibDatabaseContext)
+                                                 .map(BibDatabaseContext::getDatabasePath)
+                                                 .flatMap(Optional::stream)
+                                                 .toList();
         Path focusedLibraries = Optional.ofNullable(tabContainer.getCurrentLibraryTab())
                                         .map(LibraryTab::getBibDatabaseContext)
                                         .flatMap(BibDatabaseContext::getDatabasePath)
@@ -164,9 +164,9 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         // Handle OpenDatabases
         if (!blank) {
             uiCommands.stream()
-                    .filter(UiCommand.OpenLibraries.class::isInstance)
-                    .map(UiCommand.OpenLibraries.class::cast)
-                    .forEach(command -> openDatabaseAction.get().openFiles(command.toImport()));
+                      .filter(UiCommand.OpenLibraries.class::isInstance)
+                      .map(UiCommand.OpenLibraries.class::cast)
+                      .forEach(command -> openDatabaseAction.get().openFiles(command.toImport()));
 
             uiCommands.stream()
                       .filter(UiCommand.AppendToCurrentLibrary.class::isInstance)
