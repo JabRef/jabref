@@ -296,6 +296,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         if ("".equals(nameField.getText())) {
             nameField.setText(path.substring(path.lastIndexOf("\\") + 1));
         }
+        rootPathField.requestFocus();
     }
 
     @FXML
