@@ -418,11 +418,11 @@ class StringUtilTest {
 
     @ParameterizedTest
     @CsvSource(emptyValue = "", textBlock = """
-    '',            ''
-    'Hello world', 'Hello world'
-    a,             A
-    AA,            Aa
-    """)
+            '',            ''
+            'Hello world', 'Hello world'
+            a,             A
+            AA,            Aa
+            """)
     void capitalizeFirst(String input, String expected) {
         assertEquals(expected, StringUtil.capitalizeFirst(input));
     }
