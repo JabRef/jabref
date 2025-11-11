@@ -19,13 +19,13 @@ import org.jabref.model.entry.field.StandardField;
 import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
-public class SearchShortScienceAction extends SimpleCommand {
+public class SearchGoogleScholarAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final ExternalLinkCreator externalLinkCreator;
 
-    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, ImporterPreferences importerPreferences) {
+    public SearchGoogleScholarAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, ImporterPreferences importerPreferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -39,16 +39,11 @@ public class SearchShortScienceAction extends SimpleCommand {
     public void execute() {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             final List<BibEntry> bibEntries = stateManager.getSelectedEntries();
-
-            if (bibEntries.size() != 1) {
-                dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
-                return;
-            }
-            externalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
+            externalLinkCreator.getGoogleScholarSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
                     NativeDesktop.openExternalViewer(databaseContext, preferences, url, StandardField.URL, dialogService, bibEntries.getFirst());
                 } catch (IOException ex) {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open ShortScience."), ex);
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open Google Scholar."), ex);
                 }
             });
         });

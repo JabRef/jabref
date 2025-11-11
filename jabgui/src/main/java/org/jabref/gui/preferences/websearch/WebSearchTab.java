@@ -45,6 +45,22 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
+    @FXML private TableView<SearchEngineItem> searchEngineTable;
+    @FXML private TableColumn<SearchEngineItem, String> searchEngineName;
+    @FXML private TableColumn<SearchEngineItem, String> searchEngineUrlTemplate;
+
+    @FXML private TableView<FetcherApiKey> apiKeySelectorTable;
+    @FXML private TableColumn<FetcherApiKey, String> apiKeyName;
+    @FXML private TableColumn<FetcherApiKey, String> customApiKey;
+    @FXML private TableColumn<FetcherApiKey, Boolean> useCustomApiKey;
+    @FXML private Button testCustomApiKey;
+
+    @FXML private CheckBox persistApiKeys;
+    @FXML private SplitPane persistentTooltipWrapper; // The disabled persistApiKeys control does not show tooltips
+    @FXML private TableView<StudyCatalogItem> catalogTable;
+    @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
+
     @FXML private VBox fetchersContainer;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
@@ -76,6 +92,16 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     public void initialize() {
         this.viewModel = new WebSearchTabViewModel(preferences, refAiEnabled, taskExecutor);
+
+        searchEngineName.setCellValueFactory(param -> param.getValue().nameProperty());
+        searchEngineName.setCellFactory(TextFieldTableCell.forTableColumn());
+        searchEngineName.setEditable(false);
+
+        searchEngineUrlTemplate.setCellValueFactory(param -> param.getValue().urlTemplateProperty());
+        searchEngineUrlTemplate.setCellFactory(TextFieldTableCell.forTableColumn());
+        searchEngineUrlTemplate.setEditable(true);
+
+        searchEngineTable.setItems(viewModel.getSearchEngines());
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
