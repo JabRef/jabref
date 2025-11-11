@@ -37,10 +37,10 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "false, 0",
-            "true, 1",
-    })
+    @CsvSource(textBlock = """
+            false, 0
+            true,  1
+            """)
     void booleanToBinaryString(boolean input, String expected) {
         assertEquals(expected, StringUtil.booleanToBinaryString(input));
     }
@@ -71,20 +71,20 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            // Mac < v9
-            "'\r',newline",
-            // Windows
-            "'\r\n','newline'",
-            // Unix
-            "'\n', 'newline'"
-    })
+    @CsvSource(textBlock = """
+            # Mac < v9
+            '\r',   newline
+            # Windows
+            '\r\n', newline
+            # Unix
+            '\n',   newline
+            """)
     void unifyLineBreaks(String input, String expected) {
         assertEquals(expected, StringUtil.unifyLineBreaks(input, expected));
     }
 
     @ParameterizedTest
-    @CsvSource(nullValues = "NULL", textBlock = """
+    @CsvSource(textBlock = """
             aa,     bib, aa.bib
             .login, bib, .login.bib
             a.bib,  bib, a.bib
@@ -98,47 +98,47 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "&#33;,!",
-            "&#33;&#33;&#33;,!!!"
-    })
+    @CsvSource(textBlock = """
+            &#33;,           !
+            &#33;&#33;&#33;, !!!
+            """)
     void quoteForHTML(String expected, String input) {
         assertEquals(expected, StringUtil.quoteForHTML(input));
     }
 
     @ParameterizedTest
     @CsvSource({
-            "ABC,{ABC}",
-            "ABC,{{ABC}}",
-            "{abc},{abc}",
-            "ABCDEF,{ABC}{DEF}"
+            "ABC,    {ABC}",
+            "ABC,    {{ABC}}",
+            "{abc},  {abc}",
+            "ABCDEF, {ABC}{DEF}"
     })
     void removeBracesAroundCapitals(String expected, String input) {
         assertEquals(expected, StringUtil.removeBracesAroundCapitals(input));
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "ABC,{ABC}",
-            "{ABC},{ABC}",
-            "abc,abc",
-            "#ABC#,#ABC#",
-            "ABC def EFG,{ABC} def {EFG}"
-    })
+    @CsvSource(textBlock = """
+            ABC,         {ABC}
+            {ABC},       {ABC}
+            abc,         abc
+            '#ABC#',     '#ABC#'
+            ABC def EFG, {ABC} def {EFG}
+            """)
     void putBracesAroundCapitals(String input, String expected) {
         assertEquals(expected, StringUtil.putBracesAroundCapitals(input));
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "'',''",
-            "'   aaa\t\t\n\r','aaa'",
-            "'  {a}    ','a'",
-            "'  \"a\"    ','a'",
-            "'  {{a}}    ','{a}'",
-            "'  \"{a}\"    ','{a}'",
-            "'  \"{a\"}    ','\"{a\"}'"
-    })
+    @CsvSource(textBlock = """
+            '',               ''
+            '   aaa\t\t\n\r', aaa
+            '  {a}    ',      a
+            '  \"a\"    ',    a
+            '  {{a}}    ',    {a}
+            '  \"{a}\"    ',  {a}
+            '  \"{a\"}    ',  '\"{a\"}'
+            """)
     void shaveString(String input, String expected) {
         assertEquals(expected, StringUtil.shaveString(input));
     }
@@ -177,16 +177,16 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            // Get word between braces
-            "'{makes}','Practice {makes} perfect',8,false",
-            // When the string is empty and start Index equal zero
-            "'','',0,false",
-            // When the word are in between close curly bracket
-            "'','A closed mouth catches no }flies}',25,false",
-            // Get the word from the end of the sentence
-            "'bite','Barking dogs seldom bite',19,true"
-    })
+    @CsvSource(textBlock = """
+            # Get word between braces
+            {makes}, 'Practice {makes} perfect',              8,  false
+            # When the string is empty and start Index equal zero
+            '',      '',                                      0,  false
+            # When the word are in between close curly bracket
+            '',      'A closed mouth catches no }flies}',     25, false
+            # Get the word from the end of the sentence
+            bite,    'Barking dogs seldom bite',              19, true
+            """)
     void getPart(String expected, String input, int startIndex, boolean forward) {
         assertEquals(expected, StringUtil.getPart(input, startIndex, forward));
     }
@@ -197,15 +197,15 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "'aaaaa bbbbb ccccc',5,'aaaaanewline\tbbbbbnewline\tccccc'",
-            "'aaaaa bbbbb ccccc',8,'aaaaa bbbbbnewline\tccccc'",
-            "'aaaaa bbbbb ccccc',11,'aaaaa bbbbbnewline\tccccc'",
-            "'aaaaa bbbbb ccccc',12,'aaaaa bbbbb ccccc'",
-            "'aaaaa\nbbbbb\nccccc',12,'aaaaanewline\tnewline\tbbbbbnewline\tnewline\tccccc'",
-            "'aaaaa\n\nbbbbb\nccccc',12,'aaaaanewline\tnewline\tnewline\tbbbbbnewline\tnewline\tccccc'",
-            "'aaaaa\r\nbbbbb\r\nccccc',12,'aaaaanewline\tnewline\tbbbbbnewline\tnewline\tccccc'"
-    })
+    @CsvSource(textBlock = """
+            'aaaaa bbbbb ccccc',          5,  'aaaaanewline\tbbbbbnewline\tccccc'
+            'aaaaa bbbbb ccccc',          8,  'aaaaa bbbbbnewline\tccccc'
+            'aaaaa bbbbb ccccc',          11, 'aaaaa bbbbbnewline\tccccc'
+            'aaaaa bbbbb ccccc',          12, 'aaaaa bbbbb ccccc'
+            'aaaaa\nbbbbb\nccccc',        12, 'aaaaanewline\tnewline\tbbbbbnewline\tnewline\tccccc'
+            'aaaaa\n\nbbbbb\nccccc',      12, 'aaaaanewline\tnewline\tnewline\tbbbbbnewline\tnewline\tccccc'
+            'aaaaa\r\nbbbbb\r\nccccc',    12, 'aaaaanewline\tnewline\tbbbbbnewline\tnewline\tccccc'
+            """)
     void wrap(String input, int wrapLength, String expected) {
         String newline = "newline";
         assertEquals(expected, StringUtil.wrap(input, wrapLength, newline));
@@ -267,11 +267,11 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "1,'1'",
-            "2,'2'",
-            "8,'8'"
-    })
+    @CsvSource(textBlock = """
+            1, 1
+            2, 2
+            8, 8
+            """)
     void intValueOfSingleDigit(int expected, String input) {
         assertEquals(expected, StringUtil.intValueOf(input));
     }
@@ -302,11 +302,11 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "1,'1'",
-            "2,'2'",
-            "8,'8'"
-    })
+    @CsvSource(textBlock = """
+            1, 1
+            2, 2
+            8, 8
+            """)
     void intValueOfWithNullSingleDigit(int expected, String input) {
         assertEquals(Optional.of(expected), StringUtil.intValueOfOptional(input));
     }
@@ -353,10 +353,10 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "'Hallo Arger','Hallo Arger'",
-            "'aaAeoeeee','åÄöéèë'"
-    })
+    @CsvSource(textBlock = """
+            'Hallo Arger', 'Hallo Arger'
+            aaAeoeeee,     'åÄöéèë'
+            """)
     void replaceSpecialCharacters(String expected, String input) {
         assertEquals(expected, StringUtil.replaceSpecialCharacters(input));
     }
@@ -382,11 +382,11 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "'',0,'a'",
-            "'a',1,'a'",
-            "'aaaaaaa',7,'a'"
-    })
+    @CsvSource(textBlock = """
+            '',      0, a
+            a,       1, a
+            aaaaaaa, 7, a
+            """)
     void repeat(String expected, int count, char character) {
         assertEquals(expected, StringUtil.repeat(count, character));
     }
@@ -407,23 +407,23 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "'a:','a::',':'",
-            "'a:;','a:::;',':'",
-            "'a:b%c;','a::b:%c:;',':'"
-    })
+    @CsvSource(textBlock = """
+            'a:',       'a::',        ':'
+            'a:;',      'a:::;',      ':'
+            'a:b%c;',   'a::b:%c:;',  ':'
+            """)
     void unquote(String expected, String input, char quoteChar) {
         assertEquals(expected, StringUtil.unquote(input, quoteChar));
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "'',''",
-            "'Hello world','Hello World'",
-            "'A','a'",
-            "'Aa','AA'"
-    })
-    void capitalizeFirst(String expected, String input) {
+    @CsvSource(emptyValue = "", textBlock = """
+    '',            ''
+    'Hello world', 'Hello world'
+    a,             A
+    AA,            Aa
+    """)
+    void capitalizeFirst(String input, String expected) {
         assertEquals(expected, StringUtil.capitalizeFirst(input));
     }
 
@@ -443,10 +443,10 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "aAoeee,åÄöéèë",
-            "Muhlbach,Mühlbach"
-    })
+    @CsvSource(textBlock = """
+            aAoeee,    åÄöéèë
+            Muhlbach,  Mühlbach
+            """)
     void stripAccents(String expected, String input) {
         assertEquals(expected, StringUtil.stripAccents(input));
     }
