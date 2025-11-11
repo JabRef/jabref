@@ -193,8 +193,12 @@ public class FieldFactory {
         return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.PERSON_NAMES));
     }
 
+    /// Gets all fields with [FieldProperty#DATE].
+    /// Also includes [StandardField#YEAR].
+    ///
+    /// @return Set of fields
     public static Set<Field> getDateFields() {
-        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.DATE));
+        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.DATE) || field == StandardField.YEAR);
     }
 
     private static Set<Field> getFieldsFiltered(Predicate<Field> selector) {
