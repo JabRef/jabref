@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import org.jabref.gui.preferences.websearch.SearchEngineItem?>
+
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.websearch.WebSearchTab">
@@ -47,9 +48,9 @@
             editable="true">
         <columns>
             <TableColumn minWidth="90" prefWidth="70"
-                         fx:id="catalogEnabledColumn"
-                         text="%Enabled"
-            />
+                    fx:id="catalogEnabledColumn"
+                    text="%Enabled"
+                    />
             <TableColumn
                     fx:id="catalogColumn"
                     text="%Catalog"/>
@@ -101,12 +102,12 @@
                          text="%Catalog"
             />
             <TableColumn minWidth="120"
-                         fx:id="customApiKey"
-                         text="Key"/>
+                    fx:id="customApiKey"
+                    text="Key"/>
 
             <TableColumn minWidth="120" prefWidth="120"
-                         fx:id="useCustomApiKey"
-                         text="Use Custom Key"/>
+                    fx:id="useCustomApiKey"
+                    text="Use Custom Key"/>
         </columns>
         <columnResizePolicy>
             <TableView

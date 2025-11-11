@@ -181,10 +181,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // force match category column to be the first sort order, (match_category column is always the first column)
         this.getSortOrder().addFirst(getColumns().getFirst());
         this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
-            if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
-                this.getSortOrder().addFirst(getColumns().getFirst());
-            }
-        });
+                if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
+                    this.getSortOrder().addFirst(getColumns().getFirst());
+                }
+            });
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
@@ -415,7 +415,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case SCROLL_TO_PREVIOUS_MATCH_CATEGORY:
-                        scrollToPreviousMatchCategory();
+                         scrollToPreviousMatchCategory();
                         event.consume();
                         break;
                     case OPEN_URL_OR_DOI:
@@ -577,13 +577,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void updatePlaceholder(VBox placeholderBox) {
-        if (database.getDatabase().getEntries().isEmpty()) {
-            this.setPlaceholder(placeholderBox);
-            // [impl->req~maintable.focus~1]
-            requestFocus();
-        } else {
-            this.setPlaceholder(null);
-        }
+       if (database.getDatabase().getEntries().isEmpty()) {
+           this.setPlaceholder(placeholderBox);
+           // [impl->req~maintable.focus~1]
+           requestFocus();
+       } else {
+           this.setPlaceholder(null);
+       }
     }
 
     private BibEntry addExampleEntry() {

@@ -39,11 +39,6 @@ public class SearchGoogleScholarAction extends SimpleCommand {
     public void execute() {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             final List<BibEntry> bibEntries = stateManager.getSelectedEntries();
-
-            if (bibEntries.size() != 1) {
-                dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
-                return;
-            }
             externalLinkCreator.getGoogleScholarSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
                     NativeDesktop.openExternalViewer(databaseContext, preferences, url, StandardField.URL, dialogService, bibEntries.getFirst());
