@@ -48,4 +48,19 @@ class GitIgnoreFileFilterTest {
         GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
         assertFalse(gitIgnoreFileFilter.accept(dir.resolve("test.png")));
     }
+
+    @Test
+    void checkDirectoryGitIgnoreSubDir(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), """
+                ignore/.*
+                ignore/*
+                ignore/**
+                ignore/**/*
+                """);
+        Path subDir = dir.resolve("ignore");
+        Files.createDirectories(subDir);
+        Files.createFile(subDir.resolve("test.png"));
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertFalse(gitIgnoreFileFilter.accept(subDir.resolve("test.png")));
+    }
 }

@@ -8,7 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;

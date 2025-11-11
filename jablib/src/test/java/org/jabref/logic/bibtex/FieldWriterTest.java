@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.strings.StringUtil;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class FieldWriterTest {
                 ),
                 // source: https://github.com/JabRef/jabref/issues/8303 --> bug2.txt
                 Arguments.of("Particularly, we equip SOVA &#x2013; a Semantic and Ontological Variability Analysis method")
-                );
+        );
     }
 
     @BeforeEach
@@ -126,8 +126,15 @@ class FieldWriterTest {
     }
 
     @Test
-    void reportUnbalancedBracingWithEscapedBraces() {
+    void reportUnbalancedBracingWithEscapedClosingBraces() {
         String unbalanced = "{\\}";
+
+        assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));
+    }
+
+    @Test
+    void reportUnbalancedBracingWithEscapedOpeningBraces() {
+        String unbalanced = "\\{}";
 
         assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));
     }

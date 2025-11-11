@@ -21,7 +21,7 @@ public class ImportCleanupBiblatex extends ImportCleanup {
     @Override
     public BibEntry doPostCleanup(BibEntry entry) {
         entry = super.doPostCleanup(entry);
-         convertToBiblatexCleanup.cleanup(entry);
-         return entry;
+        convertToBiblatexCleanup.cleanup(entry);
+        return entry;
     }
 }

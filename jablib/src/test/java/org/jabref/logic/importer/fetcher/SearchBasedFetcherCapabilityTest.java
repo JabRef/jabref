@@ -36,7 +36,7 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsAuthorSearch() throws FetcherException {
-        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
+        StringJoiner queryBuilder = new StringJoiner("\" AND author=\"", "author=\"", "\"");
         getTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
@@ -58,7 +58,7 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsYearSearch() throws FetcherException {
-        List<BibEntry> result = getFetcher().performSearch("year:" + getTestYear());
+        List<BibEntry> result = getFetcher().performSearch("year=" + getTestYear());
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
@@ -79,7 +79,7 @@ interface SearchBasedFetcherCapabilityTest {
     default void supportsYearRangeSearch() throws FetcherException {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
 
-        List<BibEntry> result = getFetcher().performSearch("year-range:2018-2020");
+        List<BibEntry> result = getFetcher().performSearch("year-range=2018-2020");
         assertFalse(result.isEmpty());
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
@@ -97,13 +97,13 @@ interface SearchBasedFetcherCapabilityTest {
 
     /**
      * Test whether the library API supports journal based search.
-     *
+     * <p>
      * WARNING: the error while merging information from user-assigned DOI (more specifically, "10.1016/j.geomphys.2012.09.009")
      * is related to a failed read by the Bibtex Parser (title is formatted in a weird way)
      */
     @Test
     default void supportsJournalSearch() throws FetcherException {
-        List<BibEntry> result = getFetcher().performSearch("journal:\"" + getTestJournal() + "\"");
+        List<BibEntry> result = getFetcher().performSearch("journal=\"" + getTestJournal() + "\"");
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
@@ -111,8 +111,8 @@ interface SearchBasedFetcherCapabilityTest {
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
             assertTrue(bibEntry.hasField(StandardField.JOURNAL));
-            String journal = bibEntry.getField(StandardField.JOURNAL).orElse("");
-            assertTrue(journal.contains(getTestJournal().replace("\"", "")));
+            String journal = bibEntry.getField(StandardField.JOURNAL).orElse("").toLowerCase();
+            assertTrue(journal.contains(getTestJournal().replace("\"", "").toLowerCase()));
         });
     }
 

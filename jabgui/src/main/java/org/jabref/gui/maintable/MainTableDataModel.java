@@ -18,12 +18,13 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.SearchDisplayMode;
@@ -190,8 +191,8 @@ public class MainTableDataModel {
 
         final MatcherSet searchRules = MatcherSets.build(
                 groupsPreferences.getGroupViewMode().contains(GroupViewMode.INTERSECTION)
-                        ? MatcherSets.MatcherType.AND
-                        : MatcherSets.MatcherType.OR);
+                ? MatcherSets.MatcherType.AND
+                : MatcherSets.MatcherType.OR);
 
         for (GroupTreeNode node : selectedGroups) {
             searchRules.addRule(node.getSearchMatcher());
@@ -218,6 +219,12 @@ public class MainTableDataModel {
             return Optional.empty();
         }
         return Optional.of(entriesViewModel.get(index));
+    }
+
+    public Optional<BibEntryTableViewModel> getViewModelByCitationKey(String citationKey) {
+        return entriesViewModel.stream()
+                               .filter(viewModel -> citationKey.equals(viewModel.getEntry().getCitationKey().orElse("")))
+                               .findFirst();
     }
 
     public void resetFieldFormatter() {
@@ -260,6 +267,20 @@ public class MainTableDataModel {
         @Subscribe
         public void listen(IndexStartedEvent indexStartedEvent) {
             updateSearchMatches(searchQueryProperty.get());
+        }
+
+        @Subscribe
+        public void listen(EntriesRemovedEvent removedEntriesEvent) {
+            // When entries are removed, we need to refresh the search matches
+            // to ensure the filtered list is properly updated and doesn't show stale entries
+            BackgroundTask.wrap(() -> {
+                // Re-run the current search to update the filtered results
+                if (searchQueryProperty.get().isPresent()) {
+                    setSearchMatches(indexManager.search(searchQueryProperty.get().get()));
+                } else {
+                    clearSearchMatches();
+                }
+            }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
         }
     }
 }

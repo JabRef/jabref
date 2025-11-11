@@ -74,14 +74,14 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         }
 
         private void setListener() {
-            textProperty().addListener((observable, oldValue, newValue) -> {
+            textProperty().addListener((_, _, _) -> {
                 String enteredText = getText();
                 if (enteredText == null || enteredText.isEmpty()) {
                     suggestionsList.hide();
                 } else {
                     List<String> filteredEntries = citationKeyPatterns.stream()
                                                                       .filter(e -> e.toLowerCase().contains(enteredText.toLowerCase()))
-                                                                      .collect(Collectors.toList());
+                                                                      .toList();
 
                     if (!filteredEntries.isEmpty()) {
                         populatePopup(filteredEntries);
@@ -96,9 +96,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
                 }
             });
 
-            focusedProperty().addListener((observable, oldValue, newValue) -> {
-                suggestionsList.hide();
-            });
+            focusedProperty().addListener((_, _, _) -> suggestionsList.hide());
         }
 
         private void populatePopup(List<String> searchResult) {
@@ -119,7 +117,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
                 menuItems.add(item);
 
-                item.setOnAction(actionEvent -> {
+                item.setOnAction(_ -> {
                     setText(result);
                     positionCaret(result.length());
                     suggestionsList.hide();

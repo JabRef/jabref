@@ -32,7 +32,7 @@ public class SSRNTest {
 
     /**
      * @param findInText if the input should be found when passing through "find in text"
-     * @param input the input to be checked
+     * @param input      the input to be checked
      */
     @ParameterizedTest
     @MethodSource("provideTestData")

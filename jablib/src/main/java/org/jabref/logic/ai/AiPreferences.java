@@ -17,9 +17,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.ai.templates.AiTemplate;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
-import org.jabref.model.strings.StringUtil;
 
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
@@ -377,11 +377,16 @@ public class AiPreferences {
             return contextWindowSize.get();
         } else {
             return switch (aiProvider.get()) {
-                case OPEN_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
-                case MISTRAL_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
-                case HUGGING_FACE -> AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
-                case GEMINI -> AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
-                case GPT4ALL -> AiDefaultPreferences.getContextWindowSize(AiProvider.GPT4ALL, gpt4AllChatModel.get());
+                case OPEN_AI ->
+                        AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
+                case MISTRAL_AI ->
+                        AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
+                case HUGGING_FACE ->
+                        AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
+                case GEMINI ->
+                        AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
+                case GPT4ALL ->
+                        AiDefaultPreferences.getContextWindowSize(AiProvider.GPT4ALL, gpt4AllChatModel.get());
             };
         }
     }

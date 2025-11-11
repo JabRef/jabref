@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.util.GrobidPreferences;
@@ -13,5 +14,6 @@ public record ImportFormatPreferences(
         FieldPreferences fieldPreferences,
         XmpPreferences xmpPreferences,
         DOIPreferences doiPreferences,
-        GrobidPreferences grobidPreferences) {
+        GrobidPreferences grobidPreferences,
+        FilePreferences filePreferences) {
 }

@@ -48,9 +48,9 @@ public class Directories {
 
     public static Path getAiFilesDirectory() {
         return Path.of(AppDirsFactory.getInstance()
-                .getUserDataDir(OS.APP_DIR_APP_NAME,
-                        "ai" + File.separator + AiService.VERSION,
-                        OS.APP_DIR_APP_AUTHOR));
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
+                                             "ai" + File.separator + AiService.VERSION,
+                                             OS.APP_DIR_APP_AUTHOR));
     }
 
     public static Path getSslDirectory() {

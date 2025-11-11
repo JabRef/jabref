@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/17.0.2-ea"
+         xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.welcome.components.ThemeWireFrame" maxHeight="96.0"
+         maxWidth="160.0" minHeight="96.0" minWidth="160.0" prefHeight="96.0" prefWidth="160.0"
+              styleClass="wireframe-container">
+    <!-- Menu Bar -->
+    <HBox prefHeight="8.0" spacing="1.5" styleClass="wireframe-menubar">
+        <HBox prefHeight="2.0" prefWidth="8.0" styleClass="wireframe-menu-item" />
+        <HBox prefHeight="2.0" prefWidth="8.0" styleClass="wireframe-menu-item" />
+        <HBox prefHeight="2.0" prefWidth="8.0" styleClass="wireframe-menu-item" />
+        <HBox prefHeight="2.0" prefWidth="8.0" styleClass="wireframe-menu-item" />
+    </HBox>
+    <!-- Toolbar -->
+    <HBox prefHeight="8.0" styleClass="wireframe-toolbar">
+        <!-- Left Tools -->
+        <HBox spacing="2.0">
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+        </HBox>
+        <!-- Search Bar -->
+        <HBox prefHeight="4.0" prefWidth="32.0" styleClass="wireframe-search"
+              HBox.hgrow="ALWAYS">
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" styleClass="wireframe-search-field" HBox.hgrow="ALWAYS" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+        </HBox>
+        <!-- Right Tools -->
+        <HBox spacing="2.0">
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+            <HBox prefHeight="4.0" prefWidth="4.0" styleClass="wireframe-tool-item" />
+        </HBox>
+    </HBox>
+    <!-- Main Content -->
+    <HBox VBox.vgrow="ALWAYS">
+        <!-- Sidebar -->
+        <VBox prefWidth="40.0" spacing="36.0" minWidth="40.0" maxWidth="40.0"
+              styleClass="wireframe-sidebar">
+            <!-- Sidebar Group 1 -->
+            <HBox alignment="CENTER" spacing="4.0" fillHeight="false">
+                <HBox prefHeight="2.0" prefWidth="8.0" styleClass="wireframe-sidebar-item" />
+                <HBox spacing="2.0" HBox.hgrow="ALWAYS">
+                    <HBox prefHeight="4.0" prefWidth="4.0"
+                          styleClass="wireframe-sidebar-item" />
+                    <HBox prefHeight="4.0" prefWidth="4.0"
+                          styleClass="wireframe-sidebar-item" />
+                    <HBox prefHeight="4.0" prefWidth="4.0"
+                          styleClass="wireframe-sidebar-item" />
+                </HBox>
+            </HBox>
+            <!-- Sidebar Group 2 -->
+            <HBox alignment="CENTER" spacing="4.0" fillHeight="false">
+                <HBox prefHeight="2.0" prefWidth="8.0" styleClass="wireframe-sidebar-item" />
+                <HBox spacing="2.0" HBox.hgrow="ALWAYS">
+                    <HBox prefHeight="4.0" prefWidth="4.0"
+                          styleClass="wireframe-sidebar-item" />
+                    <HBox prefHeight="4.0" prefWidth="4.0"
+                          styleClass="wireframe-sidebar-item" />
+                    <HBox prefHeight="4.0" prefWidth="4.0"
+                          styleClass="wireframe-sidebar-item" />
+                </HBox>
+            </HBox>
+        </VBox>
+        <!-- Welcome Tab Area -->
+        <VBox spacing="6.0" styleClass="wireframe-welcome-tab-area" HBox.hgrow="ALWAYS"
+              alignment="CENTER"> <!-- Top-title -->
+            <VBox spacing="2.0" fillWidth="false" maxWidth="80">
+                <HBox prefHeight="4.0" prefWidth="48.0"
+                      styleClass="wireframe-welcome-tab-item" />
+                <HBox prefHeight="4.0" prefWidth="24.0"
+                      styleClass="wireframe-welcome-tab-item" />
+            </VBox>
+            <HBox spacing="6.0" maxWidth="80">
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <!-- Start -->
+                    <VBox spacing="2.0" fillWidth="false">
+                        <HBox prefHeight="4.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                    </VBox>
+                    <!-- Recent -->
+                    <VBox spacing="2.0" fillWidth="false">
+                        <HBox prefHeight="4.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                    </VBox>
+                </VBox>
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <!-- Quick Settings -->
+                    <VBox spacing="2.0" fillWidth="false">
+                        <HBox prefHeight="4.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="40.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="40.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                    </VBox>
+                    <!-- Walkthroughs -->
+                    <VBox spacing="2.0" fillWidth="false">
+                        <HBox prefHeight="4.0" prefWidth="16.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="40.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                        <HBox prefHeight="2.0" prefWidth="32.0"
+                              styleClass="wireframe-welcome-tab-item" />
+                    </VBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </HBox>
+</fx:root>

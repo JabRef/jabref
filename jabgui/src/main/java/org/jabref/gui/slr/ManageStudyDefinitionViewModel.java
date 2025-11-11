@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,13 +27,14 @@ import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
-import org.jabref.logic.importer.fetcher.SpringerFetcher;
+import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class ManageStudyDefinitionViewModel {
     private static final Set<String> DEFAULT_SELECTION = Set.of(
             ACMPortalFetcher.FETCHER_NAME,
             IEEE.FETCHER_NAME,
-            SpringerFetcher.FETCHER_NAME,
+            SpringerNatureWebFetcher.FETCHER_NAME,
             DBLPFetcher.FETCHER_NAME);
 
     private final StringProperty title = new SimpleStringProperty();
@@ -69,8 +69,8 @@ public class ManageStudyDefinitionViewModel {
      */
     public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
-                                          WorkspacePreferences workspacePreferences,
-                                          DialogService dialogService) {
+                                          @NonNull WorkspacePreferences workspacePreferences,
+                                          @NonNull DialogService dialogService) {
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
                                     .map(SearchBasedFetcher::getName)
@@ -82,8 +82,8 @@ public class ManageStudyDefinitionViewModel {
                                         return new StudyCatalogItem(name, enabled);
                                     })
                                     .toList());
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
+        this.dialogService = dialogService;
+        this.workspacePreferences = workspacePreferences;
     }
 
     /**
@@ -92,14 +92,14 @@ public class ManageStudyDefinitionViewModel {
      * @param study          The study to initialize the UI from
      * @param studyDirectory The path where the study resides
      */
-    public ManageStudyDefinitionViewModel(Study study,
-                                          Path studyDirectory,
+    public ManageStudyDefinitionViewModel(@NonNull Study study,
+                                          @NonNull Path studyDirectory,
                                           ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
-                                          WorkspacePreferences workspacePreferences,
-                                          DialogService dialogService) {
+                                          @NonNull WorkspacePreferences workspacePreferences,
+                                          @NonNull DialogService dialogService) {
         // copy the content of the study object into the UI fields
-        authors.addAll(Objects.requireNonNull(study).getAuthors());
+        authors.addAll(study.getAuthors());
         title.setValue(study.getTitle());
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
@@ -116,9 +116,9 @@ public class ManageStudyDefinitionViewModel {
                                     })
                                     .toList());
 
-        this.directory.set(Objects.requireNonNull(studyDirectory).toString());
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
+        this.directory.set(studyDirectory.toString());
+        this.workspacePreferences = workspacePreferences;
+        this.dialogService = dialogService;
     }
 
     public StringProperty getTitle() {

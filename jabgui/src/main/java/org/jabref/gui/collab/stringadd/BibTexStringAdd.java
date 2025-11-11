@@ -2,7 +2,7 @@ package org.jabref.gui.collab.stringadd;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -24,7 +24,7 @@ public final class BibTexStringAdd extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompound undoEdit) {
+    public void applyChange(NamedCompoundEdit undoEdit) {
         try {
             databaseContext.getDatabase().addString(addedString);
             undoEdit.addEdit(new UndoableInsertString(databaseContext.getDatabase(), addedString));

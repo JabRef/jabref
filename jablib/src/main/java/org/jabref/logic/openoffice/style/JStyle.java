@@ -37,6 +37,7 @@ import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,21 +163,24 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     private String localCopy;
     private boolean isDefaultLayoutPresent;
 
-    public JStyle(Path styleFile, LayoutFormatterPreferences layoutPreferences, JournalAbbreviationRepository abbreviationRepository) throws IOException {
-        this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
+    public JStyle(@NonNull Path styleFile,
+                  @NonNull LayoutFormatterPreferences layoutPreferences,
+                  JournalAbbreviationRepository abbreviationRepository) throws IOException {
+        this.layoutPreferences = layoutPreferences;
         this.abbreviationRepository = abbreviationRepository;
-        this.styleFile = Objects.requireNonNull(styleFile);
+        this.styleFile = styleFile;
         setDefaultProperties();
         reload();
         fromResource = false;
         path = styleFile.toAbsolutePath().toString();
     }
 
-    public JStyle(String resourcePath, LayoutFormatterPreferences layoutPreferences, JournalAbbreviationRepository abbreviationRepository) throws IOException {
-        this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
+    public JStyle(@NonNull String resourcePath,
+                  @NonNull LayoutFormatterPreferences layoutPreferences,
+                  JournalAbbreviationRepository abbreviationRepository) throws IOException {
+        this.layoutPreferences = layoutPreferences;
         this.abbreviationRepository = abbreviationRepository;
 
-        Objects.requireNonNull(resourcePath);
         setDefaultProperties();
         // we need to distinguish if it's a style from the local resources or a file on disk
         InputStream stream = JStyle.class.getResourceAsStream(resourcePath);
@@ -266,9 +270,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         return Collections.unmodifiableSet(journals);
     }
 
-    private void initialize(InputStream stream) throws IOException {
-        Objects.requireNonNull(stream);
-
+    private void initialize(@NonNull InputStream stream) throws IOException {
         try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             readFormatFile(reader);
         }
@@ -603,9 +605,9 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         }
         if (object instanceof JStyle otherStyle) {
             return Objects.equals(path, otherStyle.path)
-                   && Objects.equals(name, otherStyle.name)
-                   && Objects.equals(citProperties, otherStyle.citProperties)
-                   && Objects.equals(properties, otherStyle.properties);
+                    && Objects.equals(name, otherStyle.name)
+                    && Objects.equals(citProperties, otherStyle.citProperties)
+                    && Objects.equals(properties, otherStyle.properties);
         }
         return false;
     }
@@ -984,7 +986,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         OOText title = style.getReferenceHeaderText();
         String parStyle = style.getReferenceHeaderParagraphFormat();
         return parStyle == null
-                ? OOFormat.paragraph(title)
-                : OOFormat.paragraph(title, parStyle);
+               ? OOFormat.paragraph(title)
+               : OOFormat.paragraph(title, parStyle);
     }
 }

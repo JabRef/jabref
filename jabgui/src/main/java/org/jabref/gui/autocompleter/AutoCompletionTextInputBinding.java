@@ -49,13 +49,13 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
      */
     private StringConverter<T> converter;
     private AutoCompletionStrategy inputAnalyzer;
-    private final ChangeListener<String> textChangeListener = (obs, oldText, newText) -> {
+    private final ChangeListener<String> textChangeListener = (_, _, newText) -> {
         if (getCompletionTarget().isFocused()) {
             setUserInputText(newText);
         }
     };
     private boolean showOnFocus;
-    private final ChangeListener<Boolean> focusChangedListener = (obs, oldFocused, newFocused) -> {
+    private final ChangeListener<Boolean> focusChangedListener = (_, _, newFocused) -> {
         if (newFocused) {
             if (showOnFocus) {
                 setUserInputText(getCompletionTarget().getText());

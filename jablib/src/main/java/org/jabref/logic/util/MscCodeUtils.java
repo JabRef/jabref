@@ -12,7 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashBiMap;
-import org.eclipse.jgit.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,8 @@ public class MscCodeUtils {
         ObjectMapper mapper = new ObjectMapper();
         try {
             Map<String, String> mapping =
-                    mapper.readValue(resourceUrl, new TypeReference<Map<String, String>>() { });
+                    mapper.readValue(resourceUrl, new TypeReference<>() {
+                    });
             HashBiMap<String, String> result = HashBiMap.create(mapping);
 
             if (result.isEmpty()) {

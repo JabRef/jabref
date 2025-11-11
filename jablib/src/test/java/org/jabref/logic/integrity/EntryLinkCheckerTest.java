@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntryLinkCheckerTest {
 
@@ -25,11 +24,6 @@ class EntryLinkCheckerTest {
         checker = new EntryLinkChecker(database);
         entry = new BibEntry();
         database.insertEntry(entry);
-    }
-
-    @Test
-    void entryLinkChecker() {
-        assertThrows(NullPointerException.class, () -> new EntryLinkChecker(null));
     }
 
     @Test

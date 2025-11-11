@@ -1,6 +1,7 @@
 package org.jabref.logic.citation;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
@@ -39,29 +40,23 @@ public class SearchCitationsRelationsService {
         );
     }
 
-    /**
-     * @implNote Typically, this would be a Shim in JavaFX
-     */
     @VisibleForTesting
-    public SearchCitationsRelationsService(CitationFetcher citationFetcher,
-                                           BibEntryCitationsAndReferencesRepository repository
+    SearchCitationsRelationsService(CitationFetcher citationFetcher,
+                                    BibEntryCitationsAndReferencesRepository repository
     ) {
         this.citationFetcher = citationFetcher;
         this.relationsRepository = repository;
     }
 
-    public List<BibEntry> searchReferences(BibEntry referenced) {
-        boolean isFetchingAllowed = relationsRepository.isReferencesUpdatable(referenced)
-            || !relationsRepository.containsReferences(referenced);
+    public List<BibEntry> searchCites(BibEntry referencing) throws FetcherException {
+        boolean isFetchingAllowed =
+                !relationsRepository.containsReferences(referencing) ||
+                        relationsRepository.isReferencesUpdatable(referencing);
         if (isFetchingAllowed) {
-            try {
-                List<BibEntry> referencedBy = citationFetcher.searchCiting(referenced);
-                relationsRepository.insertReferences(referenced, referencedBy);
-            } catch (FetcherException e) {
-                LOGGER.error("Error while fetching references for entry {}", referenced.getTitle(), e);
-            }
+            List<BibEntry> referencedBy = citationFetcher.searchCiting(referencing);
+            relationsRepository.insertReferences(referencing, referencedBy);
         }
-        return relationsRepository.readReferences(referenced);
+        return relationsRepository.readReferences(referencing);
     }
 
     /**
@@ -69,18 +64,26 @@ public class SearchCitationsRelationsService {
      * If the store was not empty and nothing was fetched after a successful fetch => the store will be erased and the returned collection will be empty
      * If the store was not empty and an error occurs while fetching => will return the content of the store
      */
-    public List<BibEntry> searchCitations(BibEntry cited) {
-        boolean isFetchingAllowed = relationsRepository.isCitationsUpdatable(cited)
-            || !relationsRepository.containsCitations(cited);
+    public List<BibEntry> searchCitedBy(BibEntry cited) throws FetcherException {
+        boolean isFetchingAllowed =
+                !relationsRepository.containsCitations(cited) ||
+                        relationsRepository.isCitationsUpdatable(cited);
         if (isFetchingAllowed) {
-            try {
-                List<BibEntry> citedBy = citationFetcher.searchCitedBy(cited);
-                relationsRepository.insertCitations(cited, citedBy);
-            } catch (FetcherException e) {
-                LOGGER.error("Error while fetching citations for entry {}", cited.getTitle(), e);
-            }
+            List<BibEntry> citedBy = citationFetcher.searchCitedBy(cited);
+            relationsRepository.insertCitations(cited, citedBy);
         }
         return relationsRepository.readCitations(cited);
+    }
+
+    public int getCitationCount(BibEntry citationCounted, Optional<String> actualFieldValue) throws FetcherException {
+        boolean isFetchingAllowed = actualFieldValue.isEmpty() ||
+                relationsRepository.isCitationsUpdatable(citationCounted);
+        if (isFetchingAllowed) {
+            Optional<Integer> citationCountResult = citationFetcher.searchCitationCount(citationCounted);
+            return citationCountResult.orElse(0);
+        }
+        assert actualFieldValue.isPresent();
+        return Integer.parseInt(actualFieldValue.get());
     }
 
     public void close() {

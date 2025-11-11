@@ -3,13 +3,17 @@ package org.jabref.model.entry.types;
 import java.util.Locale;
 import java.util.Objects;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 
+import org.jspecify.annotations.NonNull;
+
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class UnknownEntryType implements EntryType {
     private final String name;
 
-    public UnknownEntryType(String name) {
-        this.name = Objects.requireNonNull(name).toLowerCase(Locale.ENGLISH);
+    public UnknownEntryType(@NonNull String name) {
+        this.name = name.toLowerCase(Locale.ENGLISH);
     }
 
     @Override

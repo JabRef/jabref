@@ -6,16 +6,38 @@
 <module name="Checker">
     <property name="charset" value="UTF-8"/>
 
-    <module name="Header">
-        <property name="header" value=""/>
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="[/\\]\.idea[/\\]" />
     </module>
-
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="[/\\]\.jbang[/\\]" />
+    </module>
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="[/\\]build-support[/\\]" />
+    </module>
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="[/\\]generated(-sources|-src)?[/\\]" />
+    </module>
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="[/\\]jablib-examples[/\\]" />
+    </module>
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="[/\\]src-gen[/\\]" />
+    </module>
+    <module name="BeforeExecutionExclusionFileFilter">
+        <!-- We ignore this file because it's a modification of the original java code https://github.com/openjdk/jfx/blob/jfx15/modules/javafx.controls/src/main/java/javafx/scene/control/skin/TitledPaneSkin.java -->
+        <property name="fileNamePattern" value="CustomTitledPaneSkin\.java$" />
+    </module>
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="(module\-info|heylogs)\.java$"/>
+    </module>
+    
     <module name="SuppressionFilter">
         <property name="file" value="config/checkstyle/suppressions.xml"/>
     </module>
 
-    <module name="BeforeExecutionExclusionFileFilter">
-        <property name="fileNamePattern" value="(module\-info|heylogs)\.java$"/>
+    <module name="Header">
+        <property name="header" value=""/>
     </module>
 
     <module name="FileTabCharacter"/>

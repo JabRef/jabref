@@ -124,13 +124,13 @@ public class MetaDataSerializerTest {
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
-                                .withRequiredFields(UnknownField.fromDisplayName("Test1"), UnknownField.fromDisplayName("Test2")),
+                                .withRequiredFields(new UnknownField("Test1"), new UnknownField("Test2")),
                         "jabref-entrytype: test: req[Test1;Test2] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
-                                .withRequiredFields(UnknownField.fromDisplayName("tEST"), UnknownField.fromDisplayName("tEsT2")),
+                                .withRequiredFields(new UnknownField("tEST"), new UnknownField("tEsT2")),
                         "jabref-entrytype: test: req[tEST;tEsT2] opt[]"
                 )
         );

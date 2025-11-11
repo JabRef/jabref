@@ -1,13 +1,14 @@
 package org.jabref.logic.integrity;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class NoteChecker implements ValueChecker {
 
@@ -15,8 +16,8 @@ public class NoteChecker implements ValueChecker {
 
     private final BibDatabaseContext bibDatabaseContextEdition;
 
-    public NoteChecker(BibDatabaseContext bibDatabaseContext) {
-        this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
+    public NoteChecker(@NonNull BibDatabaseContext bibDatabaseContext) {
+        this.bibDatabaseContextEdition = bibDatabaseContext;
     }
 
     /**

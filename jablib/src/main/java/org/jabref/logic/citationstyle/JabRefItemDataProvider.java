@@ -100,7 +100,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
     private CSLItemData bibEntryToCSLItemData(BibEntry originalBibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
         // We need to make a deep copy, because we modify the entry according to the logic presented at
         // https://github.com/JabRef/jabref/issues/8372#issuecomment-1014941935
-        BibEntry bibEntry = (BibEntry) originalBibEntry.clone();
+        BibEntry bibEntry = new BibEntry(originalBibEntry);
         String citeKey = bibEntry.getCitationKey().orElse("");
         BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 

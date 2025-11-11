@@ -3,6 +3,8 @@ package org.jabref.logic.formatter.bibtexfields;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
+import org.jspecify.annotations.NonNull;
+
 public class NormalizeEnDashesFormatter extends Formatter {
 
     @Override
@@ -16,7 +18,7 @@ public class NormalizeEnDashesFormatter extends Formatter {
     }
 
     @Override
-    public String format(String value) {
+    public String format(@NonNull String value) {
         return value.replaceAll(" - ", " -- ");
     }
 

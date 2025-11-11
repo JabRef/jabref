@@ -178,7 +178,7 @@ public class MSBibMapping {
     /**
      * <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
      *
-     * @param  LCID The LCID to transform
+     * @param LCID The LCID to transform
      * @return "english" as default. Corresponding language from BiMap otherwise.
      */
     public static String getLanguage(int LCID) {

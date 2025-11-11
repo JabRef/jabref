@@ -122,8 +122,8 @@ public class AutoSetFileLinksUtil {
 
             if (!fileAlreadyLinked) {
                 Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
-                                                            .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, externalApplicationsPreferences))
-                                                            .orElse(Optional.of(new UnknownExternalFileType("")));
+                                                          .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, externalApplicationsPreferences))
+                                                          .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.map(ExternalFileType::getName).orElse("");
                 Path relativeFilePath = FileUtil.relativize(foundFile, directories);

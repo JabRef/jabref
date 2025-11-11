@@ -2,10 +2,8 @@ package org.jabref.http.manager;
 
 import java.net.URI;
 
-import javafx.collections.ObservableList;
-
+import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.Server;
-import org.jabref.model.database.BibDatabaseContext;
 
 import jakarta.ws.rs.ProcessingException;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -20,13 +18,13 @@ public class HttpServerThread extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerThread.class);
 
     private final Server server;
-    private final ObservableList<BibDatabaseContext> contextsToServe;
+    private final SrvStateManager srvStateManager;
     private final URI uri;
 
     private HttpServer httpServer;
 
-    public HttpServerThread(ObservableList<BibDatabaseContext> contextsToServe, URI uri) {
-        this.contextsToServe = contextsToServe;
+    public HttpServerThread(SrvStateManager srvStateManager, URI uri) {
+        this.srvStateManager = srvStateManager;
         this.uri = uri;
         this.server = new Server();
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
@@ -35,7 +33,7 @@ public class HttpServerThread extends Thread {
     @Override
     public void run() {
         try {
-            httpServer = this.server.run(contextsToServe, uri);
+            httpServer = this.server.run(srvStateManager, uri);
         } catch (ProcessingException e) {
             LOGGER.error("Failed to start HTTP server thread: {}", e);
         }

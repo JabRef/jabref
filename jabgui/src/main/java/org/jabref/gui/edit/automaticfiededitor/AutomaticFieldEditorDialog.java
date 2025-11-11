@@ -60,17 +60,11 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
             }
             return "";
         });
-
-        // This will prevent all dialog buttons from having the same size
-        // Read more: https://stackoverflow.com/questions/45866249/javafx-8-alert-different-button-sizes
-        getDialogPane().getButtonTypes().stream()
-            .map(getDialogPane()::lookupButton)
-            .forEach(btn -> ButtonBar.setButtonUniformSize(btn, false));
     }
 
     @FXML
     public void initialize() {
-        viewModel = new AutomaticFieldEditorViewModel(selectedEntries, database, undoManager, stateManager);
+        viewModel = new AutomaticFieldEditorViewModel(database, undoManager, stateManager);
 
         for (AutomaticFieldEditorTab tabModel : viewModel.getFieldEditorTabs()) {
             NotificationPaneAdapter notificationPane = new NotificationPaneAdapter(tabModel.getContent());

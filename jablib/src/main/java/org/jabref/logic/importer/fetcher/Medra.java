@@ -89,8 +89,8 @@ public class Medra implements IdBasedParserFetcher {
         return IntStream.range(0, authors.length())
                         .mapToObj(authors::getJSONObject)
                         .map(author -> author.has("literal") ? // quickly route through the literal string
-                                new Author(author.getString("literal"), "", "", "", "") :
-                                new Author(author.optString("given", ""), "", "", author.optString("family", ""), ""))
+                                       new Author(author.getString("literal"), "", "", "", "") :
+                                       new Author(author.optString("given", ""), "", "", author.optString("family", ""), ""))
                         .collect(AuthorList.collect())
                         .getAsFirstLastNamesWithAnd();
     }

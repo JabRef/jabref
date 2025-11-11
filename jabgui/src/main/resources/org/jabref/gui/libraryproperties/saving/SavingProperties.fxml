@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
@@ -13,8 +14,11 @@
               text="%Refuse to save the library before external changes have been reviewed."/>
 
     <Label styleClass="sectionHeader" text="%Save sort order"/>
-    <SaveOrderConfigPanel fx:id="saveOrderConfigPanel"/>
+    <SaveOrderConfigPanel fx:id="saveOrderConfigPanel" />
 
     <Label styleClass="sectionHeader" text="%Save actions"/>
-    <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel"/>
+    <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel" />
+    <padding>
+        <Insets bottom="12.0" />
+    </padding>
 </fx:root>

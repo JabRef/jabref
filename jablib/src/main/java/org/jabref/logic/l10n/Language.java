@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Contains all supported languages.
@@ -42,6 +43,7 @@ public enum Language {
     private static final Pattern IS_NOT_LATIN = Pattern.compile("[^\\p{IsLatin}]");
     private final String displayName;
     private final String id;
+
     /**
      * @param id Typically as 639-1 code
      */
@@ -50,9 +52,7 @@ public enum Language {
         this.id = id;
     }
 
-    public static Optional<Locale> convertToSupportedLocale(Language language) {
-        Objects.requireNonNull(language);
-
+    public static Optional<Locale> convertToSupportedLocale(@NonNull Language language) {
         // Very important to split languages like pt_BR into two parts, because otherwise the country would be treated lowercase and create problems in loading
         String[] languageParts = language.getId().split("_");
         Locale locale;
@@ -77,11 +77,11 @@ public enum Language {
 
     public static List<Language> getSorted() {
         return Arrays.stream(values())
-                .sorted(Comparator.comparing(language -> removeNonLatinCharacters(language.getDisplayName())))
-                .toList();
+                     .sorted(Comparator.comparing(language -> removeNonLatinCharacters(language.getDisplayName())))
+                     .toList();
     }
 
     private static String removeNonLatinCharacters(String input) {
-       return IS_NOT_LATIN.matcher(input).replaceAll("");
+        return IS_NOT_LATIN.matcher(input).replaceAll("");
     }
 }

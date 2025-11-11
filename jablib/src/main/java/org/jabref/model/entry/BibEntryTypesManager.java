@@ -45,8 +45,10 @@ public class BibEntryTypesManager {
     @VisibleForTesting
     InternalEntryTypes getEntryTypes(BibDatabaseMode mode) {
         return switch (mode) {
-            case BIBTEX -> BIBTEX_ENTRYTYPES;
-            case BIBLATEX -> BIBLATEX_ENTRYTYPES;
+            case BIBTEX ->
+                    BIBTEX_ENTRYTYPES;
+            case BIBLATEX ->
+                    BIBLATEX_ENTRYTYPES;
         };
     }
 
@@ -127,8 +129,8 @@ public class BibEntryTypesManager {
 
         // Workaround for UI not supporting OrFields
         Optional<BibEntryType> standardTypeOpt = entryTypes.standardTypes.stream()
-                                                                      .filter(InternalEntryTypes.typeEquals(entryType.getType()))
-                                                                      .findFirst();
+                                                                         .filter(InternalEntryTypes.typeEquals(entryType.getType()))
+                                                                         .findFirst();
         if (standardTypeOpt.isEmpty()) {
             LOGGER.debug("Standard type not found for {}", entryType.getType());
             entryTypes.addCustomOrModifiedType(entryType);
@@ -143,8 +145,8 @@ public class BibEntryTypesManager {
         Set<BibField> standardOptionalFields = standardType.getOptionalFields();
 
         Set<Field> entryTypeRequiredFields = entryType.getRequiredFields().stream()
-                                                                  .map(OrFields::getFields)
-                                                                  .flatMap(Set::stream)
+                                                      .map(OrFields::getFields)
+                                                      .flatMap(Set::stream)
                                                       .collect(Collectors.toSet());
         Set<BibField> entryTypeOptionalFields = entryType.getOptionalFields();
 
@@ -194,8 +196,7 @@ public class BibEntryTypesManager {
      */
     @VisibleForTesting
     static class InternalEntryTypes {
-        @VisibleForTesting
-        final Set<BibEntryType> standardTypes;
+        @VisibleForTesting final Set<BibEntryType> standardTypes;
 
         // TreeSet needs to be used here, because then, org.jabref.model.entry.BibEntryType.compareTo is used - instead of org.jabref.model.entry.BibEntryType.equals
         private final SortedSet<BibEntryType> customOrModifiedType = new TreeSet<>();

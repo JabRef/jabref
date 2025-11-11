@@ -18,7 +18,7 @@ import com.google.common.base.CharMatcher;
 /**
  * Checks if the BibEntry contains unescaped ampersands.
  * This is done in nonverbatim fields. Similar to {@link HTMLCharacterChecker}
- *
+ * <p>
  * The {@link LatexIntegrityChecker} is not able to check unescaped ampersands. Therefore, this separate checker is required.
  */
 public class AmpersandChecker implements EntryChecker {

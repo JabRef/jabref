@@ -15,13 +15,13 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
@@ -146,11 +146,11 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
         }
 
         List<Author> authors = IntStream.range(0, works.length())
-                                          .mapToObj(works::getJSONObject)
-                                          .map(obj -> obj.getString("key"))
-                                          .map(worksLink -> BASE_URL + worksLink + ".json")
-                                          .flatMap(this::fromWorkToAuthors)
-                                          .collect(Collectors.toList());
+                                        .mapToObj(works::getJSONObject)
+                                        .map(obj -> obj.getString("key"))
+                                        .map(worksLink -> BASE_URL + worksLink + ".json")
+                                        .flatMap(this::fromWorkToAuthors)
+                                        .collect(Collectors.toList());
         return AuthorList.of(authors).getAsLastFirstNamesWithAnd(false);
     }
 

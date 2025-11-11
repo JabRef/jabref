@@ -1,23 +1,15 @@
 package org.jabref.gui.walkthrough.declarative.effect;
 
 public enum HighlightEffect {
-    /**
-     * See {@link org.jabref.gui.walkthrough.effects.BackdropHighlight}
-     */
-    BACKDROP_HIGHLIGHT,
+    /// See [org.jabref.gui.walkthrough.effects.Spotlight]
+    SPOT_LIGHT,
 
-    /**
-     * See {@link org.jabref.gui.walkthrough.effects.PulseAnimateIndicator}
-     */
-    ANIMATED_PULSE,
+    /// See [org.jabref.gui.walkthrough.effects.Ping]
+    PING,
 
-    /**
-     * See {@link org.jabref.gui.walkthrough.effects.FullScreenDarken}
-     */
+    /// See [org.jabref.gui.walkthrough.effects.FullScreenDarken]
     FULL_SCREEN_DARKEN,
 
-    /**
-     * No highlight effect is applied.
-     */
+    /// No highlight effect is applied.
     NONE
 }

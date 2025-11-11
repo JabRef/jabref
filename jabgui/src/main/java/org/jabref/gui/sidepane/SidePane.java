@@ -64,13 +64,13 @@ public class SidePane extends VBox {
         updateView();
     }
 
-     private void updateView() {
+    private void updateView() {
         getChildren().clear();
-         for (SidePaneType type : stateManager.getVisibleSidePaneComponents()) {
-             SidePaneComponent view = viewModel.getSidePaneComponent(type);
-             getChildren().add(view);
-         }
-     }
+        for (SidePaneType type : stateManager.getVisibleSidePaneComponents()) {
+            SidePaneComponent view = viewModel.getSidePaneComponent(type);
+            getChildren().add(view);
+        }
+    }
 
     public BooleanBinding paneVisibleBinding(SidePaneType pane) {
         BooleanBinding visibility = Bindings.createBooleanBinding(

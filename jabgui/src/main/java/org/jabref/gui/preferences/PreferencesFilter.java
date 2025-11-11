@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.preferences.CliPreferences;
 
+import org.jspecify.annotations.NonNull;
+
 public class PreferencesFilter {
 
     private final CliPreferences preferences;
@@ -44,9 +46,11 @@ public class PreferencesFilter {
         private final Optional<Object> defaultValue;
         private final PreferenceType type;
 
-        public PreferenceOption(String key, Object value, Object defaultValue) {
-            this.key = Objects.requireNonNull(key);
-            this.value = Objects.requireNonNull(value);
+        public PreferenceOption(@NonNull String key,
+                                @NonNull Object value,
+                                Object defaultValue) {
+            this.key = key;
+            this.value = value;
             this.defaultValue = Optional.ofNullable(defaultValue);
             this.type = Objects.requireNonNull(getType(value));
 

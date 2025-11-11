@@ -20,10 +20,11 @@ dependencies {
     // implementation("org.openjfx:javafx-fxml")
     // implementation("org.openjfx:javafx-graphics")
 
+    implementation(project(":jabls"))
+    implementation(project(":jabsrv"))
+
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
-
-    implementation(project(":jabsrv"))
 
     implementation("com.pixelduke:fxthemes")
 
@@ -80,7 +81,7 @@ dependencies {
 
     implementation ("org.apache.pdfbox:pdfbox")
 
-    // implementation("net.java.dev.jna:jna")
+    implementation("net.java.dev.jna:jna-jpms")
     implementation("net.java.dev.jna:jna-platform")
 
     implementation("org.eclipse.jgit:org.eclipse.jgit")
@@ -179,6 +180,7 @@ javaModulePackaging {
             "--linux-menu-group", "Office;",
             "--linux-rpm-license-type", "MIT",
             "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
+            "--icon", "$projectDir/src/main/resources/icons/JabRef-linux-icon-64.png",
             "--linux-shortcut",
             "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
         )
@@ -189,6 +191,7 @@ javaModulePackaging {
     }
     targetsWithOs("macos") {
         options.addAll(
+            "--icon", "$projectDir/src/main/resources/icons/jabref.icns",
             "--mac-package-identifier", "JabRef",
             "--mac-package-name", "JabRef",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
@@ -235,7 +238,8 @@ tasks.test {
         "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io"
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=javafx.graphics,javafx.web,com.sun.jna"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"

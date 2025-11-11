@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(ApplicationExtension.class)
 public class IconValidationDecoratorTest {
     static Object[][] decorationTestData() {
-        return new Object[][]{
+        return new Object[][] {
                 {Severity.ERROR, IconTheme.JabRefIcons.ERROR.getGraphicNode().toString()},
                 {Severity.WARNING, IconTheme.JabRefIcons.WARNING.getGraphicNode().toString()}
         };

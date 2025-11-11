@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<DialogPane
+        minHeight="-Infinity"
+        minWidth="-Infinity"
+        xmlns="http://javafx.com/javafx/8.0.141"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.jabref.gui.git.GitShareToGitHubDialogView">
+    <content>
+        <BorderPane>
+            <center>
+                <GridPane
+                        hgap="10.0"
+                        vgap="10.0"
+                        prefWidth="568.0">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="150"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints minWidth="30"/>
+                    </columnConstraints>
+
+                    <Label text="%GitHub Repository URL:"
+                           GridPane.rowIndex="0"
+                           GridPane.columnIndex="0"/>
+                    <TextField
+                            fx:id="repositoryUrl"
+                            GridPane.rowIndex="0"
+                            GridPane.columnIndex="1"/>
+                    <Label fx:id="repoHelpIcon" text="?" styleClass="help-icon"
+                           GridPane.rowIndex="0"
+                           GridPane.columnIndex="2">
+                        <tooltip>
+                            <Tooltip fx:id="repoHelpTooltip"/>
+                        </tooltip>
+                    </Label>
+
+                    <Label text="%GitHub Username:"
+                           GridPane.rowIndex="1"
+                           GridPane.columnIndex="0"/>
+                    <TextField
+                            fx:id="username"
+                            GridPane.rowIndex="1"
+                            GridPane.columnIndex="1"/>
+
+                    <Label text="%Personal Access Token:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <PasswordField fx:id="personalAccessToken" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <Label fx:id="patHelpIcon" text="?" styleClass="help-icon" GridPane.rowIndex="2" GridPane.columnIndex="2">
+                        <tooltip>
+                            <Tooltip fx:id="patHelpTooltip"/>
+                        </tooltip>
+                    </Label>
+
+                    <CheckBox
+                            fx:id="rememberSettingsCheck"
+                            text="%Remember Git settings"
+                            GridPane.rowIndex="3"
+                            GridPane.columnIndex="1"/>
+
+                </GridPane>
+            </center>
+        </BorderPane>
+    </content>
+    <buttonTypes>
+        <ButtonType
+                fx:id="shareButton"
+                text="%Share"
+                buttonData="OK_DONE"/>
+        <ButtonType
+                fx:constant="CANCEL"/>
+    </buttonTypes>
+</DialogPane>

@@ -11,6 +11,7 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -36,6 +37,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
@@ -66,7 +69,7 @@ class StudyRepositoryTest {
      * Set up mocks
      */
     @BeforeEach
-    void setUpMocks() throws IOException, URISyntaxException {
+    void setUpMocks() throws IOException, URISyntaxException, JabRefException {
         libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -107,19 +110,51 @@ class StudyRepositoryTest {
      * Tests whether the file structure of the repository is created correctly from the study definitions file.
      */
     @Test
-    void repositoryStructureCorrectlyCreated() {
+    void quantumRepositoryStructureCorrectlyCreated() {
         // When repository is instantiated the directory structure is created
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
+    }
+
+    @Test
+    void cloudComputingRepositoryStructureCorrectlyCreated() {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));
+    }
+
+    @Test
+    void softwareEngineeringRepositoryStructureCorrectlyCreated() {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "ArXiv.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "ArXiv.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "ArXiv.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "Springer.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "Springer.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "Springer.bib")));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    void quantumFilesCreated(String fileName) {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", fileName)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    void cloudComputingFilesCreated(String fileName) {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", fileName)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    void softwareEngineeringFilesCreated(String fileName) {
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", fileName)));
+    }
+
+    @Test
+    void doesNotCreateUnexpectedQuantumFile() {
         assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "IEEEXplore.bib")));
+    }
+
+    @Test
+    void doesNotCreateUnexpectedCloudComputingFile() {
         assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "IEEEXplore.bib")));
+    }
+
+    @Test
+    void doesNotCreateUnexpectedSoftwareEngineeringFile() {
         assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "IEEEXplore.bib")));
     }
 
@@ -134,7 +169,7 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void fetcherResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException {
+    void fetcherResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         List<QueryResult> mockResults = getMockResults();
 
         studyRepository.persist(mockResults);
@@ -145,7 +180,7 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void mergedResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException {
+    void mergedResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         List<QueryResult> mockResults = getMockResults();
         List<BibEntry> expected = new ArrayList<>();
         expected.addAll(getArXivQuantumMockResults());
@@ -160,13 +195,13 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void studyResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException {
+    void studyResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         List<QueryResult> mockResults = getMockResults();
         studyRepository.persist(mockResults);
         assertEquals(new HashSet<>(getNonDuplicateBibEntryResult().getEntries()), new HashSet<>(getTestStudyRepository().getStudyResultEntries().getEntries()));
     }
 
-    private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException {
+    private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {
         setUpTestStudyDefinitionFile();
         studyRepository = new StudyRepository(
                 tempRepositoryDirectory,

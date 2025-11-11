@@ -13,7 +13,7 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 
 /**
  * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
- *
+ * <p>
  * Background information on <a href="https://tex.stackexchange.com/questions/49757/what-should-an-entry-for-arxiv-entries-look-like-for-biblatex">tex.stackexchange</a>.
  */
 public class EprintCleanup implements CleanupJob {
@@ -46,10 +46,9 @@ public class EprintCleanup implements CleanupJob {
                 entry.setField(StandardField.EPRINTTYPE, "arxiv")
                      .ifPresent(changes::add);
 
-                arXivIdentifier.get().getClassification().ifPresent(classification ->
-                        entry.setField(StandardField.EPRINTCLASS, classification)
-                             .ifPresent(changes::add)
-                );
+                arXivIdentifier.get().getClassification()
+                               .flatMap(classification -> entry.setField(StandardField.EPRINTCLASS, classification))
+                               .ifPresent(changes::add);
 
                 entry.clearField(field)
                      .ifPresent(changes::add);

@@ -3,6 +3,8 @@ package org.jabref.gui.search;
 import java.util.EnumSet;
 import java.util.List;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputControl;
@@ -10,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -18,6 +21,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
 import org.junit.jupiter.api.Test;
@@ -45,6 +49,8 @@ public class GlobalSearchBarTest {
         SearchPreferences searchPreferences = mock(SearchPreferences.class);
         when(searchPreferences.getSearchFlags()).thenReturn(EnumSet.noneOf(SearchFlags.class));
         when(searchPreferences.getObservableSearchFlags()).thenReturn(FXCollections.observableSet());
+        when(searchPreferences.keepSearchStringProperty()).thenReturn(new SimpleBooleanProperty(false));
+        when(searchPreferences.searchDisplayModeProperty()).thenReturn(new SimpleObjectProperty<>(SearchDisplayMode.FLOAT));
         GuiPreferences preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getSearchPreferences()).thenReturn(searchPreferences);
 
@@ -52,7 +58,7 @@ public class GlobalSearchBarTest {
         when(keyBindingRepository.matches(any(), any())).thenReturn(false);
         when(preferences.getKeyBindingRepository()).thenReturn(keyBindingRepository);
 
-        stateManager = new StateManager();
+        stateManager = new JabRefGuiStateManager();
         // Need for active database, otherwise the searchField will be disabled
         stateManager.setActiveDatabase(new BibDatabaseContext());
 

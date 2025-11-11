@@ -3,7 +3,7 @@ package org.jabref.logic.exporter;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Class to write to a .bib file. Used by {@link BibDatabaseWriter}

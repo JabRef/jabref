@@ -19,6 +19,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.types.EntryType;
 
 import org.jooq.lambda.Unchecked;
@@ -85,7 +86,7 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
         List<String> results = new ArrayList<>(columnCount + 2);
         results.add("entry type");
         results.add("citation key");
-        allReportedFields.forEach(field -> results.add(field.getDisplayName()));
+        allReportedFields.forEach(field -> results.add(FieldTextMapper.getDisplayName(field)));
         return results;
     }
 
@@ -94,15 +95,15 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
         results.add(entryType);
         results.add(bibEntry.getCitationKey().orElse(""));
         allReportedFields.forEach(field -> results.add(
-            bibEntry.getField(field).map(value -> {
-            if (requiredFields.contains(field)) {
-                return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-            } else if (optionalFields.contains(field)) {
-                return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-            } else {
-                return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-            }
-        }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)));
+                bibEntry.getField(field).map(value -> {
+                    if (requiredFields.contains(field)) {
+                        return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    } else if (optionalFields.contains(field)) {
+                        return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    } else {
+                        return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    }
+                }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)));
         return results;
     }
 

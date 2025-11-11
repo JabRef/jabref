@@ -16,8 +16,8 @@ public class NewDatabaseAction extends SimpleCommand {
     /**
      * Constructs a command to create a new library of the default type
      *
-     * @param tabContainer       the ui container for libraries
-     * @param preferences the preferencesService of JabRef
+     * @param tabContainer the ui container for libraries
+     * @param preferences  the preferencesService of JabRef
      */
     public NewDatabaseAction(LibraryTabContainer tabContainer, CliPreferences preferences) {
         this.tabContainer = tabContainer;

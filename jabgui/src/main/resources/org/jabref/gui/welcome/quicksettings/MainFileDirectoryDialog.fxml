@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<?import org.jabref.gui.util.component.HelpButton?>
+<?import javafx.scene.control.ButtonType?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.welcome.quicksettings.MainFileDirectoryDialog">
+    <content>
+        <VBox styleClass="quick-settings-dialog-container">
+            <HBox alignment="CENTER_LEFT" spacing="4">
+                <Label text="%Set the default directory for storing attached files. Files will be stored relative to this directory unless specified otherwise."
+                       wrapText="true" HBox.hgrow="ALWAYS"/>
+                <HelpButton fx:id="helpButton"/>
+            </HBox>
+
+            <HBox spacing="4.0">
+                <TextField fx:id="pathField" promptText="%Main file directory path"
+                           HBox.hgrow="ALWAYS"/>
+                <Button styleClass="icon-button" onAction="#browseDirectory">
+                    <graphic>
+                        <JabRefIconView glyph="OPEN"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%Browse"/>
+                    </tooltip>
+                </Button>
+            </HBox>
+        </VBox>
+    </content>
+
+    <ButtonType fx:constant="CLOSE"/>
+    <ButtonType fx:constant="OK"/>
+</DialogPane>

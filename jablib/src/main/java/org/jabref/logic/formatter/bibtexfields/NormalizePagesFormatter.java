@@ -1,12 +1,13 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class includes sensible defaults for consistent formatting of BibTeX page numbers.
@@ -52,8 +53,7 @@ public class NormalizePagesFormatter extends Formatter {
     }
 
     @Override
-    public String format(String value) {
-        Objects.requireNonNull(value);
+    public String format(@NonNull String value) {
         if (value.isEmpty()) {
             return value;
         }

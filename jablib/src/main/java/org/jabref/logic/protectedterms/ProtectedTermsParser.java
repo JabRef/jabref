@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +30,10 @@ public class ProtectedTermsParser {
 
     private String location;
 
-    public void readTermsFromResource(String resourceFileName, String descriptionString) {
+    public void readTermsFromResource(@NonNull String resourceFileName, String descriptionString) {
         description = descriptionString;
         location = resourceFileName;
-        try (InputStream inputStream = ProtectedTermsLoader.class.getResourceAsStream(Objects.requireNonNull(resourceFileName))) {
+        try (InputStream inputStream = ProtectedTermsLoader.class.getResourceAsStream(resourceFileName)) {
             if (inputStream == null) {
                 LOGGER.error("Cannot find resource '{}' ({})", resourceFileName, descriptionString);
                 return;

@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -347,5 +348,24 @@ class ExternalLinkCreatorTest {
                 Arguments.of("C++ Programming"),
                 Arguments.of("Research & Development")
         );
+      
+    public static Optional<String> getShortScienceSearchURL(BibEntry entry) {
+        return entry.getField(StandardField.TITLE).map(title -> {
+            URIBuilder uriBuilder;
+            try {
+                uriBuilder = new URIBuilder(SHORTSCIENCE_SEARCH_URL);
+            } catch (URISyntaxException e) {
+                // This should never be able to happen as it would require the field to be misconfigured.
+                throw new AssertionError("ShortScience URL is invalid.", e);
+            }
+
+            // Converting LaTeX-formatted titles (e.g., containing braces) to plain Unicode to ensure compatibility with ShortScience's search URL.
+            // LatexToUnicodeAdapter.format() is being used because it attempts to parse LaTeX, but gracefully degrades to a normalized title on failure.
+            // This avoids sending malformed or literal LaTeX syntax titles that would give the wrong result.
+            String filteredTitle = LatexToUnicodeAdapter.format(title);
+            // Direct the user to the search results for the title.
+            uriBuilder.addParameter("q", filteredTitle.trim());
+            return uriBuilder.toString();
+        });
     }
 }

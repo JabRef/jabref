@@ -41,11 +41,11 @@ class LinkedFilesEditorViewModelTest {
         when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempDir));
 
         viewModel = new LinkedFilesEditorViewModel(StandardField.FILE, new EmptySuggestionProvider(), mock(DialogService.class), bibDatabaseContext,
-                           new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferences, undoManager);
+                new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferences, undoManager);
 
         BibEntry entry = new BibEntry().withCitationKey("test")
-            .withField(StandardField.URL, "https://ceur-ws.org/Vol-847/paper6.pdf");
-                viewModel.entry = entry;
+                                       .withField(StandardField.URL, "https://ceur-ws.org/Vol-847/paper6.pdf");
+        viewModel.entry = entry;
         viewModel.fetchFulltext();
 
         assertTrue(Files.exists(tempDir.resolve("test.pdf")));

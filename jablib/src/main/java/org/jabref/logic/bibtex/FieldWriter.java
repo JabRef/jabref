@@ -1,5 +1,9 @@
 package org.jabref.logic.bibtex;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.StringJoiner;
+
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
@@ -36,38 +40,70 @@ public class FieldWriter {
     }
 
     private static void checkBraces(String text) throws InvalidFieldValueException {
-        int left = 0;
-        int right = 0;
+        Deque<String> queue = new ArrayDeque<>();
+        int line = 0;
+        int lastLineIndex = 0;
 
         // First we collect all occurrences:
         for (int i = 0; i < text.length(); i++) {
             char item = text.charAt(i);
-
-            boolean charBeforeIsEscape = false;
-            if ((i > 0) && (text.charAt(i - 1) == '\\')) {
-                charBeforeIsEscape = true;
+            if (item == '\n') {
+                line++;
+                lastLineIndex = i;
+                continue;
             }
 
-            if (!charBeforeIsEscape && (item == '{')) {
-                left++;
-            } else if (!charBeforeIsEscape && (item == '}')) {
-                right++;
+            if (!isEscaped(text, i)) {
+                if (item == '{') {
+                    queue.add("Line %d, column %d (index %d): in '%s'".formatted(
+                            line + 1, i - lastLineIndex + 1, i, getErrorContextSnippet(text, i)));
+                } else if (item == '}') {
+                    if (queue.pollLast() == null) {
+                        String errorMessage = "Unescaped '}' without matching opening bracket found at line %d, column %d (index %d): in '%s'".formatted(
+                                line + 1, i - lastLineIndex + 1, i, getErrorContextSnippet(text, i));
+                        LOGGER.error(errorMessage);
+                        throw new InvalidFieldValueException(errorMessage);
+                    }
+                }
             }
         }
 
-        // Then we throw an exception if the error criteria are met.
-        if (right != 0 && (left == 0)) {
-            LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
+        if (!queue.isEmpty()) {
+            StringJoiner joiner = new StringJoiner("\n");
+            for (String error : queue) {
+                joiner.add(error);
+            }
+            String errorMessage = "The following unescaped '{' do not have matching closing bracket:\n%s".formatted(joiner);
+            LOGGER.error(errorMessage);
+            throw new InvalidFieldValueException(errorMessage);
         }
-        if (right != 0 && (right < left)) {
-            LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
+    }
+
+    private static String getErrorContextSnippet(String text, int index) {
+        int neighbourSize = 5;
+        return text.substring(Math.max(0, index - neighbourSize), index)
+                + "*" + text.charAt(index) + "*"
+                + text.substring(index + 1, Math.min(text.length(), index + neighbourSize + 1));
+    }
+
+    /**
+     * Checks if the character at the specified index in the given text is escaped.
+     * A character is considered escaped if it is preceded by an odd number of backslashes (\).
+     *
+     * @param text  the input string to check for escaped characters
+     * @param index the index of the character in the text to check for escaping
+     * @return true if the character at the specified index is escaped, false otherwise
+     */
+    private static boolean isEscaped(String text, int index) {
+        int indexCounter = 0;
+        for (int i = index - 1; i >= 0; i--) {
+            if (text.charAt(i) == '\\') {
+                indexCounter++;
+            } else {
+                break;
+            }
         }
-        if (left != right) {
-            LOGGER.error("Braces don't match. Field value: {}", text);
-            throw new InvalidFieldValueException("Braces don't match. Field value: " + text);
-        }
+        return indexCounter % 2 == 1;
     }
 
     /**
@@ -76,7 +112,6 @@ public class FieldWriter {
      * @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
      * @param content the content of the field
      * @return a formatted string suitable for output
-     *
      * @throws InvalidFieldValueException if content is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
     public String write(Field field, String content) throws InvalidFieldValueException {

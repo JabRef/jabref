@@ -44,7 +44,7 @@ class BibEntrySerializer extends BasicDataType<BibEntry> {
         // Furthermore, storing a string also enables other applications to work wih the data
         BibEntryWriter writer = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
         try {
-            return writer.serializeAll(List.of(entry), BibDatabaseMode.BIBTEX);
+            return writer.write(List.of(entry), BibDatabaseMode.BIBTEX);
         } catch (IOException e) {
             LOGGER.error("Could not write entry", e);
             return entry.toString();
@@ -83,10 +83,14 @@ class BibEntrySerializer extends BasicDataType<BibEntry> {
     @Override
     public int compare(@NonNull BibEntry a, @NonNull BibEntry b) {
         return switch (BibEntryCompare.compareEntries(a, b)) {
-            case SUBSET -> -1;
-            case SUPERSET -> 1;
-            case EQUAL -> 0;
-            default -> Objects.compare(a.hashCode(), b.hashCode(), Integer::compare);
+            case SUBSET ->
+                    -1;
+            case SUPERSET ->
+                    1;
+            case EQUAL ->
+                    0;
+            default ->
+                    Objects.compare(a.hashCode(), b.hashCode(), Integer::compare);
         };
     }
 

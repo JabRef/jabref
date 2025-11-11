@@ -11,7 +11,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -103,18 +103,18 @@ public class AbbreviateAction extends SimpleCommand {
                 abbreviationType,
                 journalAbbreviationPreferences.shouldUseFJournalField());
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
+        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Abbreviate journal names"));
 
         int count = entries.stream().mapToInt(entry ->
                 (int) FieldFactory.getJournalNameFields().stream().filter(journalField ->
-                        undoableAbbreviator.abbreviate(databaseContext.getDatabase(), entry, journalField, ce)).count()).sum();
+                        undoableAbbreviator.abbreviate(databaseContext.getDatabase(), entry, journalField, compoundEdit)).count()).sum();
 
         if (count == 0) {
             return Localization.lang("No journal names could be abbreviated.");
         }
 
-        ce.end();
-        undoManager.addEdit(ce);
+        compoundEdit.end();
+        undoManager.addEdit(compoundEdit);
         tabSupplier.get().markBaseChanged();
         return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
     }
@@ -122,16 +122,16 @@ public class AbbreviateAction extends SimpleCommand {
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(abbreviationRepository);
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
+        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Unabbreviate journal names"));
         int count = entries.stream().mapToInt(entry ->
                 (int) FieldFactory.getJournalNameFields().stream().filter(journalField ->
-                        undoableAbbreviator.unabbreviate(databaseContext.getDatabase(), entry, journalField, ce)).count()).sum();
+                        undoableAbbreviator.unabbreviate(databaseContext.getDatabase(), entry, journalField, compoundEdit)).count()).sum();
         if (count == 0) {
             return Localization.lang("No journal names could be unabbreviated.");
         }
 
-        ce.end();
-        undoManager.addEdit(ce);
+        compoundEdit.end();
+        undoManager.addEdit(compoundEdit);
         tabSupplier.get().markBaseChanged();
         return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
     }

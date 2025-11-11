@@ -15,16 +15,16 @@ class HtmlToUnicodeFormatterTest {
 
     private static Stream<Arguments> data() {
         return Stream.of(
-                         Arguments.of("abc", "abc"),
-                         Arguments.of("åäö", "&aring;&auml;&ouml;"),
-                         Arguments.of("í", "i&#x301;"),
-                         Arguments.of("Ε", "&Epsilon;"),
-                         Arguments.of("ä", "&auml;"),
-                         Arguments.of("ä", "&#228;"),
-                         Arguments.of("ä", "&#xe4;"),
-                         Arguments.of("ñ", "&#241;"),
-                         Arguments.of("aaa", "<p>aaa</p>"),
-                         Arguments.of("bread & butter", "<b>bread</b> &amp; butter"));
+                Arguments.of("abc", "abc"),
+                Arguments.of("åäö", "&aring;&auml;&ouml;"),
+                Arguments.of("í", "i&#x301;"),
+                Arguments.of("Ε", "&Epsilon;"),
+                Arguments.of("ä", "&auml;"),
+                Arguments.of("ä", "&#228;"),
+                Arguments.of("ä", "&#xe4;"),
+                Arguments.of("ñ", "&#241;"),
+                Arguments.of("aaa", "<p>aaa</p>"),
+                Arguments.of("bread & butter", "<b>bread</b> &amp; butter"));
     }
 
     @BeforeEach

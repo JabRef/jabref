@@ -1,6 +1,8 @@
 package org.jabref.logic.remote;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,10 +14,15 @@ class RemoteUtilTest {
         assertFalse(RemoteUtil.isUserPort(-55), "Port number must be non negative.");
     }
 
-    @Test
-    void rejectReservedSystemPorts() {
-        assertFalse(RemoteUtil.isUserPort(0), "Port number must be outside reserved system range (0-1023).");
-        assertFalse(RemoteUtil.isUserPort(1023), "Port number must be outside reserved system range (0-1023).");
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                    0
+                    1023
+                    """
+    )
+    void rejectReservedSystemPorts(int port) {
+        assertFalse(RemoteUtil.isUserPort(port));
     }
 
     @Test
@@ -24,10 +31,15 @@ class RemoteUtilTest {
         assertFalse(RemoteUtil.isUserPort(65536), "Port number should be below 65535.");
     }
 
-    @Test
-    void acceptPortsAboveSystemPorts() {
-        // ports 1024 -> 65535
-        assertTrue(RemoteUtil.isUserPort(1024), "Port number in between 1024 and 65535 should be valid.");
-        assertTrue(RemoteUtil.isUserPort(65535), "Port number in between 1024 and 65535 should be valid.");
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                    # ports 1024 -> 65535
+                    1024
+                    65535
+                    """
+    )
+    void acceptPortsAboveSystemPorts(int port) {
+        assertTrue(RemoteUtil.isUserPort(port));
     }
 }

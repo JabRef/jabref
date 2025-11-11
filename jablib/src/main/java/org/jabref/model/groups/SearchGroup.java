@@ -74,9 +74,9 @@ public class SearchGroup extends AbstractGroup {
             return false;
         }
         return Objects.equals(getName(), other.getName())
-               && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
-               && Objects.equals(getSearchExpression(), other.getSearchExpression())
-               && Objects.equals(getSearchFlags(), other.getSearchFlags());
+                && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
+                && Objects.equals(getSearchExpression(), other.getSearchExpression())
+                && Objects.equals(getSearchFlags(), other.getSearchFlags());
     }
 
     @Override

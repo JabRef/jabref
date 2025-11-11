@@ -1,10 +1,7 @@
 package org.jabref.http.dto.cayw;
 
-import java.nio.charset.StandardCharsets;
-
 import org.jabref.model.entry.BibEntry;
 
-import com.google.common.hash.Hashing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +14,9 @@ public record SimpleJson(
     public static SimpleJson fromBibEntry(BibEntry bibEntry) {
         if (bibEntry.getCitationKey().isEmpty()) {
             LOGGER.warn("BibEntry has no citation key: {}", bibEntry);
-            return new SimpleJson(0, "");
+            return new SimpleJson(-1, "");
         }
 
-        long id = Hashing.sha256().hashString(bibEntry.getCitationKey().get(), StandardCharsets.UTF_8).asLong();
-        String citationKey = bibEntry.getCitationKey().get();
-        return new SimpleJson(id, citationKey);
+        return new SimpleJson(bibEntry.getSharedBibEntryData().getSharedID(), bibEntry.getCitationKey().get());
     }
 }

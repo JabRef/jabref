@@ -28,8 +28,8 @@ testlogger {
     showPassed = false
     showSkipped = false
 
-    showCauses = false
-    showStackTraces = false
+    showCauses = true
+    showStackTraces = true
 }
 
 configurations.testCompileOnly {

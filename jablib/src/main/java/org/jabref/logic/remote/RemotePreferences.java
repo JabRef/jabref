@@ -24,12 +24,19 @@ public class RemotePreferences {
     private final IntegerProperty port;
     private final BooleanProperty useRemoteServer;
 
+    private final IntegerProperty httpPort;
     private final BooleanProperty enableHttpServer;
 
-    public RemotePreferences(int port, boolean useRemoteServer, boolean enableHttpServer) {
+    private final BooleanProperty enableLanguageServer;
+    private final IntegerProperty languageServerPort;
+
+    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort) {
         this.port = new SimpleIntegerProperty(port);
         this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
+        this.httpPort = new SimpleIntegerProperty(httpPort);
         this.enableHttpServer = new SimpleBooleanProperty(enableHttpServer);
+        this.enableLanguageServer = new SimpleBooleanProperty(enableLanguageServer);
+        this.languageServerPort = new SimpleIntegerProperty(languageServerPort);
     }
 
     public int getPort() {
@@ -60,6 +67,22 @@ public class RemotePreferences {
         this.useRemoteServer.setValue(useRemoteServer);
     }
 
+    public int getHttpPort() {
+        return httpPort.getValue();
+    }
+
+    public IntegerProperty httpPortProperty() {
+        return httpPort;
+    }
+
+    public void setHttpPort(int httpPort) {
+        this.httpPort.setValue(httpPort);
+    }
+
+    public boolean isDifferentHttpPort(int otherHttpPort) {
+        return getHttpPort() != otherHttpPort;
+    }
+
     public boolean enableHttpServer() {
         return enableHttpServer.getValue();
     }
@@ -72,6 +95,34 @@ public class RemotePreferences {
         this.enableHttpServer.setValue(enableHttpServer);
     }
 
+    public int getLanguageServerPort() {
+        return languageServerPort.getValue();
+    }
+
+    public IntegerProperty languageServerPortProperty() {
+        return languageServerPort;
+    }
+
+    public void setLanguageServerPort(int languageServerPort) {
+        this.languageServerPort.setValue(languageServerPort);
+    }
+
+    public boolean isDifferentLanguageServerPort(int otherLanguageServerPort) {
+        return getLanguageServerPort() != otherLanguageServerPort;
+    }
+
+    public boolean enableLanguageServer() {
+        return enableLanguageServer.getValue();
+    }
+
+    public BooleanProperty enableLanguageServerProperty() {
+        return enableLanguageServer;
+    }
+
+    public void setEnableLanguageServer(boolean enableLanguageServer) {
+        this.enableLanguageServer.setValue(enableLanguageServer);
+    }
+
     /// Gets the IP address where both the remote server and the http server are listening.
     public static InetAddress getIpAddress() throws UnknownHostException {
         return InetAddress.getByName("localhost");
@@ -79,7 +130,7 @@ public class RemotePreferences {
 
     public @NonNull URI getHttpServerUri() {
         try {
-            return new URI("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":23119");
+            return new URI("http", null, RemotePreferences.getIpAddress().getHostAddress(), getHttpPort(), null, null, null);
         } catch (UnknownHostException | URISyntaxException e) {
             LOGGER.error("Could not create HTTP server URI. Falling back to default.", e);
             try {

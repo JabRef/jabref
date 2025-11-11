@@ -99,7 +99,7 @@ class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
     void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws FetcherException {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
-       assertEquals(Optional.empty(), fetcher.performSearchById("9785646216541"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("9785646216541"));
     }
 
     @Test

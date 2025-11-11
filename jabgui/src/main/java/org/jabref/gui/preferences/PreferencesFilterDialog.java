@@ -1,7 +1,6 @@
 package org.jabref.gui.preferences;
 
 import java.util.Locale;
-import java.util.Objects;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -21,6 +20,7 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.NonNull;
 
 public class PreferencesFilterDialog extends BaseDialog<Void> {
 
@@ -37,8 +37,8 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
     @FXML private Label count;
     @FXML private TextField searchField;
 
-    public PreferencesFilterDialog(PreferencesFilter preferencesFilter) {
-        this.preferencesFilter = Objects.requireNonNull(preferencesFilter);
+    public PreferencesFilterDialog(@NonNull PreferencesFilter preferencesFilter) {
+        this.preferencesFilter = preferencesFilter;
         this.preferenceOptions = FXCollections.observableArrayList();
         this.filteredOptions = new FilteredList<>(this.preferenceOptions);
 
