@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.websearch;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
@@ -24,7 +25,7 @@ import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -54,6 +55,18 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         ViewLoader.view(this)
                   .root(this)
                   .load();
+    }
+
+    @Override
+    public List<String> getSearchKeywords() {
+        return List.of(
+                getTabName(),
+                Localization.lang("Configure API key"),
+                Localization.lang("Custom API key"),
+                "api",
+                "api key",
+                "apikey"
+        );
     }
 
     @Override

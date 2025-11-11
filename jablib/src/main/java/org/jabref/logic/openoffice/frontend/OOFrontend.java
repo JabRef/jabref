@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,6 +39,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import org.jspecify.annotations.NonNull;
 
 public class OOFrontend {
 
@@ -202,7 +202,7 @@ public class OOFrontend {
      */
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
-                                             List<Optional<OOText>> pageInfos,
+                                             @NonNull List<Optional<OOText>> pageInfos,
                                              CitationType citationType,
                                              XTextCursor position,
                                              boolean insertSpaceAfter)
@@ -214,7 +214,6 @@ public class OOFrontend {
             PropertyVetoException,
             IllegalTypeException {
 
-        Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
             throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }

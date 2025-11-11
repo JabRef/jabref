@@ -8,10 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
@@ -24,7 +23,6 @@ import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.NoRemoteRepositoryException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -213,11 +211,8 @@ public class GitHandler {
         boolean commitCreated = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Status status = git.status().call();
-            boolean dirty = !status.isClean();
-            RepositoryState state = git.getRepository().getRepositoryState();
-            boolean inMerging = (state == RepositoryState.MERGING) || (state == RepositoryState.MERGING_RESOLVED);
 
-            if (dirty) {
+            if (!status.isClean()) {
                 commitCreated = true;
                 // Add new and changed files to index
                 git.add()
@@ -233,14 +228,6 @@ public class GitHandler {
                 git.commit()
                    .setAmend(amend)
                    .setAllowEmpty(false)
-                   .setMessage(commitMessage)
-                   .call();
-            } else if (inMerging) {
-                // No content changes, but merge must be completed (create parent commit)
-                commitCreated = true;
-                git.commit()
-                   .setAmend(amend)
-                   .setAllowEmpty(true)
                    .setMessage(commitMessage)
                    .call();
             }
@@ -316,6 +303,10 @@ public class GitHandler {
                 pushCommand.setCredentialsProvider(credsOpt.get());
             }
             pushCommand.call();
+
+            config.setString("branch", branch, "remote", "origin");
+            config.setString("branch", branch, "merge", "refs/heads/" + branch);
+            config.save();
         }
     }
 
@@ -331,7 +322,7 @@ public class GitHandler {
             }
             pullCommand.call();
         } catch (GitAPIException e) {
-            LOGGER.info("Failed to push");
+            LOGGER.info("Failed to pull.");
         }
     }
 
@@ -412,20 +403,6 @@ public class GitHandler {
         }
     }
 
-    /// Pre-stage a merge (two parents) but do NOT commit yet.
-    /// Equivalent to: `git merge -s ours --no-commit <remote>`
-    /// Puts the repo into MERGING state, sets MERGE_HEAD=remote; working tree becomes "ours".
-    public void beginOursMergeNoCommit(RevCommit remote) throws IOException, GitAPIException {
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            git.merge()
-               .include(remote)
-               .setStrategy(org.eclipse.jgit.merge.MergeStrategy.OURS)
-               .setFastForward(org.eclipse.jgit.api.MergeCommand.FastForwardMode.NO_FF)
-               .setCommit(false)
-               .call();
-        }
-    }
-
     /// Fast-forward only to <remote> (when local is strictly behind).
     /// Equivalent to: `git merge --ff-only <remote>`
     public void fastForwardTo(RevCommit remote) throws IOException, GitAPIException {
@@ -435,98 +412,6 @@ public class GitHandler {
                .setFastForward(org.eclipse.jgit.api.MergeCommand.FastForwardMode.FF_ONLY)
                .setCommit(true)
                .call();
-        }
-    }
-
-    /// Abort a pre-commit semantic merge in a minimal/safe way:
-    /// 1) Clear merge state files (MERGE_HEAD / MERGE_MSG, etc.). Since there is no direct equivalent for git merge --abort in JGit.
-    /// 2) Restore ONLY the given file back to HEAD (both index + working tree).
-    ///
-    /// NOTE: Callers should ensure the working tree was clean before starting,
-    /// otherwise this can overwrite the user's uncommitted changes for that file.
-    public void abortSemanticMerge(Path absoluteFilePath, boolean allowHardReset) throws IOException, GitAPIException {
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Repository repo = git.getRepository();
-
-            // Only act if a branch is actually in a merge state
-            RepositoryState state = repo.getRepositoryState();
-            boolean inMerging = (state == RepositoryState.MERGING) || (state == RepositoryState.MERGING_RESOLVED);
-            if (!inMerging) {
-                return;
-            }
-
-            // 1) Clear merge state files + possible REVERT/CHERRY_PICK state
-            repo.writeMergeCommitMsg(null);
-            repo.writeMergeHeads(null);
-            repo.writeRevertHead(null);
-            repo.writeCherryPickHead(null);
-
-            // 2) Targeted rollback: only restore the file we touched back to HEAD
-            Path workTree = repo.getWorkTree().toPath().toRealPath();
-            Path targetAbs = absoluteFilePath.toRealPath();
-            if (!targetAbs.startsWith(workTree)) {
-                return;
-            }
-            String rel = workTree.relativize(targetAbs).toString().replace('\\', '/');
-
-            // 2.1 Reset the file in the index to HEAD (Equivalent to: `git reset -- <path>`)
-            git.reset()
-               .addPath(rel)
-               .call();
-
-            // 2.2 Restore the file in the working tree from HEAD (Equivalent to: `git checkout -- <path>`)
-            git.checkout()
-               .setStartPoint("HEAD")
-               .addPath(rel)
-               .call();
-        }
-    }
-
-    /// Start a "semantic-merge merge-state" and return a guard:
-    public MergeGuard beginSemanticMergeGuard(RevCommit remote, Path bibFilePath) throws IOException, GitAPIException {
-        beginOursMergeNoCommit(remote);
-        return new MergeGuard(this, bibFilePath);
-    }
-
-    public static final class MergeGuard implements AutoCloseable {
-        private final GitHandler handler;
-        private final Path bibFilePath;
-        private final AtomicBoolean active = new AtomicBoolean(true);
-        private volatile boolean committed = false;
-
-        private MergeGuard(GitHandler handler, Path bibFilePath) {
-            this.handler = handler;
-            this.bibFilePath = bibFilePath;
-        }
-
-        // Finalize: create the commit (in MERGING this becomes a merge commit with two parents).
-        public void commit(String message) throws IOException, GitAPIException {
-            if (!active.get()) {
-                return;
-            }
-            handler.createCommitOnCurrentBranch(message, false);
-            committed = true;
-        }
-
-        // If not committed and still active, best-effort rollback:
-        // only this .bib file + clear MERGE_*; never throw from close().
-        @Override
-        public void close() {
-            if (!active.compareAndSet(true, false)) {
-                return;
-            }
-            if (committed) {
-                return;
-            }
-            try {
-                handler.abortSemanticMerge(bibFilePath, false);
-            } catch (IOException | GitAPIException e) {
-                LOGGER.debug("Abort semantic merge failed (best-effort cleanup). path={}", bibFilePath, e);
-            } catch (RuntimeException e) {
-                // Deliberately catching RuntimeException here because this is a best-effort cleanup in AutoCloseable.close().
-                // have to NOT throw from close() to avoid masking the primary failure/result of pull/merge.
-                LOGGER.warn("Unexpected runtime exception during cleanup; rethrowing. path={}", bibFilePath, e);
-            }
         }
     }
 }

@@ -330,6 +330,24 @@ class BracketedPatternTest {
     }
 
     @ParameterizedTest
+    @CsvSource({
+            "'Newton', 'Isaac Newton'",
+            "'Maxwell', 'Isaac Newton and James Maxwell'",
+            "'Einstein', 'Isaac Newton and James Maxwell and Albert Einstein'",
+            "'Bohr', 'Isaac Newton and James Maxwell and Albert Einstein and N. Bohr'",
+            "'Aachen', 'Aachen'",
+            "'Berlin', 'Aachen and Berlin'",
+            "'Chemnitz', 'Aachen and Berlin and Chemnitz'",
+            "'Düsseldorf', 'Aachen and Berlin and Chemnitz and Düsseldorf'",
+            "'Essen', 'Aachen and Berlin and Chemnitz and Düsseldorf and Essen'",
+            "'Aalst', 'Wil van der Aalst'",
+            "'Lessen', 'Wil van der Aalst and Tammo van Lessen'"
+    })
+    void authLast(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.lastAuthor(list));
+    }
+
+    @ParameterizedTest
     @MethodSource
     void authShort(String expected, AuthorList list) {
         assertEquals(expected, BracketedPattern.authShort(list));
@@ -383,6 +401,15 @@ class BracketedPatternTest {
         BracketedPattern bracketedPattern = new BracketedPattern(pattern);
 
         assertEquals(expandResult, bracketedPattern.expand(bibEntry));
+    }
+
+    @Test
+    void expandBracketsWithMissingAuthorAndYear() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "").withField(StandardField.YEAR, "");
+
+        assertEquals(" - ",
+                BracketedPattern.expandBrackets("[author] - [year]", ';', bibEntry, database));
     }
 
     @Test
@@ -484,14 +511,6 @@ class BracketedPatternTest {
                 .withField(StandardField.YEAR, "2017")
                 .withField(StandardField.PAGES, "213--216");
         assertEquals("2017_Gražulis_213", pattern.expand(another_bibentry, ';', another_database));
-    }
-
-    @Test
-    void nullBibentryBracketExpansionTest() {
-        BibDatabase another_database = null;
-        BibEntry another_bibentry = null;
-        BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
-        assertThrows(NullPointerException.class, () -> pattern.expand(another_bibentry, ';', another_database));
     }
 
     @Test

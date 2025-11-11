@@ -44,7 +44,7 @@ class BibEntrySerializer extends BasicDataType<BibEntry> {
         // Furthermore, storing a string also enables other applications to work wih the data
         BibEntryWriter writer = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
         try {
-            return writer.serializeAll(List.of(entry), BibDatabaseMode.BIBTEX);
+            return writer.write(List.of(entry), BibDatabaseMode.BIBTEX);
         } catch (IOException e) {
             LOGGER.error("Could not write entry", e);
             return entry.toString();

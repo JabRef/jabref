@@ -1,7 +1,9 @@
 package org.jabref.model;
 
-import java.util.Objects;
 import java.util.Optional;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a node in a chain.
@@ -61,13 +63,13 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     /**
      * Sets the parent node of this node.
      * <p>
-     * This method does not set this node as the child of the new parent nor does it remove this node
+     * This method does not set this node as the child of the new parent, nor does it remove this node
      * from the old parent. You should probably call {@link #moveTo(ChainNode)} to change the chain.
      *
      * @param parent the new parent
      */
-    protected void setParent(T parent) {
-        this.parent = Objects.requireNonNull(parent);
+    protected void setParent(@Nullable T parent) {
+        this.parent = parent;
     }
 
     /**
@@ -87,8 +89,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
      * @return the child node
      * @throws UnsupportedOperationException if the given node has already a parent
      */
-    public T setChild(T child) {
-        Objects.requireNonNull(child);
+    public T setChild(@NonNull T child) {
         if (child.getParent().isPresent()) {
             throw new UnsupportedOperationException("Cannot add a node which already has a parent, use moveTo instead");
         }
@@ -107,9 +108,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
      * @throws NullPointerException          if target is null
      * @throws UnsupportedOperationException if target is an descendant of this node
      */
-    public void moveTo(T target) {
-        Objects.requireNonNull(target);
-
+    public void moveTo(@NonNull T target) {
         // Check that the target node is not an ancestor of this node, because this would create loops in the tree
         if (this.isAncestorOf(target)) {
             throw new UnsupportedOperationException("the target cannot be a descendant of this node");
@@ -142,9 +141,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
      * @return true if anotherNode is a descendant of this node
      * @throws NullPointerException if anotherNode is null
      */
-    public boolean isAncestorOf(T anotherNode) {
-        Objects.requireNonNull(anotherNode);
-
+    public boolean isAncestorOf(@NonNull T anotherNode) {
         if (anotherNode == this) {
             return true;
         } else {

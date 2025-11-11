@@ -3,7 +3,6 @@ package org.jabref.gui.frame;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -380,6 +379,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
                         event.consume();
                         break;
+                    case CLOSE_DATABASE:
+                        new CloseDatabaseAction(this, stateManager).execute();
+                        event.consume();
+                        break;
                     default:
                 }
             }
@@ -554,7 +557,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
-        Objects.requireNonNull(databaseContext);
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
                 this,
@@ -588,7 +590,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(tab::getBibDatabaseContext, stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(dialogService, stateManager, preferences, tab::getBibDatabaseContext)),
-                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(tab::getBibDatabaseContext, stateManager, preferences, dialogService)),
+                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(() -> {
+                    LibraryTab currentTab = getCurrentLibraryTab();
+                    return (currentTab == null) ? null : currentTab.getBibDatabaseContext();
+                }, stateManager, preferences, dialogService)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(this, tab, stateManager)),
                 factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction(tab)),

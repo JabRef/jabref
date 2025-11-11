@@ -186,8 +186,7 @@ public interface Trigger {
             return this;
         }
 
-        public Builder onTextEquals(String expected) {
-            Objects.requireNonNull(expected, "expected must not be null");
+        public Builder onTextEquals(@NonNull String expected) {
             setGenerator((node, onNavigate) -> {
                 if (!(node instanceof TextInputControl textInput)) {
                     throw new IllegalArgumentException("onTextEquals can only be used with TextInputControl");
@@ -203,8 +202,7 @@ public interface Trigger {
             return this;
         }
 
-        public Builder onTextMatchesRegex(String regex) {
-            Objects.requireNonNull(regex, "regex must not be null");
+        public Builder onTextMatchesRegex(@NonNull String regex) {
             final Pattern compiled = Pattern.compile(regex);
             setGenerator((node, onNavigate) -> {
                 if (!(node instanceof TextInputControl textInput)) {

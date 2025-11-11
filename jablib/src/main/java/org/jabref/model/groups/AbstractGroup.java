@@ -7,13 +7,17 @@ import java.util.Optional;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
-import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Base class for all groups.
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public abstract class AbstractGroup implements SearchMatcher {
 
     /**
@@ -30,9 +34,9 @@ public abstract class AbstractGroup implements SearchMatcher {
     protected Optional<String> description = Optional.empty();
     protected Optional<String> iconName = Optional.empty();
 
-    protected AbstractGroup(String name, GroupHierarchyType context) {
+    protected AbstractGroup(String name, @NonNull GroupHierarchyType context) {
         this.name.setValue(name);
-        this.context = Objects.requireNonNull(context);
+        this.context = context;
     }
 
     @Override

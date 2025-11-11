@@ -1,0 +1,37 @@
+name: On PR opened/updated (Labels)
+
+on:
+  workflow_run:
+    workflows: ["On PR opened/updated (Check)"]
+    types: [completed]
+
+jobs:
+   apply-labels:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Download artifact from triggering run
+        uses: actions/download-artifact@v6
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          name: pr_number
+        continue-on-error: true
+      - name: Check for pr_number.txt
+        id: check
+        run: |
+          if [ -f pr_number.txt ]; then
+            echo "continue=true" >> "$GITHUB_OUTPUT"
+            echo "pr_number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+          else
+            echo "continue=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: 'Remove label "status: changes-required"'
+        if: steps.check.outputs.continue == 'true'
+        run: |
+          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --remove-label "status: changes-required"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

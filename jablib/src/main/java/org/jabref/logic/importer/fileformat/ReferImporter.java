@@ -23,6 +23,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This is BibIX variant of Refer.
  * There is hardly any official document so fields are added taking standard refer type.
@@ -54,7 +56,7 @@ public class ReferImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         // look for the "%0 *" line;
         String str;
         while ((str = reader.readLine()) != null) {
@@ -66,7 +68,7 @@ public class ReferImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibEntryList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String str;

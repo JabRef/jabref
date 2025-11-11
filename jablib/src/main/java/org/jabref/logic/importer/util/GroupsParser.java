@@ -12,12 +12,15 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.strings.QuotedStringTokenizer;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -29,7 +32,6 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -118,6 +120,9 @@ public class GroupsParser {
         if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
             return automaticKeywordGroupFromString(s);
         }
+        if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID)) {
+            return automaticDateGroupFromString(s);
+        }
         if (s.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
             return texGroupFromString(s, fileMonitor, metaData, userAndHost);
         }
@@ -161,6 +166,23 @@ public class GroupsParser {
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         Field field = FieldFactory.parseField(StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         AutomaticPersonsGroup newGroup = new AutomaticPersonsGroup(name, context, field);
+        addGroupDetails(tok, newGroup);
+        return newGroup;
+    }
+
+    private static AbstractGroup automaticDateGroupFromString(String string) {
+        if (!string.startsWith(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID)) {
+            throw new IllegalArgumentException("AutomaticDateGroup cannot be created from \"" + string + "\".");
+        }
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(string.substring(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID
+                .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+
+        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
+        Field field = FieldFactory.parseField(StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        String granularityString = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        DateGranularity granularity = DateGranularity.valueOf(granularityString);
+        AutomaticDateGroup newGroup = new AutomaticDateGroup(name, context, field, granularity);
         addGroupDetails(tok, newGroup);
         return newGroup;
     }
