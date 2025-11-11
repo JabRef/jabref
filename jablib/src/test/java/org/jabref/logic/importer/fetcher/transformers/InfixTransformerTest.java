@@ -2,11 +2,9 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
-import org.jabref.logic.search.query.SearchQueryVisitor;
-import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.search.query.SearchQuery;
-
-import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,85 +37,71 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
     }
 
     @Test
-    public void convertAuthorFieldPrefix() throws ParseCancellationException {
-        String queryString = "author=\"Igor Steinmacher\"";
-        SearchQuery searchQuery = new SearchQuery(queryString);
-        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
-        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
+    public void convertAuthorFieldPrefix() throws QueryNodeParseException {
+        String queryString = "author:\"Igor Steinmacher\"";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(getAuthorPrefix() + "\"Igor Steinmacher\"");
-        assertEquals(expected, query);
+        assertEquals(expected, searchQuery);
     }
 
     @Test
-    public void convertUnFieldedTermPrefix() throws ParseCancellationException {
+    public void convertUnFieldedTermPrefix() throws QueryNodeParseException {
         String queryString = "\"default value\"";
-        SearchQuery searchQuery = new SearchQuery(queryString);
-        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
-        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(getUnFieldedPrefix() + queryString);
-        assertEquals(expected, query);
+        assertEquals(expected, searchQuery);
     }
 
     @Test
-    public void convertExplicitUnFieldedTermPrefix() throws ParseCancellationException {
-        String queryString = "default=\"default value\"";
-        SearchQuery searchQuery = new SearchQuery(queryString);
-        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
-        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
+    public void convertExplicitUnFieldedTermPrefix() throws QueryNodeParseException {
+        String queryString = "default:\"default value\"";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(getUnFieldedPrefix() + "\"default value\"");
-        assertEquals(expected, query);
+        assertEquals(expected, searchQuery);
     }
 
     @Test
-    public void convertJournalFieldPrefix() throws ParseCancellationException {
-        String queryString = "journal=Nature";
-        SearchQuery searchQuery = new SearchQuery(queryString);
-        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
-        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
+    public void convertJournalFieldPrefix() throws QueryNodeParseException {
+        String queryString = "journal:Nature";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(getJournalPrefix() + "Nature");
-        assertEquals(expected, query);
+        assertEquals(expected, searchQuery);
     }
 
     @Test
-    public abstract void convertYearField() throws ParseCancellationException;
+    public abstract void convertYearField() throws QueryNodeParseException;
 
     @Test
-    public abstract void convertYearRangeField() throws ParseCancellationException;
+    public abstract void convertYearRangeField() throws QueryNodeParseException;
 
     @Test
-    public void convertMultipleValuesWithTheSameFieldPrefix() throws ParseCancellationException {
-        String queryString = "author=\"Igor Steinmacher\" author=\"Christoph Treude\"";
-        SearchQuery searchQuery = new SearchQuery(queryString);
-        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
-        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
+    public void convertMultipleValuesWithTheSameFieldPrefix() throws QueryNodeParseException {
+        String queryString = "author:\"Igor Steinmacher\" author:\"Christoph Treude\"";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformer().getLogicalAndOperator() + getAuthorPrefix() + "\"Christoph Treude\"");
-        assertEquals(expected, query);
+        assertEquals(expected, searchQuery);
     }
 
     @Test
-    public void groupedOperationsPrefix() throws ParseCancellationException {
-        String queryString = "(author=\"Igor Steinmacher\" OR author=\"Christoph Treude\" AND author=\"Christoph Freunde\") AND title=test";
-        SearchQuery searchQuery = new SearchQuery(queryString);
-        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
-        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
+    public void groupedOperationsPrefix() throws QueryNodeParseException {
+        String queryString = "(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\" AND author:\"Christoph Freunde\") AND title:test";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of("(" + getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformer().getLogicalOrOperator() + "(" + getAuthorPrefix() + "\"Christoph Treude\"" + getTransformer().getLogicalAndOperator() + getAuthorPrefix() + "\"Christoph Freunde\"))" + getTransformer().getLogicalAndOperator() + getTitlePrefix() + "test");
-        assertEquals(expected, query);
+        assertEquals(expected, searchQuery);
     }
 
     @Test
-    public void notOperatorPrefix() throws ParseCancellationException {
-        String queryString = "NOT (author=\"Igor Steinmacher\" OR author=\"Christoph Treude\")";
-        SearchQuery searchQuery = new SearchQuery(queryString);
-        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
-        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
-
-        // If there is no not operator for this transformer, the parentheses will be at the start and end of the string and will be removed
-        Optional<String> expected;
-        if (getTransformer().getLogicalNotOperator().isEmpty()) {
-            expected = Optional.of(getTransformer().getLogicalNotOperator() + getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformer().getLogicalOrOperator() + getAuthorPrefix() + "\"Christoph Treude\"");
-        } else {
-            expected = Optional.of(getTransformer().getLogicalNotOperator() + "(" + getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformer().getLogicalOrOperator() + getAuthorPrefix() + "\"Christoph Treude\")");
-        }
-        assertEquals(expected, query);
+    public void notOperatorPrefix() throws QueryNodeParseException {
+        String queryString = "!(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\")";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
+        Optional<String> expected = Optional.of(getTransformer().getLogicalNotOperator() + "(" + getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformer().getLogicalOrOperator() + getAuthorPrefix() + "\"Christoph Treude\")");
+        assertEquals(expected, searchQuery);
     }
 }

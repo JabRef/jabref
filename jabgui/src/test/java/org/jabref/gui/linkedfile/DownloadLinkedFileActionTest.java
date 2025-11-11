@@ -182,7 +182,7 @@ class DownloadLinkedFileActionTest {
 
         entry.setFiles(List.of(linkedFile));
 
-        BibEntry expected = new BibEntry(entry);
+        BibEntry expected = (BibEntry) entry.clone();
 
         DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(
                 databaseContext,

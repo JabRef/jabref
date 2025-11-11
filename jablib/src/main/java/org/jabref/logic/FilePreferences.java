@@ -10,10 +10,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.strings.StringUtil;
 
 /**
- * Preferences for the linked files
+ *  Preferences for the linked files
  */
 public class FilePreferences {
 
@@ -22,7 +22,6 @@ public class FilePreferences {
     private final StringProperty userAndHost = new SimpleStringProperty();
     private final SimpleStringProperty mainFileDirectory = new SimpleStringProperty();
     private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
-    private final BooleanProperty autoRenameFilesOnChange = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
@@ -40,7 +39,6 @@ public class FilePreferences {
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
                            boolean storeFilesRelativeToBibFile,
-                           boolean autoRenameFilesOnChange,
                            String fileNamePattern,
                            String fileDirectoryPattern,
                            boolean downloadLinkedFiles,
@@ -57,7 +55,6 @@ public class FilePreferences {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
-        this.autoRenameFilesOnChange.setValue(autoRenameFilesOnChange);
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
@@ -107,18 +104,6 @@ public class FilePreferences {
 
     public void setStoreFilesRelativeToBibFile(boolean shouldStoreFilesRelativeToBibFile) {
         this.storeFilesRelativeToBibFile.set(shouldStoreFilesRelativeToBibFile);
-    }
-
-    public boolean shouldAutoRenameFilesOnChange() {
-        return autoRenameFilesOnChange.get();
-    }
-
-    public BooleanProperty autoRenameFilesOnChangeProperty() {
-        return autoRenameFilesOnChange;
-    }
-
-    public void setAutoRenameFilesOnChange(boolean autoRenameFilesOnChange) {
-        this.autoRenameFilesOnChange.set(autoRenameFilesOnChange);
     }
 
     public String getFileNamePattern() {

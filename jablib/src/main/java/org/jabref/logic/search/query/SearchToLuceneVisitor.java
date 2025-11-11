@@ -112,10 +112,8 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
                  SearchParser.NEEQUAL,
                  SearchParser.NCEEQUAL,
                  SearchParser.NREQUAL,
-                 SearchParser.NCREEQUAL ->
-                    true;
-            default ->
-                    false;
+                 SearchParser.NCREEQUAL -> true;
+            default -> false;
         };
     }
 
@@ -124,10 +122,8 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             case SearchParser.REQUAL,
                  SearchParser.CREEQUAL,
                  SearchParser.NREQUAL,
-                 SearchParser.NCREEQUAL ->
-                    true;
-            default ->
-                    false;
+                 SearchParser.NCREEQUAL -> true;
+            default -> false;
         };
     }
 }

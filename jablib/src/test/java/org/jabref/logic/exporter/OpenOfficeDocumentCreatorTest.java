@@ -1,7 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -73,18 +72,15 @@ public class OpenOfficeDocumentCreatorTest {
         unzipContentXml(zipPath, testFolder.resolve(unzipFolder));
         Path contentXmlPath = unzipFolder.resolve("content.xml");
 
+        Input.Builder control = Input.from(Files.newInputStream(xmlFile));
+        Input.Builder test = Input.from(Files.newInputStream(contentXmlPath));
         // for debugging purposes
-        // Files.copy(contentXmlPath, xmlFile.resolveSibling("test.xml"), StandardCopyOption.REPLACE_EXISTING);
+       // Path testPath = xmlFile.resolveSibling("test.xml");
+       // Files.copy(Files.newInputStream(contentXmlPath), testPath, StandardCopyOption.REPLACE_EXISTING);
 
-        try (InputStream xmlFileInputStream = Files.newInputStream(xmlFile);
-             InputStream contentXmlInputStream = Files.newInputStream(contentXmlPath)
-        ) {
-            Input.Builder control = Input.from(xmlFileInputStream);
-            Input.Builder test = Input.from(contentXmlInputStream);
-            assertThat(test, CompareMatcher.isSimilarTo(control)
-                                           .normalizeWhitespace()
-                                           .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
-        }
+        assertThat(test, CompareMatcher.isSimilarTo(control)
+                                       .normalizeWhitespace()
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 
     private static void unzipContentXml(Path zipFile, Path unzipFolder) throws IOException {

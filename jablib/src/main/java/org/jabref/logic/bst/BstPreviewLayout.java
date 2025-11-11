@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
@@ -23,11 +22,6 @@ import org.slf4j.LoggerFactory;
 public final class BstPreviewLayout implements PreviewLayout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BstPreviewLayout.class);
-
-    private static final Pattern COMMENT_PATTERN = Pattern.compile("%.*");
-    private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem[{].*[}]");
-    private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
-    private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
 
     private final String name;
     private String source;
@@ -61,23 +55,23 @@ public final class BstPreviewLayout implements PreviewLayout {
         if (error != null) {
             return error;
         }
-        // Ensure that the entry is of BibTeX format (and do not modify the original entry)
-        BibEntry entry = new BibEntry(originalEntry);
+        // ensure that the entry is of BibTeX format (and do not modify the original entry)
+        BibEntry entry = (BibEntry) originalEntry.clone();
         new ConvertToBibtexCleanup().cleanup(entry);
         String result = bstVM.render(List.of(entry));
         // Remove all comments
-        result = COMMENT_PATTERN.matcher(result).replaceAll("");
+        result = result.replaceAll("%.*", "");
         // Remove all LaTeX comments
         // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
         result = result.replace("\\begin{thebibliography}{1}", "");
         result = result.replace("\\end{thebibliography}", "");
         // The RemoveLatexCommandsFormatter keeps the word inside the latex command, but we want to remove that completely
-        result = BIBITEM_PATTERN.matcher(result).replaceAll("");
+        result = result.replaceAll("\\\\bibitem[{].*[}]", "");
         // We want to replace \newblock by a space instead of completely removing it
         result = result.replace("\\newblock", " ");
-        // Remove all latex commands statements - assumption: command in a separate line
-        result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
-        // Remove some IEEEtran.bst output (resulting from a multiline \providecommand)
+        // remove all latex commands statements - assumption: command in a separate line
+        result = result.replaceAll("(?m)^\\\\.*$", "");
+        // remove some IEEEtran.bst output (resulting from a multiline \providecommand)
         result = result.replace("#2}}", "");
         // Have quotes right - and more
         result = new LatexToUnicodeFormatter().format(result);
@@ -87,7 +81,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = new RemoveNewlinesFormatter().format(result);
         result = new RemoveLatexCommandsFormatter().format(result);
         result = new RemoveTilde().format(result);
-        result = MULTIPLE_SPACES_PATTERN.matcher(result.trim()).replaceAll(" ");
+        result = result.trim().replaceAll("  +", " ");
         return result;
     }
 
@@ -98,11 +92,6 @@ public final class BstPreviewLayout implements PreviewLayout {
 
     @Override
     public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getShortTitle() {
         return name;
     }
 

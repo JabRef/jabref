@@ -85,8 +85,7 @@ recipeList:
   #  - org.openrewrite.staticanalysis.UnnecessaryCloseInTryWithResources
   # Does not work
   #  - org.openrewrite.staticanalysis.UnnecessaryExplicitTypeArguments
-  # Removes too much
-  #  - org.openrewrite.staticanalysis.UnnecessaryParentheses
+  - org.openrewrite.staticanalysis.UnnecessaryParentheses
   # Does not work
   #  - org.openrewrite.staticanalysis.UnnecessaryPrimitiveAnnotations
   # Removes too much throws
@@ -128,7 +127,8 @@ recipeList:
   - org.openrewrite.staticanalysis.CompareEnumsWithEqualityOperator
   - org.openrewrite.staticanalysis.ControlFlowIndentation
   - org.openrewrite.staticanalysis.CovariantEquals
-  - org.openrewrite.staticanalysis.DefaultComesLast
+  # Needs manual intervention
+#  - org.openrewrite.staticanalysis.DefaultComesLast
   - org.openrewrite.staticanalysis.EmptyBlock
   - org.openrewrite.staticanalysis.EqualsAvoidsNull
   - org.openrewrite.staticanalysis.EqualsToContentEquals
@@ -195,7 +195,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.UseJavaStyleArrayDeclarations
   - org.openrewrite.staticanalysis.UseLambdaForFunctionalInterface
 #  - org.openrewrite.staticanalysis.UseListSort
-  - org.openrewrite.staticanalysis.UseObjectNotifyAll
+#  - org.openrewrite.staticanalysis.UseObjectNotifyAll
   - org.openrewrite.staticanalysis.UseStandardCharset
   - org.openrewrite.staticanalysis.UseStringReplace
   - org.openrewrite.staticanalysis.UseSystemLineSeparator

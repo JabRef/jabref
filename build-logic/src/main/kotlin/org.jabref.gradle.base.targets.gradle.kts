@@ -18,20 +18,20 @@ javaModulePackaging {
     target("ubuntu-22.04") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("app-image", "deb", "rpm")
+        packageTypes = listOf("app-image", "deb")
     }
     target("ubuntu-22.04-arm") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.ARM64
-        packageTypes = listOf("app-image", "deb", "rpm")
+        packageTypes = listOf("app-image", "deb")
     }
-    target("macos-15-intel") {
+    target("macos-13") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("app-image", "dmg", "pkg")
         singleStepPackaging = true
     }
-    target("macos-15") {
+    target("macos-14") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.ARM64
         packageTypes = listOf("app-image", "dmg", "pkg")

@@ -70,4 +70,13 @@ public enum BiblatexApaField implements Field {
     public boolean isStandardField() {
         return false;
     }
+
+    @Override
+    public String getDisplayName() {
+        if (displayName == null) {
+            return Field.super.getDisplayName();
+        } else {
+            return displayName;
+        }
+    }
 }

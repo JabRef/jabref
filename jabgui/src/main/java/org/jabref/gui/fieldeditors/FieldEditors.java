@@ -75,8 +75,6 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
             // Identifier editor does not support PMID, therefore excluded at the condition above
             return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
-        } else if (field == StandardField.CITATIONCOUNT) {
-            return new CitationCountEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.ISSN) {
             return new ISSNEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (field == StandardField.OWNER) {
@@ -114,8 +112,6 @@ public class FieldEditors {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
             return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction);
-        } else if (field == StandardField.ICORERANKING) {
-            return new ICORERankingEditor(field, suggestionProvider, fieldCheckers);
         } else {
             // There was no specific editor found
 

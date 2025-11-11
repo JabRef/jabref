@@ -2,8 +2,6 @@ package org.jabref.http.server.cayw;
 
 import java.util.Optional;
 
-import org.jabref.logic.push.PushApplications;
-
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.QueryParam;
 
@@ -22,6 +20,7 @@ public class CAYWQueryParams {
     private String clipboard;
 
     @QueryParam("command")
+    @DefaultValue("autocite")
     private String command;
 
     @QueryParam("minimize")
@@ -42,11 +41,8 @@ public class CAYWQueryParams {
     @QueryParam("libraryid")
     private String libraryId;
 
-    @QueryParam("application")
-    private String application;
-
-    public Optional<String> getCommand() {
-        return Optional.ofNullable(command);
+    public String getCommand() {
+        return command;
     }
 
     public boolean isClipboard() {
@@ -83,12 +79,5 @@ public class CAYWQueryParams {
 
     public Optional<String> getLibraryId() {
         return Optional.ofNullable(libraryId);
-    }
-
-    public Optional<PushApplications> getApplication() {
-        if (isTexstudio()) {
-            return Optional.of(PushApplications.TEXSTUDIO);
-        }
-        return PushApplications.getApplicationById(application);
     }
 }

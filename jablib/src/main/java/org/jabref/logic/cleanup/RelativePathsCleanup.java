@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
@@ -12,16 +13,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import org.jspecify.annotations.NonNull;
-
 public class RelativePathsCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
 
-    public RelativePathsCleanup(@NonNull BibDatabaseContext databaseContext, @NonNull FilePreferences filePreferences) {
-        this.databaseContext = databaseContext;
-        this.filePreferences = filePreferences;
+    public RelativePathsCleanup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        this.databaseContext = Objects.requireNonNull(databaseContext);
+        this.filePreferences = Objects.requireNonNull(filePreferences);
     }
 
     @Override

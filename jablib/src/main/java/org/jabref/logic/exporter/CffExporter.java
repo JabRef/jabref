@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.util.StandardFileType;
@@ -26,7 +27,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.jspecify.annotations.NonNull;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -66,17 +66,17 @@ public class CffExporter extends Exporter {
     );
 
     public static final Map<EntryType, String> TYPES_MAP = Map.ofEntries(
-            Map.entry(StandardEntryType.Article, "article"),
-            Map.entry(StandardEntryType.Book, "book"),
-            Map.entry(StandardEntryType.Booklet, "pamphlet"),
-            Map.entry(StandardEntryType.Proceedings, "conference"),
-            Map.entry(StandardEntryType.InProceedings, "conference-paper"),
-            Map.entry(StandardEntryType.Misc, "misc"),
-            Map.entry(StandardEntryType.Manual, "manual"),
-            Map.entry(StandardEntryType.Software, "software"),
-            Map.entry(StandardEntryType.Dataset, "dataset"),
-            Map.entry(StandardEntryType.Report, "report"),
-            Map.entry(StandardEntryType.Unpublished, "unpublished")
+        Map.entry(StandardEntryType.Article, "article"),
+        Map.entry(StandardEntryType.Book, "book"),
+        Map.entry(StandardEntryType.Booklet, "pamphlet"),
+        Map.entry(StandardEntryType.Proceedings, "conference"),
+        Map.entry(StandardEntryType.InProceedings, "conference-paper"),
+        Map.entry(StandardEntryType.Misc, "misc"),
+        Map.entry(StandardEntryType.Manual, "manual"),
+        Map.entry(StandardEntryType.Software, "software"),
+        Map.entry(StandardEntryType.Dataset, "dataset"),
+        Map.entry(StandardEntryType.Report, "report"),
+        Map.entry(StandardEntryType.Unpublished, "unpublished")
     );
 
     public CffExporter() {
@@ -84,9 +84,11 @@ public class CffExporter extends Exporter {
     }
 
     @Override
-    public void export(@NonNull BibDatabaseContext databaseContext,
-                       @NonNull Path file,
-                       @NonNull List<BibEntry> entries) throws SaveException {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws SaveException {
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(file);
+        Objects.requireNonNull(entries);
+
         // Do not export if no entries to export -- avoids exports with only template text
         if (entries.isEmpty()) {
             return;

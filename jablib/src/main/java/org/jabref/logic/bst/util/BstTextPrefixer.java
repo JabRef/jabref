@@ -78,7 +78,6 @@ public class BstTextPrefixer {
         public int index;
         public int braceLevel;
         public int numOfChars;
-
         public PrefixState(int index, int braceLevel, int numOfChars) {
             this.index = index;
             this.braceLevel = braceLevel;

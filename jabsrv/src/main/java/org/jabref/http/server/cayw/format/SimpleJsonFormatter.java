@@ -21,6 +21,11 @@ public class SimpleJsonFormatter implements CAYWFormatter {
     }
 
     @Override
+    public String getFormatName() {
+        return "simple-json";
+    }
+
+    @Override
     public MediaType getMediaType() {
         return MediaType.APPLICATION_JSON_TYPE;
     }
@@ -28,8 +33,8 @@ public class SimpleJsonFormatter implements CAYWFormatter {
     @Override
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
         List<SimpleJson> simpleJsons = caywEntries.stream()
-                                                  .map(caywEntry -> SimpleJson.fromBibEntry(caywEntry.bibEntry()))
-                                                  .toList();
+                                              .map(caywEntry -> SimpleJson.fromBibEntry(caywEntry.getBibEntry()))
+                                              .toList();
         return gson.toJson(simpleJsons);
     }
 }

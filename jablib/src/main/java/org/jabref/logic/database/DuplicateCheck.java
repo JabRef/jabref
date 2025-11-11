@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringSimilarity;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
@@ -26,6 +25,7 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.StringUtil;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -102,8 +102,8 @@ public class DuplicateCheck {
     private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
         final Set<OrFields> requiredFields = type.getRequiredFields();
         return requiredFields.isEmpty()
-               ? new double[] {0., 0.}
-               : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
+                ? new double[] {0., 0.}
+                : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
     }
 
     private static boolean isFarFromThreshold(double value) {
@@ -185,7 +185,7 @@ public class DuplicateCheck {
         // Harmonise case:
         final String authorOne = AuthorList.fixAuthorLastNameOnlyCommas(stringOne, false).replace(" and ", " ").toLowerCase(Locale.ROOT);
         final String authorTwo = AuthorList.fixAuthorLastNameOnlyCommas(stringTwo, false).replace(" and ", " ").toLowerCase(Locale.ROOT);
-        final double similarity = StringSimilarity.correlateByWords(authorOne, authorTwo);
+        final double similarity = DuplicateCheck.correlateByWords(authorOne, authorTwo);
         if (similarity > 0.8) {
             return EQUAL;
         }
@@ -213,7 +213,7 @@ public class DuplicateCheck {
     private static int compareJournalField(final String stringOne, final String stringTwo) {
         final String processedStringOne = stringOne.replace(".", "").toLowerCase(Locale.ROOT);
         final String processedStringTwo = stringTwo.replace(".", "").toLowerCase(Locale.ROOT);
-        final double similarity = StringSimilarity.correlateByWords(processedStringOne, processedStringTwo);
+        final double similarity = DuplicateCheck.correlateByWords(processedStringOne, processedStringTwo);
         if (similarity > 0.8) {
             return EQUAL;
         }
@@ -229,7 +229,7 @@ public class DuplicateCheck {
     private static int compareField(final String stringOne, final String stringTwo) {
         final String processedStringOne = StringUtil.unifyLineBreaks(stringOne.toLowerCase(Locale.ROOT).trim(), OS.NEWLINE);
         final String processedStringTwo = StringUtil.unifyLineBreaks(stringTwo.toLowerCase(Locale.ROOT).trim(), OS.NEWLINE);
-        final double similarity = StringSimilarity.correlateByWords(processedStringOne, processedStringTwo);
+        final double similarity = DuplicateCheck.correlateByWords(processedStringOne, processedStringTwo);
         if (similarity > 0.8) {
             return EQUAL;
         }
@@ -241,41 +241,78 @@ public class DuplicateCheck {
         allFields.addAll(one.getFields());
         allFields.addAll(two.getFields());
 
-        // totalCount counts the equal "properties" of an entry, i.e. the number of fields, the entry type, and the comment
-        int totalCount = allFields.size();
-
         int score = 0;
         for (final Field field : allFields) {
             if (isSingleFieldEqual(one, two, field)) {
                 score++;
             }
         }
-
-        totalCount++;
-        if (!haveDifferentEntryType(one, two)) {
-            score++;
-        }
-
-        totalCount++;
-        if (isCommentEqual(one, two)) {
-            score++;
-        }
-
-        if (score == totalCount) {
+        if (score == allFields.size()) {
             return 1.01; // Just to make sure we can use score > 1 without trouble.
         }
-        return (double) score / totalCount;
+        return (double) score / allFields.size();
     }
 
-    private static boolean isCommentEqual(BibEntry one, BibEntry two) {
-        return StringUtil.equalsUnifiedLineBreak(Optional.of(one.getUserComments()), Optional.of(two.getUserComments()));
-    }
-
-    /// Compares the string content of the given field at each entry character by character.
-    ///
-    /// @return true if the content is equal (with normalized linebreaks), false otherwise.
     private static boolean isSingleFieldEqual(BibEntry one, BibEntry two, Field field) {
-        return StringUtil.equalsUnifiedLineBreak(one.getField(field), two.getField(field));
+        final Optional<String> stringOne = one.getField(field);
+        final Optional<String> stringTwo = two.getField(field);
+        if (stringOne.isEmpty() && stringTwo.isEmpty()) {
+            return true;
+        }
+        if (stringOne.isEmpty() || stringTwo.isEmpty()) {
+            return false;
+        }
+        return StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
+                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE));
+    }
+
+    /**
+     * Compare two strings on the basis of word-by-word correlation analysis.
+     *
+     * @param s1 The first string
+     * @param s2 The second string
+     * @return a value in the interval [0, 1] indicating the degree of match.
+     */
+    public static double correlateByWords(final String s1, final String s2) {
+        final String[] w1 = s1.split("\\s");
+        final String[] w2 = s2.split("\\s");
+        final int n = Math.min(w1.length, w2.length);
+        int misses = 0;
+        for (int i = 0; i < n; i++) {
+            double corr = similarity(w1[i], w2[i]);
+            if (corr < 0.75) {
+                misses++;
+            }
+        }
+        final double missRate = (double) misses / (double) n;
+        return 1 - missRate;
+    }
+
+    /**
+     * Calculates the similarity (a number within 0 and 1) between two strings.
+     * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
+     */
+    private static double similarity(final String first, final String second) {
+        final String longer;
+        final String shorter;
+
+        if (first.length() < second.length()) {
+            longer = second;
+            shorter = first;
+        } else {
+            longer = first;
+            shorter = second;
+        }
+
+        final int longerLength = longer.length();
+        // both strings are zero length
+        if (longerLength == 0) {
+            return 1.0;
+        }
+        final double distanceIgnoredCase = new StringSimilarity().editDistanceIgnoreCase(longer, shorter);
+        final double similarity = (longerLength - distanceIgnoredCase) / longerLength;
+        LOGGER.trace("Longer string: {} Shorter string: {} Similarity: {}", longer, shorter, similarity);
+        return similarity;
     }
 
     /**
@@ -287,7 +324,6 @@ public class DuplicateCheck {
             return true;
         }
 
-        // TODO: Work on haveDifferentEntryType - InCollection and InProceedings could point to the same publication
         if (haveDifferentEntryType(one, two) ||
                 haveDifferentEditions(one, two) ||
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {

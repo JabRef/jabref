@@ -1,11 +1,10 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-
-import org.jspecify.annotations.NonNull;
 
 public class RemoveDigitsFormatter extends Formatter {
 
@@ -22,7 +21,9 @@ public class RemoveDigitsFormatter extends Formatter {
     }
 
     @Override
-    public String format(@NonNull String value) {
+    public String format(String value) {
+        Objects.requireNonNull(value);
+
         return DIGITS.matcher(value).replaceAll("");
     }
 

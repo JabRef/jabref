@@ -12,15 +12,12 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.strings.QuotedStringTokenizer;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
-import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -32,6 +29,7 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -47,13 +45,13 @@ public class GroupsParser {
     private GroupsParser() {
     }
 
-    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost)
+    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData)
             throws ParseException {
         try {
             GroupTreeNode cursor = null;
             GroupTreeNode root = null;
             for (String string : orderedData) {
-                // This allows reading databases that have been modified by, e.g., BibDesk
+                // This allows to read databases that have been modified by, e.g., BibDesk
                 string = string.trim();
                 if (string.isEmpty()) {
                     continue;
@@ -64,7 +62,7 @@ public class GroupsParser {
                     throw new ParseException("Expected \"" + string + "\" to contain whitespace");
                 }
                 int level = Integer.parseInt(string.substring(0, spaceIndex));
-                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData, userAndHost);
+                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData);
                 GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
                 if (cursor == null) {
                     // create new root
@@ -94,7 +92,7 @@ public class GroupsParser {
      * @return New instance of the encoded group.
      * @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost)
+    public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData)
             throws ParseException {
         if (s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             return keywordGroupFromString(s, keywordSeparator);
@@ -120,17 +118,14 @@ public class GroupsParser {
         if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
             return automaticKeywordGroupFromString(s);
         }
-        if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID)) {
-            return automaticDateGroupFromString(s);
-        }
         if (s.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
-            return texGroupFromString(s, fileMonitor, metaData, userAndHost);
+            return texGroupFromString(s, fileMonitor, metaData);
         }
 
         throw new ParseException("Unknown group: " + s);
     }
 
-    private static AbstractGroup texGroupFromString(String string, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost) throws ParseException {
+    private static AbstractGroup texGroupFromString(String string, FileUpdateMonitor fileMonitor, MetaData metaData) throws ParseException {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(string.substring(MetadataSerializationConfiguration.TEX_GROUP_ID
                 .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
@@ -139,14 +134,14 @@ public class GroupsParser {
         try {
             Path path = Path.of(tok.nextToken());
             try {
-                TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData, userAndHost);
+                TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
                 addGroupDetails(tok, newGroup);
                 return newGroup;
             } catch (IOException ex) {
                 // Problem accessing file -> create without file monitoring
                 LOGGER.warn("Could not access file {}. The group {} will not reflect changes to the aux file.", path, name, ex);
 
-                TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), metaData, userAndHost);
+                TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), metaData);
                 addGroupDetails(tok, newGroup);
                 return newGroup;
             }
@@ -166,23 +161,6 @@ public class GroupsParser {
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         Field field = FieldFactory.parseField(StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         AutomaticPersonsGroup newGroup = new AutomaticPersonsGroup(name, context, field);
-        addGroupDetails(tok, newGroup);
-        return newGroup;
-    }
-
-    private static AbstractGroup automaticDateGroupFromString(String string) {
-        if (!string.startsWith(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID)) {
-            throw new IllegalArgumentException("AutomaticDateGroup cannot be created from \"" + string + "\".");
-        }
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(string.substring(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID
-                .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-
-        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
-        Field field = FieldFactory.parseField(StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
-        String granularityString = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        DateGranularity granularity = DateGranularity.valueOf(granularityString);
-        AutomaticDateGroup newGroup = new AutomaticDateGroup(name, context, field, granularity);
         addGroupDetails(tok, newGroup);
         return newGroup;
     }
@@ -209,7 +187,7 @@ public class GroupsParser {
      *
      * @param s The String representation obtained from KeywordGroup.toString()
      */
-    private static KeywordGroup keywordGroupFromString(String s, Character keywordSeparator) {
+    private static KeywordGroup keywordGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
@@ -289,7 +267,7 @@ public class GroupsParser {
     /**
      * Called only when created fromString.
      * JabRef used to store the entries of an explicit group in the serialization, e.g.
-     * ExplicitGroup:GroupName\;0\;Key1\;Key2\;;
+     *  ExplicitGroup:GroupName\;0\;Key1\;Key2\;;
      * This method exists for backwards compatibility.
      */
     private static void addLegacyEntryKeys(QuotedStringTokenizer tok, ExplicitGroup group) {

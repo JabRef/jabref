@@ -32,15 +32,13 @@ public class UiThreadObservableList<E> implements ObservableList<E> {
         delegate.removeListener(listener);
     }
 
-    @SafeVarargs
     @Override
-    public final boolean addAll(E... elements) {
+    public boolean addAll(E... elements) {
         return delegate.addAll(elements);
     }
 
-    @SafeVarargs
     @Override
-    public final boolean setAll(E... elements) {
+    public boolean setAll(E... elements) {
         return delegate.setAll(elements);
     }
 
@@ -49,15 +47,13 @@ public class UiThreadObservableList<E> implements ObservableList<E> {
         return delegate.setAll(col);
     }
 
-    @SafeVarargs
     @Override
-    public final boolean removeAll(E... elements) {
+    public boolean removeAll(E... elements) {
         return delegate.removeAll(elements);
     }
 
-    @SafeVarargs
     @Override
-    public final boolean retainAll(E... elements) {
+    public boolean retainAll(E... elements) {
         return delegate.retainAll(elements);
     }
 

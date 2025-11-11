@@ -1,6 +1,7 @@
 package org.jabref.http.server.cayw.format;
 
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jabref.http.server.cayw.CAYWQueryParams;
 
@@ -9,28 +10,20 @@ import org.jvnet.hk2.annotations.Service;
 @Service
 public class FormatterService {
 
-    public CAYWFormatter getFormatter(CAYWQueryParams queryParams) {
-        String format = queryParams.getFormat().toLowerCase(Locale.ROOT);
+    private static final String DEFAULT_FORMATTER = "biblatex";
+    private final Map<String, CAYWFormatter> formatters;
 
-        return switch (format) {
-            case "natbib",
-                 "latex",
-                 "cite" ->
-                    new NatbibFormatter("cite");
-            case "citep" ->
-                    new NatbibFormatter("citep");
-            case "citet" ->
-                    new NatbibFormatter("citet");
-            case "mmd" ->
-                    new MMDFormatter();
-            case "pandoc" ->
-                    new PandocFormatter();
-            case "simple-json" ->
-                    new SimpleJsonFormatter();
-            case "typst" ->
-                    new TypstFormatter();
-            default ->
-                    new BibLatexFormatter("autocite");
-        };
+    public FormatterService() {
+        this.formatters = new HashMap<>();
+        registerFormatter(new SimpleJsonFormatter());
+        registerFormatter(new BibLatexFormatter());
+    }
+
+    public void registerFormatter(CAYWFormatter formatter) {
+        formatters.putIfAbsent(formatter.getFormatName(), formatter);
+    }
+
+    public CAYWFormatter getFormatter(CAYWQueryParams queryParams) {
+        return formatters.getOrDefault(queryParams.getFormat().toLowerCase(), formatters.get(DEFAULT_FORMATTER));
     }
 }

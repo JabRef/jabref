@@ -5,23 +5,19 @@ import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-
-import org.jspecify.annotations.NonNull;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Article identifier for MathSciNet (also sometimes called "MRNumber")
  */
-@AllowedToUseLogic("Uses StringUtil temporarily")
 public class MathSciNetId implements Identifier {
 
-    private final String identifier;
+    private String identifier;
 
-    public MathSciNetId(@NonNull String identifier) {
-        this.identifier = identifier;
+    public MathSciNetId(String identifier) {
+        this.identifier = Objects.requireNonNull(identifier);
     }
 
     public static Optional<MathSciNetId> parse(String mrNumberRaw) {

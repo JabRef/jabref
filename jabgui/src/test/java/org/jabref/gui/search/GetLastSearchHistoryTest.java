@@ -4,7 +4,6 @@ import java.util.List;
 
 import javafx.stage.Stage;
 
-import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ApplicationExtension.class)
 class GetLastSearchHistoryTest {
-    private final StateManager stateManager = new JabRefGuiStateManager();
+    private final StateManager stateManager = new StateManager();
     private final BibDatabaseContext dbContext1 = new BibDatabaseContext();
     private final BibDatabaseContext dbContext2 = new BibDatabaseContext();
 

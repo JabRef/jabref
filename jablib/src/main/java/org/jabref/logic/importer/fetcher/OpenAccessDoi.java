@@ -16,13 +16,12 @@ import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A fulltext fetcher that uses <a href="https://oadoi.org/">oaDOI</a>.
- * <p>
+ *
  * API is documented at http://unpaywall.org/api/v2
  */
 public class OpenAccessDoi implements FulltextFetcher {
@@ -31,7 +30,9 @@ public class OpenAccessDoi implements FulltextFetcher {
     private static final String API_URL = "https://api.oadoi.org/v2/";
 
     @Override
-    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+        Objects.requireNonNull(entry);
+
         Optional<DOI> doi = entry.getField(StandardField.DOI)
                                  .flatMap(DOI::parse);
 

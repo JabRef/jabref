@@ -48,7 +48,6 @@ import org.jabref.model.metadata.MetaData;
 
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
-import org.jspecify.annotations.NonNull;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -81,21 +80,21 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(@NonNull StateManager stateManager,
-                              @NonNull DialogService dialogService,
-                              @NonNull AiService aiService,
-                              @NonNull GuiPreferences preferences,
-                              @NonNull AdaptVisibleTabs adaptVisibleTabs,
-                              @NonNull TaskExecutor taskExecutor,
-                              @NonNull CustomLocalDragboard localDragboard
+    public GroupTreeViewModel(StateManager stateManager,
+                              DialogService dialogService,
+                              AiService aiService,
+                              GuiPreferences preferences,
+                              AdaptVisibleTabs adaptVisibleTabs,
+                              TaskExecutor taskExecutor,
+                              CustomLocalDragboard localDragboard
     ) {
-        this.stateManager = stateManager;
-        this.dialogService = dialogService;
-        this.aiService = aiService;
-        this.preferences = preferences;
+        this.stateManager = Objects.requireNonNull(stateManager);
+        this.dialogService = Objects.requireNonNull(dialogService);
+        this.aiService = Objects.requireNonNull(aiService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.adaptVisibleTabs = adaptVisibleTabs;
-        this.taskExecutor = taskExecutor;
-        this.localDragboard = localDragboard;
+        this.taskExecutor = Objects.requireNonNull(taskExecutor);
+        this.localDragboard = Objects.requireNonNull(localDragboard);
 
         // Register listener
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
@@ -190,10 +189,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
         String grpName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
         AbstractGroup importEntriesGroup = new SmartGroup(grpName, GroupHierarchyType.INDEPENDENT, ',');
         boolean isGrpExist = parent.getGroupNode()
-                                   .getChildren()
-                                   .stream()
-                                   .map(GroupTreeNode::getGroup)
-                                   .anyMatch(grp -> grp instanceof SmartGroup);
+                                 .getChildren()
+                                 .stream()
+                                 .map(GroupTreeNode::getGroup)
+                                 .anyMatch(grp -> grp instanceof SmartGroup);
         if (!isGrpExist) {
             currentDatabase.ifPresent(db -> {
                 GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);

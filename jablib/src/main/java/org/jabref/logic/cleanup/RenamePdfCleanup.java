@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -14,7 +15,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,10 +25,8 @@ public class RenamePdfCleanup implements CleanupJob {
     private final boolean onlyRelativePaths;
     private final FilePreferences filePreferences;
 
-    public RenamePdfCleanup(boolean onlyRelativePaths,
-                            @NonNull Supplier<BibDatabaseContext> databaseContext,
-                            FilePreferences filePreferences) {
-        this.databaseContext = databaseContext;
+    public RenamePdfCleanup(boolean onlyRelativePaths, Supplier<BibDatabaseContext> databaseContext, FilePreferences filePreferences) {
+        this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.filePreferences = filePreferences;
     }
@@ -50,9 +48,7 @@ public class RenamePdfCleanup implements CleanupJob {
                     changed = true;
                 }
             } catch (IOException exception) {
-                // There is no exception logged here, because the stack trace can get very large (and is not helpful)
-                // The only "real" information lost is i) the absolute path of the source file and ii) the absolute path of the target file.
-                LOGGER.error("Error while renaming file {}", file.getLink());
+                LOGGER.error("Error while renaming file {}", file.getLink(), exception);
             }
         }
 

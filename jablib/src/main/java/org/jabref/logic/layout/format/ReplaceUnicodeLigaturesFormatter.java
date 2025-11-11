@@ -9,8 +9,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.UnicodeLigaturesMap;
 
-import org.jspecify.annotations.NonNull;
-
 public class ReplaceUnicodeLigaturesFormatter extends Formatter implements LayoutFormatter {
 
     private final Map<Pattern, String> ligaturesMap;
@@ -34,7 +32,7 @@ public class ReplaceUnicodeLigaturesFormatter extends Formatter implements Layou
     }
 
     @Override
-    public String format(@NonNull String fieldText) {
+    public String format(String fieldText) {
         String result = fieldText;
         for (Pattern key : ligaturesMap.keySet()) {
             result = key.matcher(result).replaceAll(ligaturesMap.get(key));

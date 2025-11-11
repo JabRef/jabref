@@ -97,9 +97,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
                 stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
                 stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
-                if (!keepOnTop.isSelected()) {
-                    stage.hide();
-                }
+                stage.close();
             }
         });
 
@@ -110,8 +108,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         keepOnTopSubscription = EasyBind.subscribe(viewModel.keepOnTop(), value -> {
             stage.setAlwaysOnTop(value);
             keepOnTop.setGraphic(value
-                                 ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
-                                 : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
+                    ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
+                    : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
         });
 
         stage.setOnShown(event -> {

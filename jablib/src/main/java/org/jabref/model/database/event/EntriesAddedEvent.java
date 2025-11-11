@@ -7,8 +7,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * {@link EntriesAddedEvent} is fired when at least {@link BibEntry} is being added to the {@link BibDatabase}.
  */
@@ -19,19 +17,25 @@ public class EntriesAddedEvent extends EntriesEvent {
     private final BibEntry firstEntry;
 
     /**
+     * @param bibEntries the entries which are being added
+     * @param firstEntry the first entry being added
+     */
+
+    public EntriesAddedEvent(List<BibEntry> bibEntries, BibEntry firstEntry, EntriesEventSource location) {
+        super(bibEntries, location);
+        this.firstEntry = firstEntry;
+    }
+
+    /**
      * @param bibEntries <code>List</code> of <code>BibEntry</code> objects which are being added.
      * @param location   Location affected by this event
      */
     public EntriesAddedEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
         super(bibEntries, location);
-        if (bibEntries.isEmpty()) {
-            this.firstEntry = null;
-        } else {
-            this.firstEntry = bibEntries.getFirst();
-        }
+        this.firstEntry = null;
     }
 
-    public @Nullable BibEntry getFirstEntry() {
+    public BibEntry getFirstEntry() {
         return this.firstEntry;
     }
 }

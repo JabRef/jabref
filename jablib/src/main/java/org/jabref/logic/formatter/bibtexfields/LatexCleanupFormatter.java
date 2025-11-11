@@ -5,8 +5,6 @@ import java.util.regex.Pattern;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Simplifies LaTeX syntax. See {@link org.jabref.logic.layout.format.RemoveLatexCommandsFormatter} for a formatter removing LaTeX commands completely.
  */
@@ -32,7 +30,7 @@ public class LatexCleanupFormatter extends Formatter {
     }
 
     @Override
-    public String format(@NonNull String oldString) {
+    public String format(String oldString) {
         String newValue = oldString;
 
         // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted

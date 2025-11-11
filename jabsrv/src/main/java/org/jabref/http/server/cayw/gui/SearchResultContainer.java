@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.logic.os.OS;
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.strings.StringUtil;
 
 public class SearchResultContainer extends ListView<CAYWEntry> {
 
@@ -81,9 +81,9 @@ public class SearchResultContainer extends ListView<CAYWEntry> {
                 setGraphic(null);
                 setTooltip(null);
             } else {
-                labelText.setText(item.label());
+                labelText.setText(item.getLabel());
 
-                String fullDescription = item.description();
+                String fullDescription = item.getDescription();
                 String truncatedDescription = truncateToThreeLines(fullDescription);
 
                 descriptionText.setText(truncatedDescription);

@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -32,8 +33,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
-import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -46,9 +45,9 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.strings.StringUtil;
 
 import org.jooq.lambda.Unchecked;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,12 +74,12 @@ public class BibDatabaseWriter {
     protected final BibEntryTypesManager entryTypesManager;
     protected final FieldPreferences fieldPreferences;
 
-    public BibDatabaseWriter(@NonNull BibWriter bibWriter,
+    public BibDatabaseWriter(BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
                              FieldPreferences fieldPreferences,
                              CitationKeyPatternPreferences keyPatternPreferences,
                              BibEntryTypesManager entryTypesManager) {
-        this.bibWriter = bibWriter;
+        this.bibWriter = Objects.requireNonNull(bibWriter);
         this.saveConfiguration = saveConfiguration;
         this.keyPatternPreferences = keyPatternPreferences;
         this.fieldPreferences = fieldPreferences;
@@ -88,19 +87,17 @@ public class BibDatabaseWriter {
         assert saveConfiguration.getSaveOrder().getOrderType() != SaveOrder.OrderType.TABLE;
     }
 
-    /// Convenience constructor. One can directly call [#writeDatabase(BibDatabaseContext)] afterward.
-    ///
-    /// @param writer the output to use
-    /// @param bibDatabaseContext - used to get the newline
-    /// @param  preferences - used to read all the preferences
-    public BibDatabaseWriter(@NonNull Writer writer,
-                             @NonNull BibDatabaseContext bibDatabaseContext,
-                             @NonNull CliPreferences preferences) {
-        this(new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator()),
-                preferences.getSelfContainedExportConfiguration(),
-                preferences.getFieldPreferences(),
-                preferences.getCitationKeyPatternPreferences(),
-                preferences.getCustomEntryTypesRepository());
+    public BibDatabaseWriter(Writer writer,
+                                String newline,
+                                SelfContainedSaveConfiguration saveConfiguration,
+                                FieldPreferences fieldPreferences,
+                                CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                BibEntryTypesManager entryTypesManager) {
+        this(new BibWriter(writer, newline),
+                saveConfiguration,
+                fieldPreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager);
     }
 
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData, FieldPreferences fieldPreferences) {
@@ -159,8 +156,10 @@ public class BibDatabaseWriter {
      * non-database save operation (such as the exportDatabase call), we do not wish to use the global preference of
      * saving in standard order.
      */
-    public static List<BibEntry> getSortedEntries(@NonNull List<BibEntry> entriesToSort,
-                                                  @NonNull SelfContainedSaveOrder saveOrder) {
+    public static List<BibEntry> getSortedEntries(List<BibEntry> entriesToSort, SelfContainedSaveOrder saveOrder) {
+        Objects.requireNonNull(entriesToSort);
+        Objects.requireNonNull(saveOrder);
+
         List<Comparator<BibEntry>> comparators = getSaveComparators(saveOrder);
         FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
 
@@ -176,12 +175,12 @@ public class BibDatabaseWriter {
     /**
      * Saves the complete database.
      */
-    public void writeDatabase(@NonNull BibDatabaseContext bibDatabaseContext) throws IOException {
+    public void saveDatabase(BibDatabaseContext bibDatabaseContext) throws IOException {
         List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntries()
-                                                   .stream()
-                                                   .filter(entry -> !entry.isEmpty())
-                                                   .toList();
-        writePartOfDatabase(bibDatabaseContext, entries);
+                                                .stream()
+                                                .filter(entry -> !entry.isEmpty())
+                                                .toList();
+        savePartOfDatabase(bibDatabaseContext, entries);
     }
 
     /**
@@ -189,7 +188,7 @@ public class BibDatabaseWriter {
      *
      * @param entries A list of entries to save. The list itself is not modified in this code
      */
-    public void writePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
+    public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
         sharedDatabaseIDOptional.ifPresent(Unchecked.consumer(this::writeDatabaseID));
 
@@ -276,10 +275,10 @@ public class BibDatabaseWriter {
     /**
      * Writes all data to the specified writer, using each object's toString() method.
      */
-    protected void writeMetaData(@NonNull MetaData metaData,
-                                 GlobalCitationKeyPatterns globalCiteKeyPattern) throws IOException {
-        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(
-                metaData,
+    protected void writeMetaData(MetaData metaData, GlobalCitationKeyPatterns globalCiteKeyPattern) throws IOException {
+        Objects.requireNonNull(metaData);
+
+        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,
                 globalCiteKeyPattern);
 
         for (Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {

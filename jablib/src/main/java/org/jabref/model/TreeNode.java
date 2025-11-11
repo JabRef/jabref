@@ -3,6 +3,7 @@ package org.jabref.model;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -10,8 +11,6 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a node in a tree.
@@ -53,7 +52,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// Constructs a tree node without parent and no children.
     ///
     /// @param derivingClass class deriving from TreeNode<T>. It should always be "T.class".
-    ///                                           We need this parameter since it is hard to get this information by other means.
+    ///                      We need this parameter since it is hard to get this information by other means.
     public TreeNode(Class<T> derivingClass) {
         parent = null;
         children = FXCollections.observableArrayList();
@@ -129,7 +128,8 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * or an empty Optional if the specified node is a not a child of this node
      * @throws NullPointerException if childNode is null
      */
-    public Optional<Integer> getIndexOfChild(@NonNull T childNode) {
+    public Optional<Integer> getIndexOfChild(T childNode) {
+        Objects.requireNonNull(childNode);
         int index = children.indexOf(childNode);
         if (index == -1) {
             return Optional.empty();
@@ -171,7 +171,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
      * @throws UnsupportedOperationException  if target is an descendant of this node
      */
-    public void moveTo(@NonNull T target) {
+    public void moveTo(T target) {
+        Objects.requireNonNull(target);
+
         Optional<T> oldParent = getParent();
         if (oldParent.isPresent() && (oldParent.get() == target)) {
             this.moveTo(target, target.getNumberOfChildren() - 1);
@@ -304,7 +306,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * @throws NullPointerException if anotherNode is null
      * @see #isNodeDescendant
      */
-    public boolean isAncestorOf(@NonNull T anotherNode) {
+    public boolean isAncestorOf(T anotherNode) {
+        Objects.requireNonNull(anotherNode);
+
         if (anotherNode == this) {
             return true;
         } else {
@@ -389,7 +393,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * @return true if this node is an ancestor of anotherNode
      * @see #isAncestorOf
      */
-    public boolean isNodeDescendant(@NonNull T anotherNode) {
+    public boolean isNodeDescendant(T anotherNode) {
+        Objects.requireNonNull(anotherNode);
+
         return this.isAncestorOf(anotherNode);
     }
 
@@ -412,7 +418,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      *
      * @param child a child of this node to remove
      */
-    public void removeChild(@NonNull T child) {
+    public void removeChild(T child) {
+        Objects.requireNonNull(child);
+
         children.remove(child);
         child.setParent(null);
 
@@ -456,7 +464,8 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * @return the child node
      * @throws IndexOutOfBoundsException if the index is out of range
      */
-    public T addChild(@NonNull T child, int index) {
+    public T addChild(T child, int index) {
+        Objects.requireNonNull(child);
         if (child.getParent().isPresent()) {
             throw new UnsupportedOperationException("Cannot add a node which already has a parent, use moveTo instead");
         }
@@ -496,7 +505,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * @param recursive  if true the whole subtree is sorted
      * @throws NullPointerException if the comparator is null
      */
-    public void sortChildren(@NonNull Comparator<? super T> comparator, boolean recursive) {
+    public void sortChildren(Comparator<? super T> comparator, boolean recursive) {
+        Objects.requireNonNull(comparator);
+
         if (this.isLeaf()) {
             return; // nothing to sort
         }
@@ -533,7 +544,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
      * @throws UnsupportedOperationException  if target is an descendant of this node
      */
-    public void moveTo(@NonNull T target, int targetIndex) {
+    public void moveTo(T target, int targetIndex) {
+        Objects.requireNonNull(target);
+
         // Check that the target node is not an ancestor of this node, because this would create loops in the tree
         if (this.isAncestorOf(target)) {
             throw new UnsupportedOperationException("the target cannot be a descendant of this node");
@@ -571,11 +584,11 @@ public abstract class TreeNode<T extends TreeNode<T>> {
 
     /**
      * Adds the given function to the list of subscribers which are notified when something changes in the subtree.
-     * <p>
+     *
      * The following events are supported (the text in parentheses specifies which node is passed as the source):
-     * - addChild (new parent)
-     * - removeChild (old parent)
-     * - move (old parent and new parent)
+     *  - addChild (new parent)
+     *  - removeChild (old parent)
+     *  - move (old parent and new parent)
      *
      * @param subscriber function to be invoked upon a change
      */

@@ -10,10 +10,10 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.google.common.hash.Hashing;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +69,8 @@ public class SSLCertificate {
         return sha256Thumbprint;
     }
 
-    public static Optional<SSLCertificate> fromX509(@NonNull X509Certificate x509Certificate) {
+    public static Optional<SSLCertificate> fromX509(X509Certificate x509Certificate) {
+        Objects.requireNonNull(x509Certificate);
         try {
             return Optional.of(new SSLCertificate(x509Certificate.getEncoded(), x509Certificate.getSerialNumber().toString(),
                     x509Certificate.getIssuerX500Principal().getName(),
@@ -83,7 +84,8 @@ public class SSLCertificate {
         return Optional.empty();
     }
 
-    public static Optional<SSLCertificate> fromPath(@NonNull Path certPath) {
+    public static Optional<SSLCertificate> fromPath(Path certPath) {
+        Objects.requireNonNull(certPath);
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
             return fromX509((X509Certificate) certificateFactory.generateCertificate(Files.newInputStream(certPath)));

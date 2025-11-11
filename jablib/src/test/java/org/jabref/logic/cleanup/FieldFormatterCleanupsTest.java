@@ -339,7 +339,6 @@ public class FieldFormatterCleanupsTest {
                 month[normalize_month]
                 all-text-fields[replace_unicode_ligatures]
                 keywords[MSC_codes_to_descriptions]
-                issn[normalize_issn]
                 """, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, "\n"));
     }
 
@@ -351,7 +350,6 @@ public class FieldFormatterCleanupsTest {
                 month[normalize_month]
                 all-text-fields[replace_unicode_ligatures]
                 keywords[MSC_codes_to_descriptions]
-                issn[normalize_issn]
                 """));
     }
 

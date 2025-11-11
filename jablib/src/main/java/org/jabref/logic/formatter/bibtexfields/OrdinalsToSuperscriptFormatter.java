@@ -1,12 +1,11 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * This class transforms ordinal numbers into LaTeX superscripts.
@@ -39,7 +38,9 @@ public class OrdinalsToSuperscriptFormatter extends Formatter {
      * }</pre>
      */
     @Override
-    public String format(@NonNull String value) {
+    public String format(String value) {
+        Objects.requireNonNull(value);
+
         if (value.isEmpty()) {
             // nothing to do
             return value;

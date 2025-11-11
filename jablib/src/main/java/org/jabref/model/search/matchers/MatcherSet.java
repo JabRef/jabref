@@ -6,8 +6,6 @@ import java.util.Objects;
 
 import org.jabref.model.search.SearchMatcher;
 
-import org.jspecify.annotations.NonNull;
-
 public abstract class MatcherSet implements SearchMatcher {
 
     protected final List<SearchMatcher> matchers = new ArrayList<>();
@@ -31,8 +29,8 @@ public abstract class MatcherSet implements SearchMatcher {
         return Objects.hash(matchers);
     }
 
-    public void addRule(@NonNull SearchMatcher newRule) {
-        matchers.add(newRule);
+    public void addRule(SearchMatcher newRule) {
+        matchers.add(Objects.requireNonNull(newRule));
     }
 
     @Override

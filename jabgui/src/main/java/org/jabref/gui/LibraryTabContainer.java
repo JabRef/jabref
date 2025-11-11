@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -30,7 +31,7 @@ public interface LibraryTabContainer {
      */
     boolean closeTab(@Nullable LibraryTab tab);
 
-    boolean closeTabs(List<LibraryTab> tabs);
+    boolean closeTabs(@NonNull List<LibraryTab> tabs);
 
     /**
      * Refreshes the ui after changes to the preferences

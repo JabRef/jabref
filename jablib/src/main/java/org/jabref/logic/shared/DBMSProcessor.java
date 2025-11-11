@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -26,7 +27,6 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
 
 import com.google.common.collect.Lists;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -183,7 +183,7 @@ public abstract class DBMSProcessor {
         insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, bibEntries.size() - 1)));
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                new String[] {"SHARED_ID"})) {
+                new String[]{"SHARED_ID"})) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
@@ -235,7 +235,7 @@ public abstract class DBMSProcessor {
             LOGGER.error("SQL Error: ", e);
         }
         return bibEntries.stream().filter(entry ->
-                                 !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
+                !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
                          .collect(Collectors.toList());
     }
 
@@ -445,7 +445,8 @@ public abstract class DBMSProcessor {
      *
      * @param bibEntries {@link BibEntry} to be deleted
      */
-    public void removeEntries(@NonNull List<BibEntry> bibEntries) {
+    public void removeEntries(List<BibEntry> bibEntries) {
+        Objects.requireNonNull(bibEntries);
         if (bibEntries.isEmpty()) {
             return;
         }
@@ -502,7 +503,9 @@ public abstract class DBMSProcessor {
      *
      * @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
      */
-    public List<BibEntry> getSharedEntries(@NonNull List<Integer> sharedIDs) {
+    public List<BibEntry> getSharedEntries(List<Integer> sharedIDs) {
+        Objects.requireNonNull(sharedIDs);
+
         List<BibEntry> sharedEntries = new ArrayList<>();
 
         StringBuilder query = new StringBuilder();

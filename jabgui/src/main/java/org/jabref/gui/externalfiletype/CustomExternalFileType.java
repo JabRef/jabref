@@ -6,13 +6,11 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.FilePreferences;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * This class defines a type of external files that can be linked to from JabRef.
  * The class contains enough information to provide an icon, a standard extension
  * and a link to which application handles files of this type.
- * <p>
+ *
  * TODO: Move to model (and then adapt {@link org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel#fromFile(java.nio.file.Path, java.util.List, FilePreferences)}).
  */
 public class CustomExternalFileType implements ExternalFileType {
@@ -151,7 +149,8 @@ public class CustomExternalFileType implements ExternalFileType {
         return icon;
     }
 
-    public void setIcon(@NonNull JabRefIcon icon) {
+    public void setIcon(JabRefIcon icon) {
+        Objects.requireNonNull(icon);
         this.icon = icon;
     }
 

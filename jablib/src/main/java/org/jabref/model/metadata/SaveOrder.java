@@ -7,7 +7,6 @@ import java.util.Objects;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +33,9 @@ public class SaveOrder {
         this.sortCriteria = sortCriteria;
     }
 
-    private SaveOrder(@NonNull List<String> data) {
+    private SaveOrder(List<String> data) {
+        Objects.requireNonNull(data);
+
         if (data.isEmpty()) {
             throw new IllegalArgumentException();
         }
@@ -131,7 +132,7 @@ public class SaveOrder {
         }
 
         /**
-         * @param field      The field
+         * @param field The field
          * @param descending Must be a boolean value as string, e.g. "true", "false"
          */
         public SortCriterion(Field field, String descending) {

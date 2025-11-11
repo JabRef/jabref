@@ -104,8 +104,9 @@ public class FrameDndHandler {
             }
 
             if (hasEntries(dragboard)) {
-                List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
-                                                         .map(BibEntry::new).toList();
+                List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries()
+                                                         .stream().map(entry -> (BibEntry) entry.clone())
+                                                         .toList();
                 destinationLibraryTab.dropEntry(entryCopies);
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
@@ -187,7 +188,7 @@ public class FrameDndHandler {
 
     private void copyRootNode(LibraryTab destinationLibraryTab) {
         if (destinationLibraryTab.getBibDatabaseContext().getMetaData().getGroups().isPresent()
-                && stateManager.getActiveDatabase().isEmpty()) {
+            && stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
 

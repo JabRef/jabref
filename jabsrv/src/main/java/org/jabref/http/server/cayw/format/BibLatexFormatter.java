@@ -1,7 +1,6 @@
 package org.jabref.http.server.cayw.format;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.http.server.cayw.CAYWQueryParams;
@@ -14,10 +13,9 @@ import org.jvnet.hk2.annotations.Service;
 @Service
 public class BibLatexFormatter implements CAYWFormatter {
 
-    private final String defaultCommand;
-
-    public BibLatexFormatter(String defaultCommand) {
-        this.defaultCommand = defaultCommand;
+    @Override
+    public String getFormatName() {
+        return "biblatex";
     }
 
     @Override
@@ -27,16 +25,15 @@ public class BibLatexFormatter implements CAYWFormatter {
 
     @Override
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
-        String command = queryParams.getCommand().orElse(defaultCommand);
+        String command = queryParams.getCommand();
 
         List<BibEntry> bibEntries = caywEntries.stream()
-                                               .map(CAYWEntry::bibEntry)
-                                               .toList();
+                .map(CAYWEntry::getBibEntry)
+                .toList();
 
         return "\\%s{%s}".formatted(command,
                 bibEntries.stream()
-                          .map(BibEntry::getCitationKey)
-                          .flatMap(Optional::stream)
+                          .map(entry -> entry.getCitationKey().orElse(""))
                           .collect(Collectors.joining(",")));
     }
 }

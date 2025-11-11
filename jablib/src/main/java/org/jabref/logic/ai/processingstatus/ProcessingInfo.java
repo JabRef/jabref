@@ -6,7 +6,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import org.jspecify.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 public class ProcessingInfo<O, D> {
     private final O object;

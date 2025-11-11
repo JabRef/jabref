@@ -3,8 +3,6 @@ package org.jabref.logic.formatter.casechanger;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Converts all characters of the given string to upper case, but does not change words starting with "{"
  */
@@ -21,10 +19,10 @@ public class UpperCaseFormatter extends Formatter {
     }
 
     @Override
-    public String format(@NonNull String input) {
+    public String format(String input) {
         Title title = new Title(input);
 
-        title.getWords().forEach(Word::toUpperCase);
+        title.getWords().stream().forEach(Word::toUpperCase);
 
         return title.toString();
     }

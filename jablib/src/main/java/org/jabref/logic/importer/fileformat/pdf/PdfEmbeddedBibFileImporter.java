@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
@@ -39,7 +38,7 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
      * Extraction of embedded files in pdfs adapted from:
      * <a href="https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj">...</a>
      */
-    public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
+    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
         List<BibEntry> allParsedEntries = new ArrayList<>();
         PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
         if (nameDictionary != null) {
@@ -68,7 +67,7 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
                 }
             }
         }
-        return new ParserResult(allParsedEntries);
+        return allParsedEntries;
     }
 
     private List<BibEntry> extractAndParseFiles(Map<String, PDComplexFileSpecification> names) throws IOException, ParseException {

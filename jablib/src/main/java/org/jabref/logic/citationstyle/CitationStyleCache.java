@@ -1,15 +1,17 @@
 package org.jabref.logic.citationstyle;
 
+import java.util.Objects;
+
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryChangedEvent;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.eventbus.Subscribe;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Caches the generated Citations for quicker access
@@ -23,11 +25,14 @@ public class CitationStyleCache {
     private final LoadingCache<BibEntry, String> citationStyleCache;
 
     public CitationStyleCache(BibDatabaseContext databaseContext) {
-        citationStyleCache = Caffeine.newBuilder().maximumSize(CACHE_SIZE).build(entry -> {
-            if (citationStyle != null) {
-                return citationStyle.generatePreview(entry, databaseContext);
-            } else {
-                return "";
+        citationStyleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<>() {
+            @Override
+            public String load(BibEntry entry) {
+                if (citationStyle != null) {
+                    return citationStyle.generatePreview(entry, databaseContext);
+                } else {
+                    return "";
+                }
             }
         });
         databaseContext.getDatabase().registerListener(new BibDatabaseEntryListener());
@@ -37,15 +42,11 @@ public class CitationStyleCache {
      * Returns the citation for the given entry.
      */
     public String getCitationFor(BibEntry entry) {
-        return citationStyleCache.get(entry);
+        return citationStyleCache.getUnchecked(entry);
     }
 
-    /**
-     * Set a new citation style and invalidate all cached styles
-     *
-     * @param citationStyle The new citation style
-     */
-    public void setCitationStyle(@NonNull PreviewLayout citationStyle) {
+    public void setCitationStyle(PreviewLayout citationStyle) {
+        Objects.requireNonNull(citationStyle);
         if (!this.citationStyle.equals(citationStyle)) {
             this.citationStyle = citationStyle;
             this.citationStyleCache.invalidateAll();

@@ -1,11 +1,11 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.AnchorPane;
 
-public abstract class AbstractAutomaticFieldEditorTabView extends VBox implements AutomaticFieldEditorTab {
+public abstract class AbstractAutomaticFieldEditorTabView extends AnchorPane implements AutomaticFieldEditorTab {
 
     @Override
-    public VBox getContent() {
+    public AnchorPane getContent() {
         return this;
     }
 }

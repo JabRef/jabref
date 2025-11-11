@@ -1,5 +1,6 @@
 package org.jabref.gui.actions;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.icon.IconTheme;
@@ -7,27 +8,18 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
-import org.jspecify.annotations.NonNull;
-
 public enum StandardActions implements Action {
 
     COPY_TO(Localization.lang("Copy to")),
     COPY_MORE(Localization.lang("Copy") + "..."),
-    COPY_CITATION_KEY(Localization.lang("Copy citation key"), KeyBinding.COPY_CITATION_KEY),
-    COPY_AS_CITE_COMMAND(Localization.lang("Copy citation key with configured cite command"), KeyBinding.COPY_CITE_CITATION_KEY),
-    COPY_CITATION_KEY_AND_TITLE(Localization.lang("Copy citation key and title"), KeyBinding.COPY_CITATION_KEY_AND_TITLE),
-    COPY_CITATION_KEY_AND_LINK(Localization.lang("Copy citation key and link"), KeyBinding.COPY_CITATION_KEY_AND_LINK),
+    COPY_TITLE(Localization.lang("Copy title"), KeyBinding.COPY_TITLE),
+    COPY_KEY(Localization.lang("Copy citation key"), KeyBinding.COPY_CITATION_KEY),
+    COPY_CITE_KEY(Localization.lang("Copy citation key with configured cite command"), KeyBinding.COPY_CITE_CITATION_KEY),
+    COPY_KEY_AND_TITLE(Localization.lang("Copy citation key and title"), KeyBinding.COPY_CITATION_KEY_AND_TITLE),
+    COPY_KEY_AND_LINK(Localization.lang("Copy citation key and link"), KeyBinding.COPY_CITATION_KEY_AND_LINK),
     COPY_CITATION_HTML(Localization.lang("Copy citation (html)"), KeyBinding.COPY_PREVIEW),
     COPY_CITATION_TEXT(Localization.lang("Copy citation (text)")),
-    COPY_CITATION_MARKDOWN(Localization.lang("Copy citation (markdown)")),
     COPY_CITATION_PREVIEW(Localization.lang("Copy preview"), KeyBinding.COPY_PREVIEW),
-    COPY_FIELD_CONTENT(Localization.lang("Copy field content")),
-    COPY_FIELD_AUTHOR(Localization.lang("Author")),
-    COPY_FIELD_TITLE(Localization.lang("Title"), KeyBinding.COPY_TITLE),
-    COPY_FIELD_JOURNAL(Localization.lang("Journal")),
-    COPY_FIELD_DATE(Localization.lang("Date")),
-    COPY_FIELD_KEYWORDS(Localization.lang("Keywords")),
-    COPY_FIELD_ABSTRACT(Localization.lang("Abstract")),
     EXPORT_TO_CLIPBOARD(Localization.lang("Export to clipboard"), IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD),
     EXPORT_SELECTED_TO_CLIPBOARD(Localization.lang("Export selected entries to clipboard"), IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD),
     COPY(Localization.lang("Copy"), IconTheme.JabRefIcons.COPY, KeyBinding.COPY),
@@ -88,7 +80,7 @@ public enum StandardActions implements Action {
     EXPORT_SELECTED(Localization.lang("Export selected entries"), KeyBinding.EXPORT_SELECTED),
     CONNECT_TO_SHARED_DB(Localization.lang("Connect to shared database"), IconTheme.JabRefIcons.CONNECT_DB),
     PULL_CHANGES_FROM_SHARED_DB(Localization.lang("Pull changes from shared database"), KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE),
-    CLOSE_LIBRARY(Localization.lang("Close library"), Localization.lang("Close the current library"), IconTheme.JabRefIcons.CLOSE),
+    CLOSE_LIBRARY(Localization.lang("Close library"), Localization.lang("Close the current library"), IconTheme.JabRefIcons.CLOSE, KeyBinding.CLOSE_DATABASE),
     CLOSE_OTHER_LIBRARIES(Localization.lang("Close others"), Localization.lang("Close other libraries"), IconTheme.JabRefIcons.CLOSE),
     CLOSE_ALL_LIBRARIES(Localization.lang("Close all"), Localization.lang("Close all libraries"), IconTheme.JabRefIcons.CLOSE),
     QUIT(Localization.lang("Quit"), Localization.lang("Quit JabRef"), IconTheme.JabRefIcons.CLOSE_JABREF, KeyBinding.QUIT_JABREF),
@@ -97,9 +89,6 @@ public enum StandardActions implements Action {
     REPLACE_ALL(Localization.lang("Find and replace"), KeyBinding.REPLACE_STRING),
     MANAGE_KEYWORDS(Localization.lang("Manage keywords")),
     MASS_SET_FIELDS(Localization.lang("Manage field names & content")),
-
-    BACK(Localization.lang("Back"), IconTheme.JabRefIcons.LEFT, KeyBinding.BACK),
-    FORWARD(Localization.lang("Forward"), Localization.lang("Forward"), IconTheme.JabRefIcons.RIGHT, KeyBinding.FORWARD),
 
     AUTOMATIC_FIELD_EDITOR(Localization.lang("Automatic field editor")),
     TOGGLE_GROUPS(Localization.lang("Groups"), IconTheme.JabRefIcons.TOGGLE_GROUPS, KeyBinding.TOGGLE_GROUPS_INTERFACE),
@@ -117,8 +106,8 @@ public enum StandardActions implements Action {
     EDIT_EXISTING_STUDY(Localization.lang("Manage study definition")),
 
     OPEN_DATABASE_FOLDER(Localization.lang("Reveal in file explorer")),
-    OPEN_FOLDER(Localization.lang("Open folder(s)"), Localization.lang("Open folder"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
-    OPEN_FILE(Localization.lang("Open file(s)"), Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
+    OPEN_FOLDER(Localization.lang("Open folder"), Localization.lang("Open folder"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
+    OPEN_FILE(Localization.lang("Open file"), Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_CONSOLE(Localization.lang("Open terminal here"), Localization.lang("Open terminal here"), IconTheme.JabRefIcons.CONSOLE, KeyBinding.OPEN_CONSOLE),
     COPY_LINKED_FILES(Localization.lang("Copy linked files to folder...")),
     COPY_DOI(Localization.lang("Copy DOI")),
@@ -171,19 +160,20 @@ public enum StandardActions implements Action {
     SET_FILE_LINKS(Localization.lang("Automatically set file links"), KeyBinding.AUTOMATICALLY_LINK_FILES),
 
     EDIT_FILE_LINK(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT, KeyBinding.OPEN_CLOSE_ENTRY_EDITOR),
-    DOWNLOAD_FILE(Localization.lang("Download file(s)"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
-    REDOWNLOAD_FILE(Localization.lang("Redownload file(s)"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
+    DOWNLOAD_FILE(Localization.lang("Download file"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
+    REDOWNLOAD_FILE(Localization.lang("Redownload file"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     RENAME_FILE_TO_PATTERN(Localization.lang("Rename file to defined pattern"), IconTheme.JabRefIcons.AUTO_RENAME),
-    RENAME_FILE_TO_NAME(Localization.lang("Rename file(s) to configured filename format pattern"), IconTheme.JabRefIcons.RENAME, KeyBinding.REPLACE_STRING),
-    MOVE_FILE_TO_FOLDER(Localization.lang("Move file(s) to file directory"), IconTheme.JabRefIcons.MOVE_TO_FOLDER),
+    RENAME_FILE_TO_NAME(Localization.lang("Rename files to configured filename format pattern"), IconTheme.JabRefIcons.RENAME, KeyBinding.REPLACE_STRING),
+    MOVE_FILE_TO_FOLDER(Localization.lang("Move file to file directory"), IconTheme.JabRefIcons.MOVE_TO_FOLDER),
     MOVE_FILE_TO_FOLDER_AND_RENAME(Localization.lang("Move file to file directory and rename file")),
-    COPY_FILE_TO_FOLDER(Localization.lang("Copy linked file(s) to folder..."), IconTheme.JabRefIcons.COPY_TO_FOLDER, KeyBinding.COPY),
+    COPY_FILE_TO_FOLDER(Localization.lang("Copy linked file to folder..."), IconTheme.JabRefIcons.COPY_TO_FOLDER, KeyBinding.COPY),
     REMOVE_LINK(Localization.lang("Remove link"), IconTheme.JabRefIcons.REMOVE_LINK),
     REMOVE_LINKS(Localization.lang("Remove links"), IconTheme.JabRefIcons.REMOVE_LINK),
-    DELETE_FILE(Localization.lang("Permanently delete local file(s)"), IconTheme.JabRefIcons.DELETE_FILE, KeyBinding.DELETE_ENTRY),
+    DELETE_FILE(Localization.lang("Permanently delete local file"), IconTheme.JabRefIcons.DELETE_FILE, KeyBinding.DELETE_ENTRY),
 
     HELP(Localization.lang("Online help"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_GROUPS(Localization.lang("Open Help page"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
+    HELP_KEY_PATTERNS(Localization.lang("Help on key patterns"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_REGEX_SEARCH(Localization.lang("Help on regular expression search"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_NAME_FORMATTER(Localization.lang("Help on Name Formatting"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_SPECIAL_FIELDS(Localization.lang("Help on special fields"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
@@ -193,11 +183,12 @@ public enum StandardActions implements Action {
     OPEN_FACEBOOK("Facebook", Localization.lang("Opens JabRef's Facebook page"), IconTheme.JabRefIcons.FACEBOOK),
     OPEN_LINKEDIN("LinkedIn", Localization.lang("Opens JabRef's LinkedIn page"), IconTheme.JabRefIcons.LINKEDIN),
     OPEN_MASTODON("Mastodon", Localization.lang("Opens JabRef's Mastodon page"), IconTheme.JabRefIcons.MASTODON),
-    OPEN_PRIVACY_POLICY("Privacy policy", Localization.lang("Opens JabRef's privacy policy"), IconTheme.JabRefIcons.BOOK),
     OPEN_BLOG(Localization.lang("Blog"), Localization.lang("Opens JabRef's blog"), IconTheme.JabRefIcons.BLOG),
     OPEN_DEV_VERSION_LINK(Localization.lang("Development version"), Localization.lang("Opens a link where the current development version can be downloaded")),
     OPEN_CHANGELOG(Localization.lang("View change log"), Localization.lang("See what has been changed in the JabRef versions")),
     OPEN_GITHUB("GitHub", Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB),
+    WALKTHROUGH_MENU(Localization.lang("Walkthroughs"), IconTheme.JabRefIcons.BOOK),
+    MAIN_FILE_DIRECTORY_WALKTHROUGH(Localization.lang("Configure main file directory"), IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY),
     DONATE(Localization.lang("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE),
     OPEN_FORUM(Localization.lang("Community forum"), Localization.lang("Community forum"), IconTheme.JabRefIcons.FORUM),
     ERROR_CONSOLE(Localization.lang("View event log"), Localization.lang("Display all error messages")),
@@ -228,13 +219,7 @@ public enum StandardActions implements Action {
     GROUP_SUBGROUP_RENAME(Localization.lang("Rename subgroup"), KeyBinding.GROUP_SUBGROUP_RENAME),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
-    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache")),
-
-    GIT(Localization.lang("Git"), IconTheme.JabRefIcons.GIT_SYNC),
-    GIT_PULL(Localization.lang("Pull")),
-    GIT_PUSH(Localization.lang("Push")),
-    GIT_COMMIT(Localization.lang("Commit")),
-    GIT_SHARE(Localization.lang("Share this library to GitHub"));
+    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache"));
 
     private String text;
     private final String description;
@@ -314,8 +299,8 @@ public enum StandardActions implements Action {
         return description;
     }
 
-    public Action withText(@NonNull String text) {
-        this.text = text;
+    public Action withText(String text) {
+        this.text = Objects.requireNonNull(text);
         return this;
     }
 }

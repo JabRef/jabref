@@ -103,22 +103,9 @@ open module org.jabref.jablib {
     exports org.jabref.logic.shared.event;
     exports org.jabref.logic.citation;
     exports org.jabref.logic.crawler;
+    exports org.jabref.logic.git;
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
-    exports org.jabref.model.paging;
-    exports org.jabref.logic.git;
-    exports org.jabref.logic.git.conflicts;
-    exports org.jabref.logic.git.io;
-    exports org.jabref.logic.git.model;
-    exports org.jabref.logic.git.status;
-    exports org.jabref.logic.command;
-    exports org.jabref.logic.git.util;
-    exports org.jabref.logic.git.preferences;
-    exports org.jabref.logic.icore;
-    exports org.jabref.model.icore;
-    exports org.jabref.logic.git.merge.planning;
-    exports org.jabref.logic.git.merge.execution;
-    exports org.jabref.model.sciteTallies;
 
     requires java.base;
 
@@ -165,12 +152,12 @@ open module org.jabref.jablib {
     requires jakarta.ws.rs;
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
-    requires unirest.java.core;
-    requires unirest.modules.gson;
+    requires com.konghq.unirest.java.core;
+    requires com.konghq.unirest.modules.gson;
     // endregion
 
     // region: SQL databases
-    requires embedded.postgres;
+    requires io.zonky.test.embedded.postgres;
     requires org.tukaani.xz;
     requires org.postgresql.jdbc;
     // endregion
@@ -178,7 +165,7 @@ open module org.jabref.jablib {
     // region: Apache Commons and other (similar) helper libraries
     requires com.google.common;
     requires io.github.javadiffutils;
-    requires java.string.similarity;
+    requires info.debatty.java.string.similarity;
     requires org.apache.commons.compress;
     requires org.apache.commons.csv;
     requires org.apache.commons.io;
@@ -187,83 +174,80 @@ open module org.jabref.jablib {
     requires org.apache.commons.logging;
     // endregion
 
-    // region: caching
-    requires com.github.benmanes.caffeine;
-    // endregion
-
     // region: latex2unicode
     requires com.github.tomtung.latex2unicode;
-    requires fastparse;
+    requires com.lihaoyi.fastparse;
     requires scala.library;
     // endregion
 
-    requires jbibtex;
-    requires citeproc.java;
+    requires org.jbibtex;
+    requires de.undercouch.citeproc.java;
 
-    requires snuggletex.core;
+    requires de.rototor.snuggletex.core;
 
     requires org.apache.pdfbox;
     requires org.apache.xmpbox;
     requires com.ibm.icu;
 
-    requires flexmark;
-    requires flexmark.html2md.converter;
-    requires flexmark.util.ast;
-    requires flexmark.util.data;
+    requires com.vladsch.flexmark;
+    requires com.vladsch.flexmark.html2md.converter;
+    requires com.vladsch.flexmark.util.ast;
+    requires com.vladsch.flexmark.util.data;
 
     requires com.h2database.mvstore;
 
-    requires java.keyring;
+    requires com.github.java.keyring;
     requires org.freedesktop.dbus;
+
+    requires org.jooq.jool;
 
     // region AI
     requires ai.djl.api;
     requires ai.djl.pytorch_model_zoo;
     requires ai.djl.tokenizers;
-    requires jvm.openai;
-    requires langchain4j;
-    requires langchain4j.core;
+    requires io.github.stefanbratanov.jvm.openai;
+    requires dev.langchain4j;
+    requires dev.langchain4j.core;
+    requires dev.langchain4j.google.ai.gemini;
+    requires dev.langchain4j.hugging.face;
+    requires dev.langchain4j.mistral.ai;
+    requires dev.langchain4j.open.ai;
     uses ai.djl.engine.EngineProvider;
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
     uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
-    requires velocity.engine.core;
+    requires org.apache.velocity.engine.core;
     // endregion
 
     // region: Lucene
     /*
      * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene103.Lucene103Codec;
+    uses org.apache.lucene.codecs.lucene101.Lucene101Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;
     requires org.apache.lucene.queryparser;
     // endregion
 
-    // region: appdirs
     requires net.harawata.appdirs;
     requires com.sun.jna;
     requires com.sun.jna.platform;
-    // endregion
 
-    // region: jgit
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.Signer;
-    // endregion
+
+    requires transitive org.jspecify;
 
     // region: other libraries (alphabetically)
     requires cuid;
-    requires dd.plist;
+    requires com.googlecode.dd.plist;
     requires io.github.adr;
-    requires textFormatter;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;
     requires org.antlr.antlr4.runtime;
-    requires org.jooq.jool;
     requires org.libreoffice.uno;
-    requires transitive org.jspecify;
     // endregion
 }

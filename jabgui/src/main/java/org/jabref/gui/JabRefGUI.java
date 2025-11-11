@@ -22,7 +22,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
-import org.jabref.gui.keyboard.WalkthroughKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
@@ -33,11 +32,9 @@ import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.http.manager.HttpServerManager;
-import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
-import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -52,8 +49,8 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -85,11 +82,9 @@ public class JabRefGUI extends Application {
     private static ClipBoardManager clipBoardManager;
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
-    private static GitHandlerRegistry gitHandlerRegistry;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
-    private static LanguageServerController languageServerController;
 
     private Stage mainStage;
 
@@ -101,57 +96,51 @@ public class JabRefGUI extends Application {
 
     @Override
     public void start(Stage stage) {
-        try {
-            this.mainStage = stage;
-            Injector.setModelOrService(Stage.class, mainStage);
-
-            initialize();
-
-            JabRefGUI.mainFrame = new JabRefFrame(
-                    mainStage,
-                    dialogService,
-                    fileUpdateMonitor,
-                    preferences,
-                    aiService,
-                    stateManager,
-                    countingUndoManager,
-                    Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                    clipBoardManager,
-                    taskExecutor,
-                    gitHandlerRegistry);
-
-            openWindow();
-
-            startBackgroundTasks();
-
-            if (!fileUpdateMonitor.isActive()) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Unable to monitor file changes. Please close files " +
-                                "and processes and restart. You may encounter errors if you continue " +
-                                "with this session."));
-            }
-
-            BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
-            EasyBind.subscribe(preferences.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
-                if (enabled) {
-                    new VersionWorker(buildInfo.version,
-                            dialogService,
-                            taskExecutor,
-                            preferences)
-                            .checkForNewVersionDelayed();
-                }
-            });
-
-            setupProxy();
-        } catch (Throwable throwable) {
-            LOGGER.error("Error during initialization", throwable);
-            throw throwable;
-        }
+        this.mainStage = stage;
+        Injector.setModelOrService(Stage.class, mainStage);
 
         FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
             DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
             dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
         }));
+
+        initialize();
+
+        JabRefGUI.mainFrame = new JabRefFrame(
+                mainStage,
+                dialogService,
+                fileUpdateMonitor,
+                preferences,
+                aiService,
+                stateManager,
+                countingUndoManager,
+                Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                clipBoardManager,
+                taskExecutor);
+
+        openWindow();
+
+        startBackgroundTasks();
+
+        if (!fileUpdateMonitor.isActive()) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Unable to monitor file changes. Please close files " +
+                            "and processes and restart. You may encounter errors if you continue " +
+                            "with this session."));
+        }
+
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        EasyBind.subscribe(preferences.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
+            if (enabled) {
+                new VersionWorker(buildInfo.version,
+                        dialogService,
+                        taskExecutor,
+                        preferences)
+                        .checkForNewVersionDelayed();
+            }
+        });
+
+        setupProxy();
     }
 
     public void initialize() {
@@ -165,13 +154,9 @@ public class JabRefGUI extends Application {
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
-        gitHandlerRegistry = new GitHandlerRegistry();
-        Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
-
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
-        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
-        Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
+        Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
         IndexManager.clearOldSearchIndices();
@@ -182,18 +167,15 @@ public class JabRefGUI extends Application {
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
-        JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository);
-        Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
-
-        JabRefGUI.stateManager = new JabRefGuiStateManager();
+        JabRefGUI.stateManager = new StateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
 
         Injector.setModelOrService(KeyBindingRepository.class, preferences.getKeyBindingRepository());
 
         JabRefGUI.themeManager = new ThemeManager(
                 preferences.getWorkspacePreferences(),
-                fileUpdateMonitor
-        );
+                fileUpdateMonitor,
+                Runnable::run);
         Injector.setModelOrService(ThemeManager.class, themeManager);
 
         JabRefGUI.countingUndoManager = new CountingUndoManager();
@@ -228,16 +210,10 @@ public class JabRefGUI extends Application {
     }
 
     private void setupProxy() {
-        if (!preferences.getProxyPreferences().shouldUseProxy()) {
+        if (!preferences.getProxyPreferences().shouldUseProxy()
+                || !preferences.getProxyPreferences().shouldUseAuthentication()) {
             return;
         }
-
-        if (!preferences.getProxyPreferences().shouldUseAuthentication()) {
-            ProxyRegisterer.register(preferences.getProxyPreferences());
-            return;
-        }
-
-        assert preferences.getProxyPreferences().shouldUseAuthentication();
 
         if (preferences.getProxyPreferences().shouldPersistPassword()
                 && StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {
@@ -297,13 +273,12 @@ public class JabRefGUI extends Application {
         Scene scene = new Scene(JabRefGUI.mainFrame);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssImmediately(scene);
+        themeManager.installCss(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             TextInputKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
             SelectableTextFlowKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
-            WalkthroughKeyBindings.call(event, stateManager, preferences.getKeyBindingRepository());
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
@@ -331,7 +306,7 @@ public class JabRefGUI extends Application {
 
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
-                && preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
+            && preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             mainFrame.openLastEditedDatabases();
         }
 
@@ -429,18 +404,17 @@ public class JabRefGUI extends Application {
     // Background tasks
     public void startBackgroundTasks() {
         RemotePreferences remotePreferences = preferences.getRemotePreferences();
-        CLIMessageHandler cliMessageHandler = new CLIMessageHandler(mainFrame, preferences);
+
         if (remotePreferences.useRemoteServer()) {
             remoteListenerServerManager.openAndStart(
-                    cliMessageHandler,
+                    new CLIMessageHandler(
+                            mainFrame,
+                            preferences),
                     remotePreferences.getPort());
         }
 
         if (remotePreferences.enableHttpServer()) {
-            httpServerManager.start(stateManager, remotePreferences.getHttpServerUri());
-        }
-        if (remotePreferences.enableLanguageServer()) {
-            languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
+            httpServerManager.start(stateManager.getOpenDatabases(), remotePreferences.getHttpServerUri());
         }
     }
 
@@ -483,12 +457,6 @@ public class JabRefGUI extends Application {
                 LOGGER.trace("Shutting down http server manager");
                 httpServerManager.stop();
                 LOGGER.trace("HttpServerManager shut down");
-            });
-
-            executor.submit(() -> {
-                LOGGER.trace("Shutting down language server controller");
-                languageServerController.stop();
-                LOGGER.trace("LanguageServerController shut down");
             });
 
             executor.submit(() -> {
@@ -537,8 +505,5 @@ public class JabRefGUI extends Application {
         }
 
         LOGGER.trace("Finished stop");
-
-        // Just to be sure that we do not leave any threads running
-        System.exit(0);
     }
 }

@@ -190,17 +190,12 @@ public class BibFieldsIndexer {
         String insertFieldQuery = """
                 INSERT INTO %s ("%s", "%s", "%s", "%s")
                 VALUES (?, ?, ?, ?)
-                ON CONFLICT ("%s", "%s")
-                DO UPDATE SET "%s" = EXCLUDED."%s", "%s" = EXCLUDED."%s"
                 """.formatted(
                 schemaMainTableReference,
                 ENTRY_ID,
                 FIELD_NAME,
                 FIELD_VALUE_LITERAL,
-                FIELD_VALUE_TRANSFORMED,
-                ENTRY_ID, FIELD_NAME,
-                FIELD_VALUE_LITERAL, FIELD_VALUE_LITERAL,
-                FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
+                FIELD_VALUE_TRANSFORMED);
 
         String insertIntoSplitTable = """
                 INSERT INTO %s ("%s", "%s", "%s", "%s")
@@ -215,7 +210,7 @@ public class BibFieldsIndexer {
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery);
              PreparedStatement preparedStatementSplitValues = connection.prepareStatement(insertIntoSplitTable)) {
             String entryId = bibEntry.getId();
-            LOGGER.atTrace().setMessage("Adding entry {}").addArgument(bibEntry::getKeyAuthorTitleYear).log();
+            LOGGER.atTrace().setMessage("Adding entry {}").addArgument(() -> bibEntry.getKeyAuthorTitleYear()).log();
             for (Map.Entry<Field, String> fieldPair : bibEntry.getFieldMap().entrySet()) {
                 Field field = fieldPair.getKey();
                 String value = fieldPair.getValue();
@@ -347,23 +342,7 @@ public class BibFieldsIndexer {
                 LOGGER.error("Could not add an entry to the index.", e);
             }
         } else {
-            // Use upsert for all non-date fields to avoid duplicate key errors when the same field is inserted multiple times quickly
-            String upsertFieldQuery = """
-                    INSERT INTO %s ("%s", "%s", "%s", "%s")
-                    VALUES (?, ?, ?, ?)
-                    ON CONFLICT ("%s", "%s")
-                    DO UPDATE SET "%s" = EXCLUDED."%s", "%s" = EXCLUDED."%s"
-                    """.formatted(
-                    schemaMainTableReference,
-                    ENTRY_ID,
-                    FIELD_NAME,
-                    FIELD_VALUE_LITERAL,
-                    FIELD_VALUE_TRANSFORMED,
-                    ENTRY_ID, FIELD_NAME,
-                    FIELD_VALUE_LITERAL, FIELD_VALUE_LITERAL,
-                    FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(upsertFieldQuery)) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
                 String value = entry.getField(field).orElse("");
 
                 Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
@@ -433,11 +412,11 @@ public class BibFieldsIndexer {
         try {
             LOGGER.debug("Closing connection to Postgres server for library: {}", libraryName);
             connection.createStatement().executeUpdate("""
-                    DROP TABLE IF EXISTS %s
-                    """.formatted(schemaMainTableReference));
+                        DROP TABLE IF EXISTS %s
+                        """.formatted(schemaMainTableReference));
             connection.createStatement().executeUpdate("""
-                    DROP TABLE IF EXISTS %s
-                    """.formatted(schemaSplitValuesTableReference));
+                        DROP TABLE IF EXISTS %s
+                        """.formatted(schemaSplitValuesTableReference));
             connection.close();
         } catch (SQLException e) {
             LOGGER.error("Could not drop table for library: {}", libraryName, e);
@@ -450,8 +429,8 @@ public class BibFieldsIndexer {
 
     private void addEntryLinks(BibEntry bibEntry, Field field, PreparedStatement preparedStatementSplitValues, String entryId) {
         bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream()
-                .distinct()
-                .forEach(link -> addBatch(preparedStatementSplitValues, entryId, field, link.getKey()));
+            .distinct()
+            .forEach(link -> addBatch(preparedStatementSplitValues, entryId, field, link.getKey()));
     }
 
     private static void addGroups(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {

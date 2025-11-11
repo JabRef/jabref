@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.keybindings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.property.ListProperty;
@@ -23,10 +24,8 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OptionalObjectProperty;
-
-import org.jspecify.annotations.NonNull;
 
 public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
@@ -40,12 +39,10 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    public KeyBindingsTabViewModel(@NonNull KeyBindingRepository keyBindingRepository,
-                                   @NonNull DialogService dialogService,
-                                   @NonNull GuiPreferences preferences) {
+    public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, GuiPreferences preferences) {
         this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
-        this.dialogService = dialogService;
-        this.preferences = preferences;
+        this.dialogService = Objects.requireNonNull(dialogService);
+        this.preferences = Objects.requireNonNull(preferences);
 
         keyBindingPresets.add(new BashKeyBindingPreset());
         keyBindingPresets.add(new NewEntryBindingPreset());
@@ -86,7 +83,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
      * Searches for the term in the keybinding's localization, category, or key combination
      *
      * @param keyBinding keybinding to search in
-     * @param searchTerm term to search for
+     * @param searchTerm      term to search for
      * @return true if the term is found in the keybinding
      */
     private boolean matchesSearchTerm(KeyBinding keyBinding, String searchTerm) {

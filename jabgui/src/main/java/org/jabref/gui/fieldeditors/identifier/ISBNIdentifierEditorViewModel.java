@@ -28,7 +28,7 @@ public class ISBNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel
         super(StandardField.ISBN, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        configure(true, false, false);
+        configure(true, false);
     }
 
     @Override

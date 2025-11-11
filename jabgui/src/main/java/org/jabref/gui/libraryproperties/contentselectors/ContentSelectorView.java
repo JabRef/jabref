@@ -15,7 +15,6 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -58,7 +57,7 @@ public class ContentSelectorView extends AbstractPropertiesTabView<ContentSelect
         initListView(fieldsListView, viewModel::getFieldNamesBackingList);
         viewModel.selectedFieldProperty().bind(fieldsListView.getSelectionModel().selectedItemProperty());
         new ViewModelListCellFactory<Field>()
-                .withText(FieldTextMapper::getDisplayName)
+                .withText(Field::getDisplayName)
                 .install(fieldsListView);
         removeFieldNameButton.disableProperty().bind(viewModel.isNoFieldNameSelected());
         EasyBind.subscribe(viewModel.selectedFieldProperty(), viewModel::populateKeywords);

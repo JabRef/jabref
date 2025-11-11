@@ -12,7 +12,6 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -20,7 +19,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -59,17 +57,9 @@ class BackupManagerDiscardedTest {
 
         saveDatabase();
 
-        // We need a real CoarseChangeFilter to ensure that the BackupManager works correctly
-        CoarseChangeFilter coarseChangeFilter = new CoarseChangeFilter(bibDatabaseContext);
-
-        backupManager = BackupManager.start(mock(LibraryTab.class), bibDatabaseContext, coarseChangeFilter, bibEntryTypesManager, preferences);
+        backupManager = new BackupManager(mock(LibraryTab.class), bibDatabaseContext, bibEntryTypesManager, preferences);
 
         makeBackup();
-    }
-
-    @AfterEach
-    void shutdown() {
-        BackupManager.shutdown(bibDatabaseContext, backupDir, false);
     }
 
     private void saveDatabase() throws IOException {
@@ -81,7 +71,7 @@ class BackupManagerDiscardedTest {
                     preferences.getFieldPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager)
-                    .writeDatabase(bibDatabaseContext);
+                    .saveDatabase(bibDatabaseContext);
         }
     }
 

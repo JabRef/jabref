@@ -11,7 +11,6 @@ import java.util.Objects;
 
 import org.jabref.logic.os.OS;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,13 +24,10 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
     private final boolean internalList;
     private boolean enabled;
 
-    public ProtectedTermsList(@NonNull String description,
-                              @NonNull List<String> termList,
-                              @NonNull String location,
-                              boolean internalList) {
-        this.description = description;
-        this.termsList = termList;
-        this.location = location;
+    public ProtectedTermsList(String description, List<String> termList, String location, boolean internalList) {
+        this.description = Objects.requireNonNull(description);
+        this.termsList = Objects.requireNonNull(termList);
+        this.location = Objects.requireNonNull(location);
         this.internalList = internalList;
     }
 
@@ -81,7 +77,8 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
         return addProtectedTerm(term, false);
     }
 
-    public boolean addProtectedTerm(@NonNull String term, boolean create) {
+    public boolean addProtectedTerm(String term, boolean create) {
+        Objects.requireNonNull(term);
         // Cannot add to internal lists
         if (internalList) {
             return false;

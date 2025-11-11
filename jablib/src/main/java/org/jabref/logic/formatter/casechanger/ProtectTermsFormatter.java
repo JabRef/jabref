@@ -1,13 +1,12 @@
 package org.jabref.logic.formatter.casechanger;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.strings.StringLengthComparator;
-
-import org.jspecify.annotations.NonNull;
 
 /// Adds {} brackets around acronyms, month names and countries to preserve their case.
 /// Related formatter: [org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter]
@@ -34,7 +33,8 @@ public class ProtectTermsFormatter extends Formatter {
     }
 
     @Override
-    public String format(@NonNull String text) {
+    public String format(String text) {
+        Objects.requireNonNull(text);
         if (text.isEmpty()) {
             return text;
         }

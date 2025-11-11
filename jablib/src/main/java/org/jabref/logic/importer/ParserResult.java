@@ -3,11 +3,9 @@ package org.jabref.logic.importer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,25 +14,16 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
-
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-import org.jspecify.annotations.NonNull;
 
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
-    private final Multimap<Range, String> warnings;
-    @NonNull private BibDatabase database;
+    private final List<String> warnings = new ArrayList<>();
+    private BibDatabase database;
     private MetaData metaData;
     private Path file;
     private boolean invalid;
     private boolean changedOnMigration = false;
-
-    private final Map<BibEntry, Range> articleRanges = new IdentityHashMap<>();
-    private final Map<BibEntry, Map<Field, Range>> fieldRanges = new IdentityHashMap<>();
 
     public ParserResult() {
         this(List.of());
@@ -48,18 +37,15 @@ public class ParserResult {
         this(database, new MetaData(), new HashSet<>());
     }
 
-    public ParserResult(@NonNull BibDatabase database,
-                        @NonNull MetaData metaData,
-                        @NonNull Set<BibEntryType> entryTypes) {
-        this.database = database;
-        this.metaData = metaData;
-        this.entryTypes = entryTypes;
-        this.warnings = MultimapBuilder.hashKeys().hashSetValues().build();
+    public ParserResult(BibDatabase database, MetaData metaData, Set<BibEntryType> entryTypes) {
+        this.database = Objects.requireNonNull(database);
+        this.metaData = Objects.requireNonNull(metaData);
+        this.entryTypes = Objects.requireNonNull(entryTypes);
     }
 
     public static ParserResult fromErrorMessage(String message) {
         ParserResult parserResult = new ParserResult();
-        parserResult.addWarning(Range.NULL_RANGE, message);
+        parserResult.addWarning(message);
         parserResult.setInvalid(true);
         return parserResult;
     }
@@ -76,7 +62,7 @@ public class ParserResult {
         return fromErrorMessage(getErrorMessage(exception));
     }
 
-    public @NonNull BibDatabase getDatabase() {
+    public BibDatabase getDatabase() {
         return database;
     }
 
@@ -103,19 +89,17 @@ public class ParserResult {
     /**
      * Add a parser warning.
      *
-     * @param s String Warning text. Must be pre-translated. Only added if there isn't already a dupe.
+     * @param s String Warning text. Must be pretranslated. Only added if there isn't already a dupe.
      */
-    public void addWarning(@NonNull String s) {
-        addWarning(Range.NULL_RANGE, s);
+    public void addWarning(String s) {
+        if (!warnings.contains(s)) {
+            warnings.add(s);
+        }
     }
 
-    public void addWarning(Range range, @NonNull String s) {
-        warnings.put(range, s);
-    }
-
-    public void addException(Range range, Exception exception) {
+    public void addException(Exception exception) {
         String errorMessage = getErrorMessage(exception);
-        addWarning(range, errorMessage);
+        addWarning(errorMessage);
     }
 
     public boolean hasWarnings() {
@@ -123,11 +107,7 @@ public class ParserResult {
     }
 
     public List<String> warnings() {
-        return new ArrayList<>(warnings.values());
-    }
-
-    public Multimap<Range, String> getWarningsMap() {
-        return warnings;
+        return new ArrayList<>(warnings);
     }
 
     public boolean isInvalid() {
@@ -146,7 +126,8 @@ public class ParserResult {
         return new BibDatabaseContext(database, metaData, file);
     }
 
-    public void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
+    public void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+        Objects.requireNonNull(bibDatabaseContext);
         database = bibDatabaseContext.getDatabase();
         metaData = bibDatabaseContext.getMetaData();
         file = bibDatabaseContext.getDatabasePath().orElse(null);
@@ -165,55 +146,5 @@ public class ParserResult {
 
     public void setChangedOnMigration(boolean wasChangedOnMigration) {
         this.changedOnMigration = wasChangedOnMigration;
-    }
-
-    public Map<BibEntry, Map<Field, Range>> getFieldRanges() {
-        return fieldRanges;
-    }
-
-    public Map<BibEntry, Range> getArticleRanges() {
-        return articleRanges;
-    }
-
-    public record Range(
-            int startLine,
-            int startColumn,
-            int endLine,
-            int endColumn) {
-        public static final Range NULL_RANGE = new Range(0, 0, 0, 0);
-
-        public Range(int startLine, int startColumn) {
-            this(startLine, startColumn, startLine, startColumn);
-        }
-    }
-
-    /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
-    public Range getFieldRange(BibEntry entry, Field field) {
-        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
-
-        if (rangeMap.isEmpty()) {
-            return Range.NULL_RANGE;
-        }
-
-        Range range = rangeMap.get(field);
-        if (range != null) {
-            return range;
-        }
-
-        return field.getAlias()
-                    .map(rangeMap::get)
-                    .orElseGet(() -> getCompleteEntryIndicator(entry));
-    }
-
-    /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
-    public Range getCompleteEntryIndicator(BibEntry entry) {
-        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
-        Range range = rangeMap.get(InternalField.KEY_FIELD);
-        if (range != null) {
-            // this ensures that the line is highlighted from the beginning of the entry so it highlights "@Article{key," (but only if on the same line) and not just the citation key
-            return new Range(range.startLine(), 0, range.endLine(), range.endColumn());
-        }
-
-        return articleRanges.getOrDefault(entry, Range.NULL_RANGE);
     }
 }

@@ -5,18 +5,24 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.logic.push.CitationCommandString;
 
 public class ExternalApplicationsPreferences {
 
     private final StringProperty eMailSubject;
     private final BooleanProperty shouldAutoOpenEmailAttachmentsFolder;
+    private final ObjectProperty<CitationCommandString> citeCommand;
+
+    private final ObjectProperty<CitationCommandString> defaultCiteCommand;
 
     private final BooleanProperty useCustomTerminal;
     private final StringProperty customTerminalCommand;
@@ -27,6 +33,8 @@ public class ExternalApplicationsPreferences {
 
     public ExternalApplicationsPreferences(String eMailSubject,
                                            boolean shouldAutoOpenEmailAttachmentsFolder,
+                                           CitationCommandString citeCommand,
+                                           CitationCommandString defaultCiteCommand,
                                            Set<ExternalFileType> externalFileTypes,
                                            boolean useCustomTerminal,
                                            String customTerminalCommand,
@@ -36,6 +44,8 @@ public class ExternalApplicationsPreferences {
 
         this.eMailSubject = new SimpleStringProperty(eMailSubject);
         this.shouldAutoOpenEmailAttachmentsFolder = new SimpleBooleanProperty(shouldAutoOpenEmailAttachmentsFolder);
+        this.citeCommand = new SimpleObjectProperty<>(citeCommand);
+        this.defaultCiteCommand = new SimpleObjectProperty<>(defaultCiteCommand);
         this.externalFileTypes.addAll(externalFileTypes);
         this.useCustomTerminal = new SimpleBooleanProperty(useCustomTerminal);
         this.customTerminalCommand = new SimpleStringProperty(customTerminalCommand);
@@ -66,6 +76,18 @@ public class ExternalApplicationsPreferences {
 
     public void setAutoOpenEmailAttachmentsFolder(boolean shouldAutoOpenEmailAttachmentsFolder) {
         this.shouldAutoOpenEmailAttachmentsFolder.set(shouldAutoOpenEmailAttachmentsFolder);
+    }
+
+    public CitationCommandString getCiteCommand() {
+        return citeCommand.get();
+    }
+
+    public ObjectProperty<CitationCommandString> citeCommandProperty() {
+        return citeCommand;
+    }
+
+    public void setCiteCommand(CitationCommandString citeCommand) {
+        this.citeCommand.set(citeCommand);
     }
 
     public boolean useCustomTerminal() {
@@ -126,6 +148,10 @@ public class ExternalApplicationsPreferences {
 
     public void setKindleEmail(String kindleEmail) {
         this.kindleEmail.set(kindleEmail);
+    }
+
+    public CitationCommandString getDefaultCiteCommand() {
+        return defaultCiteCommand.getValue();
     }
 
     public ObservableSet<ExternalFileType> getExternalFileTypes() {

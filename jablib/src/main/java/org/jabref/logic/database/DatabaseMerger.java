@@ -1,6 +1,7 @@
 package org.jabref.logic.database;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
@@ -15,7 +16,6 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,18 +93,16 @@ public class DatabaseMerger {
      * @param other         the metaData to merge into the target
      * @param otherFilename the filename of the other library. Pass "unknown" if not known.
      */
-    public void mergeMetaData(@NonNull MetaData target,
-                              @NonNull MetaData other,
-                              @NonNull String otherFilename,
-                              @NonNull List<BibEntry> allOtherEntries) {
+    public void mergeMetaData(MetaData target, MetaData other, String otherFilename, List<BibEntry> allOtherEntries) {
+        Objects.requireNonNull(other);
+        Objects.requireNonNull(otherFilename);
+        Objects.requireNonNull(allOtherEntries);
+
         mergeGroups(target, other, otherFilename, allOtherEntries);
         mergeContentSelectors(target, other);
     }
 
-    private void mergeGroups(@NonNull MetaData target,
-                             @NonNull MetaData other,
-                             @NonNull String otherFilename,
-                             @NonNull List<BibEntry> allOtherEntries) {
+    private void mergeGroups(MetaData target, MetaData other, String otherFilename, List<BibEntry> allOtherEntries) {
         // Adds the specified node as a child of the current root. The group contained in <b>newGroups</b> must not be of
         // type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups</b> are
         // inserted directly, i.e. they are not deepCopy()'d.
@@ -116,8 +114,9 @@ public class DatabaseMerger {
                 try {
                     // This will cause a bug if the group already exists
                     // There will be group where the two groups are merged
+                    String newGroupName = otherFilename;
                     ExplicitGroup group = new ExplicitGroup(
-                            "Imported " + otherFilename,
+                            "Imported " + newGroupName,
                             GroupHierarchyType.INDEPENDENT,
                             keywordDelimiter);
                     newGroups.setGroup(group);

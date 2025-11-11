@@ -49,6 +49,6 @@ public class MedlineQueryTransformer extends AbstractQueryTransformer {
         if (endYear == Integer.MAX_VALUE) {
             return yearRange;
         }
-        return startYear + ":" + endYear + "[dp]";
+        return Integer.toString(startYear) + ":" + Integer.toString(endYear) + "[dp]";
     }
 }

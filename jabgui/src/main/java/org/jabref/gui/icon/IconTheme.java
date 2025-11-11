@@ -24,7 +24,6 @@ import javafx.scene.paint.Color;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 
-import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
@@ -105,12 +104,13 @@ public class IconTheme {
      * @param name The name of the icon, such as "open", "save", "saveAs" etc.
      * @return The URL to the actual image to use.
      */
-    public static URL getIconUrl(@NonNull String name) {
-        if (!KEY_TO_ICON.containsKey(name)) {
+    public static URL getIconUrl(String name) {
+        String key = Objects.requireNonNull(name, "icon name");
+        if (!KEY_TO_ICON.containsKey(key)) {
             LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
         }
-        String path = KEY_TO_ICON.getOrDefault(name, DEFAULT_ICON_PATH);
-        return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + name);
+        String path = KEY_TO_ICON.getOrDefault(key, DEFAULT_ICON_PATH);
+        return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + key);
     }
 
     /**
@@ -124,7 +124,10 @@ public class IconTheme {
      * @return A Map containing all key-value pairs found.
      */
     // FIXME: prefix can be removed?!
-    private static Map<String, String> readIconThemeFile(@NonNull URL url, @NonNull String prefix) {
+    private static Map<String, String> readIconThemeFile(URL url, String prefix) {
+        Objects.requireNonNull(url, "url");
+        Objects.requireNonNull(prefix, "prefix");
+
         Map<String, String> result = new HashMap<>();
 
         try (BufferedReader in = new BufferedReader(
@@ -367,9 +370,7 @@ public class IconTheme {
         CONSISTENCY_OPTIONAL_FIELD(MaterialDesignC.CIRCLE_OUTLINE),
         CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP),
         ABSOLUTE_PATH(MaterialDesignF.FAMILY_TREE),
-        GIT_SYNC(MaterialDesignG.GIT),
-        RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
-        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL);
+        RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE);
 
         private final JabRefIcon icon;
 

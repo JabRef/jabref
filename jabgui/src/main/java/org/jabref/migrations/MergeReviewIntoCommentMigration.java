@@ -1,6 +1,7 @@
 package org.jabref.migrations;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ParserResult;
@@ -8,7 +9,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,11 +20,11 @@ public class MergeReviewIntoCommentMigration {
                            .anyMatch(bibEntry -> bibEntry.getField(StandardField.REVIEW).isPresent());
     }
 
-    public void performMigration(@NonNull ParserResult parserResult) {
+    public void performMigration(ParserResult parserResult) {
         /* This migration only handles the non-conflicting entries.
          * For the other see this.performConflictingMigration().
          */
-        List<BibEntry> entries = parserResult.getDatabase().getEntries();
+        List<BibEntry> entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();
 
         if (!entries.isEmpty()) {
             parserResult.setChangedOnMigration(true);
@@ -36,8 +36,8 @@ public class MergeReviewIntoCommentMigration {
                .forEach(entry -> migrate(entry, parserResult));
     }
 
-    public static List<BibEntry> collectConflicts(@NonNull ParserResult parserResult) {
-        List<BibEntry> entries = parserResult.getDatabase().getEntries();
+    public static List<BibEntry> collectConflicts(ParserResult parserResult) {
+        List<BibEntry> entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();
 
         return entries.stream()
                       .filter(MergeReviewIntoCommentMigration::hasReviewField)

@@ -1,10 +1,11 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import java.util.Objects;
 import java.util.StringJoiner;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.strings.StringUtil;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -45,6 +46,7 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
 
     @Override
     public String format(String input) {
+        Objects.requireNonNull(input);
         if (StringUtil.isBlank(input)) {
             return input;
         }

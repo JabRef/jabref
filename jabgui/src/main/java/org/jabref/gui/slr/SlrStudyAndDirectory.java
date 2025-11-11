@@ -1,18 +1,17 @@
 package org.jabref.gui.slr;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.jabref.model.study.Study;
-
-import org.jspecify.annotations.NonNull;
 
 public class SlrStudyAndDirectory {
     private final Study study;
     private final Path studyDirectory;
 
-    public SlrStudyAndDirectory(@NonNull Study study, @NonNull Path studyDirectory) {
-        this.study = study;
-        this.studyDirectory = studyDirectory;
+    public SlrStudyAndDirectory(Study study, Path studyDirectory) {
+        this.study = Objects.requireNonNull(study);
+        this.studyDirectory = Objects.requireNonNull(studyDirectory);
     }
 
     public Path getStudyDirectory() {

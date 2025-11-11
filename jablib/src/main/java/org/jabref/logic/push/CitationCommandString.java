@@ -1,16 +1,15 @@
 package org.jabref.logic.push;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record CitationCommandString(@NonNull String prefix, @NonNull String delimiter, @NonNull String suffix) {
+public record CitationCommandString(String prefix, String delimiter, String suffix) {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationCommandString.class);
     private static final String CITE_KEY1 = "key1";
     private static final String CITE_KEY2 = "key2";
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return prefix + CITE_KEY1 + delimiter + CITE_KEY2 + suffix;
     }
 

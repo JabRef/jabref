@@ -64,7 +64,7 @@ public class ExportCited {
                 BibDatabase loopDatabase = citation.getLookupResult().get().database;
 
                 // If entry found
-                BibEntry clonedEntry = new BibEntry(entry);
+                BibEntry clonedEntry = (BibEntry) entry.clone();
 
                 // Insert a copy of the entry
                 entriesToInsert.add(clonedEntry);

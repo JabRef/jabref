@@ -45,7 +45,7 @@ class BibtexBiblatexRoundtripTest {
 
     @Test
     void roundTripBibtexToBiblatexIsIdentity() {
-        BibEntry clone = new BibEntry(bibtex);
+        BibEntry clone = (BibEntry) bibtex.clone();
 
         new ConvertToBiblatexCleanup().cleanup(clone);
         assertEquals(biblatex, clone);
@@ -56,7 +56,7 @@ class BibtexBiblatexRoundtripTest {
 
     @Test
     void roundTripBiblatexToBibtexIsIdentity() {
-        BibEntry clone = new BibEntry(biblatex);
+        BibEntry clone = (BibEntry) biblatex.clone();
 
         new ConvertToBibtexCleanup().cleanup(clone);
         assertEquals(bibtex, clone);

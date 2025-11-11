@@ -118,7 +118,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         citationParsingSystemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE));
         citationParsingUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
 
-        templatesTabPane.getSelectionModel().selectedItemProperty().addListener(_ -> viewModel.selectedTemplateProperty().set(getAiTemplate()));
+        templatesTabPane.getSelectionModel().selectedItemProperty().addListener(_ -> {
+            viewModel.selectedTemplateProperty().set(getAiTemplate());
+        });
     }
 
     private void initializeValidations() {

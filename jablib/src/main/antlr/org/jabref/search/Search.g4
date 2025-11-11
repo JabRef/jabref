@@ -39,7 +39,7 @@ CONTAINS: 'CONTAINS';
 MATCHES: 'MATCHES';
 NOT: 'NOT';
 
-FIELD: [A-Z]([A-Z] | '-' | '_')*;           // field name should allow for - or _
+FIELD: [A-Z]+;
 STRING_LITERAL: '"' ('\\"' | ~["])* '"';    // " should be escaped with a backslash
 TERM: ('\\' [=!~()] | ~[ \t\n\r=!~()])+;    // =!~() should be escaped with a backslash
 

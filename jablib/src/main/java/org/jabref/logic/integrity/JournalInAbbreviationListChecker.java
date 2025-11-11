@@ -1,6 +1,7 @@
 package org.jabref.logic.integrity;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -8,17 +9,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-import org.jspecify.annotations.NonNull;
-
 public class JournalInAbbreviationListChecker implements EntryChecker {
 
     private final Field field;
     private final JournalAbbreviationRepository abbreviationRepository;
 
-    public JournalInAbbreviationListChecker(@NonNull Field field,
-                                            @NonNull JournalAbbreviationRepository abbreviationRepository) {
-        this.field = field;
-        this.abbreviationRepository = abbreviationRepository;
+    public JournalInAbbreviationListChecker(Field field, JournalAbbreviationRepository abbreviationRepository) {
+        this.field = Objects.requireNonNull(field);
+        this.abbreviationRepository = Objects.requireNonNull(abbreviationRepository);
     }
 
     @Override

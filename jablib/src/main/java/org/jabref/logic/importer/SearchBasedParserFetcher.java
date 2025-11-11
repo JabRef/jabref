@@ -8,7 +8,8 @@ import java.net.URL;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.query.BaseQueryNode;
+
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
  * Provides a convenient interface for search-based fetcher, which follows the usual three-step procedure:
@@ -39,14 +40,14 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
      * This method is necessary as the performSearch method does not support certain URL parameters that are used for
      * fielded search, such as a title, author, or year parameter.
      *
-     * @param queryNode the first search node
+     * @param luceneQuery the root node of the lucene query
      */
     @Override
-    default List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+    default List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
-            urlForQuery = getURLForQuery(queryNode);
+            urlForQuery = getURLForQuery(luceneQuery);
         } catch (URISyntaxException | MalformedURLException | FetcherException e) {
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
@@ -75,7 +76,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
     /**
      * Constructs a URL based on the lucene query.
      *
-     * @param queryList the list that contains the parsed nodes
+     * @param luceneQuery the root node of the lucene query
      */
-    URL getURLForQuery(BaseQueryNode queryList) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException;
 }

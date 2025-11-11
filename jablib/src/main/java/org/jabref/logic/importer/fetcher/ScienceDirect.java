@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,9 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+        Objects.requireNonNull(entry);
+
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
         if (doi.isEmpty()) {
             // Full text fetching works only if a DOI is present

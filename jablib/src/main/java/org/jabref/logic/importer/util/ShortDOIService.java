@@ -19,7 +19,7 @@ import org.apache.hc.core5.net.URIBuilder;
  */
 public class ShortDOIService {
 
-    private static final String BASIC_URL = "https://shortdoi.org/";
+    private static final String BASIC_URL = "http://shortdoi.org/";
 
     /**
      * Obtains shortened DOI name for given DOI
@@ -35,6 +35,7 @@ public class ShortDOIService {
     }
 
     private JSONObject makeRequest(DOI doi) throws ShortDOIServiceException {
+
         URIBuilder uriBuilder;
         URL url;
 

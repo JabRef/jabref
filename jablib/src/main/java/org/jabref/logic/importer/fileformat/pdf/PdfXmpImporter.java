@@ -2,11 +2,12 @@ package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilReader;
+import org.jabref.model.entry.BibEntry;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
@@ -23,9 +24,8 @@ public class PdfXmpImporter extends PdfImporter {
         xmpUtilReader = new XmpUtilReader();
     }
 
-    @Override
-    public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
-        return new ParserResult(xmpUtilReader.readXmp(filePath, document, xmpPreferences));
+    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException {
+        return xmpUtilReader.readXmp(filePath, document, xmpPreferences);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
@@ -16,14 +17,13 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.http.SimpleHttpResponse;
-import org.jabref.model.search.query.BaseQueryNode;
 
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONElement;
-import org.jspecify.annotations.NonNull;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,10 +53,10 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         // ADR-0014
         try {
-            JSONElement payload = getPayloadJSON(queryNode);
+            JSONElement payload = getPayloadJSON(luceneQuery);
             HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
                                                          .header("authority", BASE_URL)
                                                          .header("accept", "application/json, text/plain, */*")
@@ -77,7 +77,7 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
                                                        .map(response -> response.optJSONArray("response"));
 
             if (jsonResponse.isEmpty()) {
-                LOGGER.debug("No entries found for query: {}", queryNode);
+                LOGGER.debug("No entries found for query: {}", luceneQuery);
                 return List.of();
             }
 
@@ -89,14 +89,16 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         }
     }
 
-    private JSONElement getPayloadJSON(BaseQueryNode searchQueryList) throws ParseException {
+    private JSONElement getPayloadJSON(QueryNode luceneQuery) {
         transformer = new CiteSeerQueryTransformer();
-        String transformedQuery = transformer.transformSearchQuery(searchQueryList).orElse("");
+        String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         return transformer.getJSONPayload();
     }
 
     @Override
-    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+        Objects.requireNonNull(entry);
+
         // does not use a valid DOI, but Cite Seer's id / hash available for each entry
         Optional<String> id = entry.getField(StandardField.DOI);
         if (id.isPresent()) {

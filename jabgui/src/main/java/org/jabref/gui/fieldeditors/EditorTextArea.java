@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
@@ -17,8 +18,6 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-
-import org.jspecify.annotations.NonNull;
 
 public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
 
@@ -65,7 +64,8 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
      *
      * @param handler an instance of PasteActionHandler that describes paste behavior
      */
-    public void setPasteActionHandler(@NonNull Runnable handler) {
+    public void setPasteActionHandler(Runnable handler) {
+        Objects.requireNonNull(handler);
         this.pasteActionHandler = handler;
     }
 

@@ -8,7 +8,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -27,13 +29,12 @@ import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
- * <p>
+ *
  * Note that we also have custom fetchers in place.
  * See {@link WebFetchers#getFullTextFetchers(ImportFormatPreferences, ImporterPreferences)}.
  */
@@ -48,7 +49,9 @@ public class DoiResolution implements FulltextFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+        Objects.requireNonNull(entry);
+
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isEmpty()) {
@@ -147,7 +150,7 @@ public class DoiResolution implements FulltextFetcher {
         if (citationPdfUrl.isPresent()) {
             try {
                 return Optional.of(URLUtil.create(citationPdfUrl.get()));
-            } catch (MalformedURLException _) {
+            } catch (MalformedURLException e) {
                 return Optional.empty();
             }
         }
@@ -164,7 +167,7 @@ public class DoiResolution implements FulltextFetcher {
             try {
                 URL url = base.toURI().resolve(pdfUrl.get()).toURL();
                 return Optional.of(url);
-            } catch (MalformedURLException | URISyntaxException _) {
+            } catch (MalformedURLException | URISyntaxException e) {
                 return Optional.empty();
             }
         }
@@ -172,7 +175,7 @@ public class DoiResolution implements FulltextFetcher {
     }
 
     private Optional<URL> findDistinctLinks(List<URL> urls) {
-        List<URL> distinctLinks = urls.stream().distinct().toList();
+        List<URL> distinctLinks = urls.stream().distinct().collect(Collectors.toList());
 
         if (distinctLinks.isEmpty()) {
             return Optional.empty();

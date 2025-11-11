@@ -7,13 +7,29 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FieldChangeTest {
 
-    private final BibEntry entry = new BibEntry()
+    private BibEntry entry = new BibEntry()
             .withField(StandardField.DOI, "foo");
-    private final BibEntry entryOther = new BibEntry();
-    private final FieldChange fc = new FieldChange(entry, StandardField.DOI, "foo", "bar");
+    private BibEntry entryOther = new BibEntry();
+    private FieldChange fc = new FieldChange(entry, StandardField.DOI, "foo", "bar");
+
+    @Test
+    void fieldChangeOnNullEntryNotAllowed() {
+        assertThrows(NullPointerException.class, () -> new FieldChange(null, StandardField.DOI, "foo", "bar"));
+    }
+
+    @Test
+    void fieldChangeOnNullFieldNotAllowed() {
+        assertThrows(NullPointerException.class, () -> new FieldChange(entry, null, "foo", "bar"));
+    }
+
+    @Test
+    void blankFieldChangeNotAllowed() {
+        assertThrows(NullPointerException.class, () -> new FieldChange(null, null, null, null));
+    }
 
     @Test
     void equalFieldChange() {

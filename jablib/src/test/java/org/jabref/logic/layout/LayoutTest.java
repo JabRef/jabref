@@ -16,8 +16,6 @@ import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -109,26 +107,32 @@ class LayoutTest {
                 layoutText);
     }
 
-    @ParameterizedTest
-    @CsvSource(
-            delimiterString = "->",
-            textBlock = """
-                    # || (OR)
-                    \\begin{editor||author}\\format[HTMLChars]{\\author}\\end{editor||author} -> Author
-                    # && (AND)
-                    \\begin{editor&&author}\\format[HTMLChars]{\\author}\\end{editor&&author} -> ''
-                    # ! (NOT)
-                    \\begin{!year}\\format[HTMLChars]{(no year)}\\end{!year} -> (no year)
-                    # combined (!a&&b)
-                    \\begin{!editor&&author}\\format[HTMLChars]{\\author}\\end{{!editor&&author}\\begin{editor&&!author}\\format[HTMLChars]{\\editor} (eds.)\\end{editor&&!author} -> Author
-                    """
-    )
-    void beginConditionals(String layoutString, String expected) throws IOException {
+    @Test
+    void beginConditionals() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.AUTHOR, "Author");
 
-        String layoutText = layout(layoutString, entry);
-        assertEquals(expected, layoutText);
+        // || (OR)
+        String layoutText = layout("\\begin{editor||author}\\format[HTMLChars]{\\author}\\end{editor||author}", entry);
+
+        assertEquals("Author", layoutText);
+
+        // && (AND)
+        layoutText = layout("\\begin{editor&&author}\\format[HTMLChars]{\\author}\\end{editor&&author}", entry);
+
+        assertEquals("", layoutText);
+
+        // ! (NOT)
+        layoutText = layout("\\begin{!year}\\format[HTMLChars]{(no year)}\\end{!year}", entry);
+
+        assertEquals("(no year)", layoutText);
+
+        // combined (!a&&b)
+        layoutText = layout(
+                "\\begin{!editor&&author}\\format[HTMLChars]{\\author}\\end{!editor&&author}" +
+                "\\begin{editor&&!author}\\format[HTMLChars]{\\editor} (eds.)\\end{editor&&!author}", entry);
+
+        assertEquals("Author", layoutText);
     }
 
     /**
@@ -173,8 +177,8 @@ class LayoutTest {
     void annotatedField() throws IOException {
         UnknownField annotatedField = new UnknownField("author+an");
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withField(annotatedField, "1:corresponding,2:highlight")
-                .withField(StandardField.AUTHOR, "Joe Doe and Mary Jane");
+            .withField(annotatedField, "1:corresponding,2:highlight")
+            .withField(StandardField.AUTHOR, "Joe Doe and Mary Jane");
 
         String layoutText = layout("\\author: \\author \\author+an", entry);
 

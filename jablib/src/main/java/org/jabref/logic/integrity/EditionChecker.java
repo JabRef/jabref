@@ -1,14 +1,13 @@
 package org.jabref.logic.integrity;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-
-import org.jspecify.annotations.NonNull;
+import org.jabref.model.strings.StringUtil;
 
 public class EditionChecker implements ValueChecker {
 
@@ -23,8 +22,8 @@ public class EditionChecker implements ValueChecker {
     // Allow integers in 'edition' field in BibTeX mode --> see GeneralTab.fml
     private final boolean allowIntegerEdition;
 
-    public EditionChecker(@NonNull BibDatabaseContext bibDatabaseContext, boolean allowIntegerEdition) {
-        this.bibDatabaseContextEdition = bibDatabaseContext;
+    public EditionChecker(BibDatabaseContext bibDatabaseContext, boolean allowIntegerEdition) {
+        this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
         this.allowIntegerEdition = allowIntegerEdition;
     }
 

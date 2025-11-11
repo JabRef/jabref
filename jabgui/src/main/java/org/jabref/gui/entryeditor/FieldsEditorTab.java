@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SequencedSet;
 import java.util.stream.Stream;
 
@@ -40,7 +41,6 @@ import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,20 +66,20 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private Subscription dividerPositionSubscription;
 
     public FieldsEditorTab(boolean compressed,
-                           @NonNull UndoManager undoManager,
+                           UndoManager undoManager,
                            UndoAction undoAction,
                            RedoAction redoAction,
-                           @NonNull GuiPreferences preferences,
-                           @NonNull JournalAbbreviationRepository journalAbbreviationRepository,
+                           GuiPreferences preferences,
+                           JournalAbbreviationRepository journalAbbreviationRepository,
                            StateManager stateManager,
                            PreviewPanel previewPanel) {
         super(stateManager, previewPanel);
         this.isCompressed = compressed;
-        this.undoManager = undoManager;
+        this.undoManager = Objects.requireNonNull(undoManager);
         this.undoAction = undoAction;
         this.redoAction = redoAction;
-        this.preferences = preferences;
-        this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.preferences = Objects.requireNonNull(preferences);
+        this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {

@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -28,7 +29,6 @@ import javafx.collections.ObservableMap;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -44,13 +44,13 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +85,7 @@ import org.slf4j.LoggerFactory;
 /// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to <code>false</code>. In case <code>changed</code>, use [#withChanged(boolean)].
 ///
 @AllowedToUseLogic("because it needs access to parser and writers")
-public class BibEntry {
+public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
@@ -155,19 +155,6 @@ public class BibEntry {
     public BibEntry(EntryType type, String citationKey) {
         this(type);
         this.setCitationKey(citationKey);
-    }
-
-    /**
-     * Returns a copy of this entry.
-     * This will set a new ID for the copied entry to be able to distinguish both copies.
-     * Does <em>not</em> port the listeners.
-     */
-    public BibEntry(BibEntry other) {
-        this(other.type.getValue());
-        this.fields = FXCollections.observableMap(new ConcurrentHashMap<>(other.fields));
-        this.commentsBeforeEntry = other.commentsBeforeEntry;
-        this.parsedSerialization = other.parsedSerialization;
-        this.changed = other.changed;
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -358,13 +345,12 @@ public class BibEntry {
         }
 
         return (database == null) || result.isEmpty() ?
-               result :
-               Optional.of(database.resolveForStrings(result.get()));
+                result :
+                Optional.of(database.resolveForStrings(result.get()));
     }
 
     /// Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
     //  It is **not** the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
-
     ///
     /// This id changes on each run of JabRef (because it is currently generated as increasing number).
     ///
@@ -381,7 +367,9 @@ public class BibEntry {
      * @param id The ID to be used
      */
     @VisibleForTesting
-    public void setId(@NonNull String id) {
+    public void setId(String id) {
+        Objects.requireNonNull(id, "Every BibEntry must have an ID");
+
         String oldId = this.id;
 
         eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));
@@ -443,7 +431,9 @@ public class BibEntry {
      * Sets this entry's type and sets the changed flag to true <br>
      * If the new entry type equals the old entry type no changed flag is set.
      */
-    public Optional<FieldChange> setType(@NonNull EntryType newType, EntriesEventSource eventSource) {
+    public Optional<FieldChange> setType(EntryType newType, EntriesEventSource eventSource) {
+        Objects.requireNonNull(newType);
+
         EntryType oldType = type.get();
         if (newType.equals(oldType)) {
             return Optional.empty();
@@ -508,7 +498,7 @@ public class BibEntry {
 
     /**
      * Internal method used to get the content of a field (or its alias)
-     * <p>
+     *
      * Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
      *
      * @param field         the field
@@ -548,14 +538,10 @@ public class BibEntry {
             Optional<Date> parsedDate = Date.parse(date.get());
             if (parsedDate.isPresent()) {
                 return switch (field) {
-                    case StandardField.YEAR ->
-                            parsedDate.get().getYear().map(Object::toString);
-                    case StandardField.MONTH ->
-                            parsedDate.get().getMonth().map(Month::getJabRefFormat);
-                    case StandardField.DAY ->
-                            parsedDate.get().getDay().map(Object::toString);
-                    default ->
-                            throw new IllegalStateException("Unexpected value");
+                    case StandardField.YEAR -> parsedDate.get().getYear().map(Object::toString);
+                    case StandardField.MONTH -> parsedDate.get().getMonth().map(Month::getJabRefFormat);
+                    case StandardField.DAY -> parsedDate.get().getDay().map(Object::toString);
+                    default -> throw new IllegalStateException("Unexpected value");
                 };
             } else {
                 // Date field not in valid format
@@ -608,7 +594,9 @@ public class BibEntry {
      * Sets a number of fields simultaneously. The given HashMap contains field
      * names as keys, each mapped to the value to set.
      */
-    public void setField(@NonNull Map<Field, String> fields) {
+    public void setField(Map<Field, String> fields) {
+        Objects.requireNonNull(fields, "fields must not be null");
+
         fields.forEach(this::setField);
     }
 
@@ -619,9 +607,11 @@ public class BibEntry {
      * @param value       The value to set
      * @param eventSource Source the event is sent from
      */
-    public Optional<FieldChange> setField(@NonNull Field field,
-                                          @NonNull String value,
-                                          @NonNull EntriesEventSource eventSource) {
+    public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
+        Objects.requireNonNull(field, "field name must not be null");
+        Objects.requireNonNull(value, "field value for field " + field.getName() + " must not be null");
+        Objects.requireNonNull(eventSource, "field eventSource must not be null");
+
         if (value.isEmpty()) {
             return clearField(field);
         }
@@ -702,6 +692,21 @@ public class BibEntry {
         return fields.stream().allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
 
+    /**
+     * Returns a clone of this entry. Useful for copying.
+     * This will set a new ID for the cloned entry to be able to distinguish both copies.
+     * Does <em>not</em> port the listeners.
+     */
+    @Override
+    public Object clone() {
+        BibEntry clone = new BibEntry(type.getValue());
+        clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
+        clone.commentsBeforeEntry = commentsBeforeEntry;
+        clone.parsedSerialization = parsedSerialization;
+        clone.changed = changed;
+        return clone;
+    }
+
     /// Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
     ///
     /// We do it this way to
@@ -731,7 +736,7 @@ public class BibEntry {
 
     /**
      * Creates a short textual description of the entry in the format: <code>Author1, Author2: Title (Year)</code>
-     * <p>
+     *
      * If <code>0</code> is passed as <code>maxCharacters</code>, the description is not truncated.
      *
      * @param maxCharacters The maximum number of characters (additional
@@ -749,11 +754,11 @@ public class BibEntry {
 
         StringBuilder textBuilder = new StringBuilder();
         textBuilder.append(formattedAuthors)
-                   .append(": \"")
-                   .append(formattedTitle)
-                   .append("\" (")
-                   .append(yearField)
-                   .append(')');
+                .append(": \"")
+                .append(formattedTitle)
+                .append("\" (")
+                .append(yearField)
+                .append(')');
 
         return StringUtil.limitStringLength(textBuilder.toString(), maxCharacters);
     }
@@ -821,11 +826,13 @@ public class BibEntry {
         return this;
     }
 
-    public Optional<FieldChange> putKeywords(List<String> keywords, @NonNull Character delimiter) {
+    public Optional<FieldChange> putKeywords(List<String> keywords, Character delimiter) {
+        Objects.requireNonNull(delimiter);
         return putKeywords(new KeywordList(keywords), delimiter);
     }
 
-    public Optional<FieldChange> putKeywords(@NonNull KeywordList keywords, Character delimiter) {
+    public Optional<FieldChange> putKeywords(KeywordList keywords, Character delimiter) {
+        Objects.requireNonNull(keywords);
         Optional<String> oldValue = this.getField(StandardField.KEYWORDS);
 
         if (keywords.isEmpty()) {
@@ -847,7 +854,9 @@ public class BibEntry {
      *
      * @param keyword Keyword to add
      */
-    public void addKeyword(@NonNull String keyword, Character delimiter) {
+    public void addKeyword(String keyword, Character delimiter) {
+        Objects.requireNonNull(keyword, "keyword must not be null");
+
         if (keyword.isEmpty()) {
             return;
         }
@@ -866,7 +875,8 @@ public class BibEntry {
      *
      * @param keywords Keywords to add
      */
-    public void addKeywords(@NonNull Collection<String> keywords, Character delimiter) {
+    public void addKeywords(Collection<String> keywords, Character delimiter) {
+        Objects.requireNonNull(keywords);
         keywords.forEach(keyword -> addKeyword(keyword, delimiter));
     }
 
@@ -945,7 +955,7 @@ public class BibEntry {
 
     /**
      * On purpose, this hashes the "content" of the BibEntry, not the {@link #sharedBibEntryData}.
-     * <p>
+     *
      * The content is
      *
      * <ul>
@@ -1136,15 +1146,15 @@ public class BibEntry {
      */
     public SequencedSet<String> getCites() {
         return this.getField(StandardField.CITES)
-                   .stream()
-                   .flatMap(content -> Arrays.stream(content.split(",")))
+                   .map(content -> Arrays.stream(content.split(",")))
+                   .orElseGet(Stream::empty)
                    .map(String::trim)
                    .filter(key -> !key.isEmpty())
                    .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Optional<FieldChange> setCites(SequencedSet<String> keys) {
-        return this.setField(StandardField.CITES, String.join(",", keys));
+        return this.setField(StandardField.CITES, keys.stream().collect(Collectors.joining(",")));
     }
 
     public void setDate(Date date) {
@@ -1190,7 +1200,7 @@ public class BibEntry {
      * This method. adds the given path (as file) to the entry and removes the url.
      *
      * @param linkToDownloadedFile the link to the file, which was downloaded
-     * @param downloadedFile       the path to be added to the entry
+     * @param downloadedFile the path to be added to the entry
      */
     public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
         List<LinkedFile> linkedFiles = this.getFiles();
@@ -1228,7 +1238,7 @@ public class BibEntry {
      * Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
      * intersection, priority is given to THIS entry's field value, UNLESS specified otherwise in the arguments.
      *
-     * @param other                  another BibEntry from which fields are sourced from
+     * @param other another BibEntry from which fields are sourced from
      * @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
      */
     public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {

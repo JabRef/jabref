@@ -55,7 +55,7 @@ class ThemeManagerTest {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
-        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
+        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
 
         assertEquals(Theme.Type.CUSTOM, themeManager.getActiveTheme().getType());
         assertEquals(testCss.toString(), themeManager.getActiveTheme().getName());
@@ -76,7 +76,7 @@ class ThemeManagerTest {
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
         // ActiveTheme should provide the additionalStylesheet that was created before
-        ThemeManager themeManagerCreatedBeforeFileDeleted = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
+        ThemeManager themeManagerCreatedBeforeFileDeleted = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
 
         Files.delete(testCss);
 
@@ -104,7 +104,7 @@ class ThemeManagerTest {
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
         // ActiveTheme should provide no additionalStylesheet when no file exists
-        ThemeManager themeManagerCreatedBeforeFileExists = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
+        ThemeManager themeManagerCreatedBeforeFileExists = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
         assertEquals(Optional.empty(), themeManagerCreatedBeforeFileExists.getActiveTheme()
                                                                           .getAdditionalStylesheet(),
                 "didn't expect additional stylesheet to be available because it didn't exist when theme was created");
@@ -135,7 +135,7 @@ class ThemeManagerTest {
         when(workspacePreferences.getTheme()).thenReturn(new Theme(largeCssTestFile.toString()));
 
         // ActiveTheme should provide the large additionalStylesheet that was created before
-        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
+        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
         Optional<String> cssLocationBeforeRemoved = themeManager.getActiveTheme()
                                                                 .getAdditionalStylesheet()
                                                                 .map(StyleSheet::getWebEngineStylesheet);
@@ -169,7 +169,7 @@ class ThemeManagerTest {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
-        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
+        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
 
         themeManager.installCss(scene);
 
@@ -184,7 +184,7 @@ class ThemeManagerTest {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
-        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
+        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
 
         CompletableFuture<String> webEngineStyleSheetLocation = new CompletableFuture<>();
 
@@ -220,7 +220,7 @@ class ThemeManagerTest {
         // Wait for the watch service to start
         Thread.sleep(500);
 
-        themeManager = new ThemeManager(workspacePreferences, fileUpdateMonitor);
+        themeManager = new ThemeManager(workspacePreferences, fileUpdateMonitor, Runnable::run);
 
         Scene scene = mock(Scene.class);
         when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());

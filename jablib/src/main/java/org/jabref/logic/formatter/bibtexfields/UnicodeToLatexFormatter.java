@@ -1,13 +1,13 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +17,14 @@ public class UnicodeToLatexFormatter extends Formatter implements LayoutFormatte
     private static final Logger LOGGER = LoggerFactory.getLogger(UnicodeToLatexFormatter.class);
 
     @Override
-    public String format(@NonNull String text) {
-        if (text.isEmpty()) {
-            return text;
+    public String format(String text) {
+        String result = Objects.requireNonNull(text);
+
+        if (result.isEmpty()) {
+            return result;
         }
 
-        String result = UNICODE_NORMALIZER.format(text);
+        result = UNICODE_NORMALIZER.format(result);
 
         // Standard symbols
         for (Map.Entry<String, String> unicodeLatexPair : HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP

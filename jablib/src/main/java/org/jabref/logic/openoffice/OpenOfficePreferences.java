@@ -38,7 +38,6 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyHeaderFormat;
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
-    private final BooleanProperty addSpaceAfter;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -50,8 +49,7 @@ public class OpenOfficePreferences {
                                  String cslBibliographyTitle,
                                  String cslBibliographyHeaderFormat,
                                  String cslBibliographyBodyFormat,
-                                 List<String> externalCslStyles,
-                                 boolean addSpaceAfter) {
+                                 List<String> externalCslStyles) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -63,7 +61,6 @@ public class OpenOfficePreferences {
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
-        this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
     }
 
     public void clearConnectionSettings() {
@@ -216,17 +213,5 @@ public class OpenOfficePreferences {
     public void setExternalCslStyles(List<String> paths) {
         externalCslStyles.clear();
         externalCslStyles.addAll(paths);
-    }
-
-    public boolean getAddSpaceAfter() {
-        return addSpaceAfter.get();
-    }
-
-    public BooleanProperty addSpaceAfterProperty() {
-        return addSpaceAfter;
-    }
-
-    public void setAddSpaceAfter(boolean addSpaceAfter) {
-        this.addSpaceAfter.setValue(addSpaceAfter);
     }
 }

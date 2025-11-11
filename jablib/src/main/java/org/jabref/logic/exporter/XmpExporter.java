@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -11,8 +12,6 @@ import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * A custom exporter to write bib entries to a .xmp file for further processing
@@ -36,9 +35,11 @@ public class XmpExporter extends Exporter {
      * @param entries         a list containing all entries that should be exported
      */
     @Override
-    public void export(@NonNull BibDatabaseContext databaseContext,
-                       @NonNull Path file,
-                       @NonNull List<BibEntry> entries) throws IOException {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(file);
+        Objects.requireNonNull(entries);
+
         if (entries.isEmpty()) {
             return;
         }

@@ -4,15 +4,15 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.NamedCompound;
 
 public class LastAutomaticFieldEditorEdit extends AbstractUndoableEdit {
     private final Integer affectedEntries;
-    private final NamedCompoundEdit edit;
+    private final NamedCompound edit;
 
     private final Integer tabIndex;
 
-    public LastAutomaticFieldEditorEdit(Integer affectedEntries, Integer tabIndex, NamedCompoundEdit edit) {
+    public LastAutomaticFieldEditorEdit(Integer affectedEntries, Integer tabIndex, NamedCompound edit) {
         this.affectedEntries = affectedEntries;
         this.edit = edit;
         this.tabIndex = tabIndex;
@@ -22,7 +22,7 @@ public class LastAutomaticFieldEditorEdit extends AbstractUndoableEdit {
         return affectedEntries;
     }
 
-    public NamedCompoundEdit getEdit() {
+    public NamedCompound getEdit() {
         return edit;
     }
 

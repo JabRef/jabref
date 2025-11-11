@@ -1,5 +1,6 @@
 package org.jabref.model.groups;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
@@ -28,9 +29,9 @@ class TexGroupTest {
     }
 
     @Test
-    void containsReturnsTrueForEntryInAux() throws URISyntaxException {
+    void containsReturnsTrueForEntryInAux() throws IOException, URISyntaxException {
         Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
-        TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData, "userandHost");
+        TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData);
         BibEntry inAux = new BibEntry();
         inAux.setCitationKey("Darwin1888");
 
@@ -38,9 +39,9 @@ class TexGroupTest {
     }
 
     @Test
-    void containsReturnsTrueForEntryNotInAux() throws URISyntaxException {
+    void containsReturnsTrueForEntryNotInAux() throws IOException, URISyntaxException {
         Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
-        TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData, "userandHost");
+        TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData);
         BibEntry notInAux = new BibEntry();
         notInAux.setCitationKey("NotInAux2017");
 
@@ -51,7 +52,7 @@ class TexGroupTest {
     void getFilePathReturnsRelativePath() throws URISyntaxException {
         Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         String user = "Darwin";
-        metaData.setLatexFileDirectory(user, auxFile.getParent().toString());
+        metaData.setLatexFileDirectory(user, auxFile.getParent());
         TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData, user);
 
         assertEquals("paper.aux", group.getFilePath().toString());

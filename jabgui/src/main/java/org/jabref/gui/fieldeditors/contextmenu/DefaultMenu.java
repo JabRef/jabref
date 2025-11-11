@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import javafx.scene.control.Menu;
@@ -11,7 +12,7 @@ import javafx.scene.control.TextInputControl;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -39,6 +40,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
     }
 
     private static Menu getCaseChangeMenu(TextInputControl textInputControl) {
+        Objects.requireNonNull(textInputControl.textProperty());
         Menu submenu = new Menu(Localization.lang("Change case"));
 
         for (final Formatter caseChanger : Formatters.getCaseChangers()) {

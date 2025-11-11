@@ -10,6 +10,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.FileNodeViewModel;
@@ -44,6 +45,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private CliPreferences preferences;
     @Inject private FileUpdateMonitor fileMonitor;
+    @Inject private ThemeManager themeManager;
     private ParseLatexDialogViewModel viewModel;
 
     public ParseLatexDialogView(BibDatabaseContext databaseContext) {
@@ -58,6 +60,8 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
         Button parseButton = (Button) getDialogPane().lookupButton(parseButtonType);
         parseButton.disableProperty().bind(viewModel.noFilesFoundProperty().or(
                 Bindings.isEmpty(viewModel.getCheckedFileList())));
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML

@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.strings.StringUtil;
 
 public class BooktitleChecker implements ValueChecker {
 

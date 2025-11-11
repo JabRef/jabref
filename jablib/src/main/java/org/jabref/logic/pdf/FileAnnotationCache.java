@@ -9,8 +9,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +30,12 @@ public class FileAnnotationCache {
     }
 
     public FileAnnotationCache(BibDatabaseContext context, FilePreferences filePreferences) {
-        annotationCache = Caffeine.newBuilder()
-                                  .maximumSize(CACHE_SIZE)
-                                  .build(entry -> new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context, filePreferences));
+        annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<>() {
+            @Override
+            public Map<Path, List<FileAnnotation>> load(BibEntry entry) {
+                return new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context, filePreferences);
+            }
+        });
     }
 
     /**
@@ -41,12 +45,12 @@ public class FileAnnotationCache {
      * @return Map containing a list of annotations in a list for each file
      */
     public Map<Path, List<FileAnnotation>> getFromCache(BibEntry entry) {
-        LOGGER.debug("Loading BibEntry '{}' from cache.", entry.getCitationKey().orElse(entry.getId()));
-        return annotationCache.get(entry);
+        LOGGER.debug("Loading BibEntry {} from cache.", entry.getCitationKey().orElse(entry.getId()));
+        return annotationCache.getUnchecked(entry);
     }
 
     public void remove(BibEntry entry) {
-        LOGGER.debug("Deleted BibEntry '{}' from cache.", entry.getCitationKey().orElse(entry.getId()));
+        LOGGER.debug("Deleted BibEntry {} from cache.", entry.getCitationKey().orElse(entry.getId()));
         annotationCache.invalidate(entry);
     }
 }

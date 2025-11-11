@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Default query transformer without any boolean operators

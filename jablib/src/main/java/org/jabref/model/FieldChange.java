@@ -5,8 +5,6 @@ import java.util.Objects;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * This class is used in the instance of a field being modified, removed or added.
  */
@@ -17,9 +15,9 @@ public class FieldChange {
     private final String oldValue;
     private final String newValue;
 
-    public FieldChange(@NonNull BibEntry entry, @NonNull Field field, String oldValue, String newValue) {
-        this.entry = entry;
-        this.field = field;
+    public FieldChange(BibEntry entry, Field field, String oldValue, String newValue) {
+        this.entry = Objects.requireNonNull(entry);
+        this.field = Objects.requireNonNull(field);
         this.oldValue = oldValue;
         this.newValue = newValue;
     }
@@ -51,16 +49,20 @@ public class FieldChange {
             return true;
         }
         if (obj instanceof FieldChange other) {
-            // Entry never null
-            if (!entry.equals(other.entry)) {
+            if (entry == null) {
+                if (other.entry != null) {
+                    return false;
+                }
+            } else if (!entry.equals(other.entry)) {
                 return false;
             }
-
-            // Field never null
-            if (!field.equals(other.field)) {
+            if (field == null) {
+                if (other.field != null) {
+                    return false;
+                }
+            } else if (!field.equals(other.field)) {
                 return false;
             }
-
             if (newValue == null) {
                 if (other.newValue != null) {
                     return false;
@@ -68,7 +70,6 @@ public class FieldChange {
             } else if (!newValue.equals(other.newValue)) {
                 return false;
             }
-
             if (oldValue == null) {
                 return other.oldValue == null;
             } else {

@@ -23,7 +23,7 @@ public record BibField(Field field, FieldPriority priority) implements Comparabl
     @Override
     public String toString() {
         return "BibField{" +
-                "field=" + field.getName() +
+                "field=" + field.getDisplayName() +
                 ", priority=" + priority +
                 '}';
     }

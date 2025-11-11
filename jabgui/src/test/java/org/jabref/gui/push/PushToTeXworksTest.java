@@ -1,6 +1,5 @@
 package org.jabref.gui.push;
 
-import java.util.List;
 import java.util.Map;
 
 import javafx.beans.property.SimpleMapProperty;
@@ -8,9 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.push.CitationCommandString;
-import org.jabref.logic.push.PushToApplicationPreferences;
-import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,27 +26,30 @@ class PushToTeXworksTest {
     private static final String TEXWORKS_CLIENT_PATH = "/usr/bin/texworks";
     private static final String DISPLAY_NAME = "TeXworks";
 
-    private GuiPushToTeXworks pushToTeXworks;
+    private PushToTeXworks pushToTeXworks;
 
     @BeforeEach
     void setup() {
         DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
+        GuiPreferences preferences = mock(GuiPreferences.class);
         PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
 
         // Mock the command path
         Map<String, String> commandPaths = Map.of(DISPLAY_NAME, TEXWORKS_CLIENT_PATH);
         ObservableMap<String, String> observableCommandPaths = FXCollections.observableMap(commandPaths);
         when(pushToApplicationPreferences.getCommandPaths()).thenReturn(new SimpleMapProperty<>(observableCommandPaths));
+        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
         // Mock the return value for getCiteCommand()
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         CitationCommandString mockCiteCommand = mock(CitationCommandString.class);
         when(mockCiteCommand.prefix()).thenReturn("");
-        when(mockCiteCommand.delimiter()).thenReturn("");
         when(mockCiteCommand.suffix()).thenReturn("");
-        when(pushToApplicationPreferences.getCiteCommand()).thenReturn(mockCiteCommand);
+        when(externalApplicationsPreferences.getCiteCommand()).thenReturn(mockCiteCommand);
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
         // Create a new instance of PushToTeXworks
-        pushToTeXworks = new GuiPushToTeXworks(dialogService, pushToApplicationPreferences);
+        pushToTeXworks = new PushToTeXworks(dialogService, preferences);
     }
 
     /**
@@ -83,7 +85,7 @@ class PushToTeXworksTest {
         String testKey = "TestKey";
         String[] expectedCommand = new String[] {TEXWORKS_CLIENT_PATH, "--insert-text", testKey};
 
-        pushToTeXworks.pushEntries(List.of(new BibEntry().withCitationKey(testKey)), processBuilder);
+        pushToTeXworks.pushEntries(null, null, testKey, processBuilder);
 
         verify(processBuilder).command(expectedCommand);
     }

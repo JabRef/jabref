@@ -7,8 +7,6 @@ import java.util.Optional;
 import org.jabref.logic.importer.fetcher.TrustLevel;
 import org.jabref.model.entry.BibEntry;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * This interface is used for classes that try to resolve a full-text PDF url for a BibTex entry.
  * Implementing classes should specialize on specific article sites.
@@ -22,9 +20,9 @@ public interface FulltextFetcher {
      * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
      * @throws NullPointerException if no BibTex entry is given
      * @throws java.io.IOException  if an IO operation has failed
-     * @throws FetcherException     if a fetcher-specific error occurred
+     * @throws FetcherException     if a fetcher specific error occurred
      */
-    Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException;
+    Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException;
 
     /**
      * Returns the level of trust for this fetcher.

@@ -12,7 +12,6 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +29,8 @@ public class SearchQuery {
         this(searchExpression, EnumSet.noneOf(SearchFlags.class));
     }
 
-    public SearchQuery(@NonNull String searchExpression, EnumSet<SearchFlags> searchFlags) {
-        this.searchExpression = searchExpression;
+    public SearchQuery(String searchExpression, EnumSet<SearchFlags> searchFlags) {
+        this.searchExpression = Objects.requireNonNull(searchExpression);
         this.searchFlags = searchFlags;
         try {
             this.context = getStartContext(searchExpression);

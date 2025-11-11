@@ -11,7 +11,7 @@ jobs:
     if: >
       (github.repository == 'JabRef/jabref') &&
       !(
-        (github.event.pull_request.user.login == 'dependabot[bot]') ||
+        (github.actor == 'dependabot[bot]') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
@@ -25,16 +25,12 @@ jobs:
       issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
     steps:
       - name: echo PR data
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          echo "PR Number: $PR_NUMBER"
-          echo "PR URL: $PR_URL"
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
           cat <<EOF
           PR Body:
-          $PR_BODY
+          ${{ github.event.pull_request.body }}
           EOF
       - name: Determine issue number
         id: get_issue_number
@@ -61,7 +57,7 @@ jobs:
       contents: read
       issues: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Remove assignee
         run: |
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error

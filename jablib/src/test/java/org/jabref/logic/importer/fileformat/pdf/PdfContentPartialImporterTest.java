@@ -35,6 +35,7 @@ class PdfContentPartialImporterTest {
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "1 ")
                 .withField(StandardField.TITLE, "Hello World");
         assertEquals(List.of(expected), result);
 

@@ -68,8 +68,8 @@ public String getHeading() {
 * Create constructor which initializes the fields to their default values. Write tests to ensure that everything works as expected!
 
 ```java
-public MyDialogViewModel(@NonNull Dependency dependency) {
-    this.dependency = dependency;
+public MyDialogViewModel(Dependency dependency) {
+    this.dependency = Objects.requireNonNull(dependency);
     heading.set("Hello " + dependency.getUserName());
 }
 ```

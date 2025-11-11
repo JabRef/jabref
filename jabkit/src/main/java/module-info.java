@@ -2,8 +2,7 @@ module org.jabref.jabkit {
     requires org.jabref.jablib;
 
     requires info.picocli;
-    opens org.jabref.toolkit.cli;
-    opens org.jabref.toolkit.cli.converter;
+    opens org.jabref.cli;
 
     requires transitive org.jspecify;
     requires java.prefs;
@@ -23,6 +22,7 @@ module org.jabref.jabkit {
     requires org.tinylog.impl;
 
     requires java.xml;
+  
     // region: other libraries (alphabetically)
     requires io.github.adr;
     // endregion

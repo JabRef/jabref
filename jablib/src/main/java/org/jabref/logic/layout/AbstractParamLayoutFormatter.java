@@ -44,16 +44,11 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
 
     private static void handleEscapedCharacter(StringBuilder current, char currentChar) {
         switch (currentChar) {
-            case 'n' ->
-                    current.append('\n');
-            case 't' ->
-                    current.append('\t');
-            case ',' ->
-                    current.append(',');
-            case '"' ->
-                    current.append('"');
-            case '\\' ->
-                    current.append('\\');
+            case 'n' -> current.append('\n');
+            case 't' -> current.append('\t');
+            case ',' -> current.append(',');
+            case '"' -> current.append('"');
+            case '\\' -> current.append('\\');
             default -> {
                 current.append('\\');
                 current.append(currentChar);

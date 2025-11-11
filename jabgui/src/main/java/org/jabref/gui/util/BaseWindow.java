@@ -1,5 +1,7 @@
 package org.jabref.gui.util;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -22,13 +24,17 @@ import com.airhacks.afterburner.injection.Injector;
  * See {@link org.jabref.gui.ai.components.aichat.AiChatWindow} for example.
  */
 public class BaseWindow extends Stage {
+    private final ObservableList<String> stylesheets = FXCollections.observableArrayList();
+
     public BaseWindow() {
         this.initModality(Modality.NONE);
         this.getIcons().add(IconTheme.getJabRefImage());
 
         setScene(new Scene(new Pane()));
 
+        stylesheets.addListener((ListChangeListener<String>) c -> getScene().getStylesheets().setAll(stylesheets));
         sceneProperty().addListener((obs, oldValue, newValue) -> {
+            newValue.getStylesheets().setAll(stylesheets);
             newValue.setOnKeyPressed(event -> {
                 KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
                 if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
@@ -40,6 +46,6 @@ public class BaseWindow extends Stage {
     }
 
     public void applyStylesheets(ObservableList<String> stylesheets) {
-        this.getScene().getStylesheets().setAll(stylesheets);
+        this.stylesheets.setAll(stylesheets);
     }
 }

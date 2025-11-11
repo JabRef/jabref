@@ -27,14 +27,13 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +62,9 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
     @Override
-    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+        Objects.requireNonNull(entry);
+
         Document html;
         try {
             html = getHTML(entry);
@@ -183,11 +184,11 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
      * Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
      * <p>
      *
-     * @param queryNode the search query.
+     * @param luceneQuery the search query.
      * @return A URL that lets us download a .bib file
      */
-    private static URL getUrlForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
-        String query = new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
+    private static URL getUrlForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+        String query = new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder source = new URIBuilder(SEARCH);
         source.addParameter("type", "publication");
         source.addParameter("query", query);
@@ -202,17 +203,17 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     /**
      * This method is used to send complex queries using fielded search.
      *
-     * @param queryNode the first node from the search parser
+     * @param luceneQuery the root node of the lucene query
      * @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
     @Override
-    public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         Document html;
 
         URL url;
         try {
-            url = getUrlForQuery(queryNode);
+            url = getUrlForQuery(luceneQuery);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Invalid URL", e);
         }
@@ -274,7 +275,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
     @Override
-    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getTitle();
         if (title.isEmpty()) {
             return new ArrayList<>();

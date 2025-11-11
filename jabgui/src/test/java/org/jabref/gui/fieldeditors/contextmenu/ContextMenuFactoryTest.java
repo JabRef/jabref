@@ -1,155 +1,165 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
+import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(ApplicationExtension.class)
-class ContextMenuFactoryTest {
+public class ContextMenuFactoryTest {
 
-    private FilePreferences filePreferences;
-    private BibDatabaseContext bibDatabaseContext;
+    private static boolean toolkitInitialized = false;
+
+    private DialogService dialogService;
+    private GuiPreferences guiPreferences;
+    private BibDatabaseContext databaseContext;
+    private ObservableOptionalValue<BibEntry> bibEntry;
+    private LinkedFilesEditorViewModel viewModel;
     private ContextMenuFactory factory;
+    private ContextMenuFactory.SingleContextCommandFactory singleCommandFactory;
+    private ContextMenuFactory.MultiContextCommandFactory multiCommandFactory;
+
+    @BeforeAll
+    public static void initToolkit() {
+        if (!toolkitInitialized) {
+            try {
+                Platform.startup(() -> { });
+            } catch (IllegalStateException e) {
+                // Toolkit already initialized by another thread/test
+            }
+            toolkitInitialized = true;
+        }
+    }
 
     @BeforeEach
-    @SuppressWarnings("unchecked")
     public void setUp() {
-        GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ObservableOptionalValue<BibEntry> bibEntry = (ObservableOptionalValue<BibEntry>) mock(ObservableOptionalValue.class);
-        when(bibEntry.getValue()).thenReturn(Optional.of(new BibEntry()));
+        dialogService = mock(DialogService.class);
+        guiPreferences = mock(GuiPreferences.class);
+        databaseContext = mock(BibDatabaseContext.class);
+        viewModel = mock(LinkedFilesEditorViewModel.class);
 
-        bibDatabaseContext = mock(BibDatabaseContext.class);
-        filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        SimpleObjectProperty<BibEntry> bibEntryProperty = new SimpleObjectProperty<>();
+        bibEntry = EasyBind.wrapNullable(bibEntryProperty);
+        bibEntryProperty.set(new BibEntry());
 
-        when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
+        singleCommandFactory = (action, file) ->
+                new ContextAction(action, file, databaseContext, bibEntry, guiPreferences, viewModel);
+
+        multiCommandFactory = (action, files) ->
+                new MultiContextAction(action, files, databaseContext, bibEntry, guiPreferences, viewModel);
 
         factory = new ContextMenuFactory(
-                mock(DialogService.class),
+                dialogService,
                 guiPreferences,
-                bibDatabaseContext,
+                databaseContext,
                 bibEntry,
-                mock(LinkedFilesEditorViewModel.class)
+                viewModel,
+                singleCommandFactory,
+                multiCommandFactory
         );
     }
 
-    @Test
-    void createMenuForSelectionNull() {
-        assertThrows(NullPointerException.class, () -> factory.createMenuForSelection(null),
-                "Factory should reject null selection");
+    private LinkedFileViewModel mockFileWithLink(String link) {
+        LinkedFile linkedFile = mock(LinkedFile.class);
+        when(linkedFile.isOnlineLink()).thenReturn(false);
+        when(linkedFile.linkProperty()).thenReturn(new SimpleStringProperty(link));
+        when(linkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
+
+        LinkedFileViewModel file = mock(LinkedFileViewModel.class);
+        when(file.getFile()).thenReturn(linkedFile);
+        when(file.isGeneratedNameSameAsOriginal()).thenReturn(false);
+        when(file.isGeneratedPathSameAsOriginal()).thenReturn(false);
+
+        return file;
     }
 
     @Test
-    void createMenuForSelectionEmpty() {
-        ObservableList<LinkedFileViewModel> emptySelection = FXCollections.observableArrayList();
-        ContextMenu contextMenu = factory.createMenuForSelection(emptySelection);
+    public void createContextMenuForSingleFile() {
+        LinkedFileViewModel file = mockFileWithLink("file1.pdf");
+        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file);
 
-        assertNotNull(contextMenu);
-        assertTrue(contextMenu.getItems().isEmpty(), "Menu should be empty for empty selection");
+        ContextMenu menu = factory.createForSelection(files);
+        assertNotNull(menu);
+        assertFalse(menu.getItems().isEmpty());
     }
 
     @Test
-    void createMenuForSingleOfflineFile() {
-        LinkedFileViewModel offlineExistingFileViewModel = mockOfflineExistingFileViewModel(
-                bibDatabaseContext, filePreferences, ""
-        );
+    public void createContextMenuForMultipleFiles() {
+        LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
+        LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
+        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file1, file2);
 
-        ObservableList<LinkedFileViewModel> singleSelection = FXCollections.observableArrayList(offlineExistingFileViewModel);
-
-        ContextMenu contextMenu = factory.createMenuForSelection(singleSelection);
-
-        assertNotNull(contextMenu);
-        assertFalse(contextMenu.getItems().isEmpty(), "Single-selection menu should not be empty");
+        ContextMenu menu = factory.createForSelection(files);
+        assertNotNull(menu);
+        assertEquals(1, menu.getItems().size());
     }
 
     @Test
-    void createMenuForOfflineAndOnlineFilesMixed() {
-        LinkedFileViewModel offlineExistingFileViewModel = mockOfflineExistingFileViewModel(
-                bibDatabaseContext, filePreferences, "https://example.com/file.pdf"
-        );
-        LinkedFileViewModel onlineFileViewModel = mockOnlineFileViewModel();
+    public void createContextMenuForEmptySelection() {
+        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList();
+        ContextMenu menu = factory.createForSelection(files);
 
-        ObservableList<LinkedFileViewModel> multiSelection = FXCollections.observableArrayList(
-                List.of(offlineExistingFileViewModel, onlineFileViewModel)
-        );
-
-        ContextMenu contextMenu = factory.createMenuForSelection(multiSelection);
-
-        assertNotNull(contextMenu);
-        assertFalse(contextMenu.getItems().isEmpty(),
-                "Multi-selection menu should not be empty");
-        assertTrue(containsMenuItemWithText(contextMenu, "Remove link"),
-                "Menu should contain 'Remove link' in multi-selection");
-        assertTrue(containsMenuItemWithText(contextMenu, "Copy linked file"),
-                "Menu should contain 'Copy linked file' item");
+        assertNotNull(menu);
+        assertTrue(menu.getItems().isEmpty());
     }
 
-    private static boolean containsMenuItemWithText(ContextMenu contextMenu, String expectedFragment) {
-        return contextMenu.getItems().stream()
-                          .map(MenuItem::getText)
-                          .filter(Objects::nonNull)
-                          .anyMatch(text -> text.contains(expectedFragment));
+    @Test
+    public void removeLinkActionCallsViewModelForSingleFile() {
+        LinkedFileViewModel file = mockFileWithLink("file1.pdf");
+        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file);
+        ContextMenu menu = factory.createForSelection(files);
+
+        menu.getItems().stream()
+                .filter(item -> {
+                    String text = item.getText();
+                    return text != null && text.toLowerCase().contains("remove link");
+                })
+                .findFirst()
+                .ifPresent(item -> item.getOnAction().handle(null));
+
+        verify(viewModel).removeFileLink(file);
     }
 
-    private static LinkedFileViewModel mockOfflineExistingFileViewModel(BibDatabaseContext bibDatabaseContext,
-                                                                        FilePreferences filePreferences,
-                                                                        String sourceUrl) {
-        LinkedFile modelLinkedFile = mock(LinkedFile.class, Answers.RETURNS_DEEP_STUBS);
-        when(modelLinkedFile.isOnlineLink()).thenReturn(false);
-        when(modelLinkedFile.findIn(bibDatabaseContext, filePreferences)).thenReturn(Optional.of(Path.of("dummy.pdf")));
-        when(modelLinkedFile.linkProperty()).thenReturn(new SimpleStringProperty("dummy.pdf"));
-        when(modelLinkedFile.getSourceUrl()).thenReturn(sourceUrl == null ? "" : sourceUrl);
-        when(modelLinkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(sourceUrl == null ? "" : sourceUrl));
+    @Test
+    public void removeLinksActionCallsViewModelForAllSelectedFiles() {
+        LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
+        LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
 
-        LinkedFileViewModel fileViewModel = mock(LinkedFileViewModel.class, Answers.RETURNS_DEEP_STUBS);
-        when(fileViewModel.getFile()).thenReturn(modelLinkedFile);
-        when(fileViewModel.isGeneratedPathSameAsOriginal()).thenReturn(false);
-        when(fileViewModel.isGeneratedNameSameAsOriginal()).thenReturn(false);
-        return fileViewModel;
-    }
+        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file1, file2);
+        ContextMenu menu = factory.createForSelection(files);
 
-    private static LinkedFileViewModel mockOnlineFileViewModel() {
-        LinkedFile modelLinkedFile = mock(LinkedFile.class, Answers.RETURNS_DEEP_STUBS);
-        when(modelLinkedFile.isOnlineLink()).thenReturn(true);
-        when(modelLinkedFile.findIn(any(), any())).thenReturn(Optional.empty());
-        when(modelLinkedFile.linkProperty()).thenReturn(new SimpleStringProperty("https://host/file2.pdf"));
-        when(modelLinkedFile.getSourceUrl()).thenReturn("https://host/file2.pdf");
-        when(modelLinkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty("https://host/file2.pdf"));
+        menu.getItems().stream()
+                .filter(item -> {
+                    String text = item.getText();
+                    return text != null && text.toLowerCase().contains("remove links");
+                })
+                .findFirst()
+                .ifPresent(item -> item.getOnAction().handle(null));
 
-        LinkedFileViewModel fileViewModel = mock(LinkedFileViewModel.class, Answers.RETURNS_DEEP_STUBS);
-        when(fileViewModel.getFile()).thenReturn(modelLinkedFile);
-        when(fileViewModel.isGeneratedPathSameAsOriginal()).thenReturn(false);
-        when(fileViewModel.isGeneratedNameSameAsOriginal()).thenReturn(false);
-        return fileViewModel;
+        verify(viewModel).removeFileLink(file1);
+        verify(viewModel).removeFileLink(file2);
     }
 }

@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import java.io.BufferedReader;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -15,9 +16,10 @@ import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,10 +28,23 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ImporterTest {
+
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    void isRecognizedFormatWithNullForBufferedReaderThrowsException(Importer format) {
+        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((BufferedReader) null));
+    }
+
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
+        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
+    }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
@@ -65,6 +80,7 @@ public class ImporterTest {
     public static Stream<Importer> instancesToTest() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         return Stream.of(
                 // all classes implementing {@link Importer}
                 // sorted alphabetically

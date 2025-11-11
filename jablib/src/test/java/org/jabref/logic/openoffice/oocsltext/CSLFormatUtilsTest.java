@@ -176,7 +176,7 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
+                        "Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” Edited by Phil Taylor. <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
                         STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
                 ),
 
@@ -490,7 +490,8 @@ class CSLFormatUtilsTest {
      * The numeric index should change to the provided "current number".
      * The rest of the citation should stay as it is (other numbers in the body shouldn't be affected).
      *
-     * @implSpec <ol>
+     * @implSpec
+     * <ol>
      * <li>Assumes that {@link CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} works as expected.</li>
      * <li>Assumes that the method {@link CSLFormatUtils#transformHTML(String) transformHTML} works as expected.</li>
      * <li>Run this test ONLY on numeric Citation Styles.</li>

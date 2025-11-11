@@ -1,5 +1,6 @@
 package org.jabref.logic.bibtex;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
@@ -8,9 +9,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode}-dependent results
@@ -21,16 +19,17 @@ public class TypedBibEntry {
     private final Optional<BibDatabase> database;
     private final BibDatabaseMode mode;
 
-    public TypedBibEntry(@NonNull BibEntry entry, @Nullable BibDatabaseMode mode) {
-        this.entry = entry;
+    public TypedBibEntry(BibEntry entry, BibDatabaseMode mode) {
+        this.entry = Objects.requireNonNull(entry);
         this.database = Optional.empty();
+        // mode may be null
         this.mode = mode;
     }
 
-    public TypedBibEntry(@NonNull BibEntry entry, @NonNull BibDatabaseContext databaseContext) {
-        this.entry = entry;
+    public TypedBibEntry(BibEntry entry, BibDatabaseContext databaseContext) {
+        this.entry = Objects.requireNonNull(entry);
         this.database = Optional.of(databaseContext.getDatabase());
-        this.mode = databaseContext.getMode();
+        this.mode = Objects.requireNonNull(databaseContext).getMode();
     }
 
     /**

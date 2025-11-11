@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -41,7 +42,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -214,12 +214,13 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     /**
      * This is the real file opening. Should be called via {@link #openFile(Path)}
-     * <p>
+     *
      * Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
      *
      * @param file the file, may be NOT null, but may not be existing
      */
-    private void openTheFile(@NonNull Path file) {
+    private void openTheFile(Path file) {
+        Objects.requireNonNull(file);
         if (!Files.exists(file)) {
             return;
         }
@@ -280,18 +281,18 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (parserResult.getDatabase().isShared()) {
-            openSharedDatabase(
-                    parserResult,
-                    tabContainer,
-                    dialogService,
-                    preferences,
-                    aiService,
-                    stateManager,
-                    entryTypesManager,
-                    fileUpdateMonitor,
-                    undoManager,
-                    clipboardManager,
-                    taskExecutor);
+                         openSharedDatabase(
+                                 parserResult,
+                                 tabContainer,
+                                 dialogService,
+                                 preferences,
+                                 aiService,
+                                 stateManager,
+                                 entryTypesManager,
+                                 fileUpdateMonitor,
+                                 undoManager,
+                                 clipboardManager,
+                                 taskExecutor);
         }
         return parserResult;
     }

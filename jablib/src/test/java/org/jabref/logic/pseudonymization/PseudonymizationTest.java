@@ -100,7 +100,7 @@ class PseudonymizationTest {
 
         Pseudonymization pseudonymization = new Pseudonymization();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
-        databaseWriter.writeDatabase(result.bibDatabaseContext());
+        databaseWriter.saveDatabase(result.bibDatabaseContext());
 
         Path expectedPath = Path.of(PseudonymizationTest.class.getResource("Chocolate-pseudnomyized.bib").toURI());
         assertEquals(Files.readString(expectedPath), stringWriter.toString());
@@ -121,7 +121,7 @@ class PseudonymizationTest {
 
         Pseudonymization pseudonymization = new Pseudonymization();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
-        databaseWriter.writeDatabase(result.bibDatabaseContext());
+        databaseWriter.saveDatabase(result.bibDatabaseContext());
 
         Files.writeString(target, stringWriter.toString());
 

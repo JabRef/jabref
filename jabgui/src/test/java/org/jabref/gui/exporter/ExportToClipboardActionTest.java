@@ -28,7 +28,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -85,9 +84,7 @@ class ExportToClipboardActionTest {
     void executeOnSuccess() {
         Exporter selectedExporter = new Exporter("html", "HTML", StandardFileType.HTML) {
             @Override
-            public void export(@NonNull BibDatabaseContext databaseContext,
-                               Path file,
-                               @NonNull List<BibEntry> entries) {
+            public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) {
             }
         };
 

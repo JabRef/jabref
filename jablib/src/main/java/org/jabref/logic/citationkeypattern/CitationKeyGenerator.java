@@ -7,14 +7,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.strings.StringUtil;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +51,10 @@ public class CitationKeyGenerator extends BracketedPattern {
                 citationKeyPatternPreferences);
     }
 
-    public CitationKeyGenerator(@NonNull AbstractCitationKeyPatterns citeKeyPattern,
-                                @NonNull BibDatabase database,
-                                @NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
-        this.citeKeyPattern = citeKeyPattern;
-        this.database = database;
-        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+    public CitationKeyGenerator(AbstractCitationKeyPatterns citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
+        this.database = Objects.requireNonNull(database);
+        this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
         this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
     }
 
@@ -103,7 +100,8 @@ public class CitationKeyGenerator extends BracketedPattern {
      * @param entry a {@link BibEntry}
      * @return a citation key based on the user's preferences
      */
-    public String generateKey(@NonNull BibEntry entry) {
+    public String generateKey(BibEntry entry) {
+        Objects.requireNonNull(entry);
         String currentKey = entry.getCitationKey().orElse(null);
 
         String newKey = createCitationKeyFromPattern(entry);
@@ -137,9 +135,7 @@ public class CitationKeyGenerator extends BracketedPattern {
             int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
             String moddedKey;
 
-            // @formatter:off
             do {
-                // @formatter:on
                 moddedKey = key + getAppendix(number);
                 number++;
 

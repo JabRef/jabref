@@ -41,8 +41,8 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.http.SimpleHttpResponse;
+import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
@@ -121,9 +121,7 @@ public class URLDownload {
         try {
             String urlToCheck = source.toString();
             String locationHeader;
-            // @formatter:off
             do {
-                // @formatter:on
                 retries++;
                 HttpResponse<String> response = Unirest.head(urlToCheck).asString();
                 // Check if we have redirects, e.g. arxiv will give otherwise content type html for the original url
@@ -369,8 +367,8 @@ public class URLDownload {
             }
 
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again
@@ -384,7 +382,7 @@ public class URLDownload {
             } else if (status >= 400) {
                 // in case of an error, propagate the error message
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
-                LOGGER.info("{}: {}", FetcherException.getRedactedUrl(this.source.toString()), httpResponse);
+                LOGGER.info("{}: {}", FetcherException.getRedactedUrl(this.source), httpResponse);
                 if (status < 500) {
                     throw new FetcherClientException(this.source, httpResponse);
                 } else {

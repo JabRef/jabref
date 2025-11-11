@@ -21,10 +21,7 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
 
     String getName();
 
-    String getShortTitle();
-
     default boolean containsCaseIndependent(String searchTerm) {
-        return this.getDisplayName().toLowerCase(Locale.ROOT).contains(searchTerm.toLowerCase(Locale.ROOT))
-                || this.getShortTitle().toLowerCase(Locale.ROOT).contains(searchTerm.toLowerCase(Locale.ROOT));
+        return this.getDisplayName().toLowerCase(Locale.ROOT).contains(searchTerm.toLowerCase(Locale.ROOT));
     }
 }

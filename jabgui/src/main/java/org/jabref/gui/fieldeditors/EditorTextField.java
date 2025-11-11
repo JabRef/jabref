@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
@@ -15,8 +16,6 @@ import javafx.scene.layout.Priority;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-
-import org.jspecify.annotations.NonNull;
 
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
@@ -53,7 +52,8 @@ public class EditorTextField extends TextField implements Initializable, Context
         // not needed
     }
 
-    public void setAdditionalPasteActionHandler(@NonNull Runnable handler) {
+    public void setAdditionalPasteActionHandler(Runnable handler) {
+        Objects.requireNonNull(handler);
         this.additionalPasteActionHandler = handler;
     }
 

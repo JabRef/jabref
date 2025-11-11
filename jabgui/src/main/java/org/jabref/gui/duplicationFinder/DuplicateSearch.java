@@ -23,7 +23,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -57,9 +57,6 @@ public class DuplicateSearch extends SimpleCommand {
     private final BibEntryTypesManager entryTypesManager;
     private final TaskExecutor taskExecutor;
 
-    // For "apply to all entries" functionality.
-    private DuplicateResolverResult rememberedDecision;
-
     public DuplicateSearch(Supplier<LibraryTab> tabSupplier,
                            DialogService dialogService,
                            StateManager stateManager,
@@ -86,7 +83,6 @@ public class DuplicateSearch extends SimpleCommand {
         libraryAnalyzed.set(false);
         autoRemoveExactDuplicates.set(false);
         duplicateCount.set(0);
-        rememberedDecision = null;
 
         if (entries.size() < 2) {
             return;
@@ -164,23 +160,9 @@ public class DuplicateSearch extends SimpleCommand {
 
         dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
 
-        DuplicateResolverResult resolverResult;
+        DuplicateResolverResult resolverResult = dialogService.showCustomDialogAndWait(dialog)
+                                                              .orElse(DuplicateResolverResult.BREAK);
 
-        if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries() && rememberedDecision != null) {
-            resolverResult = rememberedDecision;
-        } else {
-            resolverResult = dialogService.showCustomDialogAndWait(dialog)
-                                          .orElse(DuplicateResolverResult.BREAK);
-
-            if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
-                rememberedDecision = resolverResult;
-            }
-        }
-
-        applyDecisionToResult(result, first, second, resolverResult, dialog);
-    }
-
-    private void applyDecisionToResult(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverResult resolverResult, DuplicateResolverDialog dialog) {
         if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)
                 || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
             result.remove(second);
@@ -208,7 +190,7 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         LibraryTab libraryTab = tabSupplier.get();
-        final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("duplicate removal"));
+        final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
             compoundEdit.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));

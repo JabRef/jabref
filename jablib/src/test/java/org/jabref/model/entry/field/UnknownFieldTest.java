@@ -14,4 +14,10 @@ class UnknownFieldTest {
     void fieldsConsideredEqualINameDifferByCapitalization() {
         assertEquals(new UnknownField("tiTle"), new UnknownField("Title"));
     }
+
+    @Test
+    void displayNameConstructor() {
+        UnknownField cAsED = UnknownField.fromDisplayName("cAsEd");
+        assertEquals(new UnknownField("cased", "cAsEd"), cAsED);
+    }
 }

@@ -6,18 +6,15 @@ import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.paint.Color;
 
-import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
-
-import org.jspecify.annotations.NonNull;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Base class for all groups.
  */
-@AllowedToUseLogic("Uses StringUtil temporarily")
 public abstract class AbstractGroup implements SearchMatcher {
 
     /**
@@ -28,15 +25,14 @@ public abstract class AbstractGroup implements SearchMatcher {
      * The hierarchical context of the group.
      */
     protected final GroupHierarchyType context;
-    // group color stored as a String (e.g., hex like "#RRGGBB" or any CSS-compatible representation)
-    protected Optional<String> color = Optional.empty();
+    protected Optional<Color> color = Optional.empty();
     protected boolean isExpanded = true;
     protected Optional<String> description = Optional.empty();
     protected Optional<String> iconName = Optional.empty();
 
-    protected AbstractGroup(String name, @NonNull GroupHierarchyType context) {
+    protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name.setValue(name);
-        this.context = context;
+        this.context = Objects.requireNonNull(context);
     }
 
     @Override
@@ -69,18 +65,19 @@ public abstract class AbstractGroup implements SearchMatcher {
         return Objects.hash(name.getValue(), description, context);
     }
 
-    public Optional<String> getColor() {
+    public Optional<Color> getColor() {
         return color;
     }
 
-    /**
-     * Sets the group's color string. Pass null or blank to clear.
-     */
+    public void setColor(Color color) {
+        this.color = Optional.ofNullable(color);
+    }
+
     public void setColor(String colorString) {
         if (StringUtil.isBlank(colorString)) {
-            this.color = Optional.empty();
+            color = Optional.empty();
         } else {
-            this.color = Optional.of(colorString);
+            setColor(Color.valueOf(colorString));
         }
     }
 

@@ -8,8 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
@@ -17,14 +15,12 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.ListUtil;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Matches entries if a given field contains a specified word.
  */
-@AllowedToUseLogic("Uses StringUtil temporarily")
 public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger {
 
     protected final Character keywordSeparator;
@@ -69,7 +65,9 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     }
 
     @Override
-    public List<FieldChange> add(@NonNull Collection<BibEntry> entriesToAdd) {
+    public List<FieldChange> add(Collection<BibEntry> entriesToAdd) {
+        Objects.requireNonNull(entriesToAdd);
+
         List<FieldChange> changes = new ArrayList<>();
         for (BibEntry entry : new ArrayList<>(entriesToAdd)) {
             if (!contains(entry)) {
@@ -84,7 +82,8 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     }
 
     @Override
-    public List<FieldChange> remove(@NonNull List<BibEntry> entriesToRemove) {
+    public List<FieldChange> remove(List<BibEntry> entriesToRemove) {
+        Objects.requireNonNull(entriesToRemove);
         List<FieldChange> changes = new ArrayList<>();
         for (BibEntry entry : new ArrayList<>(entriesToRemove)) {
             if (contains(entry)) {
@@ -141,7 +140,6 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         boolean contains(BibEntry entry);
     }
 
-    @AllowedToUseLogic("Uses StringUtil temporarily")
     class StringSearchStrategy implements SearchStrategy {
         Set<String> searchWords;
 

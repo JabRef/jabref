@@ -25,10 +25,8 @@ public abstract class ImportCleanup {
      */
     public static ImportCleanup targeting(BibDatabaseMode mode, @NonNull FieldPreferences fieldPreferences) {
         return switch (mode) {
-            case BIBTEX ->
-                    new ImportCleanupBibtex(fieldPreferences);
-            case BIBLATEX ->
-                    new ImportCleanupBiblatex(fieldPreferences);
+            case BIBTEX -> new ImportCleanupBibtex(fieldPreferences);
+            case BIBLATEX -> new ImportCleanupBiblatex(fieldPreferences);
         };
     }
 

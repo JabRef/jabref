@@ -2,6 +2,7 @@ package org.jabref.gui.help;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -19,7 +20,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.google.common.collect.Lists;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,13 +37,10 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
 
-    public AboutDialogViewModel(@NonNull DialogService dialogService,
-                                @NonNull GuiPreferences preferences,
-                                @NonNull ClipBoardManager clipBoardManager,
-                                BuildInfo buildInfo) {
-        this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.clipBoardManager = clipBoardManager;
+    public AboutDialogViewModel(DialogService dialogService, GuiPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
+        this.dialogService = Objects.requireNonNull(dialogService);
+        this.preferences = Objects.requireNonNull(preferences);
+        this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         String[] version = buildInfo.version.getFullVersion().split("--");
         heading.set("JabRef " + version[0]);
 
@@ -126,7 +123,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
         openWebsite(URLs.LIBRARIES_URL);
     }
 
-    public void openGitHub() {
+    public void openGithub() {
         openWebsite(URLs.GITHUB_URL);
     }
 

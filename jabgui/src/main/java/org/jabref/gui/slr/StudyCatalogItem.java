@@ -9,8 +9,6 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.model.study.StudyDatabase;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * View representation of {@link StudyDatabase}
  */
@@ -18,8 +16,8 @@ public class StudyCatalogItem {
     private final StringProperty name;
     private final BooleanProperty enabled;
 
-    public StudyCatalogItem(@NonNull String name, boolean enabled) {
-        this.name = new SimpleStringProperty(name);
+    public StudyCatalogItem(String name, boolean enabled) {
+        this.name = new SimpleStringProperty(Objects.requireNonNull(name));
         this.enabled = new SimpleBooleanProperty(enabled);
     }
 

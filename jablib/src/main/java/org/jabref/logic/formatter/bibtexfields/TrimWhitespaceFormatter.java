@@ -1,9 +1,10 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import java.util.Objects;
+
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,8 @@ public class TrimWhitespaceFormatter extends Formatter {
     }
 
     @Override
-    public String format(@NonNull String value) {
+    public String format(String value) {
+        Objects.requireNonNull(value);
         String result = value.trim();
         LOGGER.trace("Formatted '{}' to '{}'", value, result);
         return result;

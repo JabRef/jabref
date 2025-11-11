@@ -6,6 +6,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -22,11 +23,9 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
-import org.controlsfx.control.SearchableComboBox;
 
 public class FieldFormatterCleanupsPanel extends VBox {
 
@@ -35,8 +34,8 @@ public class FieldFormatterCleanupsPanel extends VBox {
     @FXML private TableColumn<FieldFormatterCleanup, Field> fieldColumn;
     @FXML private TableColumn<FieldFormatterCleanup, Formatter> formatterColumn;
     @FXML private TableColumn<FieldFormatterCleanup, Field> actionsColumn;
-    @FXML private SearchableComboBox<Field> addableFields;
-    @FXML private SearchableComboBox<Formatter> addableFormatters;
+    @FXML private ComboBox<Field> addableFields;
+    @FXML private ComboBox<Formatter> addableFormatters;
 
     @Inject private StateManager stateManager;
 
@@ -64,7 +63,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
         fieldColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getField()));
         new ValueTableCellFactory<FieldFormatterCleanup, Field>()
-                .withText(FieldTextMapper::getDisplayName)
+                .withText(Field::getDisplayName)
                 .install(fieldColumn);
 
         formatterColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getFormatter()));
@@ -74,9 +73,9 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
         actionsColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getField()));
         new ValueTableCellFactory<FieldFormatterCleanup, Field>()
-                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(field -> Localization.lang("Remove formatter for %0", FieldTextMapper.getDisplayName(field)))
-                .withOnMouseClickedEvent(_ -> _ -> viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem()))
+                .withGraphic(field -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(field -> Localization.lang("Remove formatter for %0", field.getDisplayName()))
+                .withOnMouseClickedEvent(item -> event -> viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem()))
                 .install(actionsColumn);
 
         viewModel.selectedCleanupProperty().setValue(cleanupsList.getSelectionModel());
@@ -90,7 +89,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
     private void setupCombos() {
         new ViewModelListCellFactory<Field>()
-                .withText(FieldTextMapper::getDisplayName)
+                .withText(Field::getDisplayName)
                 .install(addableFields);
         addableFields.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         addableFields.setOnKeyPressed(event -> {

@@ -1,14 +1,13 @@
 package org.jabref.model.entry.identifier;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-
-import org.jspecify.annotations.NonNull;
 
 public class ISSN implements Identifier {
 
@@ -17,8 +16,8 @@ public class ISSN implements Identifier {
 
     private final String issnString;
 
-    public ISSN(@NonNull String issnString) {
-        this.issnString = issnString.trim();
+    public ISSN(String issnString) {
+        this.issnString = Objects.requireNonNull(issnString).trim();
     }
 
     public boolean isValidFormat() {

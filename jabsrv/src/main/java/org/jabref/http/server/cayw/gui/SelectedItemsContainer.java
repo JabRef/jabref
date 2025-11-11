@@ -2,6 +2,7 @@ package org.jabref.http.server.cayw.gui;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -71,12 +72,14 @@ public class SelectedItemsContainer extends FlowPane {
                 parentList.remove(entry);
             });
 
-            Label label = new Label(entry.shortLabel());
+            Label label = new Label(entry.getShortLabel());
 
             getChildren().addAll(label, removeButton);
 
             this.setOnMouseClicked(e -> {
-                // TODO: Handle the click event and show custom fields like prefix/suffix etc.
+                if (!e.isConsumed() && entry.getOnClick() != null) {
+                    entry.getOnClick().handle(new ActionEvent(entry, null));
+                }
             });
         }
 

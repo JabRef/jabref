@@ -7,19 +7,16 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
-import org.jabref.http.JabRefSrvStateManager;
-import org.jabref.http.SrvStateManager;
+import javafx.collections.ObservableList;
+
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
-import org.jabref.http.server.command.CommandResource;
-import org.jabref.http.server.resources.LibrariesResource;
-import org.jabref.http.server.resources.LibraryResource;
-import org.jabref.http.server.resources.MapResource;
-import org.jabref.http.server.resources.RootResource;
+import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
+import org.jabref.model.database.BibDatabaseContext;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -54,11 +51,11 @@ public class Server {
         FilesToServe filesToServe = new FilesToServe();
         filesToServe.setFilesToServe(filesToServeList);
 
-        SrvStateManager srvStateManager = new JabRefSrvStateManager();
+        ContextsToServe contextsToServe = new ContextsToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, contextsToServe);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
         // Required for CLI only
@@ -77,12 +74,15 @@ public class Server {
     }
 
     ///  Entry point for the GUI
-    public HttpServer run(SrvStateManager srvStateManager, URI uri) {
+    public HttpServer run(ObservableList<BibDatabaseContext> files, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
+
+        ContextsToServe contextsToServe = new ContextsToServe();
+        contextsToServe.setContextsToServe(files);
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, contextsToServe);
 
         return startServer(serviceLocator, uri);
     }
@@ -94,24 +94,15 @@ public class Server {
 
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.property("jersey.config.server.wadl.disableWadl", true);
         // TODO: Add SSL
-
-        // RESTish resources
         resourceConfig.register(RootResource.class);
         resourceConfig.register(LibrariesResource.class);
         resourceConfig.register(LibraryResource.class);
-        resourceConfig.register(MapResource.class);
-
-        // Other resources
-        resourceConfig.register(CommandResource.class);
         resourceConfig.register(CAYWResource.class);
-
-        // Supporting classes
         resourceConfig.register(CORSFilter.class);
         resourceConfig.register(GlobalExceptionMapper.class);
 
-        LOGGER.debug("Starting HTTP server...");
+        LOGGER.debug("Starting server...");
         final HttpServer httpServer =
                 GrizzlyHttpServerFactory
                         .createHttpServer(uri, resourceConfig, serviceLocator);

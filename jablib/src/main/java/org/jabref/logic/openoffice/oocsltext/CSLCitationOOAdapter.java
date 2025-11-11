@@ -61,6 +61,7 @@ public class CSLCitationOOAdapter {
         this.openOfficePreferences = openOfficePreferences;
 
         OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
+
         if (initialStyle instanceof CitationStyle citationStyle) {
             this.currentStyle = citationStyle; // else the currentStyle purposely stays null, still causing a difference with the subsequent style if CSL (valid comparison)
         }
@@ -242,7 +243,8 @@ public class CSLCitationOOAdapter {
                 preceedingSpaceExists = checkCursor.getString().matches("\\R");
             }
         }
-        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, openOfficePreferences.getAddSpaceAfter());
+
+        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, false);
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
     }

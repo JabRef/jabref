@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.cleanup.DoiCleanup;
@@ -20,10 +21,9 @@ import org.jabref.logic.layout.LayoutFormatterBasedFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.jspecify.annotations.NonNull;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
  * Fetches BibTeX data from DBLP (dblp.org)
@@ -37,14 +37,15 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public DBLPFetcher(@NonNull ImportFormatPreferences importFormatPreferences) {
+    public DBLPFetcher(ImportFormatPreferences importFormatPreferences) {
+        Objects.requireNonNull(importFormatPreferences);
         this.importFormatPreferences = importFormatPreferences;
     }
 
     @Override
-    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-        uriBuilder.addParameter("q", new DBLPQueryTransformer().transformSearchQuery(queryNode).orElse(""));
+        uriBuilder.addParameter("q", new DBLPQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         uriBuilder.addParameter("h", String.valueOf(100)); // number of hits
         uriBuilder.addParameter("c", String.valueOf(0)); // no need for auto-completion
         uriBuilder.addParameter("f", String.valueOf(0)); // "from", index of first hit to download

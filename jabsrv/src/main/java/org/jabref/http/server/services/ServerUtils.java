@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-import org.jabref.http.SrvStateManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -26,26 +25,26 @@ public class ServerUtils {
 
     private static java.nio.file.Path getLibraryPath(String id, FilesToServe filesToServe) {
         return filesToServe.getFilesToServe()
-                           .stream()
-                           .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
-                           .findAny()
-                           .orElseThrow(NotFoundException::new);
+                          .stream()
+                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
+                          .findAny()
+                          .orElseThrow(NotFoundException::new);
     }
 
-    private static java.nio.file.Path getLibraryPath(String id, SrvStateManager srvStateManager) {
-        return srvStateManager.getOpenDatabases()
-                              .stream()
-                              .filter(context -> context.getDatabasePath().isPresent())
-                              .map(context -> context.getDatabasePath().get())
-                              .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
-                              .findAny()
-                              .orElseThrow(NotFoundException::new);
+    private static java.nio.file.Path getLibraryPath(String id, ContextsToServe contextsToServe) {
+        return contextsToServe.getContextsToServe()
+                          .stream()
+                          .filter(context -> context.getDatabasePath().isPresent())
+                          .map(context -> context.getDatabasePath().get())
+                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
+                          .findAny()
+                          .orElseThrow(NotFoundException::new);
     }
 
     /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
-    public static @NonNull Path getLibraryPath(String id, FilesToServe filesToServe, SrvStateManager srvStateManager) {
+    public static @NonNull Path getLibraryPath(String id, FilesToServe filesToServe, ContextsToServe contextsToServe) {
         if (filesToServe.isEmpty()) {
-            return getLibraryPath(id, srvStateManager);
+            return getLibraryPath(id, contextsToServe);
         } else {
             return getLibraryPath(id, filesToServe);
         }
@@ -53,7 +52,7 @@ public class ServerUtils {
 
     /// @param id - also "demo" for the demo library
     /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
-    public static @NonNull BibDatabaseContext getBibDatabaseContext(String id, FilesToServe filesToServe, SrvStateManager srvStateManager, ImportFormatPreferences importFormatPreferences) throws IOException {
+    public static @NonNull BibDatabaseContext getBibDatabaseContext(String id, FilesToServe filesToServe, ContextsToServe contextsToServe, ImportFormatPreferences importFormatPreferences) throws IOException {
         BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
         if ("demo".equals(id)) {
             try (InputStream chocolateBibInputStream = BibDatabase.class.getResourceAsStream("/Chocolate.bib")) {
@@ -63,7 +62,7 @@ public class ServerUtils {
         }
 
         if (filesToServe.isEmpty()) {
-            return srvStateManager.getOpenDatabases().stream()
+            return contextsToServe.getContextsToServe().stream()
                                   .filter(context -> context.getDatabasePath().isPresent())
                                   .filter(context -> {
                                       Path p = context.getDatabasePath().get();

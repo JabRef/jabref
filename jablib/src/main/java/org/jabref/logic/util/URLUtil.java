@@ -6,11 +6,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.util.io.FileUtil;
-
-import org.jspecify.annotations.NonNull;
 
 /// URL utilities for URLs in the JabRef logic.
 ///
@@ -39,7 +38,9 @@ public class URLUtil {
      * @param url the Google search URL string
      * @return the cleaned Google URL or @code{url} if no search URL was detected
      */
-    public static String cleanGoogleSearchURL(@NonNull String url) {
+    public static String cleanGoogleSearchURL(String url) {
+        Objects.requireNonNull(url);
+
         if (!url.matches(GOOGLE_SEARCH_EXP)) {
             return url;
         }
@@ -80,15 +81,6 @@ public class URLUtil {
     /// @param url the String to check for a URL
     /// @return true if `url` contains a valid URL
     public static boolean isURL(String url) {
-        if (url == null || url.trim().isEmpty()) {
-            return false;
-        }
-
-        // Check if the URL has a protocol (http://, https://, ftp://)
-        if (!URL_PATTERN.matcher(url).matches()) {
-            return false;
-        }
-
         try {
             create(url);
             return true;
@@ -108,16 +100,8 @@ public class URLUtil {
         if (url == null || url.trim().isEmpty()) {
             throw new IllegalArgumentException("URL must not be null or empty.");
         }
-
-        String trimmedUrl = url.trim();
-
-        // Add https:// prefix to URLs starting with www. to make them absolute
-        if (trimmedUrl.startsWith("www.")) {
-            trimmedUrl = "https://" + trimmedUrl;
-        }
-
         try {
-            URI parsedUri = new URI(trimmedUrl);
+            URI parsedUri = new URI(url.trim());
             if (!parsedUri.isAbsolute()) {
                 throw new MalformedURLException("URI is not absolute: " + url);
             }

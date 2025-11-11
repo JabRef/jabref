@@ -9,7 +9,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -70,7 +70,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     private String lookupIdentifiers(List<BibEntry> bibEntries) {
         String totalCount = Integer.toString(bibEntries.size());
-        NamedCompoundEdit namedCompoundEdit = new NamedCompoundEdit(Localization.lang("Look up %0", fetcher.getIdentifierName()));
+        NamedCompound namedCompound = new NamedCompound(Localization.lang("Look up %0", fetcher.getIdentifierName()));
         int count = 0;
         int foundCount = 0;
         for (BibEntry bibEntry : bibEntries) {
@@ -87,7 +87,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
             if (identifier.isPresent() && !bibEntry.hasField(identifier.get().getDefaultField())) {
                 Optional<FieldChange> fieldChange = bibEntry.setField(identifier.get().getDefaultField(), identifier.get().asString());
                 if (fieldChange.isPresent()) {
-                    namedCompoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
+                    namedCompound.addEdit(new UndoableFieldChange(fieldChange.get()));
                     foundCount++;
                     final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                             fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
@@ -95,9 +95,9 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                 }
             }
         }
-        namedCompoundEdit.end();
+        namedCompound.end();
         if (foundCount > 0) {
-            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(namedCompoundEdit));
+            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(namedCompound));
         }
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }

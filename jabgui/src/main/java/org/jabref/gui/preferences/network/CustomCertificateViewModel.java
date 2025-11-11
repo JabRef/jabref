@@ -73,7 +73,7 @@ public class CustomCertificateViewModel extends AbstractViewModel {
         return validToProperty.getValue();
     }
 
-    public StringProperty pathProperty() {
+    public StringProperty pathPropertyProperty() {
         return pathProperty;
     }
 

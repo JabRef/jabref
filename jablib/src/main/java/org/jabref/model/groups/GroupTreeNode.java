@@ -18,8 +18,6 @@ import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
  */
@@ -60,8 +58,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      *
      * @param newGroup the new group (has to be non-null)
      */
-    public void setGroup(@NonNull AbstractGroup newGroup) {
-        this.groupProperty.set(newGroup);
+    public void setGroup(AbstractGroup newGroup) {
+        this.groupProperty.set(Objects.requireNonNull(newGroup));
     }
 
     /**
@@ -72,12 +70,10 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * @param shouldRemovePreviousAssignments specifies whether previous matched entries should be removed from the old group
      * @param entriesInDatabase               list of entries in the database
      */
-    public List<FieldChange> setGroup(@NonNull AbstractGroup newGroup,
-                                      boolean shouldKeepPreviousAssignments,
-                                      boolean shouldRemovePreviousAssignments,
-                                      List<BibEntry> entriesInDatabase) {
+    public List<FieldChange> setGroup(AbstractGroup newGroup, boolean shouldKeepPreviousAssignments,
+                                      boolean shouldRemovePreviousAssignments, List<BibEntry> entriesInDatabase) {
         AbstractGroup oldGroup = getGroup();
-        groupProperty.set(newGroup);
+        groupProperty.set(Objects.requireNonNull(newGroup));
 
         List<FieldChange> changes = new ArrayList<>();
         boolean shouldRemoveFromOldGroup = shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);

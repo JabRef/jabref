@@ -137,8 +137,7 @@
         <Button fx:id="addCertificate"
                 mnemonicParsing="false"
                 onAction="#addCertificateFile"
-                styleClass="add-certificate"
-                text="%Browse for certificate..."
+                text="%Add certificate"
                 GridPane.columnIndex="2"
                 GridPane.halignment="RIGHT"
                 GridPane.rowIndex="1"
@@ -147,7 +146,7 @@
                <Insets right="16.0"/>
            </GridPane.margin>
             <graphic>
-                <JabRefIconView glyph="ADD_NOBOX"/>
+                <JabRefIconView glyph="OPEN_LIST"/>
             </graphic>
         </Button>
     </GridPane>

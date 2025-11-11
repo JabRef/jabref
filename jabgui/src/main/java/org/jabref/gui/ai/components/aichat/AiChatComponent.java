@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,7 +38,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.ListUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.google.common.annotations.VisibleForTesting;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
@@ -77,8 +74,6 @@ public class AiChatComponent extends VBox {
     @FXML private Hyperlink exQuestion3;
     @FXML private HBox exQuestionBox;
 
-    private String noticeTemplate;
-
     public AiChatComponent(AiService aiService,
                            StringProperty name,
                            ObservableList<ChatMessage> chatHistory,
@@ -100,8 +95,8 @@ public class AiChatComponent extends VBox {
         aiService.getIngestionService().ingest(name, ListUtil.getLinkedFiles(entries).toList(), bibDatabaseContext);
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
     }
 
     @FXML
@@ -122,27 +117,11 @@ public class AiChatComponent extends VBox {
     }
 
     private void initializeNotice() {
-        this.noticeTemplate = noticeText.getText();
+        String newNotice = noticeText
+                .getText()
+                .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
 
-        noticeText.textProperty().bind(Bindings.createStringBinding(this::computeNoticeText, noticeDependencies()));
-    }
-
-    @VisibleForTesting
-    String computeNoticeText() {
-        String provider = aiPreferences.getAiProvider().getLabel();
-        String model = aiPreferences.getSelectedChatModel();
-        return noticeTemplate.replace("%0", provider + " " + model);
-    }
-
-    private Observable[] noticeDependencies() {
-        return new Observable[] {
-                aiPreferences.aiProviderProperty(),
-                aiPreferences.openAiChatModelProperty(),
-                aiPreferences.mistralAiChatModelProperty(),
-                aiPreferences.geminiChatModelProperty(),
-                aiPreferences.huggingFaceChatModelProperty(),
-                aiPreferences.gpt4AllChatModelProperty()
-        };
+        noticeText.setText(newNotice);
     }
 
     private void initializeExampleQuestions() {
@@ -236,11 +215,10 @@ public class AiChatComponent extends VBox {
 
         entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
             switch (ingestionStatus.getState()) {
-                case PROCESSING ->
-                        notifications.add(new Notification(
-                                Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
-                                Localization.lang("After the file is ingested, you will be able to chat with it.")
-                        ));
+                case PROCESSING -> notifications.add(new Notification(
+                    Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
+                    Localization.lang("After the file is ingested, you will be able to chat with it.")
+                ));
 
                 case ERROR -> {
                     assert ingestionStatus.getException().isPresent(); // When the state is ERROR, the exception must be present.
@@ -251,8 +229,7 @@ public class AiChatComponent extends VBox {
                     ));
                 }
 
-                case SUCCESS -> {
-                }
+                case SUCCESS -> { }
             }
         });
 

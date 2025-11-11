@@ -5,8 +5,6 @@ import java.util.stream.Collectors;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
-import org.jspecify.annotations.NonNull;
-
 public class CamelFormatter extends Formatter {
 
     @Override
@@ -20,7 +18,7 @@ public class CamelFormatter extends Formatter {
     }
 
     @Override
-    public String format(@NonNull String input) {
+    public String format(String input) {
         Title title = new Title(input);
 
         return title.getWords().stream()

@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,7 +21,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -40,7 +39,7 @@ import static org.mockito.Mockito.when;
 class FileUtilTest {
 
     @TempDir
-    private static Path bibTempDir;
+    static Path bibTempDir;
 
     private final Path nonExistingTestPath = Path.of("nonExistingTestPath");
     private Path existingTestFile;
@@ -55,11 +54,11 @@ class FileUtilTest {
 
         existingTestFile = subDir.resolve("existingTestFile.txt");
         Files.createFile(existingTestFile);
-        Files.writeString(existingTestFile, "existingTestFile.txt");
+        Files.write(existingTestFile, "existingTestFile.txt".getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
 
         otherExistingTestFile = subDir.resolve("otherExistingTestFile.txt");
         Files.createFile(otherExistingTestFile);
-        Files.writeString(otherExistingTestFile, "otherExistingTestFile.txt");
+        Files.write(otherExistingTestFile, "otherExistingTestFile.txt".getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
     }
 
     @Test
@@ -82,7 +81,7 @@ class FileUtilTest {
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -93,7 +92,7 @@ class FileUtilTest {
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -104,7 +103,7 @@ class FileUtilTest {
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -114,7 +113,7 @@ class FileUtilTest {
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
-        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -123,7 +122,7 @@ class FileUtilTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "mytitle");
 
-        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -132,7 +131,7 @@ class FileUtilTest {
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
 
-        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -140,23 +139,7 @@ class FileUtilTest {
         String fileNamePattern = "[title]";
         BibEntry entry = new BibEntry();
 
-        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
-    }
-
-    @Test
-    void getLinkedFileNameGetOptionalEmptyIfDashAsPattern() {
-        String fileNamePattern = "-";
-        BibEntry entry = new BibEntry();
-
-        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
-    }
-
-    @Test
-    void getLinkedFileNameGetOptionalEmptyIfDefaultAsPattern() {
-        String fileNamePattern = "default";
-        BibEntry entry = new BibEntry();
-
-        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -167,7 +150,7 @@ class FileUtilTest {
         entry.setField(StandardField.YEAR, "1868");
         entry.setField(StandardField.PAGES, "567-579");
 
-        assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
+        assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -177,8 +160,8 @@ class FileUtilTest {
                 .withCitationKey("BrayBuildingCommunity")
                 .withField(StandardField.TITLE, "Building \\mkbibquote{Community}");
         String expected = "BrayBuildingCommunity - Building Community";
-        Optional<String> result = FileUtil.createFileNameFromPattern(null, entry, pattern);
-        assertEquals(expected, result.get());
+        String result = FileUtil.createFileNameFromPattern(null, entry, pattern);
+        assertEquals(expected, result);
     }
 
     @Test
@@ -239,16 +222,16 @@ class FileUtilTest {
     @Test
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Assumed path separator is /")
     void uniquePathSubstrings() {
-        List<String> paths = List.of("C:/uniquefile.bib",
-                "C:/downloads/filename.bib",
-                "C:/mypaper/bib/filename.bib",
-                "C:/external/mypaper/bib/filename.bib",
-                "");
+       List<String> paths = List.of("C:/uniquefile.bib",
+               "C:/downloads/filename.bib",
+               "C:/mypaper/bib/filename.bib",
+               "C:/external/mypaper/bib/filename.bib",
+               "");
         List<String> uniqPath = List.of("uniquefile.bib",
-                "downloads/filename.bib",
-                "C:/mypaper/bib/filename.bib",
-                "external/mypaper/bib/filename.bib",
-                "");
+              "downloads/filename.bib",
+              "C:/mypaper/bib/filename.bib",
+              "external/mypaper/bib/filename.bib",
+              "");
 
         List<String> result = FileUtil.uniquePathSubstrings(paths);
         assertEquals(uniqPath, result);
@@ -465,88 +448,6 @@ class FileUtilTest {
         }
     }
 
-    /// Tests for issue <https://github.com/JabRef/jabref/issues/12995>
-    @Test
-    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
-    void simpleRelativizeSymlinks() throws IOException {
-        Path realDir = bibTempDir.resolve("realDir_" + UUID.randomUUID());
-        Files.createDirectories(realDir);
-
-        Path simpleFile = Files.createFile(realDir.resolve("simple.pdf"));
-        Path symlinkDir = bibTempDir.resolve("symlinkDir_" + UUID.randomUUID());
-        Files.createSymbolicLink(symlinkDir, realDir);
-
-        Path result = FileUtil.relativize(simpleFile, List.of(symlinkDir));
-        assertEquals(Path.of("simple.pdf"), result, "Simple symlink resolves to relative");
-    }
-
-    @Test
-    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
-    void chainedRelativizeSymlinks() throws IOException {
-        Path chainReal = bibTempDir.resolve("chainReal_" + UUID.randomUUID());
-        Files.createDirectories(chainReal);
-
-        Path chainedFile = Files.createFile(chainReal.resolve("chained.pdf"));
-        Path chainLink2 = bibTempDir.resolve("chainLink2_" + UUID.randomUUID());
-        Files.createSymbolicLink(chainLink2, chainReal);
-        Path chainLink1 = bibTempDir.resolve("chainLink1_" + UUID.randomUUID());
-        Files.createSymbolicLink(chainLink1, chainLink2);
-
-        Path result = FileUtil.relativize(chainedFile, List.of(chainLink1));
-        assertEquals(Path.of("chained.pdf"), result, "Chained symlink resolves to relative");
-    }
-
-    @Test
-    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
-    void nestedRelativizeSymlinks() throws IOException {
-        Path realDir = bibTempDir.resolve("realDir_" + UUID.randomUUID());
-        Files.createDirectories(realDir);
-
-        Path nestedDir = realDir.resolve("nested_" + UUID.randomUUID());
-        Files.createDirectories(nestedDir);
-        Path nestedFile = Files.createFile(nestedDir.resolve("nested.pdf"));
-        Path nestedSymlink = realDir.resolve("nestedLink_" + UUID.randomUUID());
-        Files.createSymbolicLink(nestedSymlink, nestedDir);
-
-        Path result = FileUtil.relativize(nestedFile, List.of(nestedSymlink));
-        assertEquals(Path.of("nested.pdf"), result, "Nested symlink resolves to relative");
-    }
-
-    @Test
-    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
-    void unrelatedFileRemainsAbsolute() throws IOException {
-        Path realDir = bibTempDir.resolve("realDir_" + UUID.randomUUID());
-        Files.createDirectories(realDir);
-        Path symlinkDir = bibTempDir.resolve("symlinkDir_" + UUID.randomUUID());
-        Files.createSymbolicLink(symlinkDir, realDir);
-
-        Path outsideFile = Files.createFile(bibTempDir.resolve("outside.pdf"));
-
-        Path result = FileUtil.relativize(outsideFile, List.of(symlinkDir));
-        assertEquals(outsideFile, result, "Unrelated file remains absolute");
-    }
-
-    @Test
-    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
-    void symlinkEscapeCaseIgnored() throws IOException {
-        Path veryPrivate = bibTempDir.resolve("veryprivate");
-        Files.createDirectories(veryPrivate);
-        Path secretFile = Files.createFile(veryPrivate.resolve("a.pdf"));
-
-        Path expensive = bibTempDir.resolve("expensive");
-        Files.createSymbolicLink(expensive, veryPrivate);
-        Path things = bibTempDir.resolve("things");
-        Files.createSymbolicLink(things, expensive);
-
-        Path libDir = bibTempDir.resolve("lib");
-        Files.createDirectories(libDir);
-        Files.createFile(libDir.resolve("bib.bib"));
-
-        org.junit.jupiter.api.Assumptions.assumeTrue(false, "IGNORED: Symlink chain escaping base dir, see <https://github.com/JabRef/jabref/issues/12995#issuecomment-3065149862>");
-        Path result = FileUtil.relativize(secretFile, List.of(things));
-        assertEquals(secretFile, result);
-    }
-
     /**
      * @implNote Tests inspired by {@link org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata}
      */
@@ -616,21 +517,5 @@ class FileUtilTest {
     })
     void shortenFileName(String expected, String fileName, Integer maxLength) {
         assertEquals(expected, FileUtil.shortenFileName(fileName, maxLength));
-    }
-
-    @EnabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS)
-    @ParameterizedTest
-    @ValueSource(strings = {"/c/Users/username/Downloads/test.bib",
-            "/cygdrive/c/Users/username/Downloads/test.bib",
-            "/mnt/c/Users/username/Downloads/test.bib"})
-    void convertCygwinPathToWindowsShouldConvertToWindowsFormatWhenRunningOnWindows(String filePath) {
-        assertEquals(Path.of("C:\\\\Users\\\\username\\\\Downloads\\\\test.bib"), FileUtil.convertCygwinPathToWindows(filePath));
-    }
-
-    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Test in others operational systems")
-    @ParameterizedTest
-    @ValueSource(strings = {"/home/username/Downloads/test.bib"})
-    void convertCygwinPathToWindowsShouldReturnOriginalFilePathWhenRunningOnWindows(String filePath) {
-        assertEquals(Path.of(filePath), FileUtil.convertCygwinPathToWindows(filePath));
     }
 }

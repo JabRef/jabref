@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.pdf.FileAnnotation;
@@ -19,7 +20,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +61,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Failed to read file '{}'.", path, e);
+            LOGGER.error("Failed to read file '%s'.".formatted(path), e);
         }
         return annotationsList;
     }
@@ -78,7 +78,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             if (!Arrays.asList(FileAnnotationType.values()).contains(FileAnnotationType.valueOf(annotation.getSubtype()))) {
                 return false;
             }
-        } catch (IllegalArgumentException _) {
+        } catch (IllegalArgumentException e) {
             LOGGER.debug("Could not parse the FileAnnotation {} into any known FileAnnotationType. It was {}.", annotation, annotation.getSubtype());
         }
         return true;
@@ -93,7 +93,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             try {
                 COSArray boundingBoxes = (COSArray) annotation.getCOSObject().getDictionaryObject(COSName.getPDFName("QuadPoints"));
                 annotation.setContents(new TextExtractor(page, boundingBoxes).extractMarkedText());
-            } catch (IOException _) {
+            } catch (IOException e) {
                 annotation.setContents("JabRef: Could not extract any marked text!");
             }
         }
@@ -102,19 +102,21 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
 
-    private boolean validatePath(@NonNull Path path) {
+    private boolean validatePath(Path path) {
+        Objects.requireNonNull(path);
+
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            LOGGER.warn("File '{}' does not end with .pdf!", path);
+            LOGGER.warn("File '%s' does not end with .pdf!".formatted(path));
             return false;
         }
 
         if (!Files.exists(path)) {
-            LOGGER.warn("File '{}' does not exist!", path);
+            LOGGER.warn("File '%s' does not exist!".formatted(path));
             return false;
         }
 
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-            LOGGER.warn("File '{}' is not readable!", path);
+            LOGGER.warn("File '%s' is not readable!".formatted(path));
             return false;
         }
 
