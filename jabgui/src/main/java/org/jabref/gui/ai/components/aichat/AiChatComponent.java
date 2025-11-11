@@ -197,12 +197,15 @@ public class AiChatComponent extends VBox {
             Optional<UserMessage> lastUserPrompt = Optional.empty();
             if (!aiChatLogic.getChatHistory().isEmpty()) {
                 lastUserPrompt = getLastUserMessage();
-                deleteLastMessage();
-                deleteLastMessage();
             }
-
-            chatPrompt.switchToNormalState();
-            lastUserPrompt.ifPresent(userMessage -> onSendMessage(userMessage.singleText()));
+            if (lastUserPrompt.isPresent()) {
+                while (aiChatLogic.getChatHistory().getLast().type() != ChatMessageType.USER) { // Delete all messages sent after the last user message
+                    deleteLastMessage();
+                }
+                deleteLastMessage();    // Delete also the last user message before resending it
+                chatPrompt.switchToNormalState();
+                onSendMessage(lastUserPrompt.get().singleText());
+            }
         });
 
         chatPrompt.requestPromptFocus();
@@ -350,17 +353,14 @@ public class AiChatComponent extends VBox {
     }
 
     private Optional<UserMessage> getLastUserMessage() {
-        if (!aiChatLogic.getChatHistory().isEmpty() && aiChatLogic.getChatHistory().size() >= 2) {
-            int userMessageIndex = aiChatLogic.getChatHistory().size() - 2;
-            ChatMessage chat = aiChatLogic.getChatHistory().get(userMessageIndex);
-
+        int messageIndex = aiChatLogic.getChatHistory().size() - 1;
+        while (messageIndex >= 0) {
+            ChatMessage chat = aiChatLogic.getChatHistory().get(messageIndex);
             if (chat.type() == ChatMessageType.USER) {
                 return Optional.of((UserMessage) chat);
-            } else {
-                return Optional.empty();
             }
-        } else {
-            return Optional.empty();
+                messageIndex--;
         }
+        return Optional.empty();
     }
 }
