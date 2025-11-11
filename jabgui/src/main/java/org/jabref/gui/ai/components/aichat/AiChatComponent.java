@@ -199,10 +199,10 @@ public class AiChatComponent extends VBox {
                 lastUserPrompt = getLastUserMessage();
             }
             if (lastUserPrompt.isPresent()) {
-                while (aiChatLogic.getChatHistory().getLast().type() != ChatMessageType.USER) { // Delete all messages sent after the last user message
+                while (aiChatLogic.getChatHistory().getLast().type() != ChatMessageType.USER) {
                     deleteLastMessage();
                 }
-                deleteLastMessage();    // Delete also the last user message before resending it
+                deleteLastMessage();
                 chatPrompt.switchToNormalState();
                 onSendMessage(lastUserPrompt.get().singleText());
             }
@@ -359,7 +359,7 @@ public class AiChatComponent extends VBox {
             if (chat.type() == ChatMessageType.USER) {
                 return Optional.of((UserMessage) chat);
             }
-                messageIndex--;
+            messageIndex--;
         }
         return Optional.empty();
     }
