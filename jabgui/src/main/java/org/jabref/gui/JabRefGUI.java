@@ -101,52 +101,57 @@ public class JabRefGUI extends Application {
 
     @Override
     public void start(Stage stage) {
-        this.mainStage = stage;
-        Injector.setModelOrService(Stage.class, mainStage);
+        try {
+            this.mainStage = stage;
+            Injector.setModelOrService(Stage.class, mainStage);
+
+            initialize();
+
+            JabRefGUI.mainFrame = new JabRefFrame(
+                    mainStage,
+                    dialogService,
+                    fileUpdateMonitor,
+                    preferences,
+                    aiService,
+                    stateManager,
+                    countingUndoManager,
+                    Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                    clipBoardManager,
+                    taskExecutor,
+                    gitHandlerRegistry);
+
+            openWindow();
+
+            startBackgroundTasks();
+
+            if (!fileUpdateMonitor.isActive()) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Unable to monitor file changes. Please close files " +
+                                "and processes and restart. You may encounter errors if you continue " +
+                                "with this session."));
+            }
+
+            BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+            EasyBind.subscribe(preferences.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
+                if (enabled) {
+                    new VersionWorker(buildInfo.version,
+                            dialogService,
+                            taskExecutor,
+                            preferences)
+                            .checkForNewVersionDelayed();
+                }
+            });
+
+            setupProxy();
+        } catch (Throwable throwable) {
+            LOGGER.error("Error during initialization", throwable);
+            throw throwable;
+        }
 
         FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
             DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
             dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
         }));
-
-        initialize();
-
-        JabRefGUI.mainFrame = new JabRefFrame(
-                mainStage,
-                dialogService,
-                fileUpdateMonitor,
-                preferences,
-                aiService,
-                stateManager,
-                countingUndoManager,
-                Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                clipBoardManager,
-                taskExecutor,
-                gitHandlerRegistry);
-
-        openWindow();
-
-        startBackgroundTasks();
-
-        if (!fileUpdateMonitor.isActive()) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Unable to monitor file changes. Please close files " +
-                            "and processes and restart. You may encounter errors if you continue " +
-                            "with this session."));
-        }
-
-        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
-        EasyBind.subscribe(preferences.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
-            if (enabled) {
-                new VersionWorker(buildInfo.version,
-                        dialogService,
-                        taskExecutor,
-                        preferences)
-                        .checkForNewVersionDelayed();
-            }
-        });
-
-        setupProxy();
     }
 
     public void initialize() {
