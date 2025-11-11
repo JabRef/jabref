@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.preferences.JabRefCliPreferences;
@@ -64,7 +64,7 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
         }
 
         // Using Injector to avoid widespread refactoring for constructor injection.
-        // Class that calls formatters (FieldFormatterCleanups.java) has many usages that would need updates.
+        // Class that calls formatters (FieldFormatterCleanupActions.java) has many usages that would need updates.
         JabRefCliPreferences cliPreferences = Injector.instantiateModelOrService(JabRefCliPreferences.class);
 
         // get preferences for BibEntry

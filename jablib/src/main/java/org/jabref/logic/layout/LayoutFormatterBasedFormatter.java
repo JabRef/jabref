@@ -1,6 +1,6 @@
 package org.jabref.logic.layout;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 
 import org.jspecify.annotations.NonNull;
 

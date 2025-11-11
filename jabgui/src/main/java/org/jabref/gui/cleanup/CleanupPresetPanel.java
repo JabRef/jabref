@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.FieldTextMapper;
@@ -168,7 +168,7 @@ public class CleanupPresetPanel extends VBox {
 
         activeJobs.add(CleanupPreferences.CleanupStep.FIX_FILE_LINKS);
 
-        return new CleanupPreferences(activeJobs, new FieldFormatterCleanups(
+        return new CleanupPreferences(activeJobs, new FieldFormatterCleanupActions(
                 !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
                 formatterCleanupsPanel.cleanupsProperty()));
     }

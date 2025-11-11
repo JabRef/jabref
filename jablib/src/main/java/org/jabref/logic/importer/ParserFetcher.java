@@ -1,6 +1,6 @@
 package org.jabref.logic.importer;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.model.entry.BibEntry;
 
 public interface ParserFetcher {

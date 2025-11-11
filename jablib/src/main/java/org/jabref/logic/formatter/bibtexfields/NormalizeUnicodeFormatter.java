@@ -2,7 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.text.Normalizer;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 
 import org.jspecify.annotations.NonNull;
 

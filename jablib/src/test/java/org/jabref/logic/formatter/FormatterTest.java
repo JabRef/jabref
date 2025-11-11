@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;

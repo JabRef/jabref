@@ -3,7 +3,7 @@ package org.jabref.logic.formatter.casechanger;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
