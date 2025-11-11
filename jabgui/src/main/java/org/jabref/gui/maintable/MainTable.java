@@ -314,13 +314,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // keep original entry selected and reset citation merge mode
             this.citationMergeMode = false;
         } else {
-            // select new entry
-            // Use Platform.runLater to avoid JavaFX bug with selection change events
             findEntry(bibEntry).ifPresent(entry -> {
                 int index = getItems().indexOf(entry);
                 if (index >= 0) {
-                    // Use clearAndSelect(index) instead of separate clear() + select()
-                    // to avoid JavaFX bug with selection change events
                     getSelectionModel().clearAndSelect(index);
                     scrollTo(index);
                 }
@@ -337,9 +333,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // select new entries
             List<Integer> indices = bibEntries.stream()
                                               .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                              .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
-                                              .filter(Optional::isPresent)
-                                              .map(Optional::get)
+                                              .flatMap(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()).stream())
                                               .map(entry -> getItems().indexOf(entry))
                                               .filter(index -> index >= 0)
                                               .toList();
@@ -350,6 +344,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 indices.forEach(index -> {
                     if (index < getItems().size()) {
                         getSelectionModel().select(index);
+                    } else {
+                        LOGGER.debug("Could not select entry at index {} since it is out of bounds", index);
                     }
                 });
                 scrollTo(indices.getFirst());
