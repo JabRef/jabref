@@ -2,7 +2,6 @@ package org.jabref.logic.importer.plaincitation;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
@@ -19,7 +18,7 @@ public interface PlainCitationParser {
             return CitationSplitter.splitCitations(text)
                                    .map(Unchecked.function(this::parsePlainCitation))
                                    .flatMap(Optional::stream)
-                                   .collect(Collectors.toList());
+                                   .toList();
         } catch (UncheckedException e) {
             throw (FetcherException) e.getCause();
         }

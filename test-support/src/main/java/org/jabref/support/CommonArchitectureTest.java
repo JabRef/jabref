@@ -31,6 +31,7 @@ public class CommonArchitectureTest {
     private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic..";
     private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model..";
     private static final String PACKAGE_ORG_JABREF_CLI = "org.jabref.cli..";
+    private static final String PACKAGE_ORG_JABREF_TOOLKIT_CLI = "org.jabref.toolkit.cli..";
 
     @ArchTest
     public void doNotUseApacheCommonsLang3(JavaClasses classes) {
@@ -149,7 +150,9 @@ public class CommonArchitectureTest {
 
     @ArchTest
     public void restrictStandardStreams(JavaClasses classes) {
-        ArchRuleDefinition.noClasses().that().resideOutsideOfPackages(PACKAGE_ORG_JABREF_CLI)
+        ArchRuleDefinition.noClasses().that().resideOutsideOfPackages(
+                                  PACKAGE_ORG_JABREF_CLI,
+                                  PACKAGE_ORG_JABREF_TOOLKIT_CLI)
                           .and().resideOutsideOfPackages("org.jabref.gui.openoffice..") // Uses LibreOffice SDK
                           .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
                           .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)
