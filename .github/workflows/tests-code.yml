@@ -92,7 +92,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
@@ -206,17 +206,24 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.11.1:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md > heylogs.txt || true
 
-          # improve output
-          sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
+          # ignore some errors
+          grep -v no-empty-headings < heylogs.txt | grep -v all-h2-contain-a-version | tee heylogs.txt
 
-          cat heylogs.txt
+          # exit 1 in case of an error
+          remaining=$(
+              grep -E " error " heylogx.txt \
+              | wc -l
+            )
 
-          # exit 1 in case of error
-          # We have 1 "valid" issue in CHANGELOG.md
-          grep -q "1 problem" heylogs.txt || exit 1
+          echo "Remaining errors: $remaining"
 
+          # We have on acceptable error
+          if [ "$remaining" -gt 1 ]; then
+            echo "Failing because of $remaining remaining error(s)."
+            exit 1
+          fi
   changelog-unreleased-only:
     if: github.event_name == 'pull_request'
     name: CHANGELOG.md - only unreleased touched
@@ -462,6 +469,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
       - name: Use cache
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: actions/cache@v4
         with:
           path: ~/.jbang
@@ -473,17 +481,17 @@ jobs:
         uses: jbangdev/setup-jbang@main
 
       # Build all JBang scripts
-      - run: jbang build .jbang/CheckoutPR.java
+      - run: |
+          for f in .jbang/*.java; do
+            echo "Building $f..."
+            jbang build --fresh "$f"
+          done
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build .jbang/CloneJabRef.java
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build --fresh .jbang/JabKitLauncher.java
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build --fresh .jbang/JabLsLauncher.java
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build --fresh .jbang/JabSrvLauncher.java
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang build --fresh jablib-examples/*.java
+      - run: |
+          for f in jablib-examples/*.java; do
+            echo "Building $f..."
+            jbang build --fresh "$f"
+          done
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
 
       # *Launcher.java should support "--help"
@@ -515,6 +523,7 @@ jobs:
         with:
           files: |
             .jbang/*.java
+            jabkit/src/main/java/**/*.java
             jablib/src/main/java/**/*.java
             jablib-examples/**/*.java
           files_ignore: |
@@ -546,7 +555,20 @@ jobs:
           # We modify the JBang scripts directly to avoid issues with relative paths
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
             case "$f" in
-              jablib-examples/*) continue ;; # skip scripts
+              .jbang/*)
+                # skip scripts
+                continue
+                ;;
+              jablib-examples/*)
+                # skip scripts
+                continue
+                ;;
+              jabkit/*)
+                # only JabKit needs its modified sources if jabkit was modified
+                if [ "${{ matrix.script }}" != ".jbang/JabKitLauncher.java" ]; then
+                  continue
+                fi
+                ;;
             esac
             echo "//SOURCES ../$f" >> "${{ matrix.script }}"
           done

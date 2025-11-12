@@ -59,7 +59,7 @@ Allow also access for both cases and click "Allow access".
 
 ## Wait for IntelliJ IDEA to import the gradle project
 
-IntelliJ shows "Importing 'jabref' Gradle Project" at the lower right corner.
+IntelliJ shows "Importing 'jabref' Gradle Project" in the lower right corner.
 This will take several minutes.
 Wait until this disappears.
 

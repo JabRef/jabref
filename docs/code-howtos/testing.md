@@ -36,12 +36,12 @@ Example for a nicely formatted `@CsvSource`
 
 ```java
 @ParameterizedTest
-@CsvSource(delimiterString = "->", textBlock = """
+@CsvSource(textBlock = """
     # underscore removed
-    junit_jupiter -> JunitJupiter
+    junit_jupiter, JunitJupiter
     # camel case kept
-    fooBar        -> FooBar
-    CsvSource     -> CsvSource
+    fooBar,        FooBar
+    CsvSource,     CsvSource
 """)
 void convertsToUpperCamelCase(String input, String expected) {
     String converted = caseConverter.toUpperCamelCase(input);
