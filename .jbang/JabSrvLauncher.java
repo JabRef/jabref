@@ -50,7 +50,7 @@
 // REPOS mavencentral,jitpack=https://jitpack.io
 
 // TODO: ASCII things won't work, but we accept for now to keep things going
-//DEPS com.ibm.icu:icu4j:77.1
+//DEPS com.ibm.icu:icu4j:78.1
 
 // Choose one - both should work
 // https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/jabref/jablib/
@@ -58,6 +58,7 @@
 // https://jitpack.io/#jabref/jabref/main-SNAPSHOT
 // DEPS com.github.jabref:jabref:main-SNAPSHOT
 
+//DEPS io.github.darvil82:terminal-text-formatter:2.2.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.jspecify:jspecify:1.0.0
 
@@ -72,21 +73,22 @@
 //DEPS org.bouncycastle:bcprov-jdk18on:1.82
 //DEPS com.konghq:unirest-modules-gson:4.5.1
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
-//DEPS org.glassfish.jersey.core:jersey-server:3.1.11
-//DEPS org.glassfish.jersey.inject:jersey-hk2:3.1.11
+//DEPS org.glassfish.jersey.core:jersey-server:4.0.0
+//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.0
 //DEPS org.glassfish.hk2:hk2-api:3.1.1
 //DEPS org.glassfish.hk2:hk2-utils:3.1.1
 //DEPS org.glassfish.hk2:hk2-locator:3.1.1
-//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.11
+//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.0
 //DEPS org.glassfish.grizzly:grizzly-http-server:4.0.2
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
-//DEPS org.hibernate.validator:hibernate-validator:9.0.1.Final
+//DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
 //DEPS com.konghq:unirest-modules-gson:4.5.1
 //DEPS com.google.guava:guava:33.5.0-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.5.0
-//DEPS de.undercouch:citeproc-java:3.3.0
+//DEPS de.undercouch:citeproc-java:3.4.0
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabSrvLauncher {

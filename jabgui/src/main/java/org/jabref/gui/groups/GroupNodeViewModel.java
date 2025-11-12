@@ -30,14 +30,17 @@ import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DateGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
@@ -51,7 +54,6 @@ import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
-import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -461,6 +463,10 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof TexGroup) {
             return false;
+        } else if (group instanceof AutomaticDateGroup) {
+            return false;
+        } else if (group instanceof DateGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -476,6 +482,7 @@ public class GroupNodeViewModel {
                  SearchGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -503,6 +510,8 @@ public class GroupNodeViewModel {
                     true;
             case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
+                 DateGroup _,
                  SmartGroup _ ->
                     false;
             case KeywordGroup _ ->
@@ -528,6 +537,8 @@ public class GroupNodeViewModel {
                  SearchGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
+                 DateGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -547,12 +558,14 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
             case AllEntriesGroup _,
+                 DateGroup _,
                  SmartGroup _ ->
                     false;
             case ExplicitGroup _,
                  SearchGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->

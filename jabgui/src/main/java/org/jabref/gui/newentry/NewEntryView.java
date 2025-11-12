@@ -47,6 +47,7 @@ import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -64,7 +65,6 @@ import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -72,6 +72,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
+import org.jspecify.annotations.NonNull;
 
 public class NewEntryView extends BaseDialog<BibEntry> {
     private static final String BIBTEX_REGEX = "^@([A-Za-z]+)\\{,";
@@ -345,7 +346,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         interpretParser.valueProperty().bindBidirectional(viewModel.interpretParserProperty());
         PlainCitationParserChoice initialParser = parserFromName(preferences.getLatestInterpretParser(), interpretParser.getItems());
         if (initialParser == null) {
-            final PlainCitationParserChoice defaultParser = PlainCitationParserChoice.RULE_BASED;
+            final PlainCitationParserChoice defaultParser = PlainCitationParserChoice.RULE_BASED_GENERAL;
             initialParser = parserFromName(defaultParser.getLocalizedName(), interpretParser.getItems());
         }
         interpretParser.setValue(initialParser);
@@ -590,13 +591,14 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         return null;
     }
 
-    private static PlainCitationParserChoice parserFromName(String parserName, List<PlainCitationParserChoice> parsers) {
+    private static @NonNull PlainCitationParserChoice parserFromName(String parserName, List<PlainCitationParserChoice> parsers) {
         for (PlainCitationParserChoice parser : parsers) {
             if (parser.getLocalizedName().equals(parserName)) {
                 return parser;
             }
         }
-        return null;
+        // If nothing could be mapped, return the default - set at {@link org.jabref.gui.preferences.JabRefGuiPreferences.JabRefGuiPreferences}
+        return PlainCitationParserChoice.RULE_BASED_GENERAL;
     }
 
     private Optional<Identifier> extractValidIdentifierFromClipboard() {
