@@ -455,11 +455,11 @@ public class ImportHandler {
         }
     }
 
-    public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
-        importEntriesWithDuplicateCheck(database, entriesToAdd, new EntryImportHandlerTracker(stateManager, entriesToAdd.size()));
+    public void importEntriesWithDuplicateCheck(List<BibEntry> entriesToAdd) {
+        importEntriesWithDuplicateCheck(entriesToAdd, new EntryImportHandlerTracker(stateManager, entriesToAdd.size()));
     }
 
-    public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
+    public void importEntriesWithDuplicateCheck(List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {

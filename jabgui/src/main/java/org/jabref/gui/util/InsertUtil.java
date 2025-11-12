@@ -48,6 +48,6 @@ public class InsertUtil {
             }
         });
 
-        importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
+        importHandler.importEntriesWithDuplicateCheck(entriesToAdd, tracker);
     }
 }

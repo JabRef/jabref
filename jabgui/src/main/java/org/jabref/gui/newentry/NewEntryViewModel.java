@@ -433,7 +433,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntriesWithDuplicateCheck(result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -518,7 +518,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntriesWithDuplicateCheck(result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);

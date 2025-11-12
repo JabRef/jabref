@@ -90,7 +90,7 @@ public class CopyToTest {
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(selectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class CopyToTest {
         List<BibEntry> expectedEntries = new ArrayList<>(selectedEntries);
         expectedEntries.add(referencedEntry);
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(expectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(expectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -133,7 +133,7 @@ public class CopyToTest {
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(selectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -152,7 +152,7 @@ public class CopyToTest {
         List<BibEntry> expectedEntries = new ArrayList<>(selectedEntries);
         expectedEntries.add(referencedEntry);
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(expectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(expectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -168,6 +168,6 @@ public class CopyToTest {
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(selectedEntries), trackerCaptor.capture());
     }
 }
