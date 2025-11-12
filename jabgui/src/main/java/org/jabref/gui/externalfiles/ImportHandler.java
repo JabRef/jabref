@@ -28,6 +28,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
+import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
@@ -62,6 +63,7 @@ import org.jabref.model.util.OptionalUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,7 +208,7 @@ public class ImportHandler {
                 }
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry
-                UiTaskExecutor.runInJavaFXThread(() -> importEntries(allEntriesToAdd));
+                UiTaskExecutor.runInJavaFXThread(() -> importEntries(null, allEntriesToAdd));
                 return results;
             }
 
@@ -225,24 +227,32 @@ public class ImportHandler {
     }
 
     /// Cleans up the given entries and adds them to the library.
-    public void importEntries(List<BibEntry> entries) {
+    public void importEntries(@Nullable BibDatabaseContext sourceDatabaseContext, List<BibEntry> entries) {
         ImportCleanup cleanup = ImportCleanup.targeting(targetBibDatabaseContext.getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(entries);
-        importCleanedEntries(entries);
+        importCleanedEntries(sourceDatabaseContext, entries);
     }
 
-    public void importCleanedEntries(List<BibEntry> entries) {
+    public void importCleanedEntries(@Nullable BibDatabaseContext sourceDatabaseContext, List<BibEntry> entries) {
         targetBibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
         addToImportEntriesGroup(entries);
+
+        if (sourceDatabaseContext != null) {
+            entries.stream().forEach(entry -> {
+                LinkedFileTransferHelper
+                        .adjustLinkedFilesForTarget(sourceDatabaseContext, targetBibDatabaseContext, entry, filePreferences);
+            });
+        }
+
         // TODO: Should only be done if NOT copied from other library
         entries.stream().forEach(entry -> downloadLinkedFiles(entry));
     }
 
-    public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
-        importEntryWithDuplicateCheck(entry, BREAK, new EntryImportHandlerTracker(stateManager));
+    public void importEntryWithDuplicateCheck(BibDatabaseContext sourceDatabaseContext, BibEntry entry) {
+        importEntryWithDuplicateCheck(sourceDatabaseContext, entry, BREAK, new EntryImportHandlerTracker(stateManager));
     }
 
     /**
@@ -254,7 +264,7 @@ public class ImportHandler {
      * @param decision the duplicate resolution strategy to apply
      * @param tracker tracks the import status of the entry
      */
-    private void importEntryWithDuplicateCheck(BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
+    private void importEntryWithDuplicateCheck(@Nullable BibDatabaseContext sourceDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
         // The original entry should not be modified
         BibEntry entryCopy = new BibEntry(entry);
         BibEntry entryToInsert = cleanUpEntry(entryCopy);
@@ -275,7 +285,7 @@ public class ImportHandler {
                               finalEntry = duplicateHandledEntry.get();
                           }
 
-                          importCleanedEntries(List.of(finalEntry));
+                          importCleanedEntries(sourceDatabaseContext, List.of(finalEntry));
 
                           tracker.markImported(finalEntry);
                       }).executeWith(taskExecutor);
@@ -455,26 +465,26 @@ public class ImportHandler {
         }
     }
 
-    public void importEntriesWithDuplicateCheck(List<BibEntry> entriesToAdd) {
-        importEntriesWithDuplicateCheck(entriesToAdd, new EntryImportHandlerTracker(stateManager, entriesToAdd.size()));
+    public void importEntriesWithDuplicateCheck(@Nullable BibDatabaseContext sourceDatabaseContext, List<BibEntry> entriesToAdd) {
+        importEntriesWithDuplicateCheck(sourceDatabaseContext, entriesToAdd, new EntryImportHandlerTracker(stateManager, entriesToAdd.size()));
     }
 
-    public void importEntriesWithDuplicateCheck(List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
+    public void importEntriesWithDuplicateCheck(@Nullable BibDatabaseContext sourceDatabaseContext, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
                 LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
-                importEntryWithDuplicateCheck(entry, BREAK, tracker);
+                importEntryWithDuplicateCheck(sourceDatabaseContext, entry, BREAK, tracker);
                 firstEntry = false;
                 continue;
             }
             if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
                 DuplicateResolverDialog.DuplicateResolverResult decision = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
-                importEntryWithDuplicateCheck(entry, decision, tracker);
+                importEntryWithDuplicateCheck(sourceDatabaseContext, entry, decision, tracker);
             } else {
                 LOGGER.debug("not first entry, not pref flag, break will  be used");
-                importEntryWithDuplicateCheck(entry, BREAK, tracker);
+                importEntryWithDuplicateCheck(sourceDatabaseContext, entry, BREAK, tracker);
             }
         }
     }

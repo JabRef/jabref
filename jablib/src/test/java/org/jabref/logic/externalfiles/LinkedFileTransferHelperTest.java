@@ -50,6 +50,7 @@ class LinkedFileTransferHelperTest {
                 .adjustLinkedFilesForTarget(
                         fileTestConfiguration.sourceContext,
                         fileTestConfiguration.targetContext,
+                        fileTestConfiguration.targetEntry,
                         filePreferences);
 
         if (!keepExpectedRelative) {
@@ -334,8 +335,8 @@ class LinkedFileTransferHelperTest {
         sourceContext.getDatabase().insertEntry(sourceEntry);
         targetContext.getDatabase().insertEntry(targetEntry);
 
-        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-                filePreferences);
+        Set<BibEntry> returnedEntries =
+                LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext, targetEntry, filePreferences);
 
         Path expectedFile = targetDir.resolve("sourcefiles/test.pdf");
 

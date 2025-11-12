@@ -7,7 +7,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -42,12 +41,8 @@ public class InsertUtil {
             } else {
                 dialogService.notify(Localization.lang(partialMessage, String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
             }
-            if (sourceDatabaseContext != null) {
-                LinkedFileTransferHelper
-                        .adjustLinkedFilesForTarget(sourceDatabaseContext, targetDatabaseContext, filePreferences);
-            }
         });
 
-        importHandler.importEntriesWithDuplicateCheck(entriesToAdd, tracker);
+        importHandler.importEntriesWithDuplicateCheck(sourceDatabaseContext, entriesToAdd, tracker);
     }
 }

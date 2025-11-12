@@ -107,7 +107,7 @@ public class CitationsRelationsTabViewModel {
         }
 
         existingEntry.setCites(citeKeys);
-        importHandler.importEntries(entries);
+        importHandler.importEntries(null, entries);
     }
 
     /**
@@ -131,7 +131,7 @@ public class CitationsRelationsTabViewModel {
             citingEntry.setCites(existingCites);
         }
 
-        importHandler.importEntries(entries);
+        importHandler.importEntries(null, entries);
     }
 
     public boolean shouldShow() {

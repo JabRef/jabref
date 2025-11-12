@@ -822,7 +822,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        importHandler.importCleanedEntries(entries);
+        importHandler.importCleanedEntries(null, entries);
         getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
         markBaseChanged();
         stateManager.setSelectedEntries(entries);
