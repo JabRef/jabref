@@ -71,25 +71,27 @@ public class LinkedFileTransferHelper {
                     continue;
                 }
 
-                Optional<Path> sourcePathOpt = linkedFile.findIn(sourceContext, filePreferences);
-                if (sourcePathOpt.isEmpty()) {
-                    // In case file does not exist, just keep the broken link
-                    linkedFiles.add(linkedFile);
-                    continue;
-                }
-
                 // Check target bibdatabase context offers any directory to store files in
+                // Condition works, because absolute paths are already skipped
                 Optional<Path> targetPrimaryOpt = getPrimaryPath(targetContext, filePreferences);
                 if (targetPrimaryOpt.isEmpty()) {
                     linkedFiles.add(linkedFile);
                     continue;
                 }
 
+                Optional<Path> sourcePathOpt = linkedFile.findIn(sourceContext, filePreferences);
+                if (sourcePathOpt.isEmpty()) {
+                    // In case file does not exist, just keep the broken link
+                    linkedFiles.add(linkedFile);
+                    continue;
+                }
+                Path sourcePath = sourcePathOpt.get();
+
                 Path relative;
-                if (sourcePathOpt.get().startsWith(targetPrimaryOpt.get())) {
-                    relative = targetPrimaryOpt.get().relativize(sourcePathOpt.get());
+                if (sourcePath.startsWith(targetPrimaryOpt.get())) {
+                    relative = targetPrimaryOpt.get().relativize(sourcePath);
                 } else {
-                    relative = Path.of("..").resolve(sourcePathOpt.get().getFileName());
+                    relative = Path.of("..").resolve(sourcePath.getFileName());
                 }
 
                 if (isReachableFromPrimaryDirectory(relative)) {
@@ -115,12 +117,8 @@ public class LinkedFileTransferHelper {
      * @param filePreferences File preferences for the context
      * @return Optional containing the primary directory path, or empty if none found
      */
-    public static Optional<Path> getPrimaryPath(BibDatabaseContext context, FilePreferences filePreferences) {
-        List<Path> directories = context.getFileDirectories(filePreferences);
-        if (directories.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(directories.getFirst());
+    static Optional<Path> getPrimaryPath(BibDatabaseContext context, FilePreferences filePreferences) {
+        return context.getFileDirectories(filePreferences).stream().findFirst();
     }
 
     /**
