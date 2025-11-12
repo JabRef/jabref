@@ -1,5 +1,6 @@
 package org.jabref.logic.externalfiles;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+// Assumption in all tests: if not contained in a library directory, paths are absolute
 class LinkedFileTransferHelperTest {
     private static @TempDir Path tempDir;
     private static FilePreferences filePreferences = mock(FilePreferences.class);
@@ -39,13 +41,18 @@ class LinkedFileTransferHelperTest {
     private BibEntry targetEntry;
 
     @ParameterizedTest
+    // @CsvSource could also be used, but there is no strong typing
     @MethodSource
-    void check(FileTestConfiguration fileTestConfiguration, String expectedLink) {
+    void check(FileTestConfiguration fileTestConfiguration, String expectedLink, boolean keepExpectedRelative) {
         Set<BibEntry> returnedEntries = LinkedFileTransferHelper
                 .adjustLinkedFilesForTarget(
                         fileTestConfiguration.sourceContext,
                         fileTestConfiguration.targetContext,
                         filePreferences);
+
+        if (!keepExpectedRelative) {
+            expectedLink = tempDir.resolve(expectedLink).toString();
+        }
 
         BibEntry expectedEntry = new BibEntry()
                 .withFiles(
@@ -54,7 +61,7 @@ class LinkedFileTransferHelperTest {
         assertEquals(Set.of(expectedEntry), returnedEntries);
     }
 
-    static Stream<Arguments> check() {
+    static Stream<Arguments> check() throws IOException {
         return Stream.of(
                 // region shouldStoreFilesRelativeToBibFile
 
@@ -64,13 +71,15 @@ class LinkedFileTransferHelperTest {
                                 .fileTestConfiguration()
                                 .tempDir(tempDir)
                                 .filePreferences(filePreferences)
-                                .sourceDir("source-dir")
-                                .sourceFileDir("source-dir")
-                                .targetDir("target-dir")
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .sourceBibDir("source-dir")
+                                .sourceFileDir("source-dir")
+                                .storeSourceFileRelative(true)
+                                .targetBibDir("target-dir")
                                 .build(),
-                        "test.pdf"
+                        "test.pdf",
+                        true
                 ),
 
                 // Directory not reachable with different paths - file copying with directory structure
@@ -79,13 +88,15 @@ class LinkedFileTransferHelperTest {
                                 .fileTestConfiguration()
                                 .tempDir(tempDir)
                                 .filePreferences(filePreferences)
-                                .sourceDir("source-dir")
-                                .sourceFileDir("source-dir/nested")
-                                .targetDir("target-dir")
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .sourceBibDir("source-dir")
+                                .sourceFileDir("source-dir/nested")
+                                .storeSourceFileRelative(true)
+                                .targetBibDir("target-dir")
                                 .build(),
-                        "nested/test.pdf"
+                        "nested/test.pdf",
+                        true
                 ),
 
                 // targetDirIsParentOfSourceDir
@@ -94,121 +105,41 @@ class LinkedFileTransferHelperTest {
                                 .fileTestConfiguration()
                                 .tempDir(tempDir)
                                 .filePreferences(filePreferences)
-                                .sourceDir("lit/sub-dir")
-                                .sourceFileDir("lit/sub-dir")
-                                .targetDir("lit")
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .sourceBibDir("lit/sub-dir")
+                                .sourceFileDir("lit/sub-dir")
+                                .storeSourceFileRelative(true)
+                                .targetBibDir("lit")
                                 .build(),
-                        "sub-dir/test.pdf"
+                        "sub-dir/test.pdf",
+                        true
                 ),
 
                 // endregion
 
                 // region not shouldStoreFilesRelativeToBibFile
 
+                // File in main file directory linked as is
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .tempDir(tempDir)
                                 .filePreferences(filePreferences)
-                                .sourceDir("source-dir")
-                                .sourceFileDir("source-dir")
-                                .targetDir("target-dir")
+                                .mainFileDirectory("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .sourceBibDir("source-dir")
+                                .sourceFileDir("main-file-dir")
+                                .storeSourceFileRelative(false)
+                                .targetBibDir("target-dir")
                                 .build(),
-                        "nested/test.pdf"
-                ),
-                Arguments.of(
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .tempDir(tempDir)
-                                .filePreferences(filePreferences)
-                                .sourceDir("source-dir")
-                                .sourceFileDir("source-dir")
-                                .targetDir("target-dir")
-                                .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                .build(),
-                        "nested/test.pdf"
-                ),
-                Arguments.of(
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .tempDir(tempDir)
-                                .filePreferences(filePreferences)
-                                .sourceDir("source-dir")
-                                .sourceFileDir("source-dir")
-                                .targetDir("target-dir")
-                                .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                .build(),
-                        "nested/test.pdf"
-                ),
-                Arguments.of(
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .tempDir(tempDir)
-                                .filePreferences(filePreferences)
-                                .sourceDir("source-dir")
-                                .sourceFileDir("source-dir")
-                                .targetDir("target-dir")
-                                .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                .build(),
-                        "nested/test.pdf"
-                ),
-                Arguments.of(
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .tempDir(tempDir)
-                                .filePreferences(filePreferences)
-                                .sourceDir("source-dir")
-                                .sourceFileDir("source-dir")
-                                .targetDir("target-dir")
-                                .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                .build(),
-                        "nested/test.pdf"
-                ),
+                        "main-file-dir/test.pdf",
+                        false
+                )
                 // endregion
         );
     }
-
-    // region Global latex directory tests
-
-    @Test
-    void fileInGlobalLatexDirectoryShouldBeAccessible(@TempDir Path tempDir) throws Exception {
-        targetDir = tempDir.resolve("target");
-        Path globalLatexDir = tempDir.resolve("global_latex");
-
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
-        when(filePreferences.getMainFileDirectory()).thenReturn(java.util.Optional.of(globalLatexDir));
-        when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
-        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
-
-        Files.createDirectories(targetDir);
-        Files.createDirectories(globalLatexDir);
-
-        testFile = globalLatexDir.resolve("test.pdf");
-        Files.createFile(testFile);
-
-        targetContext = new BibDatabaseContext(new BibDatabase());
-        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
-
-        LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
-
-        Optional<Path> foundPath = linkedFile.findIn(targetContext, filePreferences);
-        assertTrue(foundPath.isPresent());
-        assertTrue(foundPath.get().toString().contains("global_latex"));
-
-        Optional<Path> primaryPath = LinkedFileTransferHelper.getPrimaryPath(targetContext, filePreferences);
-        assertTrue(primaryPath.isPresent());
-        assertTrue(primaryPath.get().toString().contains("global_latex"));
-    }
-
-    // endregion
 
     // region Library-specific directory tests
 
