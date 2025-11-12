@@ -65,6 +65,12 @@ public class LinkedFileTransferHelper {
                     continue;
                 }
 
+                if (Path.of(linkedFile.getLink()).isAbsolute()) {
+                    // In case the file is an absolute path, there is no need to adjust anything
+                    linkedFiles.add(linkedFile);
+                    continue;
+                }
+
                 Optional<Path> sourcePathOpt = linkedFile.findIn(sourceContext, filePreferences);
                 if (sourcePathOpt.isEmpty()) {
                     // In case file does not exist, just keep the broken link
