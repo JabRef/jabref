@@ -142,22 +142,6 @@ public class LinkedFile implements Serializable {
         }
     }
 
-    public String getFileName() {
-    	String linkName = getLink();
-    	assert linkName != null;
-        int lastSlashIndex = linkName.lastIndexOf('/');
-        if (lastSlashIndex >= 0 && lastSlashIndex < linkName.length() - 1) {
-            linkName = linkName.substring(lastSlashIndex + 1);
-        }
-        if (isOnlineLink() && !linkName.isEmpty()) {
-            int queryIndex = linkName.indexOf('?');
-            if (queryIndex > 0) {
-                linkName = linkName.substring(0, queryIndex);
-            }
-        }
-        return linkName;
-    }
-
     public String getSourceUrl() {
         return sourceURL.get();
     }
@@ -240,17 +224,67 @@ public class LinkedFile implements Serializable {
     public boolean isOnlineLink() {
         return isOnlineLink(link.get());
     }
+    
+    public String getFileName() {
+        String linkedName = link.get();
+        if (isOnlineLink(linkedName)) {
+            int lastSlashIndex = linkedName.lastIndexOf('/');
+            if (lastSlashIndex == linkedName.length() - 1) {
+                linkedName = linkedName.substring(0,lastSlashIndex);
+                lastSlashIndex = linkedName.lastIndexOf('/');
+            }
+            if (lastSlashIndex >= 0) {
+                linkedName = linkedName.substring(lastSlashIndex + 1);
+            }
+
+            int queryIndex = linkedName.indexOf('?');
+            if (queryIndex >= 0) {
+                linkedName = linkedName.substring(0, queryIndex);
+            }
+
+            return linkedName;
+        } else {
+            try {
+                return Path.of(linkedName).getFileName().toString();
+            } catch (InvalidPathException ex) {
+                return "";
+            }
+        }
+    }
+    
+    public Optional<String> getURI(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        List<Path> dirs = databaseContext.getFileDirectories(filePreferences);
+        return getURI(dirs);
+    }
+    
+    public Optional<String> getURI(List<Path> directories) {
+        String linkedName = link.get();
+        if (isOnlineLink(linkedName)) {
+            if (linkedName.startsWith("www.")) {
+                linkedName = "https://"+linkedName;
+            }
+            return Optional.of(linkedName);
+        } else {
+            Optional<Path> fileLocation = findIn(directories);
+            if (fileLocation.isPresent()) {
+                return Optional.of(fileLocation.get().toUri().toString());
+            }
+     	   return Optional.empty();
+        }
+    }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> dirs = databaseContext.getFileDirectories(filePreferences);
         return findIn(dirs);
     }
 
-    /// Tries to locate the file.
-    /// In case the path is absolute, the path is checked.
-    /// In case the path is relative, the given directories are used as base directories.
-    ///
-    /// @return absolute path if found.
+    /**
+     * Tries to locate the file.
+     * In case the path is absolute, the path is checked.
+     * In case the path is relative, the given directories are used as base directories.
+     * 
+     * @return absolute path if found.
+     */
     public Optional<Path> findIn(List<Path> directories) {
         try {
             if (link.get().isEmpty()) {

@@ -230,7 +230,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         Optional<String> image = getCoverImageURI();
         String coverIfAny = "";
         if (image.isPresent()) {
-            coverIfAny = "<img style=\"border-width:1px;border-style:solid;border-colorblack;display:block;height:12rem;\" src=\"%s\"> <br>".formatted(image.get());
+            //TODO: figure out if should to use style field like this, something else, or just use unstyled image
+            coverIfAny = "<img style=\"border-width:1px;border-style:solid;border-color:black;display:block;height:12rem;\" src=\"%s\"> <br>".formatted(image.get());
         }
 
         layoutText = """
@@ -240,7 +241,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     </body>
                 </html>
             """.formatted(coverIfAny, text);
-        System.out.println(layoutText);
         highlightLayoutText();
         setHvalue(0);
     }
@@ -248,21 +248,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private Optional<String> getCoverImageURI() {
         if (shouldShowCoverImage()) {
             String nameFromFormat = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileNamePattern()).orElse("cover");
+            
             List<LinkedFile> linkedFiles = entry.getFiles();
             for (LinkedFile file : linkedFiles) {
-                String fileName = FileUtil.getBaseName(file.getFileName());
-
                 // matches images that are either named according to the preferred file name format
-                // or images with "COVER" in their description, to allow setting the cover to any image regardless of name.
-                if (isFileTypeAValidCoverImage(file.getFileType()) && (fileName.equals(nameFromFormat) || file.getDescription().contains("COVER"))) {
-                    if (file.isOnlineLink()) {
-                        return Optional.of(file.getLink());
-                    } else {
-                    	Optional<Path> fileLocation = file.findIn(databaseContext, preferences.getFilePreferences());
-                    	if (fileLocation.isPresent()) {
-                            return Optional.of(fileLocation.get().toUri().toString());
-                        }
-                    }
+                // or images with case-insensitive "(cover)" in their description, to allow using any image regardless of name
+                
+                if (file.getDescription().toLowerCase().contains("(cover)") || isFileTypeAValidCoverImage(file.getFileType()) && (FileUtil.getBaseName(file.getFileName()).equals(nameFromFormat))) {
+                    return file.getURI(databaseContext, preferences.getFilePreferences());
                 }
             }
         }
@@ -272,7 +265,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private boolean shouldShowCoverImage() {
         //entry is sometimes null when setPreviewText is called
         if (entry == null) {
-        	return false;
+            return false;
         }
 
         return switch (entry.getType()) {
@@ -282,8 +275,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private boolean isFileTypeAValidCoverImage(String fileType) {
+    	// to allow url links
+        if (fileType.equals("")) {
+        	return true;
+        }
         // needed because most image type names are stored in a localization dependent way
         Optional<ExternalFileType> actualFileType = ExternalFileTypes.getExternalFileTypeByName(fileType, preferences.getExternalApplicationsPreferences());
+        
         if (actualFileType.isPresent()) {
             return actualFileType.get().getMimeType().startsWith("image/");
         }

@@ -14,9 +14,16 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.util.OptionalUtil;
+
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.net.MalformedURLException;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.net.URLDownload;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -35,6 +42,10 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     protected final ImportFormatPreferences importFormatPreferences;
     private final List<AbstractIsbnFetcher> retryIsbnFetcher;
     private final GvkFetcher gvkIsbnFetcher;
+    
+	private static final String bookCoverUrlSource = "https://bookcover.longitood.com/bookcover/";
+    private static final String BOOK_COVER_JSON_URL_REGEX = "^\\s*\\{\\s*\"url\"\\s*:\\s*\"([^\"]*)\"\\s*\\}\\s*$";
+    private static final Pattern BOOK_COVER_JSON_URL_PATTERN = Pattern.compile(BOOK_COVER_JSON_URL_REGEX);
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
@@ -85,10 +96,37 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
         if (bibEntry.isEmpty()) {
             LOGGER.debug("Could not found a entry for ISBN {}", identifier);
+        } else {
+        	Optional<LinkedFile> cover = getCoverImageURLFromStringOfISBN(identifier);
+        	if (cover.isPresent()) {
+        		bibEntry.get().addFile(cover.get());
+        	}
         }
 
         return bibEntry;
     }
+    
+    private static Optional<LinkedFile> getCoverImageURLFromStringOfISBN(String identifier) {
+        try {
+            URLDownload downloader = new URLDownload(bookCoverUrlSource + identifier);
+            String json = downloader.asString();
+            Matcher matches = BOOK_COVER_JSON_URL_PATTERN.matcher(json);
+            if (matches.find()) {
+                String coverUrlString = matches.group(1);
+                if (coverUrlString != null) {
+        		    URLDownload downloader = new URLDownload(coverUrlString);
+                importFormatPreferences.filePreferences
+                    System.out.println(coverUrlString);
+                    return Optional.of(new LinkedFile("(cover)", coverUrlString, ""));
+                }
+            }
+        } catch (FetcherException e) {
+            return Optional.empty();
+        } catch (MalformedURLException e) {
+            return Optional.empty();
+        }
+        return Optional.empty();
+	}
 
     @Override
     public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {

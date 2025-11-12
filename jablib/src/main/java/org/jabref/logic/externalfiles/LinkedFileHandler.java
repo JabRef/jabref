@@ -245,14 +245,26 @@ public class LinkedFileHandler {
      * Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
      *
      * @param extension The extension of the file. If empty, no extension is added.
-     * @return The suggested filename, including extension.
+     * @return the suggested filename, including extension
      */
     public String getSuggestedFileName(@NonNull String extension) {
         Optional<String> targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern());
+
         if (targetFileName.isEmpty() && linkedFile.isOnlineLink()) {
-            String fullLinkedFileName = linkedFile.getFileName();
-            extension = FileUtil.getFileExtension(fullLinkedFileName).orElse("");
-            targetFileName = Optional.of(FileUtil.getBaseName(fullLinkedFileName));
+            String linkedName = linkedFile.getLink();
+
+            int lastSlashIndex = linkedName.lastIndexOf('/');
+            if (lastSlashIndex >= 0 && lastSlashIndex < linkedName.length() - 1) {
+                linkedName = linkedName.substring(lastSlashIndex + 1);
+            }
+
+            int queryIndex = linkedName.indexOf('?');
+            if (!linkedName.isEmpty() && queryIndex > 0) {
+                linkedName = linkedName.substring(0, queryIndex);
+            }
+
+            extension = FileUtil.getFileExtension(linkedName).orElse("");
+            targetFileName = Optional.of(FileUtil.getBaseName(linkedName));
         }
 
         String baseName = targetFileName.orElse("file");
