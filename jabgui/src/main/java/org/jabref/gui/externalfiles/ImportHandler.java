@@ -244,6 +244,8 @@ public class ImportHandler {
         generateKeys(entries);
         setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
+        addToImportEntriesGroup(entries);
+        entries.stream().forEach(entry -> downloadLinkedFiles(entry));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -280,11 +282,12 @@ public class ImportHandler {
                               }
                               finalEntry = duplicateHandledEntry.get();
                           }
+
                           importCleanedEntries(bibDatabaseContext, List.of(finalEntry));
-                          addToImportEntriesGroup(List.of(finalEntry));
-                          downloadLinkedFiles(finalEntry);
+
                           BibEntry entryToFocus = finalEntry;
                           stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entryToFocus));
+
                           tracker.markImported();
                       }).executeWith(taskExecutor);
     }
