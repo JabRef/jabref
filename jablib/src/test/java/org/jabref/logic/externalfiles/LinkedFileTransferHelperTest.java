@@ -21,6 +21,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_BIB;
+import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_MAIN_FILE_DIR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -75,7 +77,7 @@ class LinkedFileTransferHelperTest {
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
                                 .sourceBibDir("source-dir")
                                 .sourceFileDir("source-dir")
-                                .storeSourceFileRelative(true)
+                                .testFileLinkMode(RELATIVE_TO_BIB)
                                 .targetBibDir("target-dir")
                                 .build(),
                         "test.pdf",
@@ -92,7 +94,7 @@ class LinkedFileTransferHelperTest {
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
                                 .sourceBibDir("source-dir")
                                 .sourceFileDir("source-dir/nested")
-                                .storeSourceFileRelative(true)
+                                .testFileLinkMode(RELATIVE_TO_BIB)
                                 .targetBibDir("target-dir")
                                 .build(),
                         "nested/test.pdf",
@@ -109,7 +111,7 @@ class LinkedFileTransferHelperTest {
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
                                 .sourceBibDir("lit/sub-dir")
                                 .sourceFileDir("lit/sub-dir")
-                                .storeSourceFileRelative(true)
+                                .testFileLinkMode(RELATIVE_TO_BIB)
                                 .targetBibDir("lit")
                                 .build(),
                         "sub-dir/test.pdf",
@@ -131,13 +133,13 @@ class LinkedFileTransferHelperTest {
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
                                 .sourceBibDir("source-dir")
                                 .sourceFileDir("main-file-dir")
-                                .storeSourceFileRelative(false)
+                                .testFileLinkMode(RELATIVE_TO_MAIN_FILE_DIR)
                                 .targetBibDir("target-dir")
                                 .build(),
                         "main-file-dir/test.pdf",
                         false
                 )
-                // endregion
+                // endregion */
         );
     }
 

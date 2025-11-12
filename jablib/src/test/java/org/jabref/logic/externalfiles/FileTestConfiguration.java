@@ -32,7 +32,6 @@ public class FileTestConfiguration {
     /// @param tempDir the temporary directory to use
     /// @param filePreferences the file preferences to modify
     /// @param sourceFileDir relative to tempDir
-    /// @param storeSourceFileRelative should the path to the test file stored relative (or absolute)
     @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
     public FileTestConfiguration(
             Path tempDir,
@@ -46,7 +45,7 @@ public class FileTestConfiguration {
             @Opt String sourceLibrarySpecificFileDirectory,
             @Opt String sourceUserSpecificFileDirectory,
             String sourceFileDir,
-            boolean storeSourceFileRelative,
+            TestFileLinkMode testFileLinkMode,
 
             String targetBibDir,
             @Opt String targetLibrarySpecificFileDirectory,
@@ -61,12 +60,20 @@ public class FileTestConfiguration {
         this.sourceFile = sourceFileDirPath.resolve("test.pdf");
         Files.createFile(this.sourceFile);
 
-        String fileLink;
-        if (storeSourceFileRelative) {
-            fileLink = Path.of(sourceFileDir).resolve("test.pdf").toString();
-        } else {
-            fileLink = sourceFile.toString();
-        }
+        Path resolvedSourceFile = sourceFileDirPath.resolve("test.pdf");
+        Path fileLinkPath = switch (testFileLinkMode) {
+            case ABSOLUTE ->
+                    resolvedSourceFile;
+            case RELATIVE_TO_BIB ->
+                    this.sourceBibDir.relativize(resolvedSourceFile);
+            case RELATIVE_TO_MAIN_FILE_DIR ->
+                    tempDir.resolve(mainFileDirectory).relativize(resolvedSourceFile);
+            case RELATIVE_TO_LIBRARY_SPECIFIC_DIR ->
+                    tempDir.resolve(sourceLibrarySpecificFileDirectory).relativize(resolvedSourceFile);
+            case RELATIVE_TO_USER_SPECIFIC_DIR ->
+                    tempDir.resolve(sourceUserSpecificFileDirectory).relativize(resolvedSourceFile);
+        };
+        String fileLink = fileLinkPath.toString();
         LinkedFile linkedFile = new LinkedFile("", fileLink, "PDF");
         sourceEntry = new BibEntry()
                 .withFiles(List.of(linkedFile));
@@ -101,5 +108,13 @@ public class FileTestConfiguration {
         if (targetUserSpecificFileDirectory != null) {
             targetContext.getMetaData().setUserFileDirectory("testuser", targetUserSpecificFileDirectory);
         }
+    }
+
+    enum TestFileLinkMode {
+        ABSOLUTE,
+        RELATIVE_TO_MAIN_FILE_DIR,
+        RELATIVE_TO_BIB,
+        RELATIVE_TO_LIBRARY_SPECIFIC_DIR,
+        RELATIVE_TO_USER_SPECIFIC_DIR
     }
 }
