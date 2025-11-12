@@ -250,7 +250,7 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
-        importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK, new EntryImportHandlerTracker());
+        importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK, new EntryImportHandlerTracker(stateManager));
     }
 
     /**
@@ -464,7 +464,7 @@ public class ImportHandler {
     }
 
     public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
-        importEntriesWithDuplicateCheck(database, entriesToAdd, new EntryImportHandlerTracker());
+        importEntriesWithDuplicateCheck(database, entriesToAdd, new EntryImportHandlerTracker(stateManager, entriesToAdd.size()));
     }
 
     public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {

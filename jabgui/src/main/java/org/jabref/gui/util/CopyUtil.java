@@ -26,7 +26,7 @@ public class CopyUtil {
                                                ImportHandler importHandler,
                                                StateManager stateManager
     ) {
-        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(entriesToAdd.size());
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entriesToAdd.size());
         tracker.setOnFinish(() -> {
             int importedCount = tracker.getImportedCount();
             int skippedCount = tracker.getSkippedCount();
@@ -46,7 +46,6 @@ public class CopyUtil {
                 LinkedFileTransferHelper
                         .adjustLinkedFilesForTarget(sourceDatabaseContext, targetDatabaseContext, filePreferences);
             }
-            stateManager.setSelectedEntries(tracker.getImportedEntries());
         });
 
         importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
