@@ -275,9 +275,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private boolean isFileTypeAValidCoverImage(String fileType) {
-    	// to allow url links
+        // to allow url links
         if (fileType.equals("")) {
-        	return true;
+            return true;
         }
         // needed because most image type names are stored in a localization dependent way
         Optional<ExternalFileType> actualFileType = ExternalFileTypes.getExternalFileTypeByName(fileType, preferences.getExternalApplicationsPreferences());

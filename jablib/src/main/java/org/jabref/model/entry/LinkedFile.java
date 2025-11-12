@@ -269,7 +269,7 @@ public class LinkedFile implements Serializable {
             if (fileLocation.isPresent()) {
                 return Optional.of(fileLocation.get().toUri().toString());
             }
-     	   return Optional.empty();
+            return Optional.empty();
         }
     }
 
