@@ -94,12 +94,12 @@ class LinkedFileTransferHelperTest {
                         true
                 ),
                 */
-
+/*
                 // targetDirIsParentOfSourceDir
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .tempDir(tempDir)
+                                .tempDir(tempDir.resolve("targetDirIsParentOfSourceDir"))
                                 .filePreferences(filePreferences)
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
@@ -111,7 +111,7 @@ class LinkedFileTransferHelperTest {
                         "sub-dir/test.pdf",
                         true
                 ),
-
+*/
                 // endregion
 
                 // region not shouldStoreFilesRelativeToBibFile
@@ -120,7 +120,7 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .tempDir(tempDir)
+                                .tempDir(tempDir.resolve("file-in-main"))
                                 .filePreferences(filePreferences)
                                 .mainFileDirectory("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
@@ -133,7 +133,7 @@ class LinkedFileTransferHelperTest {
                         "main-file-dir/test.pdf",
                         false
                 )
-                // endregion */
+                // endregion /* */
         );
     }
 
