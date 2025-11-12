@@ -245,6 +245,7 @@ public class ImportHandler {
         setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
         addToImportEntriesGroup(entries);
+        // TODO: Should only be done if NOT copied from other library
         entries.stream().forEach(entry -> downloadLinkedFiles(entry));
     }
 
