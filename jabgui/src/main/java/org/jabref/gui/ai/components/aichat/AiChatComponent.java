@@ -194,6 +194,7 @@ public class AiChatComponent extends VBox {
         });
 
         chatPrompt.setRegenerateCallback(() -> {
+            setLoading(true);
             Optional<UserMessage> lastUserPrompt = Optional.empty();
             if (!aiChatLogic.getChatHistory().isEmpty()) {
                 lastUserPrompt = getLastUserMessage();
