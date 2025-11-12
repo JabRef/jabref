@@ -3,10 +3,13 @@ package org.jabref.model.groups;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.MetaData;
@@ -18,6 +21,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseLogic("Because it needs to recognize a PDF")
 public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryGroup.class);
@@ -83,6 +87,28 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         this.getColor().ifPresent(descendantGroup::setColor);
         this.getIconName().ifPresent(descendantGroup::setIconName);
         return descendantGroup;
+    }
+
+    public List<Path> getAllPDFs() {
+        File parentFolder = absoluteDirectoryPath.toFile();
+        Optional<GroupTreeNode> parentNode = getNode();
+        List<Path> allPDFs = new ArrayList<>();
+        File[] files = parentFolder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (FileUtil.isPDFFile(file.toPath())) {
+                    allPDFs.add(file.toPath());
+                }
+            }
+        }
+        if (parentNode.isPresent()) {
+            for (GroupTreeNode childNode : parentNode.get().getChildren()) {
+                if (childNode.getGroup() instanceof DirectoryGroup childGroup) {
+                    allPDFs.addAll(childGroup.getAllPDFs());
+                }
+            }
+        }
+        return allPDFs;
     }
 
     public Optional<GroupTreeNode> getNode() {

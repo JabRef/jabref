@@ -1,6 +1,7 @@
 package org.jabref.gui.groups;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -20,12 +23,14 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.components.aichat.AiChatWindow;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
@@ -47,6 +52,7 @@ import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
@@ -60,6 +66,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final AiService aiService;
     private final GuiPreferences preferences;
+    private final FileUpdateMonitor fileUpdateMonitor;
+    private final UndoManager undoManager;
     private final AdaptVisibleTabs adaptVisibleTabs;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
@@ -87,6 +95,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                               @NonNull DialogService dialogService,
                               @NonNull AiService aiService,
                               @NonNull GuiPreferences preferences,
+                              @NonNull FileUpdateMonitor fileUpdateMonitor,
+                              @NonNull UndoManager undoManager,
                               @NonNull AdaptVisibleTabs adaptVisibleTabs,
                               @NonNull TaskExecutor taskExecutor,
                               @NonNull CustomLocalDragboard localDragboard
@@ -95,6 +105,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.aiService = aiService;
         this.preferences = preferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.undoManager = undoManager;
         this.adaptVisibleTabs = adaptVisibleTabs;
         this.taskExecutor = taskExecutor;
         this.localDragboard = localDragboard;
@@ -231,6 +243,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     try {
                         writeGroupChangesToMetaData();
                         directoryStructureRoot.addDescendants();
+                        List<Path> allPDFs = directoryStructureRoot.getAllPDFs();
+                        ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
+                        importHandler.importFilesInBackground(allPDFs, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
                     } catch (IOException e) {
                         dialogService.showErrorDialogAndWait(e.getMessage(), Localization.lang("Cannot create directory structure."));
                     }

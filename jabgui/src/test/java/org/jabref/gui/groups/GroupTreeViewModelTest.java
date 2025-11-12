@@ -4,12 +4,15 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -63,7 +66,7 @@ class GroupTreeViewModelTest {
                 true,
                 true,
                 GroupHierarchyType.INDEPENDENT));
-        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
     }
 
     @Test
@@ -111,7 +114,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -123,7 +126,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -135,7 +138,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -147,7 +150,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -159,7 +162,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldAddsAllSuggestedGroupsWhenNoneExist() {
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         assertFalse(rootGroup.hasAllSuggestedGroups());
 
@@ -171,7 +174,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldAddOnlyMissingGroup() {
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutFilesGroup());
         assertEquals(1, rootGroup.getChildren().size());
@@ -184,7 +187,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldNotAddSuggestedGroupsWhenAllExist() {
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutFilesGroup());
         rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutGroupsGroup());
@@ -201,7 +204,7 @@ class GroupTreeViewModelTest {
         preferences.getLibraryPreferences().setAddImportedEntries(true);
 
         List<GroupNodeViewModel> prevModel = groupTree.rootGroupProperty().getValue().getChildren();
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
 
         assertEquals(0, prevModel.size());
@@ -213,7 +216,7 @@ class GroupTreeViewModelTest {
         preferences.getLibraryPreferences().setAddImportedEntries(true);
         preferences.getLibraryPreferences().setAddImportedEntriesGroupName("Review list");
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, new DefaultFileUpdateMonitor(), new UndoManager(), mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
 
         assertEquals("Review list", actualGrpName);
