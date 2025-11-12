@@ -131,8 +131,8 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
     public boolean contains(BibEntry entry) {
         List<LinkedFile> entryFiles = entry.getFiles();
         for (LinkedFile linkedFile : entryFiles) {
-            Path filePath = Path.of(linkedFile.getLink());
-            if (absoluteDirectoryPath.toString().endsWith(filePath.getParent().toString())) {
+            Path parentPath = Path.of(linkedFile.getLink()).getParent();
+            if (parentPath != null && absoluteDirectoryPath.toString().endsWith(parentPath.toString())) {
                 return true;
             }
         }
