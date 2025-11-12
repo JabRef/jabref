@@ -134,6 +134,8 @@ public class GroupNodeViewModel {
         allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
 
         this.databaseContext.getDatabase().registerListener(new SearchIndexListener());
+
+        updateMatchedEntries();
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, GuiPreferences preferences) {
@@ -272,7 +274,7 @@ public class GroupNodeViewModel {
                 // Nothing to do, as permutation doesn't change matched entries
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
-                    if (groupNode.matches(changedEntry)) {
+                    if (isMatchEffective(this, changedEntry)) {
                         // ADR-0038
                         matchedEntries.add(changedEntry.getId());
                     } else {
@@ -286,7 +288,7 @@ public class GroupNodeViewModel {
                     matchedEntries.remove(removedEntry.getId());
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
-                    if (groupNode.matches(addedEntry)) {
+                    if (isMatchEffective(this, addedEntry)) {
                         // ADR-0038
                         matchedEntries.add(addedEntry.getId());
                     }
@@ -312,7 +314,9 @@ public class GroupNodeViewModel {
         // for example, a previously matched entry gets removed -> hits = hits - 1
         if (preferences.getGroupsPreferences().shouldDisplayGroupCount()) {
             BackgroundTask
-                    .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
+                    .wrap(() -> databaseContext.getDatabase().getEntries().stream()
+                                               .filter(e -> isMatchEffective(this, e))
+                                               .toList())
                     .onSuccess(entries -> {
                         matchedEntries.clear();
                         // ADR-0038
@@ -582,6 +586,36 @@ public class GroupNodeViewModel {
         };
     }
 
+    private boolean isMatchEffective(GroupNodeViewModel vm, BibEntry entry) {
+        GroupTreeNode node = vm.groupNode;
+        return switch (node.getGroup().getHierarchicalContext()) {
+            case INDEPENDENT ->
+                    node.matches(entry);
+
+            case INCLUDING -> {
+                if (node.matches(entry)) {
+                    yield true;
+                }
+                // recursively check VM-children (including auto-groups)
+                yield vm.children.stream().anyMatch(childVm -> isMatchEffective(childVm, entry));
+            }
+
+            case REFINING -> {
+                if (!node.matches(entry)) {
+                    yield false;
+                }
+                var parent = node.getParent();
+                while (parent.isPresent()) {
+                    if (!parent.get().matches(entry)) {
+                        yield false;
+                    }
+                    parent = parent.get().getParent();
+                }
+                yield true;
+            }
+        };
+    }
+
     class SearchIndexListener {
         @Subscribe
         public void listen(IndexStartedEvent event) {
@@ -603,7 +637,7 @@ public class GroupNodeViewModel {
                     }
                 }).onFinished(() -> {
                     for (BibEntry entry : event.entries()) {
-                        if (groupNode.matches(entry)) {
+                        if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
                             matchedEntries.add(entry.getId());
                         } else {
                             matchedEntries.remove(entry.getId());
