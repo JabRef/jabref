@@ -1,9 +1,11 @@
 package org.jabref.gui.fieldeditors;
 
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -15,19 +17,18 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DateEditorViewModel extends AbstractEditorViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DateEditorViewModel.class);
-    private final DateTimeFormatter dateFormatter;
     private static final TemporalAccessor RANGE_SENTINEL = LocalDate.of(1, 1, 1);
 
-    public DateEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, DateTimeFormatter dateFormatter, FieldCheckers fieldCheckers, UndoManager undoManager) {
+    private final DateTimeFormatter dateFormatter;
+
+    public DateEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, DateTimeFormatter dateFormatter,
+                               FieldCheckers fieldCheckers, UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dateFormatter = dateFormatter;
     }
@@ -40,7 +41,6 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
                 if (currentText != null && !currentText.isEmpty()) {
                     Optional<Date> parsedDate = Date.parse(currentText);
                     if (parsedDate.isPresent() && parsedDate.get().getEndDate().isPresent()) {
-
                         return currentText;
                     }
                 }
@@ -76,7 +76,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
             @Override
             public TemporalAccessor fromString(String string) {
                 if (StringUtil.isNotBlank(string)) {
-                    // ✅ NEW: Sanitize incomplete ranges (e.g., "2010/" → "2010")
+                    // ✅ Sanitize incomplete ranges (e.g., "2010/" → "2010")
                     String sanitizedString = sanitizeIncompleteRange(string);
 
                     // Priority 1: Check if it's a date range
