@@ -69,6 +69,7 @@ public class LinkedFileTransferHelper {
                 if (sourcePathOpt.isEmpty()) {
                     // In case file does not exist, just keep the broken link
                     linkedFiles.add(linkedFile);
+                    continue;
                 }
 
                 // TODO: This condition is strange
