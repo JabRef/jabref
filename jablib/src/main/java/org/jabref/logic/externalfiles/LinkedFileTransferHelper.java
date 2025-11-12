@@ -78,7 +78,7 @@ public class LinkedFileTransferHelper {
                     continue;
                 }
 
-                // TODO: This condition is strange
+                // Check target bibdatabase context offers any directory to store files in
                 Optional<Path> targetPrimaryOpt = getPrimaryPath(targetContext, filePreferences);
                 if (targetPrimaryOpt.isEmpty()) {
                     linkedFiles.add(linkedFile);
