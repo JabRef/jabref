@@ -9,10 +9,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Immutable metrics summary for one evaluation run. */
+/**
+ * Immutable metrics summary for one evaluation run.
+ */
 public final class RelatedWorkMetrics {
 
-    /** Per-entry result summary. */
+    /**
+     * Per-entry result summary.
+     */
     public static final class PerEntry {
         public final String key; // canonical key: firstAuthor-lastname-lower + "-" + year
         public final int expectedSnippets;
@@ -94,7 +98,9 @@ public final class RelatedWorkMetrics {
                 avgSnippetsPerAnnotatedEntry);
     }
 
-    /** Builds per-entry summaries from confusion sets. */
+    /**
+     * Builds per-entry summaries from confusion sets.
+     */
     static List<PerEntry> perEntryFrom(Map<String, List<String>> expectedByKey,
                                        Map<String, List<String>> extractedByKey,
                                        Map<String, Set<Integer>> matchedIdxByKey) {

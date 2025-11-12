@@ -24,11 +24,11 @@ public class RelatedWorkMetricsTest {
     public void evaluateFixtureInline() {
         // 1. Inline Related Work text (shortened example)
         String relatedWorkText = """
-            Existing environmental LCAs include Italian chocolate production (Vesce et al., 2016),
-            a comparison of milk and white chocolate (Bianchi et al., 2021),
-            chocolate production and consumption in the UK (Konstantas et al., 2018),
-            and dark chocolate cradle-to-grave (Recanati et al., 2018).
-            """;
+                Existing environmental LCAs include Italian chocolate production (Vesce et al., 2016),
+                a comparison of milk and white chocolate (Bianchi et al., 2021),
+                chocolate production and consumption in the UK (Konstantas et al., 2018),
+                and dark chocolate cradle-to-grave (Recanati et al., 2018).
+                """;
 
         // 2. Inline expected matches
         List<RelatedWorkFixture.Expectation> expectations = List.of(

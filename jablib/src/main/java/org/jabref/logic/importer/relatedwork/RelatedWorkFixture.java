@@ -11,7 +11,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/** Gold fixture model used for evaluating citation-context extraction. */
+/**
+ * Gold fixture model used for evaluating citation-context extraction.
+ */
 public final class RelatedWorkFixture {
 
     public static final class Expectation {
@@ -50,7 +52,9 @@ public final class RelatedWorkFixture {
         this.expectations = expectations;
     }
 
-    /** Load a fixture from a JSON file. */
+    /**
+     * Load a fixture from a JSON file.
+     */
     public static RelatedWorkFixture load(Path jsonPath) throws IOException {
         try (Reader r = Files.newBufferedReader(jsonPath)) {
             return new ObjectMapper().readValue(r, RelatedWorkFixture.class);
