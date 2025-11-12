@@ -1,0 +1,34 @@
+///usr/bin/env jbang "$0" "$@" ; exit $?
+
+import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+
+import org.tinylog.Logger;
+
+//DESCRIPTION Converts a DOI to BibTeX
+
+//JAVA 25+
+//RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
+//FILES tinylog.properties=tinylog.properties
+
+//DEPS org.jabref:jablib:6.0-SNAPSHOT
+//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+
+void main() throws Exception {
+    var preferences = JabRefCliPreferences.getInstance();
+
+    // All `IdParserFetcher<DOI>` can do. In JabRef, there is currently only one implemented
+
+    var fetcher = new CrossRef();
+    var entry = fetcher.performSearchById("10.47397/tb/44-3/tb138kopp-jabref").get(); // will throw an exception if not found
+
+    try (var writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
+        var context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        var bibWriter = new BibDatabaseWriter(writer, context, preferences);
+        bibWriter.writeDatabase(context);
+    }
+}
