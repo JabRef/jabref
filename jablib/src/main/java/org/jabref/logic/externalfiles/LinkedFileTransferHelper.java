@@ -1,7 +1,6 @@
 package org.jabref.logic.externalfiles;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -15,7 +14,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,108 +151,5 @@ public class LinkedFileTransferHelper {
      */
     static Optional<Path> getPrimaryPath(BibDatabaseContext context, FilePreferences filePreferences) {
         return context.getFileDirectories(filePreferences).stream().findFirst();
-    }
-
-    /**
-     * Determines if the given relative path is reachable from the primary directory.
-     * A path is considered reachable if it does not start with ".." (i.e., does not traverse up the directory tree)
-     * and is not absolute.
-     *
-     * @param relativePath the path to check, relative to the primary directory
-     * @return true if the path is reachable from the primary directory, false otherwise
-     */
-
-    public static boolean isReachableFromPrimaryDirectory(Path relativePath) {
-        return !relativePath.startsWith("..") && !relativePath.isAbsolute();
-    }
-
-    private static boolean isPathAdjusted(LinkedFile linkedFile, Path relative, List<LinkedFile> linkedFiles, boolean entryChanged) {
-        boolean pathUpdated = adjustPathForReachableFile(
-                linkedFile, relative
-        );
-        if (pathUpdated) {
-            entryChanged = true;
-        }
-        linkedFiles.add(linkedFile);
-        return entryChanged;
-    }
-
-    private static boolean isFileCopied(FileCopyContext context, LinkedFile linkedFile, List<LinkedFile> linkedFiles, boolean entryChanged) {
-        boolean fileCopied = copyFileToTargetContext(
-                linkedFile, context
-        );
-        if (fileCopied) {
-            Optional<Path> newPath = linkedFile.findIn(context.targetContext(), context.filePreferences());
-            newPath.ifPresent(path -> linkedFile.setLink(
-                    FileUtil.relativize(path, context.targetContext(), context.filePreferences()).toString())
-            );
-            entryChanged = true;
-        }
-        linkedFiles.add(linkedFile);
-        return entryChanged;
-    }
-
-    /**
-     * Adjusts the path of a file that is already reachable from the target context.
-     *
-     * @return true if the path was updated, false otherwise
-     */
-    private static boolean adjustPathForReachableFile(
-            @NonNull LinkedFile linkedFile,
-            @NonNull Path relativePath
-    ) {
-        // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
-        String newLink = relativePath.toString();
-        String currentLink = linkedFile.getLink();
-        if (!currentLink.equals(newLink)) {
-            linkedFile.setLink(newLink);
-            LOGGER.debug("Adjusted path for reachable file: {} -> {}", currentLink, newLink);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Copies a file linked in a `LinkedFile` from the source context to the target context.
-     * Locates the source file using the source context and file preferences, then copies it to the
-     * corresponding path in the target context's primary directory, preserving the relative link.
-     *
-     * @return true if the file was successfully copied, false otherwise
-     */
-    private static boolean copyFileToTargetContext(
-            LinkedFile linkedFile,
-            FileCopyContext context
-    ) {
-        // [impl->req~logic.externalfiles.file-transfer.not-reachable-same-path~1]
-        // [impl->req~logic.externalfiles.file-transfer.not-reachable-different-path~1]
-        Optional<Path> sourcePathOpt = linkedFile.findIn(context.sourceContext(), context.filePreferences());
-        if (sourcePathOpt.isEmpty()) {
-            LOGGER.warn("Could not find source file {} to copy", linkedFile.getLink());
-            return false;
-        }
-
-        Optional<Path> targetDirOpt = getPrimaryPath(context.targetContext(), context.filePreferences());
-        if (targetDirOpt.isEmpty()) {
-            LOGGER.warn("Could not find any target directory", linkedFile.getLink());
-            return false;
-        }
-
-        Path sourcePath = sourcePathOpt.get();
-        Path relativeLinkPath = Path.of(linkedFile.getLink());
-        Path fullTargetPath = targetDirOpt.get().resolve(relativeLinkPath);
-
-        try {
-            // [impl->req~logic.externalfiles.file-transfer.not-reachable-different-path~1]
-            Files.createDirectories(fullTargetPath.getParent());
-            Files.copy(sourcePath, fullTargetPath); // no overwrite
-            LOGGER.info("Copied file from {} to {}", sourcePath, fullTargetPath);
-            return true;
-        } catch (FileAlreadyExistsException e) {
-            LOGGER.warn("Target file {} already exists – not overwriting", fullTargetPath);
-            return false;
-        } catch (IOException e) {
-            LOGGER.error("Failed to copy file from {} to {}: {}", sourcePath, fullTargetPath, e.getMessage(), e);
-            return false;
-        }
     }
 }
