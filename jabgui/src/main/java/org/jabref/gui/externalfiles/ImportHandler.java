@@ -243,7 +243,7 @@ public class ImportHandler {
         if (sourceDatabaseContext != null) {
             entries.stream().forEach(entry -> {
                 LinkedFileTransferHelper
-                        .adjustLinkedFilesForTarget(sourceDatabaseContext, targetBibDatabaseContext, entry, filePreferences);
+                        .adjustLinkedFilesForTarget(filePreferences, sourceDatabaseContext, targetBibDatabaseContext, entry);
             });
         }
 

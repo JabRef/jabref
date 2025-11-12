@@ -35,21 +35,19 @@ public class LinkedFileTransferHelper {
      * Adjusts linked files when copying entries from source to target context.
      * Files that are not reachable from the target context will be copied.
      * Files in the target context whose relative paths differ from the source will have their paths adjusted.
-     *
+     * <p>
      * There is no need to know the source entry, because we are interested in the file paths only.
      *
-     * @param sourceContext The source database context where files are currently located
-     * @param targetContext The target database context where files should be accessible
-     * @param targetEntry The entry in thet targetContext
      * @param filePreferences File preferences for both contexts
-     *
+     * @param sourceContext   The source database context where files are currently located
+     * @param targetContext   The target database context where files should be accessible
+     * @param targetEntry     The entry in thet targetContext
      * @return set of modified entries. Used for testing.
      */
     public static Set<BibEntry> adjustLinkedFilesForTarget(
-            BibDatabaseContext sourceContext,
+            FilePreferences filePreferences, BibDatabaseContext sourceContext,
             BibDatabaseContext targetContext,
-            BibEntry targetEntry,
-            FilePreferences filePreferences
+            BibEntry targetEntry
     ) {
         if (!filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()) {
             return Set.of();
