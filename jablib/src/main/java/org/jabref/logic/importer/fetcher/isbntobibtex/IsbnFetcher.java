@@ -24,7 +24,6 @@ import java.util.regex.Matcher;
 import java.net.MalformedURLException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -45,7 +44,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     private final GvkFetcher gvkIsbnFetcher;
     
     private static final String bookCoverSource = "https://bookcover.longitood.com/bookcover/";
-    private static final Pattern BOOK_COVER_PATTERN = Pattern.compile("^\\s*\\{\\s*\"url\"\\s*:\\s*\"([^\"]*)\"\\s*\\}\\s*$";);
+    private static final Pattern BOOK_COVER_PATTERN = Pattern.compile("^\\s*\\{\\s*\"url\"\\s*:\\s*\"([^\"]*)\"\\s*\\}\\s*$");
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
@@ -133,8 +132,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
             if (matches.find()) {
                 String coverUrlString = matches.group(1);
                 if (coverUrlString != null) {
-                    URLDownload downloader = new URLDownload(coverUrlString);
-                    return Optional.of(new LinkedFile("(cover)", coverUrlString, ""));
+                    return Optional.of(new LinkedFile("[cover]", coverUrlString, ""));
                 }
             }
         } catch (FetcherException e) {

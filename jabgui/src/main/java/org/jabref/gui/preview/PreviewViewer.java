@@ -254,9 +254,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             List<LinkedFile> linkedFiles = entry.getFiles();
             for (LinkedFile file : linkedFiles) {
                 // matches images that are either named according to the preferred file name format
-                // or images with case-insensitive "(cover)" in their description, to allow using any image regardless of name
+                // or images with case-insensitive "[cover]" in their description, to allow using any image regardless of name
                 
-                if (file.getDescription().toLowerCase().contains("(cover)") || isFileTypeAValidCoverImage(file.getFileType()) && (FileUtil.getBaseName(file.getFileName()).equals(nameFromFormat))) {
+                if (file.getDescription().toLowerCase().contains("[cover]") || isFileTypeAValidCoverImage(file.getFileType()) && (FileUtil.getBaseName(file.getFileName()).equals(nameFromFormat))) {
                     return file.getURI(databaseContext, preferences.getFilePreferences());
                 }
             }
