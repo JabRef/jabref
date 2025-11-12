@@ -192,10 +192,14 @@ public class LinkedFileTransferHelper {
         // [impl->req~logic.externalfiles.file-transfer.not-reachable-same-path~1]
         // [impl->req~logic.externalfiles.file-transfer.not-reachable-different-path~1]
         Optional<Path> sourcePathOpt = linkedFile.findIn(context.sourceContext(), context.filePreferences());
-        Optional<Path> targetDirOpt = getPrimaryPath(context.targetContext(), context.filePreferences());
+        if (sourcePathOpt.isEmpty()) {
+            LOGGER.warn("Could not find source file {} to copy", linkedFile.getLink());
+            return false;
+        }
 
-        if (sourcePathOpt.isEmpty() || targetDirOpt.isEmpty()) {
-            LOGGER.warn("Could not find source file {} for copy", linkedFile.getLink());
+        Optional<Path> targetDirOpt = getPrimaryPath(context.targetContext(), context.filePreferences());
+        if (targetDirOpt.isEmpty()) {
+            LOGGER.warn("Could not find any target directory", linkedFile.getLink());
             return false;
         }
 
