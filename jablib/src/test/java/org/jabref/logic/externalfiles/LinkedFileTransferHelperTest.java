@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabase;
@@ -15,6 +16,9 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,6 +27,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class LinkedFileTransferHelperTest {
+    private static @TempDir Path tempDir;
+    private static FilePreferences filePreferences = mock(FilePreferences.class);
+
     private BibDatabaseContext sourceContext;
     private BibDatabaseContext targetContext;
     private Path sourceDir;
@@ -30,173 +37,144 @@ class LinkedFileTransferHelperTest {
     private Path testFile;
     private BibEntry sourceEntry;
     private BibEntry targetEntry;
-    private final FilePreferences filePreferences = mock(FilePreferences.class);
 
-    @Test
-    void targetDirIsParentOfSourceDir(@TempDir Path tempDir) throws Exception {
-        FileTestConfiguration fileTestConfiguration = FileTestConfigurationBuilder.fileTestConfiguration()
-                                    .tempDir(tempDir)
-                                    .filePreferences(filePreferences)
-                                    .sourceDir("lit/subdir")
-                                    .sourceFile("test.pdf")
-                                    .targetDir("lit")
-                                    .shouldStoreFilesRelativeToBibFile(true)
-                                    .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                    .build();
-
-        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(
-                fileTestConfiguration.sourceContext,
-                fileTestConfiguration.targetContext,
-                filePreferences);
+    @ParameterizedTest
+    @MethodSource
+    void check(FileTestConfiguration fileTestConfiguration, String expectedLink) {
+        Set<BibEntry> returnedEntries = LinkedFileTransferHelper
+                .adjustLinkedFilesForTarget(
+                        fileTestConfiguration.sourceContext,
+                        fileTestConfiguration.targetContext,
+                        filePreferences);
 
         BibEntry expectedEntry = new BibEntry()
-                .withFiles(List.of(new LinkedFile("", "subdir/test.pdf", "PDF")));
+                .withFiles(
+                        List.of(new LinkedFile("", expectedLink, "PDF")));
 
         assertEquals(Set.of(expectedEntry), returnedEntries);
     }
 
-    // region Case 2: Directory not reachable - file copying with same relative paths
+    static Stream<Arguments> check() {
+        return Stream.of(
+                // region shouldStoreFilesRelativeToBibFile
 
-    @Test
-    void fileNotReachableShouldCopyFile(@TempDir Path tempDir) throws Exception {
-        sourceDir = tempDir.resolve("source/targetfiles");
-        targetDir = tempDir.resolve("target/sourcefiles");
+                // file next to .bib file should be copied
+                Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .tempDir(tempDir)
+                                .filePreferences(filePreferences)
+                                .sourceDir("source-dir")
+                                .sourceFileDir("source-dir")
+                                .targetDir("target-dir")
+                                .shouldStoreFilesRelativeToBibFile(true)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .build(),
+                        "test.pdf"
+                ),
 
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
+                // Directory not reachable with different paths - file copying with directory structure
+                Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .tempDir(tempDir)
+                                .filePreferences(filePreferences)
+                                .sourceDir("source-dir")
+                                .sourceFileDir("source-dir/nested")
+                                .targetDir("target-dir")
+                                .shouldStoreFilesRelativeToBibFile(true)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .build(),
+                        "nested/test.pdf"
+                ),
 
-        Files.createDirectories(sourceDir);
-        Files.createDirectories(targetDir);
+                // targetDirIsParentOfSourceDir
+                Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .tempDir(tempDir)
+                                .filePreferences(filePreferences)
+                                .sourceDir("lit/sub-dir")
+                                .sourceFileDir("lit/sub-dir")
+                                .targetDir("lit")
+                                .shouldStoreFilesRelativeToBibFile(true)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .build(),
+                        "sub-dir/test.pdf"
+                ),
 
-        testFile = sourceDir.resolve("test.pdf");
-        Files.createDirectories(testFile.getParent());
-        Files.createFile(testFile);
+                // endregion
 
-        sourceContext = new BibDatabaseContext(new BibDatabase());
-        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
-        targetContext = new BibDatabaseContext(new BibDatabase());
-        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+                // region not shouldStoreFilesRelativeToBibFile
 
-        sourceEntry = new BibEntry();
-        LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
-
-        sourceEntry.setFiles(List.of(linkedFile));
-        targetEntry = new BibEntry(sourceEntry);
-        targetEntry.setFiles(List.of(linkedFile));
-
-        sourceContext.getDatabase().insertEntry(sourceEntry);
-        targetContext.getDatabase().insertEntry(targetEntry);
-
-        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-                filePreferences);
-
-        BibEntry expectedEntry = new BibEntry();
-        LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
-        expectedEntry.setFiles(List.of(expectedLinkedFile));
-
-        Set<BibEntry> expectedEntries = Set.of(expectedEntry);
-
-        assertEquals(expectedEntries, returnedEntries);
+                Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .tempDir(tempDir)
+                                .filePreferences(filePreferences)
+                                .sourceDir("source-dir")
+                                .sourceFileDir("source-dir")
+                                .targetDir("target-dir")
+                                .shouldStoreFilesRelativeToBibFile(false)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .build(),
+                        "nested/test.pdf"
+                ),
+                Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .tempDir(tempDir)
+                                .filePreferences(filePreferences)
+                                .sourceDir("source-dir")
+                                .sourceFileDir("source-dir")
+                                .targetDir("target-dir")
+                                .shouldStoreFilesRelativeToBibFile(false)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .build(),
+                        "nested/test.pdf"
+                ),
+                Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .tempDir(tempDir)
+                                .filePreferences(filePreferences)
+                                .sourceDir("source-dir")
+                                .sourceFileDir("source-dir")
+                                .targetDir("target-dir")
+                                .shouldStoreFilesRelativeToBibFile(false)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .build(),
+                        "nested/test.pdf"
+                ),
+                Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .tempDir(tempDir)
+                                .filePreferences(filePreferences)
+                                .sourceDir("source-dir")
+                                .sourceFileDir("source-dir")
+                                .targetDir("target-dir")
+                                .shouldStoreFilesRelativeToBibFile(false)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .build(),
+                        "nested/test.pdf"
+                ),
+                Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .tempDir(tempDir)
+                                .filePreferences(filePreferences)
+                                .sourceDir("source-dir")
+                                .sourceFileDir("source-dir")
+                                .targetDir("target-dir")
+                                .shouldStoreFilesRelativeToBibFile(false)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .build(),
+                        "nested/test.pdf"
+                ),
+                // endregion
+        );
     }
-
-    // endregion
-
-    // region Case 3: Directory not reachable with different paths - file copying with directory structure
-
-    @Test
-    void fileNotReachableAndPathsDifferShouldCopyFileAndCreateDirectory(@TempDir Path tempDir) throws Exception {
-        sourceDir = tempDir.resolve("source");
-        targetDir = tempDir.resolve("target");
-
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
-
-        Files.createDirectories(sourceDir);
-        Files.createDirectories(targetDir);
-
-        testFile = sourceDir.resolve("sourcefiles/test.pdf");
-        Files.createDirectories(testFile.getParent());
-        Files.createFile(testFile);
-
-        sourceContext = new BibDatabaseContext(new BibDatabase());
-        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
-        targetContext = new BibDatabaseContext(new BibDatabase());
-        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
-
-        sourceEntry = new BibEntry();
-        LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
-
-        sourceEntry.setFiles(List.of(linkedFile));
-        targetEntry = new BibEntry(sourceEntry);
-        targetEntry.setFiles(List.of(linkedFile));
-
-        sourceContext.getDatabase().insertEntry(sourceEntry);
-        targetContext.getDatabase().insertEntry(targetEntry);
-
-        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-                filePreferences);
-
-        BibEntry expectedEntry = new BibEntry();
-        LinkedFile expectedLinkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
-        expectedEntry.setFiles(List.of(expectedLinkedFile));
-
-        Set<BibEntry> expectedEntries = Set.of(expectedEntry);
-
-        assertEquals(expectedEntries, returnedEntries);
-
-        Path expectedFile = targetDir.resolve("sourcefiles/test.pdf");
-        assertTrue(Files.exists(expectedFile));
-    }
-
-    // endregion
-
-    // region BibFile-specific directory (relative to .bib file)
-
-    @Test
-    void shouldStoreFilesRelativeToBibFile(@TempDir Path tempDir) throws Exception {
-        sourceDir = tempDir.resolve("source");
-        targetDir = tempDir.resolve("target");
-
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
-
-        Files.createDirectories(sourceDir);
-        Files.createDirectories(targetDir);
-
-        testFile = sourceDir.resolve("test.pdf");
-        Files.createFile(testFile);
-
-        sourceContext = new BibDatabaseContext(new BibDatabase());
-        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
-        targetContext = new BibDatabaseContext(new BibDatabase());
-        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
-
-        sourceEntry = new BibEntry();
-        LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
-
-        sourceEntry.setFiles(List.of(linkedFile));
-        targetEntry = new BibEntry(sourceEntry);
-        targetEntry.setFiles(List.of(linkedFile));
-
-        sourceContext.getDatabase().insertEntry(sourceEntry);
-        targetContext.getDatabase().insertEntry(targetEntry);
-
-        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-                filePreferences);
-
-        BibEntry expectedEntry = new BibEntry();
-        LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
-        expectedEntry.setFiles(List.of(expectedLinkedFile));
-
-        Set<BibEntry> expectedEntries = Set.of(expectedEntry);
-
-        assertEquals(expectedEntries, returnedEntries);
-
-        Path expectedFile = targetDir.resolve("test.pdf");
-        assertTrue(Files.exists(expectedFile));
-    }
-
-    // endregion
 
     // region Global latex directory tests
 

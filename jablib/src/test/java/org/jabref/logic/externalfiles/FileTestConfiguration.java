@@ -29,21 +29,26 @@ public class FileTestConfiguration {
 
     /// @param tempDir the temporary directory to use
     /// @param filePreferences the file preferences to modify
+    /// @param sourceFileDir relative to tempDir
     @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
     public FileTestConfiguration(
             Path tempDir,
             FilePreferences filePreferences,
             String sourceDir,
-            String sourceFile,
+            String sourceFileDir,
             String targetDir,
             Boolean shouldStoreFilesRelativeToBibFile,
             Boolean shouldAdjustOrCopyLinkedFilesOnTransfer
     ) throws IOException {
         this.sourceDir = tempDir.resolve(sourceDir);
         Files.createDirectories(this.sourceDir);
-        this.sourceFile = this.sourceDir.resolve(sourceFile);
-        Files.createDirectories(this.sourceFile.getParent());
+
+        Path sourceFileDirPath = tempDir.resolve(sourceFileDir);
+        Files.createDirectories(sourceFileDirPath);
+
+        this.sourceFile = sourceFileDirPath.resolve("test.pdf");
         Files.createFile(this.sourceFile);
+
         LinkedFile linkedFile = new LinkedFile("", sourceFile, "PDF");
         sourceEntry = new BibEntry()
                 .withFiles(List.of(linkedFile));
