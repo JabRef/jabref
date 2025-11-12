@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<fx:root xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.cleanup.CleanupFileRelatedPanel"
+         spacing="10.0" type="VBox">
+
+    <padding>
+        <Insets top="10.0" left="20.0"/>
+    </padding>
+
+    <VBox>
+        <CheckBox fx:id="cleanupUpgradeExternalLinks" />
+        <CheckBox fx:id="cleanupMovePdf" />
+        <CheckBox fx:id="cleanupMakePathsRelative" text="%Make paths of linked files relative (if possible)" />
+        <CheckBox fx:id="cleanupRenamePdf" text="%Rename files to configured filename format pattern" />
+        <VBox prefHeight="40.0" prefWidth="451.0" spacing="10.0">
+            <Label fx:id="cleanupRenamePdfLabel" />
+            <CheckBox fx:id="cleanupRenamePdfOnlyRelativePaths" text="%Only rename files that have a relative path" />
+            <VBox.margin>
+                <Insets left="20.0" />
+            </VBox.margin>
+        </VBox>
+        <CheckBox fx:id="cleanupDeletedFiles" text="Remove links to non existent files" />
+    </VBox>
+
+    <Button text="%Apply" onAction="#onApply" />
+
+</fx:root>
