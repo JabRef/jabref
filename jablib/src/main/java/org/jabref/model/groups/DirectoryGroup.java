@@ -198,14 +198,14 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         Optional<GroupTreeNode> groupNode = getNode();
         if (groupNode.isPresent()) {
             groupNode.get().removeFromParent();
-            // TODO : finish the deletion
+            // TODO : finish the deletion by deleting the corresponding entries
         } else {
             LOGGER.error("Directory {} could not be deleted because it is not linked with a GroupTreeNode", absoluteDirectoryPath);
         }
     }
 
     @Override
-    public void fileUpdated() {
-        //
+    public void PDFDeleted(Path PDFPath) {
+        // TODO : Find the corresponding entry and remove it from the database
     }
 }

@@ -16,12 +16,23 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.undo.UndoManager;
+
+import javafx.scene.input.TransferMode;
+
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.WatchServiceUnavailableException;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.util.DirectoryUpdateListener;
 import org.jabref.model.util.DirectoryUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -41,6 +52,24 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
     private final AtomicReference<Optional<JabRefException>> filesystemMonitorFailure = new AtomicReference<>(Optional.empty());
+
+    private final BibDatabaseContext database;
+    private final GuiPreferences preferences;
+    private final FileUpdateMonitor fileUpdateMonitor;
+    private final UndoManager undoManager;
+    private final StateManager stateManager;
+    private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
+
+    public DefaultDirectoryUpdateMonitor(BibDatabaseContext database, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor, UndoManager undoManager, StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor) {
+        this.database = database;
+        this.preferences = preferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.undoManager = undoManager;
+        this.stateManager = stateManager;
+        this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
+    }
 
     @Override
     public void run() {
@@ -74,7 +103,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                                 notifyAboutDirectoryCreation(path);
                             } else {
                                 if (FileUtil.isPDFFile(path)) {
-                                    // notifyAboutPDFCreation(path);
+                                    notifyAboutPDFCreation(path);
                                 }
                             }
                         }
@@ -85,7 +114,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         Path path = ((Path) key.watchable()).resolve(ev.context());
                         if (Files.exists(path)) {
                             if (!Files.isDirectory(path)) {
-                                notifyAboutFileChange(path);
+                                // TODO : modify the corresponding entry
                             }
                         }
                     } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
@@ -93,8 +122,12 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
-                        notifyAboutDirectoryDeletion(path);
-                        cleanupListenersAccordingToLocalChanges();
+                        if (Files.isDirectory(path)) {
+                            notifyAboutDirectoryDeletion(path);
+                            cleanupListenersAccordingToLocalChanges();
+                        } else if (FileUtil.isPDFFile(path)) {
+                            notifyAboutPDFDeletion(path);
+                        }
                     }
                     key.reset();
                 }
@@ -135,16 +168,19 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     }
 
     private void notifyAboutPDFCreation(Path PDFPath) {
-        Path parentPath = PDFPath.toAbsolutePath().getParent();
-        for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
-            if (listener instanceof DirectoryGroup pdfGroup) {
-                // TODO : import the PDF
-            }
-        }
+        List<Path> pathToImport = new ArrayList<>();
+        pathToImport.add(PDFPath);
+        ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
+        importHandler.importFilesInBackground(pathToImport, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
     }
 
-    private void notifyAboutFileChange(Path path) {
-        listeners.get(path).forEach(DirectoryUpdateListener::fileUpdated);
+    private void notifyAboutPDFDeletion(Path PDFPath) {
+        Path parentPath = PDFPath.toAbsolutePath().getParent();
+        for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
+            if (listener instanceof DirectoryGroup parentGroup) {
+                parentGroup.PDFDeleted(PDFPath);
+            }
+        }
     }
 
     @Override
