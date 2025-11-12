@@ -18,8 +18,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.gui.util.CopyUtil.copyEntriesWithFeedback;
+import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 
+// TODO: This is only available in the context menu; and not when using copy and paste.
+//       This is an inconsistency in the UI.
+//       Should be merged with [org.jabref.gui.LibraryTab#pasteEntry]; maybe integrate in [org.jabref.gui.util.CopyUtil]
 public class CopyTo extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyTo.class);
@@ -80,7 +83,7 @@ public class CopyTo extends SimpleCommand {
                                                             .flatMap(entry -> getCrossRefEntry(entry, sourceDatabaseContext).stream()).toList();
         entriesToAdd.addAll(entriesWithCrossRef);
 
-        copyEntriesWithFeedback(
+        addEntriesWithFeedback(
                 sourceDatabaseContext,
                 entriesToAdd,
                 targetDatabaseContext,
@@ -94,7 +97,7 @@ public class CopyTo extends SimpleCommand {
     }
 
     public void copyEntriesWithoutCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
-        copyEntriesWithFeedback(
+        addEntriesWithFeedback(
                 sourceDatabaseContext,
                 selectedEntries,
                 targetDatabaseContext,

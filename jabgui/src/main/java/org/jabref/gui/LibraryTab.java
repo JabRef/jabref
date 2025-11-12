@@ -103,7 +103,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.gui.util.CopyUtil.copyEntriesWithFeedback;
+import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 
 /**
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
@@ -874,7 +874,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         // Now, the BibEntries to add are known
         // The definitive insertion needs to happen now.
         BibDatabaseContext sourceBibDatabaseContext = clipBoardManager.getSourceBibDatabaseContext().orElse(null);
-        copyEntriesWithFeedback(
+        addEntriesWithFeedback(
                 sourceBibDatabaseContext,
                 entriesToAdd,
                 bibDatabaseContext,
@@ -903,7 +903,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
-        copyEntriesWithFeedback(
+        addEntriesWithFeedback(
                 sourceBibDatabaseContext,
                 entriesToAdd,
                 bibDatabaseContext,

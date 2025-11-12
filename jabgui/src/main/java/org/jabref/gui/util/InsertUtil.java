@@ -14,17 +14,17 @@ import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.Nullable;
 
-public class CopyUtil {
+public class InsertUtil {
 
-    public static void copyEntriesWithFeedback(@Nullable BibDatabaseContext sourceDatabaseContext,
-                                               List<BibEntry> entriesToAdd,
-                                               BibDatabaseContext targetDatabaseContext,
-                                               String successMessage,
-                                               String partialMessage,
-                                               DialogService dialogService,
-                                               FilePreferences filePreferences,
-                                               ImportHandler importHandler,
-                                               StateManager stateManager
+    public static void addEntriesWithFeedback(@Nullable BibDatabaseContext sourceDatabaseContext,
+                                              List<BibEntry> entriesToAdd,
+                                              BibDatabaseContext targetDatabaseContext,
+                                              String successMessage,
+                                              String partialMessage,
+                                              DialogService dialogService,
+                                              FilePreferences filePreferences,
+                                              ImportHandler importHandler,
+                                              StateManager stateManager
     ) {
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entriesToAdd.size());
         tracker.setOnFinish(() -> {
