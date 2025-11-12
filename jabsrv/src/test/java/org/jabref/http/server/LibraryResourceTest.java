@@ -9,7 +9,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for LibraryResource which provides the /libraries/{id}/entries/pdffiles endpoint
