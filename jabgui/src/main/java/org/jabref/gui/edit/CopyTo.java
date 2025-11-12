@@ -88,7 +88,8 @@ public class CopyTo extends SimpleCommand {
                 Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"),
                 dialogService,
                 filePreferences,
-                importHandler
+                importHandler,
+                stateManager
         );
     }
 
@@ -101,7 +102,8 @@ public class CopyTo extends SimpleCommand {
                 Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"),
                 dialogService,
                 filePreferences,
-                importHandler
+                importHandler,
+                stateManager
         );
     }
 

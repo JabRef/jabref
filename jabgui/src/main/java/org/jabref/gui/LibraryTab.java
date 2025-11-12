@@ -100,7 +100,6 @@ import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -883,7 +882,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
                 dialogService,
                 preferences.getFilePreferences(),
-                importHandler
+                importHandler,
+                stateManager
         );
     }
 
@@ -911,7 +911,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
                 dialogService,
                 preferences.getFilePreferences(),
-                importHandler
+                importHandler,
+                stateManager
         );
     }
 

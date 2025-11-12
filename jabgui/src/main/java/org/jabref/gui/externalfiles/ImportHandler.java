@@ -286,9 +286,6 @@ public class ImportHandler {
 
                           importCleanedEntries(bibDatabaseContext, List.of(finalEntry));
 
-                          BibEntry entryToFocus = finalEntry;
-                          stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entryToFocus));
-
                           tracker.markImported(finalEntry);
                       }).executeWith(taskExecutor);
     }

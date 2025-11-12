@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.logic.FilePreferences;
@@ -22,7 +23,9 @@ public class CopyUtil {
                                                String partialMessage,
                                                DialogService dialogService,
                                                FilePreferences filePreferences,
-                                               ImportHandler importHandler) {
+                                               ImportHandler importHandler,
+                                               StateManager stateManager
+    ) {
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(entriesToAdd.size());
         tracker.setOnFinish(() -> {
             int importedCount = tracker.getImportedCount();
@@ -41,9 +44,9 @@ public class CopyUtil {
             }
             if (sourceDatabaseContext != null) {
                 LinkedFileTransferHelper
-                        .adjustLinkedFilesForTarget(sourceDatabaseContext,
-                                targetDatabaseContext, filePreferences);
+                        .adjustLinkedFilesForTarget(sourceDatabaseContext, targetDatabaseContext, filePreferences);
             }
+            stateManager.setSelectedEntries(tracker.getImportedEntries());
         });
 
         importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
