@@ -69,4 +69,8 @@ public class EntryImportHandlerTracker {
     public int getSkippedCount() {
         return skipped.get();
     }
+
+    public int getImportedCount() {
+        return getImportedCount();
+    }
 }
