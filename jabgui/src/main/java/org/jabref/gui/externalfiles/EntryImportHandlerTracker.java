@@ -2,12 +2,14 @@ package org.jabref.gui.externalfiles;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jspecify.annotations.Nullable;
+
 public class EntryImportHandlerTracker {
     private final AtomicInteger imported = new AtomicInteger(0);
     private final AtomicInteger skipped = new AtomicInteger(0);
 
     private final int totalEntries;
-    private Runnable onFinish;
+    private @Nullable Runnable onFinish;
 
     public EntryImportHandlerTracker() {
         this(0);
