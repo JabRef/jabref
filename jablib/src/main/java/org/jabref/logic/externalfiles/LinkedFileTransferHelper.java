@@ -1,6 +1,7 @@
 package org.jabref.logic.externalfiles;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -14,6 +15,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +59,8 @@ public class LinkedFileTransferHelper {
                 continue;
             }
 
-            Path linkedFilePath = Path.of(linkedFile.getLink());
-            if (linkedFilePath.isAbsolute()) {
+            Path linkedFileAsPath = Path.of(linkedFile.getLink());
+            if (linkedFileAsPath.isAbsolute()) {
                 // In case the file is an absolute path, there is no need to adjust anything
                 linkedFiles.add(linkedFile);
                 continue;
@@ -80,9 +82,10 @@ public class LinkedFileTransferHelper {
                 continue;
             }
             Path sourcePath = sourcePathOpt.get();
-            assert !linkedFilePath.isAbsolute();
+            assert !linkedFileAsPath.isAbsolute();
 
-            if (linkedFile.findIn(targetContext, filePreferences).isPresent()) {
+            if ((linkedFileAsPath.getParent() != null) // the case with no parent is handled at the next if ("Try to find in other directory")
+                    && linkedFile.findIn(targetContext, filePreferences).isPresent()) {
                 LOGGER.debug("File is reachable as is");
                 // File is reachable as is - no need to copy
                 linkedFiles.add(linkedFile);
@@ -90,31 +93,32 @@ public class LinkedFileTransferHelper {
             }
 
             // Try to find in other directory
+
             List<Path> directories = targetContext.getFileDirectories(filePreferences);
-            Optional<Path> plainFilePath = FileUtil.find(Path.of(linkedFile.getLink()).getFileName().toString(), directories);
-            if (plainFilePath.isPresent()) {
-                LOGGER.debug("Found in other place", plainFilePath);
-                String newLink = FileUtil.relativize(plainFilePath.get(), directories).toString();
+            Optional<Path> otherPlaceFile = findInSubDirs(linkedFileAsPath.getFileName(), directories);
+            if (otherPlaceFile.isPresent()) {
+                LOGGER.debug("Found in other place", otherPlaceFile);
+                String newLink = FileUtil.relativize(otherPlaceFile.get(), directories).toString();
                 LOGGER.debug("Setting new link {}", newLink);
                 linkedFile.setLink(newLink);
                 fileLinksChanged = true;
                 linkedFiles.add(linkedFile);
             }
 
-            linkedFilePath = targetPrimaryPath.resolve(linkedFilePath);
+            linkedFileAsPath = targetPrimaryPath.resolve(linkedFileAsPath);
             try {
-                Files.createDirectories(linkedFilePath.getParent());
+                Files.createDirectories(linkedFileAsPath.getParent());
             } catch (IOException e) {
-                LOGGER.error("Could not create directory for linked files at {}", linkedFilePath, e);
+                LOGGER.error("Could not create directory for linked files at {}", linkedFileAsPath, e);
                 linkedFiles.add(linkedFile);
                 continue;
             }
 
-            if (!Files.exists(linkedFilePath)) {
+            if (!Files.exists(linkedFileAsPath)) {
                 try {
-                    Files.copy(sourcePath, linkedFilePath, StandardCopyOption.COPY_ATTRIBUTES);
+                    Files.copy(sourcePath, linkedFileAsPath, StandardCopyOption.COPY_ATTRIBUTES);
                 } catch (IOException e) {
-                    LOGGER.error("Could not copy file from {} to {}", sourcePath, linkedFilePath, e);
+                    LOGGER.error("Could not copy file from {} to {}", sourcePath, linkedFileAsPath, e);
                     linkedFiles.add(linkedFile);
                     continue;
                 }
@@ -138,6 +142,19 @@ public class LinkedFileTransferHelper {
         }
         if (fileLinksChanged) {
             targetEntry.setFiles(linkedFiles);
+        }
+    }
+
+    private static Optional<Path> findInSubDirs(Path fileName, List<Path> directories) {
+        try {
+            return directories
+                    .stream()
+                    .flatMap(Unchecked.function(dir -> Files.walk(dir)))
+                    .filter(path -> path.getFileName().equals(fileName))
+                    .findFirst();
+        } catch (UncheckedIOException ex) {
+            LOGGER.warn("Could not search for files {}", ex);
+            return Optional.empty();
         }
     }
 

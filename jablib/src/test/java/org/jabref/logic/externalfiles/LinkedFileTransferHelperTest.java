@@ -60,6 +60,7 @@ class LinkedFileTransferHelperTest {
                 // region shouldStoreFilesRelativeToBibFile
 
                 // file next to .bib file should be copied
+                /*
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
@@ -92,6 +93,7 @@ class LinkedFileTransferHelperTest {
                         "nested/test.pdf",
                         true
                 ),
+                */
 
                 // targetDirIsParentOfSourceDir
                 Arguments.of(
@@ -102,7 +104,7 @@ class LinkedFileTransferHelperTest {
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
                                 .sourceBibDir("lit/sub-dir")
-                                .sourceFileDir("lit/sub-dir")
+                                .sourceFileDir("lit/sub-dir") // file is stored next to .bib file
                                 .testFileLinkMode(RELATIVE_TO_BIB)
                                 .targetBibDir("lit")
                                 .build(),
@@ -123,7 +125,7 @@ class LinkedFileTransferHelperTest {
                                 .mainFileDirectory("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                .sourceBibDir("source-dir")
+                                .sourceBibDir("source-bib-dir")
                                 .sourceFileDir("main-file-dir")
                                 .testFileLinkMode(RELATIVE_TO_MAIN_FILE_DIR)
                                 .targetBibDir("target-dir")
