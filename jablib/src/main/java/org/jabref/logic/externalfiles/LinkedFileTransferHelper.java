@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.FileUtil;
@@ -17,17 +16,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class LinkedFileTransferHelper {
-
-    private record FileCopyContext(
-            BibDatabaseContext sourceContext,
-            BibDatabaseContext targetContext,
-            FilePreferences filePreferences
-    ) {
-    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileTransferHelper.class);
 
@@ -42,73 +36,111 @@ public class LinkedFileTransferHelper {
      * @param sourceContext   The source database context where files are currently located
      * @param targetContext   The target database context where files should be accessible
      * @param targetEntry     The entry in thet targetContext
-     * @return set of modified entries. Used for testing.
      */
-    public static Set<BibEntry> adjustLinkedFilesForTarget(
-            FilePreferences filePreferences, BibDatabaseContext sourceContext,
+    public static void adjustLinkedFilesForTarget(
+            FilePreferences filePreferences,
+            BibDatabaseContext sourceContext,
             BibDatabaseContext targetContext,
             BibEntry targetEntry
     ) {
         if (!filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()) {
-            return Set.of();
+            return;
         }
 
-        Set<BibEntry> modifiedEntries = new HashSet<>();
+        LOGGER.debug("Hanndling {}", targetEntry.getKeyAuthorTitleYear());
 
-        FileCopyContext context = new FileCopyContext(sourceContext, targetContext, filePreferences);
+        boolean fileLinksChanged = false;
+        List<LinkedFile> linkedFiles = new ArrayList<>();
 
-        for (BibEntry entry : targetContext.getEntries()) {
-            boolean entryChanged = false;
-            List<LinkedFile> linkedFiles = new ArrayList<>();
+        for (LinkedFile linkedFile : targetEntry.getFiles()) {
+            LOGGER.debug("Handling file {}", linkedFile);
+            if (linkedFile.getLink().isEmpty() || linkedFile.isOnlineLink()) {
+                linkedFiles.add(linkedFile);
+                continue;
+            }
 
-            for (LinkedFile linkedFile : entry.getFiles()) {
-                if (linkedFile.getLink().isEmpty() || linkedFile.isOnlineLink()) {
+            Path linkedFilePath = Path.of(linkedFile.getLink());
+            if (linkedFilePath.isAbsolute()) {
+                // In case the file is an absolute path, there is no need to adjust anything
+                linkedFiles.add(linkedFile);
+                continue;
+            }
+
+            // Check target bibdatabase context offers any directory to store files in
+            // Condition works, because absolute paths are already skipped
+            Optional<Path> targetPrimaryPathOpt = getPrimaryPath(targetContext, filePreferences);
+            if (targetPrimaryPathOpt.isEmpty()) {
+                linkedFiles.add(linkedFile);
+                continue;
+            }
+            Path targetPrimaryPath = targetPrimaryPathOpt.get();
+
+            Optional<Path> sourcePathOpt = linkedFile.findIn(sourceContext, filePreferences);
+            if (sourcePathOpt.isEmpty()) {
+                // In case file does not exist, just keep the broken link
+                linkedFiles.add(linkedFile);
+                continue;
+            }
+            Path sourcePath = sourcePathOpt.get();
+            assert !linkedFilePath.isAbsolute();
+
+            if (linkedFile.findIn(targetContext, filePreferences).isPresent()) {
+                LOGGER.debug("File is reachable as is");
+                // File is reachable as is - no need to copy
+                linkedFiles.add(linkedFile);
+                continue;
+            }
+
+            // Try to find in other directory
+            List<Path> directories = targetContext.getFileDirectories(filePreferences);
+            Optional<Path> plainFilePath = FileUtil.find(Path.of(linkedFile.getLink()).getFileName().toString(), directories);
+            if (plainFilePath.isPresent()) {
+                LOGGER.debug("Found in other place", plainFilePath);
+                String newLink = FileUtil.relativize(plainFilePath.get(), directories).toString();
+                LOGGER.debug("Setting new link {}", newLink);
+                linkedFile.setLink(newLink);
+                fileLinksChanged = true;
+                linkedFiles.add(linkedFile);
+            }
+
+            linkedFilePath = targetPrimaryPath.resolve(linkedFilePath);
+            try {
+                Files.createDirectories(linkedFilePath.getParent());
+            } catch (IOException e) {
+                LOGGER.error("Could not create directory for linked files at {}", linkedFilePath, e);
+                linkedFiles.add(linkedFile);
+                continue;
+            }
+
+            if (!Files.exists(linkedFilePath)) {
+                try {
+                    Files.copy(sourcePath, linkedFilePath, StandardCopyOption.COPY_ATTRIBUTES);
+                } catch (IOException e) {
+                    LOGGER.error("Could not copy file from {} to {}", sourcePath, linkedFilePath, e);
                     linkedFiles.add(linkedFile);
                     continue;
-                }
-
-                if (Path.of(linkedFile.getLink()).isAbsolute()) {
-                    // In case the file is an absolute path, there is no need to adjust anything
-                    linkedFiles.add(linkedFile);
-                    continue;
-                }
-
-                // Check target bibdatabase context offers any directory to store files in
-                // Condition works, because absolute paths are already skipped
-                Optional<Path> targetPrimaryOpt = getPrimaryPath(targetContext, filePreferences);
-                if (targetPrimaryOpt.isEmpty()) {
-                    linkedFiles.add(linkedFile);
-                    continue;
-                }
-
-                Optional<Path> sourcePathOpt = linkedFile.findIn(sourceContext, filePreferences);
-                if (sourcePathOpt.isEmpty()) {
-                    // In case file does not exist, just keep the broken link
-                    linkedFiles.add(linkedFile);
-                    continue;
-                }
-                Path sourcePath = sourcePathOpt.get();
-
-                Path relative;
-                if (sourcePath.startsWith(targetPrimaryOpt.get())) {
-                    relative = targetPrimaryOpt.get().relativize(sourcePath);
-                } else {
-                    relative = Path.of("..").resolve(sourcePath.getFileName());
-                }
-
-                if (isReachableFromPrimaryDirectory(relative)) {
-                    // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
-                    entryChanged = isPathAdjusted(linkedFile, relative, linkedFiles, entryChanged);
-                } else {
-                    entryChanged = isFileCopied(context, linkedFile, linkedFiles, entryChanged);
                 }
             }
-            if (entryChanged) {
-                entry.setFiles(linkedFiles);
-                modifiedEntries.add(entry);
+
+            /*
+            Path relative;
+            if (sourcePath.startsWith(targetPrimaryPathOpt.get())) {
+                relative = targetPrimaryPathOpt.get().relativize(sourcePath);
+            } else {
+                relative = Path.of("..").resolve(sourcePath.getFileName());
             }
+
+            if (isReachableFromPrimaryDirectory(relative)) {
+                // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
+                fileLinksChanged = isPathAdjusted(linkedFile, relative, linkedFiles, fileLinksChanged);
+            } else {
+                fileLinksChanged = isFileCopied(sourceContext, targetContext, filePreferences, linkedFile, linkedFiles, fileLinksChanged);
+            }
+             */
         }
-        return modifiedEntries;
+        if (fileLinksChanged) {
+            targetEntry.setFiles(linkedFiles);
+        }
     }
 
     /**
@@ -131,12 +163,9 @@ public class LinkedFileTransferHelper {
      * @param relativePath the path to check, relative to the primary directory
      * @return true if the path is reachable from the primary directory, false otherwise
      */
+
     public static boolean isReachableFromPrimaryDirectory(Path relativePath) {
-        try {
-            return !relativePath.startsWith("..") && !relativePath.isAbsolute();
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+        return !relativePath.startsWith("..") && !relativePath.isAbsolute();
     }
 
     private static boolean isPathAdjusted(LinkedFile linkedFile, Path relative, List<LinkedFile> linkedFiles, boolean entryChanged) {
