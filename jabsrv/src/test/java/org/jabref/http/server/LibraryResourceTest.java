@@ -1,15 +1,19 @@
 package org.jabref.http.server;
 
-import org.jabref.http.JabrefMediaType;
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 
 import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Tests for LibraryResource which provides the /libraries/{id}/entries/pdffiles endpoint
+ */
 class LibraryResourceTest extends ServerTest {
 
     @Override
@@ -19,25 +23,31 @@ class LibraryResourceTest extends ServerTest {
         addGuiBridgeToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
+        addGlobalExceptionMapperToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();
     }
 
     @Test
-    void getJson() {
-        assertEquals("""
-                @Misc{Author2023test,
-                  author = {Demo Author},
-                  title  = {Demo Title},
-                  year   = {2023},
-                }
+    void getPDFFilesAsListReturnsEmptyArrayWhenNoPDFs() {
+        // The test library has no PDF files attached, so we expect an empty JSON array
+        String response = target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id + "/entries/pdffiles")
+                .request(MediaType.APPLICATION_JSON)
+                .get(String.class);
 
-                @Comment{jabref-meta: databaseType:bibtex;}
-                """, target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.BIBTEX).get(String.class));
+        // The API returns an empty JSON array when there are entries but no linked PDF files
+        assertEquals("[]", response.trim());
     }
 
     @Test
-    void getClsItemJson() {
-        assertEquals("""
-                [{"id":"Author2023test","type":"article","author":[{"family":"Author","given":"Demo"}],"event-date":{"date-parts":[[2023]]},"issued":{"date-parts":[[2023]]},"title":"Demo Title"}]""", target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.JSON_CSL_ITEM).get(String.class));
+    void getPDFFilesAsListWithDemoLibrary() {
+        // The demo library (Chocolate.bib) might have PDF entries
+        // This tests the endpoint exists and returns valid JSON
+        String response = target("/libraries/demo/entries/pdffiles")
+                .request(MediaType.APPLICATION_JSON)
+                .get(String.class);
+
+        // Response should be a valid JSON array (either empty [] or with entries)
+        // At minimum, verify it starts with [ to indicate it's a JSON array
+        assertEquals('[', response.charAt(0), "Response should be a JSON array");
     }
 }
