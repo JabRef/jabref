@@ -346,7 +346,8 @@ public class Date {
         }
         throw new DateTimeParseException("Invalid Date format for season", dateString, parts[0].length());
     }
-     private boolean isRange() {
+
+    private boolean isRange() {
         return endDate != null;
     }
 
@@ -361,7 +362,7 @@ public class Date {
 
     public Optional<TemporalAccessor> getEndDate() {
         return Optional.ofNullable(endDate);
-     }
+    }
 
     public Optional<Integer> get(ChronoField field) {
         if (date.isSupported(field)) {
@@ -432,9 +433,11 @@ public class Date {
                 "date=" + formattedDate +
                 '}';
     }
+
     public Optional<Integer> getYear() {
         return get(ChronoField.YEAR);
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(getYear(), getMonth(), getSeason(), getDay(), get(ChronoField.HOUR_OF_DAY), get(ChronoField.MINUTE_OF_HOUR), get(ChronoField.OFFSET_SECONDS));

@@ -14,8 +14,10 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
+
 import java.time.LocalDate;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DateEditorViewModel.class);
     private final DateTimeFormatter dateFormatter;
     private static final TemporalAccessor RANGE_SENTINEL = LocalDate.of(1, 1, 1);
+
     public DateEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, DateTimeFormatter dateFormatter, FieldCheckers fieldCheckers, UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dateFormatter = dateFormatter;
@@ -51,6 +54,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
                 }
                 return "";
             }
+
             private String sanitizeIncompleteRange(String dateString) {
                 String trimmed = dateString.trim();
 
@@ -68,6 +72,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
 
                 return dateString;
             }
+
             @Override
             public TemporalAccessor fromString(String string) {
                 if (StringUtil.isNotBlank(string)) {
@@ -97,7 +102,5 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
                 }
             }
         };
-
     }
-
 }
