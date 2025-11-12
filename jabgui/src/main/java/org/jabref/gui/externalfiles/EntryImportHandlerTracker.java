@@ -1,12 +1,17 @@
 package org.jabref.gui.externalfiles;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.Nullable;
 
 public class EntryImportHandlerTracker {
     private final AtomicInteger imported = new AtomicInteger(0);
     private final AtomicInteger skipped = new AtomicInteger(0);
+    private final Collection<BibEntry> importedEntries;
 
     private final int totalEntries;
     private @Nullable Runnable onFinish;
@@ -17,13 +22,19 @@ public class EntryImportHandlerTracker {
 
     public EntryImportHandlerTracker(int totalEntries) {
         this.totalEntries = totalEntries;
+        if (totalEntries > 0) {
+            importedEntries = new HashSet<>(totalEntries);
+        } else {
+            importedEntries = new HashSet<>();
+        }
     }
 
-    public void setOnFinish(Runnable onFinish) {
+    public void setOnFinish(@Nullable Runnable onFinish) {
         this.onFinish = onFinish;
     }
 
-    public void markImported() {
+    /// Marks the given entry as imported
+    public void markImported(BibEntry entry) {
         int totalProcessed = imported.incrementAndGet() + skipped.get();
         checkDone(totalProcessed);
     }
