@@ -599,10 +599,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     /**
      * Moves to the next tab and focuses on its first field.
      */
-     void moveToNextTabAndFocus() {
+    void moveToNextTabAndFocus() {
         tabbed.getSelectionModel().selectNext();
 
-         Platform.runLater(() -> {
+        Platform.runLater(() -> {
             Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
             if (selectedTab instanceof FieldsEditorTab currentTab) {
                 focusFirstFieldInTab(currentTab);

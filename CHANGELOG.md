@@ -125,7 +125,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where search results would show stale entries after deleting entries from search results. [#13984](https://github.com/JabRef/jabref/issues/13984)
-- We fixed an issue where pressing <kbd>Tab</kbd> in the last text field of a tab did not move the focus to the next tab in the entry editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
+- We fixed an issue where pressing Tab in the last text field of a tab did not move the focus to the next tab in the entry editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
 - When filename pattern is missing for linked files, pattern handling has been introduced to avoid suggesting meaningless filenames like "-". [#13735](https://github.com/JabRef/jabref/issues/13735)
 - We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
 - We fixed an issue where "Specify Bib(La)TeX" tab was not focused when Bib(La)TeX was in the clipboard. [#13597](https://github.com/JabRef/jabref/issues/13597)
