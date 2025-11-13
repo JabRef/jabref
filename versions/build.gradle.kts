@@ -78,7 +78,7 @@ dependencies.constraints {
     api("com.uber.nullaway:nullaway:0.12.10")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
-    api("commons-io:commons-io:2.20.0")
+    api("commons-io:commons-io:2.21.0")
     api("commons-logging:commons-logging:1.3.5")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
