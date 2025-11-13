@@ -9,8 +9,6 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-    labels:
-      - "dependencies"
     ignore:
       - dependency-name: com.microsoft.azure:applicationinsights-core
         versions:
@@ -23,10 +21,14 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-    labels:
-      - "dependencies"
   - package-ecosystem: "gitsubmodule"
     directory: "/"
+    schedule:
+      interval: weekly
+      day: sunday
+  - package-ecosystem: "maven"
+    directories:
+      - "jablib-examples/maven3/doi-to-bibtex"
     schedule:
       interval: weekly
       day: sunday
