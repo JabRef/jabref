@@ -28,9 +28,9 @@ class DirectoryGroupTest {
 
     @Test
     void containsReturnsTrueForEntryWithAFileDirectlyInTheMirroredDirectory() {
-        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, Path.of("C:\\Users\\Me\\MyDirectory"), new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
+        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, Path.of("C:\\Users\\Me\\MyDirectory").toAbsolutePath(), new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
         BibEntry entry = new BibEntry();
-        LinkedFile file = new LinkedFile(Path.of("C:\\Users\\Me\\MyDirectory\\MyFile.pdf"));
+        LinkedFile file = new LinkedFile(Path.of("C:\\Users\\Me\\MyDirectory\\MyFile.pdf").toAbsolutePath());
         List<LinkedFile> files = Collections.singletonList(file);
         entry.setFiles(files);
 
@@ -39,12 +39,12 @@ class DirectoryGroupTest {
 
     @Test
     void containsReturnsFalseForEntryWithoutAFileDirectlyInTheMirroredDirectory() {
-        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, Path.of("C:\\Users\\Me\\MyDirectory"), new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
+        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, Path.of("C:\\Users\\Me\\MyDirectory").toAbsolutePath(), new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
         BibEntry entryWithNoFile = new BibEntry();
         BibEntry entryWithNoFileInTheDirectory = new BibEntry();
         BibEntry entryWithNoFileDirectlyInTheDirectory = new BibEntry();
-        List<LinkedFile> filesNotInTheDirectory = Collections.singletonList(new LinkedFile(Path.of("C:\\Users\\Me\\AnotherDirectory\\MyFile.pdf")));
-        List<LinkedFile> filesNotDirectlyInTheDirectory = Collections.singletonList(new LinkedFile(Path.of("C:\\Users\\Me\\MyDirectory\\MySubdirectory\\MyFile.pdf")));
+        List<LinkedFile> filesNotInTheDirectory = Collections.singletonList(new LinkedFile(Path.of("C:\\Users\\Me\\AnotherDirectory\\MyFile.pdf").toAbsolutePath()));
+        List<LinkedFile> filesNotDirectlyInTheDirectory = Collections.singletonList(new LinkedFile(Path.of("C:\\Users\\Me\\MyDirectory\\MySubdirectory\\MyFile.pdf").toAbsolutePath()));
         entryWithNoFileInTheDirectory.setFiles(filesNotInTheDirectory);
         entryWithNoFileDirectlyInTheDirectory.setFiles(filesNotDirectlyInTheDirectory);
 
