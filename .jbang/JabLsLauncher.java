@@ -27,7 +27,7 @@
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/MarkdownDefinitionProvider.java
 
 // raw is for https://github.com/unicode-org/icu/pull/2127
-//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,ossrh=https://oss.sonatype.org/content/repositories/snapshots,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 
