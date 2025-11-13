@@ -163,7 +163,13 @@ git push
 
 ### Prevention
 
-To avoid this, avoid staging using `git add .` from CLI. Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
+To avoid this, avoid staging using any of these commands:
+
+* `git add .`
+* `git add jablib/src/main` (or any path prefix)
+* `git commit -a`
+
+Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
 
 ## Q: I get `java: package org.jabref.logic.journals does not exist`
 

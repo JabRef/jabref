@@ -1,3 +1,5 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
 plugins {
     id("java-platform")
 }
@@ -6,7 +8,11 @@ javaPlatform {
     allowDependencies()
 }
 
-val javafx = "25.0.1"
+// Based on https://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle
+val os = DefaultNativePlatform.getCurrentOperatingSystem()
+val arch = DefaultNativePlatform.getCurrentArchitecture()
+val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
+
 val lucene = "10.3.1"
 val pdfbox = "3.0.5"
 
@@ -56,7 +62,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
-    api("com.google.errorprone:error_prone_core:2.42.0")
+    api("com.google.errorprone:error_prone_core:2.44.0")
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.28")
     api("com.h2database:h2-mvstore:2.3.232")
@@ -85,7 +91,7 @@ dependencies.constraints {
     api("io.github.classgraph:classgraph:4.8.181")
     api("io.github.java-diff-utils:java-diff-utils:4.15")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
-    api("io.github.thibaultmeyer:cuid:2.0.3")
+    api("io.github.thibaultmeyer:cuid:2.0.4")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     api("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
     api("io.zonky.test:embedded-postgres:2.1.1")
