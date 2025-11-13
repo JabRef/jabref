@@ -31,30 +31,23 @@
         <Label styleClass="sectionHeader" text="%General"
                GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0"/>
 
-        <CheckBox fx:id="transliterateFieldsForCitationKey" text="%Transliterate fields for citation key"
-               GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1"/>
-
-        
         <CheckBox fx:id="overwriteAllow" text="%Overwrite existing keys"
-                GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="2"/>
-        
+                GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1"/>
         <HBox styleClass="prefIndent"
-              GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3">
+              GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="2">
             <CheckBox fx:id="overwriteWarning"
                       text="%Warn before overwriting existing keys"
                       disable="${!overwriteAllow.selected}"/>
         </HBox>
-        
         <CheckBox fx:id="generateOnSave" text="%Generate keys before saving (for entries without a key)"
-                GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4"/>
-        
+                GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3"/>
         <CheckBox fx:id="generateNewKeyOnImport" text="%Generate a new key for imported entries (overwriting their default)"
-                GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="5"/>
+                GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4"/>
 
         <Label text="%Letters after duplicate generated keys" GridPane.columnIndex="0"
-               GridPane.columnSpan="3" GridPane.rowIndex="6"/>
+               GridPane.columnSpan="3" GridPane.rowIndex="5"/>
         <VBox spacing="10.0" styleClass="prefIndent"
-              GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7">
+              GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6">
             <RadioButton fx:id="letterStartA"
                          text="%Start on second duplicate key with letter A (a, b, ...)"
                          toggleGroup="$uniqueKeyLetters"/>
@@ -67,20 +60,23 @@
         </VBox>
 
         <Label text="%Replace (regular expression)"
-               GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+               GridPane.columnIndex="0" GridPane.rowIndex="7"/>
         <HBox spacing="4.0" alignment="CENTER_LEFT"
-              GridPane.columnIndex="1" GridPane.rowIndex="8">
+              GridPane.columnIndex="1" GridPane.rowIndex="7">
             <TextField fx:id="keyPatternRegex" HBox.hgrow="ALWAYS"/>
             <Label text="%by"/>
             <TextField fx:id="keyPatternReplacement" HBox.hgrow="ALWAYS"/>
         </HBox>
         <HelpButton helpUrl="https://docs.jabref.org/setup/citationkeypatterns#replace-via-regular-expression"
-                GridPane.columnIndex="2" GridPane.rowIndex="8"/>
+                GridPane.columnIndex="2" GridPane.rowIndex="7"/>
 
         <Label text="%Remove the following characters:"
-               GridPane.columnIndex="0" GridPane.rowIndex="9"/>
+               GridPane.columnIndex="0" GridPane.rowIndex="8"/>
         <TextField fx:id="unwantedCharacters"
-                GridPane.columnIndex="1" GridPane.rowIndex="9"/>
+                GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+
+        <CheckBox fx:id="transliterateFieldsForCitationKey" text="%Transliterate fields for citation key"
+                GridPane.columnIndex="0" GridPane.rowIndex="9"/>
     </GridPane>
 
     <HBox spacing="8.0">

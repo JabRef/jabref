@@ -48,7 +48,9 @@ public class CitationKeyGenerator extends BracketedPattern {
     private final String unwantedCharacters;
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
-        this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()), bibDatabaseContext.getDatabase(), citationKeyPatternPreferences);
+        this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
+                bibDatabaseContext.getDatabase(),
+                citationKeyPatternPreferences);
     }
 
     public CitationKeyGenerator(@NonNull AbstractCitationKeyPatterns citeKeyPattern,
@@ -80,7 +82,12 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
-        String newKey = key.chars().filter(c -> unwantedCharacters.indexOf(c) == -1).filter(c -> !DISALLOWED_CHARACTERS.contains((char) c)).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
+        String newKey = key.chars()
+                           .filter(c -> unwantedCharacters.indexOf(c) == -1)
+                           .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
+                           .collect(StringBuilder::new,
+                                   StringBuilder::appendCodePoint, StringBuilder::append)
+                           .toString();
 
         // Replace non-English characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
@@ -121,11 +128,13 @@ public class CitationKeyGenerator extends BracketedPattern {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = citationKeyPatternPreferences.getKeySuffix() == CitationKeyPatternPreferences.KeySuffix.ALWAYS;
+        boolean alwaysAddLetter = citationKeyPatternPreferences.getKeySuffix()
+                == CitationKeyPatternPreferences.KeySuffix.ALWAYS;
 
         if (alwaysAddLetter || occurrences != 0) {
             // The key is already in use, so we must modify it.
-            boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix() == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+            boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix()
+                    == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
 
             int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
             String moddedKey;

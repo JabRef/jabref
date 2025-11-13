@@ -44,7 +44,7 @@ class AutoRenameFileOnEntryChangeTest {
         GuiPreferences guiPreferences = mock(GuiPreferences.class);
         filePreferences = mock(FilePreferences.class);
         CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
-                true,
+                false,
                 false,
                 true,
                 false,
