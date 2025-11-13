@@ -25,7 +25,7 @@ class MakeLabelWithoutDatabaseTest {
         GlobalCitationKeyPatterns keyPattern = new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN);
         keyPattern.setDefaultValue("[auth]");
         patternPreferences = new CitationKeyPatternPreferences(
-                true,
+                false,
                 false,
                 false,
                 false,
