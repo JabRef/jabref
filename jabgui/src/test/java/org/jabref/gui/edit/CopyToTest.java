@@ -2,6 +2,7 @@ package org.jabref.gui.edit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -115,10 +115,8 @@ public class CopyToTest {
         copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
                 preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
-        BibEntry result = copyTo.getCrossRefEntry(entryWithCrossRef, sourceDatabaseContext).orElse(null);
-
-        assertNotNull(result);
-        assertEquals(referencedEntry, result);
+        Optional<BibEntry> result = copyTo.getCrossRefEntry(entryWithCrossRef, sourceDatabaseContext);
+        assertEquals(Optional.of(referencedEntry), result);
     }
 
     @Test
