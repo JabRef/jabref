@@ -15,7 +15,7 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.34.0"
+    id("com.vanniktech.maven.publish") version "0.35.0"
 
     // id("dev.jbang") version "0.2.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
