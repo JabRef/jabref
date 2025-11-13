@@ -2216,6 +2216,13 @@ public class JabRefCliPreferences implements CliPreferences {
             return importerPreferences;
         }
 
+        PlainCitationParserChoice defaultPlainCitationParser;
+        try {
+            defaultPlainCitationParser = PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER));
+        } catch (IllegalArgumentException ex) {
+            defaultPlainCitationParser = PlainCitationParserChoice.RULE_BASED_GENERAL;
+        }
+
         importerPreferences = new ImporterPreferences(
                 getBoolean(IMPORTERS_ENABLED),
                 getBoolean(GENERATE_KEY_ON_IMPORT),
@@ -2226,7 +2233,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDefaultFetcherKeys(),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
                 getStringList(SEARCH_CATALOGS),
-                PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER)),
+                defaultPlainCitationParser,
                 getInt(CITATIONS_RELATIONS_STORE_TTL)
         );
 
