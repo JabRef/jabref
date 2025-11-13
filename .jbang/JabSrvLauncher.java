@@ -44,19 +44,10 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/PreferencesFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 
-// REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
-// REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots
-//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
-// REPOS mavencentral,jitpack=https://jitpack.io
+// raw is for https://github.com/unicode-org/icu/pull/2127
+//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
-// TODO: ASCII things won't work, but we accept for now to keep things going
-//DEPS com.ibm.icu:icu4j:78.1
-
-// Choose one - both should work
-// https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/jabref/jablib/
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
-// https://jitpack.io/#jabref/jabref/main-SNAPSHOT
-// DEPS com.github.jabref:jabref:main-SNAPSHOT
 
 //DEPS io.github.darvil82:terminal-text-formatter:2.2.0
 //DEPS info.picocli:picocli:4.7.7
@@ -89,6 +80,7 @@
 //DEPS net.harawata:appdirs:1.5.0
 //DEPS de.undercouch:citeproc-java:3.4.0
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
+//DEPS org.apache.commons:commons-lang3:3.19.0
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabSrvLauncher {
