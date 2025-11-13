@@ -29,6 +29,7 @@ Implementation decision drivers:
 * Thymeleaf
 * Handlebars (Mustache)
 * Jinja
+* Pebble
 
 ## Decision Outcome
 
@@ -36,6 +37,7 @@ Chosen option: "Apache Velocity", because "Velocity's goal is to keep templates 
 Furthermore, Apache Velocity is lightweight, and it allows to generate text output. This is a good fit for the AI feature.
 
 Update from 01.10.2025: more promising options were added (Handlebars and Jinja), but the final decision was not discussed and updated.
+Update from 20.10.2025: added pebble
 
 ## Pros and Cons of the Options
 
@@ -137,6 +139,7 @@ Here are the papers you are analyzing:
 * Good, because it is powerful and flexible.
 * Good, because it has a simple API.
 * Neutral, as custom functions needs to be added manually. You cannot pass an ordinary Java object and use it as you want.
+* Bad, because as a Java port it lacks behind mainline development.
 
 ### Jinja
 
@@ -161,6 +164,31 @@ Here are the papers you are analyzing:
 * Neutral, as it was developed for web and Python, not for Java.
 * Neutral, as the Java port is quite young (in comparison to other options).
 * Neutral, as custom functions needs to be added manually. You cannot pass an ordinary Java object and use it as you want.
+* Bad, because as a Java port it lacks behind mainline development.
+
+### Pebble
+
+- Main page: <https://pebbletemplates.io/>
+- Repository and developer guide: <https://github.com/PebbleTemplates/pebble>
+- User guide: <https://pebbletemplates.io/wiki/>
+
+```text
+{% for entry in entries %}
+    {{ entry.title }}
+    {{ entry.author }}
+{% else %}
+    There are no entries.
+{% endfor %}
+```
+
+* Good, because supports plain text templating.
+* Good, because it is possible to use `String` as a template.
+* Good, because it supports template inheritance, includes, and custom functions (`macros`).
+* Good, because it is actively maintained.
+* Good, because it provides a simple API that integrates easily with Java.
+* Good, because has tooling support for common IDEs.
+* Neutral, because its feature set is smaller than FreeMarker’s, but sufficient for text-based generation.
+* Neutral, because it is less widely adopted than Thymeleaf or FreeMarker.
 
 ## More Information
 

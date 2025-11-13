@@ -181,6 +181,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     // endregion
 
+    implementation("com.github.ben-manes.caffeine:caffeine")
+
     implementation("commons-io:commons-io")
 
     implementation("com.github.tomtung:latex2unicode_2.13")
@@ -189,6 +191,8 @@ dependencies {
 
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
     implementation("io.github.adr:e-adr")
+
+    api("io.github.darvil82:terminal-text-formatter")
 
     implementation("io.zonky.test:embedded-postgres")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")

@@ -6,7 +6,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.bibtex.comparator.PreambleDiff;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public final class PreambleChangeDetailsView extends DatabaseChangeDetailsView {
 
