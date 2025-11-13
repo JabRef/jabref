@@ -15,6 +15,8 @@ import org.jabref.model.entry.LinkedFile;
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 import org.jilt.Opt;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static org.mockito.Mockito.when;
 
@@ -28,6 +30,11 @@ public class FileTestConfiguration {
     public final Path targetBibDir;
     public final BibDatabaseContext targetContext;
     public final BibEntry targetEntry;
+
+    @NonNull private final Path tempDir;
+    @Nullable private final Path mainFileDir;
+    @Nullable private final Path sourceLibrarySpecificFileDir;
+    @Nullable private final Path sourceUserSpecificFileDir;
 
     /// @param tempDir the temporary directory to use
     /// @param filePreferences the file preferences to modify
@@ -51,47 +58,45 @@ public class FileTestConfiguration {
             @Opt String targetLibrarySpecificFileDirectory,
             @Opt String targetUserSpecificFileDirectory
     ) throws IOException {
+        this.tempDir = tempDir;
         this.sourceBibDir = tempDir.resolve(sourceBibDir);
         Files.createDirectories(this.sourceBibDir);
 
         Path sourceFileDirPath = tempDir.resolve(sourceFileDir);
         Files.createDirectories(sourceFileDirPath);
 
+        sourceContext = new BibDatabaseContext(new BibDatabase());
+        sourceContext.setDatabasePath(this.sourceBibDir.resolve("source.bib"));
+
         this.sourceFile = sourceFileDirPath.resolve("test.pdf");
         Files.createFile(this.sourceFile);
 
-        Path resolvedSourceFile = sourceFileDirPath.resolve("test.pdf");
-        Path fileLinkPath = switch (testFileLinkMode) {
-            case ABSOLUTE ->
-                    resolvedSourceFile;
-            case RELATIVE_TO_BIB ->
-                    this.sourceBibDir.relativize(resolvedSourceFile);
-            case RELATIVE_TO_MAIN_FILE_DIR ->
-                    tempDir.resolve(mainFileDirectory).relativize(resolvedSourceFile);
-            case RELATIVE_TO_LIBRARY_SPECIFIC_DIR ->
-                    tempDir.resolve(sourceLibrarySpecificFileDirectory).relativize(resolvedSourceFile);
-            case RELATIVE_TO_USER_SPECIFIC_DIR ->
-                    tempDir.resolve(sourceUserSpecificFileDirectory).relativize(resolvedSourceFile);
-        };
-        String fileLink = fileLinkPath.toString();
-        LinkedFile linkedFile = new LinkedFile("", fileLink, "PDF");
-        sourceEntry = new BibEntry()
-                .withFiles(List.of(linkedFile));
-        sourceContext = new BibDatabaseContext(new BibDatabase(List.of(sourceEntry)));
-        sourceContext.setDatabasePath(this.sourceBibDir.resolve("source.bib"));
-        if (sourceLibrarySpecificFileDirectory != null) {
-            sourceContext.getMetaData().setLibrarySpecificFileDirectory(sourceLibrarySpecificFileDirectory);
-        }
-        if (sourceUserSpecificFileDirectory != null) {
-            sourceContext.getMetaData().setUserFileDirectory("testuser", sourceUserSpecificFileDirectory);
-        }
-
         if (mainFileDirectory == null) {
             when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
+            this.mainFileDir = null;
         } else {
-            Path mainFileDirectoryPath = tempDir.resolve(mainFileDirectory);
-            when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(mainFileDirectoryPath));
+            this.mainFileDir = tempDir.resolve(mainFileDirectory);
+            when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(this.mainFileDir));
         }
+        if (sourceLibrarySpecificFileDirectory == null) {
+            this.sourceLibrarySpecificFileDir = null;
+        } else {
+            this.sourceLibrarySpecificFileDir = tempDir.resolve(sourceLibrarySpecificFileDirectory);
+            sourceContext.getMetaData().setLibrarySpecificFileDirectory(sourceLibrarySpecificFileDir.toString());
+        }
+        if (sourceUserSpecificFileDirectory == null) {
+            this.sourceUserSpecificFileDir = null;
+        } else {
+            this.sourceUserSpecificFileDir = tempDir.resolve(sourceUserSpecificFileDirectory);
+            sourceContext.getMetaData().setUserFileDirectory("testuser", sourceUserSpecificFileDir.toString());
+        }
+
+        Path resolvedSourceFile = sourceFileDirPath.resolve("test.pdf");
+        Path fileLinkPath = convertLink(resolvedSourceFile, testFileLinkMode);
+        String fileLink = fileLinkPath.toString();
+        LinkedFile linkedFile = new LinkedFile("", fileLink, "PDF");
+        sourceEntry = new BibEntry().withFiles(List.of(linkedFile));
+        sourceContext.getDatabase().insertEntry(sourceEntry);
 
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(shouldStoreFilesRelativeToBibFile);
@@ -108,6 +113,22 @@ public class FileTestConfiguration {
         if (targetUserSpecificFileDirectory != null) {
             targetContext.getMetaData().setUserFileDirectory("testuser", targetUserSpecificFileDirectory);
         }
+    }
+
+    Path convertLink(Path path, TestFileLinkMode testFileLinkMode) {
+        Path resolvedSourceFile = tempDir.resolve(path);
+        return switch (testFileLinkMode) {
+            case ABSOLUTE ->
+                    resolvedSourceFile;
+            case RELATIVE_TO_BIB ->
+                    this.sourceBibDir.relativize(resolvedSourceFile);
+            case RELATIVE_TO_MAIN_FILE_DIR ->
+                    tempDir.resolve(this.mainFileDir).relativize(resolvedSourceFile);
+            case RELATIVE_TO_LIBRARY_SPECIFIC_DIR ->
+                    tempDir.resolve(this.sourceLibrarySpecificFileDir).relativize(resolvedSourceFile);
+            case RELATIVE_TO_USER_SPECIFIC_DIR ->
+                    tempDir.resolve(this.sourceUserSpecificFileDir).relativize(resolvedSourceFile);
+        };
     }
 
     enum TestFileLinkMode {

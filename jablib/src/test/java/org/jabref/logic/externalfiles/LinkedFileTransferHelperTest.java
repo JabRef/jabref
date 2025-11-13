@@ -15,7 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_BIB;
+// import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_BIB;
 import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_MAIN_FILE_DIR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -36,7 +36,7 @@ class LinkedFileTransferHelperTest {
     @ParameterizedTest
     // @CsvSource could also be used, but there is no strong typing
     @MethodSource
-    void check(FileTestConfiguration fileTestConfiguration, String expectedLink, boolean keepExpectedRelative) {
+    void check(FileTestConfiguration fileTestConfiguration, String expectedLink, FileTestConfiguration.TestFileLinkMode expectedLinkMode) {
         LinkedFileTransferHelper
                 .adjustLinkedFilesForTarget(
                         filePreferences, fileTestConfiguration.sourceContext,
@@ -44,9 +44,7 @@ class LinkedFileTransferHelperTest {
                         fileTestConfiguration.targetEntry
                 );
 
-        if (!keepExpectedRelative) {
-            expectedLink = tempDir.resolve(expectedLink).toString();
-        }
+        expectedLink = fileTestConfiguration.convertLink(Path.of(expectedLink), expectedLinkMode).toString();
 
         BibEntry expectedEntry = new BibEntry()
                 .withFiles(
@@ -131,7 +129,7 @@ class LinkedFileTransferHelperTest {
                                 .targetBibDir("target-dir")
                                 .build(),
                         "main-file-dir/test.pdf",
-                        false
+                        RELATIVE_TO_MAIN_FILE_DIR
                 )
                 // endregion /* */
         );
