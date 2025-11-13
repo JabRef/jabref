@@ -18,6 +18,7 @@ import org.tinylog.Logger;
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 // JabRef relies on PR https://github.com/unicode-org/icu/pull/2127; for experiments the release version is OK.
 //DEPS com.ibm.icu:icu4j:78.1
+//DEPS com.fasterxml.jackson.core:jackson-annotations
 //DEPS tools.jackson.core:jackson-core:3.0.2
 //DEPS tools.jackson.core:jackson-databind:3.0.2
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.2
