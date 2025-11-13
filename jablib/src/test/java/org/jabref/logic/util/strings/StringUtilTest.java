@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -212,12 +213,12 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideDecodeStringDoubleArrayData")
+    @MethodSource
     void decodeStringDoubleArray(String input, String[][] expected) {
         assertArrayEquals(expected, StringUtil.decodeStringDoubleArray(input));
     }
 
-    static Stream<Arguments> provideDecodeStringDoubleArrayData() {
+    static Stream<Arguments> decodeStringDoubleArray() {
         return Stream.of(
                 Arguments.of("a:b;c:d", new String[][] {{"a", "b"}, {"c", "d"}}),
                 Arguments.of("a:;c:d", new String[][] {{"a", ""}, {"c", "d"}}),
@@ -227,43 +228,64 @@ class StringUtilTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-            false,
-            true, {}
-            true, {a}
-            true, '{a{a}}'
-            true, '{{\\AA}sa {\\AA}Stor{\\aa}}'
-            false, {
-            false, }
-            false, a{}a
-            false, '{\\AA}sa {\\AA}Stor{\\aa}'
+            {}
+            {a}
+            '{a{a}}'
+            '{{\\AA}sa {\\AA}Stor{\\aa}}'
             """)
-    void isInCurlyBrackets(boolean expected, String input) {
-        assertEquals(expected, StringUtil.isInCurlyBrackets(input));
+    void isInCurlyBrackets(String input) {
+        assertTrue(StringUtil.isInCurlyBrackets(input));
     }
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-            false,
-            true, []
-            true, [a]
-            false, [
-            false, ]
-            false, a[]a
+            ''
+            {
+            }
+            a{}a
+            '{\\AA}sa {\\AA}Stor{\\aa}'
             """)
-    void isInSquareBrackets(boolean expected, String input) {
-        assertEquals(expected, StringUtil.isInSquareBrackets(input));
+    void isNotInCurlyBrackets(String input) {
+        assertFalse(StringUtil.isInCurlyBrackets(input));
     }
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-            false,
-            true, ""
-            true, "a"
-            false, "
-            false, a""a
+            []
+            [a]
             """)
-    void isInCitationMarks(boolean expected, String input) {
-        assertEquals(expected, StringUtil.isInCitationMarks(input));
+    void isInSquareBrackets(String input) {
+        assertTrue(StringUtil.isInSquareBrackets(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            ''
+            [
+            ]
+            a[]a
+            """)
+    void isINotnSquareBrackets(String input) {
+        assertFalse(StringUtil.isInSquareBrackets(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            ""
+            "a"
+            """)
+    void isInCitationMarks(String input) {
+        assertTrue(StringUtil.isInCitationMarks(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            ''
+            "
+            a""a
+            """)
+    void isNotInCitationMarks(String input) {
+        assertFalse(StringUtil.isInCitationMarks(input));
     }
 
     @ParameterizedTest
