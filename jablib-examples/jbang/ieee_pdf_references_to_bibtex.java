@@ -15,7 +15,7 @@ import org.tinylog.Logger;
 //FILES tinylog.properties=tinylog.properties
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
-//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,jitpack=https://jitpack.io,ossrh=https://oss.sonatype.org/content/repositories/snapshots,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 void main() throws Exception {
     var preferences = JabRefCliPreferences.getInstance();
