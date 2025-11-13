@@ -41,13 +41,6 @@
     </repository>
 
     <repository>
-      <id>ossrh-old-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-      <releases><enabled>false</enabled></releases>
-      <snapshots><enabled>true</enabled></snapshots>
-    </repository>
-
-    <repository>
       <id>ossrh-public</id>
       <url>https://oss.sonatype.org/content/groups/public</url>
     </repository>
