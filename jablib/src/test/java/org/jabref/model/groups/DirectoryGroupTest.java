@@ -1,5 +1,6 @@
 package org.jabref.model.groups;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,17 +22,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DirectoryGroupTest {
 
     private MetaData metaData;
+    private Path temporaryFolder;
 
     @BeforeEach
-    void setUp() {
+    void setUp(@TempDir Path temporaryFolder) {
         metaData = new MetaData();
+        this.temporaryFolder = temporaryFolder;
     }
 
     @Test
-    void containsReturnsTrueForEntryWithAFileDirectlyInTheMirroredDirectory() {
-        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, Path.of("C:\\Users\\Me\\MyDirectory").toAbsolutePath(), new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
+    void containsReturnsTrueForEntryWithAFileDirectlyInTheMirroredDirectory() throws IOException {
+        Path directoryPath = temporaryFolder.resolve("MyDirectory").toAbsolutePath();
+        Path filePath = directoryPath.resolve("MyFile.pdf").toAbsolutePath();
+
+        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, directoryPath, new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
         BibEntry entry = new BibEntry();
-        LinkedFile file = new LinkedFile(Path.of("C:\\Users\\Me\\MyDirectory\\MyFile.pdf").toAbsolutePath());
+        LinkedFile file = new LinkedFile(filePath);
         List<LinkedFile> files = Collections.singletonList(file);
         entry.setFiles(files);
 
@@ -39,12 +46,17 @@ class DirectoryGroupTest {
 
     @Test
     void containsReturnsFalseForEntryWithoutAFileDirectlyInTheMirroredDirectory() {
-        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, Path.of("C:\\Users\\Me\\MyDirectory").toAbsolutePath(), new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
+        Path directoryPath = temporaryFolder.resolve("MyDirectory").toAbsolutePath();
+        Path filePathNotInTheDirectory = temporaryFolder.resolve("MyFile.pdf").toAbsolutePath();
+        Path subdirectoryPath = directoryPath.resolve("MySubdirectory").toAbsolutePath();
+        Path filePathNotDirectlyInTheDirectory = subdirectoryPath.resolve("MyFile.pdf").toAbsolutePath();
+
+        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, directoryPath, new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
         BibEntry entryWithNoFile = new BibEntry();
         BibEntry entryWithNoFileInTheDirectory = new BibEntry();
         BibEntry entryWithNoFileDirectlyInTheDirectory = new BibEntry();
-        List<LinkedFile> filesNotInTheDirectory = Collections.singletonList(new LinkedFile(Path.of("C:\\Users\\Me\\AnotherDirectory\\MyFile.pdf").toAbsolutePath()));
-        List<LinkedFile> filesNotDirectlyInTheDirectory = Collections.singletonList(new LinkedFile(Path.of("C:\\Users\\Me\\MyDirectory\\MySubdirectory\\MyFile.pdf").toAbsolutePath()));
+        List<LinkedFile> filesNotInTheDirectory = Collections.singletonList(new LinkedFile(filePathNotInTheDirectory));
+        List<LinkedFile> filesNotDirectlyInTheDirectory = Collections.singletonList(new LinkedFile(filePathNotDirectlyInTheDirectory));
         entryWithNoFileInTheDirectory.setFiles(filesNotInTheDirectory);
         entryWithNoFileDirectlyInTheDirectory.setFiles(filesNotDirectlyInTheDirectory);
 
