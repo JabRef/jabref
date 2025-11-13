@@ -1,6 +1,5 @@
 package org.jabref.model.groups;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +30,7 @@ class DirectoryGroupTest {
     }
 
     @Test
-    void containsReturnsTrueForEntryWithAFileDirectlyInTheMirroredDirectory() throws IOException {
+    void containsReturnsTrueForEntryWithAFileDirectlyInTheMirroredDirectory() {
         Path directoryPath = temporaryFolder.resolve("MyDirectory").toAbsolutePath();
         Path filePath = directoryPath.resolve("MyFile.pdf").toAbsolutePath();
 
