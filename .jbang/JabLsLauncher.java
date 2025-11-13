@@ -40,7 +40,6 @@
 //DEPS tools.jackson.core:jackson-core:3.0.2
 //DEPS tools.jackson.core:jackson-databind:3.0.2
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.2
-//DEPS com.github.eclipse:lsp4j:0.24.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.2
 //DEPS org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0
