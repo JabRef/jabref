@@ -205,7 +205,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
     }
 
     @Override
-    public void PDFDeleted(Path PDFPath) {
+    public void pdfDeleted(Path pdfPath) {
         // TODO : Find the corresponding entry and remove it from the database
     }
 }

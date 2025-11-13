@@ -178,7 +178,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         Path parentPath = PDFPath.toAbsolutePath().getParent();
         for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
             if (listener instanceof DirectoryGroup parentGroup) {
-                parentGroup.PDFDeleted(PDFPath);
+                parentGroup.pdfDeleted(PDFPath);
             }
         }
     }

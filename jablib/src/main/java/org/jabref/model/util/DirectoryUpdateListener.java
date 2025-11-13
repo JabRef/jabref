@@ -9,5 +9,5 @@ public interface DirectoryUpdateListener {
 
     void directoryDeleted();
 
-    void PDFDeleted(Path PDFPath);
+    void pdfDeleted(Path pdfPath);
 }
