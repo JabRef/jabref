@@ -452,7 +452,7 @@ jobs:
           files: |
             .jbang/*.java
             jablib/src/main/java/**/*.java
-            jablib-examples/**/*.java
+            jablib-examples/jbang/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
       - name: Set up JDK
@@ -488,7 +488,7 @@ jobs:
           done
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
       - run: |
-          for f in jablib-examples/*.java; do
+          for f in jablib-examples/jbang/*.java; do
             echo "Building $f..."
             jbang build --fresh "$f"
           done
@@ -510,7 +510,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        script: [.jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/ieee_pdf_references_to_bibtex.java]
+        script: [.jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java]
     steps:
       - name: Checkout source
         uses: actions/checkout@v5
@@ -525,7 +525,7 @@ jobs:
             .jbang/*.java
             jabkit/src/main/java/**/*.java
             jablib/src/main/java/**/*.java
-            jablib-examples/**/*.java
+            jablib-examples/jbang/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
       - name: Set up JDK
