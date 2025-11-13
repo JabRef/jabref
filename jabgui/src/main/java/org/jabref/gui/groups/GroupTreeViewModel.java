@@ -239,9 +239,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 // TODO: Expand parent to make new group visible
                 // parent.expand();
+                writeGroupChangesToMetaData();
                 if (group instanceof DirectoryGroup directoryStructureRoot) {
                     try {
-                        writeGroupChangesToMetaData();
                         directoryStructureRoot.addDescendants();
                         List<Path> allPDFs = directoryStructureRoot.getAllPDFs();
                         ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
@@ -253,7 +253,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 } else {
                     dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
                 }
-                writeGroupChangesToMetaData();
             });
         });
     }
