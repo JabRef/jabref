@@ -89,6 +89,23 @@ class GroupDialogViewModelTest {
     }
 
     @Test
+    void validateNonExistingDirectoryPath() throws IOException {
+        Path notADirectory = temporaryFolder.resolve("MyDirectory");
+        
+        viewModel.directoryGroupFilePathProperty().setValue(notADirectory.toString());
+        assertFalse(viewModel.directoryGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
+    void validateExistingDirectoryPath() throws IOException {
+        Path aDirectory = temporaryFolder.resolve("MyDirectory");
+        Files.createDirectory(aDirectory);
+
+        viewModel.directoryGroupFilePathProperty().setValue(aDirectory.toString());
+        assertTrue(viewModel.directoryGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
     void hierarchicalContextFromGroup() {
         GroupHierarchyType groupHierarchyType = GroupHierarchyType.INCLUDING;
         when(group.getHierarchicalContext()).thenReturn(groupHierarchyType);
