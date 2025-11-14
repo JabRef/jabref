@@ -215,7 +215,12 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
-    module("io.github.darvil82:utils", "utils"){
+    module("io.github.darvil82:terminal-text-formatter", "io.github.darvil.terminal.textformatter") {
+        patchRealModule()
+        exportAllPackages()
+        requires("io.github.darvil.utils")
+    }
+    module("io.github.darvil82:utils", "io.github.darvil.utils") {
         patchRealModule()
         exportAllPackages()
     }
