@@ -11,7 +11,7 @@
 
 **All contributions must come from humans who understand and can take full responsibility for their code.**
 
-Large language models (LLMs) make mistakes and cannot be held accountable for their outputs. This is why we require human understanding and ownership of all submitted work. 
+Large language models (LLMs) make mistakes and cannot be held accountable for their outputs. This is why we require human understanding and ownership of all submitted work.
 
 > [!WARNING]
 > Maintainers may close PRs that appear to be fully or largely AI-generated.

@@ -162,7 +162,6 @@ We also show all contributors in our blog posts. See [Release 5.15 blog post](ht
 
 Your contribution is considered being made under [MIT license](https://tldrlegal.com/license/mit-license).
 
-
 #### AI Usage Policy
 
 This project does *not* accept fully AI-generated contributions.
