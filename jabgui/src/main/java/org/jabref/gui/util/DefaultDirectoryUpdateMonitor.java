@@ -167,18 +167,18 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         }
     }
 
-    private void notifyAboutPDFCreation(Path PDFPath) {
+    private void notifyAboutPDFCreation(Path pdfPath) {
         List<Path> pathToImport = new ArrayList<>();
-        pathToImport.add(PDFPath);
+        pathToImport.add(pdfPath);
         ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
         importHandler.importFilesInBackground(pathToImport, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
     }
 
-    private void notifyAboutPDFDeletion(Path PDFPath) {
-        Path parentPath = PDFPath.toAbsolutePath().getParent();
+    private void notifyAboutPDFDeletion(Path pdfPath) {
+        Path parentPath = pdfPath.toAbsolutePath().getParent();
         for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
             if (listener instanceof DirectoryGroup parentGroup) {
-                parentGroup.pdfDeleted(PDFPath);
+                parentGroup.pdfDeleted(pdfPath);
             }
         }
     }
