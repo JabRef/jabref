@@ -65,23 +65,23 @@ public class AuthorListTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiterString = "->", textBlock = """
+    @CsvSource(delimiterString = ";", textBlock = """
             # LaTeX-free empty author string
-            EMPTY_AUTHOR                                -> ''
+            EMPTY_AUTHOR                                ; ''
             # LaTeX-free Unicode one author name from LaTeX
-            ONE_AUTHOR_WITH_LATEX                       -> al-Khwārizmī
+            ONE_AUTHOR_WITH_LATEX                       ; al-Khwārizmī
             # LaTeX-free Unicode two author names from LaTeX
-            TWO_AUTHORS_WITH_LATEX                      -> al-Khwārizmī and Böhm
+            TWO_AUTHORS_WITH_LATEX                      ; al-Khwārizmī and Böhm
             # LaTeX-free Unicode author et al from LaTeX
-            THREE_AUTHORS_WITH_LATEX                    -> al-Khwārizmī et al.
+            THREE_AUTHORS_WITH_LATEX                    ; al-Khwārizmī et al.
             # LaTeX-free Unicode one institution name from LaTeX
-            ONE_INSTITUTION_WITH_LATEX                  -> The Banū Mūsā brothers
+            ONE_INSTITUTION_WITH_LATEX                  ; The Banū Mūsā brothers
             # LaTeX-free Unicode two institution names from LaTeX
-            TWO_INSTITUTIONS_WITH_LATEX                 -> The Banū Mūsā brothers and The Banū Mūsā brothers
+            TWO_INSTITUTIONS_WITH_LATEX                 ; The Banū Mūsā brothers and The Banū Mūsā brothers
             # LaTeX-free Unicode mixed authors from LaTeX
-            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     -> The Banū Mūsā brothers and Böhm
+            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; The Banū Mūsā brothers and Böhm
             # LaTeX-free one institution with parenthesis at start
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   -> Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; Łukasz Michał
             """)
     void getAsNatbibLatexFree(String authorListName, String expected) {
         AuthorList authorList = getAuthorListByName(authorListName);
@@ -132,43 +132,43 @@ public class AuthorListTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiterString = "->", textBlock = """
+    @CsvSource(delimiterString = ";", textBlock = """
             # Empty author string for empty input abbreviate
-            EMPTY_AUTHOR                                -> true  -> false -> ''
+            EMPTY_AUTHOR                                ; true  ; false ; ''
             # Unicode one author name from LaTeX abbreviate
-            ONE_AUTHOR_WITH_LATEX                       -> true  -> false -> M. al-Khwārizmī
+            ONE_AUTHOR_WITH_LATEX                       ; true  ; false ; M. al-Khwārizmī
             # Unicode two author names from LaTeX abbreviate
-            TWO_AUTHORS_WITH_LATEX                      -> true  -> false -> M. al-Khwārizmī and C. Böhm
+            TWO_AUTHORS_WITH_LATEX                      ; true  ; false ; M. al-Khwārizmī and C. Böhm
             # Unicode two author names from LaTeX abbreviate and Oxford comma
-            TWO_AUTHORS_WITH_LATEX                      -> true  -> true  -> M. al-Khwārizmī and C. Böhm
+            TWO_AUTHORS_WITH_LATEX                      ; true  ; true  ; M. al-Khwārizmī and C. Böhm
             # Three Unicode authors from LaTeX abbreviate
-            THREE_AUTHORS_WITH_LATEX                    -> true  -> false -> M. al-Khwārizmī, C. Böhm and K. Gödel
+            THREE_AUTHORS_WITH_LATEX                    ; true  ; false ; M. al-Khwārizmī, C. Böhm and K. Gödel
             # Three Unicode authors from LaTeX abbreviate and Oxford comma
-            THREE_AUTHORS_WITH_LATEX                    -> true  -> true  -> M. al-Khwārizmī, C. Böhm, and K. Gödel
+            THREE_AUTHORS_WITH_LATEX                    ; true  ; true  ; M. al-Khwārizmī, C. Böhm, and K. Gödel
             # Unicode one institution name from LaTeX abbreviate
-            ONE_INSTITUTION_WITH_LATEX                  -> true  -> false -> The Banū Mūsā brothers
+            ONE_INSTITUTION_WITH_LATEX                  ; true  ; false ; The Banū Mūsā brothers
             # Unicode two institution names from LaTeX abbreviate
-            TWO_INSTITUTIONS_WITH_LATEX                 -> true  -> false -> The Banū Mūsā brothers and The Banū Mūsā brothers
+            TWO_INSTITUTIONS_WITH_LATEX                 ; true  ; false ; The Banū Mūsā brothers and The Banū Mūsā brothers
             # Unicode mixed authors from LaTeX abbreviate
-            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     -> true  -> false -> The Banū Mūsā brothers and C. Böhm
+            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; true  ; false ; The Banū Mūsā brothers and C. Böhm
             # One institution with parenthesis at start abbreviate
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   -> true  -> false -> Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; true  ; false ; Łukasz Michał
             # Empty author string for empty input
-            EMPTY_AUTHOR                                -> false -> false -> ''
+            EMPTY_AUTHOR                                ; false ; false ; ''
             # Unicode one author name from LaTeX
-            ONE_AUTHOR_WITH_LATEX                       -> false -> false -> Muḥammad al-Khwārizmī
+            ONE_AUTHOR_WITH_LATEX                       ; false ; false ; Muḥammad al-Khwārizmī
             # Unicode two author names from LaTeX
-            TWO_AUTHORS_WITH_LATEX                      -> false -> false -> Muḥammad al-Khwārizmī and Corrado Böhm
+            TWO_AUTHORS_WITH_LATEX                      ; false ; false ; Muḥammad al-Khwārizmī and Corrado Böhm
             # Three Unicode authors from LaTeX
-            THREE_AUTHORS_WITH_LATEX                    -> false -> false -> Muḥammad al-Khwārizmī, Corrado Böhm and Kurt Gödel
+            THREE_AUTHORS_WITH_LATEX                    ; false ; false ; Muḥammad al-Khwārizmī, Corrado Böhm and Kurt Gödel
             # Unicode one institution name from LaTeX
-            ONE_INSTITUTION_WITH_LATEX                  -> false -> false -> The Banū Mūsā brothers
+            ONE_INSTITUTION_WITH_LATEX                  ; false ; false ; The Banū Mūsā brothers
             # Unicode two institution names from LaTeX
-            TWO_INSTITUTIONS_WITH_LATEX                 -> false -> false -> The Banū Mūsā brothers and The Banū Mūsā brothers
+            TWO_INSTITUTIONS_WITH_LATEX                 ; false ; false ; The Banū Mūsā brothers and The Banū Mūsā brothers
             # Unicode mixed authors from LaTeX
-            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     -> false -> false -> The Banū Mūsā brothers and Corrado Böhm
+            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; false ; false ; The Banū Mūsā brothers and Corrado Böhm
             # One institution with parenthesis at start
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   -> false -> false -> Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; false ; false ; Łukasz Michał
             """)
     void getAsFirstLastNamesLatexFree(String authorListName, boolean abbreviate, boolean oxford, String expected) {
         AuthorList authorList = getAuthorListByName(authorListName);
@@ -200,71 +200,71 @@ public class AuthorListTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiterString = "->", textBlock = """
+    @CsvSource(delimiterString = ";", textBlock = """
             # Empty author string for empty input abbreviate
-            EMPTY_AUTHOR                                -> true  -> false -> ''
+            EMPTY_AUTHOR                                ; true  ; false ; ''
             # Unicode one author name from LaTeX abbreviate
-            ONE_AUTHOR_WITH_LATEX                       -> true  -> false -> al-Khwārizmī, M.
+            ONE_AUTHOR_WITH_LATEX                       ; true  ; false ; al-Khwārizmī, M.
             # Unicode two author names from LaTeX abbreviate
-            TWO_AUTHORS_WITH_LATEX                      -> true  -> false -> al-Khwārizmī, M. and Böhm, C.
+            TWO_AUTHORS_WITH_LATEX                      ; true  ; false ; al-Khwārizmī, M. and Böhm, C.
             # Three Unicode authors from LaTeX abbreviate
-            THREE_AUTHORS_WITH_LATEX                    -> true  -> false -> al-Khwārizmī, M., Böhm, C. and Gödel, K.
+            THREE_AUTHORS_WITH_LATEX                    ; true  ; false ; al-Khwārizmī, M., Böhm, C. and Gödel, K.
             # Unicode one institution name from LaTeX abbreviate
-            ONE_INSTITUTION_WITH_LATEX                  -> true  -> false -> The Banū Mūsā brothers
+            ONE_INSTITUTION_WITH_LATEX                  ; true  ; false ; The Banū Mūsā brothers
             # Unicode two institution names from LaTeX abbreviate
-            TWO_INSTITUTIONS_WITH_LATEX                 -> true  -> false -> The Banū Mūsā brothers and The Banū Mūsā brothers
+            TWO_INSTITUTIONS_WITH_LATEX                 ; true  ; false ; The Banū Mūsā brothers and The Banū Mūsā brothers
             # Unicode mixed authors from LaTeX abbreviate
-            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     -> true  -> false -> The Banū Mūsā brothers and Böhm, C.
+            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; true  ; false ; The Banū Mūsā brothers and Böhm, C.
             # One institution with parenthesis at start abbreviate
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   -> true  -> false -> Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; true  ; false ; Łukasz Michał
             # Empty author string for empty input
-            EMPTY_AUTHOR                                -> false -> false -> ''
+            EMPTY_AUTHOR                                ; false ; false ; ''
             # Unicode one author name from LaTeX
-            ONE_AUTHOR_WITH_LATEX                       -> false -> false -> al-Khwārizmī, Muḥammad
+            ONE_AUTHOR_WITH_LATEX                       ; false ; false ; al-Khwārizmī, Muḥammad
             # Unicode two author names from LaTeX
-            TWO_AUTHORS_WITH_LATEX                      -> false -> false -> al-Khwārizmī, Muḥammad and Böhm, Corrado
+            TWO_AUTHORS_WITH_LATEX                      ; false ; false ; al-Khwārizmī, Muḥammad and Böhm, Corrado
             # Three Unicode authors from LaTeX
-            THREE_AUTHORS_WITH_LATEX                    -> false -> false -> al-Khwārizmī, Muḥammad, Böhm, Corrado and Gödel, Kurt
+            THREE_AUTHORS_WITH_LATEX                    ; false ; false ; al-Khwārizmī, Muḥammad, Böhm, Corrado and Gödel, Kurt
             # Unicode one institution name from LaTeX
-            ONE_INSTITUTION_WITH_LATEX                  -> false -> false -> The Banū Mūsā brothers
+            ONE_INSTITUTION_WITH_LATEX                  ; false ; false ; The Banū Mūsā brothers
             # Unicode two institution names from LaTeX
-            TWO_INSTITUTIONS_WITH_LATEX                 -> false -> false -> The Banū Mūsā brothers and The Banū Mūsā brothers
+            TWO_INSTITUTIONS_WITH_LATEX                 ; false ; false ; The Banū Mūsā brothers and The Banū Mūsā brothers
             # Unicode mixed authors from LaTeX
-            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     -> false -> false -> The Banū Mūsā brothers and Böhm, Corrado
+            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; false ; false ; The Banū Mūsā brothers and Böhm, Corrado
             # One institution with parenthesis at start
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   -> false -> false -> Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; false ; false ; Łukasz Michał
             # Empty author string for empty input abbreviate Oxford comma
-            EMPTY_AUTHOR                                -> true  -> true  -> ''
+            EMPTY_AUTHOR                                ; true  ; true  ; ''
             # Unicode one author name from LaTeX abbreviate Oxford comma
-            ONE_AUTHOR_WITH_LATEX                       -> true  -> true  -> al-Khwārizmī, M.
+            ONE_AUTHOR_WITH_LATEX                       ; true  ; true  ; al-Khwārizmī, M.
             # Unicode two author names from LaTeX abbreviate Oxford comma
-            TWO_AUTHORS_WITH_LATEX                      -> true  -> true  -> al-Khwārizmī, M. and Böhm, C.
+            TWO_AUTHORS_WITH_LATEX                      ; true  ; true  ; al-Khwārizmī, M. and Böhm, C.
             # Three Unicode authors from LaTeX abbreviate Oxford comma
-            THREE_AUTHORS_WITH_LATEX                    -> true  -> true  -> al-Khwārizmī, M., Böhm, C., and Gödel, K.
+            THREE_AUTHORS_WITH_LATEX                    ; true  ; true  ; al-Khwārizmī, M., Böhm, C., and Gödel, K.
             # Unicode one institution name from LaTeX abbreviate Oxford comma
-            ONE_INSTITUTION_WITH_LATEX                  -> true  -> true  -> The Banū Mūsā brothers
+            ONE_INSTITUTION_WITH_LATEX                  ; true  ; true  ; The Banū Mūsā brothers
             # Unicode two institution names from LaTeX abbreviate Oxford comma
-            TWO_INSTITUTIONS_WITH_LATEX                 -> true  -> true  -> The Banū Mūsā brothers and The Banū Mūsā brothers
+            TWO_INSTITUTIONS_WITH_LATEX                 ; true  ; true  ; The Banū Mūsā brothers and The Banū Mūsā brothers
             # Unicode mixed authors from LaTeX abbreviate Oxford comma
-            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     -> true  -> true  -> The Banū Mūsā brothers and Böhm, C.
+            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; true  ; true  ; The Banū Mūsā brothers and Böhm, C.
             # One institution with parenthesis at start abbreviate Oxford comma
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   -> true  -> true  -> Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; true  ; true  ; Łukasz Michał
             # Empty author string for empty input Oxford comma
-            EMPTY_AUTHOR                                -> false -> true  -> ''
+            EMPTY_AUTHOR                                ; false ; true  ; ''
             # Unicode one author name from LaTeX Oxford comma
-            ONE_AUTHOR_WITH_LATEX                       -> false -> true  -> al-Khwārizmī, Muḥammad
+            ONE_AUTHOR_WITH_LATEX                       ; false ; true  ; al-Khwārizmī, Muḥammad
             # Unicode two author names from LaTeX Oxford comma
-            TWO_AUTHORS_WITH_LATEX                      -> false -> true  -> al-Khwārizmī, Muḥammad and Böhm, Corrado
+            TWO_AUTHORS_WITH_LATEX                      ; false ; true  ; al-Khwārizmī, Muḥammad and Böhm, Corrado
             # Three Unicode authors from LaTeX Oxford comma
-            THREE_AUTHORS_WITH_LATEX                    -> false -> true  -> al-Khwārizmī, Muḥammad, Böhm, Corrado, and Gödel, Kurt
+            THREE_AUTHORS_WITH_LATEX                    ; false ; true  ; al-Khwārizmī, Muḥammad, Böhm, Corrado, and Gödel, Kurt
             # Unicode one institution name from LaTeX Oxford comma
-            ONE_INSTITUTION_WITH_LATEX                  -> false -> true  -> The Banū Mūsā brothers
+            ONE_INSTITUTION_WITH_LATEX                  ; false ; true  ; The Banū Mūsā brothers
             # Unicode two institution names from LaTeX Oxford comma
-            TWO_INSTITUTIONS_WITH_LATEX                 -> false -> true  -> The Banū Mūsā brothers and The Banū Mūsā brothers
+            TWO_INSTITUTIONS_WITH_LATEX                 ; false ; true  ; The Banū Mūsā brothers and The Banū Mūsā brothers
             # Unicode mixed authors from LaTeX Oxford comma
-            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     -> false -> true  -> The Banū Mūsā brothers and Böhm, Corrado
+            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; false ; true  ; The Banū Mūsā brothers and Böhm, Corrado
             # One institution with parenthesis at start Oxford comma
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   -> false -> true  -> Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; false ; true  ; Łukasz Michał
             """)
     void getAsLastFirstNamesLatexFree(String authorListName, boolean abbreviate, boolean oxford, String expected) {
         AuthorList authorList = getAuthorListByName(authorListName);
@@ -345,25 +345,25 @@ public class AuthorListTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiterString = "->", textBlock = """
+    @CsvSource(delimiterString = ";", textBlock = """
             # Unicode one author name from LaTeX
-            ONE_AUTHOR_WITH_LATEX                       -> false -> al-Khwārizmī
+            ONE_AUTHOR_WITH_LATEX                       ; false ; al-Khwārizmī
             # Unicode two author names from LaTeX
-            TWO_AUTHORS_WITH_LATEX                      -> false -> al-Khwārizmī and Böhm
+            TWO_AUTHORS_WITH_LATEX                      ; false ; al-Khwārizmī and Böhm
             # Unicode two author names from LaTeX using Oxford comma
-            TWO_AUTHORS_WITH_LATEX                      -> true  -> al-Khwārizmī and Böhm
+            TWO_AUTHORS_WITH_LATEX                      ; true  ; al-Khwārizmī and Böhm
             # Unicode three authors from LaTeX
-            THREE_AUTHORS_WITH_LATEX                    -> false -> al-Khwārizmī, Böhm and Gödel
+            THREE_AUTHORS_WITH_LATEX                    ; false ; al-Khwārizmī, Böhm and Gödel
             # Unicode three authors from LaTeX using Oxford comma
-            THREE_AUTHORS_WITH_LATEX                    -> true  -> al-Khwārizmī, Böhm, and Gödel
+            THREE_AUTHORS_WITH_LATEX                    ; true  ; al-Khwārizmī, Böhm, and Gödel
             # Unicode one institution name from LaTeX
-            ONE_INSTITUTION_WITH_LATEX                  -> false -> The Banū Mūsā brothers
+            ONE_INSTITUTION_WITH_LATEX                  ; false ; The Banū Mūsā brothers
             # Unicode two institution names from LaTeX
-            TWO_INSTITUTIONS_WITH_LATEX                 -> false -> The Banū Mūsā brothers and The Banū Mūsā brothers
+            TWO_INSTITUTIONS_WITH_LATEX                 ; false ; The Banū Mūsā brothers and The Banū Mūsā brothers
             # Unicode mixed authors from LaTeX
-            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     -> false -> The Banū Mūsā brothers and Böhm
+            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; false ; The Banū Mūsā brothers and Böhm
             # One institution with parenthesis at start
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   -> false -> Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; false ; Łukasz Michał
             """)
     void getAsLastNamesLatexFree(String authorListName, boolean oxfordComma, String expected) {
         AuthorList authorList = getAuthorListByName(authorListName);
