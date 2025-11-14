@@ -39,6 +39,7 @@ open module org.jabref.jablib {
     exports org.jabref.model.groups.event;
     exports org.jabref.logic.preview;
     exports org.jabref.logic.ai;
+    exports org.jabref.logic.ai.models;
     exports org.jabref.logic.pdf;
     exports org.jabref.model.database.event;
     exports org.jabref.model.entry.event;
