@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -13,8 +14,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+import org.jabref.model.openoffice.rangesort.RangeSort;
+import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
+import org.jabref.model.openoffice.uno.UnoTextRange;
+import org.jabref.model.openoffice.uno.UnoCast;
 
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
@@ -315,15 +320,65 @@ public class CSLReferenceMarkManager {
     }
 
     private void sortMarksInOrder() {
-        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
+        List<RangeSortEntry<CSLReferenceMark>> sortables = marksInOrder.stream()
+                                                                       .map(mark -> new RangeSortEntry<>(mark.getTextContent().getAnchor(), 0, mark))
+                                                                       .collect(Collectors.toCollection(ArrayList::new));
+
+        RangeSort.RangePartitions<RangeSortEntry<CSLReferenceMark>> partitions = RangeSort.partitionAndSortRanges(sortables);
+
+        List<RangeSortEntry<CSLReferenceMark>> processed = new ArrayList<>();
+        for (List<RangeSortEntry<CSLReferenceMark>> partition : partitions.getPartitions()) {
+            int indexInPartition = 0;
+            for (RangeSortEntry<CSLReferenceMark> sortable : partition) {
+                sortable.setIndexInPosition(indexInPartition++);
+                Optional.ofNullable(sortable.getRange())
+                        .flatMap(UnoTextRange::getFootnoteMarkRange)
+                        .ifPresent(sortable::setRange);
+                processed.add(sortable);
+            }
+        }
+
+        processed.sort(this::compareRangeSortEntries);
+
+        marksInOrder.clear();
+        processed.stream()
+                 .map(RangeSortEntry::getContent)
+                 .forEach(marksInOrder::add);
     }
 
-    private int compareTextRanges(XTextRange r1, XTextRange r2) {
-        try {
-            return r1 != null && r2 != null ? textRangeCompare.compareRegionStarts(r1, r2) : 0;
-        } catch (IllegalArgumentException e) {
-            LOGGER.warn("Error comparing text ranges: {}", e.getMessage(), e);
-            return 0;
+    private int compareRangeSortEntries(RangeSortEntry<CSLReferenceMark> first, RangeSortEntry<CSLReferenceMark> second) {
+        XTextRange range1 = first.getRange();
+        XTextRange range2 = second.getRange();
+
+        if (range1 != null && range2 != null) {
+            try {
+                if (UnoTextRange.comparables(range1, range2)) {
+                    return compareWithinSameText(first, second, range1);
+                }
+
+                int result = UnoTextRange.compareStartsThenEndsUnsafe(textRangeCompare, range1, range2);
+                if (result != 0) {
+                    return result;
+                }
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Error comparing text ranges: {}", e.getMessage(), e);
+            }
         }
+
+        return Integer.compare(first.getIndexInPosition(), second.getIndexInPosition());
+    }
+
+    private int compareWithinSameText(RangeSortEntry<CSLReferenceMark> first,
+                                      RangeSortEntry<CSLReferenceMark> second,
+                                      XTextRange range1) {
+        return UnoCast.cast(XTextRangeCompare.class, range1.getText())
+                      .map(compare -> {
+                          int result = UnoTextRange.compareStartsThenEndsUnsafe(compare, first.getRange(), second.getRange());
+                          if (result != 0) {
+                              return result;
+                          }
+                          return Integer.compare(first.getIndexInPosition(), second.getIndexInPosition());
+                      })
+                      .orElseGet(() -> Integer.compare(first.getIndexInPosition(), second.getIndexInPosition()));
     }
 }
