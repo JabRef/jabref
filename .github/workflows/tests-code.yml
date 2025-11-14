@@ -56,7 +56,7 @@ jobs:
           distribution: 'corretto'
           check-latest: true
       - name: Run checkstyle reporter
-        uses: dbelyaev/action-checkstyle@master
+        uses: dbelyaev/action-checkstyle@v3
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -92,7 +92,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
@@ -119,7 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: koppor/intellij-idea-format@update-to-latest-intellij
+      - uses: leventeBajczi/intellij-idea-format@master
         with:
           file-mask: "*.java"
           settings-file: ".idea/codeStyles/Project.xml"
@@ -206,17 +206,24 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.11.1:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md > heylogs.txt || true
 
-          # improve output
-          sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
+          # ignore some errors
+          grep -v no-empty-headings < heylogs.txt | grep -v all-h2-contain-a-version | tee heylogs.txt
 
-          cat heylogs.txt
+          # exit 1 in case of an error
+          remaining=$(
+              grep -E " error " heylogx.txt \
+              | wc -l
+            )
 
-          # exit 1 in case of error
-          # We have 1 "valid" issue in CHANGELOG.md
-          grep -q "1 problem" heylogs.txt || exit 1
+          echo "Remaining errors: $remaining"
 
+          # We have on acceptable error
+          if [ "$remaining" -gt 1 ]; then
+            echo "Failing because of $remaining remaining error(s)."
+            exit 1
+          fi
   changelog-unreleased-only:
     if: github.event_name == 'pull_request'
     name: CHANGELOG.md - only unreleased touched
@@ -427,7 +434,7 @@ jobs:
       KOPPOR_MAVENCENTRALUSERNAME: ${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
       KOPPOR_MAVENCENTRALPASSWORD: ${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
 
-  jbang:
+  jbang-main:
     name: JBang (main)
     runs-on: ubuntu-latest
     needs: publish
@@ -438,6 +445,89 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
+      - name: Detect changed jablib classes
+        id: changed-jablib-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            .jbang/*.java
+            jablib/src/main/java/**/*.java
+            jablib-examples/jbang/**/*.java
+          files_ignore: |
+            jablib/src/main/java/**/*-*.java
+      - name: Set up JDK
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+        uses: actions/setup-java@v5
+        with:
+          java-version: 24
+          distribution: 'corretto'
+          check-latest: true
+      - name: Generate JBang cache key
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+        uses: jbangdev/setup-jbang@main
+
+      # Build all JBang scripts
+      - run: |
+          for f in .jbang/*.java; do
+            echo "Building $f..."
+            jbang build --fresh "$f"
+          done
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+      - run: |
+          for f in jablib-examples/jbang/*.java; do
+            echo "Building $f..."
+            jbang build --fresh "$f"
+          done
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+
+      # *Launcher.java should support "--help"
+      - run: jbang run .jbang/JabKitLauncher.java --help
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+      - run: jbang run .jbang/JabLsLauncher.java --help
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+      - run: jbang run .jbang/JabSrvLauncher.java --help
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+
+  jbang-pr:
+    name: JBang (PR)
+    runs-on: ubuntu-latest
+    # does not need publish, because the JBang scripts are modified
+    if: github.ref != 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        script: [.jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Detect changed jablib classes
+        id: changed-jablib-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            .jbang/*.java
+            jabkit/src/main/java/**/*.java
+            jablib/src/main/java/**/*.java
+            jablib-examples/jbang/**/*.java
+          files_ignore: |
+            jablib/src/main/java/**/*-*.java
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -458,24 +548,49 @@ jobs:
             jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
-      - run: jbang build .jbang/CheckoutPR.java
-      - run: jbang build .jbang/CloneJabRef.java
-      - run: jbang build --fresh .jbang/JabKitLauncher.java
-      - run: jbang build --fresh .jbang/JabLsLauncher.java
-      - run: jbang build --fresh .jbang/JabSrvLauncher.java
-      - run: jbang run .jbang/JabKitLauncher.java --help
-      - run: jbang run .jbang/JabLsLauncher.java --help
-      - run: jbang run .jbang/JabSrvLauncher.java --help
+      - name: Modify ${{ matrix.script }} to include changed classes
+        shell: bash
+        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
+        run: |
+          # We modify the JBang scripts directly to avoid issues with relative paths
+          for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
+            case "$f" in
+              .jbang/*)
+                # skip scripts
+                continue
+                ;;
+              jablib-examples/*)
+                # skip scripts
+                continue
+                ;;
+              jabkit/*)
+                # only JabKit needs its modified sources if jabkit was modified
+                if [ "${{ matrix.script }}" != ".jbang/JabKitLauncher.java" ]; then
+                  continue
+                fi
+                ;;
+            esac
+            if [[ "${{ matrix.script }}" == .jbang/* ]]; then
+              echo "//SOURCES ../$f" >> "${{ matrix.script }}"
+            else
+              echo "//SOURCES ../../$f" >> "${{ matrix.script }}"
+            fi
+          done
+      - run: jbang build "${{ matrix.script }}"
+        shell: bash
+      - run: jbang "${{ matrix.script }}" --help
+        if: ${{ contains(matrix.script, 'Launcher.java') }}
+        shell: bash
 
-  jbang-pr:
-    name: JBang (PR)
+  maven-examples:
+    name: Maven examples (main)
     runs-on: ubuntu-latest
-    # does not need publish, because the JBang scripts are modified
-    if: github.ref != 'refs/heads/main'
+    needs: publish
+    if: github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
-        launcher: [JabKitLauncher, JabLsLauncher, JabSrvLauncher]
+        project: [jablib-examples/maven3/doi-to-bibtex]
     steps:
       - name: Checkout source
         uses: actions/checkout@v5
@@ -487,39 +602,38 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          cache: maven
           check-latest: true
-      - name: Generate JBang cache key
-        id: cache-key
+      - run: |
+          cd ${{ matrix.project }}
+          mvn --batch-mode --update-snapshots verify
         shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache@v4
+
+  maven-pr:
+    name: Maven examples (PR)
+    runs-on: ubuntu-latest
+    # does not need publish, because there is no publishing on non-main
+    if: github.ref != 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [jablib-examples/maven3/doi-to-bibtex]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
         with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
-      - name: Detect changed jablib classes
-        id: changed-jablib-files
-        uses: tj-actions/changed-files@v47
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
         with:
-          files: |
-            jablib/src/main/java/**/*.java
-          files_ignore: |
-            jablib/src/main/java/**/*-*.java
-      - name: Build ${{ matrix.launcher }} launcher including changed classes
-        shell: bash
-        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
-        run: |
-          # We modify the JBang scripts directly to avoid issues with relative paths
-          for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
-            echo "//SOURCES ../$f" >> ".jbang/${{ matrix.launcher }}.java"
-          done
-          jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
-      - run: jbang ".jbang/${{ matrix.launcher }}.java" --help
+          java-version: 24
+          distribution: 'corretto'
+          cache: maven
+          check-latest: true
+      - run: |
+          cd ${{ matrix.project }}
+          mvn --batch-mode --update-snapshots verify
         shell: bash
 
   codecoverage:
