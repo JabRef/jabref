@@ -49,7 +49,7 @@
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 
-//DEPS io.github.darvil82:terminal-text-formatter:2.2.0
+//DEPS io.github.darvil82:terminal-text-formatter:2.3.0c
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.jspecify:jspecify:1.0.0
 
