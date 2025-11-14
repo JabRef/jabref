@@ -758,11 +758,9 @@ public class AuthorListTest {
         assertNotSame(uniqueInstitution, AuthorList.parse(uniqueInstitutionName));
     }
 
-    /**
-     * This tests an unreachable key issue addressed in
-     * [#6552](https://github.com/JabRef/jabref/pull/6552). The test is incorrect BibTeX but is
-     * handled by the parser and common in practice.
-     */
+    /// This tests an unreachable key issue addressed in
+    /// [#6552](https://github.com/JabRef/jabref/pull/6552). The test is incorrect BibTeX but is
+    ///handled by the parser and common in practice.
     @Test
     void parseCacheAuthorsWithTwoOrMoreCommasAndWithSpaceInAllParts() {
         final String uniqueAuthorsNames = "Basil Dankworth, Gianna Birdwhistle, Cosmo Berrycloth";
@@ -771,10 +769,8 @@ public class AuthorListTest {
         assertSame(uniqueAuthors, AuthorList.parse(uniqueAuthorsNames));
     }
 
-    /**
-     * This tests an unreachable key issue addressed in
-     * [#6552](https://github.com/JabRef/jabref/pull/6552).
-     */
+    /// This tests an unreachable key issue addressed in
+    /// [#6552](https://github.com/JabRef/jabref/pull/6552).
     @Test
     void parseCacheAuthorsWithTwoOrMoreCommasAndWithoutSpaceInAllParts() {
         final String uniqueAuthorsNames = "Dankworth, Jr., Braelynn";
@@ -783,10 +779,8 @@ public class AuthorListTest {
         assertSame(uniqueAuthors, AuthorList.parse(uniqueAuthorsNames));
     }
 
-    /**
-     * This tests the issue described at
-     * https://github.com/JabRef/jabref/pull/2669#issuecomment-288519458
-     */
+    /// This tests the issue described at
+    /// <https://github.com/JabRef/jabref/pull/2669#issuecomment-288519458>
     @Test
     void correctNamesWithOneComma() {
         Author expected = new Author("Alexander der Große", "A. d. G.", null, "Canon der Barbar", null);
