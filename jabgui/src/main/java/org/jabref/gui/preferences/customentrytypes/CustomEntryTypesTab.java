@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -40,6 +39,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
+import org.controlsfx.control.SearchableComboBox;
 
 public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> implements PreferencesTab {
 
@@ -47,14 +47,16 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     @FXML private TableColumn<EntryTypeViewModel, String> entryTypColumn;
     @FXML private TableColumn<EntryTypeViewModel, String> entryTypeActionsColumn;
     @FXML private TextField addNewEntryType;
+    @FXML private TextField addNewCustomFieldText;
     @FXML private TableView<FieldViewModel> fields;
     @FXML private TableColumn<FieldViewModel, String> fieldNameColumn;
     @FXML private TableColumn<FieldViewModel, Boolean> fieldTypeColumn;
     @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
     @FXML private TableColumn<FieldViewModel, Boolean> fieldTypeMultilineColumn;
-    @FXML private ComboBox<Field> addNewField;
+    @FXML private SearchableComboBox<Field> addNewField;
     @FXML private Button addNewEntryTypeButton;
     @FXML private Button addNewFieldButton;
+    @FXML private Button addNewCustomFieldButton;
 
     @Inject private StateManager stateManager;
 
@@ -89,9 +91,13 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
         addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
 
+        viewModel.newCustomFieldToAddProperty().bindBidirectional(addNewCustomFieldText.textProperty());
+        addNewCustomFieldButton.disableProperty().bind(viewModel.customFieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
+
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.entryTypeValidationStatus(), addNewEntryType, true);
             visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);
+            visualizer.initVisualization(viewModel.customFieldValidationStatus(), addNewCustomFieldText, true);
         });
     }
 
@@ -203,7 +209,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
         // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
         // since the enabled/disabled state of addNewFieldButton won't update otherwise
-        EasyBind.subscribe(addNewField.getEditor().textProperty(), text -> addNewField.setValue(FieldsUtil.FIELD_STRING_CONVERTER.fromString(text)));
     }
 
     private void makeRotatedColumnHeader(TableColumn<?, ?> column, String text) {
@@ -267,6 +272,11 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     @FXML
     void addNewField() {
         viewModel.addNewField();
+    }
+
+    @FXML
+    void addNewCustomField() {
+        viewModel.addNewCustomField();
     }
 
     @FXML

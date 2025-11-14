@@ -8,8 +8,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
-import textFormatter.TextFormatter;
-import textFormatter.color.SimpleColor;
+import io.github.darvil.terminal.textformatter.TextFormatter;
+import io.github.darvil.terminal.textformatter.color.SimpleColor;
 
 public final class BuildInfo {
     public static final String JABREF_BANNER = TextFormatter.of("""

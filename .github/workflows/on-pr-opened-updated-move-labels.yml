@@ -17,8 +17,9 @@ jobs:
       - name: Download artifact from triggering run
         uses: actions/download-artifact@v6
         with:
-          run-id: ${{ github.event.workflow_run.id }}
-          name: pr_number
+            name: pr_number
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            run-id: ${{ github.event.workflow_run.id }}
         continue-on-error: true
       - name: Check for pr_number.txt
         id: check

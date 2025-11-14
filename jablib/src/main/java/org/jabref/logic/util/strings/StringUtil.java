@@ -22,6 +22,7 @@ import org.jabref.model.strings.UnicodeToReadableCharMap;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @AllowedToUseApacheCommonsLang3("There is no equivalent in Google's Guava")
@@ -738,7 +739,7 @@ public class StringUtil {
 
     @AllowedToUseApacheCommonsLang3("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")
     public static boolean containsIgnoreCase(String text, String searchString) {
-        return StringUtils.containsIgnoreCase(text, searchString);
+        return Strings.CI.contains(text, searchString);
     }
 
     public static boolean equalsUnifiedLineBreak(Optional<String> stringOne, Optional<String> stringTwo) {
