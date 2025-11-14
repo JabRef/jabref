@@ -14,7 +14,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
 - We added automatic date-based groups that create year/month/day subgroups from an entry’s date fields. [#10822](https://github.com/JabRef/jabref/issues/10822)
 - We added `doi-to-bibtex` to `JabKit`. [#14244](https://github.com/JabRef/jabref/pull/14244)
-- We added groups that mirror the local structure. [#10930](https://github.com/JabRef/jabref/issues/10930)
+- We added groups that mirror the local file directory structure. [#10930](https://github.com/JabRef/jabref/issues/10930)
 
 ### Changed
 
