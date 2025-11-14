@@ -27,9 +27,8 @@
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 
-//DEPS io.github.darvil82:terminal-text-formatter:2.3.0c
+// requirements needed by jabkit projecxt need to be listed; requirements by jablib are loaded transitively
 //DEPS info.picocli:picocli:4.7.7
-//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabKitLauncher {

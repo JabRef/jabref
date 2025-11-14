@@ -44,6 +44,9 @@ import static org.jabref.logic.ai.ingestion.FileEmbeddingsManager.LINK_METADATA_
  * <p>
  */
 public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore<TextSegment> {
+
+    private static final EmbeddingRecord EMPTY_EMBEDDING_RECORD = new EmbeddingRecord(null, "", new float[0]);
+
     // `file` field is nullable, because {@link Optional} can't be serialized.
     private record EmbeddingRecord(@Nullable String file, String content, float[] embeddingVector) implements Serializable {
     }
@@ -125,7 +128,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         PriorityQueue<EmbeddingMatch<TextSegment>> matches = new PriorityQueue<>(comparator);
 
         applyFilter(request.filter()).forEach(id -> {
-            EmbeddingRecord eRecord = embeddingsMap.get(id);
+            EmbeddingRecord eRecord = embeddingsMap.getOrDefault(id, EMPTY_EMBEDDING_RECORD);
 
             double cosineSimilarity = CosineSimilarity.between(Embedding.from(eRecord.embeddingVector), request.queryEmbedding());
             double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);
