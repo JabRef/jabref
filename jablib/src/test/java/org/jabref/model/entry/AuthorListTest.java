@@ -65,23 +65,23 @@ public class AuthorListTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiterString = ";", textBlock = """
+    @CsvSource(textBlock = """
             # LaTeX-free empty author string
-            EMPTY_AUTHOR                                ; ''
+            EMPTY_AUTHOR                                , ''
             # LaTeX-free Unicode one author name from LaTeX
-            ONE_AUTHOR_WITH_LATEX                       ; al-Khwārizmī
+            ONE_AUTHOR_WITH_LATEX                       , al-Khwārizmī
             # LaTeX-free Unicode two author names from LaTeX
-            TWO_AUTHORS_WITH_LATEX                      ; al-Khwārizmī and Böhm
+            TWO_AUTHORS_WITH_LATEX                      , al-Khwārizmī and Böhm
             # LaTeX-free Unicode author et al from LaTeX
-            THREE_AUTHORS_WITH_LATEX                    ; al-Khwārizmī et al.
+            THREE_AUTHORS_WITH_LATEX                    , al-Khwārizmī et al.
             # LaTeX-free Unicode one institution name from LaTeX
-            ONE_INSTITUTION_WITH_LATEX                  ; The Banū Mūsā brothers
+            ONE_INSTITUTION_WITH_LATEX                  , The Banū Mūsā brothers
             # LaTeX-free Unicode two institution names from LaTeX
-            TWO_INSTITUTIONS_WITH_LATEX                 ; The Banū Mūsā brothers and The Banū Mūsā brothers
+            TWO_INSTITUTIONS_WITH_LATEX                 , The Banū Mūsā brothers and The Banū Mūsā brothers
             # LaTeX-free Unicode mixed authors from LaTeX
-            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; The Banū Mūsā brothers and Böhm
+            MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     , The Banū Mūsā brothers and Böhm
             # LaTeX-free one institution with parenthesis at start
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   , Łukasz Michał
             """)
     void getAsNatbibLatexFree(String authorListName, String expected) {
         AuthorList authorList = getAuthorListByName(authorListName);
