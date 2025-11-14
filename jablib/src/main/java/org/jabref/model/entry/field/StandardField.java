@@ -8,7 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /// Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
-/// See `org.jabref.gui.fieldeditors.FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)` for a description of each field.
+/// See [org.jabref.model.entry.field.FieldTextMapper] for the display name creation.
+/// See [org.jabref.gui.fieldeditors.FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)] for a description of each field.
 public enum StandardField implements Field {
     ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
     ADDENDUM("addendum"),
