@@ -97,22 +97,10 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
                         if (Files.exists(path)) {
-                            if (Files.isDirectory(path) && !listeners.containsKey(path)) {
+                            if (Files.isDirectory(path)) {
                                 notifyAboutDirectoryCreation(path);
-                            } else {
-                                if (FileUtil.isPDFFile(path)) {
-                                    notifyAboutPDFCreation(path);
-                                }
-                            }
-                        }
-                    } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                        // We only handle "ENTRY_MODIFY" here, so the context is always a Path
-                        @SuppressWarnings("unchecked")
-                        WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                        Path path = ((Path) key.watchable()).resolve(ev.context());
-                        if (Files.exists(path)) {
-                            if (!Files.isDirectory(path)) {
-                                // TODO : modify the corresponding entry
+                            } else if (FileUtil.isPDFFile(path)) {
+                                notifyAboutPDFCreation(path);
                             }
                         }
                     } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
@@ -120,9 +108,9 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
-                        if (Files.isDirectory(path)) {
+                        if (FileUtil.getFileExtension(path).isEmpty()) {
                             notifyAboutDirectoryDeletion(path);
-                            cleanupListenersAccordingToLocalChanges();
+                            cleanupListenersOfADeletedDirectory(path);
                         } else if (FileUtil.isPDFFile(path)) {
                             notifyAboutPDFDeletion(path);
                         }
@@ -144,12 +132,20 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         return filesystemMonitorFailure.get().isEmpty();
     }
 
+    private void importFilesInDatabase(List<Path> files, BibDatabaseContext database) {
+        ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
+        importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
+    }
+
     private void notifyAboutDirectoryCreation(Path newPath) {
         Path parentPath = newPath.toAbsolutePath().getParent();
         for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
             if (listener instanceof DirectoryGroup parentGroup) {
                 try {
-                    parentGroup.directoryCreated(newPath);
+                    parentGroup.directoryCreated(newPath).ifPresent(group -> {
+                        importFilesInDatabase(group.getAllPDFs(), group.getBibDatabaseContext());
+                        LOGGER.info("Added group \"{}\".", group.getName());
+                    });
                 } catch (IOException e) {
                     LOGGER.error("Error while creating directory {}", newPath, e);
                 }
@@ -161,6 +157,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         for (DirectoryUpdateListener listener : listeners.get(deletedPath)) {
             if (listener instanceof DirectoryGroup deletedGroup) {
                 deletedGroup.directoryDeleted();
+                LOGGER.info("Removed group \"{}\".", deletedGroup.getName());
             }
         }
     }
@@ -182,7 +179,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         Path parentPath = pdfPath.toAbsolutePath().getParent();
         for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
             if (listener instanceof DirectoryGroup parentGroup) {
-                parentGroup.pdfDeleted(pdfPath);
+                parentGroup.pdfDeleted();
             }
         }
     }
@@ -190,7 +187,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     @Override
     public void addListenerForDirectory(Path directory, DirectoryUpdateListener listener) throws IOException {
         if (isActive()) {
-            directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+            directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
             listeners.put(directory, listener);
         } else {
             LOGGER.warn("Not adding listener {} to directory {} because the directory update monitor isn't active", listener, directory);
@@ -216,15 +213,15 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         }
     }
 
-    public void cleanupListenersAccordingToLocalChanges() {
-        List<Path> deletedPaths = new ArrayList<>();
+    public void cleanupListenersOfADeletedDirectory(Path deletedPath) {
+        List<Path> pathsToRemove = new ArrayList<>();
         for (Path registeredPath : listeners.keys()) {
-            if (registeredPath != null && !Files.exists(registeredPath)) {
-                deletedPaths.add(registeredPath);
+            if (registeredPath != null && registeredPath.startsWith(deletedPath)) {
+                pathsToRemove.add(registeredPath);
             }
         }
-        for (Path deletedPath : deletedPaths) {
-            listeners.removeAll(deletedPath);
+        for (Path registeredPath : pathsToRemove) {
+            listeners.removeAll(registeredPath);
         }
     }
 

@@ -2,6 +2,7 @@ package org.jabref.model.groups;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -185,31 +186,49 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
         return this.database;
     }
 
+    private void cleanupFilesOfAnEntry(BibEntry entry) {
+        List<LinkedFile> cleanedFiles = new ArrayList<>();
+        for (LinkedFile file : entry.getFiles()) {
+            if (Files.exists(Path.of(file.getLink()).toAbsolutePath())) {
+                cleanedFiles.add(file);
+            }
+        }
+        entry.setFiles(cleanedFiles);
+    }
+
+    private void cleanupFilesOfAllEntries() {
+        for (BibEntry entry : database.getEntries()) {
+            cleanupFilesOfAnEntry(entry);
+        }
+    }
+
     @Override
-    public void directoryCreated(Path newPath) throws IOException {
+    public Optional<DirectoryGroup> directoryCreated(Path newPath) throws IOException {
         Optional<GroupTreeNode> groupNode = getNode();
+        Optional<DirectoryGroup> resultingGroup = Optional.empty();
         if (groupNode.isPresent()) {
-            DirectoryGroup newSubgroup = this.createDescendantGroup(newPath.toFile());
-            groupNode.get().addSubgroup(newSubgroup);
-            newSubgroup.addDescendants();
+            resultingGroup = Optional.of(this.createDescendantGroup(newPath.toFile()));
+            groupNode.get().addSubgroup(resultingGroup.get());
+            resultingGroup.get().addDescendants();
         } else {
             LOGGER.error("Directory {} could not be created because its parent is not linked with a GroupTreeNode", newPath);
         }
+        return resultingGroup;
     }
 
     @Override
     public void directoryDeleted() {
         Optional<GroupTreeNode> groupNode = getNode();
         if (groupNode.isPresent()) {
+            cleanupFilesOfAllEntries();
             groupNode.get().removeFromParent();
-            // TODO : finish the deletion by deleting the corresponding entries
         } else {
             LOGGER.error("Directory {} could not be deleted because it is not linked with a GroupTreeNode", absoluteDirectoryPath);
         }
     }
 
     @Override
-    public void pdfDeleted(Path pdfPath) {
-        // TODO : Find the corresponding entry and remove it from the database
+    public void pdfDeleted() {
+        cleanupFilesOfAllEntries();
     }
 }
