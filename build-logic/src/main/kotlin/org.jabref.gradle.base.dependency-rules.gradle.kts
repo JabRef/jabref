@@ -215,12 +215,12 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
-    module("io.github.classgraph:classgraph", "io.github.classgraph") {
-        overrideModuleName()
+    module("io.github.darvil82:terminal-text-formatter", "io.github.darvil.terminal.textformatter") {
+        patchRealModule()
         exportAllPackages()
+        requires("io.github.darvil.utils")
     }
-
-    module("io.github.darvil82:utils", "utils"){
+    module("io.github.darvil82:utils", "io.github.darvil.utils") {
         patchRealModule()
         exportAllPackages()
     }
@@ -469,13 +469,6 @@ extraJavaModuleInfo {
         requires("java.logging")
     }
 
-    module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requiresTransitive("javafx.base")
-        requiresTransitive("javafx.controls")
-        requiresTransitive("org.controlsfx.controls")
-    }
     module("de.saxsys:mvvmfx", "de.saxsys.mvvmfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -485,7 +478,18 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("org.controlsfx.controls")
     }
+    // JitPack-variant because we need the latest commit
+    module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("org.controlsfx.controls")
+    }
+
     module("org.reactfx:reactfx", "reactfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
