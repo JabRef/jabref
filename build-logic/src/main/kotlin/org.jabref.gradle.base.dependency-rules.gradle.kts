@@ -464,13 +464,6 @@ extraJavaModuleInfo {
         requires("java.logging")
     }
 
-    module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requiresTransitive("javafx.base")
-        requiresTransitive("javafx.controls")
-        requiresTransitive("org.controlsfx.controls")
-    }
     module("de.saxsys:mvvmfx", "de.saxsys.mvvmfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -480,7 +473,18 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("org.controlsfx.controls")
     }
+    // JitPack-variant because we need the latest commit
+    module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("org.controlsfx.controls")
+    }
+
     module("org.reactfx:reactfx", "reactfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
