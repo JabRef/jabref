@@ -273,59 +273,25 @@ public class AuthorListTest {
         assertEquals(expected, authorList.latexFree().getAsLastFirstNames(abbreviate, oxford));
     }
 
-    @Test
-    void fixAuthorLastNameFirst() {
-        // Test helper method
+    @ParameterizedTest
+    @CsvSource(
+            delimiter = ';',
+            textBlock = """
+                    Smith, John;John Smith;false
+                    Smith, John and Black Brown, Peter;John Smith and Black Brown, Peter;false
+                    von Neumann, John and Smith, John and Black Brown, Peter;John von Neumann and John Smith and Black Brown, Peter;false
+                    von Last, Jr, First;von Last, Jr ,First;false
+                    von Neumann, John and Smith, John and Black Brown, Peter;John von Neumann and John Smith and Black Brown, Peter;false
 
-        assertEquals("Smith, John", AuthorList.fixAuthorLastNameFirst("John Smith"));
-
-        assertEquals("Smith, John and Black Brown, Peter", AuthorList
-                .fixAuthorLastNameFirst("John Smith and Black Brown, Peter"));
-
-        assertEquals("von Neumann, John and Smith, John and Black Brown, Peter", AuthorList
-                .fixAuthorLastNameFirst("John von Neumann and John Smith and Black Brown, Peter"));
-
-        assertEquals("von Last, Jr, First", AuthorList
-                .fixAuthorLastNameFirst("von Last, Jr ,First"));
-
-        assertEquals(AuthorList
-                        .fixAuthorLastNameFirst("John von Neumann and John Smith and Black Brown, Peter"),
-                AuthorList
-                        .fixAuthorLastNameFirst("John von Neumann and John Smith and Black Brown, Peter"));
-
-        // Test Abbreviation == false
-        assertEquals("Smith, John", AuthorList.fixAuthorLastNameFirst("John Smith", false));
-
-        assertEquals("Smith, John and Black Brown, Peter", AuthorList.fixAuthorLastNameFirst(
-                "John Smith and Black Brown, Peter", false));
-
-        assertEquals("von Neumann, John and Smith, John and Black Brown, Peter", AuthorList
-                .fixAuthorLastNameFirst("John von Neumann and John Smith and Black Brown, Peter",
-                        false));
-
-        assertEquals("von Last, Jr, First", AuthorList.fixAuthorLastNameFirst(
-                "von Last, Jr ,First", false));
-
-        assertEquals(AuthorList.fixAuthorLastNameFirst(
-                "John von Neumann and John Smith and Black Brown, Peter", false), AuthorList
-                .fixAuthorLastNameFirst("John von Neumann and John Smith and Black Brown, Peter", false));
-
-        // Test Abbreviate == true
-        assertEquals("Smith, J.", AuthorList.fixAuthorLastNameFirst("John Smith", true));
-
-        assertEquals("Smith, J. and Black Brown, P.", AuthorList.fixAuthorLastNameFirst(
-                "John Smith and Black Brown, Peter", true));
-
-        assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.",
-                AuthorList.fixAuthorLastNameFirst(
-                        "John von Neumann and John Smith and Black Brown, Peter", true));
-
-        assertEquals("von Last, Jr, F.", AuthorList.fixAuthorLastNameFirst("von Last, Jr ,First",
-                true));
-
-        assertEquals(AuthorList.fixAuthorLastNameFirst(
-                "John von Neumann and John Smith and Black Brown, Peter", true), AuthorList
-                .fixAuthorLastNameFirst("John von Neumann and John Smith and Black Brown, Peter", true));
+                    Smith, J.;John Smith;true
+                    Smith, J. and Black Brown, P.;John Smith and Black Brown, Peter;true
+                    von Neumann, J. and Smith, J. and Black Brown, P.;John von Neumann and John Smith and Black Brown, Peter;true
+                    von Last, Jr, F.;von Last, Jr ,First;true
+                    von Neumann, J. and Smith, J. and Black Brown, P.;John von Neumann and John Smith and Black Brown, Peter;true
+                    """
+    )
+    void fixAuthorLastNameFirst_default(String expected, String input, boolean abbreviate) {
+        assertEquals(expected, AuthorList.fixAuthorLastNameFirst(input, abbreviate));
     }
 
     @ParameterizedTest
