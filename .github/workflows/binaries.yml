@@ -137,7 +137,7 @@ jobs:
         include:
           # if you change the os version rename all other occurrences
           - os: ubuntu-22.04
-            displayName: linux
+            displayName: linux-amd64
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04 JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04/JabRef-portable_linux.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04 jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04/jabkit-portable_linux.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04/jabkit
             archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04 jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04/jabls-portable_linux.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04/jabls
@@ -151,25 +151,25 @@ jobs:
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
           - os: windows-latest
-            displayName: windows
+            displayName: windows-amd64
             archivePortable: 7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef
             archivePortableJabKit: 7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit
             archivePortableJabLS: 7z a -r jabls-cli/build/packages/windows-latest/jabls-portable_windows.zip ./jabls-cli/build/packages/windows-latest/jabls && rm -R jabls-cli/build/packages/windows-latest/jabls
             suffix: ''
             archForDebianRepack: ''
-          - os: macos-15-intel  # intel image
-            displayName: macOS
-            archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app
-            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app
-            suffix: ''
+          - os: macos-15-intel
+            displayName: macOS-intel
+            archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
+            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos-intel.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app
+            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos-intel.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app
+            suffix: '_intel'
             archForDebianRepack: ''
           - os: macos-15
-            displayName: macOS-arm
-            archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app
-            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-arm.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
-            suffix: '_arm64'
+            displayName: macOS-silicon
+            archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-silicon.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
+            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-silicon.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app
+            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-silicon.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
+            suffix: '_silicon'
             archForDebianRepack: ''
     runs-on: ${{ matrix.os }}
     outputs:
@@ -414,25 +414,25 @@ jobs:
       matrix:
         include:
           - os: macos-15
-            displayName: macOS (ARM64)
+            displayName: JabGui macOS (ARM64)
             path: 'jabgui'
             prefix: 'JabRef'
-            suffix: '_arm64'
+            suffix: '_silicon'
           - os: macos-15-intel
-            displayName: macOS
+            displayName: JabGui macOS (intel)
             path: 'jabgui'
             prefix: 'JabRef'
-            suffix: ''
+            suffix: '_intel'
           - os: macos-15
-            displayName: macOS (ARM64)
+            displayName: jabls macOS (ARM64)
             path: 'jabls'
             prefix: 'jabls'
-            suffix: '_arm64'
+            suffix: '_silicon'
           - os: macos-15-intel
-            displayName: macOS
+            displayName: jabls macOS (intel)
             path: 'jabls'
             prefix: 'jabls'
-            suffix: ''
+            suffix: '_intel'
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
