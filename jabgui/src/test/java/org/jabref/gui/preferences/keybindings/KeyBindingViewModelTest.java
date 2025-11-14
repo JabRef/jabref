@@ -84,6 +84,6 @@ class KeyBindingViewModelTest {
 
         Optional<String> saved = prefsRepo.get(binding);
         assertTrue(saved.isPresent());
-        assertTrue(saved.get().equalsIgnoreCase("ctrl+shift+L"));
+        assertTrue("ctrl+shift+L".equalsIgnoreCase(saved.get()));
     }
 }
