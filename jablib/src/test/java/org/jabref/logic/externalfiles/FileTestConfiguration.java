@@ -48,21 +48,14 @@ public class FileTestConfiguration {
             Boolean shouldStoreFilesRelativeToBibFile,
             Boolean shouldAdjustOrCopyLinkedFilesOnTransfer,
 
-            String sourceBibDir,
-            @Opt String sourceLibrarySpecificFileDirectory,
-            @Opt String sourceUserSpecificFileDirectory,
-            String sourceFileDir,
-            TestFileLinkMode testFileLinkMode,
-
-            String targetBibDir,
-            @Opt String targetLibrarySpecificFileDirectory,
-            @Opt String targetUserSpecificFileDirectory
+            BibTestConfiguration sourceBibTestConfiguration,
+            BibTestConfiguration targetBibTestConfiguration,
     ) throws IOException {
         this.tempDir = tempDir;
-        this.sourceBibDir = tempDir.resolve(sourceBibDir);
+        this.sourceBibDir = tempDir.resolve(sourceBibTestConfiguration.bibDir());
         Files.createDirectories(this.sourceBibDir);
 
-        Path sourceFileDirPath = tempDir.resolve(sourceFileDir);
+        Path sourceFileDirPath = tempDir.resolve(sourceBibTestConfiguration.sourceFileDir());
         Files.createDirectories(sourceFileDirPath);
 
         sourceContext = new BibDatabaseContext(new BibDatabase());
@@ -78,21 +71,21 @@ public class FileTestConfiguration {
             this.mainFileDir = tempDir.resolve(mainFileDirectory);
             when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(this.mainFileDir));
         }
-        if (sourceLibrarySpecificFileDirectory == null) {
+        if (sourceBibTestConfiguration.librarySpecificFileDirectory() == null) {
             this.sourceLibrarySpecificFileDir = null;
         } else {
-            this.sourceLibrarySpecificFileDir = tempDir.resolve(sourceLibrarySpecificFileDirectory);
+            this.sourceLibrarySpecificFileDir = tempDir.resolve(sourceBibTestConfiguration.librarySpecificFileDirectory());
             sourceContext.getMetaData().setLibrarySpecificFileDirectory(sourceLibrarySpecificFileDir.toString());
         }
-        if (sourceUserSpecificFileDirectory == null) {
+        if (sourceBibTestConfiguration.userSpecificFileDirectory() == null) {
             this.sourceUserSpecificFileDir = null;
         } else {
-            this.sourceUserSpecificFileDir = tempDir.resolve(sourceUserSpecificFileDirectory);
-            sourceContext.getMetaData().setUserFileDirectory("testuser", sourceUserSpecificFileDir.toString());
+            this.sourceUserSpecificFileDir = tempDir.resolve(sourceBibTestConfiguration.userSpecificFileDirectory());
+            sourceContext.getMetaData().setUserFileDirectory("testuser", this.sourceUserSpecificFileDir.toString());
         }
 
         Path resolvedSourceFile = sourceFileDirPath.resolve("test.pdf");
-        Path fileLinkPath = convertLink(resolvedSourceFile, testFileLinkMode);
+        Path fileLinkPath = convertLink(resolvedSourceFile, sourceBibTestConfiguration);
         String fileLink = fileLinkPath.toString();
         LinkedFile linkedFile = new LinkedFile("", fileLink, "PDF");
         sourceEntry = new BibEntry().withFiles(List.of(linkedFile));
@@ -115,9 +108,9 @@ public class FileTestConfiguration {
         }
     }
 
-    Path convertLink(Path path, TestFileLinkMode testFileLinkMode) {
+    Path convertLink(Path path, BibTestConfiguration bibTestConfiguration) {
         Path resolvedSourceFile = tempDir.resolve(path);
-        return switch (testFileLinkMode) {
+        return switch (bibTestConfiguration.fileLinkMode()) {
             case ABSOLUTE ->
                     resolvedSourceFile;
             case RELATIVE_TO_BIB ->

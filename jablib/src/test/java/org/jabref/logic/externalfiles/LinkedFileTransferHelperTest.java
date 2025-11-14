@@ -15,7 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-// import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_BIB;
+import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_BIB;
 import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_MAIN_FILE_DIR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -58,7 +58,6 @@ class LinkedFileTransferHelperTest {
                 // region shouldStoreFilesRelativeToBibFile
 
                 // file next to .bib file should be copied
-                /*
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
@@ -72,7 +71,7 @@ class LinkedFileTransferHelperTest {
                                 .targetBibDir("target-dir")
                                 .build(),
                         "test.pdf",
-                        true
+                        RELATIVE_TO_BIB
                 ),
 
                 // Directory not reachable with different paths - file copying with directory structure
@@ -89,10 +88,9 @@ class LinkedFileTransferHelperTest {
                                 .targetBibDir("target-dir")
                                 .build(),
                         "nested/test.pdf",
-                        true
+                        RELATIVE_TO_BIB
                 ),
-                */
-/*
+
                 // targetDirIsParentOfSourceDir
                 Arguments.of(
                         FileTestConfigurationBuilder
@@ -107,9 +105,9 @@ class LinkedFileTransferHelperTest {
                                 .targetBibDir("lit")
                                 .build(),
                         "sub-dir/test.pdf",
-                        true
+                        RELATIVE_TO_BIB
                 ),
-*/
+
                 // endregion
 
                 // region not shouldStoreFilesRelativeToBibFile
@@ -131,7 +129,7 @@ class LinkedFileTransferHelperTest {
                         "main-file-dir/test.pdf",
                         RELATIVE_TO_MAIN_FILE_DIR
                 )
-                // endregion /* */
+                // endregion
         );
     }
 
