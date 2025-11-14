@@ -50,7 +50,7 @@ jobs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
       secretspresent: ${{ steps.binary.outputs.secretspresent }}
       tagbuild: ${{ steps.binary.outputs.tagbuild }}
-      # requried to avoid obsolete builds in case of labels != "dev: binaries"
+      # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
 
@@ -365,12 +365,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: echo PR data
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          echo "PR Number: ${{ github.event.pull_request.number }}"
-          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+          echo "PR Number: $PR_NUMBER"
+          echo "PR URL: $PR_URL"
           cat <<EOF
           PR Body:
-          ${{ github.event.pull_request.body }}
+          $PR_BODY
           EOF
       - name: Determine issue number
         id: get_issue_number
