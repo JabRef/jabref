@@ -54,12 +54,12 @@ public class AuthorListTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "'', ''",
-            "'John Smith', 'Smith'",
-            "'John Smith and Black Brown, Peter', 'Smith and Black Brown'",
-            "'John von Neumann and John Smith and Black Brown, Peter', 'von Neumann et al.'"
-    })
+    @CsvSource(textBlock = """
+            '', ''
+            'John Smith', 'Smith'
+            'John Smith and Black Brown, Peter', 'Smith and Black Brown'
+            'John von Neumann and John Smith and Black Brown, Peter', 'von Neumann et al.'
+            """)
     void fixAuthorNatbib(String input, String expected) {
         assertEquals(expected, AuthorList.fixAuthorNatbib(input));
     }
