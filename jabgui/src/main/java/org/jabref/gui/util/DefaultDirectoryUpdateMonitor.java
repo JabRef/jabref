@@ -53,7 +53,6 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
     private final AtomicReference<Optional<JabRefException>> filesystemMonitorFailure = new AtomicReference<>(Optional.empty());
 
-    private final BibDatabaseContext database;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
@@ -61,8 +60,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
-    public DefaultDirectoryUpdateMonitor(BibDatabaseContext database, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor, UndoManager undoManager, StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor) {
-        this.database = database;
+    public DefaultDirectoryUpdateMonitor(GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor, UndoManager undoManager, StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
@@ -170,8 +168,14 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     private void notifyAboutPDFCreation(Path pdfPath) {
         List<Path> pathToImport = new ArrayList<>();
         pathToImport.add(pdfPath);
-        ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
-        importHandler.importFilesInBackground(pathToImport, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
+        Path parentPath = pdfPath.toAbsolutePath().getParent();
+        for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
+            if (listener instanceof DirectoryGroup parentGroup) {
+                BibDatabaseContext database = parentGroup.getBibDatabaseContext();
+                ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
+                importHandler.importFilesInBackground(pathToImport, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
+            }
+        }
     }
 
     private void notifyAboutPDFDeletion(Path pdfPath) {

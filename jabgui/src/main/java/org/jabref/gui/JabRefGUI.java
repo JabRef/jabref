@@ -54,7 +54,6 @@ import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -218,7 +217,7 @@ public class JabRefGUI extends Application {
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
 
-        DefaultDirectoryUpdateMonitor directoryUpdateMonitor = new DefaultDirectoryUpdateMonitor(new BibDatabaseContext(), preferences, fileUpdateMonitor, countingUndoManager, stateManager, dialogService, taskExecutor);
+        DefaultDirectoryUpdateMonitor directoryUpdateMonitor = new DefaultDirectoryUpdateMonitor(preferences, fileUpdateMonitor, countingUndoManager, stateManager, dialogService, taskExecutor);
         JabRefGUI.directoryUpdateMonitor = directoryUpdateMonitor;
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(directoryUpdateMonitor, "DirectoryUpdateMonitor");
         Injector.setModelOrService(DirectoryUpdateMonitor.class, directoryUpdateMonitor);

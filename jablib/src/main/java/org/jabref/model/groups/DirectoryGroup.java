@@ -10,9 +10,9 @@ import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DirectoryUpdateListener;
 import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.DummyDirectoryUpdateMonitor;
@@ -28,17 +28,17 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     private final Path absoluteDirectoryPath;
     private final DirectoryUpdateMonitor directoryUpdateMonitor;
-    private final MetaData metaData;
+    private final BibDatabaseContext database;
     private final String user;
 
     DirectoryGroup(String name,
                    GroupHierarchyType context,
                    @NonNull Path absoluteDirectoryPath,
                    DirectoryUpdateMonitor directoryUpdateMonitor,
-                   MetaData metaData,
+                   BibDatabaseContext database,
                    String user) {
         super(name, context);
-        this.metaData = metaData;
+        this.database = database;
         this.user = user;
         this.absoluteDirectoryPath = absoluteDirectoryPath;
         this.directoryUpdateMonitor = directoryUpdateMonitor;
@@ -48,9 +48,9 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
                                         GroupHierarchyType context,
                                         Path absoluteDirectoryPath,
                                         DirectoryUpdateMonitor directoryUpdateMonitor,
-                                        MetaData metaData,
+                                        BibDatabaseContext database,
                                         String userAndHost) throws IOException {
-        DirectoryGroup group = new DirectoryGroup(name, context, absoluteDirectoryPath, directoryUpdateMonitor, metaData, userAndHost);
+        DirectoryGroup group = new DirectoryGroup(name, context, absoluteDirectoryPath, directoryUpdateMonitor, database, userAndHost);
         directoryUpdateMonitor.addListenerForDirectory(absoluteDirectoryPath, group);
         return group;
     }
@@ -59,9 +59,9 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
     public static DirectoryGroup create(String name,
                                         GroupHierarchyType context,
                                         Path absoluteDirectoryPath,
-                                        MetaData metaData,
+                                        BibDatabaseContext database,
                                         String userAndHost) throws IOException {
-        return new DirectoryGroup(name, context, absoluteDirectoryPath, new DummyDirectoryUpdateMonitor(), metaData, userAndHost);
+        return new DirectoryGroup(name, context, absoluteDirectoryPath, new DummyDirectoryUpdateMonitor(), database, userAndHost);
     }
 
     public void addDescendants() throws IOException {
@@ -82,7 +82,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
                 this.context,
                 descendantDirectory.toPath(),
                 this.directoryUpdateMonitor,
-                this.metaData,
+                this.database,
                 this.user);
         this.getColor().ifPresent(descendantGroup::setColor);
         this.getIconName().ifPresent(descendantGroup::setIconName);
@@ -113,7 +113,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     public Optional<GroupTreeNode> getNode() {
         Optional<GroupTreeNode> groupNode = Optional.empty();
-        Optional<GroupTreeNode> rootNode = metaData.getGroups();
+        Optional<GroupTreeNode> rootNode = database.getMetaData().getGroups();
         if (rootNode.isPresent()) {
             List<GroupTreeNode> groupNodeCandidates = rootNode.get().findChildrenSatisfying(groupTreeNode -> groupTreeNode.getGroup().equals(this));
             if (groupNodeCandidates.size() == 1) {
@@ -146,7 +146,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     @Override
     public AbstractGroup deepCopy() {
-        return new DirectoryGroup(name.getValue(), context, absoluteDirectoryPath, directoryUpdateMonitor, metaData, user);
+        return new DirectoryGroup(name.getValue(), context, absoluteDirectoryPath, directoryUpdateMonitor, database, user);
     }
 
     @Override
@@ -179,6 +179,10 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     public Path getAbsoluteDirectoryPath() {
         return absoluteDirectoryPath;
+    }
+
+    public BibDatabaseContext getBibDatabaseContext() {
+        return this.database;
     }
 
     @Override

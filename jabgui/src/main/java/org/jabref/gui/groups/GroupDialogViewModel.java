@@ -445,7 +445,7 @@ public class GroupDialogViewModel {
                         groupHierarchySelectedProperty.getValue(),
                         Path.of(directoryGroupFilePathProperty.getValue().trim()),
                         directoryUpdateMonitor,
-                        currentDatabase.getMetaData(),
+                        currentDatabase,
                         preferences.getFilePreferences().getUserAndHost()
                 );
             } else if (Boolean.TRUE.equals(dateRadioButtonSelectedProperty.getValue())) {

@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AllowedToUseLogic("because class under test relies on logic classes")
 class DirectoryGroupTest {
 
-    private MetaData metaData;
+    private BibDatabaseContext database;
     private Path temporaryFolder;
 
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) {
-        metaData = new MetaData();
+        database = new BibDatabaseContext();
         this.temporaryFolder = temporaryFolder;
     }
 
@@ -34,7 +34,7 @@ class DirectoryGroupTest {
         Path directoryPath = temporaryFolder.resolve("MyDirectory").toAbsolutePath();
         Path filePath = directoryPath.resolve("MyFile.pdf").toAbsolutePath();
 
-        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, directoryPath, new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
+        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, directoryPath, new DummyDirectoryUpdateMonitor(), database, "userandHost");
         BibEntry entry = new BibEntry();
         LinkedFile file = new LinkedFile(filePath);
         List<LinkedFile> files = Collections.singletonList(file);
@@ -50,7 +50,7 @@ class DirectoryGroupTest {
         Path subdirectoryPath = directoryPath.resolve("MySubdirectory").toAbsolutePath();
         Path filePathNotDirectlyInTheDirectory = subdirectoryPath.resolve("MyFile.pdf").toAbsolutePath();
 
-        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, directoryPath, new DummyDirectoryUpdateMonitor(), metaData, "userandHost");
+        DirectoryGroup group = new DirectoryGroup("LocalDirectory", GroupHierarchyType.INCLUDING, directoryPath, new DummyDirectoryUpdateMonitor(), database, "userandHost");
         BibEntry entryWithNoFile = new BibEntry();
         BibEntry entryWithNoFileInTheDirectory = new BibEntry();
         BibEntry entryWithNoFileDirectlyInTheDirectory = new BibEntry();
