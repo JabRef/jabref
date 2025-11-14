@@ -570,7 +570,11 @@ jobs:
                 fi
                 ;;
             esac
-            echo "//SOURCES ../../$f" >> "${{ matrix.script }}"
+            if [[ "${{ matrix.script }}" == .jbang/* ]]; then
+              echo "//SOURCES ../$f" >> "${{ matrix.script }}"
+            else
+              echo "//SOURCES ../../$f" >> "${{ matrix.script }}"
+            fi
           done
       - run: jbang build "${{ matrix.script }}"
         shell: bash
