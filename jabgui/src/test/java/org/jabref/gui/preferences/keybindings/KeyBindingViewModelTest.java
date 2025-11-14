@@ -50,4 +50,40 @@ class KeyBindingViewModelTest {
 
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
     }
+
+    @Test
+    void verifyStoreSettingsWritesChanges() {
+        KeyBindingRepository uiRepo = new KeyBindingRepository();
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        KeyBindingRepository prefsRepo = new KeyBindingRepository();
+
+        when(preferences.getKeyBindingRepository()).thenReturn(prefsRepo);
+
+        KeyBindingsTabViewModel viewModel =
+                new KeyBindingsTabViewModel(uiRepo, mock(DialogService.class), preferences);
+
+        KeyBinding binding = KeyBinding.CLOSE_DATABASE;
+
+        KeyBindingViewModel selectedVM = new KeyBindingViewModel(uiRepo, binding, binding.getDefaultKeyBinding());
+        viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
+
+        KeyEvent event = new KeyEvent(
+                KeyEvent.KEY_PRESSED,
+                "L",
+                "L",
+                KeyCode.L,
+                true,
+                true,
+                false,
+                false
+        );
+
+        viewModel.setNewBindingForCurrent(event);
+
+        viewModel.storeSettings();
+
+        Optional<String> saved = prefsRepo.get(binding);
+        assertTrue(saved.isPresent());
+        assertTrue(saved.get().equalsIgnoreCase("ctrl+shift+L"));
+    }
 }
