@@ -27,7 +27,7 @@
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 
-//DEPS io.github.darvil82:terminal-text-formatter:2.2.0
+//DEPS io.github.darvil82:terminal-text-formatter:2.3.0c
 //DEPS info.picocli:picocli:4.7.7
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.20
