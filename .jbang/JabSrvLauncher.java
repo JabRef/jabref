@@ -80,6 +80,9 @@
 //DEPS net.harawata:appdirs:1.5.0
 //DEPS de.undercouch:citeproc-java:3.4.0
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
+//DEPS tools.jackson.core:jackson-core:3.0.2
+//DEPS tools.jackson.core:jackson-databind:3.0.2
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.2
 //DEPS org.apache.commons:commons-lang3:3.19.0
 
 /// This class is required for [jbang](https://www.jbang.dev/)

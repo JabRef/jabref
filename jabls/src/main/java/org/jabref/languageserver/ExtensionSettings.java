@@ -1,10 +1,11 @@
 package org.jabref.languageserver;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class ExtensionSettings {
 
@@ -29,7 +30,7 @@ public class ExtensionSettings {
     }
 
     public void copyFromJsonObject(JsonObject object) {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new JsonMapper();
         try {
             JsonNode node = mapper.readTree(object.toString());
             this.consistencyCheck = node.at("/jabref/consistencyCheck/enabled").asBoolean(this.consistencyCheck);
@@ -37,7 +38,7 @@ public class ExtensionSettings {
             this.consistencyCheckOptional = node.at("/jabref/consistencyCheck/optional").asBoolean(this.consistencyCheckOptional);
             this.consistencyCheckUnknown = node.at("/jabref/consistencyCheck/unknown").asBoolean(this.consistencyCheckUnknown);
             this.integrityCheck = node.at("/jabref/integrityCheck/enabled").asBoolean(this.integrityCheck);
-        } catch (JsonProcessingException processingException) {
+        } catch (JacksonException processingException) {
             LOGGER.error("Error parsing settings from JSON", processingException);
         }
     }
