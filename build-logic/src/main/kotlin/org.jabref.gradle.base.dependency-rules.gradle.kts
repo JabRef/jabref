@@ -47,7 +47,7 @@ jvmDependencyConflicts.patch {
         removeDependency("org.apache.xmlgraphics:batik-ext")
         removeDependency("org.apache.xmlgraphics:xmlgraphics-commons")
     }
-    module("org.wiremock:wiremock-netty12") {
+    module("org.wiremock:wiremock-jetty12") {
         // workaround for https://github.com/wiremock/wiremock/issues/2874
         addApiDependency("com.github.koppor:wiremock-slf4j-spi-shim")
     }
@@ -65,7 +65,7 @@ jvmDependencyConflicts.patch {
         removeDependency("org.osgi:org.osgi.annotation.bundle")
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
-    module("org.wiremock:wiremock") {
+    module("org.wiremock:wiremock-jetty12") {
         removeDependency("net.sf.jopt-simple:jopt-simple")
     }
     module("org.testfx:testfx-core") {
