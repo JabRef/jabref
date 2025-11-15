@@ -49,7 +49,7 @@
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 
-//DEPS io.github.darvil82:terminal-text-formatter:2.2.0
+//DEPS io.github.darvil82:terminal-text-formatter:2.3.0c
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.jspecify:jspecify:1.0.0
 
@@ -62,7 +62,7 @@
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.postgresql:postgresql:42.7.8
 //DEPS org.bouncycastle:bcprov-jdk18on:1.82
-//DEPS com.konghq:unirest-modules-gson:4.5.1
+//DEPS com.konghq:unirest-modules-gson:4.6.0
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS org.glassfish.jersey.core:jersey-server:4.0.0
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.0
@@ -74,7 +74,7 @@
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
-//DEPS com.konghq:unirest-modules-gson:4.5.1
+//DEPS com.konghq:unirest-modules-gson:4.6.0
 //DEPS com.google.guava:guava:33.5.0-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.5.0

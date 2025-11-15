@@ -14,6 +14,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
 - We added automatic date-based groups that create year/month/day subgroups from an entry’s date fields. [#10822](https://github.com/JabRef/jabref/issues/10822)
 - We added `doi-to-bibtex` to `JabKit`. [#14244](https://github.com/JabRef/jabref/pull/14244)
+- We added a "Regenerate" button for the AI chat allowing the user to make the language model reformulate its response to the previous prompt. [#12191](https://github.com/JabRef/jabref/issues/12191)
+- We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377)
 
 ### Changed
 
@@ -21,11 +23,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We separated the "Clean up entries" dialog into three tabs for clarity [#13819](https://github.com/JabRef/jabref/issues/13819)
 - `JabKit`: `--porcelain` does not output any logs to the console anymore. [#14244](https://github.com/JabRef/jabref/pull/14244)
 - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> now opens the terminal in the active library directory. [#14130](https://github.com/JabRef/jabref/issues/14130)
+- We changed  fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
 
 ### Fixed
 
 - We fixed an issue where pressing <kbd>ESC</kbd> in the preferences dialog would not always close the dialog. [#8888](https://github.com/JabRef/jabref/issues/8888)
 - We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional. [#14224](https://github.com/JabRef/jabref/pull/14224)
+- Correct fallback window height (786 → 768) in JabRefGUI. [#14295](https://github.com/JabRef/jabref/pull/14295)
 
 ### Removed
 
