@@ -8,7 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /// Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
-/// See `org.jabref.gui.fieldeditors.FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)` for a description of each field.
+/// See [org.jabref.model.entry.field.FieldTextMapper] for the display name creation.
+/// See [org.jabref.gui.fieldeditors.FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)] for a description of each field.
 public enum StandardField implements Field {
     ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
     ADDENDUM("addendum"),
@@ -34,7 +35,7 @@ public enum StandardField implements Field {
     DATE("date", FieldProperty.DATE),
     DAY("day"),
     DAYFILED("dayfiled"),
-    DOI("doi", "DOI", FieldProperty.VERBATIM, FieldProperty.IDENTIFIER),
+    DOI("doi", FieldProperty.VERBATIM, FieldProperty.IDENTIFIER),
     EDITION("edition", FieldProperty.NUMERIC),
     EDITOR("editor", FieldProperty.PERSON_NAMES),
     EDITORA("editora", FieldProperty.PERSON_NAMES),
@@ -64,9 +65,9 @@ public enum StandardField implements Field {
     IDS("ids", FieldProperty.MULTIPLE_ENTRY_LINK),
     INSTITUTION("institution"),
     INTRODUCTION("introduction", FieldProperty.PERSON_NAMES),
-    ISBN("isbn", "ISBN", FieldProperty.VERBATIM),
-    ISRN("isrn", "ISRN", FieldProperty.VERBATIM),
-    ISSN("issn", "ISSN", FieldProperty.VERBATIM),
+    ISBN("isbn", FieldProperty.VERBATIM),
+    ISRN("isrn", FieldProperty.VERBATIM),
+    ISSN("issn", FieldProperty.VERBATIM),
     ISSUE("issue"),
     ISSUETITLE("issuetitle"),
     ISSUESUBTITLE("issuesubtitle"),
@@ -96,9 +97,9 @@ public enum StandardField implements Field {
     PAGETOTAL("pagetotal", FieldProperty.NUMERIC),
     PAGINATION("pagination", FieldProperty.PAGINATION),
     PART("part"),
-    PDF("pdf", "PDF"),
-    PMID("pmid", "PMID", FieldProperty.NUMERIC, FieldProperty.IDENTIFIER),
-    PS("ps", "PS"),
+    PDF("pdf"),
+    PMID("pmid", FieldProperty.NUMERIC, FieldProperty.IDENTIFIER),
+    PS("ps"),
     PUBLISHER("publisher"),
     PUBSTATE("pubstate"),
     PRIMARYCLASS("primaryclass"),
@@ -118,8 +119,8 @@ public enum StandardField implements Field {
     TITLEADDON("titleaddon"),
     TRANSLATOR("translator", FieldProperty.PERSON_NAMES),
     TYPE("type"),
-    URI("uri", "URI", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
-    URL("url", "URL", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
+    URI("uri", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
+    URL("url", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
     URLDATE("urldate", FieldProperty.DATE),
     VENUE("venue"),
     VERSION("version"),
@@ -152,7 +153,6 @@ public enum StandardField implements Field {
     private static final Map<String, StandardField> NAME_TO_STANDARD_FIELD = new HashMap<>();
 
     private final String name;
-    private final String displayName;
     private final EnumSet<FieldProperty> properties;
 
     static {
@@ -163,25 +163,11 @@ public enum StandardField implements Field {
 
     StandardField(String name) {
         this.name = name;
-        this.displayName = null;
         this.properties = EnumSet.noneOf(FieldProperty.class);
-    }
-
-    StandardField(String name, String displayName) {
-        this.name = name;
-        this.displayName = displayName;
-        this.properties = EnumSet.noneOf(FieldProperty.class);
-    }
-
-    StandardField(String name, String displayName, FieldProperty first, FieldProperty... rest) {
-        this.name = name;
-        this.displayName = displayName;
-        this.properties = EnumSet.of(first, rest);
     }
 
     StandardField(String name, FieldProperty first, FieldProperty... rest) {
         this.name = name;
-        this.displayName = null;
         this.properties = EnumSet.of(first, rest);
     }
 
