@@ -15,8 +15,10 @@ import org.tinylog.Logger;
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 //FILES tinylog.properties=tinylog.properties
 
+//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
-//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+// JabRef relies on PR https://github.com/unicode-org/icu/pull/2127; for experiments the release version is OK.
+//DEPS com.ibm.icu:icu4j:78.1
 
 void main() throws Exception {
     var preferences = JabRefCliPreferences.getInstance();
