@@ -15,10 +15,14 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -31,6 +35,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final UiTaskExecutor taskExecutor;
+    @Inject private BibEntryTypesManager bibEntryTypesManager;
 
     public ConsistencyCheckAction(Supplier<LibraryTab> tabSupplier,
                                   DialogService dialogService,
@@ -63,7 +68,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
                 BibDatabaseContext bibContext = databaseContext.get();
 
                 BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-                return consistencyCheck.check(bibContext, (count, total) ->
+                return consistencyCheck.check(bibContext, bibEntryTypesManager, (count, total) ->
                         UiTaskExecutor.runInJavaFXThread(() -> {
                             updateProgress(count, total);
                             updateMessage(Localization.lang("%0/%1 entry types", count + 1, total));
