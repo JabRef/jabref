@@ -16,6 +16,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -88,7 +89,7 @@ public class LspDiagnosticHandler {
         }
 
         if (clientHandler.getSettings().isConsistencyCheck()) {
-            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult));
+            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult, new BibEntryTypesManager()));
             LOGGER.debug("Cached consistency diagnostics for {}", uri);
         }
 

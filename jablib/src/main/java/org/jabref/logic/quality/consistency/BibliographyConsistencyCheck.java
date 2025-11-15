@@ -20,13 +20,12 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
-import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
-import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -102,22 +101,17 @@ public class BibliographyConsistencyCheck {
      *
      * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
      */
-    public Result check(BibDatabaseContext bibContext, BiConsumer<Integer, Integer> entriesGroupingProgress) {
+    public Result check(BibDatabaseContext bibContext, BibEntryTypesManager bibEntryTypesManager, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();
-        // collects fields existing in all entries, scoped by entry type
+        // collects fields existing in all entries, scoped by entry typed
         Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap = new HashMap<>();
         // collects entries of the same type
         Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap = new HashMap<>();
 
         collectEntriesIntoMaps(bibContext, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
 
-        List<BibEntryType> entryTypeDefinitions;
-        if (bibContext.getMode() == BibDatabaseMode.BIBLATEX) {
-            entryTypeDefinitions = BiblatexEntryTypeDefinitions.ALL;
-        } else {
-            entryTypeDefinitions = BibtexEntryTypeDefinitions.ALL;
-        }
+        List<BibEntryType> entryTypeDefinitions = bibEntryTypesManager.getAllTypes(bibContext.getMode()).stream().toList();
 
         // Use LinkedHashMap to preserve the order of Bib(tex|latex)EntryTypeDefinitions.ALL
         Map<EntryType, EntryTypeResult> resultMap = new LinkedHashMap<>();

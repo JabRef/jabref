@@ -28,10 +28,10 @@ public class LspConsistencyCheck {
         this.settings = settings;
     }
 
-    public List<Diagnostic> check(ParserResult parserResult) {
+    public List<Diagnostic> check(ParserResult parserResult, BibEntryTypesManager bibEntryTypesManager) {
         List<Diagnostic> diagnostics = new ArrayList<>();
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(parserResult.getDatabaseContext(), (_, _) -> {
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(parserResult.getDatabaseContext(), bibEntryTypesManager, (_, _) -> {
         });
 
         Set<Field> allReportedFields = result.entryTypeToResultMap().values().stream().flatMap(entryTypeResult -> entryTypeResult.fields().stream()).collect(Collectors.toUnmodifiableSet());
