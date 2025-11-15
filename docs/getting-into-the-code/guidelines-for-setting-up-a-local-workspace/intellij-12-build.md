@@ -33,13 +33,13 @@ Go to "File > Project Structure" or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>
 ![Open Project Structure](12-02-open-project-settings.png)
 {% endfigure %}
 
-Click on "Project" on the left side. Then, select **temurin-24** as the project SDK (continue reading if this option is not available).
+Click on "Project" on the left side. Then, select **temurin-25** as the project SDK (continue reading if this option is not available).
 
 {% figure caption:"Project Structure - Project SDK" %}
 ![Project Structure - Project SDK](12-03-project-sdk.png)
 {% endfigure %}
 
-If you do not have the access to this JDK, download it by clicking on "Download JDK..." In the dialog that opens, select version 24, vendor "Eclipse Temurin (AdoptOpenJDK HotSpot)", and click "Download".
+If you do not have the access to this JDK, download it by clicking on "Download JDK..." In the dialog that opens, select version 25, vendor "Eclipse Temurin (AdoptOpenJDK HotSpot)", and click "Download".
 
 {% figure caption:"Dropdown to select Download JDK" %}
 ![Dropdown to select Download JDK](12-04-download-jdk.png)

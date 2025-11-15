@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabkit - mange BibTeX files using JabRef
 
-//JAVA 24
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/cli/converter/CygWinPathConverter.java
@@ -32,7 +32,7 @@
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabKitLauncher {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         org.jabref.toolkit.JabKit.main(args);
     }
 }
