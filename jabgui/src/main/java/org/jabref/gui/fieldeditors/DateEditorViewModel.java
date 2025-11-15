@@ -74,19 +74,15 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
             @Override
             public TemporalAccessor fromString(String string) {
                 if (StringUtil.isNotBlank(string)) {
-
                     String sanitizedString = sanitizeIncompleteRange(string);
 
                     Optional<Date> parsedDate = Date.parse(sanitizedString);
                     if (parsedDate.isPresent() && parsedDate.get().getEndDate().isPresent()) {
-
                         return RANGE_SENTINEL;
                     }
-
                     try {
                         return dateFormatter.parse(sanitizedString);
                     } catch (DateTimeParseException exception) {
-
                         return parsedDate
                                 .filter(date -> date.getEndDate().isEmpty())
                                 .map(Date::toTemporalAccessor)
