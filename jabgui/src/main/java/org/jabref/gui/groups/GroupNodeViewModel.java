@@ -134,8 +134,6 @@ public class GroupNodeViewModel {
         allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
 
         this.databaseContext.getDatabase().registerListener(new SearchIndexListener());
-
-        updateMatchedEntries();
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, GuiPreferences preferences) {
