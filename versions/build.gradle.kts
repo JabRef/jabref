@@ -171,4 +171,5 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.10.4")
     api("org.yaml:snakeyaml:2.5")
     api("tech.units:indriya:2.2.3")
+    api("org.eclipse.jetty.toolchain:jetty-servlet-api:4.0.6")
 }
