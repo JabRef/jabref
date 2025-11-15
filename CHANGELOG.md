@@ -21,6 +21,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We separated the "Clean up entries" dialog into three tabs for clarity [#13819](https://github.com/JabRef/jabref/issues/13819)
 - `JabKit`: `--porcelain` does not output any logs to the console anymore. [#14244](https://github.com/JabRef/jabref/pull/14244)
 - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> now opens the terminal in the active library directory. [#14130](https://github.com/JabRef/jabref/issues/14130)
+- We improved the handling of entries with broken links during the "Search for unlinked files" process. [#9798](https://github.com/JabRef/jabref/issues/9798)
+
 
 ### Fixed
 
