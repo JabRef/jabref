@@ -118,9 +118,9 @@ public class IconTheme {
      * of the '=' character - it simply looks for the first '=' to determine where the key ends.
      * Both the key and the value is trimmed for whitespace at the ends.
      *
-     * @param url    The URL to read information from.
+     * @param url The URL to read information from.
      * @param prefix A String to prefix to all values read. Can represent e.g. the directory where icon files are to be
-     *               found.
+     * found.
      * @return A Map containing all key-value pairs found.
      */
     // FIXME: prefix can be removed?!

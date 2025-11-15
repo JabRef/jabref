@@ -9,8 +9,8 @@ public class WalkthroughKeyBindings {
 
     /// Handles ESC key to quit active walkthrough with confirmation.
     ///
-    /// @param event                the key event
-    /// @param stateManager         the state manager
+    /// @param event the key event
+    /// @param stateManager the state manager
     /// @param keyBindingRepository the key binding repository
     public static void call(KeyEvent event, StateManager stateManager, KeyBindingRepository keyBindingRepository) {
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {

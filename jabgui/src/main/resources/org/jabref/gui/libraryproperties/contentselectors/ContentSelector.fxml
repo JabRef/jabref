@@ -6,39 +6,64 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root spacing="10.0" type="VBox"
-         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-         fx:controller="org.jabref.gui.libraryproperties.contentselectors.ContentSelectorView">
-    <HBox spacing="10.0" VBox.vgrow="ALWAYS">
-        <VBox spacing="10.0" HBox.hgrow="ALWAYS">
-            <Label styleClass="sectionHeader" text="%Field names"/>
-            <ListView fx:id="fieldsListView" VBox.vgrow="ALWAYS"/>
-            <HBox spacing="10.0" alignment="BASELINE_RIGHT">
-                <Button text="%Add" onAction="#addNewFieldName">
+<fx:root
+        spacing="10.0"
+        type="VBox"
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.libraryproperties.contentselectors.ContentSelectorView">
+    <HBox spacing="10.0"
+          VBox.vgrow="ALWAYS">
+        <VBox spacing="10.0"
+              HBox.hgrow="ALWAYS">
+            <Label styleClass="sectionHeader"
+                   text="%Field names"/>
+            <ListView
+                    fx:id="fieldsListView"
+                    VBox.vgrow="ALWAYS"/>
+            <HBox spacing="10.0"
+                  alignment="BASELINE_RIGHT">
+                <Button text="%Add"
+                        onAction="#addNewFieldName">
                     <graphic>
-                        <JabRefIconView glyph="ADD_NOBOX"/>
+                        <JabRefIconView
+                                glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button fx:id="removeFieldNameButton" text="%Remove" onAction="#removeFieldName">
+                <Button fx:id="removeFieldNameButton"
+                        text="%Remove"
+                        onAction="#removeFieldName">
                     <graphic>
-                        <JabRefIconView glyph="REMOVE_NOBOX"/>
+                        <JabRefIconView
+                                glyph="REMOVE_NOBOX"/>
                     </graphic>
                 </Button>
             </HBox>
         </VBox>
 
-        <VBox spacing="10.0" HBox.hgrow="ALWAYS">
-            <Label styleClass="sectionHeader" text="%Keywords"/>
-            <ListView fx:id="keywordsListView" VBox.vgrow="ALWAYS"/>
-            <HBox spacing="10.0" alignment="BASELINE_RIGHT">
-                <Button fx:id="addKeywordButton" text="%Add" onAction="#addNewKeyword">
+        <VBox spacing="10.0"
+              HBox.hgrow="ALWAYS">
+            <Label styleClass="sectionHeader"
+                   text="%Keywords"/>
+            <ListView
+                    fx:id="keywordsListView"
+                    VBox.vgrow="ALWAYS"/>
+            <HBox spacing="10.0"
+                  alignment="BASELINE_RIGHT">
+                <Button fx:id="addKeywordButton"
+                        text="%Add"
+                        onAction="#addNewKeyword">
                     <graphic>
-                        <JabRefIconView glyph="ADD_NOBOX"/>
+                        <JabRefIconView
+                                glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button fx:id="removeKeywordButton" text="%Remove" onAction="#removeKeyword">
+                <Button fx:id="removeKeywordButton"
+                        text="%Remove"
+                        onAction="#removeKeyword">
                     <graphic>
-                        <JabRefIconView glyph="REMOVE_NOBOX"/>
+                        <JabRefIconView
+                                glyph="REMOVE_NOBOX"/>
                     </graphic>
                 </Button>
             </HBox>

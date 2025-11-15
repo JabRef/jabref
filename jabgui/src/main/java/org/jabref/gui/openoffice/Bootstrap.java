@@ -188,7 +188,7 @@ public class Bootstrap {
     /**
      * Backwards compatibility stub.
      *
-     * @param ini_file             ini_file (may be null: uno.rc besides cppuhelper lib)
+     * @param ini_file ini_file (may be null: uno.rc besides cppuhelper lib)
      * @param bootstrap_parameters bootstrap parameters (maybe null)
      * @return a freshly bootstrapped component context.
      * @throws Exception if things go awry.
@@ -203,7 +203,7 @@ public class Bootstrap {
      * See also
      * <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
      *
-     * @param ini_file             ini_file (may be null: uno.rc besides cppuhelper lib)
+     * @param ini_file ini_file (may be null: uno.rc besides cppuhelper lib)
      * @param bootstrap_parameters bootstrap parameters (maybe null)
      * @return a freshly bootstrapped component context.
      * @throws Exception if things go awry.

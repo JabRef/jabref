@@ -60,7 +60,7 @@
     -jr-drag-target-hover: -jr-accent;
 
     -js-summary-text-color: derive(-fx-light-text-color, 70%);
-    -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
+    -js-summary-text-color-selected: derive(-fx-dark-text-color, 70%);
 
     -jr-ai-message-user: derive(-jr-theme, -50%);
     -jr-ai-message-ai: derive(-jr-theme, -75%);
@@ -105,11 +105,11 @@
     -fx-background-color: -fx-control-inner-background;
 }
 
-.table-row-cell:odd{
-    -fx-background-color:#272b38;
+.table-row-cell:odd {
+    -fx-background-color: #272b38;
 }
 
-.table-row-cell:even{
+.table-row-cell:even {
     -fx-background-color: #212330;
 }
 

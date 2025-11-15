@@ -67,12 +67,12 @@ public class XmpUtilWriter {
      * <p>
      * This is a convenience method for writeXMP(File, Collection).
      *
-     * @param file     The path to write to.
-     * @param entry    The entry to write.
+     * @param file The path to write to.
+     * @param entry The entry to write.
      * @param database An optional database which the given bibtex entries belong to, which will be used to
-     *                 resolve strings. If the database is null the strings will not be resolved.
+     * resolve strings. If the database is null the strings will not be resolved.
      * @throws TransformerException If the entry was malformed or unsupported.
-     * @throws IOException          If the file could not be written to or could not be found.
+     * @throws IOException If the file could not be written to or could not be found.
      */
     public void writeXmp(Path file,
                          BibEntry entry,
@@ -85,7 +85,7 @@ public class XmpUtilWriter {
      * Writes the information of the bib entry to the dublin core schema using a custom extractor.
      *
      * @param dcSchema Dublin core schema, which is filled with the bib entry.
-     * @param entry    The entry, which is added to the dublin core metadata.
+     * @param entry The entry, which is added to the dublin core metadata.
      */
     private void writeToDCSchema(DublinCoreSchema dcSchema,
                                  BibEntry entry) {
@@ -99,9 +99,9 @@ public class XmpUtilWriter {
      * Existing DublinCore schemas in the document are removed
      *
      * @param document The pdf document to write to.
-     * @param entries  The BibTeX entries that are written as schemas
+     * @param entries The BibTeX entries that are written as schemas
      * @param database An optional database which the given BibTeX entries belong to, which will be used to
-     *                 resolve strings. If the database is null the strings will not be resolved.
+     * resolve strings. If the database is null the strings will not be resolved.
      */
     private void writeDublinCore(PDDocument document,
                                  List<BibEntry> entries,
@@ -206,9 +206,9 @@ public class XmpUtilWriter {
      * The method to write DublinCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
      *
      * @param document The pdf document to write to.
-     * @param entry    The BibEntry that is written into the PDF properties.
+     * @param entry The BibEntry that is written into the PDF properties.
      * @param database An optional database which the given bibtex entries belong to, which will be used to
-     *                 resolve strings. If the database is null the strings will not be resolved.
+     * resolve strings. If the database is null the strings will not be resolved.
      */
     private void writeDocumentInformation(PDDocument document,
                                           BibEntry entry,
@@ -275,12 +275,12 @@ public class XmpUtilWriter {
      * <p>
      * The code for using PDFBox is also used at {@link EmbeddedBibFilePdfExporter#embedBibTex(String, Path)}.
      *
-     * @param path          The file to write the entries to.
+     * @param path The file to write the entries to.
      * @param bibtexEntries The entries to write to the file. *
-     * @param database      An optional database which the given bibtex entries belong to, which will be used
-     *                      to resolve strings. If the database is null the strings will not be resolved.
+     * @param database An optional database which the given bibtex entries belong to, which will be used
+     * to resolve strings. If the database is null the strings will not be resolved.
      * @throws TransformerException If the entry was malformed or unsupported.
-     * @throws IOException          If the file could not be written to or could not be found.
+     * @throws IOException If the file could not be written to or could not be found.
      */
     public void writeXmp(Path path,
                          List<BibEntry> bibtexEntries,

@@ -108,7 +108,7 @@ public class DOI implements Identifier {
      * Creates a DOI from various schemes including URL, URN, and plain DOIs/Short DOIs.
      *
      * @param doi the DOI/Short DOI string
-     * @throws NullPointerException     if DOI/Short DOI is null
+     * @throws NullPointerException if DOI/Short DOI is null
      * @throws IllegalArgumentException if doi does not include a valid DOI/Short DOI
      */
     public DOI(@NonNull String doi) {

@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;

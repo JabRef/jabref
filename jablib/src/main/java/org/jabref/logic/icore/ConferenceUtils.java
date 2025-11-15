@@ -92,7 +92,7 @@ public class ConferenceUtils {
      * is positioned ahead and retains the {@code -} in between.
      * </p>
      *
-     * @param input  the raw string to extract acronym candidates from, must not be {@code null}
+     * @param input the raw string to extract acronym candidates from, must not be {@code null}
      * @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
      * @return a set of acronym candidates ordered by descending length and then lexicographically,
      * or an empty set if no valid candidates are found

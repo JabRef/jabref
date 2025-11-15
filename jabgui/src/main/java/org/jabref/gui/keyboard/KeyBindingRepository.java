@@ -57,7 +57,7 @@ public class KeyBindingRepository {
      * Check if the given keyCombination equals the given keyEvent
      *
      * @param combination as KeyCombination
-     * @param keyEvent    as KeEvent
+     * @param keyEvent as KeEvent
      * @return true if matching, else false
      */
     public static boolean checkKeyCombinationEquality(KeyCombination combination, KeyEvent keyEvent) {
@@ -165,7 +165,7 @@ public class KeyBindingRepository {
     /**
      * Check if the given KeyBinding equals the given keyEvent
      *
-     * @param binding  as KeyBinding
+     * @param binding as KeyBinding
      * @param keyEvent as KeEvent
      * @return true if matching, else false
      */

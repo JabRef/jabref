@@ -195,9 +195,9 @@ public class OOFrontend {
      * <p>
      * On return {@code position} is collapsed, and is after the inserted space, or at the end of the reference mark.
      *
-     * @param citationKeys     In storage order
-     * @param pageInfos        In storage order
-     * @param position         Collapsed to its end.
+     * @param citationKeys In storage order
+     * @param pageInfos In storage order
+     * @param position Collapsed to its end.
      * @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of characters from the original position.
      */
     public CitationGroup createCitationGroup(XTextDocument doc,
@@ -439,7 +439,7 @@ public class OOFrontend {
 
     /**
      * @param requireSeparation Report range pairs that only share a boundary.
-     * @param reportAtMost      Limit number of overlaps reported (0 for no limit)
+     * @param reportAtMost Limit number of overlaps reported (0 for no limit)
      */
     public OOVoidResult<JabRefException> checkRangeOverlaps(XTextDocument doc,
                                                             List<RangeForOverlapCheck<CitationGroupId>> userRanges,
