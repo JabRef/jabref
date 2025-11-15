@@ -116,11 +116,17 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
     }
 
+    @Override
     public void storeSettings() {
-        if (!keyBindingRepository.equals(preferences.getKeyBindingRepository())) {
-            preferences.getKeyBindingRepository().getBindingsProperty().set(keyBindingRepository.getBindingsProperty());
-            restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
-        }
+        KeyBindingRepository prefsRepo = preferences.getKeyBindingRepository();
+
+        prefsRepo.getBindingsProperty().clear();
+
+        keyBindingRepository.getKeyBindings().forEach((key, value) -> {
+            prefsRepo.getBindingsProperty().put(key, value);
+        });
+
+        restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
     }
 
     public void resetToDefault() {
