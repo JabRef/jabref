@@ -60,18 +60,6 @@
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
-            <HBox spacing="10.0" alignment="BASELINE_CENTER">
-                <SearchableComboBox fx:id="addNewField" editable="true" prefWidth="150.0"/>
-                <Button fx:id="addNewFieldButton"
-                        prefHeight="20.0" prefWidth="20.0"
-                        styleClass="icon-button,narrow" onAction="#addNewField">
-                    <graphic>
-                        <JabRefIconView glyph="ADD_NOBOX"/>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="%Add new Field"/>
-                    </tooltip>
-                </Button>
             <HBox spacing="10.0" alignment="BASELINE_LEFT">
                 <VBox spacing="5.0">
                     <HBox spacing="10.0" alignment="BASELINE_CENTER">
