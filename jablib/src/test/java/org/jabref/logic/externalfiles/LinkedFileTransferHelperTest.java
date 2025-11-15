@@ -81,24 +81,36 @@ class LinkedFileTransferHelperTest {
                                                 .build()
                                 )
                                 .build()
-                ) /* ,
+                ),
 
                 // Directory not reachable with different paths - file copying with directory structure
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .tempDir(tempDir)
+                                .tempDir(getNextTempDir())
                                 .filePreferences(filePreferences)
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                .sourceBibDir("source-dir")
-                                .sourceFileDir("source-dir/nested")
-                                .testFileLinkMode(RELATIVE_TO_BIB)
-                                .targetBibDir("target-dir")
-                                .build(),
-                        "nested/test.pdf",
-                        RELATIVE_TO_BIB
-                ),
+                                .sourceBibTestConfiguration(
+                                        BibTestConfigurationBuilder
+                                                .bibTestConfiguration()
+                                                .tempDir(currentTempDir)
+                                                .bibDir("source-dir")
+                                                .pdfFileDir("source-dir/nested")
+                                                .fileLinkMode(RELATIVE_TO_BIB)
+                                                .build()
+                                )
+                                .targetBibTestConfiguration(
+                                        BibTestConfigurationBuilder
+                                                .bibTestConfiguration()
+                                                .tempDir(currentTempDir)
+                                                .bibDir("target-dir")
+                                                .pdfFileDir("target-dir/nested")
+                                                .fileLinkMode(RELATIVE_TO_BIB)
+                                                .build()
+                                )
+                                .build()
+                ) /* ,
 
                 // targetDirIsParentOfSourceDir
                 Arguments.of(
