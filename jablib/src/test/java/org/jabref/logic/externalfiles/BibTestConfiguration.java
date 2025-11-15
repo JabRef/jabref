@@ -20,7 +20,6 @@ public class BibTestConfiguration {
 
     @NonNull final Path tempDir;
     @NonNull final Path bibDir;
-    @Nullable final Path mainFileDir;
     @NonNull final Path pdfFile;
     @Nullable final Path librarySpecificFileDir;
     @Nullable final Path userSpecificFileDir;
@@ -30,7 +29,6 @@ public class BibTestConfiguration {
     BibTestConfiguration(
             Path tempDir,
             String bibDir,
-            @Opt Path mainFileDir,
             @Opt String librarySpecificFileDir,
             @Opt String userSpecificFileDir,
             String pdfFileDir,
@@ -38,7 +36,6 @@ public class BibTestConfiguration {
     ) throws IOException {
         this.tempDir = tempDir;
 
-        this.mainFileDir = mainFileDir;
         this.fileLinkMode = fileLinkMode;
         this.bibDir = tempDir.resolve(bibDir);
         Files.createDirectories(this.bibDir);
@@ -61,7 +58,9 @@ public class BibTestConfiguration {
         }
     }
 
-    void updateContext(BibDatabaseContext context) {
+    void updateContext(BibDatabaseContext context, @Nullable Path mainFileDir) {
+        context.setDatabasePath(this.bibDir.resolve("test.bib"));
+
         if (this.librarySpecificFileDir != null) {
             context.getMetaData().setLibrarySpecificFileDirectory(this.librarySpecificFileDir.toString());
         }
@@ -69,21 +68,21 @@ public class BibTestConfiguration {
             context.getMetaData().setUserFileDirectory("testuser", this.userSpecificFileDir.toString());
         }
 
-        Path fileLinkPath = convertLink();
+        Path fileLinkPath = convertLink(mainFileDir);
         String fileLink = fileLinkPath.toString();
         LinkedFile linkedFile = new LinkedFile("", fileLink, "PDF");
         BibEntry entry = new BibEntry().withFiles(List.of(linkedFile));
         context.getDatabase().insertEntry(entry);
     }
 
-    private Path convertLink() {
+    private Path convertLink(@Nullable Path mainFileDir) {
         return switch (fileLinkMode) {
             case ABSOLUTE ->
                     pdfFile;
             case RELATIVE_TO_BIB ->
                     this.bibDir.relativize(pdfFile);
             case RELATIVE_TO_MAIN_FILE_DIR ->
-                    tempDir.resolve(this.mainFileDir).relativize(pdfFile);
+                    tempDir.resolve(mainFileDir).relativize(pdfFile);
             case RELATIVE_TO_LIBRARY_SPECIFIC_DIR ->
                     tempDir.resolve(this.librarySpecificFileDir).relativize(pdfFile);
             case RELATIVE_TO_USER_SPECIFIC_DIR ->

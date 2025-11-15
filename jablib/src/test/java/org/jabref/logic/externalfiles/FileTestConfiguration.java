@@ -36,7 +36,7 @@ public class FileTestConfiguration {
             Path tempDir,
 
             FilePreferences filePreferences,
-            @Opt String mainFileDirectory,
+            @Opt String mainFileDir,
             Boolean shouldStoreFilesRelativeToBibFile,
             Boolean shouldAdjustOrCopyLinkedFilesOnTransfer,
 
@@ -45,11 +45,11 @@ public class FileTestConfiguration {
     ) {
         this.tempDir = tempDir;
 
-        if (mainFileDirectory == null) {
+        if (mainFileDir == null) {
             when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
             this.mainFileDir = null;
         } else {
-            this.mainFileDir = tempDir.resolve(mainFileDirectory);
+            this.mainFileDir = tempDir.resolve(mainFileDir);
             when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(this.mainFileDir));
         }
 
@@ -58,17 +58,16 @@ public class FileTestConfiguration {
         when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(shouldAdjustOrCopyLinkedFilesOnTransfer);
 
         this.sourceBibTestConfiguration = sourceBibTestConfiguration;
-        this.sourceContext = createContext(sourceBibTestConfiguration);
+        this.sourceContext = createContext(sourceBibTestConfiguration, this.mainFileDir);
 
         this.targetBibTestConfiguration = targetBibTestConfiguration;
-        this.targetContext = createContext(targetBibTestConfiguration);
+        this.targetContext = createContext(targetBibTestConfiguration, this.mainFileDir);
     }
 
     /// Creates a BibDatabaseContext with a single file linked as wished
-    static BibDatabaseContext createContext(BibTestConfiguration bibTestConfiguration) {
+    static BibDatabaseContext createContext(BibTestConfiguration bibTestConfiguration, @Nullable Path mainFileDir) {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase());
-        context.setDatabasePath(bibTestConfiguration.bibDir.resolve("source.bib"));
-        bibTestConfiguration.updateContext(context);
+        bibTestConfiguration.updateContext(context, mainFileDir);
         return context;
     }
 

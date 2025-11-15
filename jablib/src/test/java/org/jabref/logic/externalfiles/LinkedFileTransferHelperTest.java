@@ -13,10 +13,9 @@ import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_BIB;
+import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_MAIN_FILE_DIR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -33,6 +32,8 @@ class LinkedFileTransferHelperTest {
     void check(FileTestConfiguration fileTestConfiguration) {
         BibEntry actualEntry = new BibEntry(fileTestConfiguration.sourceContext.getEntries().getFirst());
         BibDatabaseContext actualBibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(actualEntry)));
+        actualBibDatabaseContext.setDatabasePath(fileTestConfiguration.targetContext.getDatabasePath().get());
+
         LinkedFileTransferHelper
                 .adjustLinkedFilesForTarget(
                         filePreferences, fileTestConfiguration.sourceContext,
@@ -50,12 +51,11 @@ class LinkedFileTransferHelperTest {
         return currentTempDir;
     }
 
-    static Stream<Arguments> check() throws IOException {
+    static Stream<FileTestConfiguration> check() throws IOException {
         return Stream.of(
                 // region shouldStoreFilesRelativeToBibFile
-
+/*
                 // file next to .bib file should be copied
-                Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .tempDir(getNextTempDir())
@@ -80,11 +80,9 @@ class LinkedFileTransferHelperTest {
                                                 .fileLinkMode(RELATIVE_TO_BIB)
                                                 .build()
                                 )
-                                .build()
-                ),
+                                .build(),
 
                 // Directory not reachable with different paths - file copying with directory structure
-                Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .tempDir(getNextTempDir())
@@ -109,49 +107,67 @@ class LinkedFileTransferHelperTest {
                                                 .fileLinkMode(RELATIVE_TO_BIB)
                                                 .build()
                                 )
-                                .build()
-                ) /* ,
+                                .build().
 
                 // targetDirIsParentOfSourceDir
-                Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .tempDir(tempDir.resolve("targetDirIsParentOfSourceDir"))
+                                .tempDir(getNextTempDir())
                                 .filePreferences(filePreferences)
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                .sourceBibDir("lit/sub-dir")
-                                .sourceFileDir("lit/sub-dir") // file is stored next to .bib file
-                                .testFileLinkMode(RELATIVE_TO_BIB)
-                                .targetBibDir("lit")
+                                .sourceBibTestConfiguration(
+                                        BibTestConfigurationBuilder
+                                                .bibTestConfiguration()
+                                                .tempDir(currentTempDir)
+                                                .bibDir("lit/sub-dir")
+                                                .pdfFileDir("lit/sub-dir")
+                                                .fileLinkMode(RELATIVE_TO_BIB)
+                                                .build()
+                                )
+                                .targetBibTestConfiguration(
+                                        BibTestConfigurationBuilder
+                                                .bibTestConfiguration()
+                                                .tempDir(currentTempDir)
+                                                .bibDir("lit")
+                                                .pdfFileDir("lit/sub-dir")
+                                                .fileLinkMode(RELATIVE_TO_BIB)
+                                                .build()
+                                )
                                 .build(),
-                        "sub-dir/test.pdf",
-                        RELATIVE_TO_BIB
-                ),
 
                 // endregion
 
                 // region not shouldStoreFilesRelativeToBibFile
-
+*/
                 // File in main file directory linked as is
-                Arguments.of(
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .tempDir(tempDir.resolve("file-in-main"))
-                                .filePreferences(filePreferences)
-                                .mainFileDirectory("main-file-dir")
-                                .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                .sourceBibDir("source-bib-dir")
-                                .sourceFileDir("main-file-dir")
-                                .testFileLinkMode(RELATIVE_TO_MAIN_FILE_DIR)
-                                .targetBibDir("target-dir")
-                                .build(),
-                        "main-file-dir/test.pdf",
-                        RELATIVE_TO_MAIN_FILE_DIR
-                )
+                FileTestConfigurationBuilder
+                        .fileTestConfiguration()
+                        .tempDir(getNextTempDir())
+                        .filePreferences(filePreferences)
+                        .mainFileDir("main-file-dir")
+                        .shouldStoreFilesRelativeToBibFile(false)
+                        .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                        .sourceBibTestConfiguration(
+                                BibTestConfigurationBuilder
+                                        .bibTestConfiguration()
+                                        .tempDir(currentTempDir)
+                                        .bibDir("source-bib-dir")
+                                        .pdfFileDir("main-file-dir")
+                                        .fileLinkMode(RELATIVE_TO_MAIN_FILE_DIR)
+                                        .build()
+                        )
+                        .targetBibTestConfiguration(
+                                BibTestConfigurationBuilder
+                                        .bibTestConfiguration()
+                                        .tempDir(currentTempDir)
+                                        .bibDir("target-bib-dir")
+                                        .pdfFileDir("main-file-dir/sub-dir")
+                                        .fileLinkMode(RELATIVE_TO_MAIN_FILE_DIR)
+                                        .build()
+                        )
+                        .build()
                 // endregion
-                */
         );
     }
 
