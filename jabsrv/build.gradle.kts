@@ -32,6 +32,7 @@ dependencies {
     implementation("org.glassfish.grizzly:grizzly-http-server")
     implementation("org.glassfish.grizzly:grizzly-framework")
     implementation("org.glassfish.jaxb:jaxb-runtime")
+    testImplementation("org.glassfish.jersey.test-framework:jersey-test-framework-core")
     testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("org.hibernate.validator:hibernate-validator")
@@ -66,7 +67,7 @@ dependencies {
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("jul.to.slf4j")
-    requires.add("jersey.test.framework.core")
+    requires.add("org.glassfish.jersey.tests.framework.core")
     requires.add("org.junit.jupiter.api")
     requires.add("org.mockito")
 }
