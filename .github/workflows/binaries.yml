@@ -21,6 +21,12 @@ on:
   workflow_dispatch:
     inputs:
       notarization:
+        description: "Notarize macOS DMG and PKG?"
+        type: boolean
+        required: false
+        default: false
+      eaJdk:
+        description: "Use Early-Access JDK?"
         type: boolean
         required: false
         default: false
@@ -53,6 +59,7 @@ jobs:
       # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
+      eaJdk:  ${{ steps.binary.outputs.eaJdk }}
 
     steps:
       - name: Determine conditions
@@ -65,12 +72,6 @@ jobs:
           LABEL_NAME: ${{ github.event.label.name }}
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
-          if [[ "$GITHUB_WORKFLOW" == *"early access"* && "$REPO_OWNER" != "JabRef" ]]; then
-            echo "🚫 Early access workflow for JabRef disabled for non-JabRef owner"
-            echo "should-build=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
           if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge"  || "$LABEL_NAME" == "dev: binaries" ]]; then
             echo "📦 build enabled"
             echo "should-build=true" >> "$GITHUB_OUTPUT"
@@ -78,6 +79,16 @@ jobs:
             echo "🚫 build should be skipped"
             echo "should-build=false" >> "$GITHUB_OUTPUT"
             exit 0
+          fi
+
+          if [[ "${{ inputs.eaJdk }}" == "true" ]]; then
+            echo "🚀 JDK EA build enabled"
+            echo "🚀 JDK EA build enabled" >> "$GITHUB_STEP_SUMMARY"
+            echo "eaJdk=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "🛡️ JDK stable version used"
+            echo "🛡️ JDK stable version used" >> "$GITHUB_STEP_SUMMARY"
+            echo "eaJdk=true" >> "$GITHUB_OUTPUT"
           fi
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
@@ -136,41 +147,47 @@ jobs:
       matrix:
         include:
           # if you change the os version rename all other occurrences
-          - os: ubuntu-22.04
-            displayName: linux
+          - os: ubuntu-24.04
+            displayName: linux-amd64
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04 JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04/JabRef-portable_linux.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04 jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04/jabkit-portable_linux.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04/jabkit
             archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04 jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04/jabls-portable_linux.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04/jabls
             suffix: ''
             archForDebianRepack: '_amd64'
-          - os: ubuntu-22.04-arm
+            # Browse at https://gluonhq.com/products/javafx/ for latest version
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_linux-x64_bin-jmods.zip
+          - os: ubuntu-24.04-arm
             displayName: linux-arm
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04-arm jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04-arm/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04-arm/jabkit
             archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04-arm jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04-arm/jabls-portable_linux_arm64.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04-arm/jabls
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_linux-aarch64_bin-jmods.zip
           - os: windows-latest
-            displayName: windows
+            displayName: windows-amd64
             archivePortable: 7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef
             archivePortableJabKit: 7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit
             archivePortableJabLS: 7z a -r jabls-cli/build/packages/windows-latest/jabls-portable_windows.zip ./jabls-cli/build/packages/windows-latest/jabls && rm -R jabls-cli/build/packages/windows-latest/jabls
             suffix: ''
             archForDebianRepack: ''
-          - os: macos-15-intel  # intel image
-            displayName: macOS
-            archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app
-            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app
-            suffix: ''
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_windows-x64_bin-jmods.zip
+          - os: macos-15-intel
+            displayName: macOS-intel
+            archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
+            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos-intel.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app
+            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos-intel.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app
+            suffix: '_intel'
             archForDebianRepack: ''
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_osx-x64_bin-jmods.zip
           - os: macos-15
-            displayName: macOS-arm
-            archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app
-            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-arm.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
-            suffix: '_arm64'
+            displayName: macOS-silicon
+            archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-silicon.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
+            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-silicon.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app
+            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-silicon.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
+            suffix: '_silicon'
             archForDebianRepack: ''
+            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+14_osx-aarch64_bin-jmods.zip
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
@@ -185,7 +202,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Install pigz and cache (linux)
-        if: (startsWith(matrix.os, 'ubuntu'))
+        if: startsWith(matrix.os, 'ubuntu')
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: pigz
@@ -197,12 +214,54 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
-      - name: Setup JDK
+
+      # region setup-JDK
+      - name: 'Set up latest JDK EA from jdk.java.net'
+        if: ${{ needs.conditions.outputs.eaJdk == 'true' }}
+        uses: oracle-actions/setup-java@v1
+        with:
+          website: jdk.java.net
+          release: EA
+      - name: Tell gradle to use JDK 26 (macOS)
+        if: ${{ needs.conditions.outputs.eaJdk == 'true' && (startsWith(matrix.os, 'macos')) }}
+        run: |
+          sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i '' "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+      - name: Tell gradle to use JDK 26 (linux, Windows)
+        if: ${{ needs.conditions.outputs.eaJdk == 'true' && (!startsWith(matrix.os, 'macos')) }}
+        run: |
+          sed -i "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+      - name: Download JavaFX JMODs (linux, macOS)
+        if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os != 'windows-latest') }}
+        uses: ethanjli/cached-download-action@v0.1.3
+        with:
+          url: ${{ matrix.eaJdkJmodsUrl }}
+          destination: /tmp/jmods.zip
+      - name: Download JavaFX JMODs (Windows)
+        if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os == 'windows-latest') }}
+        uses: ethanjli/cached-download-action@v0.1.3
+        with:
+          url: ${{ matrix.eaJdkJmodsUrl }}
+          destination: "C:\\temp\\jmods.zip"
+      - name: Extract JavaFX JMODs (linux, macOS)
+        if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os != 'windows-latest') }}
+        run: |
+          cd /tmp
+          unzip jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
+      - name: Extract JavaFX JMODs (Windows)
+        if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os == 'windows-latest') }}
+        run: |
+          cd C:\temp
+          unzip jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
+      - name: Setup JDK (runtime for gradle)
         uses: actions/setup-java@v5
         with:
-          java-version: '24'
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
+      # endregion
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
@@ -226,7 +285,7 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
-          keychain-password: jabref
+          keychain-password: tEmPoRaRY-PaeSWD
       - name: Setup macOS key chain for app id cert
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
@@ -234,10 +293,10 @@ jobs:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
-          keychain-password: jabref
+          keychain-password: tEmPoRaRY-PaeSWD
       - name: Build runtime image and installer
         shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
+        run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.eaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
       - name: Package JabGui application image
         shell: bash
         run: |
@@ -315,12 +374,7 @@ jobs:
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload jabkkit to builds.jabref.org (Windows)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
-        shell: cmd
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload jabls-cli to builds.jabref.org (Windows)
+      - name: Upload jabls to builds.jabref.org (Windows)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
         run: |
@@ -330,12 +384,7 @@ jobs:
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload jabkit to builds.jabref.org (linux, macOS)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload jabls-cli to builds.jabref.org (linux, macOS)
+      - name: Upload jabls to builds.jabref.org (linux, macOS)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
@@ -348,12 +397,11 @@ jobs:
           name: JabRef-${{ matrix.os }}-tbn
           path: |
             jabgui/build/packages/${{ matrix.os }}
-            jabkit/build/packages/${{ matrix.os }}
+            jabls-cli/build/packages/${{ matrix.os }}
           compression-level: 0 # no compression
       # endregion
 
-  comment-on-pr:
-    name: Comment on PR
+  comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
     needs: [conditions, build]
     if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
@@ -366,14 +414,8 @@ jobs:
             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
           comment-tag: download-link
           mode: recreate
-
-  comment-on-issue:
-    name: Comment on issue
-    # separate job, because it should wait until all binaries are available
-    needs: [conditions, build]
-    if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
-    runs-on: ubuntu-latest
-    steps:
+      - name: Create GitHub Summary
+        run: echo "The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>." >> "$GITHUB_STEP_SUMMARY"
       - name: echo PR data
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -424,7 +466,25 @@ jobs:
       matrix:
         include:
           - os: macos-15
-            displayName: macOS (ARM64)
+            displayName: JabGui macOS (ARM64)
+            path: 'jabgui'
+            prefix: 'JabRef'
+            suffix: '_silicon'
+          - os: macos-15-intel
+            displayName: JabGui macOS (intel)
+            path: 'jabgui'
+            prefix: 'JabRef'
+            suffix: '_intel'
+          - os: macos-15
+            displayName: jabls macOS (ARM64)
+            path: 'jabls'
+            prefix: 'jabls'
+            suffix: '_silicon'
+          - os: macos-15-intel
+            displayName: jabls macOS (intel)
+            path: 'jabls'
+            prefix: 'jabls'
+            suffix: '_intel'
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
@@ -434,21 +494,21 @@ jobs:
       - name: Notarize dmg
         shell: bash
         run: |
-          cd jabgui
+          cd ${{ matrix.path }}
           find . -type f
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
+          xcrun notarytool submit build/packages/${{ matrix.os }}/${{ matrix.prefix }}-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple build/packages/${{ matrix.os }}/${{ matrix.prefix }}-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
       - name: Notarize pkg
         shell: bash
         run: |
-          cd jabgui
+          cd ${{ matrix.path }}
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
+          xcrun notarytool submit build/packages/${{ matrix.os }}/${{ matrix.prefix }}-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple build/packages/${{ matrix.os }}/${{ matrix.prefix }}-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
       - name: Upload to builds.jabref.org
         shell: bash
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ matrix.path }}/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
