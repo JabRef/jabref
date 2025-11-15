@@ -286,7 +286,6 @@ extraJavaModuleInfo {
         requiresTransitive("org.testfx")
     }
 
-    module("commons-fileupload:commons-fileupload", "commons.fileupload")
 
     module("org.xmlunit:xmlunit-core", "org.xmlunit") {
         exportAllPackages()
@@ -550,7 +549,7 @@ extraJavaModuleInfo {
         requires("com.fasterxml.jackson.databind")
         requires("com.fasterxml.jackson.datatype.jsr310")
         requires("com.google.common")
-        requires("commons.fileupload")
+        requires("org.apache.commons.fileupload")
         requires("java.xml")
         requires("json.path")
         requires("org.custommonkey.xmlunit")
