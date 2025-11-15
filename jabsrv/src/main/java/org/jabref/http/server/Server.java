@@ -114,7 +114,7 @@ public class Server {
         LOGGER.debug("Starting HTTP server...");
         final HttpServer httpServer =
                 GrizzlyHttpServerFactory
-                        .createHttpServer(uri, resourceConfig, serviceLocator);
+                                        .createHttpServer(uri, resourceConfig, serviceLocator);
 
         return httpServer;
     }
