@@ -32,6 +32,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +63,12 @@ public class BibDatabaseContext {
     /**
      * The path where this database was last saved to.
      */
+    @Nullable
     private Path path;
 
+    @Nullable
     private DatabaseSynchronizer dbmsSynchronizer;
+    @Nullable
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
@@ -223,10 +227,15 @@ public class BibDatabaseContext {
 
         // If this path is relative, we try to interpret it as relative to the file path of this BIB file:
         return getDatabasePath()
-                .map(databaseFile -> databaseFile.getParent().resolve(path).normalize().toAbsolutePath())
+                .map(databaseFile -> Optional.ofNullable(databaseFile.getParent())
+                                             .orElse(Path.of(""))
+                                             .resolve(path)
+                                             .normalize()
+                                             .toAbsolutePath())
                 .orElse(path);
     }
 
+    @Nullable
     public DatabaseSynchronizer getDBMSSynchronizer() {
         return this.dbmsSynchronizer;
     }
@@ -250,7 +259,9 @@ public class BibDatabaseContext {
 
     public void convertToLocalDatabase() {
         if (dbmsListener != null && (location == DatabaseLocation.SHARED)) {
-            dbmsListener.unregisterListener(dbmsSynchronizer);
+            if (dbmsSynchronizer != null) {
+                dbmsListener.unregisterListener(dbmsSynchronizer);
+            }
             dbmsListener.shutdown();
         }
 
