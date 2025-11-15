@@ -2,6 +2,7 @@ package org.jabref.gui.edit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -84,13 +84,13 @@ public class CopyToTest {
         selectedEntries.add(entry);
         when(stateManager.getSelectedEntries()).thenReturn((ObservableList<BibEntry>) selectedEntries);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), preferences.getFilePreferences(),
                 importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -98,7 +98,8 @@ public class CopyToTest {
         selectedEntries.add(entryWithCrossRef);
         when(stateManager.getSelectedEntries()).thenReturn((ObservableList<BibEntry>) selectedEntries);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+                preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
@@ -106,17 +107,16 @@ public class CopyToTest {
         List<BibEntry> expectedEntries = new ArrayList<>(selectedEntries);
         expectedEntries.add(referencedEntry);
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(expectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(expectedEntries), trackerCaptor.capture());
     }
 
     @Test
     void executeGetCrossRefEntry() {
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+                preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
-        BibEntry result = copyTo.getCrossRefEntry(entryWithCrossRef, sourceDatabaseContext).orElse(null);
-
-        assertNotNull(result);
-        assertEquals(referencedEntry, result);
+        Optional<BibEntry> result = copyTo.getCrossRefEntry(entryWithCrossRef, sourceDatabaseContext);
+        assertEquals(Optional.of(referencedEntry), result);
     }
 
     @Test
@@ -125,12 +125,13 @@ public class CopyToTest {
         when(stateManager.getSelectedEntries()).thenReturn((ObservableList<BibEntry>) selectedEntries);
         when(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences()).thenReturn(false);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+                preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -140,7 +141,8 @@ public class CopyToTest {
         when(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences()).thenReturn(true);
         when(dialogService.showConfirmationDialogWithOptOutAndWait(anyString(), anyString(), anyString(), anyString(), anyString(), any())).thenReturn(true);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+                preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
@@ -148,7 +150,7 @@ public class CopyToTest {
         List<BibEntry> expectedEntries = new ArrayList<>(selectedEntries);
         expectedEntries.add(referencedEntry);
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(expectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(expectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -158,11 +160,12 @@ public class CopyToTest {
         when(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences()).thenReturn(true);
         when(dialogService.showConfirmationDialogWithOptOutAndWait(anyString(), anyString(), anyString(), anyString(), anyString(), any())).thenReturn(false);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+                preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(targetDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
     }
 }

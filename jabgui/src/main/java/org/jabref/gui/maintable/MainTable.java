@@ -542,7 +542,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 // - Bottom + top -> import entries
                 case TOP,
                      BOTTOM ->
-                        importHandler.importFilesInBackground(files, database, filePreferences, transferMode).executeWith(taskExecutor);
+                        importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
@@ -564,7 +564,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (event.getDragboard().hasFiles()) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).toList();
             importHandler
-                    .importFilesInBackground(files, this.database, filePreferences, event.getTransferMode())
+                    .importFilesInBackground(files, event.getTransferMode())
                     .executeWith(taskExecutor);
             success = true;
         }
