@@ -17,9 +17,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.ai.templates.AiTemplate;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
-import org.jabref.model.strings.StringUtil;
 
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
@@ -115,6 +115,9 @@ public class AiPreferences {
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
+
+        this.apiKeyChangeListener = () -> {
+        };
 
         this.templates = Map.of(
                 AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_SYSTEM_MESSAGE)),
@@ -550,14 +553,14 @@ public class AiPreferences {
     }
 
     public void setTemplate(AiTemplate aiTemplate, String template) {
-        templates.get(aiTemplate).set(template);
+        templateProperty(aiTemplate).set(template);
     }
 
     public String getTemplate(AiTemplate aiTemplate) {
-        return templates.get(aiTemplate).get();
+        return templateProperty(aiTemplate).get();
     }
 
     public StringProperty templateProperty(AiTemplate aiTemplate) {
-        return templates.get(aiTemplate);
+        return templates.getOrDefault(aiTemplate, new SimpleStringProperty(""));
     }
 }

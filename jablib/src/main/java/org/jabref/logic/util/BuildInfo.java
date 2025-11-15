@@ -8,9 +8,12 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
+import io.github.darvil.terminal.textformatter.TextFormatter;
+import io.github.darvil.terminal.textformatter.color.SimpleColor;
+
 public final class BuildInfo {
-    public static final String JABREF_BANNER = """
-            \u001B[35m
+    public static final String JABREF_BANNER = TextFormatter.of("""
+
                &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
                &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
                &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
@@ -18,16 +21,13 @@ public final class BuildInfo {
                &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
                &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
             &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
-
-            \u001B[97mVersion: %s
-            \u001B[0m
+            """, SimpleColor.MAGENTA).toString() +
+            TextFormatter.of("\nVersion: %s\n", SimpleColor.BRIGHT_WHITE).toString() + """
             Staying on top of your literature since 2003 - https://www.jabref.org/
-
             Please report issues at https://github.com/JabRef/jabref/issues
             """;
 
     public static final String UNKNOWN_VERSION = "UNKNOWN";
-
     public static final String OS = System.getProperty("os.name", UNKNOWN_VERSION);
     public static final String OS_VERSION = System.getProperty("os.version", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
     public static final String OS_ARCH = System.getProperty("os.arch", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);

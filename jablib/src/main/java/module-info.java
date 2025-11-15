@@ -187,6 +187,10 @@ open module org.jabref.jablib {
     requires org.apache.commons.logging;
     // endregion
 
+    // region: caching
+    requires com.github.benmanes.caffeine;
+    // endregion
+
     // region: latex2unicode
     requires com.github.tomtung.latex2unicode;
     requires fastparse;
@@ -253,6 +257,7 @@ open module org.jabref.jablib {
     requires cuid;
     requires dd.plist;
     requires io.github.adr;
+    requires io.github.darvil.terminal.textformatter;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;

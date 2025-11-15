@@ -19,6 +19,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
+    private final BooleanProperty transliterateFieldsForCitationKeyProperty = new SimpleBooleanProperty();
     private final BooleanProperty overwriteAllowProperty = new SimpleBooleanProperty();
     private final BooleanProperty overwriteWarningProperty = new SimpleBooleanProperty();
     private final BooleanProperty generateOnSaveProperty = new SimpleBooleanProperty();
@@ -53,6 +54,7 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        transliterateFieldsForCitationKeyProperty.setValue(keyPatternPreferences.shouldTransliterateFieldsForCitationKey());
         overwriteAllowProperty.setValue(!keyPatternPreferences.shouldAvoidOverwriteCiteKey());
         overwriteWarningProperty.setValue(keyPatternPreferences.shouldWarnBeforeOverwriteCiteKey());
         generateOnSaveProperty.setValue(keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving());
@@ -106,6 +108,7 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
             keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
         }
 
+        keyPatternPreferences.setShouldTransliterateFieldsForCitationKey(transliterateFieldsForCitationKeyProperty.getValue());
         keyPatternPreferences.setAvoidOverwriteCiteKey(!overwriteAllowProperty.getValue());
         keyPatternPreferences.setWarnBeforeOverwriteCiteKey(overwriteWarningProperty.getValue());
         keyPatternPreferences.setGenerateCiteKeysBeforeSaving(generateOnSaveProperty.getValue());
@@ -115,6 +118,10 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
         keyPatternPreferences.setKeyPatternReplacement(keyPatternReplacementProperty.getValue());
         keyPatternPreferences.setUnwantedCharacters(unwantedCharactersProperty.getValue());
         keyPatternPreferences.setKeyPatterns(newKeyPattern);
+    }
+
+    public BooleanProperty transliterateFieldsForCitationKeyProperty() {
+        return transliterateFieldsForCitationKeyProperty;
     }
 
     public BooleanProperty overwriteAllowProperty() {

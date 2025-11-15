@@ -170,7 +170,7 @@
 # PR hygiene
 
 - jobName: 'Ensure that contributor is assigned (fails if not commented on issue)'
-  workflowName: 'On PR opened/updated'
+  workflowName: 'Link PR to Issue'
   message: >
     You did not assign yourself to the issue.
     Thus, it looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.
@@ -179,24 +179,24 @@
     Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
 
 - jobName: 'PR title must not contain "issue <number>"'
-  workflowName: 'PR Format'
+  workflowName: 'Check PR Format'
   always: true
   message: >
     The title of the pull request must not start with "Fix for issue xyz".
     Please use a concise one-line summary that explains what the fix or change actually does.
     Example of a good title: "Prevent crash when importing malformed BibTeX entries".
 - jobName: 'Mandatory Checks present'
-  workflowName: 'PR Format'
+  workflowName: 'Check PR Format'
   always: true
   message: >
     You have removed the "Mandatory Checks" section from your pull request description. Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1#L10).
 - jobName: 'PR checklist OK'
-  workflowName: 'PR Format'
+  workflowName: 'Check PR Format'
   always: true
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
 - jobName: 'Determine issue number'
-  workflowName: 'On PR opened/updated'
+  workflowName: 'Link PR to Issue'
   always: true
   message: |
     Your pull request needs to link an issue correctly.
