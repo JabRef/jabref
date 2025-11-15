@@ -270,8 +270,17 @@
                                         </graphic>
                                     </Button>
                                 </HBox>
-                                <Label text="%Note: The study directory should be empty."/>
                                 <Label fx:id="directoryWarning" text="%Warning: The selected directory is not empty." visible="false" styleClass="warning-message" />
+                                <VBox spacing="5.0" fx:id="validationContainer">
+                                    <Label fx:id="validationHeaderLabel" text="%In order to proceed:" style="-fx-text-fill: -jr-error; -fx-font-weight: bold" visible="false" managed="false" />
+                                    <VBox spacing="3.0">
+                                        <Label fx:id="titleValidationLabel" visible="false" managed="false" />
+                                        <Label fx:id="authorsValidationLabel" visible="false" managed="false" />
+                                        <Label fx:id="questionsValidationLabel" visible="false" managed="false" />
+                                        <Label fx:id="queriesValidationLabel" visible="false" managed="false" />
+                                        <Label fx:id="catalogsValidationLabel" visible="false" managed="false" />
+                                    </VBox>
+                                </VBox>
                             </VBox>
                         </ScrollPane>
                     </Tab>
