@@ -50,6 +50,7 @@ import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -84,6 +85,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton searchRadioButton;
     @FXML private RadioButton autoRadioButton;
     @FXML private RadioButton texRadioButton;
+    @FXML private RadioButton directoryRadioButton;
 
     // Option Groups
     @FXML private TextField keywordGroupSearchTerm;
@@ -104,6 +106,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML private TextField texGroupFilePath;
 
+    @FXML private TextField rootPathField;
+
     @FXML private RadioButton dateRadioButton;
     @FXML private ComboBox<Field> dateGroupFieldCombo;
     @FXML private ComboBox<DateGranularity> dateGroupOptionCombo;
@@ -121,6 +125,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private GroupDialogViewModel viewModel;
 
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private DirectoryUpdateMonitor directoryUpdateMonitor;
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
@@ -181,7 +186,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferences, editedGroup, parentNode, fileUpdateMonitor, stateManager);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferences, editedGroup, parentNode, fileUpdateMonitor, directoryUpdateMonitor, stateManager);
 
         setResultConverter(viewModel::resultConverter);
 
@@ -209,6 +214,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchRadioButton.selectedProperty().bindBidirectional(viewModel.typeSearchProperty());
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
+        directoryRadioButton.selectedProperty().bindBidirectional(viewModel.typeDirectoryProperty());
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());
@@ -229,6 +235,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         autoGroupPersonsField.textProperty().bindBidirectional(viewModel.autoGroupPersonsFieldProperty());
 
         texGroupFilePath.textProperty().bindBidirectional(viewModel.texGroupFilePathProperty());
+        rootPathField.textProperty().bindBidirectional(viewModel.directoryGroupFilePathProperty());
 
         // Date Group bindings
         dateRadioButton.selectedProperty().bindBidirectional(viewModel.dateRadioButtonSelectedProperty());
@@ -250,6 +257,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
             validationVisualizer.initVisualization(viewModel.texGroupFilePathValidatonStatus(), texGroupFilePath);
+            validationVisualizer.initVisualization(viewModel.directoryGroupFilePathValidatonStatus(), rootPathField);
             nameField.requestFocus();
         });
 
@@ -278,6 +286,18 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML
     private void texGroupBrowse() {
         viewModel.texGroupBrowse();
+    }
+
+    @FXML
+    private void browseDirectory() {
+        viewModel.browseForDirectory();
+        String path = viewModel.pathProperty().getValue();
+        rootPathField.setText(path);
+        if ("".equals(nameField.getText())) {
+            nameField.setText(path.substring(path.lastIndexOf("\\") + 1));
+        }
+        viewModel.groupHierarchySelectedProperty().setValue(GroupHierarchyType.INCLUDING);
+        rootPathField.requestFocus();
     }
 
     @FXML

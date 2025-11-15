@@ -41,6 +41,7 @@ import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGroup;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
@@ -441,35 +442,31 @@ public class GroupNodeViewModel {
 
     public boolean canAddEntriesIn() {
         AbstractGroup group = groupNode.getGroup();
-        if (group instanceof AllEntriesGroup) {
-            return false;
-        } else if (group instanceof SmartGroup) {
-            return false;
-        } else if (group instanceof ExplicitGroup) {
-            return true;
-        } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
-            return groupNode.getParent()
-                            .map(GroupTreeNode::getGroup)
-                            .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
-                            .orElse(false);
-        } else if (group instanceof KeywordGroup) {
-            // also covers WordKeywordGroup
-            return true;
-        } else if (group instanceof SearchGroup) {
-            return false;
-        } else if (group instanceof AutomaticKeywordGroup) {
-            return false;
-        } else if (group instanceof AutomaticPersonsGroup) {
-            return false;
-        } else if (group instanceof TexGroup) {
-            return false;
-        } else if (group instanceof AutomaticDateGroup) {
-            return false;
-        } else if (group instanceof DateGroup) {
-            return false;
-        } else {
-            throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
-        }
+        return switch (group) {
+            case LastNameGroup _,
+                 RegexKeywordGroup _ ->
+                    groupNode.getParent()
+                             .map(GroupTreeNode::getGroup)
+                             .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
+                             .orElse(false);
+            case AllEntriesGroup _,
+                 AutomaticDateGroup _,
+                 AutomaticKeywordGroup _,
+                 AutomaticPersonsGroup _,
+                 DateGroup _,
+                 DirectoryGroup _,
+                 SearchGroup _,
+                 SmartGroup _,
+                 TexGroup _ ->
+                    false;
+            case ExplicitGroup _,
+                 KeywordGroup _ ->
+                    true;
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
+        };
     }
 
     public boolean canBeDragged() {
@@ -478,13 +475,18 @@ public class GroupNodeViewModel {
             case AllEntriesGroup _,
                  SmartGroup _ ->
                     false;
-            case ExplicitGroup _,
-                 SearchGroup _,
-                 AutomaticKeywordGroup _,
+            case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
+                 ExplicitGroup _,
+                 SearchGroup _,
                  TexGroup _ ->
                     true;
+            case DirectoryGroup _ ->
+                    groupNode.getParent()
+                             .map(GroupTreeNode::getGroup)
+                             .map(groupParent -> !(groupParent instanceof DirectoryGroup))
+                             .orElse(false);
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
                     groupNode.getParent()
@@ -508,10 +510,11 @@ public class GroupNodeViewModel {
                  SearchGroup _,
                  TexGroup _ ->
                     true;
-            case AutomaticKeywordGroup _,
+            case AutomaticDateGroup _,
+                 AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
-                 AutomaticDateGroup _,
                  DateGroup _,
+                 DirectoryGroup _,
                  SmartGroup _ ->
                     false;
             case KeywordGroup _ ->
@@ -533,12 +536,11 @@ public class GroupNodeViewModel {
             case AllEntriesGroup _,
                  SmartGroup _ ->
                     false;
-            case ExplicitGroup _,
-                 SearchGroup _,
-                 AutomaticKeywordGroup _,
+            case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
-                 AutomaticDateGroup _,
-                 DateGroup _,
+                 ExplicitGroup _,
+                 DirectoryGroup _,
+                 SearchGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -561,11 +563,12 @@ public class GroupNodeViewModel {
                  DateGroup _,
                  SmartGroup _ ->
                     false;
-            case ExplicitGroup _,
-                 SearchGroup _,
+            case AutomaticDateGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
-                 AutomaticDateGroup _,
+                 DirectoryGroup _,
+                 ExplicitGroup _,
+                 SearchGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
