@@ -9,6 +9,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
@@ -16,12 +17,21 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BibliographyConsistencyCheckTest {
+
+    private BibEntryTypesManager entryTypesManager;
+
+    @BeforeEach
+    void setUp() {
+        // TODO: add some custom entry types for this manager and test with it
+        entryTypesManager = new BibEntryTypesManager();
+    }
 
     @Test
     void checkSimpleLibrary(@TempDir Path tempDir) {
@@ -34,7 +44,7 @@ class BibliographyConsistencyCheckTest {
         BibDatabase database = new BibDatabase(List.of(first, second));
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
         });
 
         BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
@@ -55,7 +65,7 @@ class BibliographyConsistencyCheckTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.TITLE, customField), List.of(first, second));
@@ -88,7 +98,7 @@ class BibliographyConsistencyCheckTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second, third, fourth, fifth));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         BibliographyConsistencyCheck.EntryTypeResult articleResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
@@ -111,7 +121,7 @@ class BibliographyConsistencyCheckTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of());
@@ -133,7 +143,7 @@ class BibliographyConsistencyCheckTest {
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(bibContext, (_, _) -> {
+                .check(bibContext, entryTypesManager, (_, _) -> {
                 });
 
         assertEquals(Map.of(), result.entryTypeToResultMap(),
@@ -150,7 +160,7 @@ class BibliographyConsistencyCheckTest {
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(bibContext, (_, _) -> {
+                .check(bibContext, entryTypesManager, (_, _) -> {
                 });
 
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
@@ -174,7 +184,7 @@ class BibliographyConsistencyCheckTest {
         bibContext.setMode(BibDatabaseMode.BIBLATEX);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(bibContext, (_, _) -> {
+                .check(bibContext, entryTypesManager, (_, _) -> {
                 });
 
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
@@ -198,7 +208,7 @@ class BibliographyConsistencyCheckTest {
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(bibContext, (_, _) -> {
+                .check(bibContext, entryTypesManager, (_, _) -> {
                 });
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
                 result.entryTypeToResultMap().get(StandardEntryType.Online);
@@ -268,7 +278,7 @@ class BibliographyConsistencyCheckTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second, third, fourth, fifth, sixth));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck.Result actualResult = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> {
+        BibliographyConsistencyCheck.Result actualResult = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         BibliographyConsistencyCheck.EntryTypeResult articleResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
