@@ -94,7 +94,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         if (bibEntry.isEmpty()) {
             LOGGER.debug("Could not found a entry for ISBN {}", identifier);
         } else {
-            Optional<LinkedFile> cover = getCoverImageURLFromStringOfISBN(identifier);
+            Optional<LinkedFile> cover = getCoverImageFileFromStringOfISBN(identifier);
             if (cover.isPresent()) {
                 bibEntry.get().addFile(cover.get());
             }
@@ -122,7 +122,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         return NEWLINE_SPACE_PATTERN.matcher(identifier).replaceAll("");
     }
     
-    private static Optional<LinkedFile> getCoverImageURLFromStringOfISBN(String identifier) {
+    private static Optional<LinkedFile> getCoverImageFileFromStringOfISBN(String identifier) {
         try {
             URLDownload downloader = new URLDownload(bookCoverSource + identifier);
             String json = downloader.asString();
