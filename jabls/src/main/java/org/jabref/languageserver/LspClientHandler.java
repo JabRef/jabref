@@ -45,7 +45,7 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
         this.settings = ExtensionSettings.getDefaultSettings();
         this.parserHandler = new LspParserHandler();
         this.diagnosticHandler = new LspDiagnosticHandler(this, parserHandler, cliPreferences, abbreviationRepository);
-        this.linkHandler = new LspLinkHandler(parserHandler);
+        this.linkHandler = new LspLinkHandler(this, parserHandler, cliPreferences.getFilePreferences());
         this.workspaceService = new BibtexWorkspaceService(this, diagnosticHandler);
         this.textDocumentService = new BibtexTextDocumentService(messageHandler, this, diagnosticHandler, linkHandler);
         this.messageHandler = messageHandler;
