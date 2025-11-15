@@ -23,6 +23,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - `JabKit`: `--porcelain` does not output any logs to the console anymore. [#14244](https://github.com/JabRef/jabref/pull/14244)
 - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> now opens the terminal in the active library directory. [#14130](https://github.com/JabRef/jabref/issues/14130)
 - We changed  fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
+- The space character in a search field content is now also accepted when escaped. [#13836](https://github.com/JabRef/jabref/pull/13836)
+
 
 ### Fixed
 
@@ -59,6 +61,22 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new button for shortening the DOI near the DOI field in the general tab when viewing an entry. [#13639](https://github.com/JabRef/jabref/issues/13639)
 - We added support for finding CSL-Styles based on their short title (e.g. apa instead of "american psychological association"). [#13728](https://github.com/JabRef/jabref/pull/13728)
 - We added BibLaTeX datamodel validation support in order to improve error message quality in entries' fields validation. [#13318](https://github.com/JabRef/jabref/issues/13318)
+- We added more supported formats of CAYW endpoint of HTTP server. [#13578](https://github.com/JabRef/jabref/issues/13578)
+
+### Changed
+
+- We changed `ISSNCleanup` into `NormalizeIssn` a `ISSN` formatter. [#13748](https://github.com/JabRef/jabref/issues/13748)
+- We changed Citation Relations tab and gave tab panes more descriptive titles and tooltips. [#13619](https://github.com/JabRef/jabref/issues/13619)
+- We changed the name from Open AI Provider to Open AI (or API compatible). [#13585](https://github.com/JabRef/jabref/issues/13585)
+- We improved the citations relations caching by implementing an offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
+- We added a tooltip to keywords that resemble Math Subject Classification (MSC) codes. [#12944](https://github.com/JabRef/jabref/issues/12944)
+- We added a formatter to convert keywords that resemble MSC codes to their descriptions. [#12944](https://github.com/JabRef/jabref/issues/12944)
+- We introduced a new command line application called `jabkit`. [#13012](https://github.com/JabRef/jabref/pull/13012) [#110](https://github.com/JabRef/jabref/issues/110)
+- We added a new "Add JabRef suggested groups" option in the context menu of "All entries". [#12659](https://github.com/JabRef/jabref/issues/12659)
+- We added an option to create entries directly from Bib(La)TeX sources to the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
+- We added the provision to choose different CSL bibliography body formats (e.g. First Line Indent, Hanging Indent, Bibliography 1, etc.) in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
+- We use `https` to connect to [shortDOI](https://shortdoi.org/) service. [#13637](https://github.com/JabRef/jabref/pull/13637)
+- We added "Bibliography Heading" to the available CSL bibliography header formats in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
 - We added chronological navigation for entries in each library. [#6352](https://github.com/JabRef/jabref/issues/6352)
 - We added support for using Medline/Pubmed fetcher with an API key. [#11296](https://github.com/JabRef/jabref/issues/11296#issuecomment-3289005011)
 - We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
