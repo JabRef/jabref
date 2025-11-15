@@ -347,12 +347,21 @@ public class Date {
         throw new DateTimeParseException("Invalid Date format for season", dateString, parts[0].length());
     }
 
+    private boolean isRange() {
+        return endDate != null;
+    }
+
     public String getNormalized() {
+        if (isRange()) {
+            String normalizedStartDate = NORMALIZED_DATE_FORMATTER.format(date);
+            String normalizedEndDate = NORMALIZED_DATE_FORMATTER.format(endDate);
+            return normalizedStartDate + "/" + normalizedEndDate;
+        }
         return NORMALIZED_DATE_FORMATTER.format(date);
     }
 
-    public Optional<Integer> getYear() {
-        return get(ChronoField.YEAR);
+    public Optional<TemporalAccessor> getEndDate() {
+        return Optional.ofNullable(endDate);
     }
 
     public Optional<Integer> get(ChronoField field) {
@@ -423,6 +432,10 @@ public class Date {
         return "Date{" +
                 "date=" + formattedDate +
                 '}';
+    }
+
+    public Optional<Integer> getYear() {
+        return get(ChronoField.YEAR);
     }
 
     @Override
