@@ -224,7 +224,7 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock") {
+    testImplementation("org.wiremock:wiremock-jetty12") {
         exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
     }
     testImplementation("org.ow2.asm:asm")
