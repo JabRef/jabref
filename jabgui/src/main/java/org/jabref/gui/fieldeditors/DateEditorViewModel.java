@@ -58,13 +58,13 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
             private String sanitizeIncompleteRange(String dateString) {
                 String trimmed = dateString.trim();
 
-                // Remove the trailing slash (e.g., "2010/" → "2010")
+
                 if (trimmed.endsWith("/") && !trimmed.matches(".*\\d+/\\d+.*")) {
                     LOGGER.debug("Sanitizing incomplete range (trailing slash): {}", trimmed);
                     return trimmed.substring(0, trimmed.length() - 1).trim();
                 }
 
-                // Remove the leading slash (e.g., "/2010" → "2010")
+
                 if (trimmed.startsWith("/") && !trimmed.matches(".*\\d+/\\d+.*")) {
                     LOGGER.debug("Sanitizing incomplete range (leading slash): {}", trimmed);
                     return trimmed.substring(1).trim();
