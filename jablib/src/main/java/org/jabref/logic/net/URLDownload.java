@@ -232,7 +232,7 @@ public class URLDownload {
      * @param connection an existing connection
      * @return the downloaded string
      */
-    public static String asString(Charset encoding, URLConnection connection) throws FetcherException {
+    private static String asString(Charset encoding, URLConnection connection) throws FetcherException {
         try (InputStream input = new BufferedInputStream(connection.getInputStream());
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
