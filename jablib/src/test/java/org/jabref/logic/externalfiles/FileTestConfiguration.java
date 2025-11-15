@@ -43,7 +43,7 @@ public class FileTestConfiguration {
             BibTestConfiguration sourceBibTestConfiguration,
             BibTestConfiguration targetBibTestConfiguration
     ) {
-        this.tempDir = tempDir; // resolve(ThreadLocalRandom.current().nextInt();
+        this.tempDir = tempDir;
 
         if (mainFileDirectory == null) {
             when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());

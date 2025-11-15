@@ -3,6 +3,7 @@ package org.jabref.logic.externalfiles;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
@@ -22,15 +23,9 @@ import static org.mockito.Mockito.mock;
 // Assumption in all tests: if not contained in a library directory, paths are absolute
 class LinkedFileTransferHelperTest {
     private static @TempDir Path tempDir;
-    private static FilePreferences filePreferences = mock(FilePreferences.class);
+    private static @TempDir Path currentTempDir;
 
-    private BibDatabaseContext sourceContext;
-    private BibDatabaseContext targetContext;
-    private Path sourceDir;
-    private Path targetDir;
-    private Path testFile;
-    private BibEntry sourceEntry;
-    private BibEntry targetEntry;
+    private static FilePreferences filePreferences = mock(FilePreferences.class);
 
     @ParameterizedTest
     // @CsvSource could also be used, but there is no strong typing
@@ -50,6 +45,11 @@ class LinkedFileTransferHelperTest {
         assertEquals(fileTestConfiguration.targetContext.getDatabase().getEntries().getFirst(), actualEntry);
     }
 
+    static Path getNextTempDir() {
+        currentTempDir = tempDir.resolve(Integer.toString(ThreadLocalRandom.current().nextInt()));
+        return currentTempDir;
+    }
+
     static Stream<Arguments> check() throws IOException {
         return Stream.of(
                 // region shouldStoreFilesRelativeToBibFile
@@ -58,14 +58,14 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .tempDir(tempDir)
+                                .tempDir(getNextTempDir())
                                 .filePreferences(filePreferences)
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
                                 .sourceBibTestConfiguration(
                                         BibTestConfigurationBuilder
                                                 .bibTestConfiguration()
-                                                .tempDir(tempDir)
+                                                .tempDir(currentTempDir)
                                                 .bibDir("source-dir")
                                                 .pdfFileDir("source-dir")
                                                 .fileLinkMode(RELATIVE_TO_BIB)
@@ -74,7 +74,7 @@ class LinkedFileTransferHelperTest {
                                 .targetBibTestConfiguration(
                                         BibTestConfigurationBuilder
                                                 .bibTestConfiguration()
-                                                .tempDir(tempDir)
+                                                .tempDir(currentTempDir)
                                                 .bibDir("target-dir")
                                                 .pdfFileDir("target-dir")
                                                 .fileLinkMode(RELATIVE_TO_BIB)
