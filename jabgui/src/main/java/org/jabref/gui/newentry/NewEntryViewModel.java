@@ -33,19 +33,19 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter;
 import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser;
-import org.jabref.logic.importer.plaincitation.SeveralPlainCitationParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -357,13 +357,17 @@ public class NewEntryViewModel {
             }
 
             final PlainCitationParser parser = switch (parserChoice) {
-                case PlainCitationParserChoice.RULE_BASED -> new RuleBasedPlainCitationParser();
-                case PlainCitationParserChoice.GROBID -> new GrobidPlainCitationParser(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
-                case PlainCitationParserChoice.LLM -> new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
+                case PlainCitationParserChoice.RULE_BASED_GENERAL ->
+                        new RuleBasedPlainCitationParser();
+                case PlainCitationParserChoice.RULE_BASED_IEEE ->
+                        new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
+                case PlainCitationParserChoice.GROBID ->
+                        new GrobidPlainCitationParser(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
+                case PlainCitationParserChoice.LLM ->
+                        new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
             };
 
-            final SeveralPlainCitationParser setParser = new SeveralPlainCitationParser(parser);
-            final List<BibEntry> entries = setParser.parseSeveralPlainCitations(text);
+            final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
 
             if (entries.isEmpty()) {
                 return Optional.empty();

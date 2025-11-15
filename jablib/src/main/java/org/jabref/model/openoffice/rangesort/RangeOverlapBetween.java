@@ -82,8 +82,8 @@ public class RangeOverlapBetween {
                 //
                 // We return EQUAL_RANGE
                 RangeOverlapKind kind = equal ? RangeOverlapKind.EQUAL_RANGE
-                        : (touching ? RangeOverlapKind.TOUCH
-                        : RangeOverlapKind.OVERLAP);
+                                              : (touching ? RangeOverlapKind.TOUCH
+                                                          : RangeOverlapKind.OVERLAP);
 
                 List<V> valuesForOverlappingRanges = new ArrayList<>();
                 valuesForOverlappingRanges.add(aHolder);

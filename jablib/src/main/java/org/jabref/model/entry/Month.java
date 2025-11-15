@@ -2,12 +2,14 @@ package org.jabref.model.entry;
 
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Represents a Month of the Year.
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public enum Month {
 
     JANUARY("January", "jan", 1),
@@ -114,19 +116,45 @@ public enum Month {
     static Optional<Month> parseGermanShortMonth(String value) {
         value = value.toLowerCase();
         return switch (value) {
-            case "jan", "januar" -> Month.getMonthByNumber(1);
-            case "feb", "februar" -> Month.getMonthByNumber(2);
-            case "mär", "mae", "märz", "maerz" -> Month.getMonthByNumber(3);
-            case "apr", "april" -> Month.getMonthByNumber(4);
-            case "mai" -> Month.getMonthByNumber(5);
-            case "jun", "juni" -> Month.getMonthByNumber(6);
-            case "jul", "juli" -> Month.getMonthByNumber(7);
-            case "aug", "august" -> Month.getMonthByNumber(8);
-            case "sep", "september" -> Month.getMonthByNumber(9);
-            case "okt", "oktober" -> Month.getMonthByNumber(10);
-            case "nov", "november" -> Month.getMonthByNumber(11);
-            case "dez", "dezember" -> Month.getMonthByNumber(12);
-            default -> Optional.empty();
+            case "jan",
+                 "januar" ->
+                    Month.getMonthByNumber(1);
+            case "feb",
+                 "februar" ->
+                    Month.getMonthByNumber(2);
+            case "mär",
+                 "mae",
+                 "märz",
+                 "maerz" ->
+                    Month.getMonthByNumber(3);
+            case "apr",
+                 "april" ->
+                    Month.getMonthByNumber(4);
+            case "mai" ->
+                    Month.getMonthByNumber(5);
+            case "jun",
+                 "juni" ->
+                    Month.getMonthByNumber(6);
+            case "jul",
+                 "juli" ->
+                    Month.getMonthByNumber(7);
+            case "aug",
+                 "august" ->
+                    Month.getMonthByNumber(8);
+            case "sep",
+                 "september" ->
+                    Month.getMonthByNumber(9);
+            case "okt",
+                 "oktober" ->
+                    Month.getMonthByNumber(10);
+            case "nov",
+                 "november" ->
+                    Month.getMonthByNumber(11);
+            case "dez",
+                 "dezember" ->
+                    Month.getMonthByNumber(12);
+            default ->
+                    Optional.empty();
         };
     }
 

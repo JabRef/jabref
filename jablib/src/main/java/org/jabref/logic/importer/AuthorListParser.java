@@ -12,9 +12,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
-import org.jabref.model.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 
@@ -125,7 +125,7 @@ public class AuthorListParser {
 
     /**
      * Tries to get a simple BibTeX author list of the given string.
-     *
+     * <p>
      * This is an intermediate step in {@link #parse}. Since parse does not work in all cases,
      * this method can be used to get more valid BibTeX.
      *

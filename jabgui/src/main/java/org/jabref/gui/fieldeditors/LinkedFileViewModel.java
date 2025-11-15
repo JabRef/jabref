@@ -44,10 +44,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -171,7 +171,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return ControlHelper.truncateString(linkedFile.getDescription(), -1, "...",
                     ControlHelper.EllipsisPosition.CENTER) + " (" +
                     ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
-                    ControlHelper.EllipsisPosition.CENTER) + ")";
+                            ControlHelper.EllipsisPosition.CENTER) + ")";
         }
     }
 
@@ -203,8 +203,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public Observable[] getObservables() {
         List<Observable> observables = new ArrayList<>(Arrays.asList(linkedFile.getObservables()));
-        observables.add(downloadOngoing);
-        observables.add(downloadProgress);
         observables.add(isAutomaticallyFound);
         return observables.toArray(new Observable[0]);
     }
@@ -442,9 +440,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
             throw new UnsupportedOperationException("In order to download the file, the source url has to be an online link");
         }
 
+        DownloadLinkedFileAction downloadLinkedFileAction = getDownloadLinkedFileAction();
+        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
+        downloadLinkedFileAction.execute();
+    }
+
+    private DownloadLinkedFileAction getDownloadLinkedFileAction() {
         String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
-        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(
+        return new DownloadLinkedFileAction(
                 databaseContext,
                 entry,
                 linkedFile,
@@ -455,8 +459,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 taskExecutor,
                 fileName,
                 true);
-        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
-        downloadLinkedFileAction.execute();
     }
 
     public void download(boolean keepHtmlLink) {

@@ -1,0 +1,145 @@
+name: Check PR Format
+
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  check_title_format:
+    name: PR title must not contain "issue <number>"
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Check PR title
+        run: |
+          TITLE=$(gh pr view "${{ github.event.number }}" --json title --template '{{.title}}')
+          echo "Title: $TITLE"
+
+          if echo "$TITLE" | grep -Eiq 'issue ?#?[0-9]+.+'; then
+            echo "❌ Title contains 'issue <number>' — not allowed."
+            exit 1
+          fi
+
+          echo "✅ Title format OK"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  mandatory-checks-section-exists:
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
+    name: Mandatory Checks present
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+
+      - name: Check for existence of Mandatory Checks section
+        id: check_mandatory_section
+        run: |
+          set -e
+
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
+
+          if echo "$BODY" | grep -q "### Mandatory checks"; then
+            echo "✅ '### Mandatory checks' section found."
+          else
+            echo "❌ '### Mandatory checks' section is missing!"
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  checklist-checked:
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
+    name: PR checklist OK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Check for PR checklist
+        id: check_changelog_modification
+        run: |
+          set -e
+
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}' | grep -A5000 '### Mandatory checks')
+          echo "Found body: $BODY"
+
+          # Ensure the section exists
+          if ! printf '%s\n' "$BODY" | grep -q "### Mandatory checks"; then
+              echo "❌ '### Mandatory checks' section is missing!"
+              exit 1
+          fi
+
+          BOXES=$(printf '%s\n' "$BODY" | grep "^- \[")
+          echo "Found boxes: $BOXES"
+
+          while IFS= read -r line; do
+              if ! printf '%s\n' "$line" | grep -Eq "^- \[(x|/| )\] "; then
+                  echo "❌ Found improperly formatted checkbox: '$line'"
+                  exit 1
+              fi
+          done <<< "$BOXES"
+
+          LINE_COUNT=$(echo "$BOXES" | wc -l)
+
+          if [ "$LINE_COUNT" -ne 6 ]; then
+            echo "❌ Found $LINE_COUNT lines instead of 6 required lines"
+            exit 1
+          fi
+
+          echo "✅ All checkboxes are present and in the correct format."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v5
+        with:
+          name: pr_number
+          path: pr_number.txt

@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,17 +23,18 @@ import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.URLUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,9 +65,10 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
 
     private IEEEQueryTransformer transformer;
 
-    public IEEE(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        this.importerPreferences = Objects.requireNonNull(importerPreferences);
+    public IEEE(@NonNull ImportFormatPreferences importFormatPreferences,
+                @NonNull ImporterPreferences importerPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+        this.importerPreferences = importerPreferences;
     }
 
     /**
@@ -77,10 +78,14 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         BibEntry entry = new BibEntry();
 
         switch (jsonEntry.optString("content_type")) {
-            case "Books" -> entry.setType(StandardEntryType.Book);
-            case "Conferences" -> entry.setType(StandardEntryType.InProceedings);
-            case "Courses" -> entry.setType(StandardEntryType.Misc);
-            default -> entry.setType(StandardEntryType.Article);
+            case "Books" ->
+                    entry.setType(StandardEntryType.Book);
+            case "Conferences" ->
+                    entry.setType(StandardEntryType.InProceedings);
+            case "Courses" ->
+                    entry.setType(StandardEntryType.Misc);
+            default ->
+                    entry.setType(StandardEntryType.Article);
         }
 
         entry.setField(StandardField.ABSTRACT, jsonEntry.optString("abstract"));
@@ -133,9 +138,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws FetcherException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws FetcherException {
         String stampString = "";
 
         // Try URL first -- will primarily work for entries from the old IEEE search

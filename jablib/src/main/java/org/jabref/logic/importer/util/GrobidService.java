@@ -61,13 +61,13 @@ public class GrobidService {
      */
     public Optional<BibEntry> processCitation(String rawCitation, ImportFormatPreferences importFormatPreferences, ConsolidateCitations consolidateCitations) throws IOException, ParseException {
         Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + "/api/processCitation")
-                .header("Accept", MediaTypes.APPLICATION_BIBTEX)
-                .data("citations", rawCitation)
-                .data("consolidateCitations", String.valueOf(consolidateCitations.getCode()))
-                .method(Connection.Method.POST)
-                .ignoreContentType(true)
-                .timeout(100_000)
-                .execute();
+                                            .header("Accept", MediaTypes.APPLICATION_BIBTEX)
+                                            .data("citations", rawCitation)
+                                            .data("consolidateCitations", String.valueOf(consolidateCitations.getCode()))
+                                            .method(Connection.Method.POST)
+                                            .ignoreContentType(true)
+                                            .timeout(100_000)
+                                            .execute();
         String httpResponse = response.body();
         LOGGER.debug("raw citation -> response: {}, {}", rawCitation, httpResponse);
 
@@ -80,12 +80,12 @@ public class GrobidService {
 
     public List<BibEntry> processPDF(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
         Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + "/api/processHeaderDocument")
-                .header("Accept", MediaTypes.APPLICATION_BIBTEX)
-                .data("input", filePath.toString(), Files.newInputStream(filePath))
-                .method(Connection.Method.POST)
-                .ignoreContentType(true)
-                .timeout(20000)
-                .execute();
+                                            .header("Accept", MediaTypes.APPLICATION_BIBTEX)
+                                            .data("input", filePath.toString(), Files.newInputStream(filePath))
+                                            .method(Connection.Method.POST)
+                                            .ignoreContentType(true)
+                                            .timeout(20000)
+                                            .execute();
 
         String httpResponse = response.body();
 
@@ -94,13 +94,14 @@ public class GrobidService {
 
     public List<BibEntry> processReferences(List<Path> pathList, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
         List<BibEntry> entries = new ArrayList<>();
-        for (Path filePath: pathList) {
+        for (Path filePath : pathList) {
             entries.addAll(processReferences(filePath, importFormatPreferences));
         }
 
         return entries;
     }
 
+    /// Offline content-based implementation: [org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter#importDatabase(java.nio.file.Path)]
     public List<BibEntry> processReferences(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
         Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + "/api/processReferences")
                                             .header("Accept", MediaTypes.APPLICATION_BIBTEX)

@@ -3,12 +3,12 @@ package org.jabref.logic.exporter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.paint.Color;
-
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -20,7 +20,6 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.strings.StringUtil;
 
 public class GroupSerializer {
     private static String serializeAllEntriesGroup() {
@@ -97,7 +96,7 @@ public class GroupSerializer {
     private void appendGroupDetails(StringBuilder builder, AbstractGroup group) {
         builder.append(StringUtil.booleanToBinaryString(group.isExpanded()));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        builder.append(group.getColor().map(Color::toString).orElse(""));
+        builder.append(group.getColor().orElse(""));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         builder.append(group.getIconName().orElse(""));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
@@ -129,16 +128,28 @@ public class GroupSerializer {
 
     private String serializeGroup(AbstractGroup group) {
         return switch (group) {
-            case AllEntriesGroup _ -> serializeAllEntriesGroup();
-            case SmartGroup smartGroup -> serializeSmartGroup(smartGroup);
-            case ExplicitGroup explicitGroup -> serializeExplicitGroup(explicitGroup);
-            case KeywordGroup keywordGroup -> serializeKeywordGroup(keywordGroup);
-            case SearchGroup searchGroup -> serializeSearchGroup(searchGroup);
-            case AutomaticKeywordGroup keywordGroup -> serializeAutomaticKeywordGroup(keywordGroup);
-            case AutomaticPersonsGroup personsGroup -> serializeAutomaticPersonsGroup(personsGroup);
-            case TexGroup texGroup -> serializeTexGroup(texGroup);
-            case null -> throw new IllegalArgumentException("Group cannot be null");
-            default -> throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
+            case AllEntriesGroup _ ->
+                    serializeAllEntriesGroup();
+            case SmartGroup smartGroup ->
+                    serializeSmartGroup(smartGroup);
+            case ExplicitGroup explicitGroup ->
+                    serializeExplicitGroup(explicitGroup);
+            case KeywordGroup keywordGroup ->
+                    serializeKeywordGroup(keywordGroup);
+            case SearchGroup searchGroup ->
+                    serializeSearchGroup(searchGroup);
+            case AutomaticKeywordGroup keywordGroup ->
+                    serializeAutomaticKeywordGroup(keywordGroup);
+            case AutomaticPersonsGroup personsGroup ->
+                    serializeAutomaticPersonsGroup(personsGroup);
+            case AutomaticDateGroup dateGroup ->
+                    serializeAutomaticDateGroup(dateGroup);
+            case TexGroup texGroup ->
+                    serializeTexGroup(texGroup);
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
         };
     }
 
@@ -162,6 +173,18 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID);
         appendAutomaticGroupDetails(sb, group);
         sb.append(StringUtil.quote(group.getField().getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        appendGroupDetails(sb, group);
+        return sb.toString();
+    }
+
+    private String serializeAutomaticDateGroup(AutomaticDateGroup group) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID);
+        appendAutomaticGroupDetails(sb, group);
+        sb.append(StringUtil.quote(group.getField().getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(StringUtil.quote(group.getGranularity().name(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         appendGroupDetails(sb, group);
         return sb.toString();

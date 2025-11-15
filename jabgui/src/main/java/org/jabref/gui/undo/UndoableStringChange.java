@@ -1,8 +1,8 @@
 package org.jabref.gui.undo;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.strings.StringUtil;
 
 public class UndoableStringChange extends AbstractUndoableJabRefEdit {
 
@@ -22,8 +22,8 @@ public class UndoableStringChange extends AbstractUndoableJabRefEdit {
     public String getPresentationName() {
         return nameChange ? Localization.lang("change string name %0 to %1", StringUtil.boldHTML(oldValue),
                 StringUtil.boldHTML(newValue)) :
-                Localization.lang("change string content %0 to %1",
-                        StringUtil.boldHTML(oldValue), StringUtil.boldHTML(newValue));
+               Localization.lang("change string content %0 to %1",
+                       StringUtil.boldHTML(oldValue), StringUtil.boldHTML(newValue));
     }
 
     @Override

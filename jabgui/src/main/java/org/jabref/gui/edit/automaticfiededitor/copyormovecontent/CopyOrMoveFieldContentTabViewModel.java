@@ -13,13 +13,13 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -98,7 +98,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     }
 
     public void copyValue() {
-        NamedCompound copyFieldValueEdit = new NamedCompound("COPY_FIELD_VALUE");
+        NamedCompoundEdit copyFieldValueEdit = new NamedCompoundEdit("COPY_FIELD_VALUE");
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
@@ -124,7 +124,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     }
 
     public void moveValue() {
-        NamedCompound moveEdit = new NamedCompound("MOVE_EDIT");
+        NamedCompoundEdit moveEdit = new NamedCompoundEdit("MOVE_EDIT");
         int affectedEntriesCount = 0;
         if (overwriteFieldContent.get()) {
             affectedEntriesCount = new MoveFieldValueAction(fromField.get(),
@@ -142,7 +142,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     }
 
     public void swapValues() {
-        NamedCompound swapFieldValuesEdit = new NamedCompound("SWAP_FIELD_VALUES");
+        NamedCompoundEdit swapFieldValuesEdit = new NamedCompoundEdit("SWAP_FIELD_VALUES");
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");

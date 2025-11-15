@@ -12,9 +12,11 @@ import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -34,7 +36,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Loading of groups is tested at {@link org.jabref.logic.importer.util.GroupsParserTest}.
+ * Loading of groups is tested in the GroupsParserTest class.
  */
 class GroupSerializerTest {
 
@@ -71,14 +73,14 @@ class GroupSerializerTest {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         group.setIconName("test icon");
         group.setExpanded(true);
-        group.setColor(Color.ALICEBLUE);
+        group.setColor(Color.ALICEBLUE.toString());
         group.setDescription("test description");
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(List.of("0 StaticGroup:myExplicitGroup;0;1;0xf0f8ffff;test icon;test description;"), serialization);
     }
 
     @Test
-    // For https://github.com/JabRef/jabref/issues/1681
+        // For https://github.com/JabRef/jabref/issues/1681
     void serializeSingleExplicitGroupWithEscapedSlash() {
         ExplicitGroup group = new ExplicitGroup("B{\\\"{o}}hmer", GroupHierarchyType.INDEPENDENT, ',');
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
@@ -128,8 +130,32 @@ class GroupSerializerTest {
     }
 
     @Test
+    void serializeSingleAutomaticDateGroupWithYearGranularity() {
+        AutomaticDateGroup group = new AutomaticDateGroup("By Year", GroupHierarchyType.INDEPENDENT, StandardField.DATE, DateGranularity.YEAR);
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(List.of("0 AutomaticDateGroup:By Year;0;date;YEAR;1;;;;"), serialization);
+    }
+
+    @Test
+    void serializeSingleAutomaticDateGroupWithMonthGranularity() {
+        AutomaticDateGroup group = new AutomaticDateGroup("By Month", GroupHierarchyType.INCLUDING, StandardField.DATE, DateGranularity.MONTH);
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(List.of("0 AutomaticDateGroup:By Month;2;date;MONTH;1;;;;"), serialization);
+    }
+
+    @Test
+    void serializeSingleAutomaticDateGroupWithColorAndIcon() {
+        AutomaticDateGroup group = new AutomaticDateGroup("Publications", GroupHierarchyType.INDEPENDENT, StandardField.YEAR, DateGranularity.YEAR);
+        group.setColor(Color.BLUE.toString());
+        group.setIconName("calendar");
+        group.setDescription("Group by publication year");
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(List.of("0 AutomaticDateGroup:Publications;0;year;YEAR;1;0x0000ffff;calendar;Group by publication year;"), serialization);
+    }
+
+    @Test
     void serializeSingleTexGroup() throws IOException {
-        TexGroup group = TexGroup.create("myTexGroup", GroupHierarchyType.INDEPENDENT, Path.of("path", "To", "File"), new DefaultAuxParser(new BibDatabase()), new MetaData());
+        TexGroup group = TexGroup.create("myTexGroup", GroupHierarchyType.INDEPENDENT, Path.of("path", "To", "File"), new DefaultAuxParser(new BibDatabase()), new MetaData(), "");
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(List.of("0 TexGroup:myTexGroup;0;path/To/File;1;;;;"), serialization);
     }

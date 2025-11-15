@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -32,6 +31,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +52,9 @@ class ModsExporter extends Exporter {
     }
 
     @Override
-    public void export(final BibDatabaseContext databaseContext, final Path file, List<BibEntry> entries) throws SaveException {
-        Objects.requireNonNull(databaseContext);
-        Objects.requireNonNull(entries);
+    public void export(@NonNull final BibDatabaseContext databaseContext,
+                       final Path file,
+                       @NonNull List<BibEntry> entries) throws SaveException {
         if (entries.isEmpty()) { // Only export if entries exist
             return;
         }

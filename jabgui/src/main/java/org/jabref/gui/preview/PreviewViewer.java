@@ -1,8 +1,6 @@
 package org.jabref.gui.preview;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
@@ -32,10 +30,10 @@ import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
@@ -55,26 +53,26 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
     private static final String JS_GET_SELECTION_HTML_SCRIPT = """
-        function getSelectionHtml() {
-            var html = "";
-            if (typeof window.getSelection != "undefined") {
-                var sel = window.getSelection();
-                if (sel.rangeCount) {
-                    var container = document.createElement("div");
-                    for (var i = 0, len = sel.rangeCount; i < len; ++i) {
-                        container.appendChild(sel.getRangeAt(i).cloneContents());
+            function getSelectionHtml() {
+                var html = "";
+                if (typeof window.getSelection != "undefined") {
+                    var sel = window.getSelection();
+                    if (sel.rangeCount) {
+                        var container = document.createElement("div");
+                        for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                            container.appendChild(sel.getRangeAt(i).cloneContents());
+                        }
+                        html = container.innerHTML;
                     }
-                    html = container.innerHTML;
+                } else if (typeof document.selection != "undefined") {
+                    if (document.selection.type == "Text") {
+                        html = document.selection.createRange().htmlText;
+                    }
                 }
-            } else if (typeof document.selection != "undefined") {
-                if (document.selection.type == "Text") {
-                    html = document.selection.createRange().htmlText;
-                }
+                return html;
             }
-            return html;
-        }
-        getSelectionHtml();
-        """;
+            getSelectionHtml();
+            """;
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -210,13 +208,17 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private String formatError(BibEntry entry, Throwable exception) {
-        StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        return "%s\n\n%s\n\nBibTeX (internal):\n%s\n\nStack Trace:\n%s".formatted(
+        LOGGER.error("Error generating preview for entry: {}", entry.getCitationKey(), exception);
+
+        return """
+                <div class="error">
+                    <h3>%s</h3>
+                    <p>%s</p>
+                    <p><small>Check the event logs for details.</small></p>
+                </div>
+                """.formatted(
                 Localization.lang("Error while generating citation style"),
-                exception.getLocalizedMessage(),
-                entry,
-                sw);
+                exception.getLocalizedMessage() != null ? exception.getLocalizedMessage() : "Unknown error");
     }
 
     private void setPreviewText(String text) {

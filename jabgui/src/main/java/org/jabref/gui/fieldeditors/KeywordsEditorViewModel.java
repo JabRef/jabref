@@ -60,7 +60,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
         return keywordListProperty;
     }
 
-    public StringConverter<Keyword> getStringConverter() {
+    static StringConverter<Keyword> getStringConverter() {
         return new StringConverter<>() {
             @Override
             public String toString(Keyword keyword) {
@@ -68,12 +68,12 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
                     LOGGER.debug("Keyword is null");
                     return "";
                 }
-                return keyword.get();
+                return keyword.toString();
             }
 
             @Override
             public Keyword fromString(String keywordString) {
-                return new Keyword(keywordString);
+                return Keyword.ofHierarchical(keywordString);
             }
         };
     }

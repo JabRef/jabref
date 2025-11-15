@@ -36,40 +36,40 @@ class GitStatusCheckerTest {
     private final PersonIdent author = new PersonIdent("Tester", "tester@example.org");
 
     private final String baseContent = """
-        @article{a,
-          author = {initial-author},
-          doi = {xya},
-        }
+            @article{a,
+              author = {initial-author},
+              doi = {xya},
+            }
 
-        @article{b,
-          author = {initial-author},
-          doi = {xyz},
-        }
-        """;
+            @article{b,
+              author = {initial-author},
+              doi = {xyz},
+            }
+            """;
 
     private final String remoteUpdatedContent = """
-        @article{a,
-          author = {initial-author},
-          doi = {xya},
-        }
+            @article{a,
+              author = {initial-author},
+              doi = {xya},
+            }
 
-        @article{b,
-          author = {remote-update},
-          doi = {xyz},
-        }
-        """;
+            @article{b,
+              author = {remote-update},
+              doi = {xyz},
+            }
+            """;
 
     private final String localUpdatedContent = """
-        @article{a,
-          author = {local-update},
-          doi = {xya},
-        }
+            @article{a,
+              author = {local-update},
+              doi = {xya},
+            }
 
-        @article{b,
-          author = {initial-author},
-          doi = {xyz},
-        }
-        """;
+            @article{b,
+              author = {initial-author},
+              doi = {xyz},
+            }
+            """;
 
     @BeforeEach
     void setup(@TempDir Path tempDir) throws Exception {
@@ -79,9 +79,9 @@ class GitStatusCheckerTest {
 
         Path seedDir = tempDir.resolve("seed");
         seedGit = Git.init()
-                         .setInitialBranch("main")
-                         .setDirectory(seedDir.toFile())
-                         .call();
+                     .setInitialBranch("main")
+                     .setDirectory(seedDir.toFile())
+                     .call();
         Path seedFile = seedDir.resolve("library.bib");
         Files.writeString(seedFile, baseContent, StandardCharsets.UTF_8);
 
@@ -155,11 +155,11 @@ class GitStatusCheckerTest {
     void behindStatusWhenRemoteHasNewCommit(@TempDir Path tempDir) throws Exception {
         Path remoteWork = tempDir.resolve("remoteWork");
         try (Git remoteClone = Git.cloneRepository()
-                             .setURI(remoteGit.getRepository().getDirectory().toURI().toString())
-                             .setDirectory(remoteWork.toFile())
-                             .setBranchesToClone(List.of("refs/heads/main"))
-                             .setBranch("main")
-                             .call()) {
+                                  .setURI(remoteGit.getRepository().getDirectory().toURI().toString())
+                                  .setDirectory(remoteWork.toFile())
+                                  .setBranchesToClone(List.of("refs/heads/main"))
+                                  .setBranch("main")
+                                  .call()) {
             commitFile(remoteClone, remoteUpdatedContent, "Remote update");
             remoteClone.push()
                        .setRemote("origin")
@@ -187,11 +187,11 @@ class GitStatusCheckerTest {
 
         Path remoteWork = tempDir.resolve("remoteWork");
         try (Git remoteClone = Git.cloneRepository()
-                             .setURI(remoteGit.getRepository().getDirectory().toURI().toString())
-                             .setDirectory(remoteWork.toFile())
-                             .setBranchesToClone(List.of("refs/heads/main"))
-                             .setBranch("main")
-                             .call()) {
+                                  .setURI(remoteGit.getRepository().getDirectory().toURI().toString())
+                                  .setDirectory(remoteWork.toFile())
+                                  .setBranchesToClone(List.of("refs/heads/main"))
+                                  .setBranch("main")
+                                  .call()) {
             commitFile(remoteClone, remoteUpdatedContent, "Remote update");
             remoteClone.push()
                        .setRemote("origin")

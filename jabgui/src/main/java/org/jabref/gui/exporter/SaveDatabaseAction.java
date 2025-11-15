@@ -100,23 +100,23 @@ public class SaveDatabaseAction {
 
     private SelfContainedSaveOrder getSaveOrder() {
         return libraryTab.getBibDatabaseContext()
-                .getMetaData().getSaveOrder()
-                .map(so -> {
-                    if (so.getOrderType() == SaveOrder.OrderType.TABLE) {
-                        // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
-                        List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
-                        return new SelfContainedSaveOrder(
-                                SaveOrder.OrderType.SPECIFIED,
-                                sortOrder.stream()
-                                         .filter(col -> col instanceof MainTableColumn<?>)
-                                         .map(column -> ((MainTableColumn<?>) column).getModel())
-                                         .flatMap(model -> model.getSortCriteria().stream())
-                                         .toList());
-                    } else {
-                        return SelfContainedSaveOrder.of(so);
-                    }
-                })
-                .orElse(SaveOrder.getDefaultSaveOrder());
+                         .getMetaData().getSaveOrder()
+                         .map(so -> {
+                             if (so.getOrderType() == SaveOrder.OrderType.TABLE) {
+                                 // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
+                                 List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
+                                 return new SelfContainedSaveOrder(
+                                         SaveOrder.OrderType.SPECIFIED,
+                                         sortOrder.stream()
+                                                  .filter(col -> col instanceof MainTableColumn<?>)
+                                                  .map(column -> ((MainTableColumn<?>) column).getModel())
+                                                  .flatMap(model -> model.getSortCriteria().stream())
+                                                  .toList());
+                             } else {
+                                 return SelfContainedSaveOrder.of(so);
+                             }
+                         })
+                         .orElse(SaveOrder.getDefaultSaveOrder());
     }
 
     public void saveSelectedAsPlain() {
@@ -271,9 +271,9 @@ public class SaveDatabaseAction {
                         entryTypesManager);
 
                 if (selectedOnly) {
-                    databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                    databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
                 } else {
-                    databaseWriter.saveDatabase(bibDatabaseContext);
+                    databaseWriter.writeDatabase(bibDatabaseContext);
                 }
 
                 libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());

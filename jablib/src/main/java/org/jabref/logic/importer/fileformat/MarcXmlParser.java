@@ -19,6 +19,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.URLUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -26,7 +27,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -359,12 +359,18 @@ public class MarcXmlParser implements Parser {
 
                 if (StringUtil.isNotBlank(value)) {
                     switch (key) {
-                        case "number" -> bibEntry.setField(StandardField.NUMBER, value);
-                        case "year" -> bibEntry.setField(StandardField.YEAR, value);
-                        case "pages" -> bibEntry.setField(StandardField.PAGES, value);
-                        case "volume" -> bibEntry.setField(StandardField.VOLUME, value);
-                        case "day" -> bibEntry.setField(StandardField.DAY, value);
-                        case "month" -> bibEntry.setField(StandardField.MONTH, value);
+                        case "number" ->
+                                bibEntry.setField(StandardField.NUMBER, value);
+                        case "year" ->
+                                bibEntry.setField(StandardField.YEAR, value);
+                        case "pages" ->
+                                bibEntry.setField(StandardField.PAGES, value);
+                        case "volume" ->
+                                bibEntry.setField(StandardField.VOLUME, value);
+                        case "day" ->
+                                bibEntry.setField(StandardField.DAY, value);
+                        case "month" ->
+                                bibEntry.setField(StandardField.MONTH, value);
                     }
                 }
             }

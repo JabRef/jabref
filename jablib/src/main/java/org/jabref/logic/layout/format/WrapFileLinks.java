@@ -57,7 +57,7 @@ import org.jabref.model.entry.LinkedFile;
 /// ```
 /// 1. John's final report (/home/john/report.pdf)
 /// 2. An early "draft" (/home/john/draft.txt)
-/// ```
+///```
 ///
 /// If the formatter was called with a second argument, the list would be filtered.
 /// For instance:
@@ -68,7 +68,7 @@ import org.jabref.model.entry.LinkedFile;
 ///
 /// ```
 /// 1. An early "draft" (/home/john/draft.txt)
-/// ```
+///```
 ///
 /// If we wanted this output to be part of an XML styled output, the quotes in the
 /// file description could cause problems. Adding two additional arguments to translate
@@ -80,7 +80,7 @@ import org.jabref.model.entry.LinkedFile;
 ///
 /// ```
 /// 1. An early &quot;draft&quot; (/home/john/draft.txt)
-/// ```
+///```
 ///
 /// Additional pairs of replacements can be added.
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
@@ -229,7 +229,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             break;
                         case FILE_EXTENSION:
                             FileUtil.getFileExtension(flEntry.getLink())
-                                      .ifPresent(extension -> sb.append(replaceStrings(extension)));
+                                    .ifPresent(extension -> sb.append(replaceStrings(extension)));
                             break;
                         case FILE_TYPE:
                             sb.append(replaceStrings(flEntry.getFileType()));

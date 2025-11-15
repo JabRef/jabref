@@ -6,9 +6,9 @@ import java.nio.file.Path;
 
 import org.jabref.logic.util.NotificationService;
 
-import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.MVStoreException;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +17,8 @@ public abstract class MVStoreBase implements AutoCloseable {
 
     protected MVStore mvStore;
 
-    public MVStoreBase(Path path, NotificationService dialogService) {
-        @Nullable Path mvStorePath = path;
+    public MVStoreBase(@NonNull Path path, NotificationService dialogService) {
+        Path mvStorePath = path;
 
         try {
             Files.createDirectories(path.getParent());

@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -18,6 +17,7 @@ import org.jabref.logic.util.strings.StringSimilarity;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
@@ -36,7 +36,7 @@ public class JournalAbbreviationRepository {
     /**
      * Initializes the internal data based on the abbreviations found in the given MV file
      *
-     * @param journalList The path to the MV file containing the journal abbreviations.
+     * @param journalList    The path to the MV file containing the journal abbreviations.
      * @param ltwaRepository The LTWA repository to use for abbreviations.
      */
     public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {
@@ -148,9 +148,9 @@ public class JournalAbbreviationRepository {
         }
 
         Optional<Abbreviation> abbreviation = Optional.ofNullable(fullToAbbreviationObject.get(journal))
-                .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
-                .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
-                .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
+                                                      .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
+                                                      .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
+                                                      .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
 
         if (abbreviation.isEmpty()) {
             abbreviation = findAbbreviationFuzzyMatched(journal);
@@ -173,9 +173,9 @@ public class JournalAbbreviationRepository {
         final double SIMILARITY_THRESHOLD = 1.0;
 
         List<Abbreviation> candidates = abbreviations.stream()
-                .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
-                .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
-                .toList();
+                                                     .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
+                                                     .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
+                                                     .toList();
 
         if (candidates.isEmpty()) {
             return Optional.empty();
@@ -194,9 +194,7 @@ public class JournalAbbreviationRepository {
         return Optional.of(candidates.getFirst());
     }
 
-    public void addCustomAbbreviation(Abbreviation abbreviation) {
-        Objects.requireNonNull(abbreviation);
-
+    public void addCustomAbbreviation(@NonNull Abbreviation abbreviation) {
         // We do NOT want to keep duplicates
         // The set automatically "removes" duplicates
         // What is a duplicate? An abbreviation is NOT the same if any field is NOT equal (e.g., if the shortest unique differs, the abbreviation is NOT the same)

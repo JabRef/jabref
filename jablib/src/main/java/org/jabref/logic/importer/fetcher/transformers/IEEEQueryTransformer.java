@@ -3,11 +3,11 @@ package org.jabref.logic.importer.fetcher.transformers;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.casechanger.Word;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Needs to be instantiated for each new query
- *
+ * <p>
  * Stop words are ignored. See ADR-0022.
  */
 public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
@@ -57,8 +57,10 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return switch (fieldAsString) {
-            case "article_number" -> handleArticleNumber(term);
-            default -> super.handleOtherField(fieldAsString, term);
+            case "article_number" ->
+                    handleArticleNumber(term);
+            default ->
+                    super.handleOtherField(fieldAsString, term);
         };
     }
 

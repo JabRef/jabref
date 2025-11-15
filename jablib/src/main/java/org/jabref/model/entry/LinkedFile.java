@@ -22,8 +22,8 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -50,11 +50,11 @@ public class LinkedFile implements Serializable {
     private transient StringProperty sourceURL = new SimpleStringProperty();
 
     public LinkedFile(String description, Path link, String fileType) {
-        this(Objects.requireNonNull(description), Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
+        this(description, link.toString(), fileType);
     }
 
     public LinkedFile(String description, Path link, String fileType, String sourceUrl) {
-        this(Objects.requireNonNull(description), Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType), Objects.requireNonNull(sourceUrl));
+        this(description, link.toString(), fileType, sourceUrl);
     }
 
     public LinkedFile(String description, String link, FileType fileType) {
@@ -65,9 +65,9 @@ public class LinkedFile implements Serializable {
      * Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.
      */
     public LinkedFile(String description, String link, String fileType, String sourceUrl) {
-        this.description.setValue(Objects.requireNonNull(description));
+        this.description.setValue(description);
         setLink(link);
-        this.fileType.setValue(Objects.requireNonNull(fileType));
+        this.fileType.setValue(fileType);
         this.sourceURL.setValue(sourceUrl);
     }
 
@@ -76,22 +76,22 @@ public class LinkedFile implements Serializable {
     }
 
     public LinkedFile(URL link, String fileType) {
-        this("", Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
+        this("", link.toString(), fileType);
     }
 
     public LinkedFile(String description, URL link, String fileType) {
-        this(description, Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
+        this(description, link.toString(), fileType);
     }
 
     public LinkedFile(String description, URL link, String fileType, String sourceUrl) {
-        this(description, Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType), Objects.requireNonNull(sourceUrl));
+        this(description, link.toString(), fileType, sourceUrl);
     }
 
     /**
      * Constructs a new LinkedFile with an empty file type and an empty description
      */
     public LinkedFile(Path link) {
-        this("", Objects.requireNonNull(link), "");
+        this("", link, "");
     }
 
     public StringProperty descriptionProperty() {

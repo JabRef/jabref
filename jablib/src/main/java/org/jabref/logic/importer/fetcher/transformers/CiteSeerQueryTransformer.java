@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher.transformers;
 import java.util.Calendar;
 import java.util.Optional;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
@@ -67,15 +67,15 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleYearRange(String yearRange) {
-         parseYearRange(yearRange);
-         if (endYear == Integer.MAX_VALUE) { // invalid year range
-             Calendar calendar = Calendar.getInstance();
-             this.getJSONPayload().put("yearEnd", calendar.get(Calendar.YEAR));
-             return "";
-         }
-         this.getJSONPayload().put("yearStart", startYear);
-         this.getJSONPayload().put("yearEnd", endYear);
-         return yearRange;
+        parseYearRange(yearRange);
+        if (endYear == Integer.MAX_VALUE) { // invalid year range
+            Calendar calendar = Calendar.getInstance();
+            this.getJSONPayload().put("yearEnd", calendar.get(Calendar.YEAR));
+            return "";
+        }
+        this.getJSONPayload().put("yearStart", startYear);
+        this.getJSONPayload().put("yearEnd", endYear);
+        return yearRange;
     }
 
     /**
@@ -85,11 +85,16 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return switch (fieldAsString) {
-            case "page" -> handlePage(term);
-            case "pageSize" -> handlePageSize(term);
-            case "must_have_pdf" -> handleMustHavePdf(term);
-            case "sortBy" -> handleSortBy(term);
-            default -> super.handleOtherField(fieldAsString, term);
+            case "page" ->
+                    handlePage(term);
+            case "pageSize" ->
+                    handlePageSize(term);
+            case "must_have_pdf" ->
+                    handleMustHavePdf(term);
+            case "sortBy" ->
+                    handleSortBy(term);
+            default ->
+                    super.handleOtherField(fieldAsString, term);
         };
     }
 

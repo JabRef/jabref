@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ public class Version {
 
     private static final Version UNKNOWN_VERSION = new Version();
 
-    private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<num>\\d+)?(?<dev>-?dev)?.*");
+    private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?:[._]?(?<num>\\d+))?(?<dev>-?dev)?.*");
     private final static Pattern CI_SUFFIX_PATTERN = Pattern.compile("-ci\\.\\d+");
 
     private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
@@ -123,8 +124,7 @@ public class Version {
     /**
      * @return true if this version is newer than the passed one
      */
-    public boolean isNewerThan(Version otherVersion) {
-        Objects.requireNonNull(otherVersion);
+    public boolean isNewerThan(@NonNull Version otherVersion) {
         if (Objects.equals(this, otherVersion)) {
             return false;
         } else if (BuildInfo.UNKNOWN_VERSION.equals(this.getFullVersion())) {

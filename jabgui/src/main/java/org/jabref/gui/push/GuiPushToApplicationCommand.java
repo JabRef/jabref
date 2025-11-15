@@ -2,7 +2,6 @@ package org.jabref.gui.push;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
@@ -18,8 +17,8 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -72,13 +71,13 @@ public class GuiPushToApplicationCommand extends SimpleCommand {
     private void setApplication(String applicationName) {
         final ActionFactory factory = new ActionFactory();
         GuiPushToApplication application = GuiPushToApplications.getGUIApplicationByName(
-                                                                  applicationName,
-                                                                  dialogService,
-                                                                  preferences.getPushToApplicationPreferences())
+                                                                        applicationName,
+                                                                        dialogService,
+                                                                        preferences.getPushToApplicationPreferences())
                                                                 .orElseGet(() -> new GuiPushToEmacs(dialogService, preferences.getPushToApplicationPreferences()));
 
         preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
-        this.application = Objects.requireNonNull(application);
+        this.application = application;
 
         reconfigurableControls.forEach(object -> {
             if (object instanceof MenuItem item) {

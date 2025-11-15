@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
@@ -91,7 +91,7 @@ public class OS {
                     ShellLink link = new ShellLink(texworksLinkPath);
                     return link.resolveTarget();
                 } catch (IOException |
-                        ShellLinkException e) {
+                         ShellLinkException e) {
                     // Static logger instance cannot be used. See the class comment.
                     Logger logger = LoggerFactory.getLogger(OS.class);
                     logger.warn("Error while reading .lnk file for TeXworks", e);

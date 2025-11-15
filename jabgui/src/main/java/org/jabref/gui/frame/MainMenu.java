@@ -81,6 +81,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -111,6 +112,7 @@ public class MainMenu extends MenuBar {
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
     private final AiService aiService;
     private final PreviewControls previewControls;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -127,7 +129,8 @@ public class MainMenu extends MenuBar {
                     ClipBoardManager clipBoardManager,
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                     AiService aiService,
-                    PreviewControls previewControls) {
+                    PreviewControls previewControls,
+                    GitHandlerRegistry gitHandlerRegistry) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
         this.sidePane = sidePane;
@@ -144,6 +147,7 @@ public class MainMenu extends MenuBar {
         this.openDatabaseActionSupplier = openDatabaseActionSupplier;
         this.aiService = aiService;
         this.previewControls = previewControls;
+        this.gitHandlerRegistry = gitHandlerRegistry;
 
         createMenu();
     }
@@ -166,7 +170,6 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -185,8 +188,8 @@ public class MainMenu extends MenuBar {
                 // TODO: Should be only enabled if not yet shared.
                 factory.createSubMenu(StandardActions.GIT,
                         factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(dialogService, stateManager)),
-                        factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(dialogService, stateManager, preferences, taskExecutor)),
-                        factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(dialogService, stateManager, preferences, taskExecutor)),
+                        factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),
+                        factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),
                         new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),

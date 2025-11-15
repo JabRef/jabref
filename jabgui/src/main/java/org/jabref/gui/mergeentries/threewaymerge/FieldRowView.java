@@ -16,9 +16,10 @@ import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.UnifiedDiffHigh
 import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.threewaymerge.toolbar.ThreeWayMergeToolbar;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
@@ -46,7 +47,7 @@ public class FieldRowView {
     public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, GuiPreferences preferences, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
-        fieldNameCell = new FieldNameCell(field.getDisplayName(), rowIndex);
+        fieldNameCell = new FieldNameCell(FieldTextMapper.getDisplayName(field), rowIndex);
         leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferences);
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferences);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);

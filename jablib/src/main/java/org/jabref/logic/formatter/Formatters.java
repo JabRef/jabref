@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -30,6 +29,7 @@ import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
+import org.jabref.logic.formatter.bibtexfields.TransliterateFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.CamelFormatter;
@@ -46,6 +46,8 @@ import org.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+
+import org.jspecify.annotations.NonNull;
 
 public class Formatters {
     private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
@@ -65,7 +67,8 @@ public class Formatters {
                 new HtmlToUnicodeFormatter(),
                 new LatexToUnicodeFormatter(),
                 new UnicodeToLatexFormatter(),
-                new ConvertMSCCodesFormatter()
+                new ConvertMSCCodesFormatter(),
+                new TransliterateFormatter()
         );
     }
 
@@ -121,14 +124,11 @@ public class Formatters {
         return all;
     }
 
-    public static Optional<Formatter> getFormatterForKey(String name) {
-        Objects.requireNonNull(name);
+    public static Optional<Formatter> getFormatterForKey(@NonNull String name) {
         return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();
     }
 
-    public static Optional<Formatter> getFormatterForModifier(String modifier) {
-        Objects.requireNonNull(modifier);
-
+    public static Optional<Formatter> getFormatterForModifier(@NonNull String modifier) {
         switch (modifier) {
             case "lower":
                 return Optional.of(new LowerCaseFormatter());

@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * This formatter escapes characters so that they are suitable for HTML.
@@ -14,13 +14,12 @@ import org.jabref.model.strings.StringUtil;
 public class HTMLChars implements ParamLayoutFormatter {
 
     private static final Map<String, String> HTML_CHARS = HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;
-    /**
-     * This regex matches '<b>&</b>' that DO NOT BEGIN an HTML entity.
-     * <p>
-     * <b>&</b>{@literal amp;} <b>Not Matched</b><br>
-     * <b>&</b>{@literal #34;} <b>Not Matched</b><br>
-     * <b>&</b>Hey <b>Matched</b>
-     * */
+
+    /// This regex matches `&` that **do not begin** an HTML entity.
+    ///
+    /// - `&amp;` **Not Matched**
+    /// - `&#34;` **Not Matched**
+    /// - `&Hey` **Matched**
     private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("&(?!(?:[a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});)");
 
     private boolean keepCurlyBraces = false;

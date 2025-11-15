@@ -69,11 +69,16 @@ public class FileFilterUtils {
         FileFilterUtils fileFilter = new FileFilterUtils();
         LocalDateTime fileTime = FileFilterUtils.getFileTime(path);
         boolean isInDateRange = switch (filter) {
-            case DAY -> fileFilter.isDuringLastDay(fileTime);
-            case WEEK -> fileFilter.isDuringLastWeek(fileTime);
-            case MONTH -> fileFilter.isDuringLastMonth(fileTime);
-            case YEAR -> fileFilter.isDuringLastYear(fileTime);
-            case ALL_TIME -> true;
+            case DAY ->
+                    fileFilter.isDuringLastDay(fileTime);
+            case WEEK ->
+                    fileFilter.isDuringLastWeek(fileTime);
+            case MONTH ->
+                    fileFilter.isDuringLastMonth(fileTime);
+            case YEAR ->
+                    fileFilter.isDuringLastYear(fileTime);
+            case ALL_TIME ->
+                    true;
         };
         return isInDateRange;
     }
@@ -84,11 +89,11 @@ public class FileFilterUtils {
      */
     public List<Path> sortByDateAscending(List<Path> files) {
         return files.stream()
-                .sorted(Comparator.comparingLong(file -> FileFilterUtils.getFileTime(file)
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli()))
-                .collect(Collectors.toList());
+                    .sorted(Comparator.comparingLong(file -> FileFilterUtils.getFileTime(file)
+                                                                            .atZone(ZoneId.systemDefault())
+                                                                            .toInstant()
+                                                                            .toEpochMilli()))
+                    .collect(Collectors.toList());
     }
 
     /**
@@ -97,11 +102,11 @@ public class FileFilterUtils {
      */
     public List<Path> sortByDateDescending(List<Path> files) {
         return files.stream()
-                .sorted(Comparator.comparingLong(file -> -FileFilterUtils.getFileTime(file)
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli()))
-                .collect(Collectors.toList());
+                    .sorted(Comparator.comparingLong(file -> -FileFilterUtils.getFileTime(file)
+                                                                             .atZone(ZoneId.systemDefault())
+                                                                             .toInstant()
+                                                                             .toEpochMilli()))
+                    .collect(Collectors.toList());
     }
 
     /**
@@ -111,9 +116,12 @@ public class FileFilterUtils {
     public static List<Path> sortByDate(List<Path> files, ExternalFileSorter sortType) {
         FileFilterUtils fileFilter = new FileFilterUtils();
         List<Path> sortedFiles = switch (sortType) {
-            case DEFAULT -> files;
-            case DATE_ASCENDING -> fileFilter.sortByDateDescending(files);
-            case DATE_DESCENDING -> fileFilter.sortByDateAscending(files);
+            case DEFAULT ->
+                    files;
+            case DATE_ASCENDING ->
+                    fileFilter.sortByDateDescending(files);
+            case DATE_DESCENDING ->
+                    fileFilter.sortByDateAscending(files);
         };
         return sortedFiles;
     }

@@ -90,10 +90,10 @@ class RenamePdfCleanupTest {
         cleanup.cleanup(entry);
 
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(
-                Arrays.asList(
-                        new LinkedFile("", Path.of(""), ""),
-                        new LinkedFile("", Path.of("Toot - test title.tmp"), ""),
-                        new LinkedFile("", Path.of(""), "")))),
+                        Arrays.asList(
+                                new LinkedFile("", Path.of(""), ""),
+                                new LinkedFile("", Path.of("Toot - test title.tmp"), ""),
+                                new LinkedFile("", Path.of(""), "")))),
                 entry.getField(StandardField.FILE));
     }
 

@@ -68,9 +68,12 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         // SaveOrderConfigPanel, included via <?import ...> in FXML
 
         switch (saveOrder.getOrderType()) {
-            case SPECIFIED -> saveInSpecifiedOrderProperty.setValue(true);
-            case ORIGINAL -> saveInOriginalProperty.setValue(true);
-            case TABLE -> saveInTableOrderProperty.setValue(true);
+            case SPECIFIED ->
+                    saveInSpecifiedOrderProperty.setValue(true);
+            case ORIGINAL ->
+                    saveInOriginalProperty.setValue(true);
+            case TABLE ->
+                    saveInTableOrderProperty.setValue(true);
         }
 
         sortableFieldsProperty.clear();

@@ -1,5 +1,7 @@
 package org.jabref.languageserver.util;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,10 +12,10 @@ import java.util.stream.Stream;
 import org.jabref.languageserver.ExtensionSettings;
 import org.jabref.languageserver.LspClientHandler;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -27,20 +29,20 @@ public class LspDiagnosticHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(LspDiagnosticHandler.class);
     private static final int NO_VERSION = -1;
 
-    private final CliPreferences jabRefCliPreferences;
     private final LspIntegrityCheck lspIntegrityCheck;
     private final LspConsistencyCheck lspConsistencyCheck;
     private final LspClientHandler clientHandler;
+    private final LspParserHandler parserHandler;
+    private final CliPreferences cliPreferences;
     private final Map<String, List<Diagnostic>> integrityDiagnosticsCache; // Maps file URIs to the corresponding list of integrity diagnostics
     private final Map<String, List<Diagnostic>> consistencyDiagnosticsCache; // Maps file URIs to the corresponding list of consistency diagnostics
 
-    private LanguageClient client;
-
-    public LspDiagnosticHandler(LspClientHandler clientHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+    public LspDiagnosticHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.clientHandler = clientHandler;
-        this.jabRefCliPreferences = cliPreferences;
+        this.parserHandler = parserHandler;
+        this.cliPreferences = cliPreferences;
         this.lspIntegrityCheck = new LspIntegrityCheck(cliPreferences, abbreviationRepository);
-        this.lspConsistencyCheck = new LspConsistencyCheck();
+        this.lspConsistencyCheck = new LspConsistencyCheck(clientHandler.getSettings());
         this.integrityDiagnosticsCache = new ConcurrentHashMap<>();
         this.consistencyDiagnosticsCache = new ConcurrentHashMap<>();
     }
@@ -63,34 +65,45 @@ public class LspDiagnosticHandler {
     }
 
     private List<Diagnostic> computeDiagnostics(String content, String uri) {
-        BibDatabaseContext bibDatabaseContext;
+        List<Diagnostic> diagnostics = new ArrayList<>();
+        ParserResult parserResult;
+
         try {
-            bibDatabaseContext = BibDatabaseContext.of(content, jabRefCliPreferences.getImportFormatPreferences());
-        } catch (JabRefException e) {
+            parserResult = parserHandler.parserResultFromString(uri, content, cliPreferences.getImportFormatPreferences());
+        } catch (JabRefException | IOException e) {
             Diagnostic parseDiagnostic = LspDiagnosticBuilder.create(Localization.lang(
                     "Failed to parse entries.\nThe following error was encountered:\n%0",
                     e.getMessage())).setSeverity(DiagnosticSeverity.Error).build();
             return List.of(parseDiagnostic);
         }
 
+        parserResult.getWarningsMap().forEach((range, message) -> {
+            Diagnostic warningDiagnostic = LspDiagnosticBuilder.create(message).setRange(range).setSeverity(DiagnosticSeverity.Error).build();
+            diagnostics.add(warningDiagnostic);
+        });
+
         if (clientHandler.getSettings().isIntegrityCheck()) {
-            integrityDiagnosticsCache.put(uri, lspIntegrityCheck.check(bibDatabaseContext, content));
+            integrityDiagnosticsCache.put(uri, lspIntegrityCheck.check(parserResult));
             LOGGER.debug("Cached integrity diagnostics for {}", uri);
         }
 
         if (clientHandler.getSettings().isConsistencyCheck()) {
-            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(bibDatabaseContext, content));
+            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult));
             LOGGER.debug("Cached consistency diagnostics for {}", uri);
         }
 
-        return getFinalDiagnosticsList(uri);
+        return Stream.of(getFinalDiagnosticsList(uri), diagnostics).flatMap(List::stream).toList();
     }
 
     private List<Diagnostic> getFinalDiagnosticsList(String uri) {
         ExtensionSettings settings = clientHandler.getSettings();
         return Stream.concat(
-                settings.isIntegrityCheck() ? integrityDiagnosticsCache.getOrDefault(uri, List.of()).stream() : Stream.empty(),
-                settings.isConsistencyCheck() ? consistencyDiagnosticsCache.getOrDefault(uri, List.of()).stream() : Stream.empty()
+                settings.isIntegrityCheck() ?
+                integrityDiagnosticsCache.getOrDefault(uri, List.of()).stream() :
+                Stream.empty(),
+                settings.isConsistencyCheck() ?
+                consistencyDiagnosticsCache.getOrDefault(uri, List.of()).stream() :
+                Stream.empty()
         ).toList();
     }
 

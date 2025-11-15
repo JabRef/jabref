@@ -3,6 +3,7 @@ package org.jabref.languageserver.controller;
 import org.jabref.languageserver.LspLauncher;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -24,13 +25,13 @@ public class LanguageServerController implements AutoCloseable {
         LOGGER.debug("LanguageServerController initialized.");
     }
 
-    public synchronized void start(int port) {
+    public synchronized void start(RemoteMessageHandler messageHandler, int port) {
         if (lspLauncher != null) {
             LOGGER.warn("Language server controller already started, cannot start again.");
             return;
         }
 
-        lspLauncher = new LspLauncher(cliPreferences, abbreviationRepository, port);
+        lspLauncher = new LspLauncher(messageHandler, cliPreferences, abbreviationRepository, port);
         // This enqueues the thread to run in the background
         // The JVM will take care of running it at some point in time in the future
         // Thus, we cannot check directly if it really runs

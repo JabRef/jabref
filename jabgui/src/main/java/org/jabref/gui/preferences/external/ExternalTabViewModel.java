@@ -26,7 +26,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -166,9 +166,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         dialogPane.setContent(settings.getSettingsPane());
 
         dialogService.showCustomDialogAndWait(
-                Localization.lang("Application settings"),
-                dialogPane,
-                ButtonType.OK, ButtonType.CANCEL)
+                             Localization.lang("Application settings"),
+                             dialogPane,
+                             ButtonType.OK, ButtonType.CANCEL)
                      .ifPresent(btn -> {
                                  if (btn == ButtonType.OK) {
                                      settings.storeSettings();

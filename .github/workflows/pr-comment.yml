@@ -7,7 +7,8 @@ name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Source Code Tests", "On PR opened/updated", "PR Tests"]
+    # note when updating via a PR and testing - `workflow_run` executes from the `main` branch and not the PR branch
+    workflows: ["Source Code Tests", "On PR opened/updated", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md"]
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
     types: [completed]
   workflow_dispatch:
@@ -31,7 +32,8 @@ jobs:
     steps:
       - name: Download PR number
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
+        continue-on-error: true
         with:
           name: pr_number
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -41,6 +43,7 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' }}
         id: read-pr_number
         run: |
+          touch pr_number.txt
           PR_NUMBER=$(cat pr_number.txt)
           echo "Read PR number $PR_NUMBER"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
@@ -89,7 +92,7 @@ jobs:
       # This step runs in both cases using the proper variables.
       - name: ghprcomment@main
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
-        uses: jbangdev/jbang-action@v0.129.0
+        uses: jbangdev/jbang-action@v0.132.1
         with:
           script: https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
           scriptargs: "-r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}"

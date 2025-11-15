@@ -2,11 +2,13 @@ package org.jabref.model.entry;
 
 import java.util.Optional;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Represents a Season of the Year.
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public enum Season {
 
     SPRING("spring", 21),
@@ -94,11 +96,16 @@ public enum Season {
     static Optional<Season> parseGermanSeason(String value) {
         value = value.toLowerCase();
         return switch (value) {
-            case "frühling" -> Optional.of(SPRING);
-            case "sommer" -> Optional.of(SUMMER);
-            case "herbst" -> Optional.of(AUTUMN);
-            case "winter" -> Optional.of(WINTER);
-            default -> Optional.empty();
+            case "frühling" ->
+                    Optional.of(SPRING);
+            case "sommer" ->
+                    Optional.of(SUMMER);
+            case "herbst" ->
+                    Optional.of(AUTUMN);
+            case "winter" ->
+                    Optional.of(WINTER);
+            default ->
+                    Optional.empty();
         };
     }
 

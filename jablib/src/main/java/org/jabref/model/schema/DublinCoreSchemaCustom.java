@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  A DublinCoreSchema extension Class.
- *  In case anyone intends to alter standard behaviour.
+ * A DublinCoreSchema extension Class.
+ * In case anyone intends to alter standard behaviour.
  */
 @StructuredType(preferedPrefix = "dc", namespace = "http://purl.org/dc/elements/1.1/")
 public class DublinCoreSchemaCustom extends DublinCoreSchema {
@@ -44,8 +44,8 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
     }
 
     /**
-     *  Overloaded XMP Schema method
-     *  Behaviour is same except when seqName is "Date". Will return raw value instead
+     * Overloaded XMP Schema method
+     * Behaviour is same except when seqName is "Date". Will return raw value instead
      */
     @Override
     public List<String> getUnqualifiedSequenceValueList(String seqName) {
@@ -53,10 +53,10 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
         if (abstractProperty instanceof ArrayProperty property) {
             if ("date".equals(seqName)) {
                 return property.getContainer()
-                        .getAllProperties()
-                        .stream()
-                        .map(field -> (String) ((DateType) field).getRawValue())
-                        .collect(Collectors.toList());
+                               .getAllProperties()
+                               .stream()
+                               .map(field -> (String) ((DateType) field).getRawValue())
+                               .collect(Collectors.toList());
             }
             return property.getElementsAsString();
         }

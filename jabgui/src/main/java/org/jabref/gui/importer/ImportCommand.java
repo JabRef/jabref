@@ -23,8 +23,8 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -195,8 +195,8 @@ public class ImportCommand extends SimpleCommand {
                         () -> dialogService.showWarningDialogAndWait(
                                 Localization.lang("Import error"),
                                 Localization.lang("Please check your library file for wrong syntax.")
-                                + "\n\n"
-                                + ex.getLocalizedMessage()));
+                                        + "\n\n"
+                                        + ex.getLocalizedMessage()));
             }
         }
 

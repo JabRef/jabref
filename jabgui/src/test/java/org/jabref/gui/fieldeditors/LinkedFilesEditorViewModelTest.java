@@ -16,6 +16,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
@@ -34,6 +35,7 @@ class LinkedFilesEditorViewModelTest {
     private final UndoManager undoManager = mock(UndoManager.class);
 
     @Test
+    @Disabled("Runs in UI AND downloads data. This causes troubles. If @FetcherTest: UI framework cannot be started. If GuiTest: Too many connection errors")
     void urlFieldShouldDownloadFile(@TempDir Path tempDir) {
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
@@ -41,11 +43,11 @@ class LinkedFilesEditorViewModelTest {
         when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempDir));
 
         viewModel = new LinkedFilesEditorViewModel(StandardField.FILE, new EmptySuggestionProvider(), mock(DialogService.class), bibDatabaseContext,
-                           new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferences, undoManager);
+                new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferences, undoManager);
 
         BibEntry entry = new BibEntry().withCitationKey("test")
-            .withField(StandardField.URL, "https://ceur-ws.org/Vol-847/paper6.pdf");
-                viewModel.entry = entry;
+                                       .withField(StandardField.URL, "https://ceur-ws.org/Vol-847/paper6.pdf");
+        viewModel.entry = entry;
         viewModel.fetchFulltext();
 
         assertTrue(Files.exists(tempDir.resolve("test.pdf")));

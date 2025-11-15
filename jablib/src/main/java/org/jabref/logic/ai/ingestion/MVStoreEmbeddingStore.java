@@ -30,8 +30,8 @@ import dev.langchain4j.store.embedding.RelevanceScore;
 import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
 import dev.langchain4j.store.embedding.filter.comparison.IsIn;
-import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
+import org.jspecify.annotations.Nullable;
 
 import static java.util.Comparator.comparingDouble;
 import static org.jabref.logic.ai.ingestion.FileEmbeddingsManager.LINK_METADATA_KEY;
@@ -44,8 +44,12 @@ import static org.jabref.logic.ai.ingestion.FileEmbeddingsManager.LINK_METADATA_
  * <p>
  */
 public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore<TextSegment> {
+
+    private static final EmbeddingRecord EMPTY_EMBEDDING_RECORD = new EmbeddingRecord(null, "", new float[0]);
+
     // `file` field is nullable, because {@link Optional} can't be serialized.
-    private record EmbeddingRecord(@Nullable String file, String content, float[] embeddingVector) implements Serializable { }
+    private record EmbeddingRecord(@Nullable String file, String content, float[] embeddingVector) implements Serializable {
+    }
 
     private static final String EMBEDDINGS_MAP_NAME = "embeddings";
 
@@ -115,7 +119,6 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
     /// - [IsEqualTo] with key [FileEmbeddingsManager#LINK_METADATA_KEY]
     ///
     /// @param request embedding search request
-    ///
     /// @return an [EmbeddingSearchResult], which contains most relevant text segments
     @Override
     public EmbeddingSearchResult<TextSegment> search(EmbeddingSearchRequest request) {
@@ -125,7 +128,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         PriorityQueue<EmbeddingMatch<TextSegment>> matches = new PriorityQueue<>(comparator);
 
         applyFilter(request.filter()).forEach(id -> {
-            EmbeddingRecord eRecord = embeddingsMap.get(id);
+            EmbeddingRecord eRecord = embeddingsMap.getOrDefault(id, EMPTY_EMBEDDING_RECORD);
 
             double cosineSimilarity = CosineSimilarity.between(Embedding.from(eRecord.embeddingVector), request.queryEmbedding());
             double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);
@@ -160,7 +163,8 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
 
     private Stream<String> applyFilter(@Nullable Filter filter) {
         return switch (filter) {
-            case null -> embeddingsMap.keySet().stream();
+            case null ->
+                    embeddingsMap.keySet().stream();
 
             case IsIn isInFilter when Objects.equals(isInFilter.key(), LINK_METADATA_KEY) ->
                     filterEntries(entry -> isInFilter.comparisonValues().contains(entry.getValue().file));
@@ -168,7 +172,8 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
             case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), LINK_METADATA_KEY) ->
                     filterEntries(entry -> isEqualToFilter.comparisonValue().equals(entry.getValue().file));
 
-            default -> throw new IllegalArgumentException("Wrong filter passed to MVStoreEmbeddingStore");
+            default ->
+                    throw new IllegalArgumentException("Wrong filter passed to MVStoreEmbeddingStore");
         };
     }
 

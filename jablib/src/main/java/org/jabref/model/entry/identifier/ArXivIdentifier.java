@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Identifier for the arXiv. See https://arxiv.org/help/arxiv_identifier
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class ArXivIdentifier extends EprintIdentifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivIdentifier.class);
 
@@ -75,14 +77,11 @@ public class ArXivIdentifier extends EprintIdentifier {
         }
     }
 
-    /**
-     * ArXiV articles are assigned DOIs automatically, which starts with a DOI prefix '10.48550/' followed by the ArXiV
-     * ID (replacing the colon with a period).
-     *<p>
-     * For more information:
-     * <a href="https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/">
-     *     new-arxiv-articles-are-now-automatically-assigned-dois</a>
-     * */
+    /// ArXiv articles are automatically assigned DOIs starting with the prefix
+    /// `10.48550/`, followed by the ArXiv ID (with the colon replaced by a period).
+    ///
+    /// More information:
+    /// [new-arxiv-articles-are-now-automatically-assigned-dois](https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/)
     public Optional<DOI> inferDOI() {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();

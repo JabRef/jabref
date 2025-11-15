@@ -15,7 +15,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -36,7 +36,7 @@ import org.jspecify.annotations.Nullable;
  *   <li>Mode choice A: online or offline</li>
  *   <li>Mode choice B: complete entry or single file (the latter is not implemented)</li>
  * </ul>
- *
+ * <p>
  * The mode is selected by the preferences whether to use Grobid or not.
  */
 public class ExtractReferencesAction extends SimpleCommand {
@@ -48,7 +48,7 @@ public class ExtractReferencesAction extends SimpleCommand {
     private final BibEntry entry;
     private final LinkedFile linkedFile;
 
-    private final BibliographyFromPdfImporter bibliographyFromPdfImporter;
+    private final RuleBasedBibliographyPdfImporter ruleBasedBibliographyPdfImporter;
 
     public ExtractReferencesAction(DialogService dialogService,
                                    StateManager stateManager,
@@ -59,7 +59,7 @@ public class ExtractReferencesAction extends SimpleCommand {
     /**
      * Can be used to bind the action on a context menu in the linked file view (future work)
      *
-     * @param entry the entry to handle (can be null)
+     * @param entry      the entry to handle (can be null)
      * @param linkedFile the linked file (can be null)
      */
     private ExtractReferencesAction(@NonNull DialogService dialogService,
@@ -72,7 +72,7 @@ public class ExtractReferencesAction extends SimpleCommand {
         this.preferences = preferences;
         this.entry = entry;
         this.linkedFile = linkedFile;
-        bibliographyFromPdfImporter = new BibliographyFromPdfImporter(preferences.getCitationKeyPatternPreferences());
+        ruleBasedBibliographyPdfImporter = new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
 
         if (this.linkedFile == null) {
             this.executable.bind(
@@ -132,7 +132,7 @@ public class ExtractReferencesAction extends SimpleCommand {
             List<Path> fileList = FileUtil.getListOfLinkedFiles(selectedEntries, databaseContext.getFileDirectories(preferences.getFilePreferences()));
 
             // We need to have ParserResult handled at the importer, because it imports the meta data (library type, encoding, ...)
-            ParserResult result = bibliographyFromPdfImporter.importDatabase(fileList.getFirst());
+            ParserResult result = ruleBasedBibliographyPdfImporter.importDatabase(fileList.getFirst());
 
             // subsequent files are just appended to result
             Iterator<Path> fileListIterator = fileList.iterator();
@@ -155,7 +155,7 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     private void extractReferences(Iterator<Path> fileListIterator, ParserResult result, BibEntry currentEntry) {
         while (fileListIterator.hasNext()) {
-            result.getDatabase().insertEntries(bibliographyFromPdfImporter.importDatabase(fileListIterator.next()).getDatabase().getEntries());
+            result.getDatabase().insertEntries(ruleBasedBibliographyPdfImporter.importDatabase(fileListIterator.next()).getDatabase().getEntries());
         }
 
         String cites = getCites(result.getDatabase().getEntries(), currentEntry);
@@ -164,7 +164,7 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     /**
      * Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.
-     *
+     * <p>
      * TODO: Move this part to logic somehow
      *
      * @param currentEntry used to create citation keys if the importer did not provide one from the imported entry

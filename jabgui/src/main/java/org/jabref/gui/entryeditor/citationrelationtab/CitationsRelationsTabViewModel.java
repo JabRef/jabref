@@ -1,23 +1,44 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.SequencedSet;
+import java.util.concurrent.Future;
 
 import javax.swing.undo.UndoManager;
+
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.importer.fetcher.SciteAiFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.sciteTallies.TalliesResponse;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class CitationsRelationsTabViewModel {
+
+    public enum SciteStatus {
+        IN_PROGRESS,
+        FOUND,
+        ERROR,
+        DOI_MISSING,
+        DOI_LOOK_UP,
+        DOI_LOOK_UP_ERROR
+    }
 
     private final GuiPreferences preferences;
     private final UndoManager undoManager;
@@ -26,6 +47,13 @@ public class CitationsRelationsTabViewModel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
+    private final SciteAiFetcher sciteAiFetcher;
+
+    private final ObjectProperty<SciteStatus> status;
+    private final StringProperty searchError;
+    private Optional<TalliesResponse> currentResult = Optional.empty();
+    private Future<?> searchTask;
+
     public CitationsRelationsTabViewModel(GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.undoManager = undoManager;
@@ -33,6 +61,10 @@ public class CitationsRelationsTabViewModel {
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
+
+        this.status = new SimpleObjectProperty<>(SciteStatus.IN_PROGRESS);
+        this.searchError = new SimpleStringProperty("");
+        this.sciteAiFetcher = new SciteAiFetcher();
     }
 
     public void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
@@ -56,8 +88,10 @@ public class CitationsRelationsTabViewModel {
         boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
 
         switch (searchType) {
-            case CITES -> importCites(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
-            case CITED_BY -> importCitedBy(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
+            case CITES ->
+                    importCites(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
+            case CITED_BY ->
+                    importCitedBy(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
         }
     }
 
@@ -98,5 +132,78 @@ public class CitationsRelationsTabViewModel {
         }
 
         importHandler.importEntries(entries);
+    }
+
+    public boolean shouldShow() {
+        return preferences.getEntryEditorPreferences().shouldShowSciteTab();
+    }
+
+    public void bindToEntry(BibEntry entry) {
+        // If a search is already running, cancel it
+        cancelSearch();
+
+        if (entry == null) {
+            searchError.set(Localization.lang("No active entry"));
+            status.set(SciteStatus.ERROR);
+            return;
+        }
+
+        // The scite.ai api requires a DOI
+        if (entry.getDOI().isEmpty()) {
+            status.set(SciteStatus.DOI_MISSING);
+            return;
+        }
+
+        searchTask = BackgroundTask.wrap(() -> sciteAiFetcher.fetchTallies(entry.getDOI().get()))
+                                   .onRunning(() -> status.set(SciteStatus.IN_PROGRESS))
+                                   .onSuccess(result -> {
+                                       currentResult = Optional.of(result);
+                                       status.set(SciteStatus.FOUND);
+                                   })
+                                   .onFailure(error -> {
+                                       searchError.set(error.getMessage());
+                                       status.set(SciteStatus.ERROR);
+                                   })
+                                   .executeWith(taskExecutor);
+    }
+
+    private void cancelSearch() {
+        if (searchTask == null || searchTask.isCancelled() || searchTask.isDone()) {
+            return;
+        }
+
+        status.set(SciteStatus.IN_PROGRESS);
+        searchTask.cancel(true);
+    }
+
+    public void lookUpDoi(BibEntry entry) {
+        CrossRef doiFetcher = new CrossRef();
+
+        BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
+                      .onRunning(() -> {
+                          status.set(SciteStatus.DOI_LOOK_UP);
+                      })
+                      .onSuccess(identifier -> {
+                          if (identifier.isPresent()) {
+                              entry.setField(StandardField.DOI, identifier.get().asString());
+                              bindToEntry(entry);
+                          } else {
+                              status.set(SciteStatus.DOI_MISSING);
+                          }
+                      }).onFailure(ex -> {
+                          status.set(SciteStatus.DOI_LOOK_UP_ERROR);
+                      }).executeWith(taskExecutor);
+    }
+
+    public ObjectProperty<SciteStatus> statusProperty() {
+        return status;
+    }
+
+    public StringProperty searchErrorProperty() {
+        return searchError;
+    }
+
+    public Optional<TalliesResponse> getCurrentResult() {
+        return currentResult;
     }
 }

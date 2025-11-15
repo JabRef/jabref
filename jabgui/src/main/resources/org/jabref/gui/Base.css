@@ -414,12 +414,6 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
 
-.dialog-pane .button-bar .button {
-    -fx-min-width: 6em;
-    -fx-pref-width: 6em;
-    -fx-max-width: 6em;
-}
-
 .menu-button > .label {
     -fx-padding: 0 8 0 8;
 }
@@ -1097,12 +1091,26 @@ TextFlow > .tooltip-text-monospaced {
     -fx-border-width: 0;
 }
 
+.mainToolbar .icon-button {
+    -fx-padding: 0.5em;
+}
+
+/*
+ * -fx-icon-size is intentionally omitted to prevent a rendering loop. The library sets font size
+ * based on the computed icon size, which is itself relative to the font size.
+ */
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
-    -fx-font-size: 1.7em;
+    /* `!important` is override library's default font size */
+    -fx-font-size: 1.7em!important;
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
     -fx-icon-color: -jr-theme-text;
+}
+
+.mainToolbar .progress-indicator {
+    -fx-min-width: 2.8em;
+    -fx-max-width: 2.8em;
 }
 
 .search-field {
@@ -1394,6 +1402,15 @@ We want to have a look that matches our icons in the tool-bar */
 .dialog-pane {
     -fx-font-size: 1em;
     -fx-background-color: -fx-control-inner-background;
+}
+
+.innerGridPane {
+    -fx-hgap: 1em;
+    -fx-vgap: 1em;
+}
+
+.prefIndent {
+    -fx-padding: 0 0 0 1.667em;
 }
 
 .code-area .text {
@@ -3207,7 +3224,7 @@ journalInfo .grid-cell-b {
     -fx-hgap: 1.5em;
     -fx-vgap: 0.8em;
 }
-  
+
 /* Automatic Field Editor */
 .edit-field-content-pane {
     -fx-padding: 0em 1em;

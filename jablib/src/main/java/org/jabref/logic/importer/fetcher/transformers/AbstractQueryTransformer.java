@@ -4,11 +4,11 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.NotNode;
 import org.jabref.model.search.query.OperatorNode;
 import org.jabref.model.search.query.SearchQueryNode;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public abstract class AbstractQueryTransformer {
     /**
      * Returns the logical AND operator used by the library
      * Note: whitespaces have to be included around the operator
-     *
+     * <p>
      * Example: <code>" AND "</code>
      */
     protected abstract String getLogicalAndOperator();
@@ -59,14 +59,14 @@ public abstract class AbstractQueryTransformer {
     /**
      * Returns the logical OR operator used by the library
      * Note: whitespaces have to be included around the operator
-     *
+     * <p>
      * Example: <code>" OR "</code>
      */
     protected abstract String getLogicalOrOperator();
 
     /**
      * Returns the logical NOT operator used by the library
-     *
+     * <p>
      * Example: <code>"!"</code>
      */
     protected abstract String getLogicalNotOperator();
@@ -158,7 +158,7 @@ public abstract class AbstractQueryTransformer {
     /**
      * Return a string representation of the year-range fielded term
      * Should follow the structure yyyy-yyyy
-     *
+     * <p>
      * Example: <code>2015-2021</code>
      */
     protected String handleYearRange(String yearRange) {
@@ -210,7 +210,8 @@ public abstract class AbstractQueryTransformer {
             case NotNode notQueryNode -> {
                 return transform(notQueryNode);
             }
-            case null, default -> {
+            case null,
+                 default -> {
                 LOGGER.error("Unsupported case when transforming the query:\n {}", query);
                 return Optional.empty();
             }

@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
  * The data transfer object (DTO) for an BibEntry
  *
  * @param sharingMetadata the data used for sharing
- * @param userComments the comments before the BibTeX entry
- * @param citationKey the citation key (duplicated from BibEntry to ease processing by the client)
- * @param bibtex the BibEntry as BibTeX string (see ADR-0027 for more information, why we don't use a HashMap / JSON)
+ * @param userComments    the comments before the BibTeX entry
+ * @param citationKey     the citation key (duplicated from BibEntry to ease processing by the client)
+ * @param bibtex          the BibEntry as BibTeX string (see ADR-0027 for more information, why we don't use a HashMap / JSON)
  */
 public record BibEntryDTO(SharedBibEntryData sharingMetadata, String userComments, String citationKey, String bibtex) implements Comparable<BibEntryDTO> {
 

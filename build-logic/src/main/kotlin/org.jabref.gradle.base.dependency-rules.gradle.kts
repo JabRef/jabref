@@ -192,7 +192,21 @@ extraJavaModuleInfo {
         // requires("jackson.annotations")
     }
     module("dev.langchain4j:langchain4j", "langchain4j")
-    module("dev.langchain4j:langchain4j-core", "langchain4j.core")
+    module("dev.langchain4j:langchain4j-core", "langchain4j.core") {
+        // workaround for https://github.com/langchain4j/langchain4j/issues/3668
+        mergeJar("dev.langchain4j:langchain4j-http-client")
+        mergeJar("dev.langchain4j:langchain4j-http-client-jdk")
+        mergeJar("dev.langchain4j:langchain4j-hugging-face")
+        mergeJar("dev.langchain4j:langchain4j-mistral-ai")
+        mergeJar("dev.langchain4j:langchain4j-open-ai")
+        mergeJar("dev.langchain4j:langchain4j-google-ai-gemini")
+        requires("jtokkit")
+        requires("java.net.http")
+        uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        patchRealModule()
+    }
     module("dev.langchain4j:langchain4j-google-ai-gemini", "langchain4j.google.ai.gemini")
     module("dev.langchain4j:langchain4j-http-client", "langchain4j.http.client")
     module("dev.langchain4j:langchain4j-http-client-jdk", "langchain4j.http.client.jdk")
@@ -201,11 +215,19 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
-    module("io.github.classgraph:classgraph", "io.github.classgraph") {
-        overrideModuleName()
+    module("io.github.darvil82:terminal-text-formatter", "io.github.darvil.terminal.textformatter") {
+        patchRealModule()
+        exportAllPackages()
+        requires("io.github.darvil.utils")
+    }
+    module("io.github.darvil82:utils", "io.github.darvil.utils") {
+        patchRealModule()
         exportAllPackages()
     }
-    module("io.github.adr:e-adr", "io.github.adr")
+    module("io.github.adr:e-adr", "io.github.adr") {
+        patchRealModule()
+        exportAllPackages()
+    }
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "embedded.postgres.binaries.darwin.amd64")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8", "embedded.postgres.binaries.darwin.arm64v8")
@@ -293,43 +315,30 @@ extraJavaModuleInfo {
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
     module("net.sf.jopt-simple:jopt-simple", "jopt.simple")
 
-    // "com.github.eclipse:org.eclipse.lsp4j", "lsp4j"
-    //   - The name 'org.eclipse.lsp4j' is different than the name derived from the Jar file name 'lsp4j'; turn off 'failOnModifiedDerivedModuleNames' or explicitly allow override via 'overrideModuleName()'
-    //   - Not a module and no mapping defined: lsp4j-0.24.0.jar
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j", "lsp4j") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j", "org.eclipse.lsp4j") {
         exportAllPackages()
         requireAllDefinedDependencies()
-        // Note the missing "lsp4j" at the group
-        mergeJar("com.github.eclipse:lsp4j")
         requires("com.google.gson")
-
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.debug", "lsp4j.debug") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.debug", "org.eclipse.lsp4j.debug") {
         exportAllPackages()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.generator", "lsp4j.generator") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.generator", "org.eclipse.lsp4j.generator") {
         exportAllPackages()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", "lsp4j.jsonrpc") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", "org.eclipse.lsp4j.jsonrpc") {
         exportAllPackages()
         requires("com.google.gson")
         requires("java.logging")
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "lsp4j.jsonrpc.debug") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "org.eclipse.lsp4j.jsonrpc.debug") {
         exportAllPackages()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.websocket", "lsp4j.websocket") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket", "org.eclipse.lsp4j.websocket") {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "lsp4j.websocket.jakarta") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "org.eclipse.lsp4j.websocket.jakarta") {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
@@ -337,8 +346,7 @@ extraJavaModuleInfo {
         overrideModuleName()
         exportAllPackages()
     }
-    module("javax.websocket:javax.websocket-api", "javax.websocket") {
-        overrideModuleName()
+    module("javax.websocket:javax.websocket-api", "javax.websocket.api") {
         exportAllPackages()
     }
     module("org.eclipse.xtend:org.eclipse.xtend", "xtend") {
@@ -461,13 +469,6 @@ extraJavaModuleInfo {
         requires("java.logging")
     }
 
-    module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requiresTransitive("javafx.base")
-        requiresTransitive("javafx.controls")
-        requiresTransitive("org.controlsfx.controls")
-    }
     module("de.saxsys:mvvmfx", "de.saxsys.mvvmfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -477,7 +478,18 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("org.controlsfx.controls")
     }
+    // JitPack-variant because we need the latest commit
+    module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("org.controlsfx.controls")
+    }
+
     module("org.reactfx:reactfx", "reactfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -550,7 +562,7 @@ extraJavaModuleInfo {
         requiresTransitive("jdk.unsupported")
     }
 
-    module("org.openjfx:jdk-jsobject", "jdk.jsobjectEmpty")
+    module("org.openjfx:jdk-jsobject", "jdk.jsobjectEmpty") {}
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         patchRealModule()
@@ -657,4 +669,25 @@ extraJavaModuleInfo {
     module("org.openjdk.jmh:jmh-generator-bytecode", "jmh.generator.bytecode")
     module("org.openjdk.jmh:jmh-generator-reflection", "jmh.generator.reflection")
     module("org.apache.commons:commons-math3", "commons.math3")
+
+    // We need to transform this, because the java modules plugin touches all Java paths
+    // Otherwise, one gets following errormessage
+    // configuration ':jablib:annotationProcessor'.
+
+    module("javax.inject:javax.inject", "javax.inject")
+    module("com.google.auto.value:auto-value-annotations", "auto.value.annotations")
+    module("io.github.eisop:dataflow-errorprone", "org.checkerframework.dataflow")
+    module("com.google.googlejavaformat:google-java-format", "com.google.googlejavaformat")
+    module("com.google.errorprone:error_prone_core", "com.google.errorprone.core")
+    module("com.google.errorprone:error_prone_check_api", "com.google.errorprone.check.api")
+    module("com.google.errorprone:error_prone_annotation", "com.google.errorprone.annotation")
+    module("com.google.auto:auto-common", "auto.common")
+    module("com.google.auto.service:auto-service-annotations", "com.google.auto.service")
+    module("com.google.protobuf:protobuf-java", "com.google.protobuf")
+    module("com.github.kevinstern:software-and-algorithms", "software.and.algorithms")
+
+    module("com.uber.nullaway:nullaway", "nullaway")
+    module("org.checkerframework:dataflow-nullaway", "org.checkerframework.dataflow") {
+        exportAllPackages()
+    }
 }

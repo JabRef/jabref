@@ -13,13 +13,13 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
@@ -116,17 +116,21 @@ public class DOABFetcher implements SearchBasedParserFetcher {
             switch (dataObject.getString("key")) {
                 case "dc.contributor.author" -> {
                     if (dataObject.getString("value").contains("(Ed.)")) {
-                       editorsList.add(toAuthor(namePreprocessing(dataObject.getString("value"))));
+                        editorsList.add(toAuthor(namePreprocessing(dataObject.getString("value"))));
                     } else {
                         authorsList.add(toAuthor(dataObject.getString("value")));
                     }
                 }
-                case "dc.type" -> entry.setType(StandardEntryType.Book);
-                case "dc.date.issued" -> entry.setField(StandardField.DATE, dataObject.getString("value"));
-                case "oapen.identifier.doi" -> entry.setField(StandardField.DOI,
-                        dataObject.getString("value"));
-                case "dc.title" -> entry.setField(StandardField.TITLE,
-                        dataObject.getString("value"));
+                case "dc.type" ->
+                        entry.setType(StandardEntryType.Book);
+                case "dc.date.issued" ->
+                        entry.setField(StandardField.DATE, dataObject.getString("value"));
+                case "oapen.identifier.doi" ->
+                        entry.setField(StandardField.DOI,
+                                dataObject.getString("value"));
+                case "dc.title" ->
+                        entry.setField(StandardField.TITLE,
+                                dataObject.getString("value"));
                 case "oapen.pages" -> {
                     try {
                         entry.setField(StandardField.PAGES, String.valueOf(dataObject.getInt("value")));
@@ -134,28 +138,39 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                         entry.setField(StandardField.PAGES, dataObject.getString("value"));
                     }
                 }
-                case "dc.description.abstract" -> entry.setField(StandardField.ABSTRACT,
-                        dataObject.getString("value"));
-                case "dc.language" -> entry.setField(StandardField.LANGUAGE,
-                        dataObject.getString("value"));
-                case "publisher.name" -> entry.setField(StandardField.PUBLISHER,
-                        dataObject.getString("value"));
-                case "dc.identifier.uri" -> entry.setField(StandardField.URI,
-                        dataObject.getString("value"));
+                case "dc.description.abstract" ->
+                        entry.setField(StandardField.ABSTRACT,
+                                dataObject.getString("value"));
+                case "dc.language" ->
+                        entry.setField(StandardField.LANGUAGE,
+                                dataObject.getString("value"));
+                case "publisher.name" ->
+                        entry.setField(StandardField.PUBLISHER,
+                                dataObject.getString("value"));
+                case "dc.identifier.uri" ->
+                        entry.setField(StandardField.URI,
+                                dataObject.getString("value"));
                 case "dc.identifier" -> {
                     if (dataObject.getString("value").contains("http")) {
-                       entry.setField(StandardField.URL, dataObject.getString("value"));
+                        entry.setField(StandardField.URL, dataObject.getString("value"));
                     }
                 }
-                case "dc.subject.other" -> keywordJoiner.add(dataObject.getString("value"));
-                case "dc.contributor.editor" -> editorsList.add(toAuthor(dataObject.getString("value")));
-                case "oapen.volume" -> entry.setField(StandardField.VOLUME,
-                        dataObject.getString("value"));
-                case "oapen.relation.isbn", "dc.identifier.isbn" -> entry.setField(StandardField.ISBN,
-                        dataObject.getString("value"));
-                case "dc.title.alternative" -> entry.setField(StandardField.SUBTITLE,
-                        dataObject.getString("value"));
-                case "oapen.imprint" -> publisherImprint = dataObject.getString("value");
+                case "dc.subject.other" ->
+                        keywordJoiner.add(dataObject.getString("value"));
+                case "dc.contributor.editor" ->
+                        editorsList.add(toAuthor(dataObject.getString("value")));
+                case "oapen.volume" ->
+                        entry.setField(StandardField.VOLUME,
+                                dataObject.getString("value"));
+                case "oapen.relation.isbn",
+                     "dc.identifier.isbn" ->
+                        entry.setField(StandardField.ISBN,
+                                dataObject.getString("value"));
+                case "dc.title.alternative" ->
+                        entry.setField(StandardField.SUBTITLE,
+                                dataObject.getString("value"));
+                case "oapen.imprint" ->
+                        publisherImprint = dataObject.getString("value");
             }
         }
 

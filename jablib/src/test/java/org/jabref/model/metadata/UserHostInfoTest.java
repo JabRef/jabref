@@ -41,43 +41,43 @@ class UserHostInfoTest {
     void hasSameHostReturnsTrueForSameNonEmptyHost() {
         UserHostInfo userHost1 = new UserHostInfo("user1", "host");
         UserHostInfo userHost2 = new UserHostInfo("user2", "host");
-        
+
         assertTrue(userHost1.hasSameHost(userHost2));
         assertTrue(userHost2.hasSameHost(userHost1));
     }
-    
+
     @Test
     void hasSameHostReturnsFalseForDifferentHosts() {
         UserHostInfo userHost1 = new UserHostInfo("user", "host1");
         UserHostInfo userHost2 = new UserHostInfo("user", "host2");
-        
+
         assertFalse(userHost1.hasSameHost(userHost2));
         assertFalse(userHost2.hasSameHost(userHost1));
     }
-    
+
     @Test
     void hasSameHostReturnsFalseForEmptyHost() {
         UserHostInfo userHostWithEmptyHost = new UserHostInfo("user", "");
         UserHostInfo userHostWithHost = new UserHostInfo("user", "host");
-        
+
         assertFalse(userHostWithEmptyHost.hasSameHost(userHostWithHost));
         assertFalse(userHostWithHost.hasSameHost(userHostWithEmptyHost));
     }
-    
+
     @Test
     void hasSameHostReturnsFalseForBothEmptyHosts() {
         UserHostInfo userHost1 = new UserHostInfo("user1", "");
         UserHostInfo userHost2 = new UserHostInfo("user2", "");
-        
+
         assertFalse(userHost1.hasSameHost(userHost2));
         assertFalse(userHost2.hasSameHost(userHost1));
     }
-    
+
     @Test
     void toStringReturnsUserHostString() {
         UserHostInfo userHostInfo = new UserHostInfo("user", "host");
         assertEquals("user-host", userHostInfo.toString());
-        
+
         UserHostInfo userHostInfoWithEmptyHost = new UserHostInfo("user", "");
         assertEquals("user", userHostInfoWithEmptyHost.toString());
     }

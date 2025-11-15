@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -35,6 +34,7 @@ import org.jabref.logic.integrity.BracesCorrector;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.LinkedFile;
@@ -46,10 +46,10 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -115,7 +115,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
         return arXiv.findFullText(entry);
     }
 
@@ -243,10 +243,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /**
      * Eventually merge the ArXiv Bibtex entry with a Future Bibtex entry (ArXiv/user-assigned DOIs)
      *
-     * @param arXivEntry The entry to merge into
+     * @param arXivEntry     The entry to merge into
      * @param bibEntryFuture A future result of the fetching process
      * @param priorityFields Which fields from "bibEntryFuture" to prioritize, replacing them on "arXivEntry"
-     * @param id Identifier used in initiating the "bibEntryFuture" future (for logging). This is usually a DOI, but can be anything.
+     * @param id             Identifier used in initiating the "bibEntryFuture" future (for logging). This is usually a DOI, but can be anything.
      */
     private void mergeArXivEntryWithFutureDoiEntry(BibEntry arXivEntry, CompletableFuture<Optional<BibEntry>> bibEntryFuture, Set<Field> priorityFields, String id) {
         Optional<BibEntry> bibEntry;
@@ -286,7 +286,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * Infuse arXivBibEntryFuture with additional fields in an asynchronous way, accelerating the process by providing a valid ArXiv ID
      *
      * @param arXivBibEntryFuture A future entry that (if it exists) will be updated with new/modified fields
-     * @param arXivId An ArXiv ID for the main reference (from ArXiv), so that the retrieval of ArXiv-issued DOI metadata can be faster
+     * @param arXivId             An ArXiv ID for the main reference (from ArXiv), so that the retrieval of ArXiv-issued DOI metadata can be faster
      * @throws FetcherException when failed to fetch the main ArtXiv Bibtex entry ('arXivBibEntryFuture').
      */
     private void inplaceAsyncInfuseArXivWithDoi(CompletableFuture<Optional<BibEntry>> arXivBibEntryFuture, Optional<ArXivIdentifier> arXivId) throws FetcherException {
@@ -346,17 +346,17 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2);
 
         Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
-                                                                       .stream()
-                                                                       .map(bibEntry ->
-                                                                               CompletableFuture.supplyAsync(() -> {
-                                                                                   this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
-                                                                                   return bibEntry;
-                                                                               }, executor))
-                                                                       .toList();
+                                                                           .stream()
+                                                                           .map(bibEntry ->
+                                                                                   CompletableFuture.supplyAsync(() -> {
+                                                                                       this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
+                                                                                       return bibEntry;
+                                                                                   }, executor))
+                                                                           .toList();
 
         Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
-                                      .map(CompletableFuture::join)
-                                      .collect(Collectors.toList());
+                                                                      .map(CompletableFuture::join)
+                                                                      .collect(Collectors.toList());
 
         return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
     }
@@ -406,9 +406,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         @Override
-        public Optional<URL> findFullText(BibEntry entry) throws IOException {
-            Objects.requireNonNull(entry);
-
+        public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
             try {
                 Optional<URL> pdfUrl = searchForEntries(entry).stream()
                                                               .map(ArXivEntry::getPdfUrl)

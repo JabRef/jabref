@@ -95,6 +95,7 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
@@ -113,7 +114,6 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.metadata.UserHostInfo;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.strings.StringUtil;
 
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
@@ -137,8 +137,8 @@ import org.slf4j.LoggerFactory;
  * contents of the defaults HashMap that are defined in this class.
  * There are more default parameters in this map which belong to separate preference classes.
  * <p>
- *  This class is injected into formatter using reflection to avoid tight coupling and
- *  is easier than injecting via constructor due to amount of refactoring
+ * This class is injected into formatter using reflection to avoid tight coupling and
+ * is easier than injecting via constructor due to amount of refactoring
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
@@ -240,6 +240,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
     public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
+    public static final String TRANSLITERATE_FIELDS_FOR_CITATION_KEY = "transliterateFields";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -523,7 +524,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 SpringerNatureWebFetcher.FETCHER_NAME,
                 DBLPFetcher.FETCHER_NAME,
                 IEEE.FETCHER_NAME)));
-        defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());
+        defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED_GENERAL.name());
         defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(CITATIONS_RELATIONS_STORE_TTL, 30);
@@ -649,6 +650,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
+        defaults.put(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, Boolean.FALSE);
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);
@@ -873,7 +875,6 @@ public class JabRefCliPreferences implements CliPreferences {
         });
     }
     // endregion
-
 
     /**
      * @deprecated Never ever add a call to this method. There should be only one
@@ -1284,8 +1285,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
-                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
-                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
+               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
+               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
 
     //*************************************************************************************************************
@@ -1542,6 +1543,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
+                getBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY),
                 getBoolean(AVOID_OVERWRITING_KEY),
                 getBoolean(WARN_BEFORE_OVERWRITING_KEY),
                 getBoolean(GENERATE_KEYS_BEFORE_SAVING),
@@ -1553,6 +1555,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN),
                 getBibEntryPreferences().keywordSeparatorProperty());
 
+        EasyBind.listen(citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKeyProperty(),
+                (_, _, newValue) -> putBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, newValue));
         EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
                 (_, _, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
         EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
@@ -1857,8 +1861,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
                 yield SaveOrder.getDefaultSaveOrder();
             }
-            case SPECIFIED -> SelfContainedSaveOrder.of(exportSaveOrder);
-            case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
+            case SPECIFIED ->
+                    SelfContainedSaveOrder.of(exportSaveOrder);
+            case ORIGINAL ->
+                    SaveOrder.getDefaultSaveOrder();
         };
 
         return new SelfContainedSaveConfiguration(
@@ -2211,6 +2217,13 @@ public class JabRefCliPreferences implements CliPreferences {
             return importerPreferences;
         }
 
+        PlainCitationParserChoice defaultPlainCitationParser;
+        try {
+            defaultPlainCitationParser = PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER));
+        } catch (IllegalArgumentException ex) {
+            defaultPlainCitationParser = PlainCitationParserChoice.RULE_BASED_GENERAL;
+        }
+
         importerPreferences = new ImporterPreferences(
                 getBoolean(IMPORTERS_ENABLED),
                 getBoolean(GENERATE_KEY_ON_IMPORT),
@@ -2221,7 +2234,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDefaultFetcherKeys(),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
                 getStringList(SEARCH_CATALOGS),
-                PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER)),
+                defaultPlainCitationParser,
                 getInt(CITATIONS_RELATIONS_STORE_TTL)
         );
 
@@ -2411,7 +2424,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getFieldPreferences(),
                 getXmpPreferences(),
                 getDOIPreferences(),
-                getGrobidPreferences());
+                getGrobidPreferences(),
+                getFilePreferences());
     }
 
     // endregion
@@ -2511,9 +2525,9 @@ public class JabRefCliPreferences implements CliPreferences {
         if (getBoolean(GITHUB_REMEMBER_PAT_KEY)) {
             try (final Keyring keyring = Keyring.create()) {
                 return new Password(
-                    keyring.getPassword("org.jabref", "github"),
-                    getInternalPreferences().getUserAndHost())
-                    .decrypt();
+                        keyring.getPassword("org.jabref", "github"),
+                        getInternalPreferences().getUserAndHost())
+                        .decrypt();
             } catch (PasswordAccessException ex) {
                 LOGGER.warn("No GitHub token stored in keyring");
             } catch (Exception ex) {

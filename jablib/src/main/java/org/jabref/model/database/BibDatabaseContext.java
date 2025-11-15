@@ -32,6 +32,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +63,12 @@ public class BibDatabaseContext {
     /**
      * The path where this database was last saved to.
      */
+    @Nullable
     private Path path;
 
+    @Nullable
     private DatabaseSynchronizer dbmsSynchronizer;
+    @Nullable
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
@@ -72,23 +76,22 @@ public class BibDatabaseContext {
         this(new BibDatabase());
     }
 
-    public BibDatabaseContext(BibDatabase database) {
+    public BibDatabaseContext(@NonNull BibDatabase database) {
         this(database, new MetaData());
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
-        this.database = Objects.requireNonNull(database);
-        this.metaData = Objects.requireNonNull(metaData);
+    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData) {
+        this.database = database;
+        this.metaData = metaData;
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
+    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
+    public BibDatabaseContext(@NonNull BibDatabase database, @NonNull MetaData metaData, Path path, @NonNull DatabaseLocation location) {
         this(database, metaData);
-        Objects.requireNonNull(location);
         this.path = path;
 
         if (location == DatabaseLocation.LOCAL) {
@@ -100,7 +103,7 @@ public class BibDatabaseContext {
         return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
     }
 
-    public void setMode(BibDatabaseMode bibDatabaseMode) {
+    public void setMode(@NonNull BibDatabaseMode bibDatabaseMode) {
         metaData.setMode(bibDatabaseMode);
     }
 
@@ -129,8 +132,8 @@ public class BibDatabaseContext {
         return metaData;
     }
 
-    public void setMetaData(MetaData metaData) {
-        this.metaData = Objects.requireNonNull(metaData);
+    public void setMetaData(@NonNull MetaData metaData) {
+        this.metaData = metaData;
     }
 
     public boolean isBiblatexMode() {
@@ -166,7 +169,6 @@ public class BibDatabaseContext {
      * </ol>
      *
      * @param preferences The fileDirectory preferences
-     *
      * @return List of existing absolute paths
      */
     public List<Path> getFileDirectories(FilePreferences preferences) {
@@ -225,10 +227,15 @@ public class BibDatabaseContext {
 
         // If this path is relative, we try to interpret it as relative to the file path of this BIB file:
         return getDatabasePath()
-                .map(databaseFile -> databaseFile.getParent().resolve(path).normalize().toAbsolutePath())
+                .map(databaseFile -> Optional.ofNullable(databaseFile.getParent())
+                                             .orElse(Path.of(""))
+                                             .resolve(path)
+                                             .normalize()
+                                             .toAbsolutePath())
                 .orElse(path);
     }
 
+    @Nullable
     public DatabaseSynchronizer getDBMSSynchronizer() {
         return this.dbmsSynchronizer;
     }
@@ -252,7 +259,9 @@ public class BibDatabaseContext {
 
     public void convertToLocalDatabase() {
         if (dbmsListener != null && (location == DatabaseLocation.SHARED)) {
-            dbmsListener.unregisterListener(dbmsSynchronizer);
+            if (dbmsSynchronizer != null) {
+                dbmsListener.unregisterListener(dbmsSynchronizer);
+            }
             dbmsListener.shutdown();
         }
 
@@ -266,8 +275,7 @@ public class BibDatabaseContext {
     /**
      * @return The path to store the lucene index files. One directory for each library.
      */
-    @NonNull
-    public Path getFulltextIndexPath() {
+    public @NonNull Path getFulltextIndexPath() {
         Path appData = Directories.getFulltextIndexBaseDirectory();
         Path indexPath;
 

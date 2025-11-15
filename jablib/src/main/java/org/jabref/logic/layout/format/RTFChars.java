@@ -3,25 +3,25 @@ package org.jabref.logic.layout.format;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.StringInt;
 import org.jabref.logic.util.strings.RtfCharMap;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Transform a LaTeX-String to RTF.
- *
+ * <p>
  * This method will:
- *
- *   1.) Remove LaTeX-Command sequences.
- *
- *   2.) Replace LaTeX-Special chars with RTF equivalents.
- *
- *   3.) Replace emph and textit and textbf with their RTF replacements.
- *
- *   4.) Take special care to save all unicode characters correctly.
- *
- *   5.) Replace --- by \emdash and -- by \endash.
+ * <p>
+ * 1.) Remove LaTeX-Command sequences.
+ * <p>
+ * 2.) Replace LaTeX-Special chars with RTF equivalents.
+ * <p>
+ * 3.) Replace emph and textit and textbf with their RTF replacements.
+ * <p>
+ * 4.) Take special care to save all unicode characters correctly.
+ * <p>
+ * 5.) Replace --- by \emdash and -- by \endash.
  */
 public class RTFChars implements LayoutFormatter {
 

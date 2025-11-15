@@ -13,13 +13,13 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -93,7 +93,7 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
     }
 
     public void renameField() {
-        NamedCompound renameEdit = new NamedCompound("RENAME_EDIT");
+        NamedCompoundEdit renameEdit = new NamedCompoundEdit("RENAME_EDIT");
         int affectedEntriesCount = 0;
         if (fieldNameValidationStatus().isValid()) {
             affectedEntriesCount = new MoveFieldValueAction(selectedField.get(),

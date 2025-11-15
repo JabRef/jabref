@@ -28,6 +28,7 @@ import javafx.collections.ObservableMap;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -43,13 +44,13 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -357,12 +358,13 @@ public class BibEntry {
         }
 
         return (database == null) || result.isEmpty() ?
-                result :
-                Optional.of(database.resolveForStrings(result.get()));
+               result :
+               Optional.of(database.resolveForStrings(result.get()));
     }
 
     /// Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
     //  It is **not** the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
+
     ///
     /// This id changes on each run of JabRef (because it is currently generated as increasing number).
     ///
@@ -379,9 +381,7 @@ public class BibEntry {
      * @param id The ID to be used
      */
     @VisibleForTesting
-    public void setId(String id) {
-        Objects.requireNonNull(id, "Every BibEntry must have an ID");
-
+    public void setId(@NonNull String id) {
         String oldId = this.id;
 
         eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));
@@ -443,9 +443,7 @@ public class BibEntry {
      * Sets this entry's type and sets the changed flag to true <br>
      * If the new entry type equals the old entry type no changed flag is set.
      */
-    public Optional<FieldChange> setType(EntryType newType, EntriesEventSource eventSource) {
-        Objects.requireNonNull(newType);
-
+    public Optional<FieldChange> setType(@NonNull EntryType newType, EntriesEventSource eventSource) {
         EntryType oldType = type.get();
         if (newType.equals(oldType)) {
             return Optional.empty();
@@ -510,7 +508,7 @@ public class BibEntry {
 
     /**
      * Internal method used to get the content of a field (or its alias)
-     *
+     * <p>
      * Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
      *
      * @param field         the field
@@ -550,10 +548,14 @@ public class BibEntry {
             Optional<Date> parsedDate = Date.parse(date.get());
             if (parsedDate.isPresent()) {
                 return switch (field) {
-                    case StandardField.YEAR -> parsedDate.get().getYear().map(Object::toString);
-                    case StandardField.MONTH -> parsedDate.get().getMonth().map(Month::getJabRefFormat);
-                    case StandardField.DAY -> parsedDate.get().getDay().map(Object::toString);
-                    default -> throw new IllegalStateException("Unexpected value");
+                    case StandardField.YEAR ->
+                            parsedDate.get().getYear().map(Object::toString);
+                    case StandardField.MONTH ->
+                            parsedDate.get().getMonth().map(Month::getJabRefFormat);
+                    case StandardField.DAY ->
+                            parsedDate.get().getDay().map(Object::toString);
+                    default ->
+                            throw new IllegalStateException("Unexpected value");
                 };
             } else {
                 // Date field not in valid format
@@ -606,9 +608,7 @@ public class BibEntry {
      * Sets a number of fields simultaneously. The given HashMap contains field
      * names as keys, each mapped to the value to set.
      */
-    public void setField(Map<Field, String> fields) {
-        Objects.requireNonNull(fields, "fields must not be null");
-
+    public void setField(@NonNull Map<Field, String> fields) {
         fields.forEach(this::setField);
     }
 
@@ -619,11 +619,9 @@ public class BibEntry {
      * @param value       The value to set
      * @param eventSource Source the event is sent from
      */
-    public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
-        Objects.requireNonNull(field, "field name must not be null");
-        Objects.requireNonNull(value, "field value for field " + field.getName() + " must not be null");
-        Objects.requireNonNull(eventSource, "field eventSource must not be null");
-
+    public Optional<FieldChange> setField(@NonNull Field field,
+                                          @NonNull String value,
+                                          @NonNull EntriesEventSource eventSource) {
         if (value.isEmpty()) {
             return clearField(field);
         }
@@ -733,7 +731,7 @@ public class BibEntry {
 
     /**
      * Creates a short textual description of the entry in the format: <code>Author1, Author2: Title (Year)</code>
-     *
+     * <p>
      * If <code>0</code> is passed as <code>maxCharacters</code>, the description is not truncated.
      *
      * @param maxCharacters The maximum number of characters (additional
@@ -823,13 +821,11 @@ public class BibEntry {
         return this;
     }
 
-    public Optional<FieldChange> putKeywords(List<String> keywords, Character delimiter) {
-        Objects.requireNonNull(delimiter);
+    public Optional<FieldChange> putKeywords(List<String> keywords, @NonNull Character delimiter) {
         return putKeywords(new KeywordList(keywords), delimiter);
     }
 
-    public Optional<FieldChange> putKeywords(KeywordList keywords, Character delimiter) {
-        Objects.requireNonNull(keywords);
+    public Optional<FieldChange> putKeywords(@NonNull KeywordList keywords, Character delimiter) {
         Optional<String> oldValue = this.getField(StandardField.KEYWORDS);
 
         if (keywords.isEmpty()) {
@@ -851,9 +847,7 @@ public class BibEntry {
      *
      * @param keyword Keyword to add
      */
-    public void addKeyword(String keyword, Character delimiter) {
-        Objects.requireNonNull(keyword, "keyword must not be null");
-
+    public void addKeyword(@NonNull String keyword, Character delimiter) {
         if (keyword.isEmpty()) {
             return;
         }
@@ -872,8 +866,7 @@ public class BibEntry {
      *
      * @param keywords Keywords to add
      */
-    public void addKeywords(Collection<String> keywords, Character delimiter) {
-        Objects.requireNonNull(keywords);
+    public void addKeywords(@NonNull Collection<String> keywords, Character delimiter) {
         keywords.forEach(keyword -> addKeyword(keyword, delimiter));
     }
 
@@ -952,7 +945,7 @@ public class BibEntry {
 
     /**
      * On purpose, this hashes the "content" of the BibEntry, not the {@link #sharedBibEntryData}.
-     *
+     * <p>
      * The content is
      *
      * <ul>

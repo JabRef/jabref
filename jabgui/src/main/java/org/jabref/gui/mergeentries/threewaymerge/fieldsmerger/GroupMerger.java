@@ -1,23 +1,18 @@
 package org.jabref.gui.mergeentries.threewaymerge.fieldsmerger;
 
-import java.util.Objects;
-
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * A merger for the {@link StandardField#GROUPS} field
- * */
+/// A merger for the {@link org.jabref.model.entry.field.StandardField#GROUPS} field
 public class GroupMerger implements FieldMerger {
 
     private final @NonNull BibEntryPreferences bibEntryPreferences;
 
     public GroupMerger(@NonNull BibEntryPreferences bibEntryPreferences) {
-        this.bibEntryPreferences = Objects.requireNonNull(bibEntryPreferences);
+        this.bibEntryPreferences = bibEntryPreferences;
     }
 
     @Override

@@ -13,8 +13,8 @@ import java.util.Set;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.strings.StringUtil;
 
 // Do not make this class final, as it otherwise can't be mocked for tests
 public class ExternalFileTypes {
@@ -91,7 +91,7 @@ public class ExternalFileTypes {
      *
      * @param mimeType The MIME type.
      * @return The ExternalFileType registered, or null if none. For the mime type "text/html", a valid file type is
-     *         guaranteed to be returned.
+     * guaranteed to be returned.
      */
     public static Optional<ExternalFileType> getExternalFileTypeByMimeType(String mimeType, ExternalApplicationsPreferences externalApplicationsPreferences) {
         // Ignores parameters according to link: (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
@@ -129,7 +129,7 @@ public class ExternalFileTypes {
 
             // No type could be found from mime type. Try based on the extension:
             return FileUtil.getFileExtension(linkedFile.getLink())
-                             .flatMap(extension -> getExternalFileTypeByExt(extension, externalApplicationsPreferences));
+                           .flatMap(extension -> getExternalFileTypeByExt(extension, externalApplicationsPreferences));
         } else {
             return type;
         }

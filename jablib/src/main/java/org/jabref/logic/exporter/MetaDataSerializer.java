@@ -12,6 +12,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldFactory;
@@ -19,7 +20,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.strings.StringUtil;
 
 /**
  * Reading is done at {@link org.jabref.logic.importer.util.MetaDataParser}
@@ -57,7 +57,7 @@ public class MetaDataSerializer {
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + '-' + user, List.of(path.trim())));
         metaData.getLatexFileDirectories().forEach((user, path) -> stringyMetaData
-                .put(MetaData.FILE_DIRECTORY_LATEX + '-' + user, List.of(path.toString().trim())));
+                .put(MetaData.FILE_DIRECTORY_LATEX + '-' + user, List.of(path.trim())));
         metaData.getVersionDBStructure().ifPresent(
                 versionDBStructure -> stringyMetaData.put(MetaData.VERSION_DB_STRUCT, List.of(versionDBStructure.trim())));
         metaData.getBlgFilePaths().forEach((user, path) -> stringyMetaData.put(MetaData.BLG_FILE_PATH + "-" + user, List.of(path.toString().trim())));

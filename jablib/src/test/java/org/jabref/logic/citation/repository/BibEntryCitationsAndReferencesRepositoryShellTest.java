@@ -16,22 +16,22 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
     private static BibEntry createBibEntry() {
         int i = RandomGenerator.getDefault().nextInt();
         return new BibEntry()
-            .withCitationKey(String.valueOf(i))
-            .withField(StandardField.DOI, "10.1234/5678" + i);
+                .withCitationKey(String.valueOf(i))
+                .withField(StandardField.DOI, "10.1234/5678" + i);
     }
 
     private static List<BibEntry> createRelations(BibEntry entry) {
         return entry
-            .getCitationKey()
-            .map(key -> RandomGenerator
-                .StreamableGenerator.of("L128X256MixRandom").ints(150)
-                .mapToObj(i -> new BibEntry()
-                    .withCitationKey("%s relation %s".formatted(key, i))
-                    .withField(StandardField.DOI, "10.2345/6789" + i)
+                .getCitationKey()
+                .map(key -> RandomGenerator
+                        .StreamableGenerator.of("L128X256MixRandom").ints(150)
+                                            .mapToObj(i -> new BibEntry()
+                                                    .withCitationKey("%s relation %s".formatted(key, i))
+                                                    .withField(StandardField.DOI, "10.2345/6789" + i)
+                                            )
                 )
-            )
-            .orElseThrow()
-            .toList();
+                .orElseThrow()
+                .toList();
     }
 
     private static class BibEntryRelationRepositoryMock implements BibEntryRelationRepository {
@@ -66,8 +66,8 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
         List<BibEntry> citations = createRelations(bibEntry);
         BibEntryRelationRepositoryMock citationsDAO = new BibEntryRelationRepositoryMock();
         BibEntryCitationsAndReferencesRepositoryShell bibEntryRelationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
-            citationsDAO,
-            new BibEntryRelationRepositoryMock()
+                citationsDAO,
+                new BibEntryRelationRepositoryMock()
         );
         Assertions.assertFalse(bibEntryRelationsRepository.containsCitations(bibEntry));
         Assertions.assertFalse(citations.isEmpty());

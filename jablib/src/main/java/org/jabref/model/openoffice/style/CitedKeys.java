@@ -21,7 +21,7 @@ public class CitedKeys {
     }
 
     /**
-     *  The cited keys in their current order.
+     * The cited keys in their current order.
      */
     public List<CitedKey> values() {
         return new ArrayList<>(data.values());

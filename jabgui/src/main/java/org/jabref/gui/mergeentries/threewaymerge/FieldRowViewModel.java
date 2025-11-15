@@ -18,13 +18,14 @@ import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMerger;
 import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.YearFieldValuePlausibilityComparator;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class FieldRowViewModel {
         /**
          * When the user types something into the merged field value and neither the left nor
          * right values match it, NONE is selected
-         * */
+         */
         NONE
     }
 
@@ -103,15 +104,17 @@ public class FieldRowViewModel {
         });
 
         EasyBind.subscribe(selectionProperty(), selection -> {
-            LOGGER.debug("Selecting {}' value for field {}", selection, field.getDisplayName());
+            LOGGER.debug("Selecting {}' value for field {}", selection, FieldTextMapper.getDisplayName(field));
             switch (selection) {
-                case LEFT -> EasyBind.subscribe(leftFieldValueProperty(), this::setMergedFieldValue);
-                case RIGHT -> EasyBind.subscribe(rightFieldValueProperty(), this::setMergedFieldValue);
+                case LEFT ->
+                        EasyBind.subscribe(leftFieldValueProperty(), this::setMergedFieldValue);
+                case RIGHT ->
+                        EasyBind.subscribe(rightFieldValueProperty(), this::setMergedFieldValue);
             }
         });
 
         EasyBind.subscribe(mergedFieldValueProperty(), mergedValue -> {
-            LOGGER.debug("Merged value is {} for field {}", mergedValue, field.getDisplayName());
+            LOGGER.debug("Merged value is {} for field {}", mergedValue, FieldTextMapper.getDisplayName(field));
             if (mergedValue.equals(getLeftFieldValue())) {
                 selectLeftValue();
             } else if (getMergedFieldValue().equals(getRightFieldValue())) {
@@ -129,13 +132,13 @@ public class FieldRowViewModel {
         String rightValue = getRightFieldValue();
 
         if (StandardField.YEAR == field) {
-                YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();
-                ComparisonResult comparison = comparator.compare(leftValue, rightValue);
-                if (ComparisonResult.RIGHT_BETTER == comparison) {
-                    selectRightValue();
-                } else if (ComparisonResult.LEFT_BETTER == comparison) {
-                    selectLeftValue();
-                }
+            YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();
+            ComparisonResult comparison = comparator.compare(leftValue, rightValue);
+            if (ComparisonResult.RIGHT_BETTER == comparison) {
+                selectRightValue();
+            } else if (ComparisonResult.LEFT_BETTER == comparison) {
+                selectLeftValue();
+            }
         } else if (InternalField.TYPE_HEADER == field) {
             if (leftValue.equalsIgnoreCase(StandardEntryType.Misc.getName())) {
                 selectRightValue();

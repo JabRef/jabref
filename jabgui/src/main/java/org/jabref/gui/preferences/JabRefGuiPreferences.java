@@ -64,6 +64,7 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -72,7 +73,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -397,14 +397,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(CREATE_ENTRY_IMMEDIATE_TYPE, StandardEntryType.Article.getDisplayName());
         defaults.put(CREATE_ENTRY_ID_LOOKUP_GUESSING, true);
         defaults.put(CREATE_ENTRY_ID_FETCHER_NAME, DoiFetcher.NAME);
-        defaults.put(CREATE_ENTRY_INTERPRET_PARSER_NAME, PlainCitationParserChoice.RULE_BASED.getLocalizedName());
+        defaults.put(CREATE_ENTRY_INTERPRET_PARSER_NAME, PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName());
         // endregion
     }
 
     /**
      * @deprecated Never ever add a call to this method. There should be only one caller.
-     *             All other usages should get the preferences passed (or injected).
-     *             The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
+     * All other usages should get the preferences passed (or injected).
+     * The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
      */
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
@@ -1169,8 +1169,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         final int approachIndex = getInt(CREATE_ENTRY_APPROACH);
         NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
-            ? NewEntryDialogTab.values()[approachIndex]
-            : NewEntryDialogTab.values()[0];
+                                     ? NewEntryDialogTab.values()[approachIndex]
+                                     : NewEntryDialogTab.values()[0];
 
         final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE);
         EntryType immediateType = StandardEntryType.Article;
@@ -1182,14 +1182,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
 
         newEntryPreferences = new NewEntryPreferences(
-            approach,
-            getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED),
-            getBoolean(CREATE_ENTRY_EXPAND_OTHER),
-            getBoolean(CREATE_ENTRY_EXPAND_CUSTOM),
-            immediateType,
-            getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING),
-            get(CREATE_ENTRY_ID_FETCHER_NAME),
-            get(CREATE_ENTRY_INTERPRET_PARSER_NAME));
+                approach,
+                getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED),
+                getBoolean(CREATE_ENTRY_EXPAND_OTHER),
+                getBoolean(CREATE_ENTRY_EXPAND_CUSTOM),
+                immediateType,
+                getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING),
+                get(CREATE_ENTRY_ID_FETCHER_NAME),
+                get(CREATE_ENTRY_INTERPRET_PARSER_NAME));
 
         EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)));
         EasyBind.listen(newEntryPreferences.typesRecommendedExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, newValue));

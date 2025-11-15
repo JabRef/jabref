@@ -3,7 +3,6 @@ package org.jabref.gui.frame;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -11,6 +10,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -55,6 +55,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.welcome.WelcomeTab;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -102,6 +103,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
@@ -125,7 +127,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       TaskExecutor taskExecutor) {
+                       TaskExecutor taskExecutor,
+                       GitHandlerRegistry gitHandlerRegistry) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -136,6 +139,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
 
         setId("frame");
 
@@ -246,7 +250,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 clipBoardManager,
                 this::getOpenDatabaseAction,
                 aiService,
-                entryEditor);
+                entryEditor,
+                gitHandlerRegistry);
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
@@ -366,6 +371,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case NEW_INPROCEEDINGS:
                         new NewEntryAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
+                    case BACK:
+                        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::back);
+                        event.consume();
+                        break;
+                    case FORWARD:
+                        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
+                        event.consume();
+                        break;
+                    case CLOSE_DATABASE:
+                        new CloseDatabaseAction(this, stateManager).execute();
+                        event.consume();
+                        break;
                     default:
                 }
             }
@@ -446,7 +463,23 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         // Hide tab bar
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
-        EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
+        tabbedPane.getTabs().addListener((ListChangeListener<Tab>) _ -> updateTabBarVisible());
+
+        stateManager.canGoBackProperty().bind(
+                stateManager.activeTabProperty().flatMap(
+                        optionalTab -> optionalTab
+                                .map(LibraryTab::canGoBackProperty)
+                                .orElse(new SimpleBooleanProperty(false))
+                )
+        );
+
+        stateManager.canGoForwardProperty().bind(
+                stateManager.activeTabProperty().flatMap(
+                        optionalTab -> optionalTab
+                                .map(LibraryTab::canGoForwardProperty)
+                                .orElse(new SimpleBooleanProperty(false))
+                )
+        );
     }
 
     private void updateTabBarVisible() {
@@ -524,7 +557,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
-        Objects.requireNonNull(databaseContext);
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
                 this,
@@ -558,7 +590,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(tab::getBibDatabaseContext, stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(dialogService, stateManager, preferences, tab::getBibDatabaseContext)),
-                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(tab::getBibDatabaseContext, stateManager, preferences, dialogService)),
+                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(() -> {
+                    LibraryTab currentTab = getCurrentLibraryTab();
+                    return (currentTab == null) ? null : currentTab.getBibDatabaseContext();
+                }, stateManager, preferences, dialogService)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(this, tab, stateManager)),
                 factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction(tab)),

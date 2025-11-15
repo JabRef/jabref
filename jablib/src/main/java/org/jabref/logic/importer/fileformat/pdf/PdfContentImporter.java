@@ -13,18 +13,17 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -33,7 +32,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
 import org.jspecify.annotations.Nullable;
 
-import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
+import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 
 /**
  * Parses data of the first page of the PDF and creates a BibTeX entry.
@@ -41,7 +40,7 @@ import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
  * Currently, Springer, and IEEE formats are supported.
  * <p>
  * In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
- * please see {@link BibliographyFromPdfImporter}.
+ * please see {@link RuleBasedBibliographyPdfImporter}.
  * <p>
  * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
@@ -137,7 +136,9 @@ public class PdfContentImporter extends PdfImporter {
             boolean isFirst = true;
             int i = 0;
             res = "";
+            // @formatter:off
             do {
+                // @formatter:on
                 if (workedOnFirstOrMiddle) {
                     // last item was a first or a middle name
                     // we have to check whether we are on a middle name
@@ -186,13 +187,14 @@ public class PdfContentImporter extends PdfImporter {
         return removeNonLettersAtEnd(title);
     }
 
-    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException {
+    @Override
+    public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
         List<BibEntry> result = new ArrayList<>(1);
         String firstPageContents = PdfUtils.getFirstPageContents(document);
         Optional<String> titleByFontSize = extractTitleFromDocument(document);
         Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE, titleByFontSize);
         entry.ifPresent(result::add);
-        return result;
+        return new ParserResult(result);
     }
 
     private static Optional<String> extractTitleFromDocument(PDDocument document) throws IOException {
@@ -296,12 +298,12 @@ public class PdfContentImporter extends PdfImporter {
      * Parses the first page content of a PDF document and extracts bibliographic information such as title, author,
      * abstract, keywords, and other relevant metadata. This method processes the content line-by-line and uses
      * custom parsing logic to identify and assemble information blocks from academic papers.
-     *
+     * <p>
      * idea: split[] contains the different lines, blocks are separated by empty lines, treat each block
-     *       or do special treatment at authors (which are not broken).
-     *       Therefore, we do a line-based and not a block-based splitting i points to the current line
-     *       curString (mostly) contains the current block,
-     *       the different lines are joined into one and thereby separated by " "
+     * or do special treatment at authors (which are not broken).
+     * Therefore, we do a line-based and not a block-based splitting i points to the current line
+     * curString (mostly) contains the current block,
+     * the different lines are joined into one and thereby separated by " "
      *
      * <p> This method follows the structure typically found in academic paper PDFs:
      * - First, it attempts to detect the title by font size, if available, or by text position.
@@ -318,7 +320,7 @@ public class PdfContentImporter extends PdfImporter {
      * @param titleByFontSize   An optional title string determined by font size; if provided, this overrides the
      *                          default title parsing.
      * @return An {@link Optional} containing a {@link BibEntry} with the parsed bibliographic data if extraction
-     *         is successful. Otherwise, an empty {@link Optional}.
+     * is successful. Otherwise, an empty {@link Optional}.
      */
     @VisibleForTesting
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, Optional<String> titleByFontSize) {

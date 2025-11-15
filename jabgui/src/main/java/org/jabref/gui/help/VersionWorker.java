@@ -2,7 +2,6 @@ package org.jabref.gui.help;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -15,15 +14,16 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.Version;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This worker checks if there is a new version of JabRef available. If there is it will display a dialog to the user
+ * This worker checks if there is a new version of JabRef available. If there is, it will display a dialog to the user
  * offering him multiple options to proceed (see changelog, go to the download page, ignore this version, and remind
  * later).
- *
- * If the versions check is executed manually and this is the latest version it will also display a dialog to inform the
+ * <p>
+ * If the version check is executed manually and this is the latest version, it will also display a dialog to inform the
  * user.
  */
 public class VersionWorker {
@@ -40,13 +40,13 @@ public class VersionWorker {
     private final InternalPreferences internalPreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
-    public VersionWorker(Version installedVersion,
-                         DialogService dialogService,
-                         TaskExecutor taskExecutor,
-                         GuiPreferences preferences) {
-        this.installedVersion = Objects.requireNonNull(installedVersion);
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.taskExecutor = Objects.requireNonNull(taskExecutor);
+    public VersionWorker(@NonNull Version installedVersion,
+                         @NonNull DialogService dialogService,
+                         @NonNull TaskExecutor taskExecutor,
+                         @NonNull GuiPreferences preferences) {
+        this.installedVersion = installedVersion;
+        this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
         this.internalPreferences = preferences.getInternalPreferences();
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
     }
@@ -99,7 +99,7 @@ public class VersionWorker {
         } else {
             // notify the user about a newer version
             if (dialogService.showCustomDialogAndWait(
-                    new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, externalApplicationsPreferences))
+                                     new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, externalApplicationsPreferences))
                              .orElse(true)) {
                 internalPreferences.setIgnoredVersion(newerVersion.get());
             }
