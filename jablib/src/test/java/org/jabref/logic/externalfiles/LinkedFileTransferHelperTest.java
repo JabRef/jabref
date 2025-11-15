@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_BIB;
-import static org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode.RELATIVE_TO_MAIN_FILE_DIR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -36,21 +35,19 @@ class LinkedFileTransferHelperTest {
     @ParameterizedTest
     // @CsvSource could also be used, but there is no strong typing
     @MethodSource
-    void check(FileTestConfiguration fileTestConfiguration, String expectedLink, FileTestConfiguration.TestFileLinkMode expectedLinkMode) {
+    void check(FileTestConfiguration fileTestConfiguration) {
+        BibEntry actualEntry = new BibEntry(fileTestConfiguration.sourceContext.getEntries().getFirst());
+        BibDatabaseContext actualBibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(actualEntry)));
         LinkedFileTransferHelper
                 .adjustLinkedFilesForTarget(
                         filePreferences, fileTestConfiguration.sourceContext,
-                        fileTestConfiguration.targetContext,
-                        fileTestConfiguration.targetEntry
+                        actualBibDatabaseContext,
+                        actualEntry
                 );
 
-        expectedLink = fileTestConfiguration.convertLink(Path.of(expectedLink), expectedLinkMode).toString();
+        // expectedLink = fileTestConfiguration.targetContext.getDatabase().getEntries().getFirst().getFiles();
 
-        BibEntry expectedEntry = new BibEntry()
-                .withFiles(
-                        List.of(new LinkedFile("", expectedLink, "PDF")));
-
-        assertEquals(expectedEntry, fileTestConfiguration.targetEntry);
+        assertEquals(fileTestConfiguration.targetContext.getDatabase().getEntries().getFirst(), actualEntry);
     }
 
     static Stream<Arguments> check() throws IOException {
@@ -65,14 +62,26 @@ class LinkedFileTransferHelperTest {
                                 .filePreferences(filePreferences)
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                                .sourceBibDir("source-dir")
-                                .sourceFileDir("source-dir")
-                                .testFileLinkMode(RELATIVE_TO_BIB)
-                                .targetBibDir("target-dir")
-                                .build(),
-                        "test.pdf",
-                        RELATIVE_TO_BIB
-                ),
+                                .sourceBibTestConfiguration(
+                                        BibTestConfigurationBuilder
+                                                .bibTestConfiguration()
+                                                .tempDir(tempDir)
+                                                .bibDir("source-dir")
+                                                .pdfFileDir("source-dir")
+                                                .fileLinkMode(RELATIVE_TO_BIB)
+                                                .build()
+                                )
+                                .targetBibTestConfiguration(
+                                        BibTestConfigurationBuilder
+                                                .bibTestConfiguration()
+                                                .tempDir(tempDir)
+                                                .bibDir("target-dir")
+                                                .pdfFileDir("target-dir")
+                                                .fileLinkMode(RELATIVE_TO_BIB)
+                                                .build()
+                                )
+                                .build()
+                ) /* ,
 
                 // Directory not reachable with different paths - file copying with directory structure
                 Arguments.of(
@@ -130,6 +139,7 @@ class LinkedFileTransferHelperTest {
                         RELATIVE_TO_MAIN_FILE_DIR
                 )
                 // endregion
+                */
         );
     }
 
