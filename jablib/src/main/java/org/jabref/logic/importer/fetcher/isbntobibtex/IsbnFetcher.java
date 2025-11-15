@@ -1,10 +1,12 @@
 package org.jabref.logic.importer.fetcher.isbntobibtex;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -13,17 +15,13 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.util.OptionalUtil;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.net.MalformedURLException;
-import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.net.URLDownload;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;

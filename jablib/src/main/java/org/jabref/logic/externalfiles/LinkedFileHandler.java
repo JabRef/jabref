@@ -251,20 +251,7 @@ public class LinkedFileHandler {
         Optional<String> targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern());
 
         if (targetFileName.isEmpty() && linkedFile.isOnlineLink()) {
-            String linkedName = linkedFile.getLink();
-
-            int lastSlashIndex = linkedName.lastIndexOf('/');
-            if (lastSlashIndex >= 0 && lastSlashIndex < linkedName.length() - 1) {
-                linkedName = linkedName.substring(lastSlashIndex + 1);
-            }
-
-            int queryIndex = linkedName.indexOf('?');
-            if (!linkedName.isEmpty() && queryIndex > 0) {
-                linkedName = linkedName.substring(0, queryIndex);
-            }
-
-            extension = FileUtil.getFileExtension(linkedName).orElse("");
-            targetFileName = Optional.of(FileUtil.getBaseName(linkedName));
+            return linkedFile.getFileName();
         }
 
         String baseName = targetFileName.orElse("file");
