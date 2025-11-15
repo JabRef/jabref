@@ -82,7 +82,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
             } catch (ParserConfigurationException | IOException | SAXException e) {
                 Unchecked.throwChecked(new FetcherException("Issue with parsing link", e));
             }
-            return null;
+            return List.of();
         };
     }
 
