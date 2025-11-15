@@ -540,7 +540,9 @@ extraJavaModuleInfo {
     }
 
     // Workaround for https://github.com/wiremock/wiremock/issues/2149
-    module("org.wiremock:wiremock", "wiremock") {
+    module("org.wiremock:wiremock-jetty12", "wiremock") {
+
+        overrideModuleName()
         exportAllPackages()
 
         requires("org.apache.httpcomponents.client5.httpclient5")

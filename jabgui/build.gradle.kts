@@ -116,7 +116,7 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock") {
+    testImplementation("org.wiremock:wiremock-jetty12") {
         exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
     }
 
@@ -126,7 +126,7 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
-    testImplementation("org.eclipse.jetty.toolchain:jetty-servlet-api")
+    //testImplementation("org.eclipse.jetty.toolchain:jetty-servlet-api")
 
 }
 
