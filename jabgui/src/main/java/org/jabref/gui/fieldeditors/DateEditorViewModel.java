@@ -58,12 +58,10 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
             private String sanitizeIncompleteRange(String dateString) {
                 String trimmed = dateString.trim();
 
-
                 if (trimmed.endsWith("/") && !trimmed.matches(".*\\d+/\\d+.*")) {
                     LOGGER.debug("Sanitizing incomplete range (trailing slash): {}", trimmed);
                     return trimmed.substring(0, trimmed.length() - 1).trim();
                 }
-
 
                 if (trimmed.startsWith("/") && !trimmed.matches(".*\\d+/\\d+.*")) {
                     LOGGER.debug("Sanitizing incomplete range (leading slash): {}", trimmed);
@@ -79,13 +77,11 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
 
                     String sanitizedString = sanitizeIncompleteRange(string);
 
-
                     Optional<Date> parsedDate = Date.parse(sanitizedString);
                     if (parsedDate.isPresent() && parsedDate.get().getEndDate().isPresent()) {
 
                         return RANGE_SENTINEL;
                     }
-
 
                     try {
                         return dateFormatter.parse(sanitizedString);
