@@ -76,22 +76,21 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
             @Override
             public TemporalAccessor fromString(String string) {
                 if (StringUtil.isNotBlank(string)) {
-                    // ✅ Sanitize incomplete ranges (e.g., "2010/" → "2010")
+
                     String sanitizedString = sanitizeIncompleteRange(string);
 
-                    // Priority 1: Check if it's a date range
+
                     Optional<Date> parsedDate = Date.parse(sanitizedString);
                     if (parsedDate.isPresent() && parsedDate.get().getEndDate().isPresent()) {
-                        // It's a range! Return sentinel to signal this is a special case
-                        // The toString() method will retrieve the value from textProperty()
+
                         return RANGE_SENTINEL;
                     }
 
-                    // Priority 2: Try strict format parsing
+
                     try {
                         return dateFormatter.parse(sanitizedString);
                     } catch (DateTimeParseException exception) {
-                        // Priority 3: Try flexible parsing (single dates only)
+
                         return parsedDate
                                 .filter(date -> date.getEndDate().isEmpty())
                                 .map(Date::toTemporalAccessor)
