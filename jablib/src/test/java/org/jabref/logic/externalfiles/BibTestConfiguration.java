@@ -45,7 +45,9 @@ public class BibTestConfiguration {
 
         this.pdfFile = tempDir.resolve(pdfFileDir).resolve("test.pdf");
         Files.createDirectories(this.pdfFile.getParent());
-        Files.createFile(this.pdfFile);
+        if (!Files.exists(this.pdfFile)) {
+            Files.createFile(this.pdfFile);
+        }
 
         if (librarySpecificFileDir == null) {
             this.librarySpecificFileDir = null;
