@@ -41,6 +41,7 @@ dependencies {
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http")
     api("org.glassfish.jersey.core:jersey-server")
     api("org.glassfish.jersey.inject:jersey-hk2")
+    api("org.glassfish.jersey.test-framework:jersey-test-framework-core")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
 
 }
