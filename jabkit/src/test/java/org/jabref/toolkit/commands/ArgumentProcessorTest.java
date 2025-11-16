@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -16,6 +16,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.toolkit.ArgumentProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

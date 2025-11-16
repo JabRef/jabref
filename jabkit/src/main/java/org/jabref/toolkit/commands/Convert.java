@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -15,7 +15,8 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.ArgumentProcessor;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;

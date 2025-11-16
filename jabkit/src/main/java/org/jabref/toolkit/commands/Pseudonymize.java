@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +11,8 @@ import org.jabref.logic.pseudonymization.Pseudonymization;
 import org.jabref.logic.pseudonymization.PseudonymizationResultCsvWriter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.ArgumentProcessor;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import io.github.adr.linked.ADR;
 import org.slf4j.Logger;

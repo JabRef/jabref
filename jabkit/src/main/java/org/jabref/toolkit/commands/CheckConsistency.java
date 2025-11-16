@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -14,7 +14,8 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.ArgumentProcessor;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

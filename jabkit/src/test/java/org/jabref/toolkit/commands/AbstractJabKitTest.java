@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -17,6 +17,7 @@ import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.toolkit.ArgumentProcessor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Answers;

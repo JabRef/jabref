@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -28,6 +28,17 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.toolkit.commands.CheckConsistency;
+import org.jabref.toolkit.commands.CheckIntegrity;
+import org.jabref.toolkit.commands.Convert;
+import org.jabref.toolkit.commands.DoiToBibtex;
+import org.jabref.toolkit.commands.Fetch;
+import org.jabref.toolkit.commands.GenerateBibFromAux;
+import org.jabref.toolkit.commands.GenerateCitationKeys;
+import org.jabref.toolkit.commands.Pdf;
+import org.jabref.toolkit.commands.Preferences;
+import org.jabref.toolkit.commands.Pseudonymize;
+import org.jabref.toolkit.commands.Search;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

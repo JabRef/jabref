@@ -32,7 +32,6 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.toolkit.cli.ArgumentProcessor;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;

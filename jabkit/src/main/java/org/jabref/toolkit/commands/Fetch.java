@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -12,6 +12,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.toolkit.ArgumentProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

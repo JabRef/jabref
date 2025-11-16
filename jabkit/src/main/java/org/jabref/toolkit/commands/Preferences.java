@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -7,6 +7,7 @@ import java.util.prefs.BackingStoreException;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.toolkit.ArgumentProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

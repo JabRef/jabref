@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -9,7 +9,8 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.ArgumentProcessor;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
