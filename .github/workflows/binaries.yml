@@ -130,17 +130,23 @@ jobs:
 
   disk-space-check:
     needs: conditions
-    if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
     runs-on: ubuntu-latest
     outputs:
       available: ${{ steps.diskspace.outputs.available }}
     steps:
+      - name: No upload
+        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'false'
+        shell: bash
+        run: |
+          echo "available=false" >> "$GITHUB_OUTPUT"
+          echo "🚫 no upload – skipping upload"
       - name: Setup SSH key
+        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Check disk space on builds.jabref.org
-        id: diskspace
+        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
         shell: bash
         run: |
           USAGE=$(ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no jrrsync@build-upload.jabref.org \
