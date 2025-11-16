@@ -47,6 +47,7 @@ import static picocli.CommandLine.Option;
                 Fetch.class,
                 GenerateBibFromAux.class,
                 GenerateCitationKeys.class,
+                GetCitedWorks.class,
                 Pdf.class,
                 Preferences.class,
                 Pseudonymize.class,
