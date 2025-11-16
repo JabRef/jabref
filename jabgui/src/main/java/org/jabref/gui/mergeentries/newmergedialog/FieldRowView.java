@@ -204,13 +204,15 @@ public class FieldRowView {
 
         LOGGER.debug("Hiding diffs...");
 
-        int leftValueLength = getLeftValueCell().getStyleClassedLabel().getLength();
-        getLeftValueCell().getStyleClassedLabel().clearStyle(0, leftValueLength);
-        getLeftValueCell().getStyleClassedLabel().replaceText(viewModel.getLeftFieldValue());
+        resetCellText(getLeftValueCell(), viewModel.getLeftFieldValue());
+        resetCellText(getRightValueCell(), viewModel.getRightFieldValue());
+    }
 
-        int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
-        getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
-        getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());
+    private void resetCellText(FieldValueCell cell, String newText) {
+        var label = cell.getStyleClassedLabel();
+        int length = label.getLength();
+        label.clearStyle(0, length);
+        label.replaceText(newText);
     }
 
     public boolean hasEqualLeftAndRightValues() {
