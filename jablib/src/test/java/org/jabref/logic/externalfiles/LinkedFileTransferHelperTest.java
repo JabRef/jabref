@@ -64,7 +64,6 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .number(testNumber++)
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
@@ -83,7 +82,6 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .number(testNumber++)
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
@@ -102,7 +100,6 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .number(testNumber++)
                                 .shouldStoreFilesRelativeToBibFile(true)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
@@ -124,7 +121,6 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .number(testNumber++)
                                 .mainFileDir("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
@@ -144,7 +140,6 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .number(testNumber++)
                                 .mainFileDir("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
@@ -166,7 +161,6 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .number(testNumber++)
                                 .mainFileDir("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
@@ -190,7 +184,6 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .number(testNumber++)
                                 .mainFileDir("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
@@ -213,7 +206,6 @@ class LinkedFileTransferHelperTest {
                 Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
-                                .number(testNumber++)
                                 .mainFileDir("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
                                 .shouldAdjustOrCopyLinkedFilesOnTransfer(true),

@@ -15,17 +15,6 @@ import org.jspecify.annotations.Nullable;
 import static org.mockito.Mockito.when;
 
 public class FileTestConfiguration {
-
-    // for debugging purposes
-    private final int number;
-
-    @Override
-    public String toString() {
-        return "FileTestConfiguration{" +
-                "number=" + number +
-                '}';
-    }
-
     final BibDatabaseContext sourceContext;
     // final BibEntry sourceEntry;
 
@@ -41,8 +30,6 @@ public class FileTestConfiguration {
     /// @param filePreferences the file preferences to modify
     @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
     public FileTestConfiguration(
-            int number,
-
             @Opt String mainFileDir,
             Boolean shouldStoreFilesRelativeToBibFile,
             Boolean shouldAdjustOrCopyLinkedFilesOnTransfer,
@@ -53,7 +40,6 @@ public class FileTestConfiguration {
             FilePreferences filePreferences,
             Path tempDir
     ) {
-        this.number = number;
         if (mainFileDir == null) {
             when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
             this.mainFileDir = null;
