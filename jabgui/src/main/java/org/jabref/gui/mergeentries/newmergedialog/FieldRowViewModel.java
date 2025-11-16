@@ -104,7 +104,7 @@ public class FieldRowViewModel {
     }
 
     private void setupMergeListeners() {
-        EasyBind.listen(isFieldsMergedProperty(), (obs, old, areFieldsMerged) -> {
+        EasyBind.listen(isFieldsMergedProperty(), (_, _, areFieldsMerged) -> {
             LOGGER.debug("Field are merged: {}", areFieldsMerged);
             if (areFieldsMerged) {
                 selectLeftValue();

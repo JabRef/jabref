@@ -1,7 +1,6 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
@@ -148,14 +147,6 @@ public class FieldRowView {
 
     public void selectNone() {
         viewModel.selectNone();
-    }
-
-    public String getMergedValue() {
-        return mergedValueProperty().getValue();
-    }
-
-    public ReadOnlyStringProperty mergedValueProperty() {
-        return viewModel.mergedFieldValueProperty();
     }
 
     public FieldNameCell getFieldNameCell() {
