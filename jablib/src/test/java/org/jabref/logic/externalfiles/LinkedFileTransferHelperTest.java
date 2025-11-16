@@ -28,9 +28,9 @@ class LinkedFileTransferHelperTest {
     @ParameterizedTest
     // @CsvSource could also be used, but there is no strong typing
     @MethodSource
-    void check(BibTestConfigurationBuilder sourceBibTestConfigurationBuilder,
-               BibTestConfigurationBuilder targetBibTestConfigurationBuilder,
-               FileTestConfigurationBuilder fileTestConfigurationBuilder) throws IOException {
+    void check(FileTestConfigurationBuilder fileTestConfigurationBuilder,
+               BibTestConfigurationBuilder sourceBibTestConfigurationBuilder,
+               BibTestConfigurationBuilder targetBibTestConfigurationBuilder) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
         BibTestConfiguration sourceBibTestConfiguration = sourceBibTestConfigurationBuilder.tempDir(tempDir).build();
         BibTestConfiguration targetBibTestConfiguration = targetBibTestConfigurationBuilder.tempDir(tempDir).build();
@@ -62,6 +62,11 @@ class LinkedFileTransferHelperTest {
 
                 // file next to .bib file should be copied
                 Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .number(testNumber++)
+                                .shouldStoreFilesRelativeToBibFile(true)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
                                 .bibTestConfiguration()
                                 .bibDir("source-dir")
@@ -71,16 +76,16 @@ class LinkedFileTransferHelperTest {
                                 .bibTestConfiguration()
                                 .bibDir("target-dir")
                                 .pdfFileDir("target-dir")
-                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_BIB),
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .number(testNumber++)
-                                .shouldStoreFilesRelativeToBibFile(true)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_BIB)
                 ),
 
                 // Directory not reachable with different paths - file copying with directory structure
                 Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .number(testNumber++)
+                                .shouldStoreFilesRelativeToBibFile(true)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
                                 .bibTestConfiguration()
                                 .bibDir("source-dir")
@@ -90,16 +95,16 @@ class LinkedFileTransferHelperTest {
                                 .bibTestConfiguration()
                                 .bibDir("target-dir")
                                 .pdfFileDir("target-dir/nested")
-                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_BIB),
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .number(testNumber++)
-                                .shouldStoreFilesRelativeToBibFile(true)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_BIB)
                 ),
 
                 // targetDirIsParentOfSourceDir
                 Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .number(testNumber++)
+                                .shouldStoreFilesRelativeToBibFile(true)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
                                 .bibTestConfiguration()
                                 .bibDir("lit/sub-dir")
@@ -109,12 +114,7 @@ class LinkedFileTransferHelperTest {
                                 .bibTestConfiguration()
                                 .bibDir("lit")
                                 .pdfFileDir("lit/sub-dir")
-                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_BIB),
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .number(testNumber++)
-                                .shouldStoreFilesRelativeToBibFile(true)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_BIB)
                 ),
                 // endregion
 
@@ -122,6 +122,12 @@ class LinkedFileTransferHelperTest {
 
                 // File in main file directory linked as is
                 Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .number(testNumber++)
+                                .mainFileDir("main-file-dir")
+                                .shouldStoreFilesRelativeToBibFile(false)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
                                 .bibTestConfiguration()
                                 .bibDir("source-bib-dir")
@@ -131,17 +137,17 @@ class LinkedFileTransferHelperTest {
                                 .bibTestConfiguration()
                                 .bibDir("target-bib-dir")
                                 .pdfFileDir("main-file-dir/sub-dir")
-                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_MAIN_FILE_DIR),
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .number(testNumber++)
-                                .mainFileDir("main-file-dir")
-                                .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_MAIN_FILE_DIR)
                 ),
 
                 // same library-specific directory
                 Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .number(testNumber++)
+                                .mainFileDir("main-file-dir")
+                                .shouldStoreFilesRelativeToBibFile(false)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
                                 .bibTestConfiguration()
                                 .bibDir("source-bib-dir")
@@ -153,18 +159,17 @@ class LinkedFileTransferHelperTest {
                                 .bibDir("target-bib-dir")
                                 .librarySpecificFileDir("library-specific")
                                 .pdfFileDir("library-specific")
-                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_LIBRARY_SPECIFIC_DIR),
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .number(testNumber++)
-                                .mainFileDir("main-file-dir")
-                                .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-
+                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_LIBRARY_SPECIFIC_DIR)
                 ),
 
                 // same user-specific file-directory
                 Arguments.of(
+                        FileTestConfigurationBuilder
+                                .fileTestConfiguration()
+                                .number(testNumber++)
+                                .mainFileDir("main-file-dir")
+                                .shouldStoreFilesRelativeToBibFile(false)
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
                                 .bibTestConfiguration()
                                 .bibDir("source-bib-dir")
@@ -178,17 +183,17 @@ class LinkedFileTransferHelperTest {
                                 .librarySpecificFileDir("library-specific")
                                 .userSpecificFileDir("user-specific")
                                 .pdfFileDir("user-specific")
-                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_USER_SPECIFIC_DIR),
+                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_USER_SPECIFIC_DIR)
+                ),
+
+                // copied from (now unreachable) library-specific dir to other library-specific dir
+                Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .number(testNumber++)
                                 .mainFileDir("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                ),
-
-                // copied from (now unreachable) library-specific dir to other library-specific dir
-                Arguments.of(
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
                                 .bibTestConfiguration()
                                 .bibDir("source-bib-dir")
@@ -201,17 +206,17 @@ class LinkedFileTransferHelperTest {
                                 .bibDir("target-bib-dir")
                                 .librarySpecificFileDir("library-specific-target")
                                 .pdfFileDir("library-specific-target")
-                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_LIBRARY_SPECIFIC_DIR),
+                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_LIBRARY_SPECIFIC_DIR)
+                ),
+
+                // copied from (unreachable) user-specific dir to other library-specific dir (no user-specific existing there)
+                Arguments.of(
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .number(testNumber++)
                                 .mainFileDir("main-file-dir")
                                 .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
-                ),
-
-                // copied from (unreachable) user-specific dir to other library-specific dir (no user-specific existing there)
-                Arguments.of(
+                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true),
                         BibTestConfigurationBuilder
                                 .bibTestConfiguration()
                                 .bibDir("source-bib-dir")
@@ -224,13 +229,7 @@ class LinkedFileTransferHelperTest {
                                 .bibDir("target-bib-dir")
                                 .librarySpecificFileDir("library-specific-target")
                                 .pdfFileDir("library-specific-target")
-                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_LIBRARY_SPECIFIC_DIR),
-                        FileTestConfigurationBuilder
-                                .fileTestConfiguration()
-                                .number(testNumber++)
-                                .mainFileDir("main-file-dir")
-                                .shouldStoreFilesRelativeToBibFile(false)
-                                .shouldAdjustOrCopyLinkedFilesOnTransfer(true)
+                                .fileLinkMode(TestFileLinkMode.RELATIVE_TO_LIBRARY_SPECIFIC_DIR)
                 )
                 // endregion
         );
