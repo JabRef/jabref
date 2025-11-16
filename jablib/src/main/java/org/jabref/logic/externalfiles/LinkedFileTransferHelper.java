@@ -116,6 +116,7 @@ public class LinkedFileTransferHelper {
 
             if (!Files.exists(linkedFileAsPath)) {
                 try {
+                    // TODO: Currently, we copy the file and do not move it (when Ctrl+X and then Ctrl+V is pressed)
                     Files.copy(sourcePath, linkedFileAsPath, StandardCopyOption.COPY_ATTRIBUTES);
                 } catch (IOException e) {
                     LOGGER.error("Could not copy file from {} to {}", sourcePath, linkedFileAsPath, e);
