@@ -113,6 +113,24 @@ public class FieldRowViewModelTest {
     }
 
     @Test
+    void newYearShouldBeSelectedForYearsWithLargeValueGap() {
+        BibEntry leftEntry = new BibEntry().withField(StandardField.YEAR, "1990");
+        BibEntry rightEntry = new BibEntry().withField(StandardField.YEAR, "2020");
+        FieldRowViewModel yearField = new FieldRowViewModel(StandardField.YEAR, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
+        yearField.autoSelectBetterValue();
+        assertEquals(FieldRowViewModel.Selection.RIGHT, yearField.getSelection());
+    }
+
+    @Test
+    void yearInRangeShouldBeSelected() {
+        BibEntry leftEntry = new BibEntry().withField(StandardField.YEAR, "1700");
+        BibEntry rightEntry = new BibEntry().withField(StandardField.YEAR, "2000");
+        FieldRowViewModel yearField = new FieldRowViewModel(StandardField.YEAR, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
+        yearField.autoSelectBetterValue();
+        assertEquals(FieldRowViewModel.Selection.RIGHT, yearField.getSelection());
+    }
+
+    @Test
     @Disabled("This test is kept as a reminder to implement a different comparison logic based on the given field.")
     void hasEqualLeftAndRightValuesShouldReturnTrueIfKeywordsAreEqual() {
         FieldRowViewModel keywordsField = new FieldRowViewModel(StandardField.KEYWORDS, rightEntry, extraEntry, mergedEntry, fieldMergerFactory);

@@ -19,6 +19,7 @@ import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactor
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
@@ -262,6 +263,25 @@ public class FieldRowViewModel {
 
     public BibEntry getMergedEntry() {
         return mergedEntry;
+    }
+
+    public void autoSelectBetterValue() {
+        String leftValue = getLeftFieldValue();
+        String rightValue = getRightFieldValue();
+
+        if (StandardField.YEAR == field) {
+            YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();
+            ComparisonResult comparison = comparator.compare(leftValue, rightValue);
+            if (ComparisonResult.RIGHT_BETTER == comparison) {
+                selectRightValue();
+            } else if (ComparisonResult.LEFT_BETTER == comparison) {
+                selectLeftValue();
+            }
+        } else if (InternalField.TYPE_HEADER == field) {
+            if (leftValue.equalsIgnoreCase(StandardEntryType.Misc.getName())) {
+                selectRightValue();
+            }
+        }
     }
 
     class MergeFieldsUndo extends AbstractUndoableEdit {

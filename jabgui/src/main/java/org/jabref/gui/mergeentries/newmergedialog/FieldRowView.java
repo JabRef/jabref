@@ -228,6 +228,10 @@ public class FieldRowView {
         label.replaceText(newText);
     }
 
+    public void autoSelectBetterValue() {
+        viewModel.autoSelectBetterValue();
+    }
+
     public boolean hasEqualLeftAndRightValues() {
         return viewModel.hasEqualLeftAndRightValues();
     }

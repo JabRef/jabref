@@ -53,6 +53,10 @@ public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
         });
     }
 
+    public void autoSelectBetterFields() {
+        threeWayMergeView.autoSelectBetterFields();
+    }
+
     public void setLeftHeaderText(String leftHeaderText) {
         threeWayMergeView.setLeftHeader(leftHeaderText);
     }

@@ -108,7 +108,6 @@ public class ThreeWayMergeView extends VBox {
     }
 
 
-
     private void initializeHeaderView() {
         headerView.getColumnConstraints().addAll(fieldNameColumnConstraints,
                                                  leftEntryColumnConstraints,
@@ -136,6 +135,13 @@ public class ThreeWayMergeView extends VBox {
             addRow(fieldIndex);
 
             mergeGridPane.getRowConstraints().add(new RowConstraints());
+        }
+    }
+
+
+    public void autoSelectBetterFields() {
+        for (FieldRowView row : fieldRows) {
+            row.autoSelectBetterValue();
         }
     }
 
