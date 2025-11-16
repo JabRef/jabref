@@ -67,6 +67,17 @@ public class FieldRowViewModel {
         this.mergedEntry = mergedEntry;
         this.fieldMergerFactory = fieldMergerFactory;
 
+        initializeFieldValues();
+        bindEntryFieldChanges();
+
+        hasEqualLeftAndRight = createHasEqualBinding();
+
+        selectNonEmptyValue();
+
+        setupMergeListeners();
+    }
+
+    private void initializeFieldValues() {
         if (field.equals(InternalField.TYPE_HEADER)) {
             setLeftFieldValue(leftEntry.getType().getDisplayName());
             setRightFieldValue(rightEntry.getType().getDisplayName());
@@ -74,7 +85,9 @@ public class FieldRowViewModel {
             setLeftFieldValue(leftEntry.getField(field).orElse(""));
             setRightFieldValue(rightEntry.getField(field).orElse(""));
         }
+    }
 
+    private void bindEntryFieldChanges() {
         EasyBind.listen(leftFieldValueProperty(), (obs, old, leftValue) -> leftEntry.setField(field, leftValue));
         EasyBind.listen(rightFieldValueProperty(), (obs, old, rightValue) -> rightEntry.setField(field, rightValue));
         EasyBind.listen(mergedFieldValueProperty(), (obs, old, mergedFieldValue) -> {
@@ -84,11 +97,13 @@ public class FieldRowViewModel {
                 getMergedEntry().setField(field, mergedFieldValue);
             }
         });
+    }
 
-        hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValueProperty(), rightFieldValueProperty());
+    private BooleanBinding createHasEqualBinding() {
+        return Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValueProperty(), rightFieldValueProperty());
+    }
 
-        selectNonEmptyValue();
-
+    private void setupMergeListeners() {
         EasyBind.listen(isFieldsMergedProperty(), (obs, old, areFieldsMerged) -> {
             LOGGER.debug("Field are merged: {}", areFieldsMerged);
             if (areFieldsMerged) {

@@ -51,14 +51,26 @@ public class FieldRowView {
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferences);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
 
-        // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
-        // This won't be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
+        setupParentListener();
+        setupToggleMergeIfSupported(field);
+        toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);
+
+        bindCellProperties();
+        subscribeSelectionChanges();
+        subscribeToggleGroupChanges();
+        subscribeFieldsMergedChanges();
+        listenEqualLeftRight();
+    }
+
+    private void setupParentListener() {
         leftValueCell.parentProperty().addListener(e -> {
             if (leftValueCell.getParent() instanceof GridPane grid) {
                 parent = grid;
             }
         });
+    }
 
+    private void setupToggleMergeIfSupported(Field field) {
         if (FieldMergerFactory.canMerge(field)) {
             ToggleMergeUnmergeButton toggleMergeUnmergeButton = new ToggleMergeUnmergeButton(field);
             toggleMergeUnmergeButton.setCanMerge(!viewModel.hasEqualLeftAndRightValues());
@@ -73,13 +85,15 @@ public class FieldRowView {
                 }
             });
         }
+    }
 
-        toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);
-
+    private void bindCellProperties() {
         mergedValueCell.textProperty().bindBidirectional(viewModel.mergedFieldValueProperty());
         leftValueCell.textProperty().bindBidirectional(viewModel.leftFieldValueProperty());
         rightValueCell.textProperty().bindBidirectional(viewModel.rightFieldValueProperty());
+    }
 
+    private void subscribeSelectionChanges() {
         EasyBind.subscribe(viewModel.selectionProperty(), selection -> {
             if (selection == Selection.LEFT) {
                 toggleGroup.selectToggle(leftValueCell);
@@ -89,7 +103,9 @@ public class FieldRowView {
                 toggleGroup.selectToggle(null);
             }
         });
+    }
 
+    private void subscribeToggleGroupChanges() {
         EasyBind.subscribe(toggleGroup.selectedToggleProperty(), selectedToggle -> {
             if (selectedToggle == leftValueCell) {
                 selectLeftValue();
@@ -99,8 +115,9 @@ public class FieldRowView {
                 selectNone();
             }
         });
+    }
 
-        // Hide rightValueCell and extend leftValueCell to 2 columns when fields are merged
+    private void subscribeFieldsMergedChanges() {
         EasyBind.subscribe(viewModel.isFieldsMergedProperty(), isFieldsMerged -> {
             if (isFieldsMerged) {
                 rightValueCell.setVisible(false);
@@ -110,7 +127,9 @@ public class FieldRowView {
                 GridPane.setColumnSpan(leftValueCell, 1);
             }
         });
+    }
 
+    private void listenEqualLeftRight() {
         EasyBind.listen(viewModel.hasEqualLeftAndRightBinding(), (obs, old, isEqual) -> {
             if (isEqual) {
                 LOGGER.debug("Left and right values are equal, LEFT==RIGHT=={}", viewModel.getLeftFieldValue());

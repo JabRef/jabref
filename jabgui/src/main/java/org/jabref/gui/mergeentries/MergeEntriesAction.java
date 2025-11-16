@@ -33,43 +33,52 @@ public class MergeEntriesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
+        if (isNoActiveDatabase()) {
             return;
         }
 
-        // Check if there are two entries selected
+        Optional<BibEntry[]> orderedEntriesOpt = getOrderedSelectedEntries();
+        if (orderedEntriesOpt.isEmpty()) {
+            return;
+        }
+
+        BibEntry first = orderedEntriesOpt.get()[0];
+        BibEntry second = orderedEntriesOpt.get()[1];
+
+        showMergeDialogAndHandleResult(first, second);
+    }
+
+    private boolean isNoActiveDatabase() {
+        return stateManager.getActiveDatabase().isEmpty();
+    }
+
+    private Optional<BibEntry[]> getOrderedSelectedEntries() {
         List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        if (selectedEntries.size() != 2) {
-            // Inform the user to select entries first.
+        if (selectedEntries.size() != NUMBER_OF_ENTRIES_NEEDED) {
             dialogService.showInformationDialogAndWait(
                     Localization.lang("Merge entries"),
                     Localization.lang("You have to choose exactly two entries to merge."));
-            return;
+            return Optional.empty();
         }
 
-        // Store the two entries
-        BibEntry one = selectedEntries.getFirst();
+        BibEntry one = selectedEntries.get(0);
         BibEntry two = selectedEntries.get(1);
 
-        // compare two entries
-        BibEntry first;
-        BibEntry second;
         EntryComparator entryComparator = new EntryComparator(false, false, InternalField.KEY_FIELD);
         if (entryComparator.compare(one, two) <= 0) {
-            first = one;
-            second = two;
+            return Optional.of(new BibEntry[]{one, two});
         } else {
-            first = two;
-            second = one;
+            return Optional.of(new BibEntry[]{two, one});
         }
+    }
 
+    private void showMergeDialogAndHandleResult(BibEntry first, BibEntry second) {
         MergeEntriesDialog dialog = new MergeEntriesDialog(first, second, preferences);
         dialog.setTitle(Localization.lang("Merge entries"));
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
             new MergeTwoEntriesAction(entriesMergeResult, stateManager, undoManager).execute();
-
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
     }
