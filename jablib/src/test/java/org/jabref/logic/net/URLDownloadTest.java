@@ -138,5 +138,4 @@ class URLDownloadTest {
         URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/429"));
         assertThrows(FetcherClientException.class, urlDownload::asString);
     }
-
 }

@@ -49,7 +49,6 @@ class DownloadLinkedFileActionTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
 
-
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws IOException {
         entry = new BibEntry()
@@ -72,7 +71,6 @@ class DownloadLinkedFileActionTest {
         }
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
     }
-
 
     @Test
     void replacesLinkedFiles(@TempDir Path tempFolder) throws MalformedURLException {
@@ -144,5 +142,4 @@ class DownloadLinkedFileActionTest {
 
         assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
     }
-
 }
