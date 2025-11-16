@@ -103,63 +103,133 @@ public class FetchAndMergeEntry {
     }
 
     private void showMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
+        Optional<BibEntry> mergedEntry = getMergedEntryFromDialog(originalEntry, fetchedEntry, fetcher);
+
+        if (mergedEntry.isPresent()) {
+            applyMergedEntryToOriginal(originalEntry, mergedEntry.get(), fetcher);
+        } else {
+            dialogService.notify(Localization.lang("Canceled merging entries"));
+        }
+    }
+
+
+    private Optional<BibEntry> getMergedEntryFromDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
         MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferences);
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));
-        Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog).map(EntriesMergeResult::mergedEntry);
+        return dialogService.showCustomDialogAndWait(dialog).map(EntriesMergeResult::mergedEntry);
+    }
 
-        if (mergedEntry.isPresent()) {
-            NamedCompound ce = new NamedCompound(Localization.lang("Merge entry with %0 information", fetcher.getName()));
+    private void applyMergedEntryToOriginal(BibEntry originalEntry, BibEntry mergedEntry, WebFetcher fetcher) {
+        NamedCompound compoundEdit = createMergeCompoundEdit(fetcher);
 
-            // Updated the original entry with the new fields
-            Set<Field> jointFields = new TreeSet<>(Comparator.comparing(Field::getName));
-            jointFields.addAll(mergedEntry.get().getFields());
-            Set<Field> originalFields = new TreeSet<>(Comparator.comparing(Field::getName));
-            originalFields.addAll(originalEntry.getFields());
-            boolean edited = false;
+        Set<Field> jointFields = toSortedFieldSet(mergedEntry.getFields());
+        Set<Field> originalFields = toSortedFieldSet(originalEntry.getFields());
 
-            // entry type
-            EntryType oldType = originalEntry.getType();
-            EntryType newType = mergedEntry.get().getType();
+        boolean edited = false;
 
-            if (!oldType.equals(newType)) {
-                originalEntry.setType(newType);
-                ce.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
+        edited |= mergeEntryType(originalEntry, mergedEntry, compoundEdit);
+        edited |= mergeFields(originalEntry, mergedEntry, jointFields, compoundEdit);
+        edited |= removeObsoleteFields(originalEntry, originalFields, jointFields, compoundEdit);
+
+        finalizeMerge(edited, compoundEdit, fetcher);
+    }
+
+
+    private NamedCompound createMergeCompoundEdit(WebFetcher fetcher) {
+        String label = Localization.lang("Merge entry with %0 information", fetcher.getName());
+        return new NamedCompound(label);
+    }
+
+    private Set<Field> toSortedFieldSet(Set<Field> fields) {
+        Set<Field> sorted = new TreeSet<>(Comparator.comparing(Field::getName));
+        sorted.addAll(fields);
+        return sorted;
+    }
+
+    private boolean mergeEntryType(BibEntry originalEntry,
+                                   BibEntry mergedEntry,
+                                   NamedCompound compoundEdit) {
+
+        EntryType oldType = originalEntry.getType();
+        EntryType newType = mergedEntry.getType();
+
+        if (!oldType.equals(newType)) {
+            originalEntry.setType(newType);
+            compoundEdit.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean mergeFields(BibEntry originalEntry,
+                                BibEntry mergedEntry,
+                                Set<Field> jointFields,
+                                NamedCompound compoundEdit) {
+
+        boolean edited = false;
+
+        for (Field field : jointFields) {
+            Optional<String> mergedString = mergedEntry.getField(field);
+
+            // If the merged entry does not have this field, skip
+            if (mergedString.isEmpty()) {
+                continue;
+            }
+
+            Optional<String> originalString = originalEntry.getField(field);
+
+            if (originalString.isEmpty() || !originalString.get().equals(mergedString.get())) {
+                originalEntry.setField(field, mergedString.get());
+                compoundEdit.addEdit(
+                        new UndoableFieldChange(originalEntry, field, originalString.orElse(null), mergedString.get())
+                );
                 edited = true;
             }
+        }
 
-            // fields
-            for (Field field : jointFields) {
-                Optional<String> originalString = originalEntry.getField(field);
-                Optional<String> mergedString = mergedEntry.get().getField(field);
-                if (originalString.isEmpty() || !originalString.equals(mergedString)) {
-                    originalEntry.setField(field, mergedString.get()); // mergedString always present
-                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
-                            mergedString.get()));
-                    edited = true;
-                }
+        return edited;
+    }
+
+    private boolean removeObsoleteFields(BibEntry originalEntry,
+                                         Set<Field> originalFields,
+                                         Set<Field> jointFields,
+                                         NamedCompound compoundEdit) {
+
+        boolean edited = false;
+
+        for (Field field : originalFields) {
+            if (jointFields.contains(field) || FieldFactory.isInternalField(field)) {
+                continue;
             }
 
-            // Remove fields which are not in the merged entry, unless they are internal fields
-            for (Field field : originalFields) {
-                if (!jointFields.contains(field) && !FieldFactory.isInternalField(field)) {
-                    Optional<String> originalString = originalEntry.getField(field);
-                    originalEntry.clearField(field);
-                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present
-                    edited = true;
-                }
+            Optional<String> originalString = originalEntry.getField(field);
+            if (originalString.isPresent()) {
+                originalEntry.clearField(field);
+                compoundEdit.addEdit(
+                        new UndoableFieldChange(originalEntry, field, originalString.get(), null)
+                );
+                edited = true;
             }
+        }
 
-            if (edited) {
-                ce.end();
-                undoManager.addEdit(ce);
-                dialogService.notify(Localization.lang("Updated entry with info from %0", fetcher.getName()));
-            } else {
-                dialogService.notify(Localization.lang("No information added"));
-            }
+        return edited;
+    }
+
+    private void finalizeMerge(boolean edited,
+                               NamedCompound compoundEdit,
+                               WebFetcher fetcher) {
+
+        if (edited) {
+            compoundEdit.end();
+            undoManager.addEdit(compoundEdit);
+            dialogService.notify(
+                    Localization.lang("Updated entry with info from %0", fetcher.getName())
+            );
         } else {
-            dialogService.notify(Localization.lang("Canceled merging entries"));
+            dialogService.notify(Localization.lang("No information added"));
         }
     }
 
