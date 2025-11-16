@@ -121,6 +121,7 @@ public class LinkedFileTransferHelper {
                 try {
                     // [impl->req~logic.externalfiles.file-transfer.not-reachable-same-path~1]
                     // TODO: Currently, we copy the file and do not move it (when Ctrl+X and then Ctrl+V is pressed)
+                    LOGGER.debug("Copying file from {} to {}", sourcePath, linkedFileAsPath);
                     Files.copy(sourcePath, linkedFileAsPath, StandardCopyOption.COPY_ATTRIBUTES);
                 } catch (IOException e) {
                     LOGGER.error("Could not copy file from {} to {}", sourcePath, linkedFileAsPath, e);
