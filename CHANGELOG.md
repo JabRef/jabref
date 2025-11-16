@@ -11,15 +11,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added the option in Preferences → Linked files → Attached files to adjust the path of attached files and copy them if needed when entries are copied or cut to another library [#12267](https://github.com/JabRef/jabref/issues/12267)
-- We made the "Configure API key" option in the Web Search preferences tab searchable via preferences search. [#13929](https://github.com/JabRef/jabref/issues/13929)
-- We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
-- We added support for Cygwin-file paths on a Windows Operating System. [#13274](https://github.com/JabRef/jabref/issues/13274)
-- We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
 - We added automatic date-based groups that create year/month/day subgroups from an entry’s date fields. [#10822](https://github.com/JabRef/jabref/issues/10822)
 - We added `doi-to-bibtex` to `JabKit`. [#14244](https://github.com/JabRef/jabref/pull/14244)
 - We added a "Regenerate" button for the AI chat allowing the user to make the language model reformulate its response to the previous prompt. [#12191](https://github.com/JabRef/jabref/issues/12191)
+- We added the option to enable auto-copying and adjusting of attached files when copy and pasting (Preferences → Linked files → Attached files) [#12267](https://github.com/JabRef/jabref/issues/12267)
 - We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377)
 
 ### Changed
@@ -29,7 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - `JabKit`: `--porcelain` does not output any logs to the console anymore. [#14244](https://github.com/JabRef/jabref/pull/14244)
 - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> now opens the terminal in the active library directory. [#14130](https://github.com/JabRef/jabref/issues/14130)
 - After importing, now all imported entries are marked. [#13535](https://github.com/JabRef/jabref/pull/13535)
-- We changed  fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
+- We changed fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
 
 ### Fixed
 
