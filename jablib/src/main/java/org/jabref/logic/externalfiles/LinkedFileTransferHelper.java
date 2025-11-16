@@ -35,7 +35,7 @@ public class LinkedFileTransferHelper {
      * @param filePreferences File preferences for both contexts
      * @param sourceContext   The source database context where files are currently located
      * @param targetContext   The target database context where files should be accessible
-     * @param targetEntry     The entry in thet targetContext
+     * @param targetEntry     The entry in the targetContext
      */
     public static void adjustLinkedFilesForTarget(
             FilePreferences filePreferences,
