@@ -65,9 +65,7 @@ jvmDependencyConflicts.patch {
         removeDependency("org.osgi:org.osgi.annotation.bundle")
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
-    module("org.wiremock:wiremock-jetty12") {
-        removeDependency("net.sf.jopt-simple:jopt-simple")
-    }
+
     module("org.testfx:testfx-core") {
         removeDependency("org.osgi:org.osgi.core")
     }
@@ -538,52 +536,6 @@ extraJavaModuleInfo {
         requires("java.prefs")
     }
 
-    // Workaround for https://github.com/wiremock/wiremock/issues/2149
-    module("org.wiremock:wiremock-jetty12", "wiremock") {
-
-        overrideModuleName()
-        exportAllPackages()
-
-        requires("org.apache.httpcomponents.client5.httpclient5")
-        requires("com.fasterxml.jackson.core")
-        requires("com.fasterxml.jackson.databind")
-        requires("com.fasterxml.jackson.datatype.jsr310")
-        requires("com.google.common")
-        requires("org.apache.commons.fileupload")
-        requires("java.xml")
-        requires("json.path")
-        requires("org.custommonkey.xmlunit")
-        requires("org.eclipse.jetty.server")
-        requires("org.eclipse.jetty.servlet")
-        requires("org.eclipse.jetty.servlets")
-        requires("org.eclipse.jetty.webapp")
-        requires("org.eclipse.jetty.proxy")
-        requires("org.eclipse.jetty.http2.server")
-        requires("org.eclipse.jetty.alpn.server")
-        requires("org.eclipse.jetty.alpn.java.server")
-        requires("org.eclipse.jetty.alpn.java.client")
-        requires("org.eclipse.jetty.alpn.client")
-        requires("org.slf4j")
-        requires("org.xmlunit")
-        requires("wiremock.slf4j.spi.shim")
-
-        uses("com.github.tomakehurst.wiremock.extension.Extension")
-
-        // workaround for https://github.com/wiremock/wiremock/issues/2874
-        mergeJar("com.github.jknack:handlebars")
-        mergeJar("com.github.jknack:handlebars-helpers")
-
-        // Required to provide package "wiremock.org.slf4j.helpers"
-        mergeJar("com.github.koppor:wiremock-slf4j-shim")
-    }
-    module("com.github.koppor:wiremock-slf4j-shim", "wiremock.slf4j.shim") {
-        patchRealModule()
-        exportAllPackages()
-    }
-    module("com.github.koppor:wiremock-slf4j-spi-shim", "wiremock.slf4j.spi.shim") {
-        patchRealModule()
-        exportAllPackages()
-    }
     module("org.objenesis:objenesis", "org.objenesis") {
         exportAllPackages()
         requireAllDefinedDependencies()
