@@ -150,19 +150,4 @@ public class URLUtil {
             throw new IllegalArgumentException(e);
         }
     }
-
-    /**
-     * Extracts the filename from a URL.
-     * If the URL doesn't have a filename (ends with '/'), returns a default name.
-     *
-     * @param url the URL string to extract the filename from
-     * @return the extracted filename or a default name if none found
-     */
-    public static String getFileNameFromUrl(String url) {
-        String fileName = url.substring(url.lastIndexOf('/') + 1);
-        if (fileName.isBlank()) {
-            fileName = "downloaded.pdf";
-        }
-        return FileUtil.getValidFileName(fileName);
-    }
 }

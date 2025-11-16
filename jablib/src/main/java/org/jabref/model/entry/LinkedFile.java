@@ -228,21 +228,7 @@ public class LinkedFile implements Serializable {
     public String getFileName() {
         String linkedName = link.get();
         if (isOnlineLink(linkedName)) {
-            int lastSlashIndex = linkedName.lastIndexOf('/');
-            if (lastSlashIndex == linkedName.length() - 1) {
-                linkedName = linkedName.substring(0,lastSlashIndex);
-                lastSlashIndex = linkedName.lastIndexOf('/');
-            }
-            if (lastSlashIndex >= 0) {
-                linkedName = linkedName.substring(lastSlashIndex + 1);
-            }
-
-            int queryIndex = linkedName.indexOf('?');
-            if (queryIndex >= 0) {
-                linkedName = linkedName.substring(0, queryIndex);
-            }
-
-            return linkedName;
+            return FileUtil.getFileNameFromUrl(linkedName);
         } else {
             try {
                 return Path.of(linkedName).getFileName().toString();

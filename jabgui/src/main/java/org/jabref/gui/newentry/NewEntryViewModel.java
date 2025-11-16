@@ -25,6 +25,7 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -234,6 +235,10 @@ public class NewEntryViewModel {
     public ReadOnlyBooleanProperty bibtexTextValidatorProperty() {
         return bibtexTextValidator.getValidationStatus().validProperty();
     }
+    
+    private Optional<BibEntry> withCoversAttached(Optional<BibEntry> entry) {
+        return BookCoverFetcher.withAttachedCoverFileIfExists(entry, libraryTab.getBibDatabaseContext(), preferences.getFilePreferences(), preferences.getExternalApplicationsPreferences());
+    }
 
     private class WorkerLookupId extends Task<Optional<BibEntry>> {
         @Override
@@ -245,7 +250,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            return fetcher.performSearchById(text);
+            return withCoversAttached(fetcher.performSearchById(text));
         }
     }
 
@@ -260,7 +265,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            return fetcher.performSearchById(text);
+            return withCoversAttached(fetcher.performSearchById(text));
         }
     }
 
