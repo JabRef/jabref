@@ -62,6 +62,7 @@ public class LinkedFileTransferHelper {
             Path linkedFileAsPath = Path.of(linkedFile.getLink());
             if (linkedFileAsPath.isAbsolute()) {
                 // In case the file is an absolute path, there is no need to adjust anything
+                // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
                 linkedFiles.add(linkedFile);
                 continue;
             }
@@ -86,6 +87,7 @@ public class LinkedFileTransferHelper {
 
             if ((linkedFileAsPath.getParent() != null) // the case with no parent is handled at the next if ("Try to find in other directory")
                     && linkedFile.findIn(targetContext, filePreferences).isPresent()) {
+                // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
                 LOGGER.debug("File is reachable as is");
                 // File is reachable as is - no need to copy
                 linkedFiles.add(linkedFile);
@@ -94,6 +96,7 @@ public class LinkedFileTransferHelper {
 
             // Try to find in other directory
 
+            // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
             List<Path> directories = targetContext.getFileDirectories(filePreferences);
             Optional<Path> otherPlaceFile = findInSubDirs(linkedFileAsPath.getFileName(), directories);
             if (otherPlaceFile.isPresent()) {
@@ -116,6 +119,7 @@ public class LinkedFileTransferHelper {
 
             if (!Files.exists(linkedFileAsPath)) {
                 try {
+                    // [impl->req~logic.externalfiles.file-transfer.not-reachable-same-path~1]
                     // TODO: Currently, we copy the file and do not move it (when Ctrl+X and then Ctrl+V is pressed)
                     Files.copy(sourcePath, linkedFileAsPath, StandardCopyOption.COPY_ATTRIBUTES);
                 } catch (IOException e) {
@@ -134,7 +138,6 @@ public class LinkedFileTransferHelper {
             }
 
             if (isReachableFromPrimaryDirectory(relative)) {
-                // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
                 fileLinksChanged = isPathAdjusted(linkedFile, relative, linkedFiles, fileLinksChanged);
             } else {
                 fileLinksChanged = isFileCopied(sourceContext, targetContext, filePreferences, linkedFile, linkedFiles, fileLinksChanged);
