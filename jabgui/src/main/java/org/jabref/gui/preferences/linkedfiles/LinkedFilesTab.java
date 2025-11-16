@@ -7,6 +7,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -25,6 +26,11 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     @FXML private TextField mainFileDirectory;
     @FXML private RadioButton useMainFileDirectory;
+    
+    @FXML private RadioButton bookCoverDownload;
+    @FXML private Label bookCoverLabel;
+    @FXML private TextField bookCoverLocation;
+    
     @FXML private RadioButton useBibLocationAsPrimary;
     @FXML private Button browseDirectory;
     @FXML private Button autolinkRegexHelp;
@@ -63,7 +69,11 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         mainFileDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
         browseDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
-        useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());
+
+        bookCoverLocation.textProperty().bindBidirectional(viewModel.coversDownloadLocationProperty());
+        bookCoverLocation.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
+        bookCoverLabel.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
+        bookCoverDownload.selectedProperty().bindBidirectional(viewModel.shouldDownloadCoversProperty());
 
         moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());
         moveToTrash.setDisable(!NativeDesktop.get().moveToTrashSupported());

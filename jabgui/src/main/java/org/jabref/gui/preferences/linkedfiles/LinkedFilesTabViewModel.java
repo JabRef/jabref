@@ -44,6 +44,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInFilesDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastDirectory = new SimpleBooleanProperty();
+    private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
+    private final StringProperty coversDownloadLocation = new SimpleStringProperty("");
 
     private final Validator mainFileDirValidator;
 
@@ -90,6 +92,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
         openFileExplorerInFilesDirectory.setValue(filePreferences.shouldOpenFileExplorerInFileDirectory());
         openFileExplorerInLastDirectory.setValue(filePreferences.shouldOpenFileExplorerInLastUsedDirectory());
+        shouldDownloadCovers.setValue(filePreferences.shouldDownloadCovers());
+        coversDownloadLocation.setValue(filePreferences.coversDownloadLocation());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -115,6 +119,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
         filePreferences.setOpenFileExplorerInFileDirectory(openFileExplorerInFilesDirectory.getValue());
         filePreferences.setOpenFileExplorerInLastUsedDirectory(openFileExplorerInLastDirectory.getValue());
+        filePreferences.setShouldDownloadCovers(shouldDownloadCovers.getValue());
+        filePreferences.setOpenFileExplorerInLastUsedDirectory(coversDownloadLocation.getValue());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
@@ -215,6 +221,14 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty openFileExplorerInLastDirectoryProperty() {
         return openFileExplorerInLastDirectory;
+    }
+
+    public BooleanProperty shouldDownloadCoversProperty() {
+        return shouldDownloadCovers;
+    }
+
+    public StringProperty coversDownloadLocationProperty() {
+        return coversDownloadLocation;
     }
 }
 

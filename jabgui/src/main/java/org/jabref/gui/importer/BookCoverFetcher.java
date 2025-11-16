@@ -34,20 +34,20 @@ public class BookCoverFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BookCoverFetcher.class);
 
-    private static final Pattern BOOK_COVER_PATTERN = Pattern.compile("^\\s*\\{\\s*\"url\"\\s*:\\s*\"([^\"]*)\"\\s*\\}\\s*$");
+    private static final Pattern JSON_CONTAINING_URL_PATTERN = Pattern.compile("^\\s*\\{\\s*\"url\"\\s*:\\s*\"([^\"]*)\"\\s*\\}\\s*$");
 
     public static Optional<BibEntry> withAttachedCoverFileIfExists(Optional<BibEntry> possible, BibDatabaseContext databaseContext, FilePreferences filePreferences, ExternalApplicationsPreferences externalApplicationsPreferences) {
-        if (possible.isPresent()) {
+        if (possible.isPresent() && filePreferences.shouldDownloadCovers()) {
             BibEntry entry = possible.get();
             Optional<ISBN> isbn = entry.getISBN();
             if (isbn.isPresent()) {
                 final String url = getCoverImageURLForIsbn(isbn.get());
                 final Path directory = databaseContext.getFirstExistingFileDir(filePreferences).orElse(filePreferences.getWorkingDirectory());
 
-                // Cannot use pattern for name, as auto-generated citation keys aren't available where function is used
+                // Cannot use pattern for name, as auto-generated citation keys aren't available where function is used (org.jabref.gui.newentry.NewEntryViewModel#withCoversAttached)
                 final String name = "isbn-"+isbn.get().asString();
 
-                Optional<LinkedFile> file = tryToDownloadLinkedFile(externalApplicationsPreferences, directory, url, name);
+                Optional<LinkedFile> file = tryToDownloadLinkedFile(externalApplicationsPreferences, directory, url, filePreferences.coversDownloadLocation(), name);
                 if (file.isPresent()) {
                     entry.addFile(file.get());
                 }
@@ -67,7 +67,7 @@ public class BookCoverFetcher {
                 download.canBeReached();
 
                 String json = download.asString();
-                Matcher matches = BOOK_COVER_PATTERN.matcher(json);
+                Matcher matches = JSON_CONTAINING_URL_PATTERN.matcher(json);
 
                 if (matches.find()) {
                     String coverUrlString = matches.group(1);
@@ -82,13 +82,13 @@ public class BookCoverFetcher {
         return "https://covers.openlibrary.org/b/isbn/" + isbn.asString() + "-L.jpg";
     }
 
-    private static Optional<LinkedFile> tryToDownloadLinkedFile(ExternalApplicationsPreferences externalApplicationsPreferences, Path directory, String url, String name) {
-        File covers = directory.resolve("covers").toFile();
-        covers.mkdirs();
-
-        if (covers.exists()) {
-        	final Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
-            final Path destination = directory.resolve("covers").resolve(extension.map(x -> name + "." + x).orElse(name));
+    private static Optional<LinkedFile> tryToDownloadLinkedFile(ExternalApplicationsPreferences externalApplicationsPreferences, Path directory, String url, String location, String name) {
+        final Path subdirectory = directory.resolve(location);
+        
+        subdirectory.toFile().mkdirs();
+        if (subdirectory.toFile().exists()) {
+            final Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
+            final Path destination = subdirectory.resolve(extension.map(x -> name + "." + x).orElse(name));
             final String link = directory.relativize(destination).toString();
             
             if (destination.toFile().exists()) {
@@ -117,7 +117,7 @@ public class BookCoverFetcher {
 
     private static String inferFileType(ExternalApplicationsPreferences externalApplicationsPreferences, Optional<String> mime, Optional<String> extension) {
         if (mime.isPresent()) {
-        	Optional<ExternalFileType> suggested = ExternalFileTypes.getExternalFileTypeByMimeType(mime.get(), externalApplicationsPreferences);
+            Optional<ExternalFileType> suggested = ExternalFileTypes.getExternalFileTypeByMimeType(mime.get(), externalApplicationsPreferences);
             if (suggested.isPresent()) {
                 return suggested.get().getName();
             }
