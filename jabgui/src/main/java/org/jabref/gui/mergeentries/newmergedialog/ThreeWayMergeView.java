@@ -100,16 +100,14 @@ public class ThreeWayMergeView extends VBox {
     private void updateDiff() {
         if (toolbar.shouldShowDiffs()) {
             for (FieldRowView row : fieldRows) {
-                if ("Groups".equals(row.getFieldNameCell().getText()) && (row.getLeftValueCell().getText().contains(keywordSeparator) || row.getRightValueCell().getText().contains(keywordSeparator))) {
-                    row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), new GroupDiffMode(keywordSeparator)));
-                } else {
-                    row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod()));
-                }
+                row.showDiffForToolbar(toolbar, keywordSeparator);
             }
         } else {
             fieldRows.forEach(FieldRowView::hideDiff);
         }
     }
+
+
 
     private void initializeHeaderView() {
         headerView.getColumnConstraints().addAll(fieldNameColumnConstraints,

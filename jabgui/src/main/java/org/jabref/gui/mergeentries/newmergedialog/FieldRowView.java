@@ -184,6 +184,19 @@ public class FieldRowView {
         }
     }
 
+    public void showDiffForToolbar(ThreeWayMergeToolbar toolbar, String keywordSeparator) {
+        if (!rightValueCell.isVisible() || StringUtil.isNullOrEmpty(viewModel.getLeftFieldValue()) || StringUtil.isNullOrEmpty(viewModel.getRightFieldValue())) {
+            return;
+        }
+
+        if ("Groups".equals(fieldNameCell.getText()) &&
+                (leftValueCell.getText().contains(keywordSeparator) || rightValueCell.getText().contains(keywordSeparator))) {
+            showDiff(new ShowDiffConfig(toolbar.getDiffView(), new GroupDiffMode(keywordSeparator)));
+        } else {
+            showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod()));
+        }
+    }
+
     public void hide() {
         if (parent != null) {
             parent.getChildren().removeAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
