@@ -69,6 +69,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("jul.to.slf4j")
     requires.add("org.junit.jupiter.api")
     requires.add("org.mockito")
+    requires.add("org.glassfish.jersey.tests.framework.core")
 }
 
 tasks.test {
