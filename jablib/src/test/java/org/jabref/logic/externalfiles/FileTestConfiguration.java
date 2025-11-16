@@ -10,7 +10,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 import org.jilt.Opt;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static org.mockito.Mockito.when;
@@ -23,7 +22,6 @@ public class FileTestConfiguration {
     final BibDatabaseContext targetContext;
     // final BibEntry targetEntry;
 
-    @NonNull private final Path tempDir;
     @Nullable private final Path mainFileDir;
 
     private final BibTestConfiguration sourceBibTestConfiguration;
@@ -43,8 +41,6 @@ public class FileTestConfiguration {
             BibTestConfiguration sourceBibTestConfiguration,
             BibTestConfiguration targetBibTestConfiguration
     ) {
-        this.tempDir = tempDir;
-
         if (mainFileDir == null) {
             when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
             this.mainFileDir = null;
