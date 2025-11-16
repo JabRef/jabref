@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-class ArgumentProcessorTest extends AbstractJabKitTest {
+class JabKitTest extends AbstractJabKitTest {
 
     @Test
     void auxImport(@TempDir Path tempDir) throws URISyntaxException {
@@ -48,7 +48,7 @@ class ArgumentProcessorTest extends AbstractJabKitTest {
         String originBibFile = originBib.toAbsolutePath().toString();
 
         Path expectedBib = Path.of(
-                Objects.requireNonNull(ArgumentProcessorTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
+                Objects.requireNonNull(JabKitTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
                        .toURI()
         );
 

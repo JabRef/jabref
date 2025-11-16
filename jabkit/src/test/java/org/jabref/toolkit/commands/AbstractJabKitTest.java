@@ -17,7 +17,6 @@ import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.toolkit.ArgumentProcessor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Answers;
@@ -55,8 +54,8 @@ public abstract class AbstractJabKitTest {
                 0,
                 0));
 
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
-        commandLine = new CommandLine(argumentProcessor);
+        JabKit jabKit = new JabKit(preferences, entryTypesManager);
+        commandLine = new CommandLine(jabKit);
 
         outWriter = new ByteArrayOutputStream();
         errWriter = new ByteArrayOutputStream();

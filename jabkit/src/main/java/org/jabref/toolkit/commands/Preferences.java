@@ -7,7 +7,6 @@ import java.util.prefs.BackingStoreException;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.toolkit.ArgumentProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +26,10 @@ class Preferences implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Preferences.class);
 
     @ParentCommand
-    protected ArgumentProcessor argumentProcessor;
+    protected JabKit argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Override
     public void run() {

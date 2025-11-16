@@ -13,7 +13,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.toolkit.ArgumentProcessor;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
@@ -29,10 +28,10 @@ class GenerateBibFromAux implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateBibFromAux.class);
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Option(names = "--aux", required = true)
     private Path auxFile;
@@ -46,7 +45,7 @@ class GenerateBibFromAux implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> pr = ArgumentProcessor.importFile(
+        Optional<ParserResult> pr = JabKit.importFile(
                 inputFile,
                 "bibtex",
                 argumentProcessor.cliPreferences,
@@ -84,7 +83,7 @@ class GenerateBibFromAux implements Runnable {
                                           .collect(Collectors.joining("\n\n")));
             return;
         } else {
-            ArgumentProcessor.saveDatabase(
+            JabKit.saveDatabase(
                     argumentProcessor.cliPreferences,
                     argumentProcessor.entryTypesManager,
                     subDatabase,

@@ -16,7 +16,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.toolkit.ArgumentProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,15 +24,15 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "doi-to-bibtex", description = "Converts a DOI to BibTeX")
-public class DoiToBibtex implements Callable<Integer> {
+class DoiToBibtex implements Callable<Integer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiToBibtex.class);
 
     @CommandLine.ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit argumentProcessor;
 
     @CommandLine.Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Parameters(paramLabel = "DOI", description = "one or more DOIs to fetch", arity = "1..*")
     private String[] dois;

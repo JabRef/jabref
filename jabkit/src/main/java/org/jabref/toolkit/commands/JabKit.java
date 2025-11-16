@@ -1,4 +1,4 @@
-package org.jabref.toolkit;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -28,17 +28,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.toolkit.commands.CheckConsistency;
-import org.jabref.toolkit.commands.CheckIntegrity;
-import org.jabref.toolkit.commands.Convert;
-import org.jabref.toolkit.commands.DoiToBibtex;
-import org.jabref.toolkit.commands.Fetch;
-import org.jabref.toolkit.commands.GenerateBibFromAux;
-import org.jabref.toolkit.commands.GenerateCitationKeys;
-import org.jabref.toolkit.commands.Pdf;
-import org.jabref.toolkit.commands.Preferences;
-import org.jabref.toolkit.commands.Pseudonymize;
-import org.jabref.toolkit.commands.Search;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +52,8 @@ import static picocli.CommandLine.Option;
                 Pseudonymize.class,
                 Search.class
         })
-public class ArgumentProcessor implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
+public class JabKit implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabKit.class);
 
     protected final CliPreferences cliPreferences;
     protected final BibEntryTypesManager entryTypesManager;
@@ -75,7 +64,7 @@ public class ArgumentProcessor implements Runnable {
     @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
     private boolean versionInfoRequested;
 
-    public ArgumentProcessor(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
+    public JabKit(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
         this.cliPreferences = cliPreferences;
         this.entryTypesManager = entryTypesManager;
     }

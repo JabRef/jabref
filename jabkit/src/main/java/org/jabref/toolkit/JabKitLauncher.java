@@ -32,6 +32,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.toolkit.commands.JabKit;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ import picocli.CommandLine;
 /// For the GUI application see {@link org.jabref.Launcher}.
 ///
 /// Does not do any preference migrations.
-public class JabKit {
+public class JabKitLauncher {
     // J.U.L. bridge to SLF4J must be initialized before any logger is created, see initLogging()
     private static Logger LOGGER;
 
@@ -71,13 +72,13 @@ public class JabKit {
             BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
-            ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
-            CommandLine commandLine = new CommandLine(argumentProcessor);
+            JabKit jabKit = new JabKit(preferences, entryTypesManager);
+            CommandLine commandLine = new CommandLine(jabKit);
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,
-                    ArgumentProcessor.getAvailableImportFormats(preferences),
-                    ArgumentProcessor.getAvailableExportFormats(preferences),
+                    JabKit.getAvailableImportFormats(preferences),
+                    JabKit.getAvailableExportFormats(preferences),
                     WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
 
             // Show help when no arguments are given. Placed after header and footer setup
@@ -157,7 +158,7 @@ public class JabKit {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            LOGGER = LoggerFactory.getLogger(JabKit.class);
+            LOGGER = LoggerFactory.getLogger(JabKitLauncher.class);
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
@@ -180,7 +181,7 @@ public class JabKit {
         Configuration.set("%s.policies".formatted(fileWriterName), "startup");
         Configuration.set("%s.backups".formatted(fileWriterName), "30");
 
-        LOGGER = LoggerFactory.getLogger(JabKit.class);
+        LOGGER = LoggerFactory.getLogger(JabKitLauncher.class);
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {

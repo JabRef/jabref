@@ -12,7 +12,6 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.toolkit.ArgumentProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +29,10 @@ class Fetch implements Runnable {
     }
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Option(names = "--provider", required = true)
     private String provider;
@@ -74,7 +73,7 @@ class Fetch implements Runnable {
             }
 
             if (outputFile != null) {
-                ArgumentProcessor.saveDatabase(
+                JabKit.saveDatabase(
                         argumentProcessor.cliPreferences,
                         argumentProcessor.entryTypesManager,
                         new BibDatabase(matches),

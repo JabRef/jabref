@@ -9,7 +9,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.toolkit.ArgumentProcessor;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
@@ -21,14 +20,14 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "generate-citation-keys", description = "Generate citation keys for entries in a .bib file.")
-public class GenerateCitationKeys implements Runnable {
+class GenerateCitationKeys implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     // [impl->req~jabkit.cli.input-flag~1]
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
@@ -39,7 +38,7 @@ public class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
                 argumentProcessor.cliPreferences,
@@ -68,7 +67,7 @@ public class GenerateCitationKeys implements Runnable {
         }
 
         if (outputFile != null) {
-            ArgumentProcessor.saveDatabase(
+            JabKit.saveDatabase(
                     argumentProcessor.cliPreferences,
                     argumentProcessor.entryTypesManager,
                     parserResult.get().getDatabase(),
