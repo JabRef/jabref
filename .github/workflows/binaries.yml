@@ -128,8 +128,41 @@ jobs:
             echo "🚫 Label 'dev: binaries' not found – skipping upload"
           fi
 
+  disk-space-check:
+    needs: conditions
+    runs-on: ubuntu-latest
+    outputs:
+      available: ${{ steps.diskspace.outputs.available }}
+    steps:
+      - name: No upload
+        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'false'
+        shell: bash
+        run: |
+          echo "available=false" >> "$GITHUB_OUTPUT"
+          echo "🚫 no upload – skipping upload"
+      - name: Setup SSH key
+        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Check disk space on builds.jabref.org
+        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
+        shell: bash
+        run: |
+          USAGE=$(ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no jrrsync@build-upload.jabref.org \
+            "df --output=pcent /var/www/builds.jabref.org | tail -n1 | tr -dc '0-9'")
+          echo "Remote usage: ${USAGE}%"
+
+          if [ "$USAGE" -lt 80 ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "☁️ enough disk space available – will upload"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "🚫 not enough disk space – skipping upload"
+          fi
+
   build:
-    needs: [conditions]
+    needs: [conditions, disk-space-check]
     if: ${{ needs.conditions.outputs.should-build == 'true' }}
     strategy:
       fail-fast: false
@@ -281,28 +314,15 @@ jobs:
 
       # region Upload to builds.jabref.org / GitHub artifacts store
       - name: Setup SSH key
-        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')
+        if: ${{ needs.disk-space-check.available == 'true' }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
-      - name: Check disk space on builds.jabref.org
-        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')
-        id: diskspace
-        shell: bash
-        run: |
-          USAGE=$(ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no jrrsync@build-upload.jabref.org \
-            "df --output=pcent /var/www/builds.jabref.org | tail -n1 | tr -dc '0-9'")
-          echo "Remote usage: $USAGE%"
-          if [ "$USAGE" -lt 90 ]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
-          fi
       - name: Setup rsync (macOS)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')) }}
+        if: ${{ (needs.disk-space-check.available == 'true') && (startsWith(matrix.os, 'macos') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ (needs.disk-space-check.available == 'true') && (matrix.os == 'windows-latest') }}
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
@@ -310,33 +330,33 @@ jobs:
         # We need to use v6.4.4 as v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
         run: choco install rsync --version=6.4.4
       - name: Upload jabgui to builds.jabref.org (Windows)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ (needs.disk-space-check.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkkit to builds.jabref.org (Windows)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ (needs.disk-space-check.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabls-cli to builds.jabref.org (Windows)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ (needs.disk-space-check.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabgui to builds.jabref.org (linux, macOS)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && ((startsWith(matrix.os, 'macos') && (needs.conditions.outputs.should-notarize != 'true')) || startsWith(matrix.os, 'ubuntu')) }}
+        if: ${{ (needs.disk-space-check.available == 'true') && ((startsWith(matrix.os, 'macos') && (needs.conditions.outputs.should-notarize != 'true')) || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkit to builds.jabref.org (linux, macOS)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
+        if: ${{ (needs.disk-space-check.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabls-cli to builds.jabref.org (linux, macOS)
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
+        if: ${{ (needs.disk-space-check.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
