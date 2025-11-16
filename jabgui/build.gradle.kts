@@ -225,8 +225,9 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.testfx")
     requires.add("org.testfx.junit5")
 
-    requires.add("wiremock.jetty12")
-    requires.add("wiremock.slf4j.spi.shim")
+    requires.add("wiremock")
+    requires.add("wiremock.common")
+    requires.add("wiremock.jetty")
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")

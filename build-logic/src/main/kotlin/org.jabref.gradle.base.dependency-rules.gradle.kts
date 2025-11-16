@@ -47,10 +47,7 @@ jvmDependencyConflicts.patch {
         removeDependency("org.apache.xmlgraphics:batik-ext")
         removeDependency("org.apache.xmlgraphics:xmlgraphics-commons")
     }
-    module("org.wiremock:wiremock-jetty12") {
-        // workaround for https://github.com/wiremock/wiremock/issues/2874
-        addApiDependency("com.github.koppor:wiremock-slf4j-spi-shim")
-    }
+
     module("org.apache.logging.log4j:log4j-to-slf4j") {
         // remove non-module annotation libraries only used at compile time
         removeDependency("com.github.spotbugs:spotbugs-annotations")
@@ -130,6 +127,14 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("scala.library")
     }
+    module("org.wiremock:wiremock", "wiremock") {
+    }
+    module("org.wiremock:wiremock-common", "wiremock.common") {
+        exportAllPackages()
+    }
+    module("org.wiremock:wiremock-jetty", "wiremock.jetty") {
+    }
+
 
     module("com.googlecode.plist:dd-plist", "dd.plist")
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
