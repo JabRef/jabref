@@ -87,6 +87,7 @@ extraJavaModuleInfo {
     }
     module("ai.djl.pytorch:pytorch-engine", "ai.djl.pytorch_engine") {
         exportAllPackages()
+        exportAllPackages()
         requires("ai.djl.api")
         requires("org.slf4j")
     }
@@ -128,13 +129,6 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("scala.library")
     }
-
-    module("org.wiremock:wiremock-common", "wiremock.common") {
-        exportAllPackages()
-    }
-    module("org.wiremock:wiremock-jetty", "wiremock.jetty") {
-    }
-
 
     module("com.googlecode.plist:dd-plist", "dd.plist")
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")

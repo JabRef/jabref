@@ -116,8 +116,6 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock-jetty")
-
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
     testImplementation("org.ow2.asm:asm")
 
@@ -222,9 +220,6 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("org.testfx")
     requires.add("org.testfx.junit5")
-
-    requires.add("wiremock.common")
-    requires.add("wiremock.jetty")
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")
