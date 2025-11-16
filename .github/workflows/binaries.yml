@@ -147,7 +147,7 @@ jobs:
             "df --output=pcent /var/www/builds.jabref.org | tail -n1 | tr -dc '0-9'")
           echo "Remote usage: ${USAGE}%"
 
-          if [ "$USAGE" -lt 90 ]; then
+          if [ "$USAGE" -lt 80 ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
             echo "☁️ enough disk space available – will upload"
           else
