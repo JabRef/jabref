@@ -27,12 +27,12 @@ public class BibTestConfiguration {
 
     @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
     BibTestConfiguration(
-            Path tempDir,
             String bibDir,
             @Opt String librarySpecificFileDir,
             @Opt String userSpecificFileDir,
             String pdfFileDir,
-            FileTestConfiguration.TestFileLinkMode fileLinkMode
+            FileTestConfiguration.TestFileLinkMode fileLinkMode,
+            Path tempDir
     ) throws IOException {
         this.tempDir = tempDir;
 

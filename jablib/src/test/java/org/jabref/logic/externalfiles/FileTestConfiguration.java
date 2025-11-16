@@ -16,6 +16,16 @@ import static org.mockito.Mockito.when;
 
 public class FileTestConfiguration {
 
+    // for debugging purposes
+    private final int number;
+
+    @Override
+    public String toString() {
+        return "FileTestConfiguration{" +
+                "number=" + number +
+                '}';
+    }
+
     final BibDatabaseContext sourceContext;
     // final BibEntry sourceEntry;
 
@@ -31,16 +41,19 @@ public class FileTestConfiguration {
     /// @param filePreferences the file preferences to modify
     @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
     public FileTestConfiguration(
-            Path tempDir,
+            int number,
 
-            FilePreferences filePreferences,
             @Opt String mainFileDir,
             Boolean shouldStoreFilesRelativeToBibFile,
             Boolean shouldAdjustOrCopyLinkedFilesOnTransfer,
 
             BibTestConfiguration sourceBibTestConfiguration,
-            BibTestConfiguration targetBibTestConfiguration
+            BibTestConfiguration targetBibTestConfiguration,
+
+            FilePreferences filePreferences,
+            Path tempDir
     ) {
+        this.number = number;
         if (mainFileDir == null) {
             when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
             this.mainFileDir = null;
