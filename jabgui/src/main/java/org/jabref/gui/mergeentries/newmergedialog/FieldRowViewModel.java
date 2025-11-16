@@ -88,9 +88,9 @@ public class FieldRowViewModel {
     }
 
     private void bindEntryFieldChanges() {
-        EasyBind.listen(leftFieldValueProperty(), (obs, old, leftValue) -> leftEntry.setField(field, leftValue));
-        EasyBind.listen(rightFieldValueProperty(), (obs, old, rightValue) -> rightEntry.setField(field, rightValue));
-        EasyBind.listen(mergedFieldValueProperty(), (obs, old, mergedFieldValue) -> {
+        EasyBind.listen(leftFieldValueProperty(), (_, _, leftValue) -> leftEntry.setField(field, leftValue));
+        EasyBind.listen(rightFieldValueProperty(), (_, _, rightValue) -> rightEntry.setField(field, rightValue));
+        EasyBind.listen(mergedFieldValueProperty(), (_, _, mergedFieldValue) -> {
             if (field.equals(InternalField.TYPE_HEADER)) {
                 getMergedEntry().setType(EntryTypeFactory.parse(mergedFieldValue));
             } else {
@@ -258,14 +258,6 @@ public class FieldRowViewModel {
 
     public Field getField() {
         return field;
-    }
-
-    public BibEntry getLeftEntry() {
-        return leftEntry;
-    }
-
-    public BibEntry getRightEntry() {
-        return rightEntry;
     }
 
     public BibEntry getMergedEntry() {

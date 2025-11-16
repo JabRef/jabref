@@ -63,7 +63,7 @@ public class FieldRowView {
     }
 
     private void setupParentListener() {
-        leftValueCell.parentProperty().addListener(e -> {
+        leftValueCell.parentProperty().addListener(_ -> {
             if (leftValueCell.getParent() instanceof GridPane grid) {
                 parent = grid;
             }
@@ -76,7 +76,7 @@ public class FieldRowView {
             toggleMergeUnmergeButton.setCanMerge(!viewModel.hasEqualLeftAndRightValues());
             fieldNameCell.addSideButton(toggleMergeUnmergeButton);
 
-            EasyBind.listen(toggleMergeUnmergeButton.fieldStateProperty(), (observableValue, old, fieldState) -> {
+            EasyBind.listen(toggleMergeUnmergeButton.fieldStateProperty(), (_, _, fieldState) -> {
                 LOGGER.debug("Field merge state is {} for field {}", fieldState, field);
                 if (fieldState == ToggleMergeUnmergeButton.FieldState.MERGED) {
                     viewModel.mergeFields();
@@ -130,7 +130,7 @@ public class FieldRowView {
     }
 
     private void listenEqualLeftRight() {
-        EasyBind.listen(viewModel.hasEqualLeftAndRightBinding(), (obs, old, isEqual) -> {
+        EasyBind.listen(viewModel.hasEqualLeftAndRightBinding(), (_, _, isEqual) -> {
             if (isEqual) {
                 LOGGER.debug("Left and right values are equal, LEFT==RIGHT=={}", viewModel.getLeftFieldValue());
                 hideDiff();
@@ -200,11 +200,10 @@ public class FieldRowView {
     }
 
     public void show() {
-        if (parent != null) {
-            if (!parent.getChildren().contains(leftValueCell)) {
+        if (parent != null && !parent.getChildren().contains(leftValueCell)) {
                 parent.getChildren().addAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
             }
-        }
+
     }
 
     public void hideDiff() {
