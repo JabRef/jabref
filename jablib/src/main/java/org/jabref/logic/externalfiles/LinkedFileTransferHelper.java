@@ -128,21 +128,6 @@ public class LinkedFileTransferHelper {
                     continue;
                 }
             }
-
-            /*
-            Path relative;
-            if (sourcePath.startsWith(targetPrimaryPathOpt.get())) {
-                relative = targetPrimaryPathOpt.get().relativize(sourcePath);
-            } else {
-                relative = Path.of("..").resolve(sourcePath.getFileName());
-            }
-
-            if (isReachableFromPrimaryDirectory(relative)) {
-                fileLinksChanged = isPathAdjusted(linkedFile, relative, linkedFiles, fileLinksChanged);
-            } else {
-                fileLinksChanged = isFileCopied(sourceContext, targetContext, filePreferences, linkedFile, linkedFiles, fileLinksChanged);
-            }
-             */
         }
         if (fileLinksChanged) {
             targetEntry.setFiles(linkedFiles);
@@ -157,7 +142,7 @@ public class LinkedFileTransferHelper {
                     .filter(path -> path.getFileName().equals(fileName))
                     .findFirst();
         } catch (UncheckedIOException ex) {
-            LOGGER.warn("Could not search for files {}", ex);
+            LOGGER.warn("Could not search for file {} in {}", fileName, directories, ex);
             return Optional.empty();
         }
     }
