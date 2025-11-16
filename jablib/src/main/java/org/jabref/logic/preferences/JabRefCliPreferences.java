@@ -241,6 +241,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
     public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
     public static final String ADJUST_OR_COPY_LINKED_FILES_ON_TRANSFER = "adjustOrCopyLinkedFilesOnTransfer";
+    public static final String TRANSLITERATE_FIELDS_FOR_CITATION_KEY = "transliterateFields";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -650,6 +651,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
+        defaults.put(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, Boolean.FALSE);
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);
@@ -1543,6 +1545,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
+                getBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY),
                 getBoolean(AVOID_OVERWRITING_KEY),
                 getBoolean(WARN_BEFORE_OVERWRITING_KEY),
                 getBoolean(GENERATE_KEYS_BEFORE_SAVING),
@@ -1554,6 +1557,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN),
                 getBibEntryPreferences().keywordSeparatorProperty());
 
+        EasyBind.listen(citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKeyProperty(),
+                (_, _, newValue) -> putBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, newValue));
         EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
                 (_, _, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
         EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),

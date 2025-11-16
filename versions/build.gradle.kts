@@ -14,7 +14,7 @@ val arch = DefaultNativePlatform.getCurrentArchitecture()
 val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
 
 val lucene = "10.3.1"
-val pdfbox = "3.0.5"
+val pdfbox = "3.0.6"
 
 dependencies {
     api(platform("ai.djl:bom:0.34.0"))
@@ -91,7 +91,7 @@ dependencies.constraints {
     api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
     api("io.github.classgraph:classgraph:4.8.184")
-    api("io.github.java-diff-utils:java-diff-utils:4.15")
+    api("io.github.java-diff-utils:java-diff-utils:4.16")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
     api("io.github.thibaultmeyer:cuid:2.0.4")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
@@ -139,7 +139,7 @@ dependencies.constraints {
     api("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.11")
     api("org.hamcrest:hamcrest:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
+    api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
     api("org.hisp.dhis:json-tree:1.8.1")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
