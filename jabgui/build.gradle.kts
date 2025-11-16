@@ -116,9 +116,7 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock") {
-        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
-    }
+    testImplementation("org.wiremock:wiremock-jetty")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
     testImplementation("org.ow2.asm:asm")
@@ -225,7 +223,6 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.testfx")
     requires.add("org.testfx.junit5")
 
-    requires.add("wiremock")
     requires.add("wiremock.common")
     requires.add("wiremock.jetty")
 

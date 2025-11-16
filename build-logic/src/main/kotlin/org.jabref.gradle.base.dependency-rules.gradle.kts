@@ -69,6 +69,7 @@ jvmDependencyConflicts.patch {
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
+
 }
 
 extraJavaModuleInfo {
@@ -127,8 +128,7 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("scala.library")
     }
-    module("org.wiremock:wiremock", "wiremock") {
-    }
+
     module("org.wiremock:wiremock-common", "wiremock.common") {
         exportAllPackages()
     }
