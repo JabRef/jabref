@@ -122,7 +122,6 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
-    //testImplementation("org.eclipse.jetty.toolchain:jetty-servlet-api")
 
 }
 
