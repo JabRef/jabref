@@ -51,4 +51,32 @@ public class BasicModelStringIntegrationTest {
         String noChange = StringUtil.removeBracesAroundCapitals(title);
         assertEquals(title, noChange);
     }
+
+    @Test
+    void testYearFieldWithTransformation() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.YEAR, " 2024 ");
+
+        String year = entry.getField(StandardField.YEAR).orElse("");
+        assertEquals(" 2024 ", year);
+
+        // Test isBlank on non-blank string
+        assertFalse(StringUtil.isBlank(year));
+        String trimmed = year.trim();
+        assertEquals("2024", trimmed);
+
+        // Test isInCurlyBrackets with a non-bracketed string
+        assertFalse(StringUtil.isInCurlyBrackets(trimmed));
+
+        // Test boldHTML transformation
+        String boldYear = StringUtil.boldHTML(trimmed);
+        assertEquals("<b>2024</b>", boldYear);
+
+        // Test with blank/null strings
+        assertTrue(StringUtil.isBlank(""));
+        assertTrue(StringUtil.isBlank("   "));
+
+        // Test isInCurlyBrackets with bracketed content
+        assertTrue(StringUtil.isInCurlyBrackets("{2024}"));
+    }
 }
