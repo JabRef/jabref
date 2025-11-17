@@ -33,6 +33,23 @@ The system tests were executed using:
 ```bash
 ./gradlew :jablib:cleanTest :jablib:test --tests "org.jabref.system.BasicModelStringIntegrationTest"
 ```
+## File "InsertTestOptionalFields"
+
+## Test Case:
+
+| Test Case Title | Pre-conditions | Test Steps | Expected Results          |
+|-----------------|----------------|------------|---------------------------|
+| testOptionalFieldVolume | N/A | SetUp, Asserts, Initalize BibEntry, DataBase | VOL. does not equal VOL.1 |
+### Expected Output:
+"VOL. 1" for the VOLUME FIELD of the GUI interface.
+The Set FieldsWithWords returns "VOL." truncating the next word ("1"). This demonstrates that setFieldWithWords() must be improvered to add ability to have space in words as the other getField() does it correctly.
+### Actual Output:
+"VOL."
+
+```bash
+./gradlew :jabgui:test --tests "org.jabref.gui.system.GUIInsertTestOptionalFields"
+```
+
 ### Execution Outcome
 - Build Successful
 - All test cases passed
@@ -42,5 +59,6 @@ The system tests were executed using:
 ---
 ## Group Contributions
 | Member   | Contribution                                                                                                                                                                                         |
-|----------| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Geoffrey | Implemented the system test (`BasicModelStringIntegrationTest`), identified invalid StringUtil methods, corrected test compilation errors, executed all tests, and generated this report and README. |
+| Vanessa | Implemented test ('InsertOptionalFields')  Findings, Observed error of output from input.                                                                                                            |
