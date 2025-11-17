@@ -102,7 +102,7 @@ class LinkedFileHandlerTest {
             "other.pdf, path/to/other.pdf, pdf",
             "OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf"
     })
-    void getSuggestedFileName(String expectedFileName, String link, String extension) {
+    void getSuggestedFileNameWithMissingKey(String expectedFileName, String link, String extension) {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
 
         final LinkedFile linkedFile = new LinkedFile("", link, "");
