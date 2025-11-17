@@ -10,7 +10,7 @@ import org.jabref.model.search.query.BaseQueryNode;
 /// Fetcher for <https://unpaywall.org/>
 ///
 /// Currently only used for storing an "API key" to be able to cope with URLs appearing at web server answers such as `Paper or abstract available at https://api.unpaywall.org/v2/10.47397/tb/44-3/tb138kopp-jabref?email=<INSERT_YOUR_EMAIL>`
-public class UnpaywallFetcher implements SearchBasedFetcher {
+public class UnpaywallFetcher implements SearchBasedFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Unpaywall";
 
     @Override

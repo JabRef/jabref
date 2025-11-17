@@ -247,6 +247,7 @@ public class WebFetchers {
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));
         fetchers.add(new MedlineFetcher(importerPreferences));
+        fetchers.add(new UnpaywallFetcher());
         return fetchers;
     }
 }

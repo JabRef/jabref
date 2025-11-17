@@ -161,9 +161,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                                           .sorted(Comparator.comparing(WebFetcher::getName))
                                                           .toList();
 
-        Set<CustomizableKeyFetcher> customizableKeyFetchers = WebFetchers.getCustomizableKeyFetchers(importFormatPreferences, importerPreferences);
-
-        Set<String> customizableKeyFetcherNames = customizableKeyFetchers.stream().map(WebFetcher::getName).collect(Collectors.toSet());
+        // We need to use names, because [WebFetchers] creates new instances for the fetchers at each method - even if they are the same.
+        Set<String> customizableKeyFetcherNames = WebFetchers.getCustomizableKeyFetchers(importFormatPreferences, importerPreferences).stream().map(WebFetcher::getName).collect(Collectors.toSet());
 
         fetchers.clear();
         for (SearchBasedFetcher fetcher : allFetchers) {
