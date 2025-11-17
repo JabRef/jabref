@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -26,10 +26,10 @@ class Preferences implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Preferences.class);
 
     @ParentCommand
-    protected ArgumentProcessor argumentProcessor;
+    protected JabKit argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Override
     public void run() {
