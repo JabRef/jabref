@@ -392,7 +392,7 @@ public class URLDownload {
                         LOGGER.warn("importerPreferences not set, but call to Unpaywall");
                     } else {
                         Optional<String> apiKey = importerPreferences.getApiKey(UnpaywallFetcher.FETCHER_NAME);
-                        if (apiKey.isEmpty()) {
+                        if (apiKey.isEmpty() || apiKey.get().isEmpty()) { // No checking for enablement of Unpaywall, because used differently
                             LOGGER.warn("No email configured for Unpaywall");
                         } else {
                             newUrl = newUrl.replace("<INSERT_YOUR_EMAIL>", apiKey.get());
