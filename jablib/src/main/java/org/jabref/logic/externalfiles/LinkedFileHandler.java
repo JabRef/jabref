@@ -47,14 +47,14 @@ public class LinkedFileHandler {
      */
     public boolean copyOrMoveToDefaultDirectory(boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
         Optional<Path> databaseFileDirectoryOpt = databaseContext.getFirstExistingFileDir(filePreferences);
-        if (!databaseFileDirectoryOpt.isPresent()) {
+        if (databaseFileDirectoryOpt.isEmpty()) {
             LOGGER.warn("No existing file directory found");
             return false;
         }
         Path databaseFileDirectory = databaseFileDirectoryOpt.get();
 
         Optional<Path> sourcePathOpt = linkedFile.findIn(databaseContext, filePreferences);
-        if (!sourcePathOpt.isPresent()) {
+        if (sourcePathOpt.isEmpty()) {
             LOGGER.warn("Could not find file {}", linkedFile.getLink());
             return false;
         }
@@ -155,7 +155,7 @@ public class LinkedFileHandler {
 
     public boolean renameToSuggestedName() throws IOException {
         Optional<Path> oldFilePath = linkedFile.findIn(databaseContext, filePreferences);
-        if (!oldFilePath.isPresent()) {
+        if (oldFilePath.isEmpty()) {
             return false;
         }
 
@@ -187,7 +187,7 @@ public class LinkedFileHandler {
 
     public boolean renameToName(String targetFileName, boolean overwriteExistingFile) throws IOException {
         Optional<Path> oldFile = linkedFile.findIn(databaseContext, filePreferences);
-        if (!oldFile.isPresent()) {
+        if (oldFile.isEmpty()) {
             LOGGER.debug("No file found for linked file {}", linkedFile);
             return false;
         }
@@ -197,10 +197,10 @@ public class LinkedFileHandler {
         Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
 
         Path newPath;
-        if (newExtension.isPresent() || (!oldExtension.isPresent() && !newExtension.isPresent())) {
+        if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
             newPath = oldPath.resolveSibling(targetFileName);
         } else {
-            assert oldExtension.isPresent() && !newExtension.isPresent();
+            assert oldExtension.isEmpty() && newExtension.isEmpty();
             newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
         }
 
@@ -250,7 +250,7 @@ public class LinkedFileHandler {
         String basename = filename.isEmpty() ? "file" : FileUtil.getBaseName(filename);
 
         // Cannot get extension from type because would need ExternalApplicationsPreferences, as type is stored as a localisation dependent string.
-        if (!extension.isPresent()) {
+        if (extension.isEmpty()) {
             extension = FileUtil.getFileExtension(filename);
         }
 
