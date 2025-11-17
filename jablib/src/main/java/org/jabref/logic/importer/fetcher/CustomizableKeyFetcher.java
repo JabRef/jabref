@@ -2,8 +2,8 @@ package org.jabref.logic.importer.fetcher;
 
 import org.jabref.logic.importer.WebFetcher;
 
-import jakarta.annotation.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Fetchers implementing this interface support customizable keys
 @NullMarked
