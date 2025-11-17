@@ -36,7 +36,7 @@ class GetCitingWorks implements Callable<Integer> {
         List<BibEntry> entries;
 
         try {
-             entries = citationFetcher.searchCitedBy(new BibEntry().withField(StandardField.DOI, doi));
+            entries = citationFetcher.searchCitedBy(new BibEntry().withField(StandardField.DOI, doi));
         } catch (FetcherException e) {
             LOGGER.error("Could not fetch citation information based on DOI", e);
             System.err.print(Localization.lang("No data was found for the identifier"));
