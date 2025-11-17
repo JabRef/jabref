@@ -34,6 +34,7 @@ import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
+import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -157,10 +158,13 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         Set<String> enabledCatalogs = new HashSet<>(importerPreferences.getCatalogs());
 
         List<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
-                                                          .stream().sorted(Comparator.comparing(WebFetcher::getName)).toList();
+                                                          .stream().sorted(Comparator.comparing(WebFetcher::getName)).collect(Collectors.toList());
+        // Unpaywall is not a real web fetcher yet, therefore, we need to manually add it.
+        allFetchers.add(new UnpaywallFetcher());
 
         Set<CustomizableKeyFetcher> customizableKeyFetchers = WebFetchers.getCustomizableKeyFetchers(importFormatPreferences, importerPreferences);
-        Set<String> customizableFetcherNames = customizableKeyFetchers.stream().map(WebFetcher::getName).collect(Collectors.toSet());
+
+        Set<String> customizableKeyFetcherNames = customizableKeyFetchers.stream().map(WebFetcher::getName).collect(Collectors.toSet());
 
         fetchers.clear();
         for (SearchBasedFetcher fetcher : allFetchers) {
@@ -168,9 +172,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                 continue;
             }
             boolean isEnabled = enabledCatalogs.contains(fetcher.getName());
-            boolean isCustomizable = customizableFetcherNames.contains(fetcher.getName());
-            FetcherViewModel fetcherViewModel = new FetcherViewModel(fetcher, isEnabled, isCustomizable);
-            if (isCustomizable) {
+            boolean keyIsCustomizable = customizableKeyFetcherNames.contains(fetcher.getName());
+            FetcherViewModel fetcherViewModel = new FetcherViewModel(fetcher, isEnabled, keyIsCustomizable);
+            if (keyIsCustomizable) {
                 savedApiKeys.stream()
                             .filter(apiKey -> apiKey.getName().equals(fetcher.getName()))
                             .findFirst()

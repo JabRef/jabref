@@ -61,7 +61,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
-        URLDownload urlDownload = new URLDownload(citationsUrl);
+        URLDownload urlDownload = new URLDownload(importerPreferences, citationsUrl);
 
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
 
