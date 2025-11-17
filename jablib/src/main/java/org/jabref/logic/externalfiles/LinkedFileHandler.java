@@ -200,7 +200,7 @@ public class LinkedFileHandler {
         if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
             newPath = oldPath.resolveSibling(targetFileName);
         } else {
-            assert oldExtension.isEmpty() && newExtension.isEmpty();
+            assert oldExtension.isPresent() && newExtension.isEmpty();
             newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
         }
 
