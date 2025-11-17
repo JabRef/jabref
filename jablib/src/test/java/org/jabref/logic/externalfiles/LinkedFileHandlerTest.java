@@ -83,10 +83,7 @@ class LinkedFileHandlerTest {
             testEntry = entry;
         }
 
-        final LinkedFile linkedFile = mock(LinkedFile.class);
-        when(linkedFile.isOnlineLink()).thenReturn(link.startsWith("http"));
-        when(linkedFile.getLink()).thenReturn(link);
-
+        final LinkedFile linkedFile = new LinkedFile("", link);
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, testEntry, databaseContext, filePreferences);
 
         final String result = linkedFileHandler.getSuggestedFileName(extension);

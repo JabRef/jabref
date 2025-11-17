@@ -170,7 +170,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String WORKING_DIRECTORY = "workingDirectory";
     public static final String BACKUP_DIRECTORY = "backupDirectory";
     public static final String CREATE_BACKUP = "createBackup";
-    
+
     public static final String COVER_IMAGE_LOCATION = "coverLocation";
     public static final String COVER_IMAGE_DOWNLOAD = "coverDownload";
 

@@ -258,15 +258,15 @@ public class LinkedFileHandler {
         }
 
         final String basename = getSuggestedBaseName(filename);
-        return extension.map(x -> basename + x).orElse(basename);
+        return extension.map(x -> basename + "." + x).orElse(basename);
     }
-    
+
     private String getSuggestedBaseName(String filename) {
         String basename = filename.isEmpty() ? "file" : FileUtil.getBaseName(filename);
-        if (!linkedFile.isOnlineLink()) {
-            return FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
+        if (linkedFile.isOnlineLink()) {
+            return basename;
         }
-        return basename;
+        return FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
     }
 
     /**
