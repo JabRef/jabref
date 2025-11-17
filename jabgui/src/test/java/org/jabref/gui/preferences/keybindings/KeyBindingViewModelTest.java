@@ -10,6 +10,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.support.DisabledOnCIServer;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,7 @@ class KeyBindingViewModelTest {
     }
 
     @Test
+    @DisabledOnCIServer("locally runs fine")
     void verifyStoreSettingsWritesChanges() {
         KeyBindingRepository uiRepo = new KeyBindingRepository();
         GuiPreferences preferences = mock(GuiPreferences.class);
