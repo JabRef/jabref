@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -14,7 +14,7 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +28,10 @@ class CheckConsistency implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConsistency.class);
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit jabKit;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     // [impl->req~jabkit.cli.input-flag~1]
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
@@ -42,10 +42,10 @@ class CheckConsistency implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
-                argumentProcessor.cliPreferences,
+                jabKit.cliPreferences,
                 sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
@@ -83,14 +83,14 @@ class CheckConsistency implements Callable<Integer> {
                     result,
                     writer,
                     sharedOptions.porcelain,
-                    argumentProcessor.entryTypesManager,
+                    jabKit.entryTypesManager,
                     databaseContext.getMode());
         } else {
             checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
                     result,
                     writer,
                     sharedOptions.porcelain,
-                    argumentProcessor.entryTypesManager,
+                    jabKit.entryTypesManager,
                     databaseContext.getMode());
         }
 

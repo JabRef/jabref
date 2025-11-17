@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,7 +23,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -39,10 +39,10 @@ class Search implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Search.class);
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Option(names = {"--query"}, description = "Search query", required = true)
     private String query;
@@ -59,7 +59,7 @@ class Search implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
                 argumentProcessor.cliPreferences,
@@ -104,7 +104,7 @@ class Search implements Runnable {
         if ("bibtex".equals(outputFormat)) {
             // output a bib file as default or if
             // provided exportFormat is "bib"
-            ArgumentProcessor.saveDatabase(
+            JabKit.saveDatabase(
                     argumentProcessor.cliPreferences,
                     argumentProcessor.entryTypesManager,
                     new BibDatabase(matches),

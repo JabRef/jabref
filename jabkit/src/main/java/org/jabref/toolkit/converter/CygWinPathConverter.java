@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli.converter;
+package org.jabref.toolkit.converter;
 
 import java.nio.file.Path;
 
