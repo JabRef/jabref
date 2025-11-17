@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -13,10 +13,10 @@ import static picocli.CommandLine.ParentCommand;
         })
 class Pdf implements Runnable {
     @ParentCommand
-    protected ArgumentProcessor argumentProcessor;
+    protected JabKit argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Override
     public void run() {

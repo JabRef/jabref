@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -29,10 +29,10 @@ class Fetch implements Runnable {
     }
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Option(names = "--provider", required = true)
     private String provider;
@@ -73,7 +73,7 @@ class Fetch implements Runnable {
             }
 
             if (outputFile != null) {
-                ArgumentProcessor.saveDatabase(
+                JabKit.saveDatabase(
                         argumentProcessor.cliPreferences,
                         argumentProcessor.entryTypesManager,
                         new BibDatabase(matches),

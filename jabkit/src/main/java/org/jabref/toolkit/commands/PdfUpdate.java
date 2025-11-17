@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,7 +23,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ class PdfUpdate implements Runnable {
     protected Pdf pdf;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Option(names = "--format", description = "Format to update (xmp, bibtex-attachment)", split = ",")
     private List<String> formats = List.of("xmp", "bibtex-attachment"); // ToDO: default value?
@@ -67,7 +67,7 @@ class PdfUpdate implements Runnable {
             return;
         }
 
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 inputFormat,
                 pdf.argumentProcessor.cliPreferences,

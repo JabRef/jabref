@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -20,7 +20,7 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +36,10 @@ class CheckIntegrity implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckIntegrity.class);
 
     @CommandLine.ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit jabKit;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     // [impl->req~jabkit.cli.input-flag~1]
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
@@ -54,10 +54,10 @@ class CheckIntegrity implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
-                argumentProcessor.cliPreferences,
+                jabKit.cliPreferences,
                 sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
@@ -78,9 +78,9 @@ class CheckIntegrity implements Callable<Integer> {
 
         IntegrityCheck integrityCheck = new IntegrityCheck(
                 databaseContext,
-                argumentProcessor.cliPreferences.getFilePreferences(),
-                argumentProcessor.cliPreferences.getCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadRepository(argumentProcessor.cliPreferences.getJournalAbbreviationPreferences()),
+                jabKit.cliPreferences.getFilePreferences(),
+                jabKit.cliPreferences.getCitationKeyPatternPreferences(),
+                JournalAbbreviationLoader.loadRepository(jabKit.cliPreferences.getJournalAbbreviationPreferences()),
                 allowIntegerEdition
         );
 
