@@ -32,18 +32,6 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
 
-
-    api(platform("org.glassfish.grizzly:grizzly-bom:4.0.2"))
-    api("org.glassfish.grizzly:grizzly-framework")
-    api("org.glassfish.grizzly:grizzly-http-server")
-
-    api(platform("org.glassfish.jersey:jersey-bom:4.0.0"))
-    api("org.glassfish.jersey.containers:jersey-container-grizzly2-http")
-    api("org.glassfish.jersey.core:jersey-server")
-    api("org.glassfish.jersey.inject:jersey-hk2")
-    api("org.glassfish.jersey.test-framework:jersey-test-framework-core")
-    api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
-
 }
 
 dependencies.constraints {
@@ -67,6 +55,10 @@ dependencies.constraints {
     api("com.github.ben-manes.caffeine:caffeine:3.2.3")
     api("com.github.javakeyring:java-keyring:1.0.4")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.27.1")
+    api("com.github.jknack:handlebars-helpers:4.3.1") // Required by Wiremock - and our patching of Wiremock
+    api("com.github.jknack:handlebars:4.3.1") // Required by Wiremock - and our patching of Wiremock
+    api("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
+    api("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
@@ -134,10 +126,16 @@ dependencies.constraints {
     api("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.6")
+    api("org.glassfish.grizzly:grizzly-framework:4.0.2")
+    api("org.glassfish.grizzly:grizzly-http-server:4.0.2")
     api("org.glassfish.hk2:hk2-api:3.1.1")
     api("org.glassfish.hk2:hk2-locator:3.1.1")
     api("org.glassfish.hk2:hk2-utils:3.1.1")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.6")
+    api("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
+    api("org.glassfish.jersey.core:jersey-server:3.1.11")
+    api("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
+    api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.11")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
     api("org.hisp.dhis:json-tree:1.8.1")
@@ -162,6 +160,7 @@ dependencies.constraints {
     api("org.tinylog:slf4j-tinylog:2.7.0")
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")
+    api("org.wiremock:wiremock:3.13.0")
     api("org.xmlunit:xmlunit-core:2.10.4")
     api("org.xmlunit:xmlunit-matchers:2.10.4")
     api("org.yaml:snakeyaml:2.5")

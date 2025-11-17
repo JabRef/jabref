@@ -224,6 +224,9 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
+    testImplementation("org.wiremock:wiremock") {
+        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
+    }
     testImplementation("org.ow2.asm:asm")
 
     // Required for LocalizationConsistencyTest
@@ -590,7 +593,8 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("org.xmlunit")
     requires.add("org.xmlunit.matchers")
-
+    requires.add("wiremock")
+    requires.add("wiremock.slf4j.spi.shim")
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")

@@ -112,9 +112,11 @@ public class Server {
         resourceConfig.register(GlobalExceptionMapper.class);
 
         LOGGER.debug("Starting HTTP server...");
+        final HttpServer httpServer =
+                GrizzlyHttpServerFactory
+                        .createHttpServer(uri, resourceConfig, serviceLocator);
 
-        return GrizzlyHttpServerFactory
-                .createHttpServer(uri, resourceConfig, serviceLocator);
+        return httpServer;
     }
 
     private boolean sslCertExists() {

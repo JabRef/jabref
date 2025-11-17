@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.FetcherClientException;
@@ -13,11 +14,19 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import kong.unirest.core.UnirestException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -137,5 +146,30 @@ class URLDownloadTest {
     void test429ErrorThrowsFetcherClientException() throws MalformedURLException {
         URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/429"));
         assertThrows(FetcherClientException.class, urlDownload::asString);
+    }
+
+    @Test
+    void redirectWorks(@TempDir Path tempDir) throws IOException, FetcherException {
+        WireMockServer wireMockServer = new WireMockServer(2222);
+        wireMockServer.start();
+        configureFor("localhost", 2222);
+        stubFor(get("/redirect")
+                .willReturn(aResponse()
+                        .withStatus(302)
+                        .withHeader("Location", "/final")));
+        byte[] pdfContent = {0x00};
+        stubFor(get(urlEqualTo("/final"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/pdf")
+                        .withBody(pdfContent)));
+
+        URLDownload urlDownload = new URLDownload(URLUtil.create("http://localhost:2222/redirect"));
+        Path downloadedFile = tempDir.resolve("download.pdf");
+        urlDownload.toFile(downloadedFile);
+        byte[] actual = Files.readAllBytes(downloadedFile);
+        assertArrayEquals(pdfContent, actual);
+
+        wireMockServer.stop();
     }
 }

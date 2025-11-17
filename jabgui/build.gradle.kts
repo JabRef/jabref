@@ -116,13 +116,16 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
+    testImplementation("org.wiremock:wiremock") {
+        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
+    }
+
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
     testImplementation("org.ow2.asm:asm")
 
     testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
-
 }
 
 application {
@@ -219,6 +222,9 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("org.testfx")
     requires.add("org.testfx.junit5")
+
+    requires.add("wiremock")
+    requires.add("wiremock.slf4j.spi.shim")
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")
