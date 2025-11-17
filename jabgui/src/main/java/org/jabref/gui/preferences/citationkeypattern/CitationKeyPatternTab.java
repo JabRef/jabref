@@ -16,6 +16,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> implements PreferencesTab {
 
+    @FXML private CheckBox transliterateFieldsForCitationKey;
     @FXML private CheckBox overwriteAllow;
     @FXML private CheckBox overwriteWarning;
     @FXML private CheckBox generateOnSave;
@@ -42,6 +43,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     public void initialize() {
         this.viewModel = new CitationKeyPatternTabViewModel(preferences.getCitationKeyPatternPreferences(), preferences.getImporterPreferences());
 
+        transliterateFieldsForCitationKey.selectedProperty().bindBidirectional(viewModel.transliterateFieldsForCitationKeyProperty());
         overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
         overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());
         generateOnSave.selectedProperty().bindBidirectional(viewModel.generateOnSaveProperty());

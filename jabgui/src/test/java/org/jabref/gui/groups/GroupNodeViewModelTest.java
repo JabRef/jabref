@@ -183,4 +183,44 @@ class GroupNodeViewModelTest {
     private GroupNodeViewModel getViewModelForGroup(GroupTreeNode group) {
         return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
     }
+
+    @Test
+    void hitsIncludingAutomaticGroupSumsVmChildren() {
+        // Two entries that will produce VM-only subgroups under the automatic group
+        databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > B"));
+        databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > C"));
+
+        // Automatic group: its subgroups exist only in the ViewModel
+        AutomaticKeywordGroup autoRoot = new AutomaticKeywordGroup(
+                "Keywords",
+                GroupHierarchyType.INCLUDING,   // UNION behavior expected
+                StandardField.KEYWORDS,
+                ',',
+                '>'
+        );
+
+        GroupNodeViewModel vm = getViewModelForGroup(autoRoot);
+
+        // INCLUDING: automatic root sums direct matches and those of its children -> expect 2.
+        assertEquals(2, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void hitsIndependentAutomaticGroupIgnoresVmChildren() {
+        databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > B"));
+        databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > C"));
+
+        AutomaticKeywordGroup autoRoot = new AutomaticKeywordGroup(
+                "Keywords",
+                GroupHierarchyType.INDEPENDENT, // no hierarchical aggregation
+                StandardField.KEYWORDS,
+                ',',
+                '>'
+        );
+
+        GroupNodeViewModel vm = getViewModelForGroup(autoRoot);
+
+        // INDEPENDENT: automatic root has no direct matches -> expect 0.
+        assertEquals(0, vm.getHits().getValue().intValue());
+    }
 }

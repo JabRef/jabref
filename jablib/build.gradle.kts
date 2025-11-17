@@ -15,7 +15,7 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.34.0"
+    id("com.vanniktech.maven.publish") version "0.35.0"
 
     // id("dev.jbang") version "0.2.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
@@ -107,7 +107,6 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
     // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
 
     implementation("com.fasterxml:aalto-xml")
 
@@ -182,6 +181,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     // endregion
 
+    implementation("com.github.ben-manes.caffeine:caffeine")
+
     implementation("commons-io:commons-io")
 
     implementation("com.github.tomtung:latex2unicode_2.13")
@@ -191,7 +192,7 @@ dependencies {
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
     implementation("io.github.adr:e-adr")
 
-    api("io.github.darvil82:terminal-text-formatter")
+    implementation("io.github.darvil82:terminal-text-formatter")
 
     implementation("io.zonky.test:embedded-postgres")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
@@ -223,9 +224,6 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock") {
-        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
-    }
     testImplementation("org.ow2.asm:asm")
 
     // Required for LocalizationConsistencyTest
@@ -592,8 +590,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("org.xmlunit")
     requires.add("org.xmlunit.matchers")
-    requires.add("wiremock")
-    requires.add("wiremock.slf4j.spi.shim")
+
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")
