@@ -2,7 +2,6 @@ package org.jabref.gui.preview;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,8 +26,8 @@ import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
-import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
@@ -236,12 +235,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
 
         layoutText = """
-                <html>
-                    <body id="previewBody">
-                        %s <div id="content"> %s </div>
-                    </body>
-                </html>
-            """.formatted(coverIfAny, text);
+                    <html>
+                        <body id="previewBody">
+                            %s <div id="content"> %s </div>
+                        </body>
+                    </html>
+                """.formatted(coverIfAny, text);
         highlightLayoutText();
         setHvalue(0);
     }
@@ -264,14 +263,20 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private boolean shouldShowCoverImage() {
-        //entry is sometimes null when setPreviewText is called
+        // entry is sometimes null when setPreviewText is called
         if (entry == null) {
             return false;
         }
 
         return switch (entry.getType()) {
-            case StandardEntryType.Book, StandardEntryType.Booklet, StandardEntryType.BookInBook, StandardEntryType.InBook, StandardEntryType.MvBook -> true;
-            default -> false;
+            case StandardEntryType.Book,
+                 StandardEntryType.Booklet,
+                 StandardEntryType.BookInBook,
+                 StandardEntryType.InBook,
+                 StandardEntryType.MvBook ->
+                    true;
+            default ->
+                    false;
         };
     }
 

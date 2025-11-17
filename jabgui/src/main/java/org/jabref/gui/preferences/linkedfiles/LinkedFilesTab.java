@@ -5,9 +5,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Label;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -26,11 +26,11 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     @FXML private TextField mainFileDirectory;
     @FXML private RadioButton useMainFileDirectory;
-    
+
     @FXML private RadioButton bookCoverDownload;
     @FXML private Label bookCoverLabel;
     @FXML private TextField bookCoverLocation;
-    
+
     @FXML private RadioButton useBibLocationAsPrimary;
     @FXML private Button browseDirectory;
     @FXML private Button autolinkRegexHelp;

@@ -170,6 +170,9 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String WORKING_DIRECTORY = "workingDirectory";
     public static final String BACKUP_DIRECTORY = "backupDirectory";
     public static final String CREATE_BACKUP = "createBackup";
+    
+    public static final String COVER_IMAGE_LOCATION = "coverLocation";
+    public static final String COVER_IMAGE_DOWNLOAD = "coverDownload";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
 
@@ -217,8 +220,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
-    public static final String COVER_IMAGE_LOCATION = "coverLocation";
-    public static final String COVER_IMAGE_DOWNLOAD = "coverDownload";
 
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
@@ -595,7 +596,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(LAST_USED_DIRECTORY, getDefaultPath().toString());
 
         defaults.put(CREATE_BACKUP, Boolean.TRUE);
-        
+
         defaults.put(COVER_IMAGE_DOWNLOAD, Boolean.TRUE);
         defaults.put(COVER_IMAGE_LOCATION, "covers");
 

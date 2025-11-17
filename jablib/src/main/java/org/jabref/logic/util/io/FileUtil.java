@@ -108,7 +108,7 @@ public class FileUtil {
     public static String getBaseName(Path fileNameWithExtension) {
         return getBaseName(fileNameWithExtension.getFileName().toString());
     }
-    
+
     /**
      * Extracts the filename from a URL.
      * If the URL doesn't have a filename (ends with '/'), returns an empty string.

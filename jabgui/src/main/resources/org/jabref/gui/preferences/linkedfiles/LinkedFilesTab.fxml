@@ -45,7 +45,7 @@
         </tooltip>
     </RadioButton>
     
-    <RadioButton fx:id="bookCoverDownload" text="%Automatically download cover images"/>
+    <CheckBox fx:id="bookCoverDownload" text="%Automatically download cover images"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label fx:id="bookCoverLabel" text="%Cover image download location"/>
         <TextField fx:id="bookCoverLocation" HBox.hgrow="ALWAYS"/>

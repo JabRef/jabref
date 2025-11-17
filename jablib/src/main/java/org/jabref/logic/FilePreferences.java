@@ -294,7 +294,7 @@ public class FilePreferences {
     public void setShouldDownloadCovers(boolean value) {
         this.shouldDownloadCovers.set(value);
     }
-    
+
     public String coversDownloadLocation() {
         return coversDownloadLocation.get();
     }

@@ -224,7 +224,12 @@ public class LinkedFile implements Serializable {
     public boolean isOnlineLink() {
         return isOnlineLink(link.get());
     }
-    
+
+    /**
+     * Extracts the file name, including basename and extension, from the link.
+     *
+     * @return extracted file name
+     */
     public String getFileName() {
         String linkedName = link.get();
         if (isOnlineLink(linkedName)) {
@@ -237,17 +242,24 @@ public class LinkedFile implements Serializable {
             }
         }
     }
-    
+
     public Optional<String> getURI(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> dirs = databaseContext.getFileDirectories(filePreferences);
         return getURI(dirs);
     }
-    
+
+    /**
+     * Tries to associate the file with a URI.
+     * In case of an online link, uses the referenced URL directly.
+     * In case of a file link, searches for the file's path, which may not exist.
+     *
+     * @return String of the URI that points to the file
+     */
     public Optional<String> getURI(List<Path> directories) {
         String linkedName = link.get();
         if (isOnlineLink(linkedName)) {
             if (linkedName.startsWith("www.")) {
-                linkedName = "https://"+linkedName;
+                linkedName = "https://" + linkedName;
             }
             return Optional.of(linkedName);
         } else {
@@ -268,7 +280,7 @@ public class LinkedFile implements Serializable {
      * Tries to locate the file.
      * In case the path is absolute, the path is checked.
      * In case the path is relative, the given directories are used as base directories.
-     * 
+     *
      * @return absolute path if found.
      */
     public Optional<Path> findIn(List<Path> directories) {

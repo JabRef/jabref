@@ -8,8 +8,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.util.io.FileUtil;
-
 import org.jspecify.annotations.NonNull;
 
 /// URL utilities for URLs in the JabRef logic.
