@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "get-citing-works", description = "Outputs a list of works citting the work at hand")
+@Command(name = "get-citing-works", description = "Outputs a list of works citing the work at hand")
 class GetCitingWorks implements Callable<Integer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetCitingWorks.class);
