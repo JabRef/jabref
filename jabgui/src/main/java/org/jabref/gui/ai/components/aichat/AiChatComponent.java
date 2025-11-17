@@ -3,6 +3,7 @@ package org.jabref.gui.ai.components.aichat;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.beans.Observable;
@@ -43,6 +44,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.google.common.annotations.VisibleForTesting;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.UserMessage;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
@@ -191,6 +193,22 @@ public class AiChatComponent extends VBox {
             onSendMessage(userMessage);
         });
 
+        chatPrompt.setRegenerateCallback(() -> {
+            setLoading(true);
+            Optional<UserMessage> lastUserPrompt = Optional.empty();
+            if (!aiChatLogic.getChatHistory().isEmpty()) {
+                lastUserPrompt = getLastUserMessage();
+            }
+            if (lastUserPrompt.isPresent()) {
+                while (aiChatLogic.getChatHistory().getLast().type() != ChatMessageType.USER) {
+                    deleteLastMessage();
+                }
+                deleteLastMessage();
+                chatPrompt.switchToNormalState();
+                onSendMessage(lastUserPrompt.get().singleText());
+            }
+        });
+
         chatPrompt.requestPromptFocus();
 
         updatePromptHistory();
@@ -333,5 +351,17 @@ public class AiChatComponent extends VBox {
             int index = aiChatLogic.getChatHistory().size() - 1;
             aiChatLogic.getChatHistory().remove(index);
         }
+    }
+
+    private Optional<UserMessage> getLastUserMessage() {
+        int messageIndex = aiChatLogic.getChatHistory().size() - 1;
+        while (messageIndex >= 0) {
+            ChatMessage chat = aiChatLogic.getChatHistory().get(messageIndex);
+            if (chat.type() == ChatMessageType.USER) {
+                return Optional.of((UserMessage) chat);
+            }
+            messageIndex--;
+        }
+        return Optional.empty();
     }
 }

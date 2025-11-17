@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -52,8 +52,8 @@ import static picocli.CommandLine.Option;
                 Pseudonymize.class,
                 Search.class
         })
-public class ArgumentProcessor implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
+public class JabKit implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabKit.class);
 
     protected final CliPreferences cliPreferences;
     protected final BibEntryTypesManager entryTypesManager;
@@ -64,7 +64,7 @@ public class ArgumentProcessor implements Runnable {
     @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
     private boolean versionInfoRequested;
 
-    public ArgumentProcessor(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
+    public JabKit(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
         this.cliPreferences = cliPreferences;
         this.entryTypesManager = entryTypesManager;
     }
