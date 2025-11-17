@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 class LinkedFileHandlerTest {
     private Path tempFolder;
     private BibEntry entry;
-    private BibEntry entryBad;
     private BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final CliPreferences preferences = mock(CliPreferences.class);
@@ -72,7 +71,7 @@ class LinkedFileHandlerTest {
             "asdf.pdf, https://example.com/file.pdf, '', [bibtexkey]",
             "asdf.pdf, https://example.com/, pdf, [bibtexkey]",
             "asdf.pdf, path/to/file.pdf, pdf, [bibtexkey]",
-            "asdf.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf, [bibtexkey]"
+            "asdf.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf, [bibtexkey]",
             "file.pdf, '', pdf, ''",
             "file.pdf, https://example.com/file.pdf, pdf, ''",
             "file.pdf, https://example.com/file.pdf?query=test, pdf, ''",
