@@ -9,7 +9,6 @@ From the project root, run:
 
 ```bash
 ./gradlew :jablib:cleanTest :jablib:test --tests "org.jabref.system.BasicModelStringIntegrationTest"
-./gradlew :jablib:test --tests "org.jabref.system.InsertTestOptionalFields"
 ```
 This command ensures:
 - All test classes under jablib test scope are compiled.
