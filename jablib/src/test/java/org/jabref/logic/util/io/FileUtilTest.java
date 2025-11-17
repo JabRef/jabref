@@ -235,7 +235,7 @@ class FileUtilTest {
     void getFileNameWithMultipleDotsString() {
         assertEquals("te.st", FileUtil.getBaseName("te.st.PdF  "));
     }
-    
+
     @Test
     void getFileNameFromUrlsCorrectly() {
         final String urls[] = {"www.example.com/", "http://www.example.com/", "https://www.example.com/"};
@@ -243,12 +243,12 @@ class FileUtilTest {
         final String files[] = {"file.pdf", "blank", "unknown.doc", ""};
         final String queries[] = {"", "?field=value", "?a=1&b=2", "?search=for+a+file"};
         for (String file : files) {
-           for (String dir : dirs) {
-                final String path = dir+file;
+            for (String dir : dirs) {
+                final String path = dir + file;
                 for (String url : urls) {
-                    final String webpage = url+path;
+                    final String webpage = url + path;
                     for (String query : queries) {
-                        assertEquals("from '"+webpage+query+"'", file, FileUtil.getFileNameFromUrl(webpage+query));
+                        assertEquals("from '" + webpage+query + "'", file, FileUtil.getFileNameFromUrl(webpage + query));
                     }
                 }
             }
