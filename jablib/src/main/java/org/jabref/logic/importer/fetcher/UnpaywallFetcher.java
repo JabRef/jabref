@@ -20,6 +20,7 @@ import org.jabref.model.search.query.BaseQueryNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,9 +61,7 @@ public class UnpaywallFetcher implements SearchBasedFetcher, CustomizableKeyFetc
         if (StringUtil.isBlank(emailOpt)) {
             return Optional.empty();
         }
-        String url = URL_PATTERN
-                .replace("<DOI>", doiOpt.get())
-                .replace("<EMAIL>", emailOpt.get());
+        String url = getUrl(doiOpt.get(), emailOpt.get());
 
         try (InputStream stream = new URLDownload(url).asInputStream()) {
             JsonNode node = mapper.readTree(stream);
@@ -77,8 +76,19 @@ public class UnpaywallFetcher implements SearchBasedFetcher, CustomizableKeyFetc
         }
     }
 
+    private static @NonNull String getUrl(String doi, String email) {
+        return URL_PATTERN
+                .replace("<DOI>", doi)
+                .replace("<EMAIL>", email);
+    }
+
     @Override
     public TrustLevel getTrustLevel() {
         return TrustLevel.META_SEARCH;
+    }
+
+    @Override
+    public @NonNull String getTestUrl() {
+        return getUrl("10.47397/tb/44-3/tb138kopp-jabref", "");
     }
 }
