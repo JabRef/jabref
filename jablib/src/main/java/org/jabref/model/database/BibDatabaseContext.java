@@ -349,6 +349,7 @@ public class BibDatabaseContext {
     public String getUid() {
         return uid;
     }
+
     /**
      * Builder for {@link BibDatabaseContext}.
      */
