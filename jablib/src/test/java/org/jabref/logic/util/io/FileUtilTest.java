@@ -237,7 +237,7 @@ class FileUtilTest {
     }
     
     @Test
-    void getFileNameFromUrlsCorrectly(String path, String file, String query) {
+    void getFileNameFromUrlsCorrectly() {
         final String urls[] = {"www.example.com/", "http://www.example.com/", "https://www.example.com/"};
         final String dirs[] = {"path/to/", "not\\a\\windows\\path/", "///", ""};
         final String files[] = {"file.pdf", "blank", "unknown.doc", ""};
