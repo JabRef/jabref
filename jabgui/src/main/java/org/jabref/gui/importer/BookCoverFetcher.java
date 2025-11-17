@@ -1,6 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -16,8 +15,8 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.identifier.ISBN;
 
 import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;

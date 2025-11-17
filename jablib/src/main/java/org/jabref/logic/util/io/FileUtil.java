@@ -366,11 +366,7 @@ public class FileUtil {
         String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
         if (targetName.isEmpty() || "-".equals(targetName)) {
-            targetName = entry.getCitationKey().orElse("default");
-        }
-
-        if ("default".equals(targetName)) {
-            return Optional.empty();
+            return entry.getCitationKey().map(FileNameCleaner::cleanFileName);
         }
 
         // Remove LaTeX commands (e.g., \mkbibquote{}) from expanded fields before cleaning filename

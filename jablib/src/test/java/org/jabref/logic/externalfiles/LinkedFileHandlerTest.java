@@ -3,6 +3,7 @@ package org.jabref.logic.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
@@ -10,6 +11,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -23,6 +25,7 @@ import static org.mockito.Mockito.when;
 class LinkedFileHandlerTest {
     private Path tempFolder;
     private BibEntry entry;
+    private BibEntry entryBad;
     private BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final CliPreferences preferences = mock(CliPreferences.class);
@@ -59,34 +62,40 @@ class LinkedFileHandlerTest {
         assertEquals(expectedFileName, result);
     }
 
-    @ParameterizedTest(name = "{1} with {2} should be {0}")
+    @ParameterizedTest(name = "{1} with {2} should be {0} with pattern '{3}'")
     @CsvSource({
-            "asdf.pdf, '', pdf",
-            "file.pdf, https://example.com/file.pdf, pdf",
-            "file.pdf, https://example.com/file.pdf?query=test, pdf",
-            "file.pdf, https://example.com/file.doc, pdf",
-            "file.pdf, https://example.com/file, pdf",
-            "file.pdf, https://example.com/file.pdf, ''",
-            "file.pdf, https://example.com/, pdf",
-            "file.pdf, path/to/file.pdf, pdf",
-            "OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf"
+            "asdf.pdf, '', pdf, [bibtexkey]",
+            "asdf.pdf, https://example.com/file.pdf, pdf, [bibtexkey]",
+            "asdf.pdf, https://example.com/file.pdf?query=test, pdf, [bibtexkey]",
+            "asdf.pdf, https://example.com/file.doc, pdf, [bibtexkey]",
+            "asdf.pdf, https://example.com/file, pdf, [bibtexkey]",
+            "asdf.pdf, https://example.com/file.pdf, '', [bibtexkey]",
+            "asdf.pdf, https://example.com/, pdf, [bibtexkey]",
+            "asdf.pdf, path/to/file.pdf, pdf, [bibtexkey]",
+            "asdf.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf, [bibtexkey]"
+            "file.pdf, '', pdf, ''",
+            "file.pdf, https://example.com/file.pdf, pdf, ''",
+            "file.pdf, https://example.com/file.pdf?query=test, pdf, ''",
+            "file.pdf, https://example.com/file.doc, pdf, ''",
+            "file.pdf, https://example.com/file, pdf, ''",
+            "file.pdf, https://example.com/file.pdf, '', ''",
+            "file.pdf, https://example.com/, pdf, ''",
+            "file.pdf, path/to/file.pdf, pdf, ''",
+            "other.pdf, https://example.com/other.pdf, pdf, ''",
+            "other.pdf, https://example.com/other.pdf?query=test, pdf, ''",
+            "other.pdf, https://example.com/other.doc, pdf, ''",
+            "other.pdf, https://example.com/other, pdf, ''",
+            "other.pdf, https://example.com/other.pdf, '', ''",
+            "other.pdf, path/to/other.pdf, pdf, ''",
+            "OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf, ''"
     })
-    void getSuggestedFileName(String expectedFileName, String link, String extension) {
-        if (link.isEmpty()) {
-            when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
-        } else {
-            when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey] - [title]");
-        }
-
-        BibEntry testEntry = new BibEntry();
-        if (link.isEmpty()) {
-            testEntry = entry;
-        }
+    void getSuggestedFileName(String expectedFileName, String link, String extension, String pattern) {
+        when(filePreferences.getFileNamePattern()).thenReturn(pattern);
 
         final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, testEntry, databaseContext, filePreferences);
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
 
-        final String result = linkedFileHandler.getSuggestedFileName(extension);
+        final String result = linkedFileHandler.getSuggestedFileName(extension.isEmpty() ? Optional.empty() : Optional.of(extension));
         assertEquals(expectedFileName, result);
     }
 }

@@ -120,7 +120,7 @@ public class LinkedFileHandler {
     private GetTargetPathResult getTargetPath(Path sourcePath, Path targetDirectory, boolean useSuggestedName) throws IOException {
         Path suggestedFileName;
         if (useSuggestedName) {
-            suggestedFileName = Path.of(getSuggestedFileName(FileUtil.getFileExtension(sourcePath).orElse("")));
+            suggestedFileName = Path.of(getSuggestedFileName(FileUtil.getFileExtension(sourcePath)));
         } else {
             suggestedFileName = sourcePath.getFileName();
         }
@@ -239,10 +239,6 @@ public class LinkedFileHandler {
         return getSuggestedFileName(Optional.empty());
     }
 
-    public String getSuggestedFileName(@NonNull String extension) {
-        return getSuggestedFileName(Optional.of(extension));
-    }
-
     /**
      * Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
      *
@@ -251,22 +247,15 @@ public class LinkedFileHandler {
      */
     public String getSuggestedFileName(Optional<String> extension) {
         String filename = linkedFile.getFileName();
+        String basename = filename.isEmpty() ? "file" : FileUtil.getBaseName(filename);
 
         // Cannot get extension from type because would need ExternalApplicationsPreferences, as type is stored as a localisation dependent string.
         if (!extension.isPresent()) {
             extension = FileUtil.getFileExtension(filename);
         }
 
-        final String basename = getSuggestedBaseName(filename);
-        return extension.map(x -> basename + "." + x).orElse(basename);
-    }
-
-    private String getSuggestedBaseName(String filename) {
-        String basename = filename.isEmpty() ? "file" : FileUtil.getBaseName(filename);
-        if (linkedFile.isOnlineLink()) {
-            return basename;
-        }
-        return FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
+        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
+        return extension.map(x -> targetFileName + "." + x).orElse(targetFileName);
     }
 
     /**
