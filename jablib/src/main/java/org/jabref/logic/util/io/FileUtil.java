@@ -118,7 +118,7 @@ public class FileUtil {
      */
     public static String getFileNameFromUrl(String link) {
         int slash = link.lastIndexOf('/');
-        if (slash >= 0) {
+        if (slash >= 0 && slash < link.length()) {
             link = link.substring(slash + 1);
         }
         int query = link.indexOf('?');

@@ -236,7 +236,12 @@ public class LinkedFile implements Serializable {
             return FileUtil.getFileNameFromUrl(linkedName);
         } else {
             try {
-                return Path.of(linkedName).getFileName().toString();
+                Path pathname = Path.of(linkedName).getFileName();
+                if (pathname != null) {
+                    return pathname.toString();
+                } else {
+                    return "";
+                }
             } catch (InvalidPathException ex) {
                 return "";
             }

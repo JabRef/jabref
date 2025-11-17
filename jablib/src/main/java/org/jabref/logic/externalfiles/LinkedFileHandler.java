@@ -236,17 +236,11 @@ public class LinkedFileHandler {
     }
 
     public String getSuggestedFileName() {
-        // Cannot get extension from type because would need both ExternalApplicationsPreferences, as type is stored as a localisation dependent string.
-        String filename = linkedFile.getFileName();
-        Optional<String> targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern());
-        if (targetFileName.isPresent()) {
-            Optional<String> extension = FileUtil.getFileExtension(filename);
-            if (extension.isPresent()) {
-                return FileUtil.getValidFileName(targetFileName.get() + "." + extension.get());
-            }
-            return FileUtil.getValidFileName(targetFileName.get());
-        }
-        return filename;
+        return getSuggestedFileName(Optional.empty());
+    }
+
+    public String getSuggestedFileName(@NonNull String extension) {
+        return getSuggestedFileName(Optional.of(extension));
     }
 
     /**
@@ -255,16 +249,25 @@ public class LinkedFileHandler {
      * @param extension The extension of the file. If empty, no extension is added.
      * @return the suggested filename, including extension
      */
-    public String getSuggestedFileName(@NonNull String extension) {
-        Optional<String> targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern());
-        String basename = targetFileName.orElse(FileUtil.getBaseName(linkedFile.getFileName()));
-        return FileUtil.getValidFileName(basename + "." + extension);
+    public String getSuggestedFileName(Optional<String> extension) {
+        // Cannot get extension from type because would need ExternalApplicationsPreferences, as type is stored as a localisation dependent string.
+        if (!extension.isPresent()) {
+            extension = FileUtil.getFileExtension(filename);
+        }
+
+        String filename = linkedFile.getFileName();
+        String basename = filename.isEmpty() ? "file" : FileUtil.getBaseName(filename);
+        if (!linkedFile.isOnlineLink()) {
+            basename = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
+        }
+
+        return extension.map(x -> basename + x).orElse(basename);
     }
 
     /**
      * Check to see if a file already exists in the target directory.  Search is not case sensitive.
      *
-     * @return First identified path that matches an existing file.  This name can be used in subsequent calls to
+     * @return First identified path that matches an existing file. This name can be used in subsequent calls to
      * override the existing file.
      */
     public Optional<Path> findExistingFile(LinkedFile linkedFile, BibEntry entry, String targetFileName) {
