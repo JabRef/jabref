@@ -32,7 +32,7 @@ class GetCitedWorks implements Callable<Integer> {
     @CommandLine.Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    @CommandLine.Option(names = {"DOI"}, description = "DOI to check")
+    @CommandLine.Parameters(description = "DOI to check")
     private String doi;
 
     @Override
