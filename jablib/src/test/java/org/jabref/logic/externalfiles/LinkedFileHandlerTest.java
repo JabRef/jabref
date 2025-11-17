@@ -83,7 +83,7 @@ class LinkedFileHandlerTest {
             testEntry = entry;
         }
 
-        final LinkedFile linkedFile = new LinkedFile("", link);
+        final LinkedFile linkedFile = new LinkedFile("", link, "");
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, testEntry, databaseContext, filePreferences);
 
         final String result = linkedFileHandler.getSuggestedFileName(extension);

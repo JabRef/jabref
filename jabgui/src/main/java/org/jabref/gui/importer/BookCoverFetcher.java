@@ -31,7 +31,7 @@ public class BookCoverFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(BookCoverFetcher.class);
 
     private static final Pattern URL_JSON_PATTERN = Pattern.compile("^\\s*\\{\\s*\"url\"\\s*:\\s*\"([^\"]*)\"\\s*\\}\\s*$");
-    
+
     private static final String URL_FETCHER_URL = "https://bookcover.longitood.com/bookcover/";
     private static final String IMAGE_FALLBACK_URL = "https://covers.openlibrary.org/b/isbn/";
     private static final String IMAGE_FALLBACK_SUFFIX = "-L.jpg";
