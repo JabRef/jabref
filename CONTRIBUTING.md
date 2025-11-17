@@ -162,9 +162,16 @@ We also show all contributors in our blog posts. See [Release 5.15 blog post](ht
 
 Your contribution is considered being made under [MIT license](https://tldrlegal.com/license/mit-license).
 
-#### Notes on AI usage
+#### AI Usage Policy
 
-Please keep these two principles in mind when you contribute:
+This project does *not* accept fully AI-generated contributions.
+AI tools may be used assistively only. As a contributor, you should be able to understand and take responsibility for changes you make to the codebase.
+
+Agents and AI coding assistants must follow the guidelines in [`./AGENTS.md`](./AGENTS.md).
+
+Please read the [AI Usage Policy](./AI_USAGE_POLICY.md) before proceeding.
+In short, please keep these two principles in mind when you contribute:
+
 > [!IMPORTANT]
 >
 > 1. Never let an LLM speak for you.
