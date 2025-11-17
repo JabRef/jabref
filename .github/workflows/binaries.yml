@@ -288,6 +288,10 @@ jobs:
       - name: Build runtime image and installer
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
+      - name: Smoke test JabGui
+        shell: bash
+        run: |
+          ./gradlew :jabgui:run --args="--help"
       - name: Package JabGui application image
         shell: bash
         run: |
@@ -311,9 +315,18 @@ jobs:
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
 
+      - name: Smoke test JabSrv-CLI
+        shell: bash
+        run: |
+          ./gradlew :jabsrv-cli:run --args="--help"
+
       - name: Build JabKit
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
+      - name: Smoke test JabKit
+        shell: bash
+        run: |
+          ./gradlew :jabkit:run --args="--help"
       - name: Package JabKit application image
         shell: bash
         run: |
@@ -323,6 +336,10 @@ jobs:
       - name: Build JabLS-CLI
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabls-cli:jpackage
+      - name: Smoke test JabLs-CLI
+        shell: bash
+        run: |
+          ./gradlew :jabls-cli:run --args="--help"
       - name: Package JabLS-CLI application image
         shell: bash
         run: |
