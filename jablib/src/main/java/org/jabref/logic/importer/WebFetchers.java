@@ -48,6 +48,7 @@ import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerNatureFullTextFetcher;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
+import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
@@ -136,6 +137,8 @@ public class WebFetchers {
         set.add(new LOBIDFetcher());
         set.add(new ScholarArchiveFetcher());
         set.add(new EuropePmcFetcher());
+        // Even though Unpaywall is used differently, adding it here enables "smooth" setting of the email (as fetcher key) in the preferences UI
+        set.add(new UnpaywallFetcher());
         return set;
     }
 

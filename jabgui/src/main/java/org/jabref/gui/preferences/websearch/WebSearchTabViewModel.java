@@ -34,7 +34,6 @@ import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
-import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -158,9 +157,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         Set<String> enabledCatalogs = new HashSet<>(importerPreferences.getCatalogs());
 
         List<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
-                                                          .stream().sorted(Comparator.comparing(WebFetcher::getName)).collect(Collectors.toList());
-        // Unpaywall is not a real web fetcher yet, therefore, we need to manually add it.
-        allFetchers.add(new UnpaywallFetcher());
+                                                          .stream()
+                                                          .sorted(Comparator.comparing(WebFetcher::getName))
+                                                          .toList();
 
         Set<CustomizableKeyFetcher> customizableKeyFetchers = WebFetchers.getCustomizableKeyFetchers(importFormatPreferences, importerPreferences);
 
