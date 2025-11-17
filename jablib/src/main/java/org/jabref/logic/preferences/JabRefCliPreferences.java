@@ -2331,12 +2331,12 @@ public class JabRefCliPreferences implements CliPreferences {
         BuildInfo buildInfo = new BuildInfo();
 
         Map<String, String> keys = new HashMap<>();
-        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
         keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
         keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);
-        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         // SpringerLink uses the same key and fetcher name as SpringerFetcher
+        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
 
         return keys;
     }
