@@ -72,7 +72,7 @@ public class BasicModelStringIntegrationTest {
         String boldYear = StringUtil.boldHTML(trimmed);
         assertEquals("<b>2024</b>", boldYear);
 
-        // Test with blank/null strings
+        // Test with blank/
         assertTrue(StringUtil.isBlank(""));
         assertTrue(StringUtil.isBlank("   "));
 
