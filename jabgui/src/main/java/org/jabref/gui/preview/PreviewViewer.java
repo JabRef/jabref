@@ -282,7 +282,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private boolean isFileTypeAValidCoverImage(String fileType) {
         // to allow url links
-        if (fileType.equals("")) {
+        if ("".equals(fileType)) {
             return true;
         }
 

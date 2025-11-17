@@ -27,7 +27,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private TextField mainFileDirectory;
     @FXML private RadioButton useMainFileDirectory;
 
-    @FXML private RadioButton bookCoverDownload;
+    @FXML private CheckBox bookCoverDownload;
     @FXML private Label bookCoverLabel;
     @FXML private TextField bookCoverLocation;
 
