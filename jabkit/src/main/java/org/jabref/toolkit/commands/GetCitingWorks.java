@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "get-cited-works", description = "Outputs a list of works cited (\"bibliography\")")
-class GetCitedWorks implements Callable<Integer> {
+@Command(name = "get-citing-works", description = "Outputs a list of works citting the work at hand")
+class GetCitingWorks implements Callable<Integer> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GetCitedWorks.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetCitingWorks.class);
 
     @CommandLine.ParentCommand
     private JabKit argumentProcessor;
@@ -36,7 +36,7 @@ class GetCitedWorks implements Callable<Integer> {
         List<BibEntry> entries;
 
         try {
-             entries = citationFetcher.searchCiting(new BibEntry().withField(StandardField.DOI, doi));
+             entries = citationFetcher.searchCitedBy(new BibEntry().withField(StandardField.DOI, doi));
         } catch (FetcherException e) {
             LOGGER.error("Could not fetch citation information based on DOI", e);
             System.err.print(Localization.lang("No data was found for the identifier"));

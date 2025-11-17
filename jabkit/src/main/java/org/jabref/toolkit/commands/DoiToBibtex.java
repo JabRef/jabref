@@ -73,15 +73,6 @@ class DoiToBibtex implements Callable<Integer> {
             entries.add(entry.get());
         }
 
-        try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
-            BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
-            BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, context, argumentProcessor.cliPreferences);
-            bibWriter.writeDatabase(context);
-        } catch (IOException e) {
-            LOGGER.error("Could not write BibTeX", e);
-            System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
-            return 1;
-        }
-        return 0;
+        return JabKit.outputEntries(argumentProcessor.cliPreferences, entries);
     }
 }
