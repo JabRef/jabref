@@ -251,18 +251,22 @@ public class LinkedFileHandler {
      */
     public String getSuggestedFileName(Optional<String> extension) {
         String filename = linkedFile.getFileName();
-        String basename = filename.isEmpty() ? "file" : FileUtil.getBaseName(filename);
 
         // Cannot get extension from type because would need ExternalApplicationsPreferences, as type is stored as a localisation dependent string.
         if (!extension.isPresent()) {
             extension = FileUtil.getFileExtension(filename);
         }
 
-        if (!linkedFile.isOnlineLink()) {
-            basename = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
-        }
-
+        final String basename = getSuggestedBaseName(filename);
         return extension.map(x -> basename + x).orElse(basename);
+    }
+    
+    private String getSuggestedBaseName(String filename) {
+        String basename = filename.isEmpty() ? "file" : FileUtil.getBaseName(filename);
+        if (!linkedFile.isOnlineLink()) {
+            return FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
+        }
+        return basename;
     }
 
     /**
