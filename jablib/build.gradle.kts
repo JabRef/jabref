@@ -103,8 +103,8 @@ dependencies {
 
     implementation("org.eclipse.jgit:org.eclipse.jgit")
 
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation("tools.jackson.dataformat:jackson-dataformat-yaml")
+    implementation("tools.jackson.core:jackson-databind")
     // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
     // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
 
@@ -224,9 +224,6 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock") {
-        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
-    }
     testImplementation("org.ow2.asm:asm")
 
     // Required for LocalizationConsistencyTest
@@ -593,8 +590,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("org.xmlunit")
     requires.add("org.xmlunit.matchers")
-    requires.add("wiremock")
-    requires.add("wiremock.slf4j.spi.shim")
+
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")
