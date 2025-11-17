@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +11,7 @@ import org.jabref.logic.pseudonymization.Pseudonymization;
 import org.jabref.logic.pseudonymization.PseudonymizationResultCsvWriter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
@@ -22,17 +22,17 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 
 @Command(name = "pseudonymize", description = "Perform pseudonymization of the library")
-public class Pseudonymize implements Runnable {
+class Pseudonymize implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(Pseudonymize.class);
     private static final String PSEUDO_SUFFIX = ".pseudo";
     private static final String BIB_EXTENSION = ".bib";
     private static final String CSV_EXTENSION = ".csv";
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit argumentProcessor;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @ADR(45)
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "BibTeX file to be pseudonymized", required = true)
@@ -53,7 +53,7 @@ public class Pseudonymize implements Runnable {
         Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
         Path pseudoKeyPath = resolveOutputPath(keyFile, inputPath, fileName + PSEUDO_SUFFIX + CSV_EXTENSION);
 
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+        Optional<ParserResult> parserResult = JabKit.importFile(
                 inputPath,
                 "bibtex",
                 argumentProcessor.cliPreferences,
@@ -78,7 +78,7 @@ public class Pseudonymize implements Runnable {
             return;
         }
 
-        ArgumentProcessor.saveDatabaseContext(
+        JabKit.saveDatabaseContext(
                 argumentProcessor.cliPreferences,
                 argumentProcessor.entryTypesManager,
                 result.bibDatabaseContext(),
