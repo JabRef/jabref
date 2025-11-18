@@ -13,7 +13,11 @@ import kong.unirest.core.json.JSONObject;
 /**
  * Converts an {@link InputStream} into a {@link JSONObject}.
  */
-public class JsonReader {
+public final class JsonReader {
+
+    private JsonReader() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     /**
      * Converts the given input stream into a {@link JSONObject}.
