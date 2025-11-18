@@ -21,9 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @AllowedToUseClassGetResource("to determine the root directory")
-public class MathMLParser {
+public final class MathMLParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MathMLParser.class);
     private static final String XSLT_FILE_PATH = "/xslt/mathml_latex/mmltex.xsl";
+
+    private MathMLParser() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     /**
      * Parses the MathML element into its corresponding
@@ -63,4 +67,3 @@ public class MathMLParser {
         return latexResult;
     }
 }
-
