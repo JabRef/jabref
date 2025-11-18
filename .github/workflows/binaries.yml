@@ -66,8 +66,8 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
           if [[ "$GITHUB_WORKFLOW" == *"early access"* && "$REPO_OWNER" != "JabRef" ]]; then
-            echo "🚫 Early access workflow for JabRef disabled for non-JabRef owner"
-            echo "🚫 Early access workflow for JabRef disabled for non-JabRef owner" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ Early access workflow for JabRef disabled for non-JabRef owner"
+            echo "⊘ Early access workflow for JabRef disabled for non-JabRef owner" >> $GITHUB_STEP_SUMMARY
             echo "should-build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -77,15 +77,15 @@ jobs:
             echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
             echo "should-build=true" >> "$GITHUB_OUTPUT"
           else
-            echo "🚫 build should be skipped"
-            echo "🚫 build should be skipped" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ build should be skipped"
+            echo "⊘ build should be skipped" >> $GITHUB_STEP_SUMMARY
             echo "should-build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
-            echo "🚫 Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
-            echo "🚫 Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
+            echo "⊘ Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
+            echo "⊘ Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             echo "secretspresent=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -93,17 +93,17 @@ jobs:
           echo "secretspresent=true" >> "$GITHUB_OUTPUT"
 
           if [[ "$GITHUB_REF" == refs/heads/gh-readonly-queue* ]]; then
-            echo "🚫 merge queue – skipping upload"
-            echo "🚫 merge queue – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ merge queue – skipping upload"
+            echo "⊘ merge queue – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "tag bulid" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ tag bulid" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=true" >> "$GITHUB_OUTPUT"
           else
-            echo "no tag bulid" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ no tag bulid" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -117,8 +117,8 @@ jobs:
              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
              exit 0;
           else
-            echo "🚫 no macOS notarization"
-            echo "🚫 no macOS notarization" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ no macOS notarization"
+            echo "⊘ no macOS notarization" >> $GITHUB_STEP_SUMMARY
             echo "should-notarize=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -136,8 +136,8 @@ jobs:
             echo "☁️ Label 'dev: binaries' found – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
           else
-            echo "🚫 Label 'dev: binaries' not found – skipping upload"
-            echo "🚫 Label 'dev: binaries' not found – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ Label 'dev: binaries' not found – skipping upload"
+            echo "⊘ Label 'dev: binaries' not found – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -151,8 +151,8 @@ jobs:
         if: needs.conditions.outputs.upload-to-builds-jabref-org == 'false'
         shell: bash
         run: |
-          echo "🚫 no upload – skipping upload"
-          echo "🚫 no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
+          echo "⊘ no upload – skipping upload"
+          echo "⊘ no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
           echo "available=false" >> "$GITHUB_OUTPUT"
       - name: Setup SSH key
         if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
@@ -173,8 +173,8 @@ jobs:
             echo "☁️ enough disk space available – will upload" >> $GITHUB_STEP_SUMMARY
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
-            echo "🚫 not enough disk space – skipping upload"
-            echo "🚫 not enough disk space – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "⛔ not enough disk space – skipping upload"
+            echo "⛔ not enough disk space – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
 
