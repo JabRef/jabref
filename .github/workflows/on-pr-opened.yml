@@ -23,8 +23,7 @@ jobs:
 
 
             We have automatic checks in place, based on which you will soon get automated feedback if any of them are failing.
-            We also use [TragBot](https://usetrag.com/) with custom rules that scans your changes and provides some preliminary comments, before a maintainer takes a look.
-            TragBot is still learning, and may not always be accurate.
+            Later on in the review process, one of our maintainers will also go through your contribution.
             In the "Files changed" tab, you can go through its comments and just click on "Resolve conversation" if you are sure that it is incorrect, or comment on the conversation if you are doubtful.
 
 
