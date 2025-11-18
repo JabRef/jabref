@@ -14,5 +14,5 @@
   ignore = all
   shallow = true
 [submodule "java-module-packaging"]
-	path = java-module-packaging
-	url = https://github.com/koppor/java-module-packaging.git
+  path = java-module-packaging
+  url = https://github.com/koppor/java-module-packaging.git
