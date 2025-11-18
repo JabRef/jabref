@@ -41,6 +41,7 @@ class MakeLabelWithDatabaseTest {
                 false,
                 false,
                 false,
+                false,
                 CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
@@ -73,6 +74,7 @@ class MakeLabelWithDatabaseTest {
                 false,
                 false,
                 false,
+                false,
                 CitationKeyPatternPreferences.KeySuffix.ALWAYS,
                 "",
                 "",
@@ -88,6 +90,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateDefaultKeyAlwaysLetterAlreadyExistsDuplicatesStartAtB() {
         preferences = new CitationKeyPatternPreferences(
+                false,
                 false,
                 false,
                 false,
@@ -114,6 +117,7 @@ class MakeLabelWithDatabaseTest {
                 false,
                 false,
                 false,
+                false,
                 CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
                 "",
                 "",
@@ -129,6 +133,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateDefaultKeyAlreadyExistsDuplicatesStartAtB() {
         preferences = new CitationKeyPatternPreferences(
+                false,
                 false,
                 false,
                 false,
@@ -430,6 +435,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateKeyRegExReplace() {
         preferences = new CitationKeyPatternPreferences(
+                false,
                 false,
                 false,
                 false,

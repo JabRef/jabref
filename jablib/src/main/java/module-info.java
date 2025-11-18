@@ -156,9 +156,9 @@ open module org.jabref.jablib {
     // region: data mapping
     requires jdk.xml.dom;
     requires com.google.gson;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.dataformat.yaml;
-    requires com.fasterxml.jackson.datatype.jsr310;
+    requires tools.jackson.databind;
+    requires tools.jackson.dataformat.yaml;
+    requires tools.jackson.core;
     // endregion
 
     // region HTTP clients
@@ -186,6 +186,10 @@ open module org.jabref.jablib {
     requires org.apache.commons.lang3;
     requires org.apache.commons.text;
     requires org.apache.commons.logging;
+    // endregion
+
+    // region: caching
+    requires com.github.benmanes.caffeine;
     // endregion
 
     // region: latex2unicode
@@ -254,7 +258,7 @@ open module org.jabref.jablib {
     requires cuid;
     requires dd.plist;
     requires io.github.adr;
-    requires textFormatter;
+    requires io.github.darvil.terminal.textformatter;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;
@@ -262,6 +266,5 @@ open module org.jabref.jablib {
     requires org.jooq.jool;
     requires org.libreoffice.uno;
     requires transitive org.jspecify;
-    requires com.fasterxml.jackson.datatype.jdk8;
     // endregion
 }

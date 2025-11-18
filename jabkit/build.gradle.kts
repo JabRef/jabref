@@ -21,6 +21,7 @@ dependencies {
     implementation("info.picocli:picocli")
     annotationProcessor("info.picocli:picocli-codegen")
 
+    implementation("com.github.ben-manes.caffeine:caffeine")
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify")
 
@@ -62,11 +63,14 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 }
 
 application {
-    mainClass.set("org.jabref.JabKit")
+    mainClass.set("org.jabref.toolkit.JabKitLauncher")
     mainModule.set("org.jabref.jabkit")
 
     // Also passed to launcher by java-module-packaging plugin
     applicationDefaultJvmArgs = listOf(
+        // JEP 158: Disable all java util logging
+        "-Xlog:disable",
+
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
