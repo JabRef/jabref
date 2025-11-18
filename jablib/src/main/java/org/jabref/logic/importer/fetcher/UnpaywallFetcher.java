@@ -20,7 +20,6 @@ import org.jabref.model.search.query.BaseQueryNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,5 +90,4 @@ public class UnpaywallFetcher implements SearchBasedFetcher, CustomizableKeyFetc
     public TrustLevel getTrustLevel() {
         return TrustLevel.META_SEARCH;
     }
-
 }
