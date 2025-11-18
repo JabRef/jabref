@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;

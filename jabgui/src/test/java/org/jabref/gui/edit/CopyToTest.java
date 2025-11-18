@@ -12,6 +12,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -90,7 +91,7 @@ public class CopyToTest {
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(new org.jabref.model.TransferInformation(sourceDatabaseContext, TransferMode.COPY)), eq(selectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -107,7 +108,7 @@ public class CopyToTest {
         List<BibEntry> expectedEntries = new ArrayList<>(selectedEntries);
         expectedEntries.add(referencedEntry);
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(expectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(new org.jabref.model.TransferInformation(sourceDatabaseContext, TransferMode.COPY)), eq(expectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -131,7 +132,7 @@ public class CopyToTest {
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(new org.jabref.model.TransferInformation(sourceDatabaseContext, TransferMode.COPY)), eq(selectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -150,7 +151,7 @@ public class CopyToTest {
         List<BibEntry> expectedEntries = new ArrayList<>(selectedEntries);
         expectedEntries.add(referencedEntry);
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(expectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(new org.jabref.model.TransferInformation(sourceDatabaseContext, TransferMode.COPY)), eq(expectedEntries), trackerCaptor.capture());
     }
 
     @Test
@@ -166,6 +167,6 @@ public class CopyToTest {
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
 
-        verify(importHandler).importEntriesWithDuplicateCheck(eq(sourceDatabaseContext), eq(selectedEntries), trackerCaptor.capture());
+        verify(importHandler).importEntriesWithDuplicateCheck(eq(new org.jabref.model.TransferInformation(sourceDatabaseContext, TransferMode.COPY)), eq(selectedEntries), trackerCaptor.capture());
     }
 }

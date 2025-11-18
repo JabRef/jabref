@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.FileTestConfiguration.TestFileLinkMode;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -46,7 +47,8 @@ class LinkedFileTransferHelperTest {
 
         LinkedFileTransferHelper
                 .adjustLinkedFilesForTarget(
-                        filePreferences, fileTestConfiguration.sourceContext,
+                        filePreferences,
+                        new org.jabref.model.TransferInformation(fileTestConfiguration.sourceContext, TransferMode.COPY)
                         actualBibDatabaseContext,
                         actualEntry
                 );

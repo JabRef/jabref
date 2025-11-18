@@ -39,6 +39,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -76,6 +77,8 @@ import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -834,8 +837,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void copyEntry() {
-        clipBoardManager.setSourceBibDatabaseContext(this.getBibDatabaseContext());
-        int entriesCopied = doCopyEntry(getSelectedEntries());
+        int entriesCopied = doCopyEntry(TransferMode.COPY, getSelectedEntries());
         if (entriesCopied >= 0) {
             dialogService.notify(Localization.lang("Copied %0 entry(s)", entriesCopied));
         } else {
@@ -843,18 +845,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    private int doCopyEntry(List<BibEntry> selectedEntries) {
+    private int doCopyEntry(TransferMode transferMode, List<BibEntry> selectedEntries) {
         if (selectedEntries.isEmpty()) {
             return 0;
         }
 
         List<BibtexString> stringConstants = bibDatabaseContext.getDatabase().getUsedStrings(selectedEntries);
         try {
-            if (stringConstants.isEmpty()) {
-                clipBoardManager.setContent(selectedEntries, entryTypesManager);
-            } else {
-                clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
-            }
+            clipBoardManager.setContent(transferMode, bibDatabaseContext, selectedEntries, entryTypesManager, stringConstants);
             return selectedEntries.size();
         } catch (IOException e) {
             LOGGER.error("Error while copying selected entries to clipboard.", e);
@@ -873,15 +871,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
         // Now, the BibEntries to add are known
         // The definitive insertion needs to happen now.
-        BibDatabaseContext sourceBibDatabaseContext = clipBoardManager.getSourceBibDatabaseContext().orElse(null);
         addEntriesWithFeedback(
-                sourceBibDatabaseContext,
+                clipBoardManager.getJabRefClipboardTransferData(),
                 entriesToAdd,
                 bibDatabaseContext,
                 Localization.lang("Pasted %0 entry(s) to %1"),
                 Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
                 dialogService,
-                preferences.getFilePreferences(),
                 importHandler,
                 stateManager
         );
@@ -904,21 +900,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
         addEntriesWithFeedback(
-                sourceBibDatabaseContext,
+                new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file (and entry(s)) should be copied or moved
                 entriesToAdd,
                 bibDatabaseContext,
                 Localization.lang("Moved %0 entry(s) to %1"),
                 Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
                 dialogService,
-                preferences.getFilePreferences(),
                 importHandler,
                 stateManager
         );
     }
 
     public void cutEntry() {
-        clipBoardManager.setSourceBibDatabaseContext(this.getBibDatabaseContext());
-        int entriesCopied = doCopyEntry(getSelectedEntries());
+        int entriesCopied = doCopyEntry(TransferMode.MOVE, getSelectedEntries());
         int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
 
         if (entriesCopied == entriesDeleted) {

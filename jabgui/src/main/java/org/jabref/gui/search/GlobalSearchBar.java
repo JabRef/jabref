@@ -39,7 +39,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
-import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;

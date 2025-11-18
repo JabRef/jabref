@@ -11,6 +11,8 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -84,13 +86,12 @@ public class CopyTo extends SimpleCommand {
         entriesToAdd.addAll(entriesWithCrossRef);
 
         addEntriesWithFeedback(
-                sourceDatabaseContext,
+                new TransferInformation(sourceDatabaseContext, TransferMode.COPY),
                 entriesToAdd,
                 targetDatabaseContext,
                 Localization.lang("Copied %0 entry(s) to %1, including cross-references"),
                 Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"),
                 dialogService,
-                filePreferences,
                 importHandler,
                 stateManager
         );
@@ -98,13 +99,12 @@ public class CopyTo extends SimpleCommand {
 
     public void copyEntriesWithoutCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
         addEntriesWithFeedback(
-                sourceDatabaseContext,
+                new TransferInformation(sourceDatabaseContext, TransferMode.COPY),
                 selectedEntries,
                 targetDatabaseContext,
                 Localization.lang("Copied %0 entry(s) to %1, without cross-references"),
                 Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"),
                 dialogService,
-                filePreferences,
                 importHandler,
                 stateManager
         );

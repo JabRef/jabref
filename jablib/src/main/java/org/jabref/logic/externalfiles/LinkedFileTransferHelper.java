@@ -11,6 +11,8 @@ import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -33,13 +35,13 @@ public class LinkedFileTransferHelper {
      * There is no need to know the source entry, because we are interested in the file paths only.
      *
      * @param filePreferences File preferences for both contexts
-     * @param sourceContext   The source database context where files are currently located
+     * @param transferInformation   The source database context where files are currently located - and the transferMode
      * @param targetContext   The target database context where files should be accessible
      * @param targetEntry     The entry in the targetContext
      */
     public static void adjustLinkedFilesForTarget(
             FilePreferences filePreferences,
-            BibDatabaseContext sourceContext,
+            TransferInformation transferInformation,
             BibDatabaseContext targetContext,
             BibEntry targetEntry
     ) {
@@ -76,7 +78,7 @@ public class LinkedFileTransferHelper {
             }
             Path targetPrimaryPath = targetPrimaryPathOpt.get();
 
-            Optional<Path> sourcePathOpt = linkedFile.findIn(sourceContext, filePreferences);
+            Optional<Path> sourcePathOpt = linkedFile.findIn(transferInformation.bibDatabaseContext(), filePreferences);
             if (sourcePathOpt.isEmpty()) {
                 // In case file does not exist, just keep the broken link
                 linkedFiles.add(linkedFile);
@@ -106,6 +108,7 @@ public class LinkedFileTransferHelper {
                 linkedFile.setLink(newLink);
                 fileLinksChanged = true;
                 linkedFiles.add(linkedFile);
+                continue;
             }
 
             linkedFileAsPath = targetPrimaryPath.resolve(linkedFileAsPath);
@@ -120,9 +123,14 @@ public class LinkedFileTransferHelper {
             if (!Files.exists(linkedFileAsPath)) {
                 try {
                     // [impl->req~logic.externalfiles.file-transfer.not-reachable-same-path~1]
-                    // TODO: Currently, we copy the file and do not move it (when Ctrl+X and then Ctrl+V is pressed)
-                    LOGGER.debug("Copying file from {} to {}", sourcePath, linkedFileAsPath);
-                    Files.copy(sourcePath, linkedFileAsPath, StandardCopyOption.COPY_ATTRIBUTES);
+                    if (transferInformation.transferMode() == TransferMode.COPY) {
+                        LOGGER.debug("Copying file from {} to {}", sourcePath, linkedFileAsPath);
+                        Files.copy(sourcePath, linkedFileAsPath, StandardCopyOption.COPY_ATTRIBUTES);
+                    } else {
+                        LOGGER.debug("Moving file from {} to {}", sourcePath, linkedFileAsPath);
+                        assert transferInformation.transferMode() == TransferMode.MOVE;
+                        Files.move(sourcePath, linkedFileAsPath, StandardCopyOption.ATOMIC_MOVE);
+                    }
                 } catch (IOException e) {
                     LOGGER.error("Could not copy file from {} to {}", sourcePath, linkedFileAsPath, e);
                     linkedFiles.add(linkedFile);

@@ -6,8 +6,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.TransferInformation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -15,13 +15,13 @@ import org.jspecify.annotations.Nullable;
 
 public class InsertUtil {
 
-    public static void addEntriesWithFeedback(@Nullable BibDatabaseContext sourceDatabaseContext,
+    /// @param jabRefClipboardTransferData - can be null if called via clipboard and clipboard content was NOT created by JabRef
+    public static void addEntriesWithFeedback(@Nullable TransferInformation jabRefClipboardTransferData,
                                               List<BibEntry> entriesToAdd,
                                               BibDatabaseContext targetDatabaseContext,
                                               String successMessage,
                                               String partialMessage,
                                               DialogService dialogService,
-                                              FilePreferences filePreferences,
                                               ImportHandler importHandler,
                                               StateManager stateManager
     ) {
@@ -43,6 +43,6 @@ public class InsertUtil {
             }
         });
 
-        importHandler.importEntriesWithDuplicateCheck(sourceDatabaseContext, entriesToAdd, tracker);
+        importHandler.importEntriesWithDuplicateCheck(jabRefClipboardTransferData, entriesToAdd, tracker);
     }
 }

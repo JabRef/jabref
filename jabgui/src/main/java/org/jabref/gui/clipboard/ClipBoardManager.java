@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.clipboard;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -13,12 +13,18 @@ import javafx.application.Platform;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseButton;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.gui.StateManager;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.importer.util.MediaTypes;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -27,6 +33,7 @@ import org.jabref.model.entry.BibtexString;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,19 +41,22 @@ import org.slf4j.LoggerFactory;
 public class ClipBoardManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
 
+    private static final DataFormat DATAFORMAT_JABREF_DATA = new DataFormat(MediaTypes.APPLICATION_JABREF_DATA);
+
     private static Clipboard clipboard;
 
     private static java.awt.datatransfer.Clipboard primary;
 
-    private BibDatabaseContext sourceDatabaseContext;
+    private final StateManager stateManager;
 
-    public ClipBoardManager() {
-        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection());
+    public ClipBoardManager(StateManager stateManager) {
+        this(stateManager, Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection());
     }
 
-    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary) {
+    public ClipBoardManager(StateManager stateManager, Clipboard clipboard, java.awt.datatransfer.Clipboard primary) {
         ClipBoardManager.clipboard = clipboard;
         ClipBoardManager.primary = primary;
+        this.stateManager = stateManager;
     }
 
     /**
@@ -88,6 +98,15 @@ public class ClipBoardManager {
         return result;
     }
 
+    public @Nullable TransferInformation getJabRefClipboardTransferData() {
+        return Optional.ofNullable(clipboard.getContent(DATAFORMAT_JABREF_DATA))
+                       .filter(String.class::isInstance)
+                       .map(String.class::cast)
+                       .map(JabRefClipboardData::fromJson)
+                       .flatMap(data -> data.toTransferInformation(stateManager))
+                       .orElse(null);
+    }
+
     public static @NonNull String getHtmlContents() {
         String result = clipboard.getHtml();
         if (result == null) {
@@ -112,7 +131,7 @@ public class ClipBoardManager {
                 try {
                     return (String) contents.getTransferData(DataFlavor.stringFlavor);
                 } catch (UnsupportedFlavorException | IOException e) {
-                    LOGGER.warn("", e);
+                    LOGGER.warn("Could not get transfer data", e);
                 }
             }
         }
@@ -149,31 +168,32 @@ public class ClipBoardManager {
     }
 
     public void setContent(String string) {
-        final ClipboardContent content = new ClipboardContent();
+        setContent(string, null);
+    }
+
+    private void setContent(String string, @Nullable JabRefClipboardData jabRefClipboardData) {
+        ClipboardContent content = new ClipboardContent();
         content.putString(string);
+        if (jabRefClipboardData != null) {
+            content.put(DATAFORMAT_JABREF_DATA, jabRefClipboardData.asJson());
+        }
         clipboard.setContent(content);
         setPrimaryClipboardContent(content);
     }
 
-    public void setContent(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
-        String serializedEntries = serializeEntries(entries, entryTypesManager);
-        setContent(serializedEntries);
-    }
-
-    public void setContent(List<BibEntry> entries, BibEntryTypesManager entryTypesManager, List<BibtexString> stringConstants) throws IOException {
+    public void setContent(TransferMode transferMode, BibDatabaseContext bibDatabaseContext, List<BibEntry> entries, BibEntryTypesManager entryTypesManager, List<BibtexString> stringConstants) throws IOException {
         StringBuilder builder = new StringBuilder();
-        stringConstants.forEach(strConst -> builder.append(strConst.getParsedSerialization() == null ? "" : strConst.getParsedSerialization()));
+        if (!stringConstants.isEmpty()) {
+            stringConstants.forEach(strConst -> {
+                builder.append(strConst.getParsedSerialization() == null ? "" : strConst.getParsedSerialization());
+                builder.append(OS.NEWLINE);
+            });
+            builder.append(OS.NEWLINE);
+        }
         String serializedEntries = serializeEntries(entries, entryTypesManager);
         builder.append(serializedEntries);
-        setContent(builder.toString());
-    }
-
-    public Optional<BibDatabaseContext> getSourceBibDatabaseContext() {
-        return Optional.ofNullable(sourceDatabaseContext);
-    }
-
-    public void setSourceBibDatabaseContext(@NonNull BibDatabaseContext context) {
-        sourceDatabaseContext = context;
+        JabRefClipboardData jabRefClipboardData = new JabRefClipboardData(bibDatabaseContext.getUid(), transferMode);
+        setContent(builder.toString(), jabRefClipboardData);
     }
 
     private String serializeEntries(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {

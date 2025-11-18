@@ -43,6 +43,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -336,7 +338,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
