@@ -161,6 +161,7 @@ jobs:
           chmod 600 sshkey
       - name: Check disk space on builds.jabref.org
         if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
+        id: diskspace
         shell: bash
         run: |
           USAGE=$(ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no jrrsync@build-upload.jabref.org \
@@ -177,6 +178,12 @@ jobs:
             echo "⛔ not enough disk space – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
+      - name: Output URL
+        if: steps.diskspace.outputs.available == 'true'
+        shell: bash
+        run: |
+            echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge"
+            echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge" >> $GITHUB_STEP_SUMMARY
 
   build:
     needs: [conditions, disk-space-check]
