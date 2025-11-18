@@ -5,23 +5,6 @@
 //JAVA 24
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Convert.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/DoiToBibtex.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Fetch.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateBibFromAux.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateCitationKeys.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pdf.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/PdfUpdate.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Preferences.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pseudonymize.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Search.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/JabKitLauncher.java
-//FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties
-
 // raw is for https://github.com/unicode-org/icu/pull/2127
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
@@ -30,9 +13,24 @@
 // requirements needed by jabkit projecxt need to be listed; requirements by jablib are loaded transitively
 //DEPS info.picocli:picocli:4.7.7
 
-/// This class is required for [jbang](https://www.jbang.dev/)
-public class JabKitLauncher {
-    public static void main(String[] args) {
-        org.jabref.toolkit.JabKitLauncher.main(args);
-    }
-}
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Convert.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/DoiToBibtex.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Fetch.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateBibFromAux.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateCitationKeys.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitedWorks.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitingWorks.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pdf.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/PdfUpdate.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Preferences.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pseudonymize.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Search.java
+
+//FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties
+
+// This is the main class - directly called by JBang
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/JabKitLauncher.java
