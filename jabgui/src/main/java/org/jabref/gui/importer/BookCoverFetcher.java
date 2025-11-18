@@ -47,7 +47,7 @@ public class BookCoverFetcher {
                 // Cannot use pattern for name, as auto-generated citation keys aren't available where function is used (org.jabref.gui.newentry.NewEntryViewModel#withCoversAttached)
                 final String name = "isbn-" + isbn.get().asString();
 
-                Optional<LinkedFile> file = tryToDownloadLinkedFile(externalApplicationsPreferences, url, filePreferences.coversDownloadLocation().trim(), directory, name);
+                Optional<LinkedFile> file = tryToDownloadLinkedFile(externalApplicationsPreferences, url, directory, filePreferences.coversDownloadLocation().trim(), name);
                 if (file.isPresent()) {
                     entry.addFile(file.get());
                 }
