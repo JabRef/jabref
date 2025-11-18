@@ -24,7 +24,7 @@ jobs:
 
             We have automatic checks in place, based on which you will soon get automated feedback if any of them are failing.
             Later on in the review process, one of our maintainers will also go through your contribution.
-            In the "Files changed" tab, you can go through its comments and just click on "Resolve conversation" if you are sure that it is incorrect, or comment on the conversation if you are doubtful.
+            In the "Files changed" tab, you can go through his comments and just click on "Resolve conversation" if you resolved the comment, or answer him on the conversation if you have further input regarding his comment.
 
 
             Please re-check our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) in case of any other doubts related to our contribution workflow.
