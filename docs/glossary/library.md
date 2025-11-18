@@ -1,3 +1,7 @@
+---
+parent: Glossary
+---
+
 # Library
 
 **Synonyms:** BibTeX file, `.bib` file, Database file, Bibliographic library
