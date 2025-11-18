@@ -80,7 +80,7 @@ public class ClipBoardManager {
      *
      * @return any text found on the Clipboard; if none found, return an empty String.
      */
-    public static String getContents() {
+    public static @NonNull String getContents() {
         String result = clipboard.getString();
         if (result == null) {
             return "";
@@ -88,7 +88,7 @@ public class ClipBoardManager {
         return result;
     }
 
-    public static String getHtmlContents() {
+    public static @NonNull String getHtmlContents() {
         String result = clipboard.getHtml();
         if (result == null) {
             return "";
@@ -105,7 +105,7 @@ public class ClipBoardManager {
      *
      * @return any text found on the primary Clipboard; if none found, try with the system clipboard.
      */
-    public static String getContentsPrimary() {
+    public static @NonNull String getContentsPrimary() {
         if (primary != null) {
             Transferable contents = primary.getContents(null);
             if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
