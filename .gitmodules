@@ -13,3 +13,6 @@
   url = https://github.com/citation-style-language/locales.git
   ignore = all
   shallow = true
+[submodule "java-module-packaging"]
+	path = java-module-packaging
+	url = https://github.com/koppor/java-module-packaging.git
