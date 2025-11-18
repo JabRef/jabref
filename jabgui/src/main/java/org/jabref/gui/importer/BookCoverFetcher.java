@@ -121,7 +121,9 @@ public class BookCoverFetcher {
                 if (subdirectory.toFile().exists()) {
                     return Optional.of(subdirectory);
                 }
-            } catch (InvalidPathException e) {}
+            } catch (InvalidPathException e) {
+                return Optional.empty();
+            }
         }
         return Optional.empty();
     }
