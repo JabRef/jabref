@@ -3,7 +3,12 @@ package org.jabref.logic.ai.util;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public class CitationKeyCheck {
+public final class CitationKeyCheck {
+
+    private CitationKeyCheck() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     public static boolean citationKeyIsPresentAndUnique(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
         return !hasEmptyCitationKey(bibEntry) && bibEntry.getCitationKey().map(key -> citationKeyIsUnique(bibDatabaseContext, key)).orElse(false);
     }
