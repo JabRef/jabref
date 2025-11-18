@@ -248,7 +248,7 @@ class FileUtilTest {
                 for (String url : urls) {
                     final String webpage = url + path;
                     for (String query : queries) {
-                        assertEquals("from '" + webpage+query + "'", file, FileUtil.getFileNameFromUrl(webpage + query));
+                        assertEquals(file, FileUtil.getFileNameFromUrl(webpage + query), "from '" + webpage + query + "'");
                     }
                 }
             }

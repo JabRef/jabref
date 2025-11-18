@@ -1,6 +1,7 @@
 package org.jabref.gui.importer;
 
 import java.net.MalformedURLException;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -41,12 +42,12 @@ public class BookCoverFetcher {
             Optional<ISBN> isbn = entry.getISBN();
             if (isbn.isPresent()) {
                 final String url = getCoverImageURLForIsbn(isbn.get());
-                final Path directory = databaseContext.getFirstExistingFileDir(filePreferences).orElse(filePreferences.getWorkingDirectory());
+                final Optional<Path> directory = databaseContext.getFirstExistingFileDir(filePreferences);
 
                 // Cannot use pattern for name, as auto-generated citation keys aren't available where function is used (org.jabref.gui.newentry.NewEntryViewModel#withCoversAttached)
                 final String name = "isbn-" + isbn.get().asString();
 
-                Optional<LinkedFile> file = tryToDownloadLinkedFile(externalApplicationsPreferences, directory, url, filePreferences.coversDownloadLocation(), name);
+                Optional<LinkedFile> file = tryToDownloadLinkedFile(externalApplicationsPreferences, url, filePreferences.coversDownloadLocation().trim(), directory, name);
                 if (file.isPresent()) {
                     entry.addFile(file.get());
                 }
@@ -81,36 +82,47 @@ public class BookCoverFetcher {
         return IMAGE_FALLBACK_URL + isbn.asString() + IMAGE_FALLBACK_SUFFIX;
     }
 
-    private static Optional<LinkedFile> tryToDownloadLinkedFile(ExternalApplicationsPreferences externalApplicationsPreferences, Path directory, String url, String location, String name) {
-        final Path subdirectory = directory.resolve(location);
+    private static Optional<LinkedFile> tryToDownloadLinkedFile(ExternalApplicationsPreferences externalApplicationsPreferences, String url, Optional<Path> directory, String location, String name) {
+        Optional<Path> subdirectory = resolveRealSubdirectory(directory, location);
+        if (subdirectory.isPresent()) {
+            Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
+            Path destination = subdirectory.get().resolve(extension.map(x -> name + "." + x).orElse(name));
 
-        subdirectory.toFile().mkdirs();
-        if (subdirectory.toFile().exists()) {
-            final Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
-            final Path destination = subdirectory.resolve(extension.map(x -> name + "." + x).orElse(name));
-            final String link = directory.relativize(destination).toString();
+            String type = inferFileTypeFromExtension(externalApplicationsPreferences, extension);
+            String link = directory.get().relativize(destination).toString();
 
-            if (destination.toFile().exists()) {
-                return Optional.of(new LinkedFile("[cover]", link, inferFileTypeFromExtension(externalApplicationsPreferences, extension), url));
-            } else {
+            if (!destination.toFile().exists()) {
                 try {
                     LOGGER.info("Downloading cover image file from {}", url);
-
                     URLDownload download = new URLDownload(url);
                     download.canBeReached();
 
-                    final String type = inferFileType(externalApplicationsPreferences, download.getMimeType(), extension);
                     download.toFile(destination);
-                    return Optional.of(new LinkedFile("[cover]", link, type, url));
                 } catch (UnirestException | FetcherException | MalformedURLException e) {
-                    LOGGER.error("Error while downloading cover image file", e);
+                    LOGGER.error("Error while downloading cover image file, Storing as URL in file field", e);
+                    return Optional.of(new LinkedFile("[cover]", url, ""));
                 }
             }
+            return Optional.of(new LinkedFile("[cover]", link, type, url));
         } else {
             LOGGER.warn("File directory not available while downloading cover image {}. Storing as URL in file field.", url);
             return Optional.of(new LinkedFile("[cover]", url, ""));
         }
+    }
 
+    private static Optional<Path> resolveRealSubdirectory(Optional<Path> directory, String location) {
+        if ("".equals(location)) {
+            return directory;
+        }
+        if (directory.isPresent()) {
+            try {
+                final Path subdirectory = directory.get().resolve(location);
+                subdirectory.toFile().mkdirs();
+                if (subdirectory.toFile().exists()) {
+                    return Optional.of(subdirectory);
+                }
+            } catch (InvalidPathException e) {}
+        }
         return Optional.empty();
     }
 
