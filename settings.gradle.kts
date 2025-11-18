@@ -1,6 +1,6 @@
 pluginManagement {
     includeBuild("build-logic")
-    includeBuild("java-module-packaging")
+    includeBuild("build-logic/java-module-packaging")
 
     // get jitpack running
     // see https://github.com/jitpack/jitpack.io/issues/1459
