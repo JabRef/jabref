@@ -8,6 +8,7 @@ import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Searches web resources for bibliographic information based on a free-text query.
@@ -16,6 +17,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
  * This interface is used for web resources which directly return BibTeX data ({@link BibEntry})
  * </p>
  */
+@NullMarked
 public interface SearchBasedFetcher extends WebFetcher {
 
     /**
