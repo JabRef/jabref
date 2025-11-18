@@ -11,9 +11,16 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
+- We made the "Configure API key" option in the Web Search preferences tab searchable via preferences search. [#13929](https://github.com/JabRef/jabref/issues/13929)
+- We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
+- We added support for Cygwin-file paths on a Windows Operating System. [#13274](https://github.com/JabRef/jabref/issues/13274)
+- We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
 - We added automatic date-based groups that create year/month/day subgroups from an entry’s date fields. [#10822](https://github.com/JabRef/jabref/issues/10822)
 - We added `doi-to-bibtex` to `JabKit`. [#14244](https://github.com/JabRef/jabref/pull/14244)
+- We added [unpaywall](https://unpaywall.org/) as fulltext fetcher. [#14340](https://github.com/JabRef/jabref/pull/14340)
+- We added the possibility to configure the email provided to unpaywall. [#14340](https://github.com/JabRef/jabref/pull/14340)
 - We added a "Regenerate" button for the AI chat allowing the user to make the language model reformulate its response to the previous prompt. [#12191](https://github.com/JabRef/jabref/issues/12191)
 - We added the option to enable auto-copying and adjusting of attached files when copy and pasting (Preferences → Linked files → Attached files) [#12267](https://github.com/JabRef/jabref/issues/12267)
 - We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377)
