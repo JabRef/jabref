@@ -10,7 +10,12 @@ import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-public class ConflictRules {
+public final class ConflictRules {
+
+    private ConflictRules() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     /**
      * Detect entry-level conflicts among base, local, and remote versions of an entry.
      * <p>
