@@ -76,6 +76,11 @@ public class UnpaywallFetcher implements SearchBasedFetcher, CustomizableKeyFetc
         }
     }
 
+    @Override
+    public @NonNull String getTestUrl() {
+        return getUrl("10.47397/tb/44-3/tb138kopp-jabref", "");
+    }
+
     private static @NonNull String getUrl(String doi, String email) {
         return URL_PATTERN
                 .replace("<DOI>", doi)
@@ -87,8 +92,4 @@ public class UnpaywallFetcher implements SearchBasedFetcher, CustomizableKeyFetc
         return TrustLevel.META_SEARCH;
     }
 
-    @Override
-    public @NonNull String getTestUrl() {
-        return getUrl("10.47397/tb/44-3/tb138kopp-jabref", "");
-    }
 }
