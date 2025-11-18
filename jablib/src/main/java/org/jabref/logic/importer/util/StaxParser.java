@@ -4,7 +4,11 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-public class StaxParser {
+public final class StaxParser {
+
+    private StaxParser() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     /**
      * Extracts the XML content inside the first
