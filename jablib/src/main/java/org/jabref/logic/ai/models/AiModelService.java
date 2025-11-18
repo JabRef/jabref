@@ -2,8 +2,6 @@ package org.jabref.logic.ai.models;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.model.ai.AiProvider;
@@ -37,7 +35,7 @@ public class AiModelService {
      * @return A list of available model names
      */
     public List<String> getAvailableModels(AiProvider aiProvider, String apiBaseUrl, String apiKey) {
-        List<String> dynamicModels = fetchModelsDynamically(aiProvider, apiBaseUrl, apiKey);
+        List<String> dynamicModels = fetchModelsSynchronously(aiProvider, apiBaseUrl, apiKey);
 
         if (!dynamicModels.isEmpty()) {
             LOGGER.info("Using {} dynamic models for {}", dynamicModels.size(), aiProvider.getLabel());
@@ -60,36 +58,81 @@ public class AiModelService {
     }
 
     /**
-     * Asynchronously fetches the list of available models from the API.
+     * Synchronously fetches the list of available models from the API with a timeout.
+     * This method will block until the fetch completes or times out.
      *
      * @param aiProvider The AI provider
      * @param apiBaseUrl The base URL for the API
      * @param apiKey The API key for authentication
-     * @return A CompletableFuture containing the list of model names
+     * @return A list of model names, or an empty list if the fetch fails
      */
-    public CompletableFuture<List<String>> fetchModelsAsync(AiProvider aiProvider, String apiBaseUrl, String apiKey) {
-        return CompletableFuture.supplyAsync(() -> fetchModelsDynamically(aiProvider, apiBaseUrl, apiKey));
-    }
-
-    private List<String> fetchModelsDynamically(AiProvider aiProvider, String apiBaseUrl, String apiKey) {
+    public List<String> fetchModelsSynchronously(AiProvider aiProvider, String apiBaseUrl, String apiKey) {
         for (AiModelProvider provider : modelProviders) {
             if (provider.supports(aiProvider)) {
                 try {
-                    CompletableFuture<List<String>> future = CompletableFuture.supplyAsync(
-                            () -> provider.fetchModels(aiProvider, apiBaseUrl, apiKey)
-                    );
+                    FetchThread fetchThread = new FetchThread(provider, aiProvider, apiBaseUrl, apiKey);
+                    fetchThread.start();
+                    fetchThread.join(FETCH_TIMEOUT_SECONDS * 1000L);
 
-                    List<String> models = future.get(FETCH_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                    if (fetchThread.isAlive()) {
+                        fetchThread.interrupt();
+                        LOGGER.debug("Timeout while fetching models for {}", aiProvider.getLabel());
+                        return List.of();
+                    }
 
+                    if (fetchThread.getException() != null) {
+                        LOGGER.debug("Failed to fetch models for {}: {}", aiProvider.getLabel(), fetchThread.getException().getMessage());
+                        return List.of();
+                    }
+
+                    List<String> models = fetchThread.getResult();
                     if (models != null && !models.isEmpty()) {
                         return models;
                     }
-                } catch (Exception e) {
-                    LOGGER.debug("Failed to fetch models for {}: {}", aiProvider.getLabel(), e.getMessage());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    LOGGER.debug("Interrupted while fetching models for {}", aiProvider.getLabel());
                 }
             }
         }
 
         return List.of();
+    }
+
+    /**
+     * Helper thread class to perform the fetch operation with timeout support.
+     */
+    private static class FetchThread extends Thread {
+        private final AiModelProvider provider;
+        private final AiProvider aiProvider;
+        private final String apiBaseUrl;
+        private final String apiKey;
+        private List<String> result;
+        private Exception exception;
+
+        FetchThread(AiModelProvider provider, AiProvider aiProvider, String apiBaseUrl, String apiKey) {
+            this.provider = provider;
+            this.aiProvider = aiProvider;
+            this.apiBaseUrl = apiBaseUrl;
+            this.apiKey = apiKey;
+            setDaemon(true); // Don't prevent JVM shutdown
+        }
+
+        @Override
+        public void run() {
+            try {
+                result = provider.fetchModels(aiProvider, apiBaseUrl, apiKey);
+            } catch (Exception e) {
+                this.exception = e;
+            }
+        }
+
+        public List<String> getResult() {
+            return result;
+        }
+
+        public Exception getException() {
+            return exception;
+        }
     }
 }

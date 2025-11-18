@@ -1,7 +1,13 @@
 package org.jabref.logic.ai.models;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -9,20 +15,20 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hc.core5.net.URIBuilder;
+
 import org.jabref.model.ai.AiProvider;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Model provider for OpenAI-compatible APIs.
  * Fetches available models from the /v1/models endpoint.
+ * Mistral provides an OpenAI-compatible API, so this works for Mistral as well.
  */
 public class OpenAiCompatibleModelProvider implements AiModelProvider {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAiCompatibleModelProvider.class);
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(10);
 
@@ -30,8 +36,8 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
     public OpenAiCompatibleModelProvider() {
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(5))
-                .build();
+                                    .connectTimeout(Duration.ofSeconds(5))
+                                    .build();
     }
 
     public OpenAiCompatibleModelProvider(HttpClient httpClient) {
@@ -48,14 +54,14 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
         }
 
         try {
-            String modelsEndpoint = buildModelsEndpoint(apiBaseUrl);
+            URI uri = buildModelsEndpoint(apiBaseUrl);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(modelsEndpoint))
-                    .header("Authorization", "Bearer " + apiKey)
-                    .header("Content-Type", "application/json")
-                    .timeout(REQUEST_TIMEOUT)
-                    .GET()
-                    .build();
+                                             .uri(uri)
+                                             .header("Authorization", "Bearer " + apiKey)
+                                             .header("Content-Type", "application/json")
+                                             .timeout(REQUEST_TIMEOUT)
+                                             .GET()
+                                             .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -65,7 +71,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
             } else {
                 LOGGER.debug("Failed to fetch models from {} (status: {})", aiProvider.getLabel(), response.statusCode());
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException | URISyntaxException e) {
             LOGGER.debug("Failed to fetch models from {}: {}", aiProvider.getLabel(), e.getMessage());
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
@@ -79,30 +85,49 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
     @Override
     public boolean supports(AiProvider aiProvider) {
-        // OpenAI-compatible providers: OpenAI, Mistral AI, and custom OpenAI-compatible endpoints
         return aiProvider == AiProvider.OPEN_AI
                 || aiProvider == AiProvider.MISTRAL_AI
                 || aiProvider == AiProvider.GPT4ALL;
     }
 
-    private String buildModelsEndpoint(String apiBaseUrl) {
+    /**
+     * Builds the URI for the models endpoint from the given API base URL.
+     * <p>
+     * The OpenAI API specification defines the models endpoint at /v1/models.
+     * This method handles various URL formats:
+     * <ul>
+     *   <li>If the URL already ends with /v1, appends /models</li>
+     *   <li>If the URL doesn't end with /v1, appends /v1/models</li>
+     *   <li>Removes trailing slashes before building the path</li>
+     * </ul>
+     *
+     * @param apiBaseUrl the base URL of the API (e.g., "https://api.openai.com" or "https://api.openai.com/v1")
+     * @return the complete URI for the models endpoint
+     * @throws URISyntaxException if the provided URL is malformed
+     */
+    private URI buildModelsEndpoint(String apiBaseUrl) throws URISyntaxException {
         String baseUrl = apiBaseUrl.trim();
         if (baseUrl.endsWith("/")) {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
 
+        String modelsPath;
         if (baseUrl.endsWith("/v1")) {
-            return baseUrl + "/models";
+            modelsPath = baseUrl + "/models";
         } else {
-            return baseUrl + "/v1/models";
+            modelsPath = baseUrl + "/v1/models";
         }
+
+        return new URIBuilder(modelsPath).build();
     }
 
     private List<String> parseModelsFromResponse(String responseBody) {
         List<String> models = new ArrayList<>();
 
         try {
-            JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
+            JsonObject jsonResponse = JsonParser.parseString(
+                    responseBody
+            ).getAsJsonObject();
 
             if (jsonResponse.has("data") && jsonResponse.get("data").isJsonArray()) {
                 JsonArray modelsArray = jsonResponse.getAsJsonArray("data");
@@ -111,14 +136,16 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
                     if (element.isJsonObject()) {
                         JsonObject modelObject = element.getAsJsonObject();
                         if (modelObject.has("id")) {
-                            String modelId = modelObject.get("id").getAsString();
+                            String modelId = modelObject
+                                    .get("id")
+                                    .getAsString();
                             models.add(modelId);
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Failed to parse models response: {}", e.getMessage());
+            LOGGER.warn("Failed to parse models response.", e);
         }
 
         return models;
