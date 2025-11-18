@@ -229,7 +229,7 @@ public class AstrophysicsDataSystem
     }
 
     /**
-     * @param identifiers bibcodes for which bibentries ahould be fetched
+     * @param identifiers bibcodes for which bibentries should be fetched
      * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested bibcodes
      */
     private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
