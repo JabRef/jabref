@@ -182,8 +182,8 @@ jobs:
         if: steps.diskspace.outputs.available == 'true'
         shell: bash
         run: |
-            echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge"
-            echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge" >> $GITHUB_STEP_SUMMARY
+          echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge"
+          echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge" >> $GITHUB_STEP_SUMMARY
 
   build:
     needs: [conditions, disk-space-check]
