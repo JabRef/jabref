@@ -111,9 +111,9 @@ public class CrossRefCitationFetcher implements CitationFetcher {
     private BibEntry getBibEntryFromText(PlainCitationParser parser, String unstructured) {
         try {
             return parser.parsePlainCitation(unstructured)
-                  .orElseGet(() -> new BibEntry()
-                          .withField(StandardField.NOTE, unstructured)
-                          .withChanged(true));
+                         .orElseGet(() -> new BibEntry()
+                                 .withField(StandardField.NOTE, unstructured)
+                                 .withChanged(true));
         } catch (FetcherException e) {
             LOGGER.warn("Could not get bib entry from text {}", unstructured, e);
             return new BibEntry()
