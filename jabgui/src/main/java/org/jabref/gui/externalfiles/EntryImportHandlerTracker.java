@@ -66,11 +66,11 @@ public class EntryImportHandlerTracker {
         stateManager.setSelectedEntries(importedEntries);
     }
 
-    public int getSkippedCount() {
-        return skipped.get();
+    public int getImportedCount() {
+        return imported.get();
     }
 
-    public int getImportedCount() {
-        return getImportedCount();
+    public int getSkippedCount() {
+        return skipped.get();
     }
 }
