@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import org.jspecify.annotations.NonNull;
 
-public class ConferenceUtils {
+public final class ConferenceUtils {
     // Regex that'll extract the string within the first deepest set of parentheses
     // A slight modification of: https://stackoverflow.com/a/17759264
     private static final Pattern PARENTHESES_PATTERN = Pattern.compile("\\(([^()]*)\\)");
@@ -31,6 +31,10 @@ public class ConferenceUtils {
     );
     private static final int MAX_CANDIDATES_THRESHOLD = 50;
     private static final int DELIMITER_START = -1;
+
+    private ConferenceUtils() {
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
+    }
 
     /**
      * Attempts to extract the string enclosed in the first deepest set of parentheses from the given input string.

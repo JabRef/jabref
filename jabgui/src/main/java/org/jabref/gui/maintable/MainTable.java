@@ -314,11 +314,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // keep original entry selected and reset citation merge mode
             this.citationMergeMode = false;
         } else {
-            // select new entry
-            getSelectionModel().clearSelection();
             findEntry(bibEntry).ifPresent(entry -> {
-                getSelectionModel().select(entry);
-                scrollTo(entry);
+                int index = getItems().indexOf(entry);
+                if (index >= 0) {
+                    getSelectionModel().clearAndSelect(index);
+                    scrollTo(index);
+                }
             });
         }
     }
@@ -330,16 +331,24 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             this.citationMergeMode = false;
         } else {
             // select new entries
-            getSelectionModel().clearSelection();
-            List<BibEntryTableViewModel> entries = bibEntries.stream()
-                                                             .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                                             .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
-                                                             .filter(Optional::isPresent)
-                                                             .map(Optional::get)
-                                                             .toList();
-            entries.forEach(entry -> getSelectionModel().select(entry));
-            if (!entries.isEmpty()) {
-                scrollTo(entries.getFirst());
+            List<Integer> indices = bibEntries.stream()
+                                              .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
+                                              .flatMap(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()).stream())
+                                              .map(entry -> getItems().indexOf(entry))
+                                              .filter(index -> index >= 0)
+                                              .toList();
+
+            if (!indices.isEmpty()) {
+                // For multiple selections, clear once then select all
+                getSelectionModel().clearSelection();
+                indices.forEach(index -> {
+                    if (index < getItems().size()) {
+                        getSelectionModel().select(index);
+                    } else {
+                        LOGGER.debug("Could not select entry at index {} since it is out of bounds", index);
+                    }
+                });
+                scrollTo(indices.getFirst());
             }
         }
     }
