@@ -19,6 +19,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
@@ -44,7 +45,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private CheckBox moveToTrash;
     @FXML private CheckBox adjustLinkedFilesOnTransfer;
     @FXML private CheckBox copyLinkedFilesOnTransfer;
-    @FXML private CheckBox moveFilesOnTransfer;
+    @FXML private CheckBox moveLinkedFilesOnTransfer;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -86,7 +87,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         openFileExplorerInLastDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInLastDirectoryProperty());
         adjustLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.adjustLinkedFilesOnTransferProperty());
         copyLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.copyLinkedFilesOnTransferProperty());
-        moveFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.moveFilesOnTransferProperty());
+        moveLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.moveFilesOnTransferProperty());
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);
