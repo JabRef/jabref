@@ -112,11 +112,13 @@ public class CrossRefCitationFetcher implements CitationFetcher {
         try {
             return parser.parsePlainCitation(unstructured)
                   .orElseGet(() -> new BibEntry()
-                          .withField(StandardField.NOTE, unstructured));
+                          .withField(StandardField.NOTE, unstructured)
+                          .withChanged(true));
         } catch (FetcherException e) {
             LOGGER.warn("Could not get bib entry from text {}", unstructured, e);
             return new BibEntry()
-                    .withField(StandardField.NOTE, unstructured);
+                    .withField(StandardField.NOTE, unstructured)
+                    .withChanged(true);
         }
     }
 
@@ -126,7 +128,8 @@ public class CrossRefCitationFetcher implements CitationFetcher {
         return crossRefForDoi.performSearchById(referenceDoi)
                              .orElseGet(() -> new BibEntry()
                                      .withField(StandardField.DOI, referenceDoi)
-                                     .withField(StandardField.NOTE, unstructured));
+                                     .withField(StandardField.NOTE, unstructured)
+                                     .withChanged(true));
     }
 
     /// Crossref has no citation count feature
