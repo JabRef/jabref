@@ -6,7 +6,7 @@ import org.jabref.model.entry.BibEntry;
 public final class CitationKeyCheck {
 
     private CitationKeyCheck() {
-        throw new UnsupportedOperationException("Utility class");
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
     }
 
     public static boolean citationKeyIsPresentAndUnique(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
