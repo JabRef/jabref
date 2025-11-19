@@ -13,7 +13,7 @@ import org.jabref.model.entry.field.Field;
 public final class ConflictRules {
 
     private ConflictRules() {
-        throw new UnsupportedOperationException("Utility class");
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
     }
 
     /**
