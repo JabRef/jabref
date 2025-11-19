@@ -161,7 +161,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                     Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
         };
 
-        dialogService.notifyAll(message);
+        dialogService.notify(message);
     }
 
     private void cleanup(CleanupPreferences cleanupPreferences, List<BibEntry> entries) {
@@ -198,4 +198,3 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         );
     }
 }
-
