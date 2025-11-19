@@ -50,7 +50,7 @@ public class FileTestConfiguration {
 
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(shouldStoreFilesRelativeToBibFile);
-        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(shouldAdjustOrCopyLinkedFilesOnTransfer);
+        when(filePreferences.shouldAdjustFileLinksOnTransfer()).thenReturn(shouldAdjustOrCopyLinkedFilesOnTransfer);
 
         this.sourceBibTestConfiguration = sourceBibTestConfiguration;
         this.sourceContext = createContext(sourceBibTestConfiguration, this.mainFileDir);

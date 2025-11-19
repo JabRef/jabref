@@ -42,7 +42,11 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
-    private final BooleanProperty adjustOrCopyLinkedFilesOnTransferProperty = new SimpleBooleanProperty();
+
+    private final BooleanProperty adjustLinkedFilesOnTransferProperty = new SimpleBooleanProperty();
+    private final BooleanProperty copyLinkedFilesOnTransferProperty = new SimpleBooleanProperty();
+    private final BooleanProperty moveFilesOnTransferProperty = new SimpleBooleanProperty();
+
     private final BooleanProperty openFileExplorerInFilesDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastDirectory = new SimpleBooleanProperty();
 
@@ -91,7 +95,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
         openFileExplorerInFilesDirectory.setValue(filePreferences.shouldOpenFileExplorerInFileDirectory());
         openFileExplorerInLastDirectory.setValue(filePreferences.shouldOpenFileExplorerInLastUsedDirectory());
-        adjustOrCopyLinkedFilesOnTransferProperty.setValue(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer());
+        adjustLinkedFilesOnTransferProperty.setValue(filePreferences.shouldAdjustFileLinksOnTransfer());
+        copyLinkedFilesOnTransferProperty.setValue(filePreferences.shouldCopyLinkedFilesOnTransfer());
+        moveFilesOnTransferProperty.setValue(filePreferences.shouldMoveLinkedFilesOnTransfer());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -130,7 +136,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
-        filePreferences.setAdjustOrCopyLinkedFilesOnTransfer(adjustOrCopyLinkedFilesOnTransferProperty.getValue());
+        filePreferences.setAdjustFileLinksOnTransfer(adjustLinkedFilesOnTransferProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -212,8 +218,16 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return this.moveToTrashProperty;
     }
 
-    public BooleanProperty adjustOrCopyLinkedFilesOnTransferProperty() {
-        return adjustOrCopyLinkedFilesOnTransferProperty;
+    public BooleanProperty adjustLinkedFilesOnTransferProperty() {
+        return adjustLinkedFilesOnTransferProperty;
+    }
+
+    public BooleanProperty copyLinkedFilesOnTransferProperty() {
+        return copyLinkedFilesOnTransferProperty;
+    }
+
+    public BooleanProperty moveFilesOnTransferProperty() {
+        return moveFilesOnTransferProperty;
     }
 
     public BooleanProperty openFileExplorerInFilesDirectoryProperty() {

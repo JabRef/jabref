@@ -45,7 +45,7 @@ public class LinkedFileTransferHelper {
             BibDatabaseContext targetContext,
             BibEntry targetEntry
     ) {
-        if (!filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()) {
+        if (!filePreferences.shouldAdjustFileLinksOnTransfer()) {
             return;
         }
 

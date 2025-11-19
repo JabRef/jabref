@@ -42,7 +42,9 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private TextField fileDirectoryPattern;
     @FXML private CheckBox confirmLinkedFileDelete;
     @FXML private CheckBox moveToTrash;
-    @FXML private CheckBox adjustOrCopyLinkedFilesOnTransfer;
+    @FXML private CheckBox adjustLinkedFilesOnTransfer;
+    @FXML private CheckBox copyLinkedFilesOnTransfer;
+    @FXML private CheckBox moveFilesOnTransfer;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -82,7 +84,9 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
         openFileExplorerInFilesDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInFilesDirectoryProperty());
         openFileExplorerInLastDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInLastDirectoryProperty());
-        adjustOrCopyLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.adjustOrCopyLinkedFilesOnTransferProperty());
+        adjustLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.adjustLinkedFilesOnTransferProperty());
+        copyLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.copyLinkedFilesOnTransferProperty());
+        moveFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.moveFilesOnTransferProperty());
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);

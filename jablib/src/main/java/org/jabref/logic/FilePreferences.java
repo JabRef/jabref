@@ -32,7 +32,11 @@ public class FilePreferences {
     private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
-    private final BooleanProperty adjustOrCopyLinkedFilesOnTransfer = new SimpleBooleanProperty();
+
+    private final BooleanProperty adjustFileLinksOnTransfer = new SimpleBooleanProperty();
+    private final BooleanProperty copyLinkedFilesOnTransfer = new SimpleBooleanProperty();
+    private final BooleanProperty moveLinkedFilesOnTransfer = new SimpleBooleanProperty();
+
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
     private final ObjectProperty<Path> lastUsedDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
@@ -51,7 +55,9 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
-                           boolean adjustOrCopyLinkedFilesOnTransfer,
+                           boolean adjustFileLinksOnTransfer,
+                           boolean copyLinkedFilesOnTransfer,
+                           boolean moveFilesOnTransferProperty,
                            boolean shouldKeepDownloadUrl,
                            Path lastUsedDirectory,
                            boolean openFileExplorerInFileDirectory,
@@ -69,7 +75,9 @@ public class FilePreferences {
         this.backupDirectory.setValue(backupDirectory);
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
-        this.adjustOrCopyLinkedFilesOnTransfer.setValue(adjustOrCopyLinkedFilesOnTransfer);
+        this.adjustFileLinksOnTransfer.setValue(adjustFileLinksOnTransfer);
+        this.copyLinkedFilesOnTransfer.setValue(copyLinkedFilesOnTransfer);
+        this.moveLinkedFilesOnTransfer.setValue(moveFilesOnTransferProperty);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
         this.lastUsedDirectory.setValue(lastUsedDirectory);
         this.openFileExplorerInFileDirectory.set(openFileExplorerInFileDirectory);
@@ -232,16 +240,40 @@ public class FilePreferences {
         this.moveToTrash.set(moveToTrash);
     }
 
-    public boolean shouldAdjustOrCopyLinkedFilesOnTransfer() {
-        return adjustOrCopyLinkedFilesOnTransfer.get();
+    public boolean shouldAdjustFileLinksOnTransfer() {
+        return adjustFileLinksOnTransfer.get();
     }
 
-    public BooleanProperty adjustOrCopyLinkedFilesOnTransferProperty() {
-        return adjustOrCopyLinkedFilesOnTransfer;
+    public BooleanProperty adjustFileLinksOnTransferProperty() {
+        return adjustFileLinksOnTransfer;
     }
 
-    public void setAdjustOrCopyLinkedFilesOnTransfer(boolean adjustOrCopyLinkedFilesOnTransfer) {
-        this.adjustOrCopyLinkedFilesOnTransfer.set(adjustOrCopyLinkedFilesOnTransfer);
+    public void setAdjustFileLinksOnTransfer(boolean adjustFileLinksOnTransfer) {
+        this.adjustFileLinksOnTransfer.set(adjustFileLinksOnTransfer);
+    }
+
+    public boolean shouldCopyLinkedFilesOnTransfer() {
+        return copyLinkedFilesOnTransfer.get();
+    }
+
+    public BooleanProperty copyLinkedFilesOnTransferProperty() {
+        return copyLinkedFilesOnTransfer;
+    }
+
+    public void setCopyLinkedFilesOnTransfer(boolean copyLinkedFilesOnTransfer) {
+        this.copyLinkedFilesOnTransfer.set(copyLinkedFilesOnTransfer);
+    }
+
+    public boolean shouldMoveLinkedFilesOnTransfer() {
+        return moveLinkedFilesOnTransfer.get();
+    }
+
+    public BooleanProperty moveLinkedFilesOnTransferPropertyProperty() {
+        return moveLinkedFilesOnTransfer;
+    }
+
+    public void setMoveLinkedFilesOnTransfer(boolean moveLinkedFilesOnTransfer) {
+        this.moveLinkedFilesOnTransfer.set(moveLinkedFilesOnTransfer);
     }
 
     public boolean shouldKeepDownloadUrl() {
