@@ -1,19 +1,13 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 
@@ -24,15 +18,15 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "doi-to-bibtex", description = "Converts a DOI to BibTeX")
-public class DoiToBibtex implements Callable<Integer> {
+class DoiToBibtex implements Callable<Integer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiToBibtex.class);
 
     @CommandLine.ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit argumentProcessor;
 
     @CommandLine.Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Parameters(paramLabel = "DOI", description = "one or more DOIs to fetch", arity = "1..*")
     private String[] dois;
@@ -73,15 +67,6 @@ public class DoiToBibtex implements Callable<Integer> {
             entries.add(entry.get());
         }
 
-        try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
-            BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
-            BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, context, argumentProcessor.cliPreferences);
-            bibWriter.writeDatabase(context);
-        } catch (IOException e) {
-            LOGGER.error("Could not write BibTeX", e);
-            System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
-            return 1;
-        }
-        return 0;
+        return JabKit.outputEntries(argumentProcessor.cliPreferences, entries);
     }
 }

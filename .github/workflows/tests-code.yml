@@ -578,6 +578,7 @@ jobs:
               echo "//SOURCES ../../$f" >> "${{ matrix.script }}"
             fi
           done
+      - run: cat ${{ matrix.script }}
       - run: jbang build "${{ matrix.script }}"
         shell: bash
       - run: jbang "${{ matrix.script }}" --help

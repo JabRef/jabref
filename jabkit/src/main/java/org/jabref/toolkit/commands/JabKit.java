@@ -1,6 +1,7 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -9,6 +10,8 @@ import java.util.Optional;
 
 import javafx.util.Pair;
 
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -26,6 +29,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -47,13 +51,15 @@ import static picocli.CommandLine.Option;
                 Fetch.class,
                 GenerateBibFromAux.class,
                 GenerateCitationKeys.class,
+                GetCitedWorks.class,
+                GetCitingWorks.class,
                 Pdf.class,
                 Preferences.class,
                 Pseudonymize.class,
                 Search.class
         })
-public class ArgumentProcessor implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
+public class JabKit implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabKit.class);
 
     protected final CliPreferences cliPreferences;
     protected final BibEntryTypesManager entryTypesManager;
@@ -64,7 +70,7 @@ public class ArgumentProcessor implements Runnable {
     @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
     private boolean versionInfoRequested;
 
-    public ArgumentProcessor(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
+    public JabKit(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
         this.cliPreferences = cliPreferences;
         this.entryTypesManager = entryTypesManager;
     }
@@ -156,6 +162,26 @@ public class ArgumentProcessor implements Runnable {
         saveDatabaseContext(cliPreferences, entryTypesManager, new BibDatabaseContext(newBase), outputFile);
     }
 
+    static int outputEntries(CliPreferences cliPreferences, List<BibEntry> entries) {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(entries));
+        return outputDatabaseContext(cliPreferences, bibDatabaseContext);
+    }
+
+    /// Outputs to StdOut. Generates citation keys if missing.
+    static int outputDatabaseContext(CliPreferences cliPreferences, BibDatabaseContext bibDatabaseContext) {
+        JabKit.generateCitationKeys(bibDatabaseContext, cliPreferences.getCitationKeyPatternPreferences());
+
+        try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
+            BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, bibDatabaseContext, cliPreferences);
+            bibWriter.writeDatabase(bibDatabaseContext);
+        } catch (IOException e) {
+            LOGGER.error("Could not write BibTeX", e);
+            System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
+            return 1;
+        }
+        return 0;
+    }
+
     protected static void saveDatabaseContext(CliPreferences cliPreferences,
                                               BibEntryTypesManager entryTypesManager,
                                               BibDatabaseContext bibDatabaseContext,
@@ -185,6 +211,18 @@ public class ArgumentProcessor implements Runnable {
             }
         } catch (IOException ex) {
             System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+        }
+    }
+
+    /// Generates a citation key if there is no key existing
+    public static void generateCitationKeys(BibDatabaseContext databaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
+                databaseContext,
+                citationKeyPatternPreferences);
+        for (BibEntry entry : databaseContext.getEntries()) {
+            if (!entry.hasCitationKey()) {
+                keyGenerator.generateAndSetKey(entry);
+            }
         }
     }
 
