@@ -4,8 +4,8 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.TextInputControl;
 
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;

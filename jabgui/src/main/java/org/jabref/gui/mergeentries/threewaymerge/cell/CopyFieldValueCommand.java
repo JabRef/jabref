@@ -1,8 +1,8 @@
 package org.jabref.gui.mergeentries.threewaymerge.cell;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.clipboard.ClipBoardManager;
 
 import org.jspecify.annotations.NonNull;
 

@@ -30,13 +30,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;

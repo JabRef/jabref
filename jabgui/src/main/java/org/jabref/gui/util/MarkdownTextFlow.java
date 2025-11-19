@@ -9,8 +9,8 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 
