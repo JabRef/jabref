@@ -89,6 +89,11 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         copyLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.copyLinkedFilesOnTransferProperty());
         moveLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.moveFilesOnTransferProperty());
 
+        EasyBind.listen(adjustLinkedFilesOnTransfer.selectedProperty(), (_, _, selected) -> {
+            copyLinkedFilesOnTransfer.setDisable(!selected);
+            moveLinkedFilesOnTransfer.setDisable(!selected);
+        });
+
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);
 

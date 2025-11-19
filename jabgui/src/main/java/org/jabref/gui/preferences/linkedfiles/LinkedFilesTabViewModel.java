@@ -137,6 +137,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
         filePreferences.setAdjustFileLinksOnTransfer(adjustLinkedFilesOnTransferProperty.getValue());
+        filePreferences.setCopyLinkedFilesOnTransfer(copyLinkedFilesOnTransferProperty.getValue());
+        filePreferences.setMoveLinkedFilesOnTransfer(moveFilesOnTransferProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {
