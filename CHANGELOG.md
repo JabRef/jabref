@@ -93,6 +93,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new `jabkit` command `pseudonymize` to pseudonymize the library. [#13109](https://github.com/JabRef/jabref/issues/13109)
 - We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
 - We added "Bibliography Heading" to the available CSL bibliography header formats in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
+- We added a "Generate follow-up questions" feature to AI chat that suggests relevant questions after each AI response. [#12243](https://github.com/JabRef/jabref/issues/12243)
 
 ### Changed
 
