@@ -33,7 +33,7 @@ public final class ConferenceUtils {
     private static final int DELIMITER_START = -1;
 
     private ConferenceUtils() {
-        throw new UnsupportedOperationException("Utility class");
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
     }
 
     /**
