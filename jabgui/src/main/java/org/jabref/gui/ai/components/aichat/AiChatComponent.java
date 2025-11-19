@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
@@ -78,6 +79,7 @@ public class AiChatComponent extends VBox {
     @FXML private Hyperlink exQuestion2;
     @FXML private Hyperlink exQuestion3;
     @FXML private HBox exQuestionBox;
+    @FXML private HBox followUpQuestionsBox;
 
     private String noticeTemplate;
 
@@ -114,6 +116,7 @@ public class AiChatComponent extends VBox {
         initializeNotifications();
         sendExampleQuestions();
         initializeExampleQuestions();
+        initializeFollowUpQuestions();
     }
 
     private void initializeNotifications() {
@@ -214,6 +217,39 @@ public class AiChatComponent extends VBox {
         updatePromptHistory();
     }
 
+    private void initializeFollowUpQuestions() {
+        aiChatLogic.getFollowUpQuestions().addListener((javafx.collections.ListChangeListener<String>) change -> {
+            updateFollowUpQuestions();
+        });
+    }
+
+    private void updateFollowUpQuestions() {
+        // Get the current questions (this is thread-safe)
+        List<String> questions = new ArrayList<>(aiChatLogic.getFollowUpQuestions());
+
+        // Update UI on the JavaFX Application Thread
+        Platform.runLater(() -> {
+            followUpQuestionsBox.getChildren().removeIf(node -> node instanceof Hyperlink);
+
+            if (questions.isEmpty()) {
+                followUpQuestionsBox.setVisible(false);
+                followUpQuestionsBox.setManaged(false);
+            } else {
+                followUpQuestionsBox.setVisible(true);
+                followUpQuestionsBox.setManaged(true);
+
+                for (String question : questions) {
+                    Hyperlink link = new Hyperlink(question);
+                    link.getStyleClass().add("exampleQuestionStyle");
+                    link.setOnAction(event -> {
+                        onSendMessage(question);
+                    });
+                    followUpQuestionsBox.getChildren().add(link);
+                }
+            }
+        });
+    }
+
     private void updateNotifications() {
         notifications.clear();
         notifications.addAll(entries.stream().map(this::updateNotificationsForEntry).flatMap(List::stream).toList());
@@ -278,6 +314,7 @@ public class AiChatComponent extends VBox {
     }
 
     private void onSendMessage(String userPrompt) {
+        aiChatLogic.getFollowUpQuestions().clear();
         UserMessage userMessage = new UserMessage(userPrompt);
         updatePromptHistory();
         setLoading(true);

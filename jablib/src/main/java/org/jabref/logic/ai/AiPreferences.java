@@ -35,6 +35,7 @@ public class AiPreferences {
     private final BooleanProperty enableAi;
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
+    private final BooleanProperty generateFollowUpQuestions;
 
     private final ObjectProperty<AiProvider> aiProvider;
 
@@ -67,6 +68,7 @@ public class AiPreferences {
     public AiPreferences(boolean enableAi,
                          boolean autoGenerateEmbeddings,
                          boolean autoGenerateSummaries,
+                         boolean generateFollowUpQuestions,
                          AiProvider aiProvider,
                          String openAiChatModel,
                          String mistralAiChatModel,
@@ -91,6 +93,7 @@ public class AiPreferences {
         this.enableAi = new SimpleBooleanProperty(enableAi);
         this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
         this.autoGenerateSummaries = new SimpleBooleanProperty(autoGenerateSummaries);
+        this.generateFollowUpQuestions = new SimpleBooleanProperty(generateFollowUpQuestions);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
 
@@ -193,6 +196,18 @@ public class AiPreferences {
 
     public void setAutoGenerateSummaries(boolean autoGenerateSummaries) {
         this.autoGenerateSummaries.set(autoGenerateSummaries);
+    }
+
+    public BooleanProperty generateFollowUpQuestionsProperty() {
+        return generateFollowUpQuestions;
+    }
+
+    public boolean getGenerateFollowUpQuestions() {
+        return generateFollowUpQuestions.get();
+    }
+
+    public void setGenerateFollowUpQuestions(boolean generateFollowUpQuestions) {
+        this.generateFollowUpQuestions.set(generateFollowUpQuestions);
     }
 
     public ObjectProperty<AiProvider> aiProviderProperty() {

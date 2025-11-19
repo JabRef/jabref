@@ -330,4 +330,11 @@
               text="%Automatically generate summaries for new entries"
               HBox.hgrow="ALWAYS"
               maxWidth="Infinity"/>
+
+    <CheckBox fx:id="generateFollowUpQuestions"
+              mnemonicParsing="false"
+              text="%Generate follow-up questions"
+              HBox.hgrow="ALWAYS"
+              maxWidth="Infinity"/>
+
 </fx:root>

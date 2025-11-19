@@ -44,6 +44,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableAutoGenerateEmbeddings = new SimpleBooleanProperty();
     private final BooleanProperty autoGenerateSummaries = new SimpleBooleanProperty();
     private final BooleanProperty disableAutoGenerateSummaries = new SimpleBooleanProperty();
+    private final BooleanProperty generateFollowUpQuestions = new SimpleBooleanProperty();
 
     private final ListProperty<AiProvider> aiProvidersList =
             new SimpleListProperty<>(FXCollections.observableArrayList(AiProvider.values()));
@@ -341,6 +342,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         enableAi.setValue(aiPreferences.getEnableAi());
         autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());
+        generateFollowUpQuestions.setValue(aiPreferences.getGenerateFollowUpQuestions());
 
         selectedAiProvider.setValue(aiPreferences.getAiProvider());
 
@@ -364,6 +366,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setEnableAi(enableAi.get());
         aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
         aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
+        aiPreferences.setGenerateFollowUpQuestions(generateFollowUpQuestions.get());
 
         aiPreferences.setAiProvider(selectedAiProvider.get());
 
@@ -485,6 +488,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty disableAutoGenerateSummaries() {
         return disableAutoGenerateSummaries;
+    }
+
+    public BooleanProperty generateFollowUpQuestions() {
+        return generateFollowUpQuestions;
     }
 
     public ReadOnlyListProperty<AiProvider> aiProvidersProperty() {
