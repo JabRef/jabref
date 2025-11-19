@@ -26,7 +26,7 @@ public final class MathMLParser {
     private static final String XSLT_FILE_PATH = "/xslt/mathml_latex/mmltex.xsl";
 
     private MathMLParser() {
-        throw new UnsupportedOperationException("Utility class");
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
     }
 
     /**
