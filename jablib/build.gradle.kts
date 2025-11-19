@@ -231,9 +231,9 @@ dependencies {
     testImplementation("org.testfx:testfx-junit5")
 
     // Highly recommended builder generator - https://github.com/skinny85/jilt
+    // Keep it for tests only
     testCompileOnly("cc.jilt:jilt")
     testAnnotationProcessor("cc.jilt:jilt")
-    // testImplementation("com.github.koppor:jilt:jitpack-SNAPSHOT")
 
     errorprone("com.google.errorprone:error_prone_core")
     errorprone("com.uber.nullaway:nullaway")
