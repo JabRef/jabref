@@ -49,7 +49,7 @@ public class LinkedFileTransferHelper {
             return;
         }
 
-        LOGGER.debug("Hanndling {}", targetEntry.getKeyAuthorTitleYear());
+        LOGGER.debug("Handling {}", targetEntry.getKeyAuthorTitleYear());
 
         boolean fileLinksChanged = false;
         List<LinkedFile> linkedFiles = new ArrayList<>();
