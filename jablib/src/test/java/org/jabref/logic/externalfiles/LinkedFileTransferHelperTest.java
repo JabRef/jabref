@@ -22,8 +22,6 @@ import static org.mockito.Mockito.mock;
 
 // Assumption in all tests: if not contained in a library directory, paths are absolute
 class LinkedFileTransferHelperTest {
-    private static int testNumber = 0;
-
     private @TempDir Path tempDir;
 
     @ParameterizedTest
