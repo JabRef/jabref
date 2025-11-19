@@ -111,6 +111,15 @@ public class LinkedFileTransferHelper {
                 continue;
             }
 
+            if ((transferInformation.transferMode() == TransferMode.COPY) && !filePreferences.shouldCopyLinkedFilesOnTransfer()) {
+                LOGGER.debug("File copy not allowed by preferences");
+                return;
+            }
+            if ((transferInformation.transferMode() == TransferMode.MOVE) && !filePreferences.shouldMoveLinkedFilesOnTransfer()) {
+                LOGGER.debug("File move not allowed by preferences");
+                return;
+            }
+
             linkedFileAsPath = targetPrimaryPath.resolve(linkedFileAsPath);
             try {
                 Files.createDirectories(linkedFileAsPath.getParent());
