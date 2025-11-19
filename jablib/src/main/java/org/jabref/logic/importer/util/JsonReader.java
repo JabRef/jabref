@@ -16,7 +16,7 @@ import kong.unirest.core.json.JSONObject;
 public final class JsonReader {
 
     private JsonReader() {
-        throw new UnsupportedOperationException("Utility class");
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
     }
 
     /**
