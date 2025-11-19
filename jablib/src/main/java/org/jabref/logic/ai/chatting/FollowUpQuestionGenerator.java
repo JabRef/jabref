@@ -41,12 +41,12 @@ public class FollowUpQuestionGenerator {
             return questions;
         } catch (Exception e) {
             LOGGER.warn("Failed to generate follow-up questions", e);
-            return new ArrayList<>(); // Return empty list on failure
+            return new ArrayList<>();
         }
     }
 
     private String buildPrompt(String userMessage, String aiResponse) {
-        return String.format("""
+        return """
                   Based on this conversation:
 
                   User: %s
@@ -58,30 +58,26 @@ public class FollowUpQuestionGenerator {
                   2. [question]
                   3. [question]
 
-                  Only provide the numbered list, nothing else.""",
+                  Only provide the numbered list, nothing else.""".formatted(
                 userMessage, aiResponse);
     }
 
     private List<String> parseQuestions(String response) {
         List<String> questions = new ArrayList<>();
 
-        // Pattern to match numbered list items: "1. Question text"
         Pattern numberedPattern = Pattern.compile("^\\s*\\d+\\.\\s*(.+)$", Pattern.MULTILINE);
         Matcher matcher = numberedPattern.matcher(response);
 
         while (matcher.find() && questions.size() < MAX_QUESTIONS) {
             String question = matcher.group(1).trim();
 
-            // Remove quotes if present
             question = question.replaceAll("^[\"']|[\"']$", "");
 
-            // Validate question
             if (isValidQuestion(question)) {
                 questions.add(question);
             }
         }
 
-        // If numbered format didn't work, try splitting by newlines and filtering
         if (questions.isEmpty()) {
             LOGGER.debug("Numbered format parsing failed, trying line-by-line parsing");
             String[] lines = response.split("\n");
@@ -92,7 +88,6 @@ public class FollowUpQuestionGenerator {
                 }
 
                 line = line.trim();
-                // Remove common prefixes
                 line = line.replaceAll("^[-*•]\\s*", "");
                 line = line.replaceAll("^\\d+\\.\\s*", "");
                 line = line.replaceAll("^[\"']|[\"']$", "");

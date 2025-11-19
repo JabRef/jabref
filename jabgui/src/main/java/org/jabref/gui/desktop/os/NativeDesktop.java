@@ -316,7 +316,7 @@ public abstract class NativeDesktop {
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
-            dialogService.notify(couldNotOpenBrowser);
+            dialogService.notifyAll(couldNotOpenBrowser);
             dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
     }
