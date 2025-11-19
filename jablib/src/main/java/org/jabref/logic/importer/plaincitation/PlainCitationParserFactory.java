@@ -11,10 +11,10 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class PlainCitationParserFactory {
     public static PlainCitationParser getPlainCitationParser(PlainCitationParserChoice parserChoice,
-                                                              CitationKeyPatternPreferences citationKeyPatternPreferences,
-                                                              GrobidPreferences grobidPreferences,
-                                                              ImportFormatPreferences importFormatPreferences,
-                                                              AiService aiService) {
+                                                             CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                                             GrobidPreferences grobidPreferences,
+                                                             ImportFormatPreferences importFormatPreferences,
+                                                             AiService aiService) {
         return switch (parserChoice) {
             case PlainCitationParserChoice.RULE_BASED_GENERAL ->
                     new RuleBasedPlainCitationParser();
