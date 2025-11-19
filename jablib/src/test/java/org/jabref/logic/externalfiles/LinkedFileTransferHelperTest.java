@@ -46,7 +46,7 @@ class LinkedFileTransferHelperTest {
         LinkedFileTransferHelper
                 .adjustLinkedFilesForTarget(
                         filePreferences,
-                        new org.jabref.model.TransferInformation(fileTestConfiguration.sourceContext, TransferMode.COPY)
+                        new org.jabref.model.TransferInformation(fileTestConfiguration.sourceContext, TransferMode.COPY),
                         actualBibDatabaseContext,
                         actualEntry
                 );
