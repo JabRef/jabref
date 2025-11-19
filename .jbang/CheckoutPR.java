@@ -1,4 +1,4 @@
-////usr/bin/env jbang "$0" "$@" ; exit $?
+///usr/bin/env jbang "$0" "$@" ; exit $?
 
 import java.io.File;
 import java.util.List;

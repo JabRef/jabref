@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -15,7 +15,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.cli.converter.CygWinPathConverter;
+import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
@@ -28,14 +28,14 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "convert", description = "Convert between bibliography formats.")
-public class Convert implements Runnable {
+class Convert implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Convert.class);
 
     @ParentCommand
-    private ArgumentProcessor argumentProcessor;
+    private JabKit jabKit;
 
     @Mixin
-    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
+    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     // [impl->req~jabkit.cli.input-flag~1]
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input file", required = true)
@@ -52,7 +52,7 @@ public class Convert implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, inputFormat, argumentProcessor.cliPreferences, sharedOptions.porcelain);
+        Optional<ParserResult> parserResult = JabKit.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
@@ -81,9 +81,9 @@ public class Convert implements Runnable {
         }
 
         if ("bibtex".equalsIgnoreCase(format)) {
-            ArgumentProcessor.saveDatabase(
-                    argumentProcessor.cliPreferences,
-                    argumentProcessor.entryTypesManager,
+            JabKit.saveDatabase(
+                    jabKit.cliPreferences,
+                    jabKit.entryTypesManager,
                     parserResult.getDatabase(),
                     outputFile);
             return;
@@ -93,9 +93,9 @@ public class Convert implements Runnable {
         BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
         databaseContext.setDatabasePath(path);
         List<Path> fileDirForDatabase = databaseContext
-                .getFileDirectories(argumentProcessor.cliPreferences.getFilePreferences());
+                .getFileDirectories(jabKit.cliPreferences.getFilePreferences());
 
-        ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
+        ExporterFactory exporterFactory = ExporterFactory.create(jabKit.cliPreferences);
         Optional<Exporter> exporter = exporterFactory.getExporterByName(format);
         if (exporter.isEmpty()) {
             System.out.println(Localization.lang("Unknown export format '%0'.", format));

@@ -1,4 +1,4 @@
-package org.jabref.toolkit.cli;
+package org.jabref.toolkit.commands;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -54,8 +54,8 @@ public abstract class AbstractJabKitTest {
                 0,
                 0));
 
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
-        commandLine = new CommandLine(argumentProcessor);
+        JabKit jabKit = new JabKit(preferences, entryTypesManager);
+        commandLine = new CommandLine(jabKit);
 
         outWriter = new ByteArrayOutputStream();
         errWriter = new ByteArrayOutputStream();
