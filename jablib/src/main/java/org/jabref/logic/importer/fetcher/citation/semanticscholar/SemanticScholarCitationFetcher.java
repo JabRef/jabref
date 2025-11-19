@@ -42,14 +42,14 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
                 + "&limit=1000";
     }
 
-    public String getUrlForCitationCount(BibEntry entry) {
+    public @NonNull String getUrlForCitationCount(@NonNull BibEntry entry) {
         return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString()
                 + "?fields=" + "citationCount"
                 + "&limit=1";
     }
 
     @Override
-    public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
+    public @NonNull List<@NonNull BibEntry> searchCitedBy(@NonNull BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }
@@ -61,7 +61,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
-        URLDownload urlDownload = new URLDownload(citationsUrl);
+        URLDownload urlDownload = new URLDownload(importerPreferences, citationsUrl);
 
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
 
@@ -74,7 +74,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     @Override
-    public @NonNull List<BibEntry> searchCiting(@NonNull BibEntry entry) throws FetcherException {
+    public @NonNull List<@NonNull BibEntry> searchCiting(@NonNull BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }

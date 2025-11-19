@@ -66,8 +66,8 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
           if [[ "$GITHUB_WORKFLOW" == *"early access"* && "$REPO_OWNER" != "JabRef" ]]; then
-            echo "🚫 Early access workflow for JabRef disabled for non-JabRef owner"
-            echo "🚫 Early access workflow for JabRef disabled for non-JabRef owner" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ Early access workflow for JabRef disabled for non-JabRef owner"
+            echo "⊘ Early access workflow for JabRef disabled for non-JabRef owner" >> $GITHUB_STEP_SUMMARY
             echo "should-build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -77,15 +77,15 @@ jobs:
             echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
             echo "should-build=true" >> "$GITHUB_OUTPUT"
           else
-            echo "🚫 build should be skipped"
-            echo "🚫 build should be skipped" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ build should be skipped"
+            echo "⊘ build should be skipped" >> $GITHUB_STEP_SUMMARY
             echo "should-build=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
-            echo "🚫 Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
-            echo "🚫 Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
+            echo "⊘ Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
+            echo "⊘ Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             echo "secretspresent=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -93,17 +93,17 @@ jobs:
           echo "secretspresent=true" >> "$GITHUB_OUTPUT"
 
           if [[ "$GITHUB_REF" == refs/heads/gh-readonly-queue* ]]; then
-            echo "🚫 merge queue – skipping upload"
-            echo "🚫 merge queue – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ merge queue – skipping upload"
+            echo "⊘ merge queue – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "tag bulid" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ tag bulid" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=true" >> "$GITHUB_OUTPUT"
           else
-            echo "no tag bulid" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ no tag bulid" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -117,8 +117,8 @@ jobs:
              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
              exit 0;
           else
-            echo "🚫 no macOS notarization"
-            echo "🚫 no macOS notarization" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ no macOS notarization"
+            echo "⊘ no macOS notarization" >> $GITHUB_STEP_SUMMARY
             echo "should-notarize=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -136,8 +136,8 @@ jobs:
             echo "☁️ Label 'dev: binaries' found – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
           else
-            echo "🚫 Label 'dev: binaries' not found – skipping upload"
-            echo "🚫 Label 'dev: binaries' not found – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "⊘ Label 'dev: binaries' not found – skipping upload"
+            echo "⊘ Label 'dev: binaries' not found – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -151,8 +151,8 @@ jobs:
         if: needs.conditions.outputs.upload-to-builds-jabref-org == 'false'
         shell: bash
         run: |
-          echo "🚫 no upload – skipping upload"
-          echo "🚫 no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
+          echo "⊘ no upload – skipping upload"
+          echo "⊘ no upload – skipping upload" >> $GITHUB_STEP_SUMMARY
           echo "available=false" >> "$GITHUB_OUTPUT"
       - name: Setup SSH key
         if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
@@ -161,6 +161,7 @@ jobs:
           chmod 600 sshkey
       - name: Check disk space on builds.jabref.org
         if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
+        id: diskspace
         shell: bash
         run: |
           USAGE=$(ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no jrrsync@build-upload.jabref.org \
@@ -173,10 +174,16 @@ jobs:
             echo "☁️ enough disk space available – will upload" >> $GITHUB_STEP_SUMMARY
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
-            echo "🚫 not enough disk space – skipping upload"
-            echo "🚫 not enough disk space – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "⛔ not enough disk space – skipping upload"
+            echo "⛔ not enough disk space – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
+      - name: Output URL
+        if: steps.diskspace.outputs.available == 'true'
+        shell: bash
+        run: |
+          echo "Link: https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge"
+          echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>" >> $GITHUB_STEP_SUMMARY
 
   build:
     needs: [conditions, disk-space-check]
@@ -348,15 +355,15 @@ jobs:
 
       # region Upload to builds.jabref.org / GitHub artifacts store
       - name: Setup SSH key
-        if: ${{ needs.disk-space-check.available == 'true' }}
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Setup rsync (macOS)
-        if: ${{ (needs.disk-space-check.available == 'true') && (startsWith(matrix.os, 'macos') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')) }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
-        if: ${{ (needs.disk-space-check.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
@@ -364,33 +371,33 @@ jobs:
         # We need to use v6.4.4 as v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
         run: choco install rsync --version=6.4.4
       - name: Upload jabgui to builds.jabref.org (Windows)
-        if: ${{ (needs.disk-space-check.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkkit to builds.jabref.org (Windows)
-        if: ${{ (needs.disk-space-check.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabls-cli to builds.jabref.org (Windows)
-        if: ${{ (needs.disk-space-check.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabgui to builds.jabref.org (linux, macOS)
-        if: ${{ (needs.disk-space-check.available == 'true') && ((startsWith(matrix.os, 'macos') && (needs.conditions.outputs.should-notarize != 'true')) || startsWith(matrix.os, 'ubuntu')) }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && ((startsWith(matrix.os, 'macos') && (needs.conditions.outputs.should-notarize != 'true')) || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkit to builds.jabref.org (linux, macOS)
-        if: ${{ (needs.disk-space-check.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabls-cli to builds.jabref.org (linux, macOS)
-        if: ${{ (needs.disk-space-check.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
