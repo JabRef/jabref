@@ -47,19 +47,18 @@ public class FollowUpQuestionGenerator {
 
     private String buildPrompt(String userMessage, String aiResponse) {
         return """
-                  Based on this conversation:
+                Based on this conversation:
 
-                  User: %s
-                  Assistant: %s
+                User: %s
+                Assistant: %s
 
-                  Generate 3-5 short follow-up questions (maximum 10 words each) that the user might want to ask next.
-                  Format your response as a numbered list:
-                  1. [question]
-                  2. [question]
-                  3. [question]
+                Generate 3-5 short follow-up questions (maximum 10 words each) that the user might want to ask next.
+                Format your response as a numbered list:
+                1. [question]
+                2. [question]
+                3. [question]
 
-                  Only provide the numbered list, nothing else.""".formatted(
-                userMessage, aiResponse);
+                Only provide the numbered list, nothing else.""".formatted(userMessage, aiResponse);
     }
 
     private List<String> parseQuestions(String response) {
