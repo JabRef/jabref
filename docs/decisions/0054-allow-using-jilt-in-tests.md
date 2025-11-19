@@ -79,7 +79,7 @@ Chosen option: "Jilt staged builder (`@Builder(style = BuilderStyle.STAGED_PRESE
 
 ## Pros and Cons of the Options
 
-### Jilt staged builder (`@Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)`).
+### Jilt staged builder (`@Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)`)
 
 Homepage: <https://github.com/skinny85/jilt>
 
@@ -91,7 +91,7 @@ Homepage: <https://github.com/skinny85/jilt>
 * Bad, because adding an annotation processor requires **IDE/build configuration** and developer knowledge.
 * Bad, because navigating to generated code can be less convenient, depending on IDE support.
 
-### Plain constructors (direct `new BibTestConfiguration(…)`), setters, and `initialize()` method.
+### Plain constructors (direct `new BibTestConfiguration(…)`), setters, and `initialize()` method
 
 * Good, because useful for very small classes.
 * Good, because no extra dependency.
@@ -101,7 +101,7 @@ Homepage: <https://github.com/skinny85/jilt>
 * Bad, because no compile-time enforcement of “required vs. optional” beyond primitive defaults and `null`.
 * Bad, because changing constructor parameter order can silently break call sites.
 
-### Handwritten classic builder.
+### Handwritten classic builder
 
 * Good, because familiar builder pattern; no extra tools.
 * Good, because call sites are readable and explicit.
@@ -109,7 +109,7 @@ Homepage: <https://github.com/skinny85/jilt>
 * Bad, because easy to introduce inconsistencies between builder and target class.
 * Bad, because type-safety of required/optional parameters might be weaker than staged builders.
 
-### Lombok’s `@Builder`.
+### Lombok’s `@Builder`
 
 * Good, because concise annotation, common in many Java projects.
 * Good, because builder usage is clear at call sites.
