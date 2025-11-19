@@ -7,7 +7,7 @@ import javax.xml.stream.XMLStreamReader;
 public final class StaxParser {
 
     private StaxParser() {
-        throw new UnsupportedOperationException("Utility class");
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
     }
 
     /**
