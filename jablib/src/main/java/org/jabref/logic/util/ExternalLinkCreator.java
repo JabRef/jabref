@@ -104,7 +104,7 @@ public class ExternalLinkCreator {
                 return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName);
             }
         } catch (Exception ex) {
-            LOGGER.error("Error constructing URL for {}: {}", serviceName, ex.getMessage());
+            LOGGER.error("Error constructing URL for {}: {}", serviceName, ex.getMessage(), ex);
             return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName);
         }
     }
