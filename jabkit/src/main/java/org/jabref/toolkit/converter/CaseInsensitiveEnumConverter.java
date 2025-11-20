@@ -1,0 +1,18 @@
+package org.jabref.toolkit.converter;
+
+import picocli.CommandLine;
+
+public class CaseInsensitiveEnumConverter<T extends Enum<T>>
+        implements CommandLine.ITypeConverter<T> {
+
+    private final Class<T> enumType;
+
+    public CaseInsensitiveEnumConverter(Class<T> enumType) {
+        this.enumType = enumType;
+    }
+
+    @Override
+    public T convert(String value) {
+        return Enum.valueOf(enumType, value.toUpperCase());
+    }
+}

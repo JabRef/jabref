@@ -13,6 +13,8 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.toolkit.arguments.Provider;
+import org.jabref.toolkit.converter.ProviderConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +34,10 @@ class GetCitedWorks implements Callable<Integer> {
 
     @CommandLine.Option(
             names = "--provider",
+            converter = ProviderConverter.class,
             description = "Metadata provider: ${COMPLETION-CANDIDATES}"
     )
-    private Provider provider = Provider.crossref;
+    private Provider provider = Provider.CROSSREF;
 
     @CommandLine.Parameters(description = "DOI to check")
     private String doi;
@@ -42,7 +45,7 @@ class GetCitedWorks implements Callable<Integer> {
     @Override
     public Integer call() {
         CitationFetcher citationFetcher = switch (provider) {
-            case crossref -> {
+            case CROSSREF -> {
                 CliPreferences preferences = argumentProcessor.cliPreferences;
                 AiService aiService = new AiService(
                         preferences.getAiPreferences(),
@@ -57,7 +60,7 @@ class GetCitedWorks implements Callable<Integer> {
                         preferences.getGrobidPreferences(),
                         aiService);
             }
-            case semanticscholar ->
+            case SEMANTICSCHOLAR ->
                     new SemanticScholarCitationFetcher(
                             argumentProcessor.cliPreferences.getImporterPreferences()
                     );
@@ -79,8 +82,4 @@ class GetCitedWorks implements Callable<Integer> {
         return JabKit.outputEntries(argumentProcessor.cliPreferences, entries);
     }
 
-    private enum Provider {
-        crossref,
-        semanticscholar
-    }
 }
