@@ -53,7 +53,7 @@ public class WorkspacePreferences {
     }
 
     /// Creates Object with default values
-    public WorkspacePreferences() {
+    private WorkspacePreferences() {
         this(
                 Language.getLanguageFor(Locale.getDefault().getLanguage()), // Default language
                 false,                                                      // Default font size override
@@ -69,19 +69,22 @@ public class WorkspacePreferences {
         );
     }
 
-    public void reset() {
-        WorkspacePreferences defaults = new WorkspacePreferences();
-        this.language.set(defaults.getLanguage());
-        this.shouldOverrideDefaultFontSize.set(defaults.shouldOverrideDefaultFontSize());
-        this.mainFontSize.set(defaults.getMainFontSize());
-        this.defaultFontSize.set(defaults.getDefaultFontSize());
-        this.theme.set(defaults.getTheme());
-        this.themeSyncOs.set(defaults.shouldThemeSyncOs());
-        this.shouldOpenLastEdited.set(defaults.shouldOpenLastEdited());
-        this.showAdvancedHints.set(defaults.shouldShowAdvancedHints());
-        this.confirmDelete.set(defaults.shouldConfirmDelete());
-        this.confirmHideTabBar.set(defaults.shouldHideTabBar());
-        this.selectedSlrCatalogs.setAll(defaults.getSelectedSlrCatalogs());
+    public static WorkspacePreferences getDefault() {
+        return new WorkspacePreferences();
+    }
+
+    public void setAll(WorkspacePreferences preferences) {
+                this.language.set(preferences.getLanguage());
+        this.shouldOverrideDefaultFontSize.set(preferences.shouldOverrideDefaultFontSize());
+        this.mainFontSize.set(preferences.getMainFontSize());
+        this.defaultFontSize.set(preferences.getDefaultFontSize());
+        this.theme.set(preferences.getTheme());
+        this.themeSyncOs.set(preferences.shouldThemeSyncOs());
+        this.shouldOpenLastEdited.set(preferences.shouldOpenLastEdited());
+        this.showAdvancedHints.set(preferences.shouldShowAdvancedHints());
+        this.confirmDelete.set(preferences.shouldConfirmDelete());
+        this.confirmHideTabBar.set(preferences.shouldHideTabBar());
+        this.selectedSlrCatalogs.setAll(preferences.getSelectedSlrCatalogs());
     }
 
     public Language getLanguage() {

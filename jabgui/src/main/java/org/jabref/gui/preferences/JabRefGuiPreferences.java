@@ -46,6 +46,7 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
@@ -421,7 +422,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     @Override
     public void clear() throws BackingStoreException {
         super.clear();
-        getWorkspacePreferences().reset();
+
+        getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
+    }
+
+    @Override
+    public void importPreferences(Path file) throws JabRefException {
+        super.importPreferences(file);
+
+        // in case of incomplete or corrupt xml fall back to current preferences
+        getWorkspacePreferences().setAll(getWorkspacePreferencesFromLowLevelApi(getWorkspacePreferences()));
     }
 
     // region EntryEditorPreferences
@@ -636,20 +646,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return workspacePreferences;
         }
 
-        WorkspacePreferences defaults = new WorkspacePreferences();
-
-        workspacePreferences = new WorkspacePreferences(
-                getLanguage(),
-                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
-                getInt(MAIN_FONT_SIZE, defaults.getMainFontSize()),
-                new WorkspacePreferences().getDefaultFontSize(),
-                new Theme(get(THEME, Theme.BASE_CSS)),
-                getBoolean(THEME_SYNC_OS, defaults.shouldThemeSyncOs()),
-                getBoolean(OPEN_LAST_EDITED, defaults.shouldOpenLastEdited()),
-                getBoolean(SHOW_ADVANCED_HINTS, defaults.shouldShowAdvancedHints()),
-                getBoolean(CONFIRM_DELETE, defaults.shouldConfirmDelete()),
-                getBoolean(CONFIRM_HIDE_TAB_BAR, defaults.shouldHideTabBar()),
-                getStringList(SELECTED_SLR_CATALOGS));
+        workspacePreferences = getWorkspacePreferencesFromLowLevelApi(WorkspacePreferences.getDefault());
 
         EasyBind.listen(workspacePreferences.languageProperty(), (_, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -678,6 +675,21 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         workspacePreferences.getSelectedSlrCatalogs().addListener((ListChangeListener<String>) _ ->
                 putStringList(SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
         return workspacePreferences;
+    }
+
+    private WorkspacePreferences getWorkspacePreferencesFromLowLevelApi(WorkspacePreferences defaults) {
+        return new WorkspacePreferences(
+                getLanguage(),
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
+                getInt(MAIN_FONT_SIZE, defaults.getMainFontSize()),
+                defaults.getDefaultFontSize(), // FixMe
+                new Theme(get(THEME, Theme.BASE_CSS)),
+                getBoolean(THEME_SYNC_OS, defaults.shouldThemeSyncOs()),
+                getBoolean(OPEN_LAST_EDITED, defaults.shouldOpenLastEdited()),
+                getBoolean(SHOW_ADVANCED_HINTS, defaults.shouldShowAdvancedHints()),
+                getBoolean(CONFIRM_DELETE, defaults.shouldConfirmDelete()),
+                getBoolean(CONFIRM_HIDE_TAB_BAR, defaults.shouldHideTabBar()),
+                getStringList(SELECTED_SLR_CATALOGS));
     }
 
     @Override
