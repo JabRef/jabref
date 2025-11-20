@@ -34,6 +34,7 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -60,7 +61,8 @@ public class RightClickMenu {
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,
                                      BibEntryTypesManager entryTypesManager,
-                                     ImportHandler importHandler) {
+                                     ImportHandler importHandler,
+                                     ImporterPreferences importerPreferences) {
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
 
@@ -99,7 +101,8 @@ public class RightClickMenu {
                 extractFileReferencesOffline,
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences)),
+
+                createSearchSubMenu(factory, dialogService, stateManager, preferences, importerPreferences),
 
                 new SeparatorMenuItem(),
 
@@ -236,5 +239,18 @@ public class RightClickMenu {
         );
 
         return sendMenu;
+    }
+
+    private static Menu createSearchSubMenu(ActionFactory factory,
+                                            DialogService dialogService,
+                                            StateManager stateManager,
+                                            GuiPreferences preferences,
+                                            ImporterPreferences importerPreferences) {
+        Menu searchMenu = factory.createMenu(StandardActions.SEARCH);
+        searchMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences, importerPreferences)),
+                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences, importerPreferences))
+        );
+        return searchMenu;
     }
 }
