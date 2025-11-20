@@ -6,7 +6,7 @@ on:
     types: [completed]
 
 jobs:
-   apply-labels:
+   mark-pr-ready-for-review:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
