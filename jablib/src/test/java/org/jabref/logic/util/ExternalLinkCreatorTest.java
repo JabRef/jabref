@@ -39,7 +39,7 @@ class ExternalLinkCreatorTest {
     }
 
     /**
-     * Validates URL conformance to RFC 2396 using standard Java URI parsing.
+     * Validates URL conformance to RFC 2396. Does not perform complex checks such as opening connections.
      */
     private boolean urlIsValid(String url) {
         try {
