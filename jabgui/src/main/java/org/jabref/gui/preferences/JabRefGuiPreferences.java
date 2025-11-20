@@ -112,7 +112,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiPreferences.class);
 
-    // WorkspacePreferences
+    // region WorkspacePreferences
     private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     private static final String MAIN_FONT_SIZE = "mainFontSize";
     private static final String THEME = "fxTheme";
@@ -122,6 +122,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CONFIRM_DELETE = "confirmDelete";
     private static final String CONFIRM_HIDE_TAB_BAR = "confirmHideTabBar";
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
+    // endregion
 
     // region core GUI preferences
     private static final String MAIN_WINDOW_POS_X = "mainWindowPosX";
