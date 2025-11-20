@@ -10,7 +10,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
@@ -25,11 +24,11 @@ public class SearchShortScienceAction extends SimpleCommand {
     private final GuiPreferences preferences;
     private final ExternalLinkCreator externalLinkCreator;
 
-    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, ImporterPreferences importerPreferences) {
+    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
-        this.externalLinkCreator = new ExternalLinkCreator(importerPreferences);
+        this.externalLinkCreator = new ExternalLinkCreator(preferences.getImporterPreferences());
 
         BooleanExpression fieldIsSet = isFieldSetForSelectedEntry(StandardField.TITLE, stateManager);
         this.executable.bind(needsEntriesSelected(1, stateManager).and(fieldIsSet));

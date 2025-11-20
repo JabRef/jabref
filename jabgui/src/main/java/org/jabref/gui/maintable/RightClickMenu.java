@@ -102,7 +102,7 @@ public class RightClickMenu {
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),
 
-                createSearchSubMenu(factory, dialogService, stateManager, preferences, importerPreferences),
+                createSearchSubMenu(factory, dialogService, stateManager, preferences),
 
                 new SeparatorMenuItem(),
 
@@ -244,12 +244,11 @@ public class RightClickMenu {
     private static Menu createSearchSubMenu(ActionFactory factory,
                                             DialogService dialogService,
                                             StateManager stateManager,
-                                            GuiPreferences preferences,
-                                            ImporterPreferences importerPreferences) {
+                                            GuiPreferences preferences) {
         Menu searchMenu = factory.createMenu(StandardActions.SEARCH);
         searchMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences, importerPreferences)),
-                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences, importerPreferences))
+                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences))
         );
         return searchMenu;
     }
