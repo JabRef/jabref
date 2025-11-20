@@ -1,12 +1,12 @@
-name: Adapt PR status labels (Move)
+name: Adapt PR status
 
 on:
   workflow_run:
-    workflows: ["Adapt PR status labels (Check)"]
+    workflows: ["On PR labeled"]
     types: [completed]
 
 jobs:
-   apply-labels:
+   mark-pr-ready-for-review:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
@@ -30,11 +30,16 @@ jobs:
           else
             echo "continue=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: Apply label operations
+      - name: Mark PR ready for review
         if: steps.check.outputs.continue == 'true'
         run: |
-          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --remove-label "status: ready-for-review"
-          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --remove-label "status: awaiting-second-review"
-          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --add-label "status: changes-required"
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ steps.check.outputs.pr_number }}/labels --jq '.[].name')
+
+          if echo "$LABELS" | grep -q "^status: ready-for-review$"; then
+            echo "✅ label ready-for-review found"
+            gh pr ready --repo ${{ github.repository }} ${{ steps.check.outputs.pr_number }}
+          else
+            echo "⊘ label ready-for-review not found"
+          fi;
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

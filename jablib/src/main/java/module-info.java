@@ -69,6 +69,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.auxparser;
     exports org.jabref.logic.cleanup;
     exports org.jabref.logic.formatter;
+    exports org.jabref.logic.importer.fetcher.citation.crossref;
     exports org.jabref.logic.importer.fetcher.citation.semanticscholar;
     exports org.jabref.logic.formatter.bibtexfields;
     exports org.jabref.model.pdf;
