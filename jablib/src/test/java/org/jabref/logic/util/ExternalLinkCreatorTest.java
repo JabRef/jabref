@@ -45,7 +45,7 @@ class ExternalLinkCreatorTest {
         try {
             URI.create(url);
             return true;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
