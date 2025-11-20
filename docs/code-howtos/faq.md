@@ -171,8 +171,6 @@ A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as ind
 
 Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
 
-<!-- markdownlint-disable-file MD033 -->
-
 ## IDE import issues
 
 One might see following error:
@@ -200,3 +198,5 @@ In case Gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg)
 4. Wait until the command execution completes.
 
 After about one minute, however, you can continue setting up IntelliJ, because the initial Gradle setup succeeded.
+
+<!-- markdownlint-disable-file MD033 -->
