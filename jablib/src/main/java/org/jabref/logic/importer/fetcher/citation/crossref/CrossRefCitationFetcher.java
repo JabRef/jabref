@@ -87,11 +87,11 @@ public class CrossRefCitationFetcher implements CitationFetcher {
             return references.valueStream()
                              .map(Unchecked.function(reference -> {
                                  String unstructured = reference.at("/unstructured").asText();
-                                 String referenceDoi = reference.at("/DOI").asText();
-                                 if (referenceDoi == null) {
+                                 JsonNode doiNode = reference.at("/DOI");
+                                 if (doiNode.isMissingNode()) {
                                      return getBibEntryFromText(parser, unstructured);
                                  } else {
-                                     return getBibEntryFromDoi(referenceDoi, unstructured);
+                                     return getBibEntryFromDoi(doiNode.asText(), unstructured);
                                  }
                              }))
                              .toList();
