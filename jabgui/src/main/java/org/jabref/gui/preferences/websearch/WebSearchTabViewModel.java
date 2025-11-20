@@ -75,7 +75,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     private final ObservableList<SearchEngineItem> searchEngines = FXCollections.observableArrayList();
 
-    private final CliPreferences preferences;
     private final DOIPreferences doiPreferences;
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
@@ -87,7 +86,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final ReadOnlyBooleanProperty refAiEnabled;
 
     public WebSearchTabViewModel(CliPreferences preferences, ReadOnlyBooleanProperty refAiEnabled, TaskExecutor taskExecutor) {
-        this.preferences = preferences;
         this.importerPreferences = preferences.getImporterPreferences();
         this.grobidPreferences = preferences.getGrobidPreferences();
         this.doiPreferences = preferences.getDOIPreferences();
@@ -98,11 +96,11 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         this.refAiEnabled = refAiEnabled;
 
-        setupPlainCitationParsers(preferences);
+        setupPlainCitationParsers();
         setupSearchEngines();
     }
 
-    private void setupPlainCitationParsers(CliPreferences preferences) {
+    private void setupPlainCitationParsers() {
         if (!refAiEnabled.get()) {
             plainCitationParsers.remove(PlainCitationParserChoice.LLM);
         }
