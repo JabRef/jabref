@@ -63,14 +63,12 @@
         </HBox>
     </GridPane>
 
-    <Hyperlink fx:id="moreThemes" text = "%Get more themes..." onAction="#openBrowser"/>
+    <Hyperlink text = "%Get more themes..." onAction="#openBrowser"/>
 
     <Label styleClass="sectionHeader" text="%User interface"/>
     <CheckBox fx:id="openLastStartup" text="%Open last edited libraries on startup"/>
     <CheckBox fx:id="showAdvancedHints"
               text="%Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"/>
-    <CheckBox fx:id="inspectionWarningDuplicate"
-              text="%Warn about unresolved duplicates when closing inspection window"/>
 
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
     <CheckBox fx:id="shouldAskForIncludingCrossReferences" text="%Ask whether to include cross-references when copying to another library"/>

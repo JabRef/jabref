@@ -3,13 +3,13 @@ package org.jabref.gui.theme;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.stream.Stream;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
@@ -111,16 +111,15 @@ public class ThemeManager {
     /// Using `installCss` directly would cause a delay in theme application, resulting
     /// in a brief flash of the default JavaFX theme (Modena CSS) before the intended theme appears.
     public void installCssImmediately(Scene scene) {
-        List<String> stylesheets = scene.getStylesheets();
-        scene.getStylesheets().clear();
-        List<String> baseOrThemeStylesheet = Stream
-                .of(baseStyleSheet.getSceneStylesheet(),
-                        theme.getAdditionalStylesheet().map(StyleSheet::getSceneStylesheet).orElse(null)
-                ).filter(Objects::nonNull)
-                .map(URL::toExternalForm)
-                .toList();
+        List<String> toAdd = new ArrayList<>(2);
+        toAdd.add(baseStyleSheet.getSceneStylesheet().toExternalForm());
+        theme.getAdditionalStylesheet()
+             .map(StyleSheet::getSceneStylesheet)
+             .map(URL::toExternalForm)
+             .ifPresent(toAdd::add);
 
-        stylesheets.addAll(baseOrThemeStylesheet);
+        scene.getStylesheets().clear();
+        scene.getStylesheets().addAll(toAdd);
     }
 
     /// Registers a runnable on JavaFX thread to install the base and additional css files as stylesheets in the given scene.
