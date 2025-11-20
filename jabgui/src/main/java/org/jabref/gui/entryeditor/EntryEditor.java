@@ -32,6 +32,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -179,15 +180,14 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
 
         stateManager.getSelectedEntries().addListener((InvalidationListener) _ -> {
-                    if (stateManager.getSelectedEntries().isEmpty()) {
-                        // [impl->req~entry-editor.keep-showing~1]
-                        // No change in the entry editor
-                        // We allow users to edit the "old" entry
-                    } else {
-                        setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
-                    }
-                }
-        );
+            if (stateManager.getSelectedEntries().isEmpty()) {
+                // [impl->req~entry-editor.keep-showing~1]
+                // No change in the entry editor
+                // We allow users to edit the "old" entry
+            } else {
+                setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
+            }
+        });
 
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (_, _, newValue) -> {
@@ -273,6 +273,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
                         break;
+                    case JUMP_TO_FIELD:
+                        selectFieldDialog();
+                        event.consume();
+                        break;
                     case HELP:
                         new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
                         event.consume();
@@ -291,6 +295,15 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 }
             }
         });
+    }
+
+    public void selectFieldDialog() {
+        if (getCurrentlyEditedEntry() == null) {
+            return;
+        }
+        JumpToFieldDialog dialog = new JumpToFieldDialog(this);
+        dialog.initModality(Modality.NONE);
+        dialog.show();
     }
 
     @FXML
@@ -445,6 +458,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         return currentlyEditedEntry;
     }
 
+    public List<EntryEditorTab> getAllPossibleTabs() {
+        return allPossibleTabs;
+    }
+
     public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
         if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
             return;
@@ -459,11 +476,17 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
 
         typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
-            typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+            typeLabel.setText(new TypedBibEntry(this.currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
             adaptVisibleTabs();
             setupToolBar();
-            getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
+            getSelectedTab().notifyAboutFocus(this.currentlyEditedEntry);
         });
+
+        typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+
+        adaptVisibleTabs();
+
+        setupToolBar();
 
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
@@ -475,6 +498,11 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 }
             }
         });
+
+        EntryEditorTab selectedTab = getSelectedTab();
+        if (selectedTab != null) {
+            Platform.runLater(() -> selectedTab.notifyAboutFocus(currentlyEditedEntry));
+        }
     }
 
     private EntryEditorTab getSelectedTab() {
@@ -522,6 +550,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
         new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(currentlyEditedEntry, fetcher);
+    }
+
+    public void selectField(String fieldName) {
+        setFocusToField(org.jabref.model.entry.field.FieldFactory.parseField(fieldName));
     }
 
     public void setFocusToField(Field field) {

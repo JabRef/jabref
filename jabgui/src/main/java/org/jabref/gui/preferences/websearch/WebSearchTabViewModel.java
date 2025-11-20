@@ -157,10 +157,12 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         Set<String> enabledCatalogs = new HashSet<>(importerPreferences.getCatalogs());
 
         List<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
-                                                          .stream().sorted(Comparator.comparing(WebFetcher::getName)).toList();
+                                                          .stream()
+                                                          .sorted(Comparator.comparing(WebFetcher::getName))
+                                                          .toList();
 
-        Set<CustomizableKeyFetcher> customizableKeyFetchers = WebFetchers.getCustomizableKeyFetchers(importFormatPreferences, importerPreferences);
-        Set<String> customizableFetcherNames = customizableKeyFetchers.stream().map(WebFetcher::getName).collect(Collectors.toSet());
+        // We need to use names, because [WebFetchers] creates new instances for the fetchers at each method - even if they are the same.
+        Set<String> customizableKeyFetcherNames = WebFetchers.getCustomizableKeyFetchers(importFormatPreferences, importerPreferences).stream().map(WebFetcher::getName).collect(Collectors.toSet());
 
         fetchers.clear();
         for (SearchBasedFetcher fetcher : allFetchers) {
@@ -168,9 +170,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                 continue;
             }
             boolean isEnabled = enabledCatalogs.contains(fetcher.getName());
-            boolean isCustomizable = customizableFetcherNames.contains(fetcher.getName());
-            FetcherViewModel fetcherViewModel = new FetcherViewModel(fetcher, isEnabled, isCustomizable);
-            if (isCustomizable) {
+            boolean keyIsCustomizable = customizableKeyFetcherNames.contains(fetcher.getName());
+            FetcherViewModel fetcherViewModel = new FetcherViewModel(fetcher, isEnabled, keyIsCustomizable);
+            if (keyIsCustomizable) {
                 savedApiKeys.stream()
                             .filter(apiKey -> apiKey.getName().equals(fetcher.getName()))
                             .findFirst()
