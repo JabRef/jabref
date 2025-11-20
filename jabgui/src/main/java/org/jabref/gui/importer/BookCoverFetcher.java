@@ -38,11 +38,11 @@ public class BookCoverFetcher {
     private static final String IMAGE_FALLBACK_SUFFIX = "-L.jpg";
 
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
-    
+
     public BookCoverFetcher(ExternalApplicationsPreferences externalApplicationsPreferences) {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
     }
-    
+
     public Optional<Path> getDownloadedCoverForEntry(BibEntry entry, Path directory) {
         Optional<ISBN> isbn = entry.getISBN();
         if (isbn.isPresent()) {
@@ -51,7 +51,6 @@ public class BookCoverFetcher {
         }
         return Optional.empty();
     }
-    
 
     public void downloadCoversForEntry(BibEntry entry, Path directory) {
         Optional<ISBN> isbn = entry.getISBN();
