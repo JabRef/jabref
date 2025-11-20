@@ -107,7 +107,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
             plainCitationParsers.remove(PlainCitationParserChoice.LLM);
         }
 
-        refAiEnabled.addListener((observable, oldValue, newValue) -> {
+        refAiEnabled.addListener((_, _, newValue) -> {
             if (newValue) {
                 plainCitationParsers.add(PlainCitationParserChoice.LLM);
             } else {
@@ -125,7 +125,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
             plainCitationParsers.remove(PlainCitationParserChoice.GROBID);
         }
 
-        grobidEnabledProperty.addListener((observable, oldValue, newValue) -> {
+        grobidEnabledProperty.addListener((_, _, newValue) -> {
             if (newValue) {
                 plainCitationParsers.add(PlainCitationParserChoice.GROBID);
             } else {
