@@ -55,9 +55,9 @@ public class BookCoverFetcher {
     public void downloadCoversForEntry(BibEntry entry, Path directory) {
         Optional<ISBN> isbn = entry.getISBN();
         if (isbn.isPresent()) {
-            final String name = "isbn-" + isbn.asString();
+            final String name = "isbn-" + isbn.get().asString();
             if (findExistingImage(name, directory).isEmpty()) {
-                final String url = getSourceForIsbn(isbn);
+                final String url = getSourceForIsbn(isbn.get());
                 Optional<LinkedFile> file = downloadCoverImage(url, name, directory);
             }
         }
