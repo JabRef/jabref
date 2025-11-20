@@ -44,7 +44,7 @@ public class BookCoverFetcher {
     }
 
     public Optional<Path> getDownloadedCoverForEntry(BibEntry entry, String location) {
-        return entry.getISBN().map(isbn -> findExistingImage("isbn-" + isbn.asString(), Path.of(location));
+        return entry.getISBN().map(isbn -> findExistingImage("isbn-" + isbn.asString(), Path.of(location)));
     }
 
     public void downloadCoversForEntry(BibEntry entry, String location) {
@@ -80,7 +80,7 @@ public class BookCoverFetcher {
             URLDownload download = new URLDownload(url);
             Optional<String> mime = download.getMimeType();
 
-            inferExtensionOfImage(mime, extension).map(x -> directory.resolve(FileUtil.getValidFileName(name + "." + x))).ifPresent(p - > download.toFile(p));
+            inferExtensionOfImage(mime, extension).map(x -> directory.resolve(FileUtil.getValidFileName(name + "." + x))).ifPresent(p -> download.toFile(p));
         } catch (FetcherException | MalformedURLException e) {
             LOGGER.error("Error while downloading cover image file", e);
         }
@@ -88,8 +88,8 @@ public class BookCoverFetcher {
 
     private Optional<String> inferExtensionOfImage(String url) {
         return mime.map(m -> ExternalFileTypes.getExternalFileTypeByMimeType(m, externalApplicationsPreferences))
-                .orElse(extension.flatMap(x -> ExternalFileTypes.getExternalFileTypeByExt(x, externalApplicationsPreferences)))
-                .filter(t -> t.getMimeType().startsWith("image/")).map(t -> t.getExtension());
+                   .orElse(extension.flatMap(x -> ExternalFileTypes.getExternalFileTypeByExt(x, externalApplicationsPreferences)))
+                   .filter(t -> t.getMimeType().startsWith("image/")).map(t -> t.getExtension());
     }
 
     private static String getSourceForIsbn(ISBN isbn) {
