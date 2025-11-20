@@ -47,7 +47,7 @@ public class BookCoverFetcher {
         Optional<ISBN> isbn = entry.getISBN();
         if (isbn.isPresent()) {
             final String name = "isbn-" + isbn.get().asString();
-            return findCoverImageByNameWithAnyExtension(name, directory);
+            return findExistingImage(name, directory);
         }
         return Optional.empty();
     }
@@ -56,14 +56,14 @@ public class BookCoverFetcher {
         Optional<ISBN> isbn = entry.getISBN();
         if (isbn.isPresent()) {
             final String name = "isbn-" + isbn.asString();
-            if (findCoverImageByNameWithAnyExtension(name, directory).isEmpty()) {
+            if (findExistingImage(name, directory).isEmpty()) {
                 final String url = getSourceForIsbn(isbn);
                 Optional<LinkedFile> file = downloadCoverImage(url, name, directory);
             }
         }
     }
 
-    private Optional<Path> findCoverImageByNameWithAnyExtension(String name, Path directory) {
+    private Optional<Path> findExistingImage(String name, Path directory) {
         for (ExternalFileType filetype : externalApplicationsPreferences.getExternalFileTypes()) {
             if (filetype.getMimeType().startsWith("image/")) {
                 Path path = directory.resolve(FileUtil.getValidName(name + "." + t.getExtension()));
