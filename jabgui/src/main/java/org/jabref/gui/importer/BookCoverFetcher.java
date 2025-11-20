@@ -129,9 +129,7 @@ public class BookCoverFetcher {
             try {
                 final Path subdirectory = directory.get().resolve(location);
                 Files.createDirectories(subdirectory);
-                if (Files.exists(subdirectory)) {
-                    return Optional.of(subdirectory);
-                }
+                return Optional.of(subdirectory);
             } catch (IOException | InvalidPathException e) {
                 return Optional.empty();
             }
@@ -145,7 +143,7 @@ public class BookCoverFetcher {
             suggested = ExternalFileTypes.getExternalFileTypeByMimeType(mime.get(), externalApplicationsPreferences);
         }
         if (suggested.isEmpty() && extension.isPresent()) {
-            Optional<ExternalFileType> suggested = ExternalFileTypes.getExternalFileTypeByExt(extension.get(), externalApplicationsPreferences);
+            suggested = ExternalFileTypes.getExternalFileTypeByExt(extension.get(), externalApplicationsPreferences);
         }
         return suggested.map(t -> t.getName()).orElse("");
     }
