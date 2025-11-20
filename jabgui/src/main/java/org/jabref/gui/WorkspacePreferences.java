@@ -74,7 +74,7 @@ public class WorkspacePreferences {
     }
 
     public void setAll(WorkspacePreferences preferences) {
-                this.language.set(preferences.getLanguage());
+        this.language.set(preferences.getLanguage());
         this.shouldOverrideDefaultFontSize.set(preferences.shouldOverrideDefaultFontSize());
         this.mainFontSize.set(preferences.getMainFontSize());
         this.defaultFontSize.set(preferences.getDefaultFontSize());
