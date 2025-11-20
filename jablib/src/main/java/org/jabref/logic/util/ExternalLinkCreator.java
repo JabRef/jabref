@@ -67,7 +67,9 @@ public class ExternalLinkCreator {
      * @return Optional containing the constructed URL, or empty if construction failed
      */
     private Optional<String> buildSearchUrl(String baseUrl, String defaultUrl, String title, Optional<String> author, String serviceName) {
-        // Apply LaTeX to Unicode conversion to the title before using it in the URL
+        // Converting LaTeX-formatted titles (e.g., containing braces) to plain Unicode to ensure compatibility with ShortScience's search URL.
+        // LatexToUnicodeAdapter.format() is being used because it attempts to parse LaTeX, but gracefully degrades to a normalized title on failure.
+        // This avoids sending malformed or literal LaTeX syntax titles that would give the wrong result.
         String filteredTitle = LatexToUnicodeAdapter.format(title);
 
         // Validate the base URL scheme to prevent injection attacks
