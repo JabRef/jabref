@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "IEEE" as another option for parsing plain text citations. [#14233](https://github.com/JabRef/jabref/pull/14233)
 - We added automatic date-based groups that create year/month/day subgroups from an entry’s date fields. [#10822](https://github.com/JabRef/jabref/issues/10822)
 - We added `doi-to-bibtex` to `JabKit`. [#14244](https://github.com/JabRef/jabref/pull/14244)
+- We added `--provider=crossref` to `get-cited-works` at `JabKit`. [#14357](https://github.com/JabRef/jabref/pull/14357)
 - We added [unpaywall](https://unpaywall.org/) as fulltext fetcher. [#14340](https://github.com/JabRef/jabref/pull/14340)
 - We added the possibility to configure the email provided to unpaywall. [#14340](https://github.com/JabRef/jabref/pull/14340)
 - We added a "Regenerate" button for the AI chat allowing the user to make the language model reformulate its response to the previous prompt. [#12191](https://github.com/JabRef/jabref/issues/12191)

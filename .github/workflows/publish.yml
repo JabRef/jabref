@@ -3,6 +3,8 @@ name: Publish to maven central
 on:
   # On releases
   push:
+    branches:
+      - main
     tags:
       - '**'
 
