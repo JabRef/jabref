@@ -15,6 +15,7 @@ import org.jabref.support.DisabledOnCIServer;
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -86,7 +87,6 @@ class KeyBindingViewModelTest {
         viewModel.storeSettings();
 
         Optional<String> saved = prefsRepo.get(binding);
-        assertTrue(saved.isPresent());
-        assertTrue("ctrl+shift+L".equalsIgnoreCase(saved.get()));
+        assertEquals(Optional.of("ctrl+shift+L"), saved);
     }
 }
