@@ -81,5 +81,4 @@ class GetCitedWorks implements Callable<Integer> {
 
         return JabKit.outputEntries(argumentProcessor.cliPreferences, entries);
     }
-
 }
