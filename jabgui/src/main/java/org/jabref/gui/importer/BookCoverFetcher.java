@@ -66,7 +66,7 @@ public class BookCoverFetcher {
     private Optional<Path> findExistingImage(String name, Path directory) {
         for (ExternalFileType filetype : externalApplicationsPreferences.getExternalFileTypes()) {
             if (filetype.getMimeType().startsWith("image/")) {
-                Path path = directory.resolve(FileUtil.getValidName(name + "." + t.getExtension()));
+                Path path = directory.resolve(FileUtil.getValidFileName(name + "." + t.getExtension()));
                 if (Files.exists(path)) {
                     return Optional.of(path);
                 }
@@ -94,7 +94,7 @@ public class BookCoverFetcher {
 
             if (suggested.isPresent()) {
                 if (suggested.get().getMimeType().startsWith("image/")) {
-                    download.toFile(directory.resolve(FileUtil.getValidName(name + "." + suggested.get().getExtension())));
+                    download.toFile(directory.resolve(FileUtil.getValidFileName(name + "." + suggested.get().getExtension())));
                 }
             }
         } catch (FetcherException | MalformedURLException e) {
