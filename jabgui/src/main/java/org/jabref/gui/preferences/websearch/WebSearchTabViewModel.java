@@ -165,7 +165,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
-        Set<FetcherApiKey> savedApiKeys = preferences.getImporterPreferences().getApiKeys();
+        Set<FetcherApiKey> savedApiKeys = importerPreferences.getApiKeys();
         Set<String> enabledCatalogs = new HashSet<>(importerPreferences.getCatalogs());
 
         List<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
@@ -197,10 +197,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         }
 
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
-        apikeyPersistProperty.setValue(preferences.getImporterPreferences().shouldPersistCustomKeys());
+        apikeyPersistProperty.setValue(importerPreferences.shouldPersistCustomKeys());
 
         // Load custom URL templates from preferences if they exist
-        Map<String, String> savedTemplates = preferences.getImporterPreferences().getSearchEngineUrlTemplates();
+        Map<String, String> savedTemplates = importerPreferences.getSearchEngineUrlTemplates();
         if (!savedTemplates.isEmpty()) {
             searchEngines.clear();
             savedTemplates.forEach((name, url) -> searchEngines.add(new SearchEngineItem(name, url)));
@@ -240,9 +240,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                                      .toList();
 
         importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
-        preferences.getImporterPreferences().getApiKeys().clear();
+        importerPreferences.getApiKeys().clear();
         if (apikeyPersistAvailableProperty.get()) {
-            preferences.getImporterPreferences().getApiKeys().addAll(apiKeysToStore);
+            importerPreferences.getApiKeys().addAll(apiKeysToStore);
         }
 
         // Save custom URL templates to preferences
@@ -251,7 +251,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                                              SearchEngineItem::getName,
                                                              SearchEngineItem::getUrlTemplate
                                                      ));
-        preferences.getImporterPreferences().setSearchEngineUrlTemplates(templates);
+        importerPreferences.setSearchEngineUrlTemplates(templates);
     }
 
     public BooleanProperty enableWebSearchProperty() {
