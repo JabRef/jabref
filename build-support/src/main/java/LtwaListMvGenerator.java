@@ -8,8 +8,8 @@
 //DEPS org.jooq:jool:0.9.15
 //DEPS org.openjfx:javafx-base:24.0.2
 //DEPS org.jspecify:jspecify:1.0.0
-//DEPS org.slf4j:slf4j-api:2.0.13
-//DEPS org.slf4j:slf4j-simple:2.0.13
+//DEPS org.slf4j:slf4j-api:2.0.17
+//DEPS org.slf4j:slf4j-simple:2.0.17
 
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
