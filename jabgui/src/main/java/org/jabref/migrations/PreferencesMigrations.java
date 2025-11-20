@@ -483,6 +483,10 @@ public class PreferencesMigrations {
             // some versions stored the font size as double to the **same** key
             // since the preference store is type-safe, we need to add this workaround
             String fontSizeAsString = preferences.get(V5_0_MAIN_FONT_SIZE);
+            if (fontSizeAsString == null) {
+                return;
+            }
+
             int fontSizeAsInt = (int) Math.round(Double.parseDouble(fontSizeAsString));
             preferences.putInt(V5_0_MAIN_FONT_SIZE, fontSizeAsInt);
         } catch (ClassCastException e) {
