@@ -95,7 +95,7 @@ public class BookCoverFetcher {
                 try {
                     String possiblyNullMimeType = Files.probeContentType();
                     if (possiblyNullMimeType != null) {
-                        mime = Optional.of(possiblyNullMimeType)
+                        mime = Optional.of(possiblyNullMimeType);
                     }
                 } catch (IOException e) {
                     LOGGER.error("File said it existed, but probeContentType failed", e);
