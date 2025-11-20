@@ -65,7 +65,6 @@ public class BookCoverFetcher {
                 LOGGER.info("Downloading book cover url from {}", url);
 
                 URLDownload download = new URLDownload(url);
-
                 String json = download.asString();
                 Matcher matches = URL_JSON_PATTERN.matcher(json);
 
@@ -88,21 +87,33 @@ public class BookCoverFetcher {
             Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
             Path destination = subdirectory.get().resolve(extension.map(x -> name + "." + x).orElse(name));
 
-            String type = inferFileTypeFromExtension(externalApplicationsPreferences, extension);
             String link = directory.get().relativize(destination).toString();
+            
+            Optional<String> mime = Optional.empty();
 
-            if (Files.notExists(destination)) {
+            if (Files.exists(destination)) {
+                try {
+                    String possiblyNullMimeType = Files.probeContentType();
+                    if (possiblyNullMimeType != null) {
+                        mime = Optional.of(possiblyNullMimeType)
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("File said it existed, but probeContentType failed", e);
+                }
+            } else {
                 try {
                     LOGGER.info("Downloading cover image file from {}", url);
 
                     URLDownload download = new URLDownload(url);
-
+                    mime = download.getMimeType();
                     download.toFile(destination);
                 } catch (FetcherException | MalformedURLException e) {
                     LOGGER.error("Error while downloading cover image file, Storing as URL in file field", e);
                     return Optional.of(new LinkedFile("[cover]", url, ""));
                 }
             }
+            
+            String type = inferFileType(externalApplicationsPreferences, mime, extension);
             return Optional.of(new LinkedFile("[cover]", link, type, url));
         } else {
             LOGGER.warn("File directory not available while downloading cover image {}. Storing as URL in file field.", url);
@@ -128,7 +139,14 @@ public class BookCoverFetcher {
         return Optional.empty();
     }
 
-    private static String inferFileTypeFromExtension(ExternalApplicationsPreferences externalApplicationsPreferences, Optional<String> extension) {
-        return extension.map(x -> ExternalFileTypes.getExternalFileTypeByExt(x, externalApplicationsPreferences).map(t -> t.getName()).orElse("")).orElse("");
+    private static String inferFileType(ExternalApplicationsPreferences externalApplicationsPreferences, Optional<String> mime, Optional<String> extension) {
+        Optional<ExternalFileType> suggested = Optional.empty();
+        if (mime.isPresent()) {
+            suggested = ExternalFileTypes.getExternalFileTypeByMimeType(mime.get(), externalApplicationsPreferences);
+        }
+        if (suggested.isEmpty() && extension.isPresent()) {
+            Optional<ExternalFileType> suggested = ExternalFileTypes.getExternalFileTypeByExt(extension.get(), externalApplicationsPreferences);
+        }
+        return suggested.map(t -> t.getName()).orElse("");
     }
 }
