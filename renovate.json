@@ -7,7 +7,11 @@
   "prConcurrentLimit": 1,
   "regexManagers": [
     {
-      "managerFilePatterns": ".jbang/*.java",
+      "managerFilePatterns": [
+        ".jbang/*.java",
+        "build-support/src/main/java/*.java",
+        "jablib-examples/jbang/*.jbang"
+      ],
       "matchStrings": [
         "//DEPS (?<depName>\\S+):(\\${\\S+:(?<currentValue>[^ }]+)})",
         "//DEPS ((?<depName>\\S+:\\S+):(?<currentValue>[^$]\\S+))(\\@\\w+)?"

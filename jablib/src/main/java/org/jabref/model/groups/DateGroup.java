@@ -22,12 +22,6 @@ public class DateGroup extends AbstractGroup {
         this.date = date;
     }
 
-    static Optional<Integer> extractYear(Field field, BibEntry bibEntry) {
-        return bibEntry.getField(field)
-                       .flatMap(Date::parse)
-                       .flatMap(Date::getYear);
-    }
-
     static Optional<Date> extractDate(Field field, BibEntry entry) {
         boolean isCore =
                 (field == StandardField.DATE)
@@ -58,7 +52,7 @@ public class DateGroup extends AbstractGroup {
         Optional<Integer> y = d.getYear();
         return switch (numOfdashes) {
             case 0 ->
-                    y.map(val -> "%04d".formatted(val)); // "YYYY"
+                    y.map("%04d"::formatted); // "YYYY"
             case 1 -> { // "YYYY-MM"
                 if (d.getYear().isPresent() && d.getMonth().isPresent()) {
                     String out = "%04d-%02d".formatted(d.getYear().get(), d.getMonth().get().getNumber());

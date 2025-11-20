@@ -131,10 +131,9 @@ public class ImporterPreferences {
         this.persistCustomKeys.set(persistCustomKeys);
     }
 
-    /**
-     * @param name of the fetcher
-     * @return either a customized API key if configured or the default key
-     */
+    /// @param name of the fetcher
+    /// @return either a customized API key if configured or the default key
+    /// @implNote See `fetchers.md` for general information on fetchers.
     public Optional<String> getApiKey(String name) {
         return apiKeys.stream()
                       .filter(key -> key.getName().equalsIgnoreCase(name))

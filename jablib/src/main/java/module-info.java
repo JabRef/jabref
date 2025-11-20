@@ -68,6 +68,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.auxparser;
     exports org.jabref.logic.cleanup;
     exports org.jabref.logic.formatter;
+    exports org.jabref.logic.importer.fetcher.citation.crossref;
     exports org.jabref.logic.importer.fetcher.citation.semanticscholar;
     exports org.jabref.logic.formatter.bibtexfields;
     exports org.jabref.model.pdf;
@@ -155,9 +156,9 @@ open module org.jabref.jablib {
     // region: data mapping
     requires jdk.xml.dom;
     requires com.google.gson;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.dataformat.yaml;
-    requires com.fasterxml.jackson.datatype.jsr310;
+    requires tools.jackson.databind;
+    requires tools.jackson.dataformat.yaml;
+    requires tools.jackson.core;
     // endregion
 
     // region HTTP clients
@@ -257,7 +258,7 @@ open module org.jabref.jablib {
     requires cuid;
     requires dd.plist;
     requires io.github.adr;
-    requires textFormatter;
+    requires io.github.darvil.terminal.textformatter;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;
