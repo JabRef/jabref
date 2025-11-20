@@ -14,6 +14,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,6 +55,7 @@ class BibDefinitionProviderTest {
                         """,
                 importFormatPreferences);
         List<LinkedFile> files = parserResult.getDatabaseContext().getEntries().getFirst().getFiles();
+        assertEquals(2, files.size());
         assertNotNull(files.getLast().getLink());
     }
 }

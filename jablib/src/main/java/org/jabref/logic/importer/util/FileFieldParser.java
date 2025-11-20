@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.LinkedFile;
@@ -49,7 +50,7 @@ public class FileFieldParser {
     public static List<LinkedFile> parse(String value) {
         // We need state to have a more clean code. Thus, we instantiate the class and then return the result
         FileFieldParser fileFieldParser = new FileFieldParser(value);
-        return new ArrayList<>(fileFieldParser.parse().stream().map(LinkedFilePosition::linkedFile).toList());
+        return fileFieldParser.parse().stream().map(LinkedFilePosition::linkedFile).collect(Collectors.toList());
     }
 
     public static Map<LinkedFile, Range> parseToPosition(String value) {
