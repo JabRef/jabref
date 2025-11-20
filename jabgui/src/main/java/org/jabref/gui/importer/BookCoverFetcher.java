@@ -43,7 +43,7 @@ public class BookCoverFetcher {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
     }
 
-    public Optional<Path> getDownloadedCoverForEntry(BibEntry entry, Path directory) {
+    public Optional<Path> getDownloadedCoverForEntry(BibEntry entry, String location) {
         Optional<ISBN> isbn = entry.getISBN();
         if (isbn.isPresent()) {
             final String name = "isbn-" + isbn.get().asString();
@@ -52,13 +52,14 @@ public class BookCoverFetcher {
         return Optional.empty();
     }
 
-    public void downloadCoversForEntry(BibEntry entry, Path directory) {
+    public void downloadCoversForEntry(BibEntry entry, String location) {
+        Path directory = Path.of(location);
         Optional<ISBN> isbn = entry.getISBN();
         if (isbn.isPresent()) {
             final String name = "isbn-" + isbn.get().asString();
             if (findExistingImage(name, directory).isEmpty()) {
                 final String url = getSourceForIsbn(isbn.get());
-                Optional<LinkedFile> file = downloadCoverImage(url, name, directory);
+                downloadCoverImage(url, name, directory);
             }
         }
     }
@@ -66,7 +67,7 @@ public class BookCoverFetcher {
     private Optional<Path> findExistingImage(String name, Path directory) {
         for (ExternalFileType filetype : externalApplicationsPreferences.getExternalFileTypes()) {
             if (filetype.getMimeType().startsWith("image/")) {
-                Path path = directory.resolve(FileUtil.getValidFileName(name + "." + t.getExtension()));
+                Path path = directory.resolve(FileUtil.getValidFileName(name + "." + filetype.getExtension()));
                 if (Files.exists(path)) {
                     return Optional.of(path);
                 }

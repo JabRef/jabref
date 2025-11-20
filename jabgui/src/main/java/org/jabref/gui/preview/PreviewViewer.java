@@ -253,8 +253,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private Optional<String> getCoverImageURL() {
         if (entry != null) {
-            Path directory = Path.of(preferences.getFilePreferences().coversDownloadLocation());
-            return bookCoverFetcher.getDownloadedCoverForEntry(entry, location, preferences.getExternalApplicationsPreferences()).map(p -> p.toUri().toString());
+            String location = preferences.getFilePreferences().coversDownloadLocation();
+            return bookCoverFetcher.getDownloadedCoverForEntry(entry, location).map(p -> p.toUri().toString());
         }
         return Optional.empty();
     }

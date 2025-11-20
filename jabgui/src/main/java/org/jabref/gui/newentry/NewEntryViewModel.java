@@ -239,8 +239,8 @@ public class NewEntryViewModel {
 
     private BibEntry withCoversDownloaded(BibEntry entry) {
         if (preferences.getFilePreferences().shouldDownloadCovers()) {
-            Path directory = Path.of(preferences.getFilePreferences().coversDownloadLocation());
-            bookCoverFetcher.downloadCoversForEntry(entry, directory, preferences.getExternalApplicationsPreferences());
+            String location = preferences.getFilePreferences().coversDownloadLocation();
+            bookCoverFetcher.downloadCoversForEntry(entry, location);
         }
         return entry;
     }
@@ -255,7 +255,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            return fetcher.performSearchById(text).map(this::withCoversDownloaded);
+            return fetcher.performSearchById(text).map(e -> withCoversDownloaded(e));
         }
     }
 
@@ -270,7 +270,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            return fetcher.performSearchById(text).map(this::withCoversDownloaded);
+            return fetcher.performSearchById(text).map(e -> withCoversDownloaded(e));
         }
     }
 
