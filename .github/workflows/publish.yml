@@ -64,6 +64,11 @@ jobs:
           files: |
             jablib/src/main/java/**/*.java
             .github/workflows/publish.yml
+      - name: List changed files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          echo $ALL_CHANGED_FILES
 
   publish:
     name: jablib
