@@ -43,7 +43,7 @@ class ExternalLinkCreatorTest {
      */
     private boolean urlIsValid(String url) {
         try {
-            new URI(url);
+            URI.create(url);
             return true;
         } catch (Exception e) {
             return false;
