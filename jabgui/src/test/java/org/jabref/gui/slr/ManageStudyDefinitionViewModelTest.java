@@ -46,6 +46,7 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("DBLP", true),
                 new StudyCatalogItem("DOAB", false),
                 new StudyCatalogItem("DOAJ", false),
+                new StudyCatalogItem("Europe/PMCID", false),
                 new StudyCatalogItem("GVK", false),
                 new StudyCatalogItem("IEEEXplore", true),
                 new StudyCatalogItem("INSPIRE", false),
@@ -53,11 +54,13 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("LOBID", false),
                 new StudyCatalogItem("MathSciNet", false),
                 new StudyCatalogItem("Medline/PubMed", false),
+                new StudyCatalogItem("OpenAlex", false),
                 new StudyCatalogItem("ResearchGate", false),
                 new StudyCatalogItem("SAO/NASA ADS", false),
                 new StudyCatalogItem("ScholarArchive", false),
                 new StudyCatalogItem("SemanticScholar", false),
                 new StudyCatalogItem("Springer", true),
+                new StudyCatalogItem("Unpaywall", false),
                 new StudyCatalogItem("zbMATH", false)
         ), manageStudyDefinitionViewModel.getCatalogs());
     }
@@ -75,6 +78,7 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("DBLP", false),
                 new StudyCatalogItem("DOAB", false),
                 new StudyCatalogItem("DOAJ", false),
+                new StudyCatalogItem("Europe/PMCID", false),
                 new StudyCatalogItem("GVK", false),
                 new StudyCatalogItem("IEEEXplore", false),
                 new StudyCatalogItem("INSPIRE", false),
@@ -82,11 +86,13 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("LOBID", false),
                 new StudyCatalogItem("MathSciNet", false),
                 new StudyCatalogItem("Medline/PubMed", false),
+                new StudyCatalogItem("OpenAlex", false),
                 new StudyCatalogItem("ResearchGate", false),
                 new StudyCatalogItem("SAO/NASA ADS", false),
                 new StudyCatalogItem("ScholarArchive", false),
                 new StudyCatalogItem("SemanticScholar", false),
                 new StudyCatalogItem("Springer", false),
+                new StudyCatalogItem("Unpaywall", false),
                 new StudyCatalogItem("zbMATH", false)
         ), manageStudyDefinitionViewModel.getCatalogs());
     }

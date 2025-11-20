@@ -43,8 +43,8 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -288,12 +288,12 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             }
         });
 
+        CLIMessageHandler messageHandler = new CLIMessageHandler(uiMessageHandler, preferences);
         // stop in all cases, because the port might have changed
         remoteListenerServerManager.stop();
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences),
+            remoteListenerServerManager.openAndStart(messageHandler,
                     remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);

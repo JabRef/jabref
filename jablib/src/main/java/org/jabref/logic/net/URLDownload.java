@@ -39,14 +39,18 @@ import javax.net.ssl.SSLContext;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.http.SimpleHttpResponse;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +77,10 @@ public class URLDownload {
 
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
+
+    // In case Unpaywall should be supported, this should be non-null
+    private @Nullable ImporterPreferences importerPreferences;
+
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
     private SSLContext sslContext;
@@ -107,6 +115,11 @@ public class URLDownload {
             LOGGER.error("Could not initialize SSL context", e);
             sslContext = null;
         }
+    }
+
+    public URLDownload(@NonNull ImporterPreferences importerPreferences, @NonNull URL citationsUrl) {
+        this(citationsUrl);
+        this.importerPreferences = importerPreferences;
     }
 
     public URL getSource() {
@@ -373,6 +386,20 @@ public class URLDownload {
                     || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
+
+                if (newUrl.startsWith("https://api.unpaywall.org/")) {
+                    if (importerPreferences == null) {
+                        LOGGER.warn("importerPreferences not set, but call to Unpaywall");
+                    } else {
+                        Optional<String> apiKey = importerPreferences.getApiKey(UnpaywallFetcher.FETCHER_NAME);
+                        if (StringUtil.isBlank(apiKey)) { // No checking for enablement of Unpaywall, because used differently
+                            LOGGER.warn("No email configured for Unpaywall");
+                        } else {
+                            newUrl = newUrl.replace("<INSERT_YOUR_EMAIL>", apiKey.get());
+                        }
+                    }
+                }
+
                 // open the new connection again
                 try {
                     httpURLConnection.disconnect();

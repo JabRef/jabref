@@ -18,7 +18,7 @@ import org.jabref.model.entry.KeywordList;
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.eclipse.jgit.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

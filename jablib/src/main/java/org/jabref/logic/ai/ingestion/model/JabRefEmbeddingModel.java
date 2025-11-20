@@ -74,7 +74,7 @@ public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
         predictorProperty.set(Optional.empty());
 
         new UpdateEmbeddingModelTask(aiPreferences, predictorProperty)
-                .onSuccess(v -> {
+                .onSuccess(_ -> {
                     LOGGER.info("Embedding model was successfully updated");
                     errorWhileBuildingModel = "";
                     eventBus.post(new EmbeddingModelBuiltEvent());
@@ -82,7 +82,7 @@ public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
                 .onFailure(e -> {
                     LOGGER.error("An error occurred while building the embedding model", e);
                     notificationService.notify(Localization.lang("An error occurred while building the embedding model"));
-                    errorWhileBuildingModel = e.getMessage();
+                    errorWhileBuildingModel = e.getMessage() == null ? "" : e.getMessage();
                     eventBus.post(new EmbeddingModelBuildingErrorEvent());
                 })
                 .executeWith(taskExecutor);

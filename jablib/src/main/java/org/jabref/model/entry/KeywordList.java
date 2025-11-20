@@ -12,7 +12,8 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 
@@ -20,6 +21,7 @@ import org.jspecify.annotations.NonNull;
  * Represents a list of keyword chains.
  * For example, "Type > A, Type > B, Something else".
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class KeywordList implements Iterable<Keyword> {
 
     private final List<Keyword> keywordChains;

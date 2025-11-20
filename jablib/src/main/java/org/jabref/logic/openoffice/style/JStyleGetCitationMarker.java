@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -17,7 +18,6 @@ import org.jabref.model.openoffice.style.CitationMarkerEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNormEntry;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 import org.jabref.model.openoffice.style.PageInfo;
-import org.jabref.model.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 

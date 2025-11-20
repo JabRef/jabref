@@ -330,6 +330,24 @@ class BracketedPatternTest {
     }
 
     @ParameterizedTest
+    @CsvSource({
+            "'Newton', 'Isaac Newton'",
+            "'Maxwell', 'Isaac Newton and James Maxwell'",
+            "'Einstein', 'Isaac Newton and James Maxwell and Albert Einstein'",
+            "'Bohr', 'Isaac Newton and James Maxwell and Albert Einstein and N. Bohr'",
+            "'Aachen', 'Aachen'",
+            "'Berlin', 'Aachen and Berlin'",
+            "'Chemnitz', 'Aachen and Berlin and Chemnitz'",
+            "'Düsseldorf', 'Aachen and Berlin and Chemnitz and Düsseldorf'",
+            "'Essen', 'Aachen and Berlin and Chemnitz and Düsseldorf and Essen'",
+            "'Aalst', 'Wil van der Aalst'",
+            "'Lessen', 'Wil van der Aalst and Tammo van Lessen'"
+    })
+    void authLast(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.lastAuthor(list));
+    }
+
+    @ParameterizedTest
     @MethodSource
     void authShort(String expected, AuthorList list) {
         assertEquals(expected, BracketedPattern.authShort(list));

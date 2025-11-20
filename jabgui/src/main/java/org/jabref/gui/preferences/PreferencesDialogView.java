@@ -7,8 +7,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.TreeTableView;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -93,6 +97,14 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 preferencesContainer.setContent(preferencesTab.getBuilder());
                 preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
                 preferencesTab.getStyleClass().add("preferencesTab");
+                this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                        if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
+                            this.closeDialog();
+                            event.consume();
+                        }
+                    }
+                });
             } else {
                 preferencesContainer.setContent(null);
             }

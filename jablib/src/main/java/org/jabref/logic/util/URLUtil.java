@@ -104,12 +104,11 @@ public class URLUtil {
      * @return the {@link URL} object created from the string URL.
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
-    public static URL create(String url) throws MalformedURLException {
-        if (url == null || url.trim().isEmpty()) {
-            throw new IllegalArgumentException("URL must not be null or empty.");
-        }
-
+    public static @NonNull URL create(@NonNull String url) throws MalformedURLException {
         String trimmedUrl = url.trim();
+        if (trimmedUrl.isEmpty()) {
+            throw new IllegalArgumentException("URL must not be empty.");
+        }
 
         // Add https:// prefix to URLs starting with www. to make them absolute
         if (trimmedUrl.startsWith("www.")) {

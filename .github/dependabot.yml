@@ -3,13 +3,13 @@ updates:
   - package-ecosystem: gradle
     directories:
       - "/build-logic"   # versions of 3rd party gradle plugins
+      - "jablib"
       - "/versions"      # versions of 3rd party dependencies of all JabRef modules
       - "/"              # plugins
     schedule:
       interval: weekly
       day: sunday
-    labels:
-      - "dependencies"
+    labels: [ ]
     ignore:
       - dependency-name: com.microsoft.azure:applicationinsights-core
         versions:
@@ -22,10 +22,17 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-    labels:
-      - "dependencies"
+    labels: [ ]
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
       interval: weekly
       day: sunday
+    labels: [ ]
+  - package-ecosystem: "maven"
+    directories:
+      - "jablib-examples/maven3/doi-to-bibtex"
+    schedule:
+      interval: weekly
+      day: sunday
+    labels: [ ]

@@ -20,6 +20,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -30,9 +31,9 @@ import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
-import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -45,6 +46,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<EntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
+    private final StringProperty newCustomFieldToAdd = new SimpleStringProperty("");
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
@@ -55,6 +57,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     private final Validator entryTypeValidator;
     private final Validator fieldValidator;
+    private final Validator customFieldValidator;
     private final Set<Field> multiLineFields = new HashSet<>();
 
     Predicate<Field> isMultiline = field -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
@@ -72,12 +75,17 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
         entryTypeValidator = new FunctionBasedValidator<>(
                 entryTypeToAdd,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
+                input -> StringUtil.isNotBlank(input) && !input.contains(" "),
+                ValidationMessage.error(Localization.lang("Entry type cannot be empty and must not contain spaces.")));
         fieldValidator = new FunctionBasedValidator<>(
                 newFieldToAdd,
                 input -> (input != null) && StringUtil.isNotBlank(FieldTextMapper.getDisplayName(input)),
                 ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
+        customFieldValidator = new FunctionBasedValidator<>(
+                newCustomFieldToAdd,
+                input -> StringUtil.isNotBlank(input) && !input.contains(" "),
+                ValidationMessage.error(Localization.lang("Field cannot be empty and must not contain spaces."))
+        );
     }
 
     @Override
@@ -167,6 +175,26 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         newFieldToAddProperty().setValue(null);
     }
 
+    public void addNewCustomField() {
+        String fieldName = newCustomFieldToAdd.get().trim();
+        Field newField = new UnknownField(fieldName);
+
+        boolean fieldExists = displayNameExists(FieldTextMapper.getDisplayName(newField));
+
+        if (fieldExists) {
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Duplicate fields"),
+                    Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", FieldTextMapper.getDisplayName(newField)));
+        } else {
+            this.selectedEntryType.getValue().addField(new FieldViewModel(
+                    newField,
+                    FieldViewModel.Mandatory.REQUIRED,
+                    FieldPriority.IMPORTANT,
+                    false));
+        }
+        newCustomFieldToAdd.set("");
+    }
+
     public boolean displayNameExists(String displayName) {
         ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
         return entryFields.stream().anyMatch(fieldViewModel ->
@@ -202,11 +230,19 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         return this.fieldsForAdding;
     }
 
+    public StringProperty newCustomFieldToAddProperty() {
+        return this.newCustomFieldToAdd;
+    }
+
     public ValidationStatus entryTypeValidationStatus() {
         return entryTypeValidator.getValidationStatus();
     }
 
     public ValidationStatus fieldValidationStatus() {
         return fieldValidator.getValidationStatus();
+    }
+
+    public ValidationStatus customFieldValidationStatus() {
+        return customFieldValidator.getValidationStatus();
     }
 }

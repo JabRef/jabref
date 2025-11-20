@@ -53,7 +53,7 @@ public class SearchCitationsRelationsService {
                 !relationsRepository.containsReferences(referencing) ||
                         relationsRepository.isReferencesUpdatable(referencing);
         if (isFetchingAllowed) {
-            List<BibEntry> referencedBy = citationFetcher.searchCiting(referencing);
+            List<BibEntry> referencedBy = citationFetcher.getReferences(referencing);
             relationsRepository.insertReferences(referencing, referencedBy);
         }
         return relationsRepository.readReferences(referencing);
@@ -69,7 +69,7 @@ public class SearchCitationsRelationsService {
                 !relationsRepository.containsCitations(cited) ||
                         relationsRepository.isCitationsUpdatable(cited);
         if (isFetchingAllowed) {
-            List<BibEntry> citedBy = citationFetcher.searchCitedBy(cited);
+            List<BibEntry> citedBy = citationFetcher.getCitations(cited);
             relationsRepository.insertCitations(cited, citedBy);
         }
         return relationsRepository.readCitations(cited);
@@ -79,7 +79,7 @@ public class SearchCitationsRelationsService {
         boolean isFetchingAllowed = actualFieldValue.isEmpty() ||
                 relationsRepository.isCitationsUpdatable(citationCounted);
         if (isFetchingAllowed) {
-            Optional<Integer> citationCountResult = citationFetcher.searchCitationCount(citationCounted);
+            Optional<Integer> citationCountResult = citationFetcher.getCitationCount(citationCounted);
             return citationCountResult.orElse(0);
         }
         assert actualFieldValue.isPresent();

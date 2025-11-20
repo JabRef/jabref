@@ -27,7 +27,7 @@ import org.jspecify.annotations.NonNull;
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
     private final Multimap<Range, String> warnings;
-    private BibDatabase database;
+    @NonNull private BibDatabase database;
     private MetaData metaData;
     private Path file;
     private boolean invalid;
@@ -76,7 +76,7 @@ public class ParserResult {
         return fromErrorMessage(getErrorMessage(exception));
     }
 
-    public BibDatabase getDatabase() {
+    public @NonNull BibDatabase getDatabase() {
         return database;
     }
 
@@ -105,11 +105,11 @@ public class ParserResult {
      *
      * @param s String Warning text. Must be pre-translated. Only added if there isn't already a dupe.
      */
-    public void addWarning(String s) {
+    public void addWarning(@NonNull String s) {
         addWarning(Range.NULL_RANGE, s);
     }
 
-    public void addWarning(Range range, String s) {
+    public void addWarning(Range range, @NonNull String s) {
         warnings.put(range, s);
     }
 

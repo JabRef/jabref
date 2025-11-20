@@ -6,9 +6,12 @@ import java.util.Optional;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.net.URLDownload;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Searches web resources for bibliographic information.
  */
+@NullMarked
 public interface WebFetcher {
 
     /**
