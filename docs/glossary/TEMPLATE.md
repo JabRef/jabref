@@ -1,8 +1,3 @@
----
-parent: Glossary
-nav_order: 100 # remove this for the concrete term
----
-
 # {{Term}}
 
 **Synonyms:** {{List of synonyms}}
