@@ -85,6 +85,16 @@ class ExternalLinkCreatorTest {
             assertEquals(Optional.empty(), linkCreator.getShortScienceSearchURL(entry));
         }
 
+        @Test
+        void getShortScienceSearchURLRemovesLatexBraces() {
+            BibEntry entry = createEntryWithTitle("{The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages}");
+            Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
+
+            // URIBuilder encodes spaces as %20, braces should be gone
+            String expectedUrl = "https://www.shortscience.org/internalsearch?q=The%20Difference%20Between%20Graph-Based%20and%20Block-Structured%20Business%20Process%20Modelling%20Languages";
+            assertEquals(Optional.of(expectedUrl), url);
+        }
+
         @ParameterizedTest
         @CsvSource({
                 // Standard space: Java trim() removes it -> "q="
@@ -207,6 +217,7 @@ class ExternalLinkCreatorTest {
         void getGoogleScholarSearchURLLinksToSearchResults(String title, String expectedUrl) {
             BibEntry entry = createEntryWithTitle(title);
             Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
+
             assertEquals(Optional.of(expectedUrl), url);
             assertTrue(url.get().startsWith(DEFAULT_GOOGLE_SCHOLAR_URL));
         }
