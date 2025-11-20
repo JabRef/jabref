@@ -195,6 +195,16 @@ class ExternalLinkCreatorTest {
             assertEquals(Optional.empty(), linkCreator.getGoogleScholarSearchURL(entry));
         }
 
+        @Test
+        void getGoogleScholarSearchURLRemovesLatexBraces() {
+            // Equivalent test for Google Scholar
+            BibEntry entry = createEntryWithTitle("{The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages}");
+            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
+
+            String expectedUrl = "https://scholar.google.com/scholar?q=The%20Difference%20Between%20Graph-Based%20and%20Block-Structured%20Business%20Process%20Modelling%20Languages";
+            assertEquals(Optional.of(expectedUrl), url);
+        }
+
         @ParameterizedTest
         @CsvSource({
                 "' ', 'https://scholar.google.com/scholar?q='",
