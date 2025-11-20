@@ -93,7 +93,7 @@ public class BookCoverFetcher {
 
             if (Files.exists(destination)) {
                 try {
-                    String possiblyNullMimeType = Files.probeContentType();
+                    String possiblyNullMimeType = Files.probeContentType(destination);
                     if (possiblyNullMimeType != null) {
                         mime = Optional.of(possiblyNullMimeType);
                     }
