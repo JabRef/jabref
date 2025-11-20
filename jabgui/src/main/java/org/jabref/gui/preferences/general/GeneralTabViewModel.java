@@ -293,8 +293,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         remoteListenerServerManager.stop();
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            remoteListenerServerManager.openAndStart(messageHandler,
-                    remotePreferences.getPort());
+            remoteListenerServerManager.openAndStart(messageHandler, remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
             remoteListenerServerManager.stop();
@@ -327,7 +326,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         languageServerController.stop();
         if (enableLanguageServerProperty.getValue()) {
             remotePreferences.setEnableLanguageServer(true);
-            languageServerController.start(remotePreferences.getLanguageServerPort());
+            languageServerController.start(messageHandler, remotePreferences.getLanguageServerPort());
         } else {
             remotePreferences.setEnableLanguageServer(false);
             languageServerController.stop();
