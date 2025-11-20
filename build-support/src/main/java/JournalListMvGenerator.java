@@ -1,7 +1,7 @@
 //JAVA 24
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
-//DEPS com.h2database:h2:2.2.224
+//DEPS com.h2database:h2:2.4.240
 //DEPS org.antlr:antlr4-runtime:4.13.2
 //DEPS org.apache.commons:commons-csv:1.14.1
 //DEPS info.debatty:java-string-similarity:2.0.0
