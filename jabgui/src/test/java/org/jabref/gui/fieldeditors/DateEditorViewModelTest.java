@@ -1,27 +1,25 @@
 package org.jabref.gui.fieldeditors;
 
+import java.time.LocalDate;
+import javax.swing.undo.UndoManager;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.swing.undo.UndoManager;
-
-import java.time.LocalDate;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class DateEditorViewModelTest {
-
     private DateEditorViewModel viewModel;
     private StringConverter<TemporalAccessor> dateToStringConverter;
 
