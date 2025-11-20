@@ -17,11 +17,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DateTest {
+
     private static Stream<Arguments> validDates() {
         return Stream.of(
                 Arguments.of(LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 24), "2018-10-03T07:24"),
@@ -94,7 +93,7 @@ class DateTest {
         return Stream.of(
                 Arguments.of("", "input value not empty"),
                 Arguments.of("32-06-2014", "day of month exists [1]"),
-                Arguments.of("00-06-2014", "day of month exists [2]"),
+                Arguments.of("00-06-2014", "day of month exists[2]"),
                 Arguments.of("30-13-2014", "month exists [1]"),
                 Arguments.of("30-00-2014", "month exists [2]")
         );
@@ -124,12 +123,43 @@ class DateTest {
         assertThrows(NullPointerException.class, () -> Date.parse(null));
     }
 
-    // Date.parse() has been updated to defensively strip surrounding whitespace from input strings.
     @Test
     void parseShouldTrimValidDate() {
-        assertEquals(
-                Date.parse("2025-05-02"),
-                Date.parse(" 2025-05-02 ")
+        assertEquals(Date.parse("2025-05-02"), Date.parse(" 2025-05-02 "));
+    }
+
+
+    @Test
+    void normalizedRangeIsCorrect() {
+        Date d = new Date(
+                LocalDate.of(2020, 1, 1),
+                LocalDate.of(2020, 2, 1)
         );
+
+        assertEquals("2020-01-01/2020-02-01", d.getNormalized());
+    }
+
+    @Test
+    void normalizedSingleDateIsCorrect() {
+        Date d = new Date(LocalDate.of(2020, 1, 1));
+
+        assertEquals("2020-01-01", d.getNormalized());
+    }
+
+    @Test
+    void endDatePresentForRange() {
+        Date d = new Date(
+                LocalDate.of(2020, 1, 1),
+                LocalDate.of(2020, 12, 31)
+        );
+
+        assertTrue(d.getEndDate().isPresent());
+    }
+
+    @Test
+    void endDateEmptyForSingleDate() {
+        Date d = new Date(LocalDate.of(2020, 1, 1));
+
+        assertTrue(d.getEndDate().isEmpty());
     }
 }
