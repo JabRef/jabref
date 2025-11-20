@@ -113,6 +113,7 @@ class ExternalLinkCreatorTest {
             Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
 
             assertEquals(Optional.of(expectedUrl), url);
+            assertTrue(url.get().startsWith(DEFAULT_SHORTSCIENCE_URL));
         }
 
         @ParameterizedTest
@@ -178,6 +179,25 @@ class ExternalLinkCreatorTest {
             assertEquals(Optional.empty(), linkCreator.getGoogleScholarSearchURL(entry));
         }
 
+        @Test
+        void getGoogleScholarSearchURLReturnsEmptyOnEmptyString() {
+            BibEntry entry = createEntryWithTitle("");
+            assertEquals(Optional.empty(), linkCreator.getGoogleScholarSearchURL(entry));
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+                "' ', 'https://scholar.google.com/scholar?q='",
+                "'   ', 'https://scholar.google.com/scholar?q=%C2%A0%20%C2%A0'"
+        })
+        void getGoogleScholarSearchURLHandlesWhitespace(String title, String expectedUrl) {
+            BibEntry entry = createEntryWithTitle(title);
+            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
+
+            assertTrue(url.isPresent());
+            assertEquals(expectedUrl, url.get());
+        }
+
         @ParameterizedTest
         @CsvSource({
                 // Expect %20
@@ -188,6 +208,7 @@ class ExternalLinkCreatorTest {
             BibEntry entry = createEntryWithTitle(title);
             Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
             assertEquals(Optional.of(expectedUrl), url);
+            assertTrue(url.get().startsWith(DEFAULT_GOOGLE_SCHOLAR_URL));
         }
 
         @ParameterizedTest
