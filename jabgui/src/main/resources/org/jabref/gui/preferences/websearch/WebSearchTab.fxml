@@ -68,7 +68,7 @@
         <columnResizePolicy>
             <TableView
                     fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-        </columnResizePolicy>Expand commentComment on line R90ResolvedCode has comments. Press enter to view.
+        </columnResizePolicy>
     </TableView>
 
     <Label styleClass="sectionHeader" text="%Web search fetchers"/>
