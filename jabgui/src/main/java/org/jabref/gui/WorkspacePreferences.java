@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.util.List;
+import java.util.Locale;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -23,7 +24,6 @@ public class WorkspacePreferences {
     private final BooleanProperty themeSyncOs;
     private final BooleanProperty shouldOpenLastEdited;
     private final BooleanProperty showAdvancedHints;
-    private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
     private final BooleanProperty confirmHideTabBar;
     private final ObservableList<String> selectedSlrCatalogs;
@@ -36,7 +36,6 @@ public class WorkspacePreferences {
                                 boolean themeSyncOs,
                                 boolean shouldOpenLastEdited,
                                 boolean showAdvancedHints,
-                                boolean warnAboutDuplicatesInInspection,
                                 boolean confirmDelete,
                                 boolean confirmHideTabBar,
                                 List<String> selectedSlrCatalogs) {
@@ -48,10 +47,44 @@ public class WorkspacePreferences {
         this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);
         this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
-        this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
         this.confirmHideTabBar = new SimpleBooleanProperty(confirmHideTabBar);
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
+    }
+
+    /// Creates Object with default values
+    private WorkspacePreferences() {
+        this(
+                Language.getLanguageFor(Locale.getDefault().getLanguage()), // Default language
+                false,                                                      // Default font size override
+                9,                                                          // Default font size
+                9,                                                          // FixMe: main default and default default is weird
+                new Theme(Theme.BASE_CSS),                                  // Default theme
+                false,                                                      // Default theme sync with OS
+                true,                                                       // Default open last edited
+                true,                                                       // Default show advanced hints
+                true,                                                       // Default confirm delete
+                true,                                                       // Default confirm hide tab bar
+                List.of()                                                   // Default selected SLR catalogs
+        );
+    }
+
+    public static WorkspacePreferences getDefault() {
+        return new WorkspacePreferences();
+    }
+
+    public void setAll(WorkspacePreferences preferences) {
+        this.language.set(preferences.getLanguage());
+        this.shouldOverrideDefaultFontSize.set(preferences.shouldOverrideDefaultFontSize());
+        this.mainFontSize.set(preferences.getMainFontSize());
+        this.defaultFontSize.set(preferences.getDefaultFontSize());
+        this.theme.set(preferences.getTheme());
+        this.themeSyncOs.set(preferences.shouldThemeSyncOs());
+        this.shouldOpenLastEdited.set(preferences.shouldOpenLastEdited());
+        this.showAdvancedHints.set(preferences.shouldShowAdvancedHints());
+        this.confirmDelete.set(preferences.shouldConfirmDelete());
+        this.confirmHideTabBar.set(preferences.shouldHideTabBar());
+        this.selectedSlrCatalogs.setAll(preferences.getSelectedSlrCatalogs());
     }
 
     public Language getLanguage() {
@@ -140,18 +173,6 @@ public class WorkspacePreferences {
 
     public void setShowAdvancedHints(boolean showAdvancedHints) {
         this.showAdvancedHints.set(showAdvancedHints);
-    }
-
-    public boolean shouldWarnAboutDuplicatesInInspection() {
-        return warnAboutDuplicatesInInspection.get();
-    }
-
-    public BooleanProperty warnAboutDuplicatesInInspectionProperty() {
-        return warnAboutDuplicatesInInspection;
-    }
-
-    public void setWarnAboutDuplicatesInInspection(boolean warnAboutDuplicatesInInspection) {
-        this.warnAboutDuplicatesInInspection.set(warnAboutDuplicatesInInspection);
     }
 
     public boolean shouldConfirmDelete() {
