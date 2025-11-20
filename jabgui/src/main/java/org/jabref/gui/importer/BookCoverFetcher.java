@@ -81,7 +81,7 @@ public class BookCoverFetcher {
         return IMAGE_FALLBACK_URL + isbn.asString() + IMAGE_FALLBACK_SUFFIX;
     }
 
-    private static Optional<LinkedFile> tryToDownloadLinkedFile(ExternalApplicationsPreferences externalApplicationsPreferences, String url, Optional<Path> directory, String location, String name) {
+    private static Optional<LinkedFile> downloadLinkedFile(ExternalApplicationsPreferences externalApplicationsPreferences, String url, Optional<Path> directory, String location, String name) {
         Optional<Path> subdirectory = resolveRealSubdirectory(directory, location);
         if (subdirectory.isPresent()) {
             Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
