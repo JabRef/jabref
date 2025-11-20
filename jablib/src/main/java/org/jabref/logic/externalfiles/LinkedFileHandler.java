@@ -249,20 +249,20 @@ public class LinkedFileHandler {
         String filename = linkedFile.getFileName();
         String basename = filename.isEmpty() ? "file" : FileUtil.getBaseName(filename);
 
+        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
+
         // Cannot get extension from type because would need ExternalApplicationsPreferences, as type is stored as a localisation dependent string.
         if (extension.isEmpty()) {
             extension = FileUtil.getFileExtension(filename);
         }
 
-        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
-        return extension.map(x -> targetFileName + "." + x).orElse(targetFileName);
+        return FileUtil.getValidFileName(extension.map(x -> targetFileName + "." + x).orElse(targetFileName));
     }
 
     /**
      * Check to see if a file already exists in the target directory.  Search is not case sensitive.
      *
-     * @return First identified path that matches an existing file. This name can be used in subsequent calls to
-     * override the existing file.
+     * @return First identified path that matches an existing file. This name can be used in subsequent calls to override the existing file.
      */
     public Optional<Path> findExistingFile(LinkedFile linkedFile, BibEntry entry, String targetFileName) {
         // The .get() is legal without check because the method will always return a value.

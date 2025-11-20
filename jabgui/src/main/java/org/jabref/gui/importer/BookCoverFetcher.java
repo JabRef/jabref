@@ -1,8 +1,10 @@
 package org.jabref.gui.importer;
 
 import java.net.MalformedURLException;
+import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,7 +21,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.identifier.ISBN;
 
-import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,6 @@ public class BookCoverFetcher {
                 LOGGER.info("Downloading book cover url from {}", url);
 
                 URLDownload download = new URLDownload(url);
-                download.canBeReached();
 
                 String json = download.asString();
                 Matcher matches = URL_JSON_PATTERN.matcher(json);
@@ -75,7 +75,7 @@ public class BookCoverFetcher {
                         return coverUrlString;
                     }
                 }
-            } catch (MalformedURLException | FetcherException e) {
+            } catch (FetcherException | MalformedURLException e) {
                 LOGGER.error("Error while querying cover url, using fallback", e);
             }
         }
@@ -91,14 +91,14 @@ public class BookCoverFetcher {
             String type = inferFileTypeFromExtension(externalApplicationsPreferences, extension);
             String link = directory.get().relativize(destination).toString();
 
-            if (!destination.toFile().exists()) {
+            if (Files.notExists(destination)) {
                 try {
                     LOGGER.info("Downloading cover image file from {}", url);
+
                     URLDownload download = new URLDownload(url);
-                    download.canBeReached();
 
                     download.toFile(destination);
-                } catch (UnirestException | FetcherException | MalformedURLException e) {
+                } catch (FetcherException | MalformedURLException e) {
                     LOGGER.error("Error while downloading cover image file, Storing as URL in file field", e);
                     return Optional.of(new LinkedFile("[cover]", url, ""));
                 }
@@ -117,25 +117,15 @@ public class BookCoverFetcher {
         if (directory.isPresent()) {
             try {
                 final Path subdirectory = directory.get().resolve(location);
-                subdirectory.toFile().mkdirs();
-                if (subdirectory.toFile().exists()) {
+                Files.createDirectories(subdirectory);
+                if (Files.exists(subdirectory)) {
                     return Optional.of(subdirectory);
                 }
-            } catch (InvalidPathException e) {
+            } catch (IOException | InvalidPathException e) {
                 return Optional.empty();
             }
         }
         return Optional.empty();
-    }
-
-    private static String inferFileType(ExternalApplicationsPreferences externalApplicationsPreferences, Optional<String> mime, Optional<String> extension) {
-        if (mime.isPresent()) {
-            Optional<ExternalFileType> suggested = ExternalFileTypes.getExternalFileTypeByMimeType(mime.get(), externalApplicationsPreferences);
-            if (suggested.isPresent()) {
-                return suggested.get().getName();
-            }
-        }
-        return inferFileTypeFromExtension(externalApplicationsPreferences, extension);
     }
 
     private static String inferFileTypeFromExtension(ExternalApplicationsPreferences externalApplicationsPreferences, Optional<String> extension) {
