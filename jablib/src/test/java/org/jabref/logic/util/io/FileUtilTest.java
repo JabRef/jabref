@@ -241,12 +241,13 @@ class FileUtilTest {
     void getFileNameFromUrlsCorrectly(String file, String url) {
         assertEquals(file, FileUtil.getFileNameFromUrl(url), "from '" + url + "'");
     }
+
     private static Stream<Arguments> getFileNameFromUrlsCorrectly() {
         final Stream<String> urls = Stream.of("www.example.com/", "http://www.example.com/", "https://www.example.com/");
         final Stream<String> dirs = Stream.of("path/to/", "not\\a\\windows\\path/", "///", "");
         final Stream<String> files = Stream.of("file.pdf", "blank", "unknown.doc", "");
         final Stream<String> queries = Stream.of("", "?field=value", "?a=1&b=2", "?search=for+a+file");
-        return files.flatMap(file -> dirs.flatMap(dir -> urls.flatMap(url -> queries.flatMap(query -> Argument.of(file, url+dir+file+query)))));
+        return files.flatMap(file -> dirs.flatMap(dir -> urls.flatMap(url -> queries.flatMap(query -> Argument.of(file, url + dir + file + query)))));
     }
 
     @Test

@@ -44,12 +44,12 @@ class LinkedFileHandlerTest {
 
     @ParameterizedTest(name = "{1} to {2} should be {0}")
     @CsvSource(textBlock = """
-        newName.pdf, test.pdf, newName
-        newName.txt, test.pdf, newName.txt
-        newNameWithoutExtension, test, newNameWithoutExtension
-        newName.pdf, testFile, newName.pdf
-        newName..pdf, test.pdf, newName.
-    """)
+                newName.pdf, test.pdf, newName
+                newName.txt, test.pdf, newName.txt
+                newNameWithoutExtension, test, newNameWithoutExtension
+                newName.pdf, testFile, newName.pdf
+                newName..pdf, test.pdf, newName.
+            """)
     void renameFile(String expectedFileName, String originalFileName, String newFileName) throws IOException {
         final Path tempFile = tempFolder.resolve(originalFileName);
         Files.createFile(tempFile);
@@ -64,16 +64,16 @@ class LinkedFileHandlerTest {
 
     @ParameterizedTest(name = "{1} with {2} should be {0} with citation key 'asdf'")
     @CsvSource(textBlock = """
-        asdf.pdf, '', pdf
-        asdf.pdf, https://example.com/file.pdf, pdf
-        asdf.pdf, https://example.com/file.pdf?query=test, pdf
-        asdf.pdf, https://example.com/file.doc, pdf
-        asdf.pdf, https://example.com/file, pdf
-        asdf.pdf, https://example.com/file.pdf, ''
-        asdf.pdf, https://example.com/, pdf
-        asdf.pdf, path/to/file.pdf, pdf
-        asdf.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
-    """)
+                asdf.pdf, '', pdf
+                asdf.pdf, https://example.com/file.pdf, pdf
+                asdf.pdf, https://example.com/file.pdf?query=test, pdf
+                asdf.pdf, https://example.com/file.doc, pdf
+                asdf.pdf, https://example.com/file, pdf
+                asdf.pdf, https://example.com/file.pdf, ''
+                asdf.pdf, https://example.com/, pdf
+                asdf.pdf, path/to/file.pdf, pdf
+                asdf.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
+            """)
     void getSuggestedFileName(String expectedFileName, String link, String extension) {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
 
@@ -86,22 +86,22 @@ class LinkedFileHandlerTest {
 
     @ParameterizedTest(name = "{1} with {2} should be {0} with empty citation key")
     @CsvSource(textBlock = """
-        file.pdf, '', pdf
-        file.pdf, https://example.com/file.pdf, pdf
-        file.pdf, https://example.com/file.pdf?query=test, pdf
-        file.pdf, https://example.com/file.doc, pdf
-        file.pdf, https://example.com/file, pdf
-        file.pdf, https://example.com/file.pdf, ''
-        file.pdf, https://example.com/, pdf
-        file.pdf, path/to/file.pdf, pdf
-        other.pdf, https://example.com/other.pdf, pdf
-        other.pdf, https://example.com/other.pdf?query=test, pdf
-        other.pdf, https://example.com/other.doc, pdf
-        other.pdf, https://example.com/other, pdf
-        other.pdf, https://example.com/other.pdf, ''
-        other.pdf, path/to/other.pdf, pdf
-        OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
-    """)
+                file.pdf, '', pdf
+                file.pdf, https://example.com/file.pdf, pdf
+                file.pdf, https://example.com/file.pdf?query=test, pdf
+                file.pdf, https://example.com/file.doc, pdf
+                file.pdf, https://example.com/file, pdf
+                file.pdf, https://example.com/file.pdf, ''
+                file.pdf, https://example.com/, pdf
+                file.pdf, path/to/file.pdf, pdf
+                other.pdf, https://example.com/other.pdf, pdf
+                other.pdf, https://example.com/other.pdf?query=test, pdf
+                other.pdf, https://example.com/other.doc, pdf
+                other.pdf, https://example.com/other, pdf
+                other.pdf, https://example.com/other.pdf, ''
+                other.pdf, path/to/other.pdf, pdf
+                OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
+            """)
     void getSuggestedFileNameWithMissingKey(String expectedFileName, String link, String extension) {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
 
