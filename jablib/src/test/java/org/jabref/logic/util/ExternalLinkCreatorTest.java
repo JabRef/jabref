@@ -233,7 +233,7 @@ class ExternalLinkCreatorTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = { "!*'();:@&=+$,/?#[]", "100% Complete", "Question?" })
+        @ValueSource(strings = {"!*'();:@&=+$,/?#[]", "100% Complete", "Question?"})
         void getGoogleScholarSearchURLEncodesSpecialCharacters(String title) {
             BibEntry entry = createEntryWithTitle(title);
             Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
