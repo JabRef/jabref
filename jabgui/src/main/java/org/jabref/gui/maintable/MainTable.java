@@ -162,8 +162,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager,
-                        importHandler,
-                        preferences.getImporterPreferences()))
+                        importHandler))
                 .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS))
                 .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_NOT_GROUPS))
                 .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_GROUPS_NOT_SEARCH))

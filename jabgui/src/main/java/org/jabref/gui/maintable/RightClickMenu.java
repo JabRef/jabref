@@ -34,7 +34,6 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -61,8 +60,7 @@ public class RightClickMenu {
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,
                                      BibEntryTypesManager entryTypesManager,
-                                     ImportHandler importHandler,
-                                     ImporterPreferences importerPreferences) {
+                                     ImportHandler importHandler) {
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
 
