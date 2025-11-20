@@ -105,11 +105,10 @@ public class JabKitLauncher {
         }
     }
 
-    private static boolean hasCommandOption(CommandLine.Model.CommandSpec commandSpec, String optionName) {
-        return commandSpec.options().stream()
-                          .anyMatch(opt -> Arrays.asList(opt.names()).contains(optionName));
-    }
-
+    /**
+     * Applies appropriate usage footers to each subcommand based on their supported options.
+     * Distinguishes between input formats, output formats, and export formats.
+     */
     private static void applyUsageFooters(CommandLine commandLine,
                                           List<Pair<String, String>> inputFormats,
                                           List<Pair<String, String>> outputFormats,
@@ -149,6 +148,11 @@ public class JabKitLauncher {
                                      .map(WebFetcher::getName)
                                      .filter(name -> !"Search pre-configured".equals(name))
                                      .collect(Collectors.joining(", ")));
+    }
+
+    private static boolean hasCommandOption(CommandLine.Model.CommandSpec commandSpec, String optionName) {
+        return commandSpec.options().stream()
+                          .anyMatch(opt -> Arrays.asList(opt.names()).contains(optionName));
     }
 
     /// This needs to be called as early as possible. After the first log writing, it
