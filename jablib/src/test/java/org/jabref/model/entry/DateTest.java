@@ -128,7 +128,6 @@ class DateTest {
         assertEquals(Date.parse("2025-05-02"), Date.parse(" 2025-05-02 "));
     }
 
-
     @Test
     void normalizedRangeIsCorrect() {
         Date d = new Date(
