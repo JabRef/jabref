@@ -55,17 +55,17 @@ public class WorkspacePreferences {
     /// Creates Object with default values
     public WorkspacePreferences() {
         this(
-                Language.getLanguageFor(Locale.getDefault().getLanguage()),
-                false,
-                9,
-                9,
-                new Theme(Theme.BASE_CSS),
-                false,
-                true,
-                true,
-                true,
-                true,
-                List.of()
+                Language.getLanguageFor(Locale.getDefault().getLanguage()), // Default language
+                false,                                                      // Default font size override
+                9,                                                          // Default font size
+                9,                                                          // FixMe: main default and default default is weird
+                new Theme(Theme.BASE_CSS),                                  // Default theme
+                false,                                                      // Default theme sync with OS
+                true,                                                       // Default open last edited
+                true,                                                       // Default show advanced hints
+                true,                                                       // Default confirm delete
+                true,                                                       // Default confirm hide tab bar
+                List.of()                                                   // Default selected SLR catalogs
         );
     }
 
