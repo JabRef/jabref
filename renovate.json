@@ -1,12 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base"
-  ],
+  "extends": ["config:recommended"],
   "dependencyDashboard": false,
   "prConcurrentLimit": 1,
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "managerFilePatterns": [
         ".jbang/*.java",
         "build-support/src/main/java/*.java",
@@ -21,18 +20,19 @@
   ],
   "packageRules": [
     {
-      "managers": ["dockerfile", "gradle", "gradle-wrapper", "github-actions"],
+      "matchManagers": [
+        "dockerfile",
+        "gradle",
+        "gradle-wrapper",
+        "github-actions"
+      ],
       "enabled": false
     },
     {
       "groupName": "all dependencies",
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
       "matchDepTypes": ["*"]
-    }
-  ],
-  "maven": {
-    "repositories": [
-      "https://central.sonatype.com/repository/maven-snapshots/"
-    ]
-  }
+    },
+    {"allowedVersions": "!/ea/i", "matchPackageNames": ["org.openjfx:{/,}**"]}
+  ]
 }
