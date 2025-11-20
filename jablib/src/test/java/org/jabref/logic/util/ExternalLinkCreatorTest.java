@@ -88,7 +88,8 @@ class ExternalLinkCreatorTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"", " ", "   "}) // includes non-breaking space (U+00A0)
+        @ValueSource(strings = {"", " ", "   "})
+            // includes non-breaking space (U+00A0)
         void getShortScienceSearchURLHandlesEmptyOrWhitespaceTitles(String title) {
             BibEntry entry = createEntryWithTitle(title);
             Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
