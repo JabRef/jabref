@@ -363,10 +363,6 @@ public class FileUtil {
      * @return a suggested fileName
      */
     public static Optional<String> createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
-        if ("default".equals(fileNamePattern.trim())) {
-            return Optional.empty();
-        }
-
         String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
         if (targetName.isEmpty() || "-".equals(targetName)) {

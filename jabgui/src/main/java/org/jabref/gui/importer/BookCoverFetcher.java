@@ -86,7 +86,7 @@ public class BookCoverFetcher {
         }
     }
 
-    private Optional<String> inferExtensionOfImage(String url) {
+    private Optional<String> inferExtensionOfImage(Optional<String> mime, Optional<String> extension) {
         return mime.map(m -> ExternalFileTypes.getExternalFileTypeByMimeType(m, externalApplicationsPreferences))
                    .orElse(extension.flatMap(x -> ExternalFileTypes.getExternalFileTypeByExt(x, externalApplicationsPreferences)))
                    .filter(t -> t.getMimeType().startsWith("image/")).map(t -> t.getExtension());
