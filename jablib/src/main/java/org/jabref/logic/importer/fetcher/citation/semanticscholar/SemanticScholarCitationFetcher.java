@@ -49,7 +49,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     @Override
-    public @NonNull List<@NonNull BibEntry> searchCitedBy(@NonNull BibEntry entry) throws FetcherException {
+    public @NonNull List<@NonNull BibEntry> getCitations(@NonNull BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }
@@ -74,7 +74,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     @Override
-    public @NonNull List<@NonNull BibEntry> searchCiting(@NonNull BibEntry entry) throws FetcherException {
+    public @NonNull List<@NonNull BibEntry> getReferences(@NonNull BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }
@@ -115,7 +115,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     @Override
-    public Optional<Integer> searchCitationCount(BibEntry entry) throws FetcherException {
+    public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return Optional.empty();
         }
