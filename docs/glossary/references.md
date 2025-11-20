@@ -1,3 +1,7 @@
+---
+parent: Glossary
+---
+
 # References
 
 **Synonyms:** Bibliographic References, Reference List, Literature, Literature List, Works Cited

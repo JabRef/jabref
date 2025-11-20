@@ -2332,21 +2332,21 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Map<String, String> getDefaultFetcherKeys() {
-        // TODO: We do not want to have a depdency on afterburner.fx (because of huge JavaFX depdencny tree). - Should be rewritten to new DI framework
+        // We do not want to have a dependency on afterburner.fx (because of huge JavaFX dependency tree). Therefore, we do not use following line, but instantiate "BuildInfo" directly.
         // BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        // if (buildInfo == null) {
+        //     LOGGER.warn("Could not instantiate BuildInfo.");
+        //     return Map.of();
+        // }
         BuildInfo buildInfo = new BuildInfo();
-        if (buildInfo == null) {
-            LOGGER.warn("Could not instantiate BuildInfo.");
-            return Map.of();
-        }
 
         Map<String, String> keys = new HashMap<>();
-        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
         keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
         keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);
-        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         // SpringerLink uses the same key and fetcher name as SpringerFetcher
+        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
 
         return keys;
     }
