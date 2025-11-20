@@ -244,8 +244,25 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     try {
                         directoryStructureRoot.addDescendants();
                         List<Path> allPDFs = directoryStructureRoot.getAllPDFs();
-                        ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
-                        importHandler.importFilesInBackground(allPDFs, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
+                        int nbPDFs = allPDFs.size();
+                        if (nbPDFs > 0) {
+                            ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
+                            importHandler.importFilesInBackground(allPDFs, database, preferences.getFilePreferences(), TransferMode.LINK)
+                                         .onSuccess(_ -> {
+                                             selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
+                                             if (nbPDFs == 1) {
+                                                 dialogService.notify(Localization.lang("Successfully imported %0 PDF.", nbPDFs));
+                                             } else {
+                                                 dialogService.notify(Localization.lang("Successfully imported %0 PDFs.", nbPDFs));
+                                             }
+                                         }).onFailure(_ -> {
+                                             if (nbPDFs == 1) {
+                                                 dialogService.notify(Localization.lang("Failed to import %0 PDF.", nbPDFs));
+                                             } else {
+                                                 dialogService.notify(Localization.lang("Failed to import %0 PDFs.", nbPDFs));
+                                             }
+                                         }).executeWith(taskExecutor);
+                        }
                     } catch (IOException e) {
                         dialogService.showErrorDialogAndWait(e.getMessage(), Localization.lang("Cannot create directory structure."));
                     }
