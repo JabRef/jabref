@@ -5,7 +5,7 @@
 //DEPS org.antlr:antlr4-runtime:4.13.2
 //DEPS org.apache.commons:commons-csv:1.14.1
 //DEPS info.debatty:java-string-similarity:2.0.0
-//DEPS org.jooq:jool:0.9.14
+//DEPS org.jooq:jool:0.9.15
 //DEPS org.openjfx:javafx-base:24.0.1
 //DEPS org.slf4j:slf4j-api:2.0.13
 //DEPS org.slf4j:slf4j-simple:2.0.13
