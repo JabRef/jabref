@@ -1,10 +1,10 @@
 package org.jabref.gui.importer;
 
-import java.net.MalformedURLException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
