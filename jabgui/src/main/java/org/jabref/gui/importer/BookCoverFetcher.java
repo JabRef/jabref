@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides functions for downloading book covers for new entries.
+ * Provides functions for downloading and retrieving book covers for entries.
  */
 public class BookCoverFetcher {
 
@@ -37,28 +37,68 @@ public class BookCoverFetcher {
     private static final String IMAGE_FALLBACK_URL = "https://covers.openlibrary.org/b/isbn/";
     private static final String IMAGE_FALLBACK_SUFFIX = "-L.jpg";
 
-    public static Optional<BibEntry> withAttachedCoverFileIfExists(Optional<BibEntry> possible, BibDatabaseContext databaseContext, FilePreferences filePreferences, ExternalApplicationsPreferences externalApplicationsPreferences) {
-        if (possible.isPresent() && filePreferences.shouldDownloadCovers()) {
-            BibEntry entry = possible.get();
-            Optional<ISBN> isbn = entry.getISBN();
-            if (isbn.isPresent()) {
-                final String url = getCoverImageURLForIsbn(isbn.get());
-                final Optional<Path> directory = databaseContext.getFirstExistingFileDir(filePreferences);
-
-                // Cannot use pattern for name, as auto-generated citation keys aren't available where function is used (org.jabref.gui.newentry.NewEntryViewModel#withCoversAttached)
-                final String name = "isbn-" + isbn.get().asString();
-
-                Optional<LinkedFile> file = tryToDownloadLinkedFile(externalApplicationsPreferences, url, directory, filePreferences.coversDownloadLocation().trim(), name);
-                if (file.isPresent()) {
-                    entry.addFile(file.get());
-                }
-            }
-            possible = Optional.of(entry);
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    
+    public BookCoverFetcher(ExternalApplicationsPreferences externalApplicationsPreferences) {
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
+    }
+    
+    public Optional<Path> getDownloadedCoverForEntry(BibEntry entry, Path directory) {
+        Optional<ISBN> isbn = entry.getISBN();
+        if (isbn.isPresent()) {
+            final String name = "isbn-" + isbn.get().asString();
+            return findFileByNameWithAnyExtension(name, directory);
         }
-        return possible;
+        return Optional.empty();
+    }
+    
+
+    public void downloadCoversForEntry(BibEntry entry, Path directory) {
+        Optional<ISBN> isbn = entry.getISBN();
+        if (isbn.isPresent()) {
+            final String name = "isbn-" + isbn.asString();
+            if (findFileByNameWithAnyExtension(name, directory).isEmpty()) {
+                final String url = getSourceForIsbn(isbn);
+                Optional<LinkedFile> file = downloadCoverImage(url, name, directory);
+            }
+        }
     }
 
-    private static String getCoverImageURLForIsbn(ISBN isbn) {
+    private Optional<Path> findFileByNameWithAnyExtension(String name, Path directory)
+        return externalApplicationsPreferences.getExternalFileTypes().stream()
+            .filter(t -> t.getMimeType().startsWith("image/"))
+            .map(t -> directory.resolve(FileUtil.getValidName(name + "." + t.getExtension())))
+            .filter(Files::exists).findFirst();
+    }
+
+    private void downloadCoverImage(String url, String name, Path directory) {
+        Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
+
+        try {
+            LOGGER.info("Downloading cover image file from {}", url);
+
+            URLDownload download = new URLDownload(url);
+            Optional<String> mime = download.getMimeType();
+
+            Optional<ExternalFileType> suggested = Optional.empty();
+            if (mime.isPresent()) {
+                suggested = ExternalFileTypes.getExternalFileTypeByMimeType(mime.get(), externalApplicationsPreferences);
+            }
+            if (suggested.isEmpty() && extension.isPresent()) {
+                suggested = ExternalFileTypes.getExternalFileTypeByExt(extension.get(), externalApplicationsPreferences);
+            }
+
+            if (suggested.isPresent()) {
+                if (suggested.get().getMimeType().startsWith("image/")) {
+                    download.toFile(directory.resolve(FileUtil.getValidName(name + "." + suggested.get().getExtension())));
+                }
+            }
+        } catch (FetcherException | MalformedURLException e) {
+            LOGGER.error("Error while downloading cover image file", e);
+        }
+    }
+
+    private static String getSourceForIsbn(ISBN isbn) {
         if (isbn.isIsbn13()) {
             String url = URL_FETCHER_URL + isbn.asString();
             try {
@@ -79,72 +119,5 @@ public class BookCoverFetcher {
             }
         }
         return IMAGE_FALLBACK_URL + isbn.asString() + IMAGE_FALLBACK_SUFFIX;
-    }
-
-    private static Optional<LinkedFile> downloadLinkedFile(ExternalApplicationsPreferences externalApplicationsPreferences, String url, Optional<Path> directory, String location, String name) {
-        Optional<Path> subdirectory = resolveRealSubdirectory(directory, location);
-        if (subdirectory.isPresent()) {
-            Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
-            Path destination = subdirectory.get().resolve(extension.map(x -> name + "." + x).orElse(name));
-
-            String link = directory.get().relativize(destination).toString();
-            
-            Optional<String> mime = Optional.empty();
-
-            if (Files.exists(destination)) {
-                try {
-                    String possiblyNullMimeType = Files.probeContentType(destination);
-                    if (possiblyNullMimeType != null) {
-                        mime = Optional.of(possiblyNullMimeType);
-                    }
-                } catch (IOException e) {
-                    LOGGER.error("File said it existed, but probeContentType failed", e);
-                }
-            } else {
-                try {
-                    LOGGER.info("Downloading cover image file from {}", url);
-
-                    URLDownload download = new URLDownload(url);
-                    mime = download.getMimeType();
-                    download.toFile(destination);
-                } catch (FetcherException | MalformedURLException e) {
-                    LOGGER.error("Error while downloading cover image file, Storing as URL in file field", e);
-                    return Optional.of(new LinkedFile("[cover]", url, ""));
-                }
-            }
-            
-            String type = inferFileType(externalApplicationsPreferences, mime, extension);
-            return Optional.of(new LinkedFile("[cover]", link, type, url));
-        } else {
-            LOGGER.warn("File directory not available while downloading cover image {}. Storing as URL in file field.", url);
-            return Optional.of(new LinkedFile("[cover]", url, ""));
-        }
-    }
-
-    private static Optional<Path> resolveRealSubdirectory(Optional<Path> directory, String location) {
-        if ("".equals(location)) {
-            return directory;
-        }
-        if (directory.isPresent()) {
-            try {
-                final Path subdirectory = directory.get().resolve(location);
-                Files.createDirectories(subdirectory);
-                return Optional.of(subdirectory);
-            } catch (IOException | InvalidPathException e) {
-                return Optional.empty();
-            }
-        }
-        return Optional.empty();
-    }
-
-    private static String inferFileType(ExternalApplicationsPreferences externalApplicationsPreferences, Optional<String> mime, Optional<String> extension) {
-        Optional<ExternalFileType> suggested = Optional.empty();
-        if (mime.isPresent()) {
-            suggested = ExternalFileTypes.getExternalFileTypeByMimeType(mime.get(), externalApplicationsPreferences);
-        }
-        if (suggested.isEmpty() && extension.isPresent()) {
-            suggested = ExternalFileTypes.getExternalFileTypeByExt(extension.get(), externalApplicationsPreferences);
-        }
-        return suggested.map(t -> t.getName()).orElse("");
     }
 }

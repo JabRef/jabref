@@ -87,6 +87,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
 
+    private final BookCoverFetcher bookCoverFetcher;
+
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
@@ -110,6 +112,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
+
+        this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -229,9 +233,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void setPreviewText(String text) {
         String coverIfAny = "";
-        Optional<String> image = getCoverImageURI();
+        Optional<String> image = getCoverImageURL();
         if (image.isPresent()) {
-            coverIfAny = "<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>".formatted(image.get());
+            coverIfAny = "<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>".formatted(image);
         }
 
         layoutText = """
@@ -245,54 +249,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setHvalue(0);
     }
 
-    private Optional<String> getCoverImageURI() {
-        if (shouldShowCoverImage()) {
-            String nameFromFormat = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileNamePattern()).orElse("cover");
-
-            List<LinkedFile> linkedFiles = entry.getFiles();
-            for (LinkedFile file : linkedFiles) {
-                // matches images that are either named according to the preferred file name format
-                // or images with case-insensitive "[cover]" in their description, to allow using any image regardless of name
-
-                if (file.getDescription().toLowerCase().contains("[cover]") || isFileTypeAValidCoverImage(file.getFileType()) && (FileUtil.getBaseName(file.getFileName()).equals(nameFromFormat))) {
-                    return file.getURI(databaseContext, preferences.getFilePreferences());
-                }
-            }
+    private Optional<String> getCoverImageURL() {
+        if (entry != null) {
+            Path directory = Path.of(preferences.getFilePreferences().coversDownloadLocation());
+            return bookCoverFetcher.getDownloadedCoverForEntry(entry, location, preferences.getExternalApplicationsPreferences()).map(p -> p.toUri().toString());
         }
         return Optional.empty();
-    }
-
-    private boolean shouldShowCoverImage() {
-        // entry is sometimes null when setPreviewText is called
-        if (entry == null) {
-            return false;
-        }
-
-        return switch (entry.getType()) {
-            case StandardEntryType.Book,
-                 StandardEntryType.Booklet,
-                 StandardEntryType.BookInBook,
-                 StandardEntryType.InBook,
-                 StandardEntryType.MvBook ->
-                    true;
-            default ->
-                    false;
-        };
-    }
-
-    private boolean isFileTypeAValidCoverImage(String fileType) {
-        // to allow url links
-        if ("".equals(fileType)) {
-            return true;
-        }
-
-        // needed because type names are stored in a localization dependent way
-        Optional<ExternalFileType> actualFileType = ExternalFileTypes.getExternalFileTypeByName(fileType, preferences.getExternalApplicationsPreferences());
-
-        if (actualFileType.isPresent()) {
-            return actualFileType.get().getMimeType().startsWith("image/");
-        }
-        return false;
     }
 
     private void highlightLayoutText() {

@@ -68,6 +68,8 @@ public class NewEntryViewModel {
     private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
 
+    private final BookCoverFetcher bookCoverFetcher;
+
     private final BooleanProperty executing;
     private final BooleanProperty executedSuccessfully;
 
@@ -105,6 +107,8 @@ public class NewEntryViewModel {
         this.taskExecutor = taskExecutor;
         this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+
+        this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
         executing = new SimpleBooleanProperty(false);
         executedSuccessfully = new SimpleBooleanProperty(false);
@@ -236,8 +240,12 @@ public class NewEntryViewModel {
         return bibtexTextValidator.getValidationStatus().validProperty();
     }
 
-    private Optional<BibEntry> withCoversAttached(Optional<BibEntry> entry) {
-        return BookCoverFetcher.withAttachedCoverFileIfExists(entry, libraryTab.getBibDatabaseContext(), preferences.getFilePreferences(), preferences.getExternalApplicationsPreferences());
+    private BibEntry withCoversDownloaded(BibEntry entry) {
+        if (preferences.getFilePreferences().shouldDownloadCovers()) {
+            Path directory = Path.of(preferences.getFilePreferences().coversDownloadLocation());
+            bookCoverFetcher.downloadCoversForEntry(entry, directory, preferences.getExternalApplicationsPreferences());
+        }
+        return entry;
     }
 
     private class WorkerLookupId extends Task<Optional<BibEntry>> {
@@ -250,7 +258,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            return withCoversAttached(fetcher.performSearchById(text));
+            return fetcher.performSearchById(text).map(this::withCoversDownloaded);
         }
     }
 
@@ -265,7 +273,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            return withCoversAttached(fetcher.performSearchById(text));
+            return fetcher.performSearchById(text).map(this::withCoversDownloaded);
         }
     }
 

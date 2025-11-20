@@ -598,7 +598,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(CREATE_BACKUP, Boolean.TRUE);
 
         defaults.put(COVER_IMAGE_DOWNLOAD, Boolean.TRUE);
-        defaults.put(COVER_IMAGE_LOCATION, "covers");
+        defaults.put(COVER_IMAGE_LOCATION, getDefaultPath().resolve("covers").toString());
 
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);

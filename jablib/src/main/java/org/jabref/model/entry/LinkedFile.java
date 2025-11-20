@@ -248,19 +248,19 @@ public class LinkedFile implements Serializable {
         }
     }
 
-    public Optional<String> getURI(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    /**
+     * Tries to associate the file with a URL.
+     * In case of an online link, uses the referenced URL directly.
+     * In case of a file link, searches for the file's path, which may not exist.
+     *
+     * @return String of the URL that points to the file
+     */
+    public Optional<String> getURL(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> dirs = databaseContext.getFileDirectories(filePreferences);
         return getURI(dirs);
     }
 
-    /**
-     * Tries to associate the file with a URI.
-     * In case of an online link, uses the referenced URL directly.
-     * In case of a file link, searches for the file's path, which may not exist.
-     *
-     * @return String of the URI that points to the file
-     */
-    public Optional<String> getURI(List<Path> directories) {
+    private Optional<String> getURL(List<Path> directories) {
         String linkedName = link.get();
         if (isOnlineLink(linkedName)) {
             if (linkedName.startsWith("www.")) {
