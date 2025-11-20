@@ -52,7 +52,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
-    private final BooleanProperty shouldkeepDownloadUrl = new SimpleBooleanProperty();
+    private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
 
     private final ListProperty<PlainCitationParserChoice> plainCitationParsers =
             new SimpleListProperty<>(FXCollections.observableArrayList(PlainCitationParserChoice.values()));
@@ -151,7 +151,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         enableWebSearchProperty.setValue(importerPreferences.areImporterEnabled());
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
-        shouldkeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
+        shouldKeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
         addImportedEntries.setValue(libraryPreferences.isAddImportedEntriesEnabled());
         addImportedEntriesGroupName.setValue(libraryPreferences.getAddImportedEntriesGroupName());
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
@@ -210,7 +210,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
-        filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
+        filePreferences.setKeepDownloadUrl(shouldKeepDownloadUrl.getValue());
         libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
         if (addImportedEntriesGroupName.getValue().isEmpty() || addImportedEntriesGroupName.getValue().startsWith(" ")) {
             libraryPreferences.setAddImportedEntriesGroupName(Localization.lang("Imported entries"));
@@ -301,7 +301,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     }
 
     public BooleanProperty shouldKeepDownloadUrl() {
-        return shouldkeepDownloadUrl;
+        return shouldKeepDownloadUrl;
     }
 
     public ReadOnlyBooleanProperty apiKeyPersistAvailable() {
