@@ -25,7 +25,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377)
 - Added support for BibLaTeX date ranges and improved normalization in the date editor. [#14289](https://github.com/JabRef/jabref/pull/14289)
 
-
 ### Changed
 
 - We replaced the standard ComboBox with a SearchableComboBox and added a free text field in custom Entry Types [#14082](https://github.com/JabRef/jabref/issues/14082)
