@@ -56,12 +56,12 @@ import org.slf4j.LoggerFactory;
 
 /// ## Example
 ///
-/// ```java
+/// ``java
 /// URLDownload dl = new URLDownload(URL);
 /// String content = dl.asString(ENCODING);
 /// dl.toFile(Path);              // available in FILE
 /// String contentType = dl.getMimeType();
-/// ```
+/// ``
 ///
 /// Almost every call to a public method creates a new HTTP connection
 /// (except for {@link #asString(Charset, URLConnection) asString},
