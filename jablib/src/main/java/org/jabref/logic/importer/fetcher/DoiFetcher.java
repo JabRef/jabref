@@ -142,11 +142,10 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
         URLDownload download = getUrlDownload(doiURL);
         download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
+        HttpURLConnection connection = (HttpURLConnection) download.openConnection();
+        InputStream inputStream = download.asInputStream(connection);
 
         BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
-
-        HttpURLConnection connection = (HttpURLConnection) download.openConnection();
-        InputStream inputStream = download.asInputStream();
         try {
             fetchedEntry = bibtexParser.parseEntries(inputStream).stream().findFirst();
         } catch (ParseException e) {
@@ -220,7 +219,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public Optional<String> getAgency(DOI doi) throws FetcherException, MalformedURLException {
         Optional<String> agency = Optional.empty();
         try {
-            URLDownload download = getUrlDownload(URLUtil.create(DOI.AGENCY_RESOLVER + "/" + URLEncoder.encode(doi.asString(),
+            URLDownload download = getUrlDownload(
+                    URLUtil.create(DOI.AGENCY_RESOLVER + "/" + URLEncoder.encode(doi.asString(),
                     StandardCharsets.UTF_8)));
             JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
             if (response != null) {
