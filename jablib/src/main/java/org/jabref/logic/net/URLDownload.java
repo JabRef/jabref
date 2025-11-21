@@ -139,7 +139,7 @@ public class URLDownload {
                 // @formatter:on
                 retries++;
                 HttpResponse<String> response = Unirest.head(urlToCheck).asString();
-                // Check if we have redirects, e.g. arxiv will give otherwise content type html for the original url
+                // Check if we have redirects, e.g. arxiv will give otherwise content type HTML for the original url
                 // We need to do it "manually", because ".followRedirects(true)" only works for GET not for HEAD
                 locationHeader = response.getHeaders().getFirst("location");
                 if (!StringUtil.isNullOrEmpty(locationHeader)) {
