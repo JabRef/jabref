@@ -1,7 +1,8 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,45 +15,39 @@ class TrimWhitespaceFormatterTest {
         formatter = new TrimWhitespaceFormatter();
     }
 
-    @Test
-    void removeHorizontalTabulations() {
-        assertEquals("whitespace", formatter.format("\twhitespace"));
-        assertEquals("whitespace", formatter.format("whitespace\t"));
-        assertEquals("whitespace", formatter.format("\twhitespace\t\t"));
-    }
+    @ParameterizedTest
+    @ValueSource(strings = {
+            // remove horizontal tabulation
+            "\twhitespace",
+            "whitespace\t",
+            "\twhitespace\t\t",
 
-    @Test
-    void removeLineFeeds() {
-        assertEquals("whitespace", formatter.format("\nwhitespace"));
-        assertEquals("whitespace", formatter.format("whitespace\n"));
-        assertEquals("whitespace", formatter.format("\nwhitespace\n\n"));
-    }
+            // remove line feeds
+            "\nwhitespace",
+            "whitespace\n",
+            "\nwhitespace\n\n",
 
-    @Test
-    void removeFormFeeds() {
-        assertEquals("whitespace", formatter.format("\fwhitespace"));
-        assertEquals("whitespace", formatter.format("whitespace\f"));
-        assertEquals("whitespace", formatter.format("\fwhitespace\f\f"));
-    }
+            // remove form feeds
+            "\fwhitespace",
+            "whitespace\f",
+            "\fwhitespace\f\f",
 
-    @Test
-    void removeCarriageReturnFeeds() {
-        assertEquals("whitespace", formatter.format("\rwhitespace"));
-        assertEquals("whitespace", formatter.format("whitespace\r"));
-        assertEquals("whitespace", formatter.format("\rwhitespace\r\r"));
-    }
+            // remove carriage returns
+            "\rwhitespace",
+            "whitespace\r",
+            "\rwhitespace\r\r",
 
-    @Test
-    void removeSeparatorSpaces() {
-        assertEquals("whitespace", formatter.format(" whitespace"));
-        assertEquals("whitespace", formatter.format("whitespace "));
-        assertEquals("whitespace", formatter.format(" whitespace  "));
-    }
+            // remove spaces
+            " whitespace",
+            "whitespace ",
+            " whitespace  ",
 
-    @Test
-    void removeMixedWhitespaceChars() {
-        assertEquals("whitespace", formatter.format(" \r\t\fwhitespace"));
-        assertEquals("whitespace", formatter.format("whitespace \n \r"));
-        assertEquals("whitespace", formatter.format("   \f\t whitespace  \r \n"));
+            // remove combinations
+            " \r\t\fwhitespace",
+            "whitespace \n \r",
+            "   \f\t whitespace  \r \n",
+    })
+    void removeBlankCharacters(String expression) {
+        assertEquals("whitespace", formatter.format(expression));
     }
 }
