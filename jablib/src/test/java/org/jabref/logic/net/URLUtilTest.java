@@ -163,4 +163,116 @@ class URLUtilTest {
                 URLUtil.create("http://[invalid-url]"));
         assertTrue(exception.getMessage().contains("Invalid URI"));
     }
+
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                http://www.google.com
+                https://www.google.com
+                http://example.com
+                https://example.com
+                http://example.com/path
+                https://example.com/path/to/resource
+                http://example.com:8080
+                https://example.com:443/path?query=value
+                HTTP://EXAMPLE.COM
+                HTTPS://EXAMPLE.COM
+                '  http://example.com  '
+                '  https://example.com  '
+                """
+    )
+    void isValidHttpUrlShouldAcceptValidHttpUrls(String url) {
+        assertTrue(URLUtil.isValidHttpUrl(url));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                ftp://example.com
+                file:///path/to/file
+                mailto:someone@example.com
+                www.google.com
+                example.com
+                //example.com
+                http
+                https
+                """
+    )
+    void isValidHttpUrlShouldRejectNonHttpUrls(String url) {
+        assertFalse(URLUtil.isValidHttpUrl(url));
+    }
+
+    @Test
+    void isValidHttpUrlShouldRejectNull() {
+        assertFalse(URLUtil.isValidHttpUrl(null));
+    }
+
+    @Test
+    void isValidHttpUrlShouldRejectEmptyString() {
+        assertFalse(URLUtil.isValidHttpUrl(""));
+    }
+
+    @Test
+    void isValidHttpUrlShouldRejectBlankString() {
+        assertFalse(URLUtil.isValidHttpUrl("   "));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                http://www.google.com
+                https://www.google.com
+                http://example.com
+                https://example.com/path
+                http://example.com:8080
+                https://example.com:443/path?query=value
+                http://example.com/path/to/resource
+                https://sub.example.com
+                """
+    )
+    void isValidUrlShouldAcceptValidHttpUrls(String url) {
+        assertTrue(URLUtil.isValidUrl(url));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                ftp://example.com
+                file:///path/to/file
+                mailto:someone@example.com
+                www.google.com
+                example.com
+                //example.com
+                """
+    )
+    void isValidUrlShouldRejectNonHttpUrls(String url) {
+        assertFalse(URLUtil.isValidUrl(url));
+    }
+
+    @Test
+    void isValidUrlShouldRejectNull() {
+        assertFalse(URLUtil.isValidUrl(null));
+    }
+
+    @Test
+    void isValidUrlShouldRejectEmptyString() {
+        assertFalse(URLUtil.isValidUrl(""));
+    }
+
+    @Test
+    void isValidUrlShouldRejectMalformedUrl() {
+        assertFalse(URLUtil.isValidUrl("http://[invalid-url]"));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                http://example.com/test|file
+                http://example.com/test<>file
+                http://example.com/test{file}
+                """
+    )
+    void isValidUrlShouldRejectUrlsWithInvalidCharacters(String url) {
+        assertFalse(URLUtil.isValidUrl(url));
+    }
 }

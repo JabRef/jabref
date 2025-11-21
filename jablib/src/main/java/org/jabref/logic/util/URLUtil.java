@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
@@ -182,6 +183,10 @@ public class URLUtil {
      */
     public static boolean isValidUrl(String url) {
         try {
+            if (StringUtil.isBlank(url)) {
+                return false;
+            }
+
             new URIBuilder(url);
             return isValidHttpUrl(url);
         } catch (URISyntaxException ex) {
