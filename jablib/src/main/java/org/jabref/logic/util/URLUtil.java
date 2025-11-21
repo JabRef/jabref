@@ -167,7 +167,7 @@ public class URLUtil {
     }
 
     /**
-     * Validates that a constructed URL is valid (conforms to RFC 2396).
+     * Validates that a constructed URL is valid  and conforms to RFC 3986 URI syntax (updated RFC 2396).
      * And also validates that it has an HTTP or HTTPS scheme to prevent injection attacks.
      * Does not perform complex checks such as opening connections.
      */
