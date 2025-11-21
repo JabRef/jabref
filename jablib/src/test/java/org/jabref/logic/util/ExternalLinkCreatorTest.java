@@ -24,8 +24,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ExternalLinkCreatorTest {
-    private static final String DEFAULT_SHORTSCIENCE_URL = "https://www.shortscience.org/internalsearch";
     private static final String DEFAULT_GOOGLE_SCHOLAR_URL = "https://scholar.google.com/scholar";
+    private static final String DEFAULT_SHORTSCIENCE_URL = "https://www.shortscience.org/internalsearch";
 
     private ImporterPreferences mockPreferences;
     private ExternalLinkCreator linkCreator;
