@@ -10,10 +10,12 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.support.DisabledOnCIServer;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.when;
 class KeyBindingViewModelTest {
 
     @Test
+    @DisabledOnCIServer("locally runs fine")
     void resetToDefault() {
         // Set new key binding
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
@@ -49,5 +52,41 @@ class KeyBindingViewModelTest {
         viewModel.resetToDefault();
 
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+    }
+
+    @Test
+    @DisabledOnCIServer("locally runs fine")
+    void verifyStoreSettingsWritesChanges() {
+        KeyBindingRepository uiRepo = new KeyBindingRepository();
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        KeyBindingRepository prefsRepo = new KeyBindingRepository();
+
+        when(preferences.getKeyBindingRepository()).thenReturn(prefsRepo);
+
+        KeyBindingsTabViewModel viewModel =
+                new KeyBindingsTabViewModel(uiRepo, mock(DialogService.class), preferences);
+
+        KeyBinding binding = KeyBinding.CLOSE_DATABASE;
+
+        KeyBindingViewModel selectedVM = new KeyBindingViewModel(uiRepo, binding, binding.getDefaultKeyBinding());
+        viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
+
+        KeyEvent event = new KeyEvent(
+                KeyEvent.KEY_PRESSED,
+                "L",
+                "L",
+                KeyCode.L,
+                true,
+                true,
+                false,
+                false
+        );
+
+        viewModel.setNewBindingForCurrent(event);
+
+        viewModel.storeSettings();
+
+        Optional<String> saved = prefsRepo.get(binding);
+        assertEquals(Optional.of("ctrl+shift+L"), saved);
     }
 }

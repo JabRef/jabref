@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Unassign stale assignments
         id: unassign
-        uses: takanome-dev/assign-issue-action@edge
+        uses: koppor/assign-issue-action@patch-2
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           reminder_comment: |
