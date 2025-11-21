@@ -17,7 +17,10 @@ public enum AiTemplate {
 
     // Templates that are used to convert a raw citation into a {@link BibEntry}.
     CITATION_PARSING_SYSTEM_MESSAGE,
-    CITATION_PARSING_USER_MESSAGE;
+    CITATION_PARSING_USER_MESSAGE,
+
+    // Template that is used to generate follow-up questions in chat,
+    FOLLOW_UP_QUESTIONS;
 
     public String getLocalizedName() {
         return switch (this) {
@@ -37,6 +40,8 @@ public enum AiTemplate {
                     Localization.lang("System message for citation parsing");
             case CITATION_PARSING_USER_MESSAGE ->
                     Localization.lang("User message for citation parsing");
+            case FOLLOW_UP_QUESTIONS ->
+                    Localization.lang("Prompt for generating follow-up questions");
         };
     }
 }

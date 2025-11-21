@@ -36,6 +36,7 @@ public class AiPreferences {
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
     private final BooleanProperty generateFollowUpQuestions;
+    private final IntegerProperty followUpQuestionsCount;
 
     private final ObjectProperty<AiProvider> aiProvider;
 
@@ -69,6 +70,7 @@ public class AiPreferences {
                          boolean autoGenerateEmbeddings,
                          boolean autoGenerateSummaries,
                          boolean generateFollowUpQuestions,
+                         int followUpQuestionsCount,
                          AiProvider aiProvider,
                          String openAiChatModel,
                          String mistralAiChatModel,
@@ -94,6 +96,7 @@ public class AiPreferences {
         this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
         this.autoGenerateSummaries = new SimpleBooleanProperty(autoGenerateSummaries);
         this.generateFollowUpQuestions = new SimpleBooleanProperty(generateFollowUpQuestions);
+        this.followUpQuestionsCount = new SimpleIntegerProperty(followUpQuestionsCount);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
 
@@ -130,7 +133,8 @@ public class AiPreferences {
                 AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE)),
                 AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE)),
                 AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE)),
-                AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_USER_MESSAGE))
+                AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_USER_MESSAGE)),
+                AiTemplate.FOLLOW_UP_QUESTIONS, new SimpleStringProperty(templates.get(AiTemplate.FOLLOW_UP_QUESTIONS))
         );
     }
 
@@ -200,6 +204,18 @@ public class AiPreferences {
 
     public BooleanProperty generateFollowUpQuestionsProperty() {
         return generateFollowUpQuestions;
+    }
+
+    public IntegerProperty followUpQuestionsCountProperty() {
+        return followUpQuestionsCount;
+    }
+
+    public int getFollowUpQuestionsCount() {
+        return followUpQuestionsCount.get();
+    }
+
+    public void setFollowUpQuestionsCount(int followUpQuestionsCount) {
+        this.followUpQuestionsCount.set(followUpQuestionsCount);
     }
 
     public boolean getGenerateFollowUpQuestions() {

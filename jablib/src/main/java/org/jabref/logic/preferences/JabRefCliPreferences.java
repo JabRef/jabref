@@ -382,6 +382,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
     private static final String AI_AUTO_GENERATE_SUMMARIES = "aiAutoGenerateSummaries";
     private static final String AI_GENERATE_FOLLOW_UP_QUESTIONS = "aiGenerateFollowUpQuestions";
+    private static final String AI_FOLLOW_UP_QUESTIONS_COUNT = "aiFollowUpQuestionsCount";
+    private static final String AI_FOLLOW_UP_QUESTIONS_TEMPLATE = "aiFollowUpQuestionsTemplate";
     private static final String AI_PROVIDER = "aiProvider";
     private static final String AI_OPEN_AI_CHAT_MODEL = "aiOpenAiChatModel";
     private static final String AI_MISTRAL_AI_CHAT_MODEL = "aiMistralAiChatModel";
@@ -732,6 +734,8 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, AiDefaultPreferences.AUTO_GENERATE_EMBEDDINGS);
         defaults.put(AI_AUTO_GENERATE_SUMMARIES, AiDefaultPreferences.AUTO_GENERATE_SUMMARIES);
         defaults.put(AI_GENERATE_FOLLOW_UP_QUESTIONS, AiDefaultPreferences.GENERATE_FOLLOW_UP_QUESTIONS);
+        defaults.put(AI_FOLLOW_UP_QUESTIONS_COUNT, AiDefaultPreferences.FOLLOW_UP_QUESTIONS_COUNT);
+        defaults.put(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.FOLLOW_UP_QUESTIONS));
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
         defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI).getName());
         defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI).getName());
@@ -2027,6 +2031,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(AI_AUTO_GENERATE_EMBEDDINGS),
                 getBoolean(AI_AUTO_GENERATE_SUMMARIES),
                 getBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS),
+                getInt(AI_FOLLOW_UP_QUESTIONS_COUNT),
                 AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),
                 get(AI_MISTRAL_AI_CHAT_MODEL),
@@ -2054,13 +2059,15 @@ public class JabRefCliPreferences implements CliPreferences {
                         AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, get(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE),
                         AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, get(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE),
                         AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, get(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE),
-                        AiTemplate.CITATION_PARSING_USER_MESSAGE, get(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE)
+                        AiTemplate.CITATION_PARSING_USER_MESSAGE, get(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE),
+                        AiTemplate.FOLLOW_UP_QUESTIONS, get(AI_FOLLOW_UP_QUESTIONS_TEMPLATE)
                 ));
 
         EasyBind.listen(aiPreferences.enableAiProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
         EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
         EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));
         EasyBind.listen(aiPreferences.generateFollowUpQuestionsProperty(), (_, _, newValue) -> putBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS, newValue));
+        EasyBind.listen(aiPreferences.followUpQuestionsCountProperty(), (_, _, newValue) -> putInt(AI_FOLLOW_UP_QUESTIONS_COUNT, newValue));
 
         EasyBind.listen(aiPreferences.aiProviderProperty(), (_, _, newValue) -> put(AI_PROVIDER, newValue.name()));
 
@@ -2094,6 +2101,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE), (_, _, newValue) -> put(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE, newValue));
         EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE), (_, _, newValue) -> put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, newValue));
         EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CITATION_PARSING_USER_MESSAGE), (_, _, newValue) -> put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.FOLLOW_UP_QUESTIONS), (_, _, newValue) -> put(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, newValue));
 
         return aiPreferences;
     }

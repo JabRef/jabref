@@ -41,6 +41,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private CheckBox autoGenerateEmbeddings;
     @FXML private CheckBox autoGenerateSummaries;
     @FXML private CheckBox generateFollowUpQuestions;
+    @FXML private IntegerInputField followUpQuestionsCountTextField;
+    @FXML private Tab followUpQuestionsTab;
+    @FXML private TextArea followUpQuestionsTextArea;
 
     @FXML private ComboBox<AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
@@ -250,6 +253,11 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         autoGenerateEmbeddings.selectedProperty().bindBidirectional(viewModel.autoGenerateEmbeddings());
         autoGenerateEmbeddings.disableProperty().bind(viewModel.disableAutoGenerateEmbeddings());
         generateFollowUpQuestions.selectedProperty().bindBidirectional(viewModel.generateFollowUpQuestions());
+        followUpQuestionsCountTextField.valueProperty().addListener((observable, oldValue, newValue) ->
+                viewModel.followUpQuestionsCountProperty().set(newValue == null ? 1 : newValue));
+        viewModel.followUpQuestionsCountProperty().addListener((observable, oldValue, newValue) ->
+                followUpQuestionsCountTextField.valueProperty().set(newValue == null ? 1 : newValue.intValue()));
+        followUpQuestionsTextArea.textProperty().bindBidirectional(viewModel.followUpQuestionsTemplateProperty());
     }
 
     @Override

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.ai.templates.AiTemplatesService;
+
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
@@ -13,14 +15,17 @@ import org.slf4j.LoggerFactory;
 
 public class FollowUpQuestionGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(FollowUpQuestionGenerator.class);
-    private static final int MAX_QUESTIONS = 5;
     private static final int MIN_QUESTION_LENGTH = 5;
     private static final int MAX_QUESTION_LENGTH = 100;
 
     private final ChatModel chatLanguageModel;
+    private final AiTemplatesService aiTemplatesService;
+    private final int maxQuestions;
 
-    public FollowUpQuestionGenerator(ChatModel chatLanguageModel) {
+    public FollowUpQuestionGenerator(ChatModel chatLanguageModel, AiTemplatesService aiTemplatesService, int maxQuestions) {
         this.chatLanguageModel = chatLanguageModel;
+        this.aiTemplatesService = aiTemplatesService;
+        this.maxQuestions = maxQuestions;
     }
 
     public List<String> generateFollowUpQuestions(UserMessage userMessage, AiMessage aiMessage) {
@@ -46,19 +51,7 @@ public class FollowUpQuestionGenerator {
     }
 
     private String buildPrompt(String userMessage, String aiResponse) {
-        return """
-                Based on this conversation:
-
-                User: %s
-                Assistant: %s
-
-                Generate 3-5 short follow-up questions (maximum 10 words each) that the user might want to ask next.
-                Format your response as a numbered list:
-                1. [question]
-                2. [question]
-                3. [question]
-
-                Only provide the numbered list, nothing else.""".formatted(userMessage, aiResponse);
+        return aiTemplatesService.makeFollowUpQuestionsPrompt(userMessage, aiResponse, maxQuestions);
     }
 
     private List<String> parseQuestions(String response) {
@@ -67,7 +60,7 @@ public class FollowUpQuestionGenerator {
         Pattern numberedPattern = Pattern.compile("^\\s*\\d+\\.\\s*(.+)$", Pattern.MULTILINE);
         Matcher matcher = numberedPattern.matcher(response);
 
-        while (matcher.find() && questions.size() < MAX_QUESTIONS) {
+        while (matcher.find() && questions.size() < maxQuestions) {
             String question = matcher.group(1).trim();
 
             question = question.replaceAll("^[\"']|[\"']$", "");
@@ -82,7 +75,7 @@ public class FollowUpQuestionGenerator {
             String[] lines = response.split("\n");
 
             for (String line : lines) {
-                if (questions.size() >= MAX_QUESTIONS) {
+                if (questions.size() >= maxQuestions) {
                     break;
                 }
 

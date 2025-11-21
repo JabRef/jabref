@@ -40,7 +40,10 @@ public class AiChatService {
             ObservableList<BibEntry> entries,
             BibDatabaseContext bibDatabaseContext
     ) {
-        FollowUpQuestionGenerator followUpQuestionGenerator = new FollowUpQuestionGenerator(chatLanguageModel);
+        FollowUpQuestionGenerator followUpQuestionGenerator = new FollowUpQuestionGenerator(
+                chatLanguageModel,
+                aiTemplatesService,
+                aiPreferences.getFollowUpQuestionsCount());
         return new AiChatLogic(
                 aiPreferences,
                 chatLanguageModel,
