@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,6 +20,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,9 +35,6 @@ import org.jspecify.annotations.Nullable;
 @AllowedToUseLogic("Uses FileUtil from logic")
 @NullMarked
 public class LinkedFile implements Serializable {
-
-    private static final String REGEX_URL = "^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
-    private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
 
@@ -195,11 +192,10 @@ public class LinkedFile implements Serializable {
      * Checks if the given String is an online link
      *
      * @param toCheck The String to check
-     * @return <code>true</code>, if it starts with "http://", "https://" or contains "www."; <code>false</code> otherwise
+     * @return <code>true</code>, if it starts with "http://" or "https://" and conforms to RFC 3986 URI syntax (updated RFC 2396); <code>false</code> otherwise
      */
     public static boolean isOnlineLink(String toCheck) {
-        String normalizedFilePath = toCheck.trim().toLowerCase();
-        return URL_PATTERN.matcher(normalizedFilePath).matches();
+        return URLUtil.isValidHttpUrl(toCheck);
     }
 
     @Override
