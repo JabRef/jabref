@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.util.io.FileUtil;
 
+import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
 
 /// URL utilities for URLs in the JabRef logic.
@@ -163,5 +164,28 @@ public class URLUtil {
             fileName = "downloaded.pdf";
         }
         return FileUtil.getValidFileName(fileName);
+    }
+
+    /**
+     * Validates that a URL has an HTTP or HTTPS scheme to prevent injection attacks
+     */
+    public static boolean isValidHttpUrl(String url) {
+        if (url == null || url.isEmpty()) {
+            return false;
+        }
+        String lowerUrl = url.toLowerCase().trim();
+        return lowerUrl.startsWith("http://") || lowerUrl.startsWith("https://");
+    }
+
+    /**
+     * Validates that a constructed URL is valid
+     */
+    public static boolean isValidUrl(String url) {
+        try {
+            new URIBuilder(url);
+            return isValidHttpUrl(url);
+        } catch (URISyntaxException ex) {
+            return false;
+        }
     }
 }

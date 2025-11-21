@@ -75,7 +75,7 @@ public class ExternalLinkCreator {
         String filteredTitle = LatexToUnicodeAdapter.format(title);
 
         // Validate the base URL scheme to prevent injection attacks
-        if (!isValidHttpUrl(baseUrl)) {
+        if (!URLUtil.isValidHttpUrl(baseUrl)) {
             LOGGER.warn("Invalid URL scheme in {} preference: {}. Using default URL.", serviceName, baseUrl);
             return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName);
         }
@@ -101,7 +101,7 @@ public class ExternalLinkCreator {
             }
 
             // Validate the final constructed URL
-            if (isValidUrl(finalUrl)) {
+            if (URLUtil.isValidUrl(finalUrl)) {
                 return Optional.of(finalUrl);
             } else {
                 LOGGER.warn("Constructed URL for {} is invalid: {}. Using default URL.", serviceName, finalUrl);
@@ -126,29 +126,6 @@ public class ExternalLinkCreator {
         } catch (URISyntaxException ex) {
             LOGGER.error("Failed to construct {} URL: {}", serviceName, ex.getMessage());
             return Optional.empty();
-        }
-    }
-
-    /**
-     * Validates that a URL has an HTTP or HTTPS scheme to prevent injection attacks
-     */
-    private boolean isValidHttpUrl(String url) {
-        if (url == null || url.isEmpty()) {
-            return false;
-        }
-        String lowerUrl = url.toLowerCase().trim();
-        return lowerUrl.startsWith("http://") || lowerUrl.startsWith("https://");
-    }
-
-    /**
-     * Validates that a constructed URL is valid
-     */
-    private boolean isValidUrl(String url) {
-        try {
-            new URIBuilder(url);
-            return isValidHttpUrl(url);
-        } catch (URISyntaxException ex) {
-            return false;
         }
     }
 }
