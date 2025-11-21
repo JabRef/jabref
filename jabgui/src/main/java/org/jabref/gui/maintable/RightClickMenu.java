@@ -245,8 +245,8 @@ public class RightClickMenu {
                                             GuiPreferences preferences) {
         Menu searchMenu = factory.createMenu(StandardActions.SEARCH);
         searchMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences))
+                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences))
         );
         return searchMenu;
     }

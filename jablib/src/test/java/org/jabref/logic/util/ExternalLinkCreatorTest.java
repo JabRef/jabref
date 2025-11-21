@@ -70,6 +70,78 @@ class ExternalLinkCreatorTest {
     }
 
     @Nested
+    class GoogleScholarTests {
+
+        @Test
+        void getGoogleScholarSearchURLReturnsEmptyOnMissingTitle() {
+            BibEntry entry = new BibEntry();
+            assertEquals(Optional.empty(), linkCreator.getGoogleScholarSearchURL(entry));
+        }
+
+        @Test
+        void getGoogleScholarSearchURLReturnsEmptyOnEmptyString() {
+            BibEntry entry = createEntryWithTitle("");
+            assertEquals(Optional.empty(), linkCreator.getGoogleScholarSearchURL(entry));
+        }
+
+        @Test
+        void getGoogleScholarSearchURLRemovesLatexBraces() {
+            // Equivalent test for Google Scholar
+            BibEntry entry = createEntryWithTitle("{The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages}");
+            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
+
+            String expectedUrl = "https://scholar.google.com/scholar?q=The%20Difference%20Between%20Graph-Based%20and%20Block-Structured%20Business%20Process%20Modelling%20Languages";
+            assertEquals(Optional.of(expectedUrl), url);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+                "' ', 'https://scholar.google.com/scholar?q='",
+                "'   ', 'https://scholar.google.com/scholar?q=%C2%A0%20%C2%A0'"
+        })
+        void getGoogleScholarSearchURLHandlesWhitespace(String title, String expectedUrl) {
+            BibEntry entry = createEntryWithTitle(title);
+            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
+
+            assertTrue(url.isPresent());
+            assertEquals(expectedUrl, url.get());
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+                // Expect %20
+                "'JabRef bibliography management', 'https://scholar.google.com/scholar?q=JabRef%20bibliography%20management'",
+                "'Machine learning', 'https://scholar.google.com/scholar?q=Machine%20learning'"
+        })
+        void getGoogleScholarSearchURLLinksToSearchResults(String title, String expectedUrl) {
+            BibEntry entry = createEntryWithTitle(title);
+            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
+
+            assertEquals(Optional.of(expectedUrl), url);
+            assertTrue(url.get().startsWith(DEFAULT_GOOGLE_SCHOLAR_URL));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"!*'();:@&=+$,/?#[]", "100% Complete", "Question?"})
+        void getGoogleScholarSearchURLEncodesSpecialCharacters(String title) {
+            BibEntry entry = createEntryWithTitle(title);
+            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
+            assertTrue(url.isPresent());
+            assertTrue(urlIsValid(url.get()));
+        }
+
+        @Test
+        void getGoogleScholarSearchURLIncludesAuthor() {
+            BibEntry entry = createEntryWithTitleAndAuthor("Quantum Computing", "Alice Smith");
+            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
+
+            assertTrue(url.isPresent());
+            assertTrue(urlIsValid(url.get()));
+            assertTrue(url.get().contains("author=Alice%20Smith"));
+        }
+    }
+
+    @Nested
     class ShortScienceTests {
 
         @Test
@@ -177,78 +249,6 @@ class ExternalLinkCreatorTest {
             assertTrue(url.isPresent());
             assertTrue(urlIsValid(url.get()));
             assertTrue(url.get().contains(expectedAuthorEncoding));
-        }
-    }
-
-    @Nested
-    class GoogleScholarTests {
-
-        @Test
-        void getGoogleScholarSearchURLReturnsEmptyOnMissingTitle() {
-            BibEntry entry = new BibEntry();
-            assertEquals(Optional.empty(), linkCreator.getGoogleScholarSearchURL(entry));
-        }
-
-        @Test
-        void getGoogleScholarSearchURLReturnsEmptyOnEmptyString() {
-            BibEntry entry = createEntryWithTitle("");
-            assertEquals(Optional.empty(), linkCreator.getGoogleScholarSearchURL(entry));
-        }
-
-        @Test
-        void getGoogleScholarSearchURLRemovesLatexBraces() {
-            // Equivalent test for Google Scholar
-            BibEntry entry = createEntryWithTitle("{The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages}");
-            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
-
-            String expectedUrl = "https://scholar.google.com/scholar?q=The%20Difference%20Between%20Graph-Based%20and%20Block-Structured%20Business%20Process%20Modelling%20Languages";
-            assertEquals(Optional.of(expectedUrl), url);
-        }
-
-        @ParameterizedTest
-        @CsvSource({
-                "' ', 'https://scholar.google.com/scholar?q='",
-                "'   ', 'https://scholar.google.com/scholar?q=%C2%A0%20%C2%A0'"
-        })
-        void getGoogleScholarSearchURLHandlesWhitespace(String title, String expectedUrl) {
-            BibEntry entry = createEntryWithTitle(title);
-            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
-
-            assertTrue(url.isPresent());
-            assertEquals(expectedUrl, url.get());
-        }
-
-        @ParameterizedTest
-        @CsvSource({
-                // Expect %20
-                "'JabRef bibliography management', 'https://scholar.google.com/scholar?q=JabRef%20bibliography%20management'",
-                "'Machine learning', 'https://scholar.google.com/scholar?q=Machine%20learning'"
-        })
-        void getGoogleScholarSearchURLLinksToSearchResults(String title, String expectedUrl) {
-            BibEntry entry = createEntryWithTitle(title);
-            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
-
-            assertEquals(Optional.of(expectedUrl), url);
-            assertTrue(url.get().startsWith(DEFAULT_GOOGLE_SCHOLAR_URL));
-        }
-
-        @ParameterizedTest
-        @ValueSource(strings = {"!*'();:@&=+$,/?#[]", "100% Complete", "Question?"})
-        void getGoogleScholarSearchURLEncodesSpecialCharacters(String title) {
-            BibEntry entry = createEntryWithTitle(title);
-            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
-            assertTrue(url.isPresent());
-            assertTrue(urlIsValid(url.get()));
-        }
-
-        @Test
-        void getGoogleScholarSearchURLIncludesAuthor() {
-            BibEntry entry = createEntryWithTitleAndAuthor("Quantum Computing", "Alice Smith");
-            Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
-
-            assertTrue(url.isPresent());
-            assertTrue(urlIsValid(url.get()));
-            assertTrue(url.get().contains("author=Alice%20Smith"));
         }
     }
 

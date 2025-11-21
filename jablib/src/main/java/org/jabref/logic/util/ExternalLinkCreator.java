@@ -17,28 +17,13 @@ import org.slf4j.LoggerFactory;
 public class ExternalLinkCreator {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalLinkCreator.class);
 
-    private static final String DEFAULT_SHORTSCIENCE_SEARCH_URL = "https://www.shortscience.org/internalsearch";
     private static final String DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL = "https://scholar.google.com/scholar";
+    private static final String DEFAULT_SHORTSCIENCE_SEARCH_URL = "https://www.shortscience.org/internalsearch";
 
     private final ImporterPreferences importerPreferences;
 
     public ExternalLinkCreator(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
-    }
-
-    /**
-     * Get a URL to the search results of ShortScience for the BibEntry's title
-     *
-     * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
-     * @return The URL if it was successfully created
-     */
-    public Optional<String> getShortScienceSearchURL(BibEntry entry) {
-        return entry.getField(StandardField.TITLE).flatMap(title -> {
-            String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
-                                                .getOrDefault("Short Science", DEFAULT_SHORTSCIENCE_SEARCH_URL);
-            Optional<String> author = entry.getField(StandardField.AUTHOR);
-            return buildSearchUrl(baseUrl, DEFAULT_SHORTSCIENCE_SEARCH_URL, title, author, "ShortScience");
-        });
     }
 
     /**
@@ -53,6 +38,21 @@ public class ExternalLinkCreator {
                                                 .getOrDefault("Google Scholar", DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL);
             Optional<String> author = entry.getField(StandardField.AUTHOR);
             return buildSearchUrl(baseUrl, DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL, title, author, "Google Scholar");
+        });
+    }
+
+    /**
+     * Get a URL to the search results of ShortScience for the BibEntry's title
+     *
+     * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
+     * @return The URL if it was successfully created
+     */
+    public Optional<String> getShortScienceSearchURL(BibEntry entry) {
+        return entry.getField(StandardField.TITLE).flatMap(title -> {
+            String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
+                                                .getOrDefault("Short Science", DEFAULT_SHORTSCIENCE_SEARCH_URL);
+            Optional<String> author = entry.getField(StandardField.AUTHOR);
+            return buildSearchUrl(baseUrl, DEFAULT_SHORTSCIENCE_SEARCH_URL, title, author, "ShortScience");
         });
     }
 
