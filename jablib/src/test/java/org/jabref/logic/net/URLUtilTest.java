@@ -167,19 +167,19 @@ class URLUtilTest {
     @ParameterizedTest
     @CsvSource(
             textBlock = """
-                http://www.google.com
-                https://www.google.com
-                http://example.com
-                https://example.com
-                http://example.com/path
-                https://example.com/path/to/resource
-                http://example.com:8080
-                https://example.com:443/path?query=value
-                HTTP://EXAMPLE.COM
-                HTTPS://EXAMPLE.COM
-                http://example.com/path/to/resource
-                https://sub.example.com
-                """
+                    http://www.google.com
+                    https://www.google.com
+                    http://example.com
+                    https://example.com
+                    http://example.com/path
+                    https://example.com/path/to/resource
+                    http://example.com:8080
+                    https://example.com:443/path?query=value
+                    HTTP://EXAMPLE.COM
+                    HTTPS://EXAMPLE.COM
+                    http://example.com/path/to/resource
+                    https://sub.example.com
+                    """
     )
     void isValidHttpUrlShouldAcceptValidHttpUrls(String url) {
         assertTrue(URLUtil.isValidHttpUrl(url));
@@ -188,19 +188,19 @@ class URLUtilTest {
     @ParameterizedTest
     @CsvSource(
             textBlock = """
-                ftp://example.com
-                file:///path/to/file
-                mailto:someone@example.com
-                www.google.com
-                example.com
-                //example.com
-                http
-                https
-                http://example.com/test|file
-                http://example.com/test<>file
-                http://example.com/test{file}
-                http://[invalid-url]
-                """
+                    ftp://example.com
+                    file:///path/to/file
+                    mailto:someone@example.com
+                    www.google.com
+                    example.com
+                    //example.com
+                    http
+                    https
+                    http://example.com/test|file
+                    http://example.com/test<>file
+                    http://example.com/test{file}
+                    http://[invalid-url]
+                    """
     )
     void isValidHttpUrlShouldRejectNonHttpUrls(String url) {
         assertFalse(URLUtil.isValidHttpUrl(url));
