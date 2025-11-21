@@ -12,15 +12,14 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import com.dlsc.gemsfx.Spacer?>
 <?import com.dlsc.unitfx.IntegerInputField?>
 <?import org.controlsfx.control.SearchableComboBox?>
 <?import org.controlsfx.control.textfield.CustomPasswordField?>
-<?import javafx.scene.layout.Region?>
-<?import com.dlsc.gemsfx.Spacer?>
-<?import javafx.scene.layout.Pane?>
 <fx:root
         spacing="10.0"
         type="VBox"

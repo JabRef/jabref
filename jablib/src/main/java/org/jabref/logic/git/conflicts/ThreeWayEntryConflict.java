@@ -6,7 +6,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// Represents a semantic conflict between base, local, and remote versions of a {@link BibEntry}.
-/// This is similar in structure to {@link RevisionTriple}, but uses nullable entries to model deletion.
+/// This is similar in structure to {@link org.jabref.logic.git.io.RevisionTriple}, but uses nullable entries to model deletion.
 ///
 /// Constraint: At least one of {@code local} or {@code remote} must be non-null.
 @NullMarked

@@ -63,7 +63,7 @@ public class MergeEntriesAction extends SimpleCommand {
             second = one;
         }
 
-        MergeEntriesDialog dialog = new MergeEntriesDialog(first, second, preferences);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(first, second, preferences, stateManager);
         dialog.setTitle(Localization.lang("Merge entries"));
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
@@ -24,10 +25,11 @@ public class ChangeScanner {
 
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
-                         GuiPreferences preferences) {
+                         GuiPreferences preferences,
+                         StateManager stateManager) {
         this.database = database;
         this.preferences = preferences;
-        this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database, preferences);
+        this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database, preferences, stateManager);
     }
 
     public List<DatabaseChange> scanForChanges() {

@@ -6,7 +6,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
 <fx:root type="VBox" styleClass="edit-field-content-pane" xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView">

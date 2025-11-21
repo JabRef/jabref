@@ -91,21 +91,21 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
-                threeWayMerge = new ThreeWayMergeView(one, two, preferences);
+                threeWayMerge = new ThreeWayMergeView(one, two, preferences, stateManager);
             }
             case DUPLICATE_SEARCH_WITH_EXACT -> {
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 removeExactVisible = true;
-                threeWayMerge = new ThreeWayMergeView(one, two, preferences);
+                threeWayMerge = new ThreeWayMergeView(one, two, preferences, stateManager);
             }
             case IMPORT_CHECK -> {
                 first = new ButtonType(Localization.lang("Keep existing entry"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Existing entry"),
-                        Localization.lang("From import"), preferences);
+                        Localization.lang("From import"), preferences, stateManager);
             }
             default ->
                     throw new IllegalStateException("Switch expression should be exhaustive");

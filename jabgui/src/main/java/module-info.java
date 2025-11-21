@@ -80,7 +80,7 @@ open module org.jabref {
     // region: data mapping
     requires jdk.xml.dom;
     // requires com.google.gson;
-    // requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.databind;
     // requires com.fasterxml.jackson.dataformat.yaml;
     // requires com.fasterxml.jackson.datatype.jsr310;
     // endregion
@@ -179,6 +179,7 @@ open module org.jabref {
     // uses org.eclipse.jgit.lib.Signer;
 
     requires transitive org.jspecify;
+    requires io.github.adr;
 
     // region: other libraries (alphabetically)
     // requires cuid;
@@ -186,7 +187,6 @@ open module org.jabref {
     requires com.pixelduke.fxthemes;
     // requires com.sun.jna;
     // requires dd.plist;
-    requires io.github.adr;
     // required by okhttp and some AI library
     // requires kotlin.stdlib;
     // requires mslinks;
