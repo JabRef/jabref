@@ -184,9 +184,10 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         NORMALIZE_PAGES.cleanup(entry);
         CLEAR_URL.cleanup(entry);
         HTML_TO_LATEX_TITLE.cleanup(entry);
+        entry.trimLeft();
     }
 
-    private void updateCrossrefAPIRate(URLConnection existingConnection) {
+    private synchronized void updateCrossrefAPIRate(URLConnection existingConnection) {
         try {
             // Assuming this field is given in seconds
             String xRateLimitInterval = existingConnection.getHeaderField("X-Rate-Limit-Interval").replaceAll("[^\\.0123456789]", "");
@@ -225,7 +226,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         try {
             URLDownload download = getUrlDownload(
                     URLUtil.create(DOI.AGENCY_RESOLVER + "/" + URLEncoder.encode(doi.asString(),
-                    StandardCharsets.UTF_8)));
+                            StandardCharsets.UTF_8)));
             JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
             if (response != null) {
                 agency = Optional.ofNullable(response.optString("RA"));
