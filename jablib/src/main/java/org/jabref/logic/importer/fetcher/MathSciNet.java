@@ -33,6 +33,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import kong.unirest.core.JsonNode;
@@ -118,7 +119,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
             List<BibEntry> entries = new ArrayList<>();
-            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
+            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
 
             try {
                 // Depending on the type of query we might get either a json object or directly a json array

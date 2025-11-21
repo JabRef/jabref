@@ -40,6 +40,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -57,6 +58,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private ParserResult parserResult = null;
     private final ObservableList<BibEntry> entries;
     private final GuiPreferences preferences;
@@ -86,6 +88,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                   StateManager stateManager,
                                   BibEntryTypesManager entryTypesManager,
                                   FileUpdateMonitor fileUpdateMonitor,
+                                  DirectoryUpdateMonitor directoryUpdateMonitor,
                                   Optional<SearchBasedFetcher> fetcher,
                                   Optional<String> query) {
         this.taskExecutor = taskExecutor;
@@ -96,6 +99,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.entries = FXCollections.observableArrayList();
         this.message = new SimpleStringProperty();
         this.message.bind(task.messageProperty());
@@ -203,6 +207,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 selectedDb.getValue(),
                 preferences,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,

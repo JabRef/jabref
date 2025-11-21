@@ -42,6 +42,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -85,6 +86,7 @@ public class UnlinkedFilesDialogViewModel {
     public UnlinkedFilesDialogViewModel(DialogService dialogService,
                                         UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor,
+                                        DirectoryUpdateMonitor directoryUpdateMonitor,
                                         GuiPreferences preferences,
                                         StateManager stateManager,
                                         TaskExecutor taskExecutor) {
@@ -96,6 +98,7 @@ public class UnlinkedFilesDialogViewModel {
                 bibDatabase,
                 preferences,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,

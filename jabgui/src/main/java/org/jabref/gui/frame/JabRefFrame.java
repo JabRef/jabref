@@ -62,6 +62,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -100,6 +101,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
@@ -121,6 +123,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
+                       DirectoryUpdateMonitor directoryUpdateMonitor,
                        GuiPreferences preferences,
                        AiService aiService,
                        StateManager stateManager,
@@ -132,6 +135,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.preferences = preferences;
         this.aiService = aiService;
         this.stateManager = stateManager;
@@ -153,6 +157,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this::getOpenDatabaseAction,
                 entryTypesManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 undoManager,
                 clipBoardManager,
                 taskExecutor);
@@ -188,6 +193,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager,
                 entryEditor,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
                 undoManager);
@@ -229,6 +235,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 preferences,
                 aiService,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
@@ -242,6 +249,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 taskExecutor,
                 dialogService,
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
@@ -539,6 +547,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 stateManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
@@ -565,6 +574,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
@@ -650,6 +660,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 stateManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,

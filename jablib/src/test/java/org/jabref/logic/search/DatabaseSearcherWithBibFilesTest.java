@@ -26,6 +26,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.hamcrest.Matchers;
@@ -98,7 +99,7 @@ class DatabaseSearcherWithBibFilesTest {
     }
 
     private BibDatabaseContext initializeDatabaseFromPath(Path testFile) throws IOException {
-        ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(testFile);
+        ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext databaseContext = spy(result.getDatabaseContext());
 
         when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);

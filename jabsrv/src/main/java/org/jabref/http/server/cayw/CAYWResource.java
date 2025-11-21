@@ -36,6 +36,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import jakarta.inject.Inject;
@@ -214,7 +215,7 @@ public class CAYWResource {
     }
 
     private BibDatabaseContext getDatabaseContextFromStream(InputStream inputStream) throws IOException {
-        BibtexImporter bibtexImporter = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        BibtexImporter bibtexImporter = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         BibDatabaseContext databaseContext;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             databaseContext = bibtexImporter.importDatabase(reader).getDatabaseContext();

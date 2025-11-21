@@ -12,6 +12,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.texparser.LatexParserResults;
+import org.jabref.model.util.DirectoryUpdateMonitor;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -31,6 +33,7 @@ class LatexParserTest {
     private final static String EINSTEIN_C = "Einstein1920c";
 
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private final DirectoryUpdateMonitor directoryUpdateMonitor = new DummyDirectoryUpdateMonitor();
     private ImportFormatPreferences importFormatPreferences;
     private BibDatabase database;
     private BibDatabase database2;
@@ -99,12 +102,12 @@ class LatexParserTest {
         expectedParserResult.addKey(EINSTEIN, texFile, 6, 20, 32, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
         expectedParserResult.addKey(DARWIN, texFile, 7, 73, 83, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
 
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(new LatexParserResults(parserResult));
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor, directoryUpdateMonitor).resolve(new LatexParserResults(parserResult));
         LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(new LatexParserResults(expectedParserResult));
 
         assertEquals(expectedCrossingResult, crossingResult);
 
-        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor).resolve(new LatexParserResults(parserResult));
+        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor, directoryUpdateMonitor).resolve(new LatexParserResults(parserResult));
         LatexBibEntriesResolverResult expectedCrossingResult2 = new LatexBibEntriesResolverResult(new LatexParserResults(expectedParserResult));
 
         expectedCrossingResult2.addEntry(database.getEntryByCitationKey(EINSTEIN).get());
@@ -119,7 +122,7 @@ class LatexParserTest {
         Path texFile2 = Path.of(LatexParserTest.class.getResource("paper2.tex").toURI());
 
         LatexParserResults parserResults = new DefaultLatexParser().parse(List.of(texFile, texFile2));
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResults);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor, directoryUpdateMonitor).resolve(parserResults);
 
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
         expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));
@@ -140,7 +143,7 @@ class LatexParserTest {
 
         assertEquals(expectedCrossingResult, crossingResult);
 
-        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor).resolve(parserResults);
+        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor, directoryUpdateMonitor).resolve(parserResults);
         LatexBibEntriesResolverResult expectedCrossingResult2 = new LatexBibEntriesResolverResult(expectedParserResults);
 
         expectedCrossingResult2.addEntry(database.getEntryByCitationKey(EINSTEIN).get());

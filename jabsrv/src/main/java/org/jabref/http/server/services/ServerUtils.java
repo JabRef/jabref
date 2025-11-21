@@ -13,6 +13,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import jakarta.ws.rs.InternalServerErrorException;
@@ -54,7 +55,7 @@ public class ServerUtils {
     /// @param id - also "demo" for the demo library
     /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
     public static @NonNull BibDatabaseContext getBibDatabaseContext(String id, FilesToServe filesToServe, SrvStateManager srvStateManager, ImportFormatPreferences importFormatPreferences) throws IOException {
-        BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+        BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         if ("demo".equals(id)) {
             try (InputStream chocolateBibInputStream = BibDatabase.class.getResourceAsStream("/Chocolate.bib")) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(chocolateBibInputStream, StandardCharsets.UTF_8));

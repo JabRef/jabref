@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,7 @@ class ImportFormatReaderIntegrationTest {
         reader = new ImportFormatReader(
                 importerPreferences,
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(CitationKeyPatternPreferences.class), new DummyFileUpdateMonitor()
+                mock(CitationKeyPatternPreferences.class), new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor()
         );
     }
 
@@ -41,7 +42,7 @@ class ImportFormatReaderIntegrationTest {
     @MethodSource("importFormats")
     void importUnknownFormat(String resource, String format, int count) throws ImportException, URISyntaxException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
-        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file, new DummyFileUpdateMonitor());
+        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         assertEquals(count, unknownFormat.parserResult().getDatabase().getEntryCount());
     }
 

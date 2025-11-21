@@ -11,6 +11,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 import org.jabref.model.texparser.LatexParserResults;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -23,11 +24,13 @@ public class TexBibEntriesResolver {
     private final BibDatabase masterDatabase;
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
 
-    public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DirectoryUpdateMonitor directoryUpdateMonitor) {
         this.masterDatabase = masterDatabase;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
     }
 
     /**
@@ -40,7 +43,7 @@ public class TexBibEntriesResolver {
         List<BibDatabase> bibDatabases =
                 latexParserResults.getBibFiles().stream().map(path -> {
                     try {
-                        return OpenDatabase.loadDatabase(path, importFormatPreferences, fileMonitor).getDatabase();
+                        return OpenDatabase.loadDatabase(path, importFormatPreferences, fileMonitor, directoryUpdateMonitor).getDatabase();
                     } catch (IOException e) {
                         LOGGER.error("Error opening file '{}'", path, e);
                         return ParserResult.fromError(e).getDatabase();

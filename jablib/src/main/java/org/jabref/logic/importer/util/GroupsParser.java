@@ -14,6 +14,7 @@ import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.strings.QuotedStringTokenizer;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
@@ -21,6 +22,7 @@ import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGranularity;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -32,6 +34,7 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -47,7 +50,7 @@ public class GroupsParser {
     private GroupsParser() {
     }
 
-    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost)
+    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator, FileUpdateMonitor fileMonitor, DirectoryUpdateMonitor directoryUpdateMonitor, BibDatabaseContext database, String userAndHost)
             throws ParseException {
         try {
             GroupTreeNode cursor = null;
@@ -64,7 +67,7 @@ public class GroupsParser {
                     throw new ParseException("Expected \"" + string + "\" to contain whitespace");
                 }
                 int level = Integer.parseInt(string.substring(0, spaceIndex));
-                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData, userAndHost);
+                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, directoryUpdateMonitor, database, userAndHost);
                 GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
                 if (cursor == null) {
                     // create new root
@@ -94,7 +97,7 @@ public class GroupsParser {
      * @return New instance of the encoded group.
      * @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost)
+    public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor, DirectoryUpdateMonitor directoryUpdateMonitor, BibDatabaseContext database, String userAndHost)
             throws ParseException {
         if (s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             return keywordGroupFromString(s, keywordSeparator);
@@ -124,10 +127,41 @@ public class GroupsParser {
             return automaticDateGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
-            return texGroupFromString(s, fileMonitor, metaData, userAndHost);
+            return texGroupFromString(s, fileMonitor, database.getMetaData(), userAndHost);
+        }
+        if (s.startsWith(MetadataSerializationConfiguration.DIRECTORY_GROUP_ID)) {
+            return directoryGroupFromString(s, directoryUpdateMonitor, database, userAndHost);
         }
 
         throw new ParseException("Unknown group: " + s);
+    }
+
+    private static AbstractGroup directoryGroupFromString(String string, DirectoryUpdateMonitor directoryUpdateMonitor, BibDatabaseContext database, String userAndHost) throws ParseException {
+        if (!string.startsWith(MetadataSerializationConfiguration.DIRECTORY_GROUP_ID)) {
+            throw new IllegalArgumentException("DirectoryGroup cannot be created from \"" + string + "\".");
+        }
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(string.substring(MetadataSerializationConfiguration.DIRECTORY_GROUP_ID
+                .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+
+        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
+        try {
+            Path absoluteDirectoryPath = Path.of(tok.nextToken());
+            try {
+                DirectoryGroup newGroup = DirectoryGroup.create(name, context, absoluteDirectoryPath, directoryUpdateMonitor, database, userAndHost);
+                addGroupDetails(tok, newGroup);
+                return newGroup;
+            } catch (IOException ex) {
+                // Problem accessing folder -> create without directory monitoring
+                LOGGER.warn("Could not access file {}. The group {} will not reflect changes to the local folder.", absoluteDirectoryPath, name, ex);
+
+                DirectoryGroup newGroup = DirectoryGroup.create(name, context, absoluteDirectoryPath, database, userAndHost);
+                addGroupDetails(tok, newGroup);
+                return newGroup;
+            }
+        } catch (InvalidPathException | IOException ex) {
+            throw new ParseException(ex);
+        }
     }
 
     private static AbstractGroup texGroupFromString(String string, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost) throws ParseException {

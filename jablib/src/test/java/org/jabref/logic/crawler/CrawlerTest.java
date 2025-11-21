@@ -22,6 +22,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -101,7 +102,8 @@ class CrawlerTest {
                 gitHandler,
                 preferences,
                 entryTypesManager,
-                new DummyFileUpdateMonitor());
+                new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor());
 
         testCrawler.performCrawl();
 

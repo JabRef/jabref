@@ -21,6 +21,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class SidePane extends VBox {
@@ -41,6 +42,7 @@ public class SidePane extends VBox {
                     StateManager stateManager,
                     AdaptVisibleTabs adaptVisibleTabs,
                     FileUpdateMonitor fileUpdateMonitor,
+                    DirectoryUpdateMonitor directoryUpdateMonitor,
                     BibEntryTypesManager entryTypesManager,
                     ClipBoardManager clipBoardManager,
                     UndoManager undoManager) {
@@ -56,6 +58,7 @@ public class SidePane extends VBox {
                 dialogService,
                 aiService,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
                 undoManager);

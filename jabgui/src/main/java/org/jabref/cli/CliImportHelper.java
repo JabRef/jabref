@@ -12,6 +12,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -71,7 +72,8 @@ public class CliImportHelper {
                     cliPreferences.getImporterPreferences(),
                     cliPreferences.getImportFormatPreferences(),
                     cliPreferences.getCitationKeyPatternPreferences(),
-                    new DummyFileUpdateMonitor()
+                    new DummyFileUpdateMonitor(),
+                    new DummyDirectoryUpdateMonitor()
             );
 
             if (!porcelain) {

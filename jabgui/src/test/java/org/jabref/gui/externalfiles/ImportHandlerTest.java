@@ -21,6 +21,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -69,6 +70,7 @@ class ImportHandlerTest {
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
@@ -91,6 +93,7 @@ class ImportHandlerTest {
                 mock(BibDatabaseContext.class),
                 preferences,
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
@@ -137,6 +140,7 @@ class ImportHandlerTest {
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
@@ -168,6 +172,7 @@ class ImportHandlerTest {
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
@@ -202,6 +207,7 @@ class ImportHandlerTest {
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),

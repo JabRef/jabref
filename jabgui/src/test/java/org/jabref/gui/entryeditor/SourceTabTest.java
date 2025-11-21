@@ -21,6 +21,7 @@ import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.fxmisc.richtext.CodeArea;
@@ -62,6 +63,7 @@ class SourceTabTest {
                 fieldPreferences,
                 importFormatPreferences,
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 mock(DialogService.class),
                 mock(BibEntryTypesManager.class),
                 keyBindingRepository,

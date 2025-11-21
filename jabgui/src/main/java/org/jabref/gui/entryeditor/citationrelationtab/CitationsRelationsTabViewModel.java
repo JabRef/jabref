@@ -27,6 +27,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.sciteTallies.TalliesResponse;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class CitationsRelationsTabViewModel {
@@ -45,6 +46,7 @@ public class CitationsRelationsTabViewModel {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
     private final SciteAiFetcher sciteAiFetcher;
@@ -54,12 +56,13 @@ public class CitationsRelationsTabViewModel {
     private Optional<TalliesResponse> currentResult = Optional.empty();
     private Future<?> searchTask;
 
-    public CitationsRelationsTabViewModel(GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
+    public CitationsRelationsTabViewModel(GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, DirectoryUpdateMonitor directoryUpdateMonitor, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.taskExecutor = taskExecutor;
 
         this.status = new SimpleObjectProperty<>(SciteStatus.IN_PROGRESS);
@@ -80,6 +83,7 @@ public class CitationsRelationsTabViewModel {
                 databaseContext,
                 preferences,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ class ParserResultTest {
                 """;
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
-        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         assertEquals("Line 1: Found corrupted citation key  (contains whitespaces).", parserResult.warnings().getFirst());
     }
 
@@ -89,7 +90,7 @@ class ParserResultTest {
                 """;
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
-        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         assertEquals("Line 1: Found corrupted citation key  (comma missing).", parserResult.warnings().getFirst());
     }
 
@@ -108,7 +109,7 @@ class ParserResultTest {
 
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
-        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         assertEquals("Line 2: Found corrupted citation key .", parserResult.warnings().getFirst());
     }
 
@@ -127,7 +128,7 @@ class ParserResultTest {
                 """;
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
-        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         assertFalse(parserResult.getDatabase().hasEntries());
     }
 }

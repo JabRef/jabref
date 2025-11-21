@@ -32,6 +32,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class ImportCommand extends SimpleCommand {
     private final DialogService dialogService;
     private final CliPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
     public ImportCommand(LibraryTabContainer tabContainer,
@@ -60,12 +62,14 @@ public class ImportCommand extends SimpleCommand {
                          CliPreferences preferences,
                          StateManager stateManager,
                          FileUpdateMonitor fileUpdateMonitor,
+                         DirectoryUpdateMonitor directoryUpdateMonitor,
                          TaskExecutor taskExecutor,
                          DialogService dialogService) {
         this.tabContainer = tabContainer;
         this.importMethod = importMethod;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
 
@@ -80,7 +84,8 @@ public class ImportCommand extends SimpleCommand {
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getCitationKeyPatternPreferences(),
-                fileUpdateMonitor
+                fileUpdateMonitor,
+                directoryUpdateMonitor
         );
         SortedSet<Importer> importers = importFormatReader.getImportFormats();
 
@@ -164,7 +169,8 @@ public class ImportCommand extends SimpleCommand {
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getCitationKeyPatternPreferences(),
-                fileUpdateMonitor
+                fileUpdateMonitor,
+                directoryUpdateMonitor
         );
         for (Path filename : files) {
             try {
@@ -177,7 +183,7 @@ public class ImportCommand extends SimpleCommand {
                         dialogService.notify(Localization.lang("Importing file %0 as unknown format", filename.getFileName().toString()));
                     });
                     // This import method never throws an IOException
-                    imports.add(importFormatReader.importUnknownFormat(filename, fileUpdateMonitor));
+                    imports.add(importFormatReader.importUnknownFormat(filename, fileUpdateMonitor, directoryUpdateMonitor));
                 } else {
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (((importer.get() instanceof PdfGrobidImporter) || (importer.get() instanceof PdfMergeMetadataImporter))

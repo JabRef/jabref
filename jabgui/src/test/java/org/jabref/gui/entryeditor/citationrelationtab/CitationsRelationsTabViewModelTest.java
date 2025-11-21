@@ -27,6 +27,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -88,6 +89,7 @@ class CitationsRelationsTabViewModelTest {
                 stateManager,
                 mock(DialogService.class),
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 new CurrentThreadTaskExecutor());
 
         existingEntry = new BibEntry(StandardEntryType.Article)

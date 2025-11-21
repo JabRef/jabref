@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.model.util.DirectoryUpdateMonitor;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -21,24 +23,25 @@ class ImportFormatReaderParameterlessTest {
 
     private ImportFormatReader reader;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private final DirectoryUpdateMonitor directoryUpdateMonitor = new DummyDirectoryUpdateMonitor();
 
     @BeforeEach
     void setUp() {
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        reader = new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), fileMonitor);
+        reader = new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), fileMonitor, directoryUpdateMonitor);
     }
 
     @Test
     void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound() throws URISyntaxException {
         Path file = Path.of(ImportFormatReaderParameterlessTest.class.getResource("fileformat/emptyFile.xml").toURI());
-        assertThrows(ImportException.class, () -> reader.importUnknownFormat(file, fileMonitor));
+        assertThrows(ImportException.class, () -> reader.importUnknownFormat(file, fileMonitor, directoryUpdateMonitor));
     }
 
     @Test
     void importUnknownFormatThrowsExceptionIfPathIsNull() {
-        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null, fileMonitor));
+        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null, fileMonitor, directoryUpdateMonitor));
     }
 
     @Test

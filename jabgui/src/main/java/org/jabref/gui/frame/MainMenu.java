@@ -91,6 +91,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -103,6 +104,7 @@ public class MainMenu extends MenuBar {
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -121,6 +123,7 @@ public class MainMenu extends MenuBar {
                     GuiPreferences preferences,
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,
+                    DirectoryUpdateMonitor directoryUpdateMonitor,
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
                     JournalAbbreviationRepository abbreviationRepository,
@@ -138,6 +141,7 @@ public class MainMenu extends MenuBar {
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.abbreviationRepository = abbreviationRepository;
@@ -174,8 +178,8 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.IMPORT,
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService)),
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService))),
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferences, stateManager, fileUpdateMonitor, directoryUpdateMonitor, taskExecutor, dialogService)),
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferences, stateManager, fileUpdateMonitor, directoryUpdateMonitor, taskExecutor, dialogService))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
@@ -341,9 +345,9 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 // Systematic Literature Review (SLR)
-                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(frame, openDatabaseActionSupplier, fileUpdateMonitor, taskExecutor, preferences, stateManager, dialogService)),
+                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(frame, openDatabaseActionSupplier, fileUpdateMonitor, directoryUpdateMonitor, taskExecutor, preferences, stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(frame, openDatabaseActionSupplier, dialogService, fileUpdateMonitor, taskExecutor, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(frame, openDatabaseActionSupplier, dialogService, fileUpdateMonitor, directoryUpdateMonitor, taskExecutor, preferences, stateManager)),
 
                 new SeparatorMenuItem(),
 

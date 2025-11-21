@@ -70,6 +70,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -96,6 +97,7 @@ public class GroupTreeView extends BorderPane {
     private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final KeyBindingRepository keyBindingRepository;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
@@ -125,7 +127,8 @@ public class GroupTreeView extends BorderPane {
                          DialogService dialogService,
                          AiService aiService,
                          UndoManager undoManager,
-                         FileUpdateMonitor fileUpdateMonitor) {
+                         FileUpdateMonitor fileUpdateMonitor,
+                         DirectoryUpdateMonitor directoryUpdateMonitor) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.adaptVisibleTabs = adaptVisibleTabs;
@@ -134,6 +137,7 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
         this.disableProperty().bind(groupsDisabledProperty());
         createNodes();
@@ -191,7 +195,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, fileUpdateMonitor, undoManager, adaptVisibleTabs, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, fileUpdateMonitor, directoryUpdateMonitor, undoManager, adaptVisibleTabs, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -406,6 +410,7 @@ public class GroupTreeView extends BorderPane {
                     database,
                     preferences,
                     fileUpdateMonitor,
+                    directoryUpdateMonitor,
                     undoManager,
                     stateManager,
                     dialogService,

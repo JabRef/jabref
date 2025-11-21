@@ -65,6 +65,7 @@ import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -91,6 +92,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private AiService aiService;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private DirectoryUpdateMonitor directoryUpdateMonitor;
 
     private final ControlsFxVisualizer visualizer;
 
@@ -205,7 +207,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     @FXML
     public void initialize() {
-        viewModel = new NewEntryViewModel(guiPreferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
+        viewModel = new NewEntryViewModel(guiPreferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor, directoryUpdateMonitor);
 
         visualizer.setDecoration(new IconValidationDecorator());
 

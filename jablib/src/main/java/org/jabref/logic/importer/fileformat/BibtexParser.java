@@ -53,6 +53,8 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.DirectoryUpdateMonitor;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -115,14 +117,14 @@ public class BibtexParser implements Parser {
 
     private GroupTreeNode bibDeskGroupTreeNode;
 
-    public BibtexParser(@NonNull ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public BibtexParser(@NonNull ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DirectoryUpdateMonitor directoryUpdateMonitor) {
         this.importFormatPreferences = importFormatPreferences;
-        this.metaDataParser = new MetaDataParser(fileMonitor);
+        this.metaDataParser = new MetaDataParser(fileMonitor, directoryUpdateMonitor);
         this.parsedBibDeskGroups = new HashMap<>();
     }
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences) {
-        this(importFormatPreferences, new DummyFileUpdateMonitor());
+        this(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
     }
 
     /**

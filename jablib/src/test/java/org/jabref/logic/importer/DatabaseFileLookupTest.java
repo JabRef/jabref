@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +27,7 @@ class DatabaseFileLookupTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor())
+        ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor())
                 .importDatabase(ImportDataTest.UNLINKED_FILES_TEST_BIB);
         database = result.getDatabase();
         entries = database.getEntries();

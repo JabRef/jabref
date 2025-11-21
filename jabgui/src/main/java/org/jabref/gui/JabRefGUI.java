@@ -114,6 +114,7 @@ public class JabRefGUI extends Application {
                     mainStage,
                     dialogService,
                     fileUpdateMonitor,
+                    directoryUpdateMonitor,
                     preferences,
                     aiService,
                     stateManager,

@@ -18,6 +18,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -32,6 +33,7 @@ public class SidePaneContentFactory {
     private final StateManager stateManager;
     private final AdaptVisibleTabs adaptVisibleTabs;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
@@ -45,6 +47,7 @@ public class SidePaneContentFactory {
                                   StateManager stateManager,
                                   AdaptVisibleTabs adaptVisibleTabs,
                                   FileUpdateMonitor fileUpdateMonitor,
+                                  DirectoryUpdateMonitor directoryUpdateMonitor,
                                   BibEntryTypesManager entryTypesManager,
                                   ClipBoardManager clipBoardManager,
                                   UndoManager undoManager) {
@@ -57,6 +60,7 @@ public class SidePaneContentFactory {
         this.stateManager = stateManager;
         this.adaptVisibleTabs = adaptVisibleTabs;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
@@ -73,7 +77,8 @@ public class SidePaneContentFactory {
                             dialogService,
                             aiService,
                             undoManager,
-                            fileUpdateMonitor);
+                            fileUpdateMonitor,
+                            directoryUpdateMonitor);
             case OPEN_OFFICE ->
                     new OpenOfficePanel(
                             tabContainer,
@@ -88,6 +93,7 @@ public class SidePaneContentFactory {
                             aiService,
                             stateManager,
                             fileUpdateMonitor,
+                            directoryUpdateMonitor,
                             entryTypesManager,
                             clipBoardManager,
                             undoManager).getContent();

@@ -18,6 +18,7 @@ import org.jabref.logic.importer.fileformat.OvidImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -69,7 +70,7 @@ public class ImporterTest {
                 // all classes implementing {@link Importer}
                 // sorted alphabetically
                 new BiblioscapeImporter(),
-                new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()),
+                new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor()),
                 new CitaviXmlImporter(),
                 new CopacImporter(),
                 new EndnoteImporter(),

@@ -31,6 +31,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -126,7 +127,8 @@ public class JabKit implements Runnable {
                     cliPreferences.getImporterPreferences(),
                     cliPreferences.getImportFormatPreferences(),
                     cliPreferences.getCitationKeyPatternPreferences(),
-                    new DummyFileUpdateMonitor()
+                    new DummyFileUpdateMonitor(),
+                    new DummyDirectoryUpdateMonitor()
             );
 
             if (!"*".equals(importFormat)) {
@@ -142,7 +144,7 @@ public class JabKit implements Runnable {
                 }
 
                 ImportFormatReader.UnknownFormatImport importResult =
-                        importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
+                        importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
 
                 if (!porcelain) {
                     System.out.println(Localization.lang("Format used: %0", importResult.format()));
@@ -231,7 +233,8 @@ public class JabKit implements Runnable {
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getCitationKeyPatternPreferences(),
-                new DummyFileUpdateMonitor()
+                new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor()
         );
         return importFormatReader
                 .getImportFormats().stream()

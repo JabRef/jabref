@@ -133,7 +133,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     }
 
     private void importFilesInDatabase(List<Path> files, BibDatabaseContext database) {
-        ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
+        ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, this, undoManager, stateManager, dialogService, taskExecutor);
         importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
     }
 
@@ -169,7 +169,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
             if (listener instanceof DirectoryGroup parentGroup) {
                 BibDatabaseContext database = parentGroup.getBibDatabaseContext();
-                ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
+                ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, this, undoManager, stateManager, dialogService, taskExecutor);
                 importHandler.importFilesInBackground(pathToImport, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
             }
         }

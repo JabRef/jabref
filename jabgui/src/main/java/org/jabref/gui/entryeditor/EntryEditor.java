@@ -69,6 +69,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -114,6 +115,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
+    @Inject private DirectoryUpdateMonitor directoryUpdateMonitor;
     @Inject private DirectoryMonitor directoryMonitor;
     @Inject private CountingUndoManager undoManager;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
@@ -342,6 +344,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 undoManager,
                 stateManager,
                 fileMonitor,
+                directoryUpdateMonitor,
                 preferences,
                 taskExecutor,
                 bibEntryTypesManager,
@@ -353,6 +356,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 preferences.getFieldPreferences(),
                 preferences.getImportFormatPreferences(),
                 fileMonitor,
+                directoryUpdateMonitor,
                 dialogService,
                 bibEntryTypesManager,
                 keyBindingRepository,

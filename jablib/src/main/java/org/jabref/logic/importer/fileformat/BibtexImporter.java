@@ -19,6 +19,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseModeDetection;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NonNull;
@@ -37,10 +38,12 @@ public class BibtexImporter extends Importer {
 
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
 
-    public BibtexImporter(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public BibtexImporter(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DirectoryUpdateMonitor directoryUpdateMonitor) {
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
     }
 
     /**
@@ -128,7 +131,7 @@ public class BibtexImporter extends Importer {
      */
     @Override
     public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
-        return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
+        return new BibtexParser(importFormatPreferences, fileMonitor, directoryUpdateMonitor).parse(reader);
     }
 
     @Override

@@ -52,6 +52,7 @@ import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -67,6 +68,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final AiService aiService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final UndoManager undoManager;
     private final AdaptVisibleTabs adaptVisibleTabs;
     private final TaskExecutor taskExecutor;
@@ -96,6 +98,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                               @NonNull AiService aiService,
                               @NonNull GuiPreferences preferences,
                               @NonNull FileUpdateMonitor fileUpdateMonitor,
+                              @NonNull DirectoryUpdateMonitor directoryUpdateMonitor,
                               @NonNull UndoManager undoManager,
                               @NonNull AdaptVisibleTabs adaptVisibleTabs,
                               @NonNull TaskExecutor taskExecutor,
@@ -106,6 +109,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.aiService = aiService;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.undoManager = undoManager;
         this.adaptVisibleTabs = adaptVisibleTabs;
         this.taskExecutor = taskExecutor;
@@ -246,7 +250,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         List<Path> allPDFs = directoryStructureRoot.getAllPDFs();
                         int nbPDFs = allPDFs.size();
                         if (nbPDFs > 0) {
-                            ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
+                            ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, directoryUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
                             importHandler.importFilesInBackground(allPDFs, database, preferences.getFilePreferences(), TransferMode.LINK)
                                          .onSuccess(_ -> {
                                              selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
