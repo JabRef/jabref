@@ -6,7 +6,7 @@
 //DEPS org.apache.commons:commons-csv:1.14.1
 //DEPS info.debatty:java-string-similarity:2.0.0
 //DEPS org.jooq:jool:0.9.15
-//DEPS org.openjfx:javafx-base:25.0.1
+//DEPS org.openjfx:javafx-base:24.0.2
 //DEPS org.slf4j:slf4j-api:2.0.17
 //DEPS org.slf4j:slf4j-simple:2.0.17
 //DEPS org.jspecify:jspecify:1.0.0
