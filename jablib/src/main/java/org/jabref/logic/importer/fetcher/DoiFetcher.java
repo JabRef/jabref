@@ -67,7 +67,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     private static final FieldFormatterCleanup NORMALIZE_PAGES = new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter());
     private static final FieldFormatterCleanup CLEAR_URL = new FieldFormatterCleanup(StandardField.URL, new ClearFormatter());
-    private static final FieldFormatterCleanup HTML_TO_LATEX_TITLE = new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter);
+    private static final FieldFormatterCleanup HTML_TO_LATEX_TITLE = new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter());
 
     private final ImportFormatPreferences preferences;
 
