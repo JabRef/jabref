@@ -1,6 +1,5 @@
 package org.jabref.logic.util;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -36,18 +35,6 @@ class ExternalLinkCreatorTest {
         // By default, assume no custom templates are set
         when(mockPreferences.getSearchEngineUrlTemplates()).thenReturn(Map.of());
         linkCreator = new ExternalLinkCreator(mockPreferences);
-    }
-
-    /**
-     * Validates URL conformance to RFC 2396. Does not perform complex checks such as opening connections.
-     */
-    private boolean urlIsValid(String url) {
-        try {
-            URI.create(url);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
     }
 
     private BibEntry createEntryWithTitle(String title) {
@@ -127,7 +114,7 @@ class ExternalLinkCreatorTest {
             BibEntry entry = createEntryWithTitle(title);
             Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
             assertTrue(url.isPresent());
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
         }
 
         @Test
@@ -136,7 +123,7 @@ class ExternalLinkCreatorTest {
             Optional<String> url = linkCreator.getGoogleScholarSearchURL(entry);
 
             assertTrue(url.isPresent());
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
             assertTrue(url.get().contains("author=Alice%20Smith"));
         }
     }
@@ -213,7 +200,7 @@ class ExternalLinkCreatorTest {
             Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
 
             assertTrue(url.isPresent());
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
             assertTrue(url.get().contains(expectedQueryPart));
         }
 
@@ -223,7 +210,7 @@ class ExternalLinkCreatorTest {
             BibEntry entry = createEntryWithTitle(title);
             Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
             assertTrue(url.isPresent());
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
         }
 
         @Test
@@ -232,7 +219,7 @@ class ExternalLinkCreatorTest {
             Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
 
             assertTrue(url.isPresent());
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
             // Expect %20 for space
             assertTrue(url.get().contains("author=John%20Doe"));
         }
@@ -247,7 +234,7 @@ class ExternalLinkCreatorTest {
             Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
 
             assertTrue(url.isPresent());
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
             assertTrue(url.get().contains(expectedAuthorEncoding));
         }
     }
@@ -266,7 +253,7 @@ class ExternalLinkCreatorTest {
 
             assertTrue(url.isPresent());
             assertEquals("https://custom.com/search?title=Test+Title", url.get());
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
         }
 
         @Test
@@ -281,7 +268,7 @@ class ExternalLinkCreatorTest {
             assertTrue(url.isPresent());
             assertTrue(url.get().startsWith(DEFAULT_SHORTSCIENCE_URL));
             assertTrue(url.get().contains("q=Test%20Title"));
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
         }
     }
 
@@ -304,7 +291,7 @@ class ExternalLinkCreatorTest {
             assertTrue(url.isPresent());
             // Must fall back to the default secure HTTPS URL
             assertTrue(url.get().startsWith("https://"));
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
         }
 
         @Test
@@ -313,7 +300,7 @@ class ExternalLinkCreatorTest {
             Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
 
             assertTrue(url.isPresent());
-            assertTrue(urlIsValid(url.get()));
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
 
             // URIBuilder encodes safely (%20)
             assertTrue(url.get().contains("q=%27%3B%20DROP%20TABLE%20entries%3B%20%E2%80%93"));

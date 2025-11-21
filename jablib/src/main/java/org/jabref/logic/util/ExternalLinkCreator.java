@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
@@ -76,14 +77,16 @@ public class ExternalLinkCreator {
         String filteredTitle = LatexToUnicodeAdapter.format(title);
 
         // Validate the base URL scheme to prevent injection attacks
-        if (!URLUtil.isValidHttpUrl(baseUrl)) {
+        // We cannot use URLUtil#isValidHttpUrl here as {title} placeholder will throw URISyntaxException till replaced (below)
+        String lowerUrl = baseUrl.toLowerCase().trim();
+        if (StringUtil.isBlank(lowerUrl) || !(lowerUrl.startsWith("http://") || lowerUrl.startsWith("https://"))) {
             LOGGER.warn("Invalid URL scheme in {} preference: {}. Using default URL.", serviceName, baseUrl);
             return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName);
         }
 
         // If URL doesn't contain {title}, it's not a valid template, use query parameters
         if (!baseUrl.contains("{title}")) {
-            LOGGER.debug("URL template for {} doesn't contain {{title}} placeholder. Using query parameters.", serviceName);
+            LOGGER.warn("URL template for {} doesn't contain {{title}} placeholder. Using query parameters.", serviceName);
             return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName);
         }
 
@@ -102,7 +105,7 @@ public class ExternalLinkCreator {
             }
 
             // Validate the final constructed URL
-            if (URLUtil.isValidUrl(finalUrl)) {
+            if (URLUtil.isValidHttpUrl(finalUrl)) {
                 return Optional.of(finalUrl);
             } else {
                 LOGGER.warn("Constructed URL for {} is invalid: {}. Using default URL.", serviceName, finalUrl);
