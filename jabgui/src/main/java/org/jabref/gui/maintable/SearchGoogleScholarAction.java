@@ -15,10 +15,15 @@ import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 public class SearchGoogleScholarAction extends SimpleCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchGoogleScholarAction.class);
+
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
@@ -43,7 +48,8 @@ public class SearchGoogleScholarAction extends SimpleCommand {
                 try {
                     NativeDesktop.openExternalViewer(databaseContext, preferences, url, StandardField.URL, dialogService, bibEntries.getFirst());
                 } catch (IOException ex) {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open Google Scholar."), ex);
+                    LOGGER.warn("Could not open Google Scholar", ex);
+                    dialogService.notify(Localization.lang("Unable to open Google Scholar.") + " " + ex.getMessage());
                 }
             });
         });

@@ -26,6 +26,8 @@ public class ExternalLinkCreator {
         this.importerPreferences = importerPreferences;
     }
 
+    // Note: We use configurable templates due to requirement stated at https://github.com/JabRef/jabref/issues/12268#issuecomment-2523108605
+
     /**
      * Get a URL to the search results of Google Scholar for the BibEntry's title
      *
