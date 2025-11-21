@@ -65,6 +65,10 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
      */
     private static final RateLimiter CROSSREF_DCN_RATE_LIMITER = RateLimiter.create(50.0);
 
+    private static final FieldFormatterCleanup NORMALIZE_PAGES = new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter());
+    private static final FieldFormatterCleanup CLEAR_URL = new FieldFormatterCleanup(StandardField.URL, new ClearFormatter());
+    private static final FieldFormatterCleanup HTML_TO_LATEX_TITLE = new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter);
+
     private final ImportFormatPreferences preferences;
 
     public DoiFetcher(ImportFormatPreferences preferences) {
@@ -177,9 +181,9 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     private void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter()).cleanup(entry);
+        NORMALIZE_PAGES.cleanup(entry);
+        CLEAR_URL.cleanup(entry);
+        HTML_TO_LATEX_TITLE.cleanup(entry);
     }
 
     private void updateCrossrefAPIRate(URLConnection existingConnection) {
