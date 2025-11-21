@@ -221,31 +221,11 @@ public class URLDownload {
     /**
      * Downloads the web resource to a String.
      *
-     * @param encoding the desired String encoding
-     * @return the downloaded string
-     */
-    public String asString(Charset encoding) throws FetcherException {
-        return asString(encoding, this.openConnection());
-    }
-
-    /**
-     * Downloads the web resource to a String from an existing connection. Uses UTF-8 as encoding.
-     *
-     * @param existingConnection an existing connection
-     * @return the downloaded string
-     */
-    public static String asString(URLConnection existingConnection) throws FetcherException {
-        return asString(StandardCharsets.UTF_8, existingConnection);
-    }
-
-    /**
-     * Downloads the web resource to a String.
-     *
      * @param encoding   the desired String encoding
      * @param connection an existing connection
      * @return the downloaded string
      */
-    public static String asString(Charset encoding, URLConnection connection) throws FetcherException {
+    private static String asString(Charset encoding, URLConnection connection) throws FetcherException {
         try (InputStream input = new BufferedInputStream(connection.getInputStream());
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
@@ -285,12 +265,16 @@ public class URLDownload {
         }
     }
 
-    /**
-     * Takes the web resource as the source for a monitored input stream.
-     */
+    /// Uses the web resource as source and creates a monitored input stream.
     public ProgressInputStream asInputStream() throws FetcherException {
         HttpURLConnection urlConnection = (HttpURLConnection) this.openConnection();
+        return asInputStream(urlConnection);
+    }
 
+    /// Uses the web resource as source and creates a monitored input stream.
+    ///
+    /// Exposing the urlConnection is required for dynamic API limiting of CrossRef
+    public ProgressInputStream asInputStream(HttpURLConnection urlConnection) throws FetcherException {
         int responseCode;
         try {
             responseCode = urlConnection.getResponseCode();

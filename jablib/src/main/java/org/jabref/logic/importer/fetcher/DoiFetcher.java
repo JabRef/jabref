@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,6 +32,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
 import com.google.common.util.concurrent.RateLimiter;
@@ -116,66 +117,64 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        Optional<DOI> doi = DOI.parse(identifier);
-
-        if (doi.isEmpty()) {
-            throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
-        }
+        DOI doi = DOI.parse(identifier)
+                     .orElseThrow(() -> new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier)));
 
         URL doiURL;
         try {
-            doiURL = URLUtil.create(doi.get().getURIAsASCIIString());
+            doiURL = URLUtil.create(doi.getURIAsASCIIString());
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
 
+        Optional<BibEntry> fetchedEntry;
+
+        // mEDRA does not return a parsable bibtex string
+        Optional<String> agency;
         try {
-            Optional<BibEntry> fetchedEntry;
+            agency = getAgency(doi);
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Invalid URL", e);
+        }
+        if (agency.isPresent() && "medra".equalsIgnoreCase(agency.get())) {
+            return new Medra().performSearchById(identifier);
+        }
 
-            // mEDRA does not return a parsable bibtex string
-            Optional<String> agency = getAgency(doi.get());
-            if (agency.isPresent() && "medra".equalsIgnoreCase(agency.get())) {
-                return new Medra().performSearchById(identifier);
-            }
+        URLDownload download = getUrlDownload(doiURL);
+        download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
 
-            // BibTeX data
-            URLDownload download = getUrlDownload(doiURL);
-            download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
+        BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
 
-            String bibtexString;
-            URLConnection openConnection;
-
-            openConnection = download.openConnection();
-            bibtexString = URLDownload.asString(openConnection).trim();
-
-            // BibTeX entry
-            fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
-            fetchedEntry.ifPresent(this::doPostCleanup);
-
-            // Crossref has a dynamic API rate limit
-            if (agency.isPresent() && "crossref".equalsIgnoreCase(agency.get())) {
-                updateCrossrefAPIRate(openConnection);
-            }
-
-            // Check if the entry is an APS journal and add the article id as the page count if page field is missing
-            if (fetchedEntry.isPresent() && fetchedEntry.get().hasField(StandardField.DOI)) {
-                BibEntry entry = fetchedEntry.get();
-                if (isAPSJournal(entry, entry.getField(StandardField.DOI).get()) && !entry.hasField(StandardField.PAGES)) {
-                    setPageCountToArticleId(entry, entry.getField(StandardField.DOI).get());
-                }
-            }
-
-            if (openConnection instanceof HttpURLConnection connection) {
-                connection.disconnect();
-            }
-            return fetchedEntry;
-        } catch (IOException e) {
-            throw new FetcherException(doiURL, Localization.lang("Connection error"), e);
+        HttpURLConnection connection = (HttpURLConnection) download.openConnection();
+        InputStream inputStream = download.asInputStream();
+        try {
+            fetchedEntry = bibtexParser.parseEntries(inputStream).stream().findFirst();
         } catch (ParseException e) {
             throw new FetcherException(doiURL, "Could not parse BibTeX entry", e);
-        } catch (JSONException e) {
-            throw new FetcherException(doiURL, "Could not retrieve Registration Agency", e);
         }
+        // Crossref has a dynamic API rate limit
+        if (agency.isPresent() && "crossref".equalsIgnoreCase(agency.get())) {
+            updateCrossrefAPIRate(connection);
+        }
+        connection.disconnect();
+
+        fetchedEntry.ifPresent(entry -> {
+            doPostCleanup(entry);
+
+            // Output warnings in case of inconsistencies
+            entry.getField(StandardField.DOI)
+                 .filter(entryDoi -> entryDoi.equals(doi.asString()))
+                 .ifPresent(entryDoi -> LOGGER.warn("Fetched entry's DOI {} is different from requested DOI {}", entryDoi, identifier));
+            if (entry.getField(StandardField.DOI).isEmpty()) {
+                LOGGER.warn("Fetched entry does not contain doi field {}", identifier);
+            }
+
+            if (isAPSJournal(entry, doi) && !entry.hasField(StandardField.PAGES)) {
+                setPageNumbersBasedOnDoi(entry, doi);
+            }
+        });
+
+        return fetchedEntry;
     }
 
     private void doPostCleanup(BibEntry entry) {
@@ -235,18 +234,20 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         return agency;
     }
 
-    private void setPageCountToArticleId(BibEntry entry, String doiAsString) {
+    private void setPageNumbersBasedOnDoi(BibEntry entry, DOI doi) {
+        String doiAsString = doi.asString();
         String articleId = doiAsString.substring(doiAsString.lastIndexOf('.') + 1);
         entry.setField(StandardField.PAGES, articleId);
     }
 
     // checks if the entry is an APS journal by comparing the organization id and the suffix format
-    private boolean isAPSJournal(BibEntry entry, String doiAsString) {
+    private boolean isAPSJournal(BibEntry entry, DOI doi) {
         if (!entry.getType().equals(StandardEntryType.Article)) {
             return false;
         }
-        String suffix = doiAsString.substring(doiAsString.lastIndexOf('/') + 1);
-        String organizationId = doiAsString.substring(doiAsString.indexOf('.') + 1, doiAsString.indexOf('/'));
+        String doiString = doi.asString();
+        String suffix = doiString.substring(doiString.lastIndexOf('/') + 1);
+        String organizationId = doiString.substring(doiString.indexOf('.') + 1, doiString.indexOf('/'));
         return APS_JOURNAL_ORG_DOI_ID.equals(organizationId) && APS_SUFFIX_PATTERN.matcher(suffix).matches();
     }
 }
