@@ -69,7 +69,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -103,7 +103,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -150,7 +150,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -195,7 +195,7 @@ jobs:
         run: |
           echo "cache_key=jbang-heylogs-$(date +%F)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -238,7 +238,7 @@ jobs:
           fetch-depth: 0
       - name: Cache clparse jar
         id: cache-clparse
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: /tmp/clparse
           key: clparse-0.9.1
@@ -276,7 +276,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -361,7 +361,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -411,7 +411,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -471,7 +471,7 @@ jobs:
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -541,7 +541,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -689,7 +689,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/restore@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
