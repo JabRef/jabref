@@ -29,7 +29,7 @@ public abstract class DefinitionProvider {
         this.parserHandler = parserHandler;
     }
 
-    public List<Location> provideDefinition(String content, Position position) {
+    public List<Location> provideDefinition(String uri, String content, Position position) {
         Optional<String> citationKey = getCitationKeyAtPosition(content, position);
         if (citationKey.isPresent()) {
             Map<String, List<BibEntry>> entriesMap = parserHandler.searchForEntryByCitationKey(citationKey.get());
@@ -43,7 +43,7 @@ public abstract class DefinitionProvider {
         return List.of();
     }
 
-    public List<DocumentLink> provideDocumentLinks(String content) {
+    public List<DocumentLink> provideDocumentLinks(String fileUri, String content) {
         if (content == null || content.isEmpty()) {
             return List.of();
         }
