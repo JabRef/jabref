@@ -18,14 +18,14 @@ public class UrlChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        try {
-            new URIBuilder(value);
-        } catch (URISyntaxException e) {
-            return Optional.empty();
-        }
-
         if (!value.contains("://")) {
             return Optional.of(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...");
+        }
+
+        try {
+            new URIBuilder(value);
+        } catch (URISyntaxException ex) {
+            return Optional.of(Localization.lang("invalid URL format"));
         }
 
         return Optional.empty();
