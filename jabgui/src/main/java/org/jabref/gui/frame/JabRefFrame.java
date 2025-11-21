@@ -741,7 +741,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
-    private class CloseOthersDatabaseAction extends SimpleCommand {
+    public class CloseOthersDatabaseAction extends SimpleCommand {
 
         private final LibraryTab libraryTab;
 
@@ -753,22 +753,27 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         @Override
         public void execute() {
             LibraryTab toKeepLibraryTab = Optional.of(libraryTab).get();
-            for (Tab tab : tabbedPane.getTabs()) {
-                LibraryTab libraryTab = (LibraryTab) tab;
-                if (libraryTab != toKeepLibraryTab) {
-                    Platform.runLater(() -> closeTab(libraryTab));
-                }
+            List<LibraryTab> libraryTabs = tabbedPane.getTabs().stream()
+                    .filter(LibraryTab.class::isInstance)
+                    .map(LibraryTab.class::cast)
+                    .filter(tab -> tab != toKeepLibraryTab)
+                    .toList();
+            for (LibraryTab tab : libraryTabs) {
+                Platform.runLater(() -> closeTab(tab));
             }
         }
     }
 
-    private class CloseAllDatabaseAction extends SimpleCommand {
+    public class CloseAllDatabaseAction extends SimpleCommand {
 
         @Override
         public void execute() {
-            tabbedPane.getTabs().removeIf(t -> t instanceof WelcomeTab);
-            for (Tab tab : tabbedPane.getTabs()) {
-                Platform.runLater(() -> closeTab((LibraryTab) tab));
+            List<LibraryTab> libraryTabs = tabbedPane.getTabs().stream()
+                    .filter(LibraryTab.class::isInstance)
+                    .map(LibraryTab.class::cast)
+                    .toList();
+            for (LibraryTab tab : libraryTabs) {
+                Platform.runLater(() -> closeTab(tab));
             }
         }
     }
