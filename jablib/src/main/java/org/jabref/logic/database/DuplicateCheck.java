@@ -341,4 +341,32 @@ public class DuplicateCheck {
 
         return database.getEntries().stream().filter(other -> isDuplicate(entry, other, bibDatabaseMode)).findFirst();
     }
+
+    /**
+     * Checks across all fields of the entries,
+     * any matching ones get compared.
+     * If they are not the same the score goes down.
+     * The score goes down depending on the StringSimilarity score.
+     * <p>
+     * If the result is zero, it means that either no common fields were found
+     * or that all common fields were very far apart lexically.
+     * <p>
+     * If the result is one, it means that there was at least one common field
+     * and all the common fields were the same.
+     * <p>
+     * Similar entries have a score of above 0.8
+     *
+     * @param one The first entry
+     * @param two The second entry
+     * @return number [0,1] 1 representing the same (one potentially having more fields), 0 representing completely different
+     */
+    public double degreeOfSimilarity(final BibEntry one, final BibEntry two) {
+        StringSimilarity stringSimilarity = new StringSimilarity();
+        return one.getFields((field) -> two.getField(field).isPresent())
+                  .stream().mapToDouble((field) -> {
+                    String first = one.getField(field).get();
+                    String second = two.getField(field).get();
+                    return stringSimilarity.similarity(first, second);
+                }).average().orElse(0.0);
+    }
 }
