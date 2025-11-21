@@ -266,7 +266,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:

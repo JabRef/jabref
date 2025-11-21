@@ -67,7 +67,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
@@ -101,7 +101,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
@@ -148,7 +148,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
@@ -273,7 +273,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
@@ -307,7 +307,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
@@ -358,7 +358,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
@@ -408,7 +408,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
@@ -467,7 +467,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: actions/cache@v4
@@ -538,7 +538,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
@@ -686,7 +686,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
