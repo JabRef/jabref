@@ -68,12 +68,13 @@ jobs:
         shell: bash
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      # the only place in all workflows where the JBang cache is updated
-      - name: Update cache
-        uses: actions/cache@v4
+      - name: Use cache
+        uses: actions/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       - name: Run checkstyle using gradle
@@ -308,13 +309,13 @@ jobs:
         shell: bash
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/restore@v4
+      # the only place in all workflows where the JBang cache is updated
+      # placed here as this updates the cache for all operating systems - these are different according to https://github.com/actions/cache/tree/main?tab=readme-ov-file#cache-version
+      - name: Update cache
+        uses: actions/cache@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       - name: Setup Gradle
