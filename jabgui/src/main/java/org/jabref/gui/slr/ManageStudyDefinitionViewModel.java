@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -64,6 +65,13 @@ public class ManageStudyDefinitionViewModel {
 
     private final WorkspacePreferences workspacePreferences;
 
+    private final StringProperty titleValidationMessage = new SimpleStringProperty();
+    private final StringProperty authorsValidationMessage = new SimpleStringProperty();
+    private final StringProperty questionsValidationMessage = new SimpleStringProperty();
+    private final StringProperty queriesValidationMessage = new SimpleStringProperty();
+    private final StringProperty catalogsValidationMessage = new SimpleStringProperty();
+    private final StringProperty validationHeaderMessage = new SimpleStringProperty();
+
     /**
      * Constructor for a new study
      */
@@ -84,6 +92,8 @@ public class ManageStudyDefinitionViewModel {
                                     .toList());
         this.dialogService = dialogService;
         this.workspacePreferences = workspacePreferences;
+
+        initializeValidationBindings();
     }
 
     /**
@@ -119,6 +129,47 @@ public class ManageStudyDefinitionViewModel {
         this.directory.set(studyDirectory.toString());
         this.workspacePreferences = workspacePreferences;
         this.dialogService = dialogService;
+
+        initializeValidationBindings();
+    }
+
+    private void initializeValidationBindings() {
+        titleValidationMessage.bind(Bindings.when(title.isEmpty())
+                                            .then(Localization.lang("Study title is required"))
+                                            .otherwise(""));
+
+        authorsValidationMessage.bind(Bindings.when(Bindings.isEmpty(authors))
+                                              .then(Localization.lang("At least one author is required"))
+                                              .otherwise(""));
+
+        questionsValidationMessage.bind(Bindings.when(Bindings.isEmpty(researchQuestions))
+                                                .then(Localization.lang("At least one research question is required"))
+                                                .otherwise(""));
+
+        queriesValidationMessage.bind(Bindings.when(Bindings.isEmpty(queries))
+                                              .then(Localization.lang("At least one query is required"))
+                                              .otherwise(""));
+
+        catalogsValidationMessage.bind(Bindings.when(
+                                                       Bindings.createBooleanBinding(() ->
+                                                               databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases))
+                                               .then(Localization.lang("At least one catalog must be selected"))
+                                               .otherwise(""));
+
+        validationHeaderMessage.bind(Bindings.when(
+                                                     Bindings.or(
+                                                             Bindings.or(
+                                                                     Bindings.or(
+                                                                             Bindings.or(title.isEmpty(), Bindings.isEmpty(authors)),
+                                                                             Bindings.isEmpty(researchQuestions)
+                                                                     ),
+                                                                     Bindings.isEmpty(queries)
+                                                             ),
+                                                             Bindings.createBooleanBinding(() ->
+                                                                     databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases)
+                                                     ))
+                                             .then(Localization.lang("In order to proceed:"))
+                                             .otherwise(""));
     }
 
     public StringProperty getTitle() {
@@ -240,5 +291,29 @@ public class ManageStudyDefinitionViewModel {
                                                      .collect(Collectors.toList());
 
         workspacePreferences.setSelectedSlrCatalogs(selectedCatalogsList);
+    }
+
+    public StringProperty validationHeaderMessageProperty() {
+        return validationHeaderMessage;
+    }
+
+    public StringProperty titleValidationMessageProperty() {
+        return titleValidationMessage;
+    }
+
+    public StringProperty authorsValidationMessageProperty() {
+        return authorsValidationMessage;
+    }
+
+    public StringProperty questionsValidationMessageProperty() {
+        return questionsValidationMessage;
+    }
+
+    public StringProperty queriesValidationMessageProperty() {
+        return queriesValidationMessage;
+    }
+
+    public StringProperty catalogsValidationMessageProperty() {
+        return catalogsValidationMessage;
     }
 }
