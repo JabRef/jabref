@@ -11,6 +11,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class ExternalLinkCreator {
         return entry.getField(StandardField.TITLE).flatMap(title -> {
             String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
                                                 .getOrDefault("Google Scholar", DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL);
-            Optional<String> author = entry.getField(StandardField.AUTHOR);
+            String author = entry.getField(StandardField.AUTHOR).orElse(null);
             return buildSearchUrl(baseUrl, DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL, title, author, "Google Scholar");
         });
     }
@@ -53,7 +54,7 @@ public class ExternalLinkCreator {
         return entry.getField(StandardField.TITLE).flatMap(title -> {
             String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
                                                 .getOrDefault("Short Science", DEFAULT_SHORTSCIENCE_SEARCH_URL);
-            Optional<String> author = entry.getField(StandardField.AUTHOR);
+            String author = entry.getField(StandardField.AUTHOR).orElse(null);
             return buildSearchUrl(baseUrl, DEFAULT_SHORTSCIENCE_SEARCH_URL, title, author, "ShortScience");
         });
     }
@@ -64,11 +65,11 @@ public class ExternalLinkCreator {
      * @param baseUrl The custom or default base URL
      * @param defaultUrl The fallback default URL
      * @param title The title to search for
-     * @param author Optional author to include in search
+     * @param author Optional author to include in search (null if not present)
      * @param serviceName Name of the service for logging
      * @return Optional containing the constructed URL, or empty if construction failed
      */
-    private Optional<String> buildSearchUrl(String baseUrl, String defaultUrl, String title, Optional<String> author, String serviceName) {
+    private Optional<String> buildSearchUrl(String baseUrl, String defaultUrl, String title, @Nullable String author, String serviceName) {
         // Converting LaTeX-formatted titles (e.g., containing braces) to plain Unicode to ensure compatibility with ShortScience's search URL.
         // LatexToUnicodeAdapter.format() is being used because it attempts to parse LaTeX, but gracefully degrades to a normalized title on failure.
         // This avoids sending malformed or literal LaTeX syntax titles that would give the wrong result.
@@ -92,8 +93,8 @@ public class ExternalLinkCreator {
             String urlWithTitle = baseUrl.replace("{title}", encodedTitle);
             String finalUrl;
 
-            if (author.isPresent()) {
-                String encodedAuthor = URLEncoder.encode(author.get().trim(), StandardCharsets.UTF_8);
+            if (author != null) {
+                String encodedAuthor = URLEncoder.encode(author.trim(), StandardCharsets.UTF_8);
                 finalUrl = urlWithTitle.replace("{author}", encodedAuthor);
             } else {
                 // Remove {author} placeholder if no author is present
@@ -116,12 +117,14 @@ public class ExternalLinkCreator {
     /**
      * Builds a URL using query parameters (fallback method)
      */
-    private Optional<String> buildUrlWithQueryParams(String baseUrl, String title, Optional<String> author, String serviceName) {
+    private Optional<String> buildUrlWithQueryParams(String baseUrl, String title, @Nullable String author, String serviceName) {
         try {
             URIBuilder uriBuilder = new URIBuilder(baseUrl);
             // Title is already converted to Unicode by buildSearchUrl before reaching here
             uriBuilder.addParameter("q", title.trim());
-            author.ifPresent(a -> uriBuilder.addParameter("author", a.trim()));
+            if (author != null) {
+                uriBuilder.addParameter("author", author.trim());
+            }
             return Optional.of(uriBuilder.toString());
         } catch (URISyntaxException ex) {
             LOGGER.error("Failed to construct {} URL: {}", serviceName, ex.getMessage());
