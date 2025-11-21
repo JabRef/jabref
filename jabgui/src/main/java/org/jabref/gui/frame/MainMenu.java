@@ -180,8 +180,8 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new SimpleCommand() {
                     {
                         this.executable.bind(Bindings.createBooleanBinding(
-                            () -> ActionHelper.needsMultipleDatabases(stateManager).get() && frame.getCurrentLibraryTab() != null,
-                            stateManager.getOpenDatabases(), stateManager.activeTabProperty()));
+                                () -> ActionHelper.needsMultipleDatabases(stateManager).get() && frame.getCurrentLibraryTab() != null,
+                                stateManager.getOpenDatabases(), stateManager.activeTabProperty()));
                     }
 
                     @Override
