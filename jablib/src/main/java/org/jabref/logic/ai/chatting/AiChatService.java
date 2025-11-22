@@ -43,7 +43,7 @@ public class AiChatService {
         FollowUpQuestionGenerator followUpQuestionGenerator = new FollowUpQuestionGenerator(
                 chatLanguageModel,
                 aiTemplatesService,
-                aiPreferences.getFollowUpQuestionsCount());
+                aiPreferences);
         return new AiChatLogic(
                 aiPreferences,
                 chatLanguageModel,

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
@@ -227,7 +226,7 @@ public class AiChatComponent extends VBox {
     private void updateFollowUpQuestions() {
         List<String> questions = new ArrayList<>(aiChatLogic.getFollowUpQuestions());
 
-        Platform.runLater(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             followUpQuestionsBox.getChildren().removeIf(node -> node instanceof Hyperlink);
 
             if (questions.isEmpty()) {

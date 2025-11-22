@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.templates.AiTemplatesService;
 
 import dev.langchain4j.data.message.AiMessage;
@@ -20,12 +21,12 @@ public class FollowUpQuestionGenerator {
 
     private final ChatModel chatLanguageModel;
     private final AiTemplatesService aiTemplatesService;
-    private final int maxQuestions;
+    private final AiPreferences aiPreferences;
 
-    public FollowUpQuestionGenerator(ChatModel chatLanguageModel, AiTemplatesService aiTemplatesService, int maxQuestions) {
+    public FollowUpQuestionGenerator(ChatModel chatLanguageModel, AiTemplatesService aiTemplatesService, AiPreferences aiPreferences) {
         this.chatLanguageModel = chatLanguageModel;
         this.aiTemplatesService = aiTemplatesService;
-        this.maxQuestions = maxQuestions;
+        this.aiPreferences = aiPreferences;
     }
 
     public List<String> generateFollowUpQuestions(UserMessage userMessage, AiMessage aiMessage) {
@@ -51,7 +52,7 @@ public class FollowUpQuestionGenerator {
     }
 
     private String buildPrompt(String userMessage, String aiResponse) {
-        return aiTemplatesService.makeFollowUpQuestionsPrompt(userMessage, aiResponse, maxQuestions);
+        return aiTemplatesService.makeFollowUpQuestionsPrompt(userMessage, aiResponse, aiPreferences.getFollowUpQuestionsCount());
     }
 
     private List<String> parseQuestions(String response) {
@@ -60,7 +61,7 @@ public class FollowUpQuestionGenerator {
         Pattern numberedPattern = Pattern.compile("^\\s*\\d+\\.\\s*(.+)$", Pattern.MULTILINE);
         Matcher matcher = numberedPattern.matcher(response);
 
-        while (matcher.find() && questions.size() < maxQuestions) {
+        while (matcher.find() && questions.size() < aiPreferences.getFollowUpQuestionsCount()) {
             String question = matcher.group(1).trim();
 
             question = question.replaceAll("^[\"']|[\"']$", "");
@@ -75,7 +76,7 @@ public class FollowUpQuestionGenerator {
             String[] lines = response.split("\n");
 
             for (String line : lines) {
-                if (questions.size() >= maxQuestions) {
+                if (questions.size() >= aiPreferences.getFollowUpQuestionsCount()) {
                     break;
                 }
 
