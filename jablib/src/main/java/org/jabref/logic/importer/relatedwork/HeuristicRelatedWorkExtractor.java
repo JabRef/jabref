@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.StandardField;
 
 /**
  * Deterministic extractor for author–year style citations in "Related Work" sections.
- * Handles single and multi-citation parentheticals, including diacritics and all-caps acronyms (e.g., CIA, Šimić).
+ * Handles single and multi-citation parentheticals, including diacritics and all-caps acronyms.
  */
 public class HeuristicRelatedWorkExtractor implements RelatedWorkExtractor {
 
