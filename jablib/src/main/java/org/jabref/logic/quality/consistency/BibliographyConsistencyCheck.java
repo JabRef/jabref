@@ -104,7 +104,7 @@ public class BibliographyConsistencyCheck {
     public Result check(BibDatabaseContext bibContext, BibEntryTypesManager bibEntryTypesManager, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();
-        // collects fields existing in all entries, scoped by entry typed
+        // collects fields existing in all entries, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap = new HashMap<>();
         // collects entries of the same type
         Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap = new HashMap<>();
