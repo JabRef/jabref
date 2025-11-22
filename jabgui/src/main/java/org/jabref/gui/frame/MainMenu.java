@@ -2,7 +2,6 @@ package org.jabref.gui.frame;
 
 import java.util.function.Supplier;
 
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -12,10 +11,8 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.ClearEmbeddingsAction;
@@ -177,31 +174,8 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
-                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new SimpleCommand() {
-                    {
-                        this.executable.bind(Bindings.createBooleanBinding(
-                                () -> ActionHelper.needsMultipleDatabases(stateManager).get() && frame.getCurrentLibraryTab() != null,
-                                stateManager.getOpenDatabases(), stateManager.activeTabProperty()));
-                    }
-
-                    @Override
-                    public void execute() {
-                        LibraryTab currentTab = frame.getCurrentLibraryTab();
-                        if (currentTab != null) {
-                            frame.new CloseOthersDatabaseAction(currentTab).execute();
-                        }
-                    }
-                }),
-                factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new SimpleCommand() {
-                    {
-                        this.executable.bind(ActionHelper.needsDatabase(stateManager));
-                    }
-
-                    @Override
-                    public void execute() {
-                        frame.new CloseAllDatabaseAction().execute();
-                    }
-                }),
+                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, frame.new CloseOthersFromMenuAction()),
+                factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, frame.new CloseAllFromMenuAction()),
 
                 new SeparatorMenuItem(),
 
