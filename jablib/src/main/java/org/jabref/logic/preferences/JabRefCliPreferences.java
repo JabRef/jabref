@@ -24,7 +24,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
@@ -142,7 +141,6 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
-
     public static final String LANGUAGE = "language";
 
     public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
@@ -959,12 +957,16 @@ public class JabRefCliPreferences implements CliPreferences {
         return prefs.getInt(key, getIntDefault(key));
     }
 
-    public double getDouble(String key) {
-        return prefs.getDouble(key, getDoubleDefault(key));
+    public int getInt(String key, int def) {
+        return prefs.getInt(key, def);
     }
 
     public int getIntDefault(String key) {
         return (Integer) defaults.get(key);
+    }
+
+    public double getDouble(String key) {
+        return prefs.getDouble(key, getDoubleDefault(key));
     }
 
     private double getDoubleDefault(String key) {
@@ -1660,10 +1662,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     protected Language getLanguage() {
-        return Stream.of(Language.values())
-                     .filter(language -> language.getId().equalsIgnoreCase(get(LANGUAGE)))
-                     .findFirst()
-                     .orElse(Language.ENGLISH);
+        return Language.getLanguageFor(get(LANGUAGE));
     }
 
     @Override
@@ -2322,21 +2321,21 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Map<String, String> getDefaultFetcherKeys() {
-        // TODO: We do not want to have a depdency on afterburner.fx (because of huge JavaFX depdencny tree). - Should be rewritten to new DI framework
+        // We do not want to have a dependency on afterburner.fx (because of huge JavaFX dependency tree). Therefore, we do not use following line, but instantiate "BuildInfo" directly.
         // BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        // if (buildInfo == null) {
+        //     LOGGER.warn("Could not instantiate BuildInfo.");
+        //     return Map.of();
+        // }
         BuildInfo buildInfo = new BuildInfo();
-        if (buildInfo == null) {
-            LOGGER.warn("Could not instantiate BuildInfo.");
-            return Map.of();
-        }
 
         Map<String, String> keys = new HashMap<>();
-        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
         keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
         keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);
-        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         // SpringerLink uses the same key and fetcher name as SpringerFetcher
+        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
 
         return keys;
     }

@@ -103,8 +103,8 @@ dependencies {
 
     implementation("org.eclipse.jgit:org.eclipse.jgit")
 
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation("tools.jackson.dataformat:jackson-dataformat-yaml")
+    implementation("tools.jackson.core:jackson-databind")
     // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
     // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
 
@@ -224,9 +224,6 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock") {
-        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
-    }
     testImplementation("org.ow2.asm:asm")
 
     // Required for LocalizationConsistencyTest
@@ -357,13 +354,14 @@ val versionProvider = providers.gradleProperty("projVersionInfo").orElse("100.0.
 val year = Calendar.getInstance().get(Calendar.YEAR).toString()
 
 val azureInstrumentationKey = providers.environmentVariable("AzureInstrumentationKey").orElse("")
-val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
 val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDataSystemAPIKey").orElse("")
-val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
-val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
-val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
+val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
+val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
+val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
+val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
+val unpaywallEmail = providers.environmentVariable("UNPAYWALL_EMAIL").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(extractMaintainers)
@@ -376,13 +374,15 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("year", year)
     inputs.property("maintainers", maintainersProvider)
     inputs.property("azureInstrumentationKey", azureInstrumentationKey)
-    inputs.property("springerNatureAPIKey", springerNatureAPIKey)
+
     inputs.property("astrophysicsDataSystemAPIKey", astrophysicsDataSystemAPIKey)
-    inputs.property("ieeeAPIKey", ieeeAPIKey)
-    inputs.property("scienceDirectApiKey", scienceDirectApiKey)
     inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
-    inputs.property("semanticScholarApiKey", semanticScholarApiKey)
+    inputs.property("ieeeAPIKey", ieeeAPIKey)
     inputs.property("medlineApiKey", medlineApiKey)
+    inputs.property("springerNatureAPIKey", springerNatureAPIKey)
+    inputs.property("scienceDirectApiKey", scienceDirectApiKey)
+    inputs.property("semanticScholarApiKey", semanticScholarApiKey)
+    inputs.property("unpaywallEmail", unpaywallEmail)
 
     filesMatching("build.properties") {
         expand(
@@ -391,13 +391,15 @@ tasks.named<ProcessResources>("processResources") {
                 "year" to inputs.properties["year"],
                 "maintainers" to inputs.properties["maintainers"],
                 "azureInstrumentationKey" to inputs.properties["azureInstrumentationKey"],
-                "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
+
                 "astrophysicsDataSystemAPIKey" to inputs.properties["astrophysicsDataSystemAPIKey"],
-                "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
-                "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
+                "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
+                "medlineApiKey" to inputs.properties["medlineApiKey"],
+                "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
                 "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
-                "medlineApiKey" to inputs.properties["medlineApiKey"]
+                "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
+                "unpaywallEmail" to inputs.properties["unpaywallEmail"],
             )
         )
     }
@@ -593,8 +595,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("org.xmlunit")
     requires.add("org.xmlunit.matchers")
-    requires.add("wiremock")
-    requires.add("wiremock.slf4j.spi.shim")
+
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")

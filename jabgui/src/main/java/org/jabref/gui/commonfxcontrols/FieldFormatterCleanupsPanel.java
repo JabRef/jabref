@@ -19,7 +19,7 @@ import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
