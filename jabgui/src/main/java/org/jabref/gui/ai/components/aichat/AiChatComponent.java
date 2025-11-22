@@ -16,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -224,10 +225,8 @@ public class AiChatComponent extends VBox {
     }
 
     private void updateFollowUpQuestions() {
-        // Get the current questions (this is thread-safe)
         List<String> questions = new ArrayList<>(aiChatLogic.getFollowUpQuestions());
 
-        // Update UI on the JavaFX Application Thread
         Platform.runLater(() -> {
             followUpQuestionsBox.getChildren().removeIf(node -> node instanceof Hyperlink);
 
@@ -241,6 +240,7 @@ public class AiChatComponent extends VBox {
                 for (String question : questions) {
                     Hyperlink link = new Hyperlink(question);
                     link.getStyleClass().add("exampleQuestionStyle");
+                    link.setTooltip(new Tooltip(question));
                     link.setOnAction(event -> {
                         onSendMessage(question);
                     });

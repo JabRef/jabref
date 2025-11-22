@@ -79,10 +79,10 @@ public class FollowUpQuestionGenerator {
                     break;
                 }
 
-                line = line.trim();
-                line = line.replaceAll("^[-*•]\\s*", "");
-                line = line.replaceAll("^\\d+\\.\\s*", "");
-                line = line.replaceAll("^[\"']|[\"']$", "");
+                line = line.trim()
+                           .replaceAll("^[-*•]\\s*", "")
+                           .replaceAll("^\\d+\\.\\s*", "")
+                           .replaceAll("^[\"']|[\"']$", "");
 
                 if (isValidQuestion(line)) {
                     questions.add(line);

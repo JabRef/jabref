@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
@@ -339,7 +340,7 @@
 
     <CheckBox fx:id="generateFollowUpQuestions"
               mnemonicParsing="false"
-              text="%Generate follow-up questions"
+              text="%Automatically generate follow-up questions"
               HBox.hgrow="ALWAYS"
               maxWidth="Infinity"/>
 
@@ -349,10 +350,9 @@
         </padding>
         <Label alignment="BASELINE_CENTER"
                text="%Number of follow-up questions"/>
-        <IntegerInputField
-            fx:id="followUpQuestionsCountTextField"
-            HBox.hgrow="ALWAYS"
-            maxWidth="150"/>
+        <Spinner fx:id="followUpQuestionsCountSpinner"
+                 editable="true"
+                 maxWidth="100"/>
     </HBox>
 
 </fx:root>
