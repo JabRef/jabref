@@ -29,7 +29,7 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     private final Path absoluteDirectoryPath;
     private final DirectoryUpdateMonitor directoryUpdateMonitor;
-    private final BibDatabaseContext database;
+    private BibDatabaseContext database;
     private final String user;
 
     DirectoryGroup(String name,
@@ -184,6 +184,10 @@ public class DirectoryGroup extends AbstractGroup implements DirectoryUpdateList
 
     public BibDatabaseContext getBibDatabaseContext() {
         return this.database;
+    }
+
+    public void setBibDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+        this.database = bibDatabaseContext;
     }
 
     private void cleanupFilesOfAnEntry(BibEntry entry) {

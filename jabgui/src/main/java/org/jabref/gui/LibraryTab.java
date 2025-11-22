@@ -89,6 +89,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DirectoryUpdateMonitor;
@@ -316,7 +317,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             this.markBaseChanged();
         }
 
-        setDatabaseContext(result.getDatabaseContext());
+        BibDatabaseContext newDatabase = result.getDatabaseContext();
+        setDatabaseContext(newDatabase);
+
+        // Update the database stored in Directory Groups
+        newDatabase.getMetaData().getGroups().ifPresent(groupTree -> {
+            groupTree.findChildrenSatisfying(groupTreeNode -> groupTreeNode.getGroup() instanceof DirectoryGroup)
+                     .forEach(groupTreeNode -> {
+                         if (groupTreeNode.getGroup() instanceof DirectoryGroup directoryGroup) {
+                             directoryGroup.setBibDatabaseContext(newDatabase);
+                         }
+                     });
+        });
+
         // Notify listeners that the auto-completer may have changed
         if (autoCompleterChangedListener != null) {
             autoCompleterChangedListener.run();
