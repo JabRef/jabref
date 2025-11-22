@@ -26,6 +26,7 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.WatchServiceUnavailableException;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -133,8 +134,25 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     }
 
     private void importFilesInDatabase(List<Path> files, BibDatabaseContext database) {
-        ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, this, undoManager, stateManager, dialogService, taskExecutor);
-        importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
+        int nbPDFs = files.size();
+        if (nbPDFs > 0) {
+            ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, this, undoManager, stateManager, dialogService, taskExecutor);
+            importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), TransferMode.LINK)
+                         .onSuccess(_ -> {
+                             if (nbPDFs == 1) {
+                                 dialogService.notify(Localization.lang("Successfully imported %0 PDF.", nbPDFs));
+                             } else {
+                                 dialogService.notify(Localization.lang("Successfully imported %0 PDFs.", nbPDFs));
+                             }
+                         }).onFailure(_ -> {
+                             if (nbPDFs == 1) {
+                                 dialogService.notify(Localization.lang("Failed to import %0 PDF.", nbPDFs));
+                             } else {
+                                 dialogService.notify(Localization.lang("Failed to import %0 PDFs.", nbPDFs));
+                             }
+                         })
+                         .executeWith(taskExecutor);
+        }
     }
 
     private void notifyAboutDirectoryCreation(Path newPath) {
@@ -163,14 +181,11 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     }
 
     private void notifyAboutPDFCreation(Path pdfPath) {
-        List<Path> pathToImport = new ArrayList<>();
-        pathToImport.add(pdfPath);
         Path parentPath = pdfPath.toAbsolutePath().getParent();
         for (DirectoryUpdateListener listener : listeners.get(parentPath)) {
             if (listener instanceof DirectoryGroup parentGroup) {
                 BibDatabaseContext database = parentGroup.getBibDatabaseContext();
-                ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, this, undoManager, stateManager, dialogService, taskExecutor);
-                importHandler.importFilesInBackground(pathToImport, database, preferences.getFilePreferences(), TransferMode.LINK).executeWith(taskExecutor);
+                importFilesInDatabase(List.of(pdfPath), database);
             }
         }
     }
