@@ -198,4 +198,3 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         );
     }
 }
-

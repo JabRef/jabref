@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -40,6 +41,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private CheckBox enableAi;
     @FXML private CheckBox autoGenerateEmbeddings;
     @FXML private CheckBox autoGenerateSummaries;
+    @FXML private CheckBox generateFollowUpQuestions;
+    @FXML private Spinner<Integer> followUpQuestionsCountSpinner;
+    @FXML private Tab followUpQuestionsTab;
+    @FXML private TextArea followUpQuestionsTextArea;
 
     @FXML private ComboBox<AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
@@ -117,7 +122,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         summarizationCombineUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE));
         citationParsingSystemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE));
         citationParsingUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
-
+        followUpQuestionsTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.FOLLOW_UP_QUESTIONS));
         templatesTabPane.getSelectionModel().selectedItemProperty().addListener(_ -> viewModel.selectedTemplateProperty().set(getAiTemplate()));
     }
 
@@ -248,6 +253,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         autoGenerateSummaries.disableProperty().bind(viewModel.disableAutoGenerateSummaries());
         autoGenerateEmbeddings.selectedProperty().bindBidirectional(viewModel.autoGenerateEmbeddings());
         autoGenerateEmbeddings.disableProperty().bind(viewModel.disableAutoGenerateEmbeddings());
+        generateFollowUpQuestions.selectedProperty().bindBidirectional(viewModel.generateFollowUpQuestions());
+        followUpQuestionsCountSpinner.setValueFactory(AiTabViewModel.followUpQuestionsCountValueFactory);
+        followUpQuestionsCountSpinner.getValueFactory().valueProperty().bindBidirectional(viewModel.followUpQuestionsCountProperty().asObject());
     }
 
     @Override

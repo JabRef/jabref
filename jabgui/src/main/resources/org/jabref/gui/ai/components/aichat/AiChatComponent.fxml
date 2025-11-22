@@ -31,6 +31,10 @@
         <Hyperlink fx:id="exQuestion3" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
     </HBox>
 
+    <HBox spacing="10" alignment="CENTER" fx:id="followUpQuestionsBox" managed="false" visible="false">
+        <Label text="%Follow-up questions" BorderPane.alignment="CENTER"/>
+    </HBox>
+
     <HBox spacing="10">
         <Button alignment="CENTER"
                 fx:id="notificationsButton"
