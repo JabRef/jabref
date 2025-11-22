@@ -118,7 +118,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private Subscription horizontalDividerSubscription;
     private Subscription verticalDividerSubscription;
 
-    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     public JabRefFrame(Stage mainStage, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, GuiPreferences preferences, AiService aiService, StateManager stateManager, CountingUndoManager undoManager, BibEntryTypesManager entryTypesManager, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor, GitHandlerRegistry gitHandlerRegistry) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
