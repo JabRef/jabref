@@ -79,7 +79,7 @@ class AiModelServiceTest {
     @Test
     void fetchModelsSynchronouslyHandlesTimeout() {
         // This test uses a URL that will likely timeout (non-routable IP)
-        // The HTTP client has a built-in 5-second connect timeout, so should fail quickly
+        // Unirest has a default timeout, so should fail and return empty list
         long startTime = System.currentTimeMillis();
 
         List<String> models = aiModelService.fetchModelsSynchronously(
@@ -91,8 +91,8 @@ class AiModelServiceTest {
         long duration = System.currentTimeMillis() - startTime;
 
         assertTrue(models.isEmpty());
-        // Should timeout around 5 seconds (connect timeout), allow margin for test execution
-        assertTrue(duration < 7000, "Should timeout within ~5 seconds, but took " + duration + "ms");
+        // Unirest default timeout is around 10 seconds, allow margin for test execution
+        assertTrue(duration < 15000, "Should timeout within reasonable time, but took " + duration + "ms");
     }
 
     @Test
