@@ -79,7 +79,7 @@ class AiModelServiceTest {
     @Test
     void fetchModelsSynchronouslyHandlesTimeout() {
         // This test uses a URL that will likely timeout (non-routable IP)
-        // The service should timeout after 5 seconds and return empty list
+        // The HTTP client has a built-in 5-second connect timeout, so should fail quickly
         long startTime = System.currentTimeMillis();
 
         List<String> models = aiModelService.fetchModelsSynchronously(
@@ -91,7 +91,7 @@ class AiModelServiceTest {
         long duration = System.currentTimeMillis() - startTime;
 
         assertTrue(models.isEmpty());
-        // Should timeout around 5 seconds, allow some margin for test execution
+        // Should timeout around 5 seconds (connect timeout), allow margin for test execution
         assertTrue(duration < 7000, "Should timeout within ~5 seconds, but took " + duration + "ms");
     }
 
