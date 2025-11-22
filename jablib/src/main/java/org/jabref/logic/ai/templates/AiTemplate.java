@@ -19,7 +19,7 @@ public enum AiTemplate {
     CITATION_PARSING_SYSTEM_MESSAGE,
     CITATION_PARSING_USER_MESSAGE,
 
-    // Template that is used to generate follow-up questions in chat,
+    // Template that is used to generate follow-up questions in chat.
     FOLLOW_UP_QUESTIONS;
 
     public String getLocalizedName() {
