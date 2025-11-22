@@ -22,6 +22,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,7 @@ class SidePaneViewModelTest {
     DialogService dialogService = mock(DialogService.class);
     AiService aiService = mock(AiService.class);
     FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
+    DirectoryUpdateMonitor directoryUpdateMonitor = mock(DirectoryUpdateMonitor.class);
     BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
     UndoManager undoManager = mock(UndoManager.class);
@@ -76,6 +78,7 @@ class SidePaneViewModelTest {
                 dialogService,
                 aiService,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
                 undoManager);

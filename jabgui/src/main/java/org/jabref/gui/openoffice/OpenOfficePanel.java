@@ -64,6 +64,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.sun.star.comp.helper.BootstrapException;
@@ -111,6 +112,7 @@ public class OpenOfficePanel {
     private final CSLStyleLoader cslStyleLoader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
     private OOStyle currentStyle;
@@ -129,11 +131,13 @@ public class OpenOfficePanel {
                            AiService aiService,
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,
+                           DirectoryUpdateMonitor directoryUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
                            ClipBoardManager clipBoardManager,
                            UndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.openOfficePreferences = openOfficePreferences;
@@ -343,6 +347,7 @@ public class OpenOfficePanel {
                     preferences,
                     stateManager,
                     fileUpdateMonitor,
+                    directoryUpdateMonitor,
                     entryTypesManager,
                     undoManager,
                     clipBoardManager,

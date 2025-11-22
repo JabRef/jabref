@@ -53,6 +53,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -92,6 +93,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private DirectoryUpdateMonitor directoryUpdateMonitor;
 
     /**
      * Creates an import dialog for entries from file sources.
@@ -130,7 +132,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query);
+        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor, directoryUpdateMonitor, searchBasedFetcher, query);
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);

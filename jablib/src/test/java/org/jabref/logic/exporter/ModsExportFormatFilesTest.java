@@ -15,6 +15,7 @@ import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
@@ -62,7 +63,7 @@ public class ModsExportFormatFilesTest {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         exporter = new ModsExporter();
-        bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+        bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         modsImporter = new ModsImporter(importFormatPreferences);
 
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");

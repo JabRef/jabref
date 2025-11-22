@@ -31,6 +31,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -92,6 +93,7 @@ class StudyRepositoryTest {
                 gitHandler,
                 preferences,
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 entryTypesManager));
     }
 
@@ -197,6 +199,7 @@ class StudyRepositoryTest {
                 gitHandler,
                 preferences,
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 entryTypesManager);
         return studyRepository;
     }

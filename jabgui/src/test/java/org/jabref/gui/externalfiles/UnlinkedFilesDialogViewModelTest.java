@@ -64,6 +64,7 @@ public class UnlinkedFilesDialogViewModelTest {
                 null,
                 null,
                 null,
+                null,
                 guiPreferences,
                 stateManager,
                 taskExecutor

@@ -89,8 +89,10 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -113,6 +115,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
@@ -179,6 +182,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        @NonNull GuiPreferences preferences,
                        @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
+                       DirectoryUpdateMonitor directoryUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
                        CountingUndoManager undoManager,
                        ClipBoardManager clipBoardManager,
@@ -192,6 +196,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.stateManager = stateManager;
         assert bibDatabaseContext.getDatabasePath().isEmpty() || fileUpdateMonitor != null;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -231,6 +236,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 bibDatabaseContext,
                 preferences,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,
@@ -311,7 +317,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             this.markBaseChanged();
         }
 
-        setDatabaseContext(result.getDatabaseContext());
+        BibDatabaseContext newDatabase = result.getDatabaseContext();
+        setDatabaseContext(newDatabase);
+
+        // Update the database stored in Directory Groups
+        newDatabase.getMetaData().getGroups().ifPresent(groupTree -> {
+            groupTree.findChildrenSatisfying(groupTreeNode -> groupTreeNode.getGroup() instanceof DirectoryGroup)
+                     .forEach(groupTreeNode -> {
+                         if (groupTreeNode.getGroup() instanceof DirectoryGroup directoryGroup) {
+                             directoryGroup.setBibDatabaseContext(newDatabase);
+                         }
+                     });
+        });
+
         // Notify listeners that the auto-completer may have changed
         if (autoCompleterChangedListener != null) {
             autoCompleterChangedListener.run();
@@ -1033,6 +1051,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               StateManager stateManager,
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
+                                              DirectoryUpdateMonitor directoryUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               CountingUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
@@ -1048,6 +1067,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
@@ -1070,6 +1090,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               GuiPreferences preferences,
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
+                                              DirectoryUpdateMonitor directoryUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               UndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
@@ -1082,6 +1103,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 (CountingUndoManager) undoManager,
                 clipBoardManager,

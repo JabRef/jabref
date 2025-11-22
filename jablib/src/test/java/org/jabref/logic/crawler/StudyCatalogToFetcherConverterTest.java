@@ -18,6 +18,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +60,7 @@ class StudyCatalogToFetcherConverterTest {
                 gitHandler,
                 preferences,
                 new DummyFileUpdateMonitor(),
+                new DummyDirectoryUpdateMonitor(),
                 entryTypesManager);
         StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),

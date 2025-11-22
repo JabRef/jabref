@@ -79,6 +79,11 @@ public class MetadataSerializationConfiguration {
      */
     public static final String AUTOMATIC_DATE_GROUP_ID = "AutomaticDateGroup:";
 
+    /**
+     * Identifier for DirectoryGroup.
+     */
+    public static final String DIRECTORY_GROUP_ID = "DirectoryGroup:";
+
     private MetadataSerializationConfiguration() {
     }
 }

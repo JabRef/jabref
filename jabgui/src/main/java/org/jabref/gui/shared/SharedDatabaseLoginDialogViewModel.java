@@ -47,6 +47,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -89,6 +90,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
@@ -108,6 +110,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
+                                              DirectoryUpdateMonitor directoryUpdateMonitor,
                                               UndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
@@ -118,6 +121,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -200,6 +204,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
+                    directoryUpdateMonitor,
                     undoManager,
                     clipBoardManager,
                     taskExecutor);

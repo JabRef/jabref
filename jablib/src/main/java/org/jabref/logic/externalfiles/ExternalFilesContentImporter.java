@@ -9,6 +9,7 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class ExternalFilesContentImporter {
@@ -27,7 +28,7 @@ public class ExternalFilesContentImporter {
         }
     }
 
-    public ParserResult importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor) throws IOException {
-        return OpenDatabase.loadDatabase(bibFile, importFormatPreferences, fileUpdateMonitor);
+    public ParserResult importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor, DirectoryUpdateMonitor directoryUpdateMonitor) throws IOException {
+        return OpenDatabase.loadDatabase(bibFile, importFormatPreferences, fileUpdateMonitor, directoryUpdateMonitor);
     }
 }

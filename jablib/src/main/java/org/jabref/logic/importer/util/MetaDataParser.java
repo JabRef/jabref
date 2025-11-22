@@ -22,6 +22,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -33,6 +34,7 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -46,6 +48,7 @@ public class MetaDataParser {
     public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);
     private static FileUpdateMonitor fileMonitor;
+    private static DirectoryUpdateMonitor directoryUpdateMonitor;
     private static final Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
 
     static {
@@ -57,8 +60,9 @@ public class MetaDataParser {
                         new ReplaceUnicodeLigaturesFormatter()));
     }
 
-    public MetaDataParser(FileUpdateMonitor fileMonitor) {
+    public MetaDataParser(FileUpdateMonitor fileMonitor, DirectoryUpdateMonitor directoryUpdateMonitor) {
         MetaDataParser.fileMonitor = fileMonitor;
+        MetaDataParser.directoryUpdateMonitor = directoryUpdateMonitor;
     }
 
     public static Optional<BibEntryType> parseCustomEntryType(String comment) {
@@ -94,7 +98,7 @@ public class MetaDataParser {
      * Parses the given data map and returns a new resulting {@link MetaData} instance.
      */
     public MetaData parse(Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
-        return parse(new MetaData(), data, keywordSeparator, userAndHost);
+        return parse(new BibDatabaseContext(), data, keywordSeparator, userAndHost);
     }
 
     /**
@@ -102,7 +106,7 @@ public class MetaDataParser {
      *
      * @return the given metaData instance (which is modified, too)
      */
-    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
+    public MetaData parse(BibDatabaseContext database, Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
         CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
         Map<EntryType, CitationKeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();
 
@@ -118,51 +122,51 @@ public class MetaDataParser {
                 nonDefaultCiteKeyPatterns.put(entryType, new CitationKeyPattern(getSingleItem(values)));
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
-                metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
+                database.getMetaData().addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(org.jabref.model.metadata.MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), org.jabref.model.metadata.MetaData.ESCAPE_CHARACTER)));
             } else if (MetaData.FILE_DIRECTORY.equals(entry.getKey())) {
-                metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
+                database.getMetaData().setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.BLG_FILE_PATH + "-")) {
-                handleBlgFilePathEntry(entry, metaData);
+                handleBlgFilePathEntry(entry, database.getMetaData());
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
-                metaData.setUserFileDirectory(user, parseDirectory(entry.getValue()));
+                database.getMetaData().setUserFileDirectory(user, parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY_LATEX)) {
                 // The user-host string starts directly after FILE_DIRECTORY_LATEX + '-'
                 String userHostString = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
-                metaData.setLatexFileDirectory(userHostString, parseDirectory(entry.getValue()));
+                database.getMetaData().setLatexFileDirectory(userHostString, parseDirectory(entry.getValue()));
             } else if (MetaData.SAVE_ACTIONS.equals(entry.getKey())) {
-                metaData.setSaveActions(fieldFormatterCleanupsParse(values));
+                database.getMetaData().setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
-                metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
+                database.getMetaData().setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {
                 defaultCiteKeyPattern = new CitationKeyPattern(getSingleItem(values));
             } else if (MetaData.PROTECTED_FLAG_META.equals(entry.getKey())) {
                 if (Boolean.parseBoolean(getSingleItem(values))) {
-                    metaData.markAsProtected();
+                    database.getMetaData().markAsProtected();
                 } else {
-                    metaData.markAsNotProtected();
+                    database.getMetaData().markAsNotProtected();
                 }
             } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
-                metaData.setSaveOrder(SaveOrder.parse(values));
-            } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
-                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData, userAndHost));
+                database.getMetaData().setSaveOrder(SaveOrder.parse(values));
+            } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || org.jabref.model.metadata.MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
+                database.getMetaData().setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, directoryUpdateMonitor, database, userAndHost));
             } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {
                 Version version = Version.parse(getSingleItem(values));
-                metaData.setGroupSearchSyntaxVersion(version);
+                database.getMetaData().setGroupSearchSyntaxVersion(version);
             } else if (MetaData.VERSION_DB_STRUCT.equals(entry.getKey())) {
-                metaData.setVersionDBStructure(getSingleItem(values));
+                database.getMetaData().setVersionDBStructure(getSingleItem(values));
             } else {
                 // Keep meta data items that we do not know in the file
-                metaData.putUnknownMetaDataItem(entry.getKey(), values);
+                database.getMetaData().putUnknownMetaDataItem(entry.getKey(), values);
             }
         }
 
         if (!defaultCiteKeyPattern.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN) || !nonDefaultCiteKeyPatterns.isEmpty()) {
-            metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
+            database.getMetaData().setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
         }
 
-        return metaData;
+        return database.getMetaData();
     }
 
     /**

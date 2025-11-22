@@ -20,6 +20,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -36,6 +37,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     protected final StateManager stateManager;
 
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final TaskExecutor taskExecutor;
     private final LibraryTabContainer tabContainer;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
@@ -49,6 +51,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
             Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
+            DirectoryUpdateMonitor directoryUpdateMonitor,
             TaskExecutor taskExecutor,
             CliPreferences preferences,
             StateManager stateManager) {
@@ -56,6 +59,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                 openDatabaseActionSupplier,
                 dialogService,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 taskExecutor,
                 preferences,
                 stateManager,
@@ -67,6 +71,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
             Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
+            DirectoryUpdateMonitor directoryUpdateMonitor,
             TaskExecutor taskExecutor,
             CliPreferences preferences,
             StateManager stateManager,
@@ -75,6 +80,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         this.openDatabaseActionSupplier = openDatabaseActionSupplier;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.stateManager = stateManager;
@@ -116,7 +122,8 @@ public class ExistingStudySearchAction extends SimpleCommand {
                     new SlrGitHandler(this.studyDirectory),
                     preferences,
                     new BibEntryTypesManager(),
-                    fileUpdateMonitor);
+                    fileUpdateMonitor,
+                    directoryUpdateMonitor);
         } catch (IOException | ParseException | JabRefException e) {
             LOGGER.error("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);

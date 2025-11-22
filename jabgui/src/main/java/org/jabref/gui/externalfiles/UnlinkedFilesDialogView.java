@@ -49,6 +49,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -87,6 +88,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private DirectoryUpdateMonitor directoryUpdateMonitor;
 
     private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
@@ -117,6 +119,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                 dialogService,
                 undoManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 preferences,
                 stateManager,
                 taskExecutor);

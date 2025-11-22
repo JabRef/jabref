@@ -16,6 +16,7 @@ import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
@@ -50,7 +51,7 @@ class EndnoteXmlExporterFilesTest {
         databaseContext = new BibDatabaseContext();
         exporter = new EndnoteXmlExporter(new BibEntryPreferences(','));
         endnoteXmlImporter = new EndnoteXmlImporter(importFormatPreferences);
-        bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+        bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         exportFile = testFolder.resolve("exported-endnote.xml").toAbsolutePath();
     }
 

@@ -35,6 +35,7 @@ import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NonNull;
@@ -52,15 +53,18 @@ public class ImportFormatReader {
     private final ImporterPreferences importerPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
                               CitationKeyPatternPreferences citationKeyPatternPreferences,
-                              FileUpdateMonitor fileUpdateMonitor) {
+                              FileUpdateMonitor fileUpdateMonitor,
+                              DirectoryUpdateMonitor directoryUpdateMonitor) {
         this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         reset();
     }
@@ -89,7 +93,7 @@ public class ImportFormatReader {
         formats.add(new RisImporter());
         formats.add(new CffImporter(citationKeyPatternPreferences));
         formats.add(new BiblioscapeImporter());
-        formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
+        formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor, directoryUpdateMonitor));
         formats.add(new CitaviXmlImporter());
 
         // Get custom import formats
@@ -147,7 +151,8 @@ public class ImportFormatReader {
     ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     public UnknownFormatImport importUnknownFormat(@NonNull Path filePath,
-                                                   FileUpdateMonitor fileMonitor) throws ImportException {
+                                                   FileUpdateMonitor fileMonitor,
+                                                   DirectoryUpdateMonitor directoryUpdateMonitor) throws ImportException {
         try {
             UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath), importer -> importer.isRecognizedFormat(filePath));
             unknownFormatImport.parserResult.setPath(filePath);
@@ -155,7 +160,7 @@ public class ImportFormatReader {
         } catch (ImportException e) {
             // If all importers fail, try to read the file as BibTeX
             try {
-                ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor);
+                ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor, directoryUpdateMonitor);
                 if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
                     parserResult.setPath(filePath);
                     return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);

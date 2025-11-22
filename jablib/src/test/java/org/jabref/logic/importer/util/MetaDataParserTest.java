@@ -11,11 +11,13 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.MetaDataSerializerTest;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.Test;
@@ -71,8 +73,8 @@ public class MetaDataParserTest {
     @Test
     void saveActions() throws ParseException {
         Map<String, String> data = Map.of("saveActions", "enabled;title[lower_case]");
-        MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
-        MetaData parsed = metaDataParser.parse(new MetaData(), data, ',', "userAndHost");
+        MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
+        MetaData parsed = metaDataParser.parse(new BibDatabaseContext(), data, ',', "userAndHost");
 
         MetaData expected = new MetaData();
         FieldFormatterCleanups fieldFormatterCleanups = new FieldFormatterCleanups(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
@@ -86,7 +88,7 @@ public class MetaDataParserTest {
         String rawKey = "blgFilePath-" + user;
         String rawValue = "/home/user/test.blg;";
 
-        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',', "userAndHost");
 
         assertEquals(Optional.of(Path.of("/home/user/test.blg")), parsed.getBlgFilePath(user));
@@ -100,7 +102,7 @@ public class MetaDataParserTest {
         String rawKey = "fileDirectoryLatex-" + userHost;
         String rawValue = "/home/user/latex;";
 
-        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',', "userAndHost");
 
         assertEquals(Optional.of(Path.of("/home/user/latex")), parsed.getLatexFileDirectory(userHost));
@@ -116,7 +118,7 @@ public class MetaDataParserTest {
                 "fileDirectoryLatex-" + userHost2, "/path/for/host2;"
         );
 
-        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         MetaData parsed = parser.parse(data, ',', "userAndHost");
 
         assertEquals(Optional.of(Path.of("/path/for/host1")), parsed.getLatexFileDirectory(userHost1));
@@ -129,7 +131,7 @@ public class MetaDataParserTest {
         String rawKey = "fileDirectoryLatex-" + userHost;
         String rawValue = "C:\\\\Path\\\\To\\\\Latex;";
 
-        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',', "userAndHost");
 
         assertEquals(Optional.of(Path.of("C:\\Path\\To\\Latex")), parsed.getLatexFileDirectory(userHost));

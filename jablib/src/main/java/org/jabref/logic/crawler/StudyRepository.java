@@ -36,6 +36,7 @@ import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -69,6 +70,7 @@ public class StudyRepository {
     private final Study study;
     private final CliPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final BibEntryTypesManager bibEntryTypesManager;
 
     /**
@@ -85,11 +87,13 @@ public class StudyRepository {
                            SlrGitHandler gitHandler,
                            CliPreferences preferences,
                            FileUpdateMonitor fileUpdateMonitor,
+                           DirectoryUpdateMonitor directoryUpdateMonitor,
                            BibEntryTypesManager bibEntryTypesManager) throws IOException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.studyDefinitionFile = Path.of(repositoryPath.toString(), STUDY_DEFINITION_FILE_NAME);
         this.bibEntryTypesManager = bibEntryTypesManager;
 
@@ -139,7 +143,8 @@ public class StudyRepository {
         if (Files.exists(getPathToFetcherResultFile(query, fetcherName))) {
             return OpenDatabase.loadDatabase(getPathToFetcherResultFile(query, fetcherName),
                     preferences.getImportFormatPreferences(),
-                    fileUpdateMonitor).getDatabaseContext();
+                    fileUpdateMonitor,
+                    directoryUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
     }
@@ -151,7 +156,8 @@ public class StudyRepository {
         if (Files.exists(getPathToQueryResultFile(query))) {
             return OpenDatabase.loadDatabase(getPathToQueryResultFile(query),
                     preferences.getImportFormatPreferences(),
-                    fileUpdateMonitor).getDatabaseContext();
+                    fileUpdateMonitor,
+                    directoryUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
     }
@@ -163,7 +169,8 @@ public class StudyRepository {
         if (Files.exists(getPathToStudyResultFile())) {
             return OpenDatabase.loadDatabase(getPathToStudyResultFile(),
                     preferences.getImportFormatPreferences(),
-                    fileUpdateMonitor).getDatabaseContext();
+                    fileUpdateMonitor,
+                    directoryUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
     }

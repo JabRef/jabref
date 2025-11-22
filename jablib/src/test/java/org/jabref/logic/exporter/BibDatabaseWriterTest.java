@@ -49,6 +49,7 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -462,7 +463,7 @@ class BibDatabaseWriterTest {
     @Test
     void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws IOException, URISyntaxException {
         Path testFile = Path.of(BibDatabaseWriterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
-        ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
+        ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         Path pathToFile = bibFolder.resolve("JabRef.bib");
@@ -486,7 +487,7 @@ class BibDatabaseWriterTest {
     @Test
     void roundtripUtf8HeaderKept(@TempDir Path bibFolder) throws URISyntaxException, IOException {
         Path testFile = Path.of(BibDatabaseWriterTest.class.getResource("encoding-utf-8-with-header-with-databasetypecomment.bib").toURI());
-        ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
+        ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         Path pathToFile = bibFolder.resolve("JabRef.bib");
@@ -510,7 +511,7 @@ class BibDatabaseWriterTest {
     @Test
     void roundtripNotExplicitUtf8HeaderNotInsertedDuringWrite(@TempDir Path bibFolder) throws URISyntaxException, IOException {
         Path testFile = Path.of(BibDatabaseWriterTest.class.getResource("encoding-utf-8-without-header-with-databasetypecomment.bib").toURI());
-        ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
+        ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         Path pathToFile = bibFolder.resolve("JabRef.bib");
@@ -1027,7 +1028,7 @@ class BibDatabaseWriterTest {
         // @formatter:on
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Reader.of(bibtexEntry));
+        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor()).parse(Reader.of(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -1056,7 +1057,7 @@ class BibDatabaseWriterTest {
         // @formatter:on
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Reader.of(bibtexEntry));
+        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor()).parse(Reader.of(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 

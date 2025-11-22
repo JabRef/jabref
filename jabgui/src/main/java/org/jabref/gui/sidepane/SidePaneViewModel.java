@@ -26,6 +26,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                              DialogService dialogService,
                              AiService aiService,
                              FileUpdateMonitor fileUpdateMonitor,
+                             DirectoryUpdateMonitor directoryUpdateMonitor,
                              BibEntryTypesManager entryTypesManager,
                              ClipBoardManager clipBoardManager,
                              UndoManager undoManager) {
@@ -68,6 +70,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                 stateManager,
                 adaptVisibleTabs,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
                 undoManager);
