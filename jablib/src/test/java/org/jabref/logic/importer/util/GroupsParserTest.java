@@ -19,6 +19,7 @@ import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGranularity;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -32,6 +33,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,12 +42,14 @@ class GroupsParserTest {
     private FileUpdateMonitor fileMonitor;
     private DirectoryUpdateMonitor directoryUpdateMonitor;
     private BibDatabaseContext database;
+    private Path temporaryFolder;
 
     @BeforeEach
-    void setUp() {
+    void setUp(@TempDir Path temporaryFolder) {
         fileMonitor = new DummyFileUpdateMonitor();
         directoryUpdateMonitor = new DummyDirectoryUpdateMonitor();
         database = new BibDatabaseContext();
+        this.temporaryFolder = temporaryFolder;
     }
 
     // For https://github.com/JabRef/jabref/issues/1681
@@ -176,6 +180,25 @@ class GroupsParserTest {
         expected.setIconName("calendar");
         expected.setDescription("Group by publication year");
         AbstractGroup parsed = GroupsParser.fromString("AutomaticDateGroup:Publications;0;year;YEAR;1;0x0000ffff;calendar;Group by publication year;", ',', fileMonitor, directoryUpdateMonitor, database, "userAndHost");
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void fromStringParsesDirectoryGroup() throws ParseException, IOException {
+        Path myLocalDirectory = temporaryFolder.resolve("myLocalDirectory").toAbsolutePath();
+        DirectoryGroup expected = DirectoryGroup.create("myDirectoryGroup", GroupHierarchyType.INCLUDING, myLocalDirectory, directoryUpdateMonitor, database, "userAndHost");
+        AbstractGroup parsed = GroupsParser.fromString("DirectoryGroup:myDirectoryGroup;2;" + myLocalDirectory, ',', fileMonitor, directoryUpdateMonitor, database, "userAndHost");
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void fromStringParsesDirectoryGroupWithColorAndIcon() throws ParseException, IOException {
+        Path myLocalDirectory = temporaryFolder.resolve("myLocalDirectory").toAbsolutePath();
+        DirectoryGroup expected = DirectoryGroup.create("myDirectoryGroup", GroupHierarchyType.INCLUDING, myLocalDirectory, directoryUpdateMonitor, database, "userAndHost");
+        expected.setColor(Color.BLUE.toString());
+        expected.setIconName("calendar");
+        expected.setDescription("Mirror my local directory structure");
+        AbstractGroup parsed = GroupsParser.fromString("DirectoryGroup:myDirectoryGroup;2;" + myLocalDirectory + ";1;0x0000ffff;calendar;Mirror my local directory structure;", ',', fileMonitor, directoryUpdateMonitor, database, "userAndHost");
         assertEquals(expected, parsed);
     }
 }

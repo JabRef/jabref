@@ -89,7 +89,7 @@ class GroupDialogViewModelTest {
     }
 
     @Test
-    void validateNonExistingDirectoryPath() throws IOException {
+    void validateNonExistingDirectoryPath() {
         Path notADirectory = temporaryFolder.resolve("MyDirectory").toAbsolutePath();
 
         viewModel.directoryGroupFilePathProperty().setValue(notADirectory.toString());
