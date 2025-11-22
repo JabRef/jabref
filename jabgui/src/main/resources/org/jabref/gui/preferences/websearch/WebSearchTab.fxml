@@ -3,6 +3,8 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
@@ -46,6 +48,28 @@
         <Label text="%Grobid URL"/>
         <TextField fx:id="grobidURL" HBox.hgrow="ALWAYS"/>
     </HBox>
+
+    <Label styleClass="sectionHeader" text="%Search Engine URL Templates"/>
+    <Label text="%( Note: Press return to commit changes in the table! )"/>
+    <TableView
+            fx:id="searchEngineTable"
+            VBox.vgrow="ALWAYS"
+            editable="true">
+        <columns>
+            <TableColumn minWidth="120"
+                         fx:id="searchEngineName"
+                         text="%Search Engine"
+                         editable="false"/>
+            <TableColumn minWidth="300"
+                         fx:id="searchEngineUrlTemplate"
+                         text="%URL Template"
+                         editable="true"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView
+                    fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
 
     <Label styleClass="sectionHeader" text="%Web search fetchers"/>
     <VBox fx:id="fetchersContainer"/>
