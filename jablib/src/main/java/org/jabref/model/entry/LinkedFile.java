@@ -225,16 +225,41 @@ public class LinkedFile implements Serializable {
         return isOnlineLink(link.get());
     }
 
+    /**
+     * Extracts the file name, including basename and extension, from the link.
+     *
+     * @return extracted file name
+     */
+    public String getFileName() {
+        String linkedName = link.get();
+        if (isOnlineLink(linkedName)) {
+            return FileUtil.getFileNameFromUrl(linkedName);
+        } else {
+            try {
+                Path pathname = Path.of(linkedName).getFileName();
+                if (pathname != null) {
+                    return pathname.toString();
+                } else {
+                    return "";
+                }
+            } catch (InvalidPathException ex) {
+                return "";
+            }
+        }
+    }
+
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> dirs = databaseContext.getFileDirectories(filePreferences);
         return findIn(dirs);
     }
 
-    /// Tries to locate the file.
-    /// In case the path is absolute, the path is checked.
-    /// In case the path is relative, the given directories are used as base directories.
-    ///
-    /// @return absolute path if found.
+    /**
+     * Tries to locate the file.
+     * In case the path is absolute, the path is checked.
+     * In case the path is relative, the given directories are used as base directories.
+     *
+     * @return absolute path if found.
+     */
     public Optional<Path> findIn(List<Path> directories) {
         try {
             if (link.get().isEmpty()) {

@@ -2,8 +2,10 @@ package org.jabref.gui.preview;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -20,6 +22,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
@@ -30,9 +35,12 @@ import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -81,6 +89,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
 
+    private final BookCoverFetcher bookCoverFetcher;
+
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
@@ -104,6 +114,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
+
+        this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -222,15 +234,29 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
+        String coverIfAny = "";
+        Optional<String> image = getCoverImageURL();
+        if (image.isPresent()) {
+            coverIfAny = "<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>".formatted(image);
+        }
+
         layoutText = """
-                <html>
-                    <body id="previewBody">
-                        <div id="content"> %s </div>
-                    </body>
-                </html>
-                """.formatted(text);
+                    <html>
+                        <body id="previewBody">
+                            %s <div id="content"> %s </div>
+                        </body>
+                    </html>
+                """.formatted(coverIfAny, text);
         highlightLayoutText();
         setHvalue(0);
+    }
+
+    private Optional<String> getCoverImageURL() {
+        if (entry != null) {
+            String location = preferences.getFilePreferences().coversDownloadLocation();
+            return bookCoverFetcher.getDownloadedCoverForEntry(entry, location).map(p -> p.toUri().toString());
+        }
+        return Optional.empty();
     }
 
     private void highlightLayoutText() {

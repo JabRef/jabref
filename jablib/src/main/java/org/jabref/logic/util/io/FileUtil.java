@@ -89,24 +89,43 @@ public class FileUtil {
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
-     * @return the extension (without leading dot), trimmed and in lowercase.
+     * @return the extension (without leading dot), trimmed and in lowercase
      */
     public static Optional<String> getFileExtension(Path file) {
         return getFileExtension(file.getFileName().toString());
     }
 
     /**
-     * Returns the name part of a file name (i.e., everything in front of last ".").
+     * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(String fileNameWithExtension) {
         return com.google.common.io.Files.getNameWithoutExtension(fileNameWithExtension);
     }
 
     /**
-     * Returns the name part of a file name (i.e., everything in front of last ".").
+     * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(Path fileNameWithExtension) {
         return getBaseName(fileNameWithExtension.getFileName().toString());
+    }
+
+    /**
+     * Extracts the filename from a URL.
+     * If the URL doesn't have a filename (ends with '/'), returns an empty string.
+     *
+     * @param link the URL string to extract the filename from
+     * @return the extracted filename
+     */
+    public static String getFileNameFromUrl(String link) {
+        int slash = link.lastIndexOf('/');
+        if (slash >= 0 && slash < link.length()) {
+            link = link.substring(slash + 1);
+        }
+        int query = link.indexOf('?');
+        if (query >= 0) {
+            link = link.substring(0, query);
+        }
+        return getValidFileName(link);
     }
 
     /**
@@ -347,11 +366,7 @@ public class FileUtil {
         String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
         if (targetName.isEmpty() || "-".equals(targetName)) {
-            targetName = entry.getCitationKey().orElse("default");
-        }
-
-        if ("default".equals(targetName)) {
-            return Optional.empty();
+            return entry.getCitationKey().map(FileNameCleaner::cleanFileName);
         }
 
         // Remove LaTeX commands (e.g., \mkbibquote{}) from expanded fields before cleaning filename
