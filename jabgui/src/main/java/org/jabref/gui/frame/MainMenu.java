@@ -173,6 +173,12 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
+                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, frame.new CloseOthersFromMenuAction()),
+                factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, frame.new CloseAllFromMenuAction()),
+
+                new SeparatorMenuItem(),
+
                 factory.createSubMenu(StandardActions.IMPORT,
                         factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService)),
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService))),
@@ -439,7 +445,6 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor))
         );
-
         return sendMenu;
     }
 }
