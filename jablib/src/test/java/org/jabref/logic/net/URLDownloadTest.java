@@ -3,7 +3,6 @@ package org.jabref.logic.net;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.FetcherClientException;
@@ -32,13 +31,6 @@ class URLDownloadTest {
         URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(dl.asString().contains("Google"), "google.com should contain google");
-    }
-
-    @Test
-    void stringDownload() throws MalformedURLException, FetcherException {
-        URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
-
-        assertTrue(dl.asString(StandardCharsets.UTF_8).contains("Google"), "google.com should contain google");
     }
 
     @Test

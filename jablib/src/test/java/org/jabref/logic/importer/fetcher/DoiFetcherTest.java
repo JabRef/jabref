@@ -57,6 +57,8 @@ class DoiFetcherTest {
             .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
             .withField(StandardField.PAGES, "871–876")
             .withField(StandardField.VOLUME, "77");
+
+    // APS Journal
     private final BibEntry bibEntryStenzel2020 = new BibEntry(StandardEntryType.Article)
             .withCitationKey("Stenzel_2020")
             .withField(StandardField.AUTHOR, "Stenzel, L. and Hayward, A. L. C. and Schollwöck, U. and Heidrich-Meisner, F.")
@@ -68,8 +70,9 @@ class DoiFetcherTest {
             .withField(StandardField.DOI, "10.1103/physreva.102.023315")
             .withField(StandardField.ISSN, "2469-9934")
             .withField(StandardField.PUBLISHER, "American Physical Society (APS)")
-            .withField(StandardField.PAGES, "023315")
+            .withField(StandardField.PAGES, "023315") // This is the last part of the DOI
             .withField(StandardField.NUMBER, "2");
+
     private final BibEntry bibBenedetto2000 = new BibEntry(StandardEntryType.Article)
             .withCitationKey("Benedetto_2000")
             .withField(StandardField.AUTHOR, "Benedetto, D. and Caglioti, E. and Marchioro, C.")
