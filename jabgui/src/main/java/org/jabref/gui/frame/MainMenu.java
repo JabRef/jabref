@@ -174,8 +174,6 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
-                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, frame.new CloseOthersFromMenuAction()),
-                factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, frame.new CloseAllFromMenuAction()),
 
                 new SeparatorMenuItem(),
 

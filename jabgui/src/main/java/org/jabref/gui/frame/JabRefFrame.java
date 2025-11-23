@@ -613,10 +613,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 factory.createMenuItem(
                         StandardActions.CLOSE_OTHER_LIBRARIES,
                         new CloseOthersDatabaseAction(tab)
-                ),
-                factory.createMenuItem(
-                        StandardActions.CLOSE_ALL_LIBRARIES,
-                        new CloseAllDatabaseAction()
                 )
         );
 
