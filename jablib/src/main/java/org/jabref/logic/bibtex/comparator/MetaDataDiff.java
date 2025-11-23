@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelectors;
@@ -94,7 +94,7 @@ public class MetaDataDiff {
         if (!groupRoot.getChildren().isEmpty()) {
             return false;
         }
-        return groupRoot.getGroup().equals(DefaultGroupsFactory.getAllEntriesGroup());
+        return groupRoot.getGroup().equals(GroupsFactory.getAllEntriesGroup());
     }
 
     /**

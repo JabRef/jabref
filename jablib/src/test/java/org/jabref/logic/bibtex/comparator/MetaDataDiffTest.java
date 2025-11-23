@@ -3,7 +3,7 @@ package org.jabref.logic.bibtex.comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -43,7 +43,7 @@ class MetaDataDiffTest {
     @Test
     void allEntriesGroupIgnored() {
         MetaData one = new MetaData();
-        one.setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));
+        one.setGroups(GroupTreeNode.fromGroup(GroupsFactory.getAllEntriesGroup()));
         MetaData two = new MetaData();
 
         assertEquals(Optional.empty(), MetaDataDiff.compare(one, two));
@@ -52,7 +52,7 @@ class MetaDataDiffTest {
     @Test
     void allEntriesGroupContainingGroupNotIgnored() {
         MetaData one = new MetaData();
-        GroupTreeNode root = GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup());
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.getAllEntriesGroup());
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
         one.setGroups(root);
 
