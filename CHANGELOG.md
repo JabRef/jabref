@@ -24,6 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the possibility to configure the email provided to unpaywall. [#14340](https://github.com/JabRef/jabref/pull/14340)
 - We added a "Regenerate" button for the AI chat allowing the user to make the language model reformulate its response to the previous prompt. [#12191](https://github.com/JabRef/jabref/issues/12191)
 - We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377)
+- We added pseudonymization of groups [#14117](https://github.com/JabRef/jabref/issues/14117)
 
 ### Changed
 

@@ -5,11 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -31,6 +34,8 @@ public class Pseudonymization {
         Map<Field, Map<String, Integer>> fieldToValueToIdMap = new HashMap<>();
         List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, fieldToValueToIdMap);
 
+        Optional<GroupTreeNode> newGroups = pseudonymizeGroups(bibDatabaseContext, fieldToValueToIdMap);
+
         Map<String, String> valueMapping = new HashMap<>();
         fieldToValueToIdMap.forEach((field, stringToIntMap) ->
                 stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
@@ -38,6 +43,7 @@ public class Pseudonymization {
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
+        newGroups.ifPresent(result.getMetaData()::setGroups);
 
         return new Result(result, valueMapping);
     }
@@ -62,5 +68,45 @@ public class Pseudonymization {
             }
         }
         return newEntries;
+    }
+
+    /**
+     * Pseudonymizes the root group and all subgroups.
+     * If no groups exist, returns empty.
+     */
+    private static Optional<GroupTreeNode> pseudonymizeGroups(BibDatabaseContext bibDatabaseContext, Map<Field, Map<String, Integer>> fieldToValueToIdMap) {
+        var metadata = bibDatabaseContext.getMetaData();
+        var groupsOpt = metadata.getGroups();
+
+        if (groupsOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        var originalRoot = groupsOpt.get();
+        var groupValueMap = fieldToValueToIdMap.computeIfAbsent(StandardField.GROUPS, _ -> new HashMap<>());
+
+        var newRoot = pseudonymizeGroupNode(originalRoot, groupValueMap);
+        return Optional.of(newRoot);
+    }
+
+    /**
+     * Recursively rewrites a group node and its children.
+     * Each original group receives a generated ID, resulting in: original -> "groups-n"
+     */
+    private static GroupTreeNode pseudonymizeGroupNode(GroupTreeNode node, Map<String, Integer> valueToIdMap) {
+        var originalGroup = node.getGroup();
+        var groupCopy = originalGroup.deepCopy();
+
+        var originalName = node.getName();
+        var id = valueToIdMap.computeIfAbsent(originalName, _ -> valueToIdMap.size() + 1);
+        groupCopy.nameProperty().setValue(StandardField.GROUPS.getName() + "-" + id);
+
+        var newNode = new GroupTreeNode(groupCopy);
+        for (GroupTreeNode child : node.getChildren()) {
+            var childCopy = pseudonymizeGroupNode(child, valueToIdMap);
+            newNode.addChild(childCopy);
+        }
+
+        return newNode;
     }
 }
