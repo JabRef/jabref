@@ -6,7 +6,7 @@ import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.groups.UndoableModifySubtree;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
@@ -27,7 +27,7 @@ public final class GroupChange extends DatabaseChange {
         GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
 
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
-            GroupTreeNode groupTreeNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
+            GroupTreeNode groupTreeNode = new GroupTreeNode(GroupsFactory.getAllEntriesGroup());
             databaseContext.getMetaData().setGroups(groupTreeNode);
             return groupTreeNode;
         });
@@ -38,7 +38,7 @@ public final class GroupChange extends DatabaseChange {
         root.removeAllChildren();
         if (newRoot == null) {
             // I think setting root to null is not possible
-            root.setGroup(DefaultGroupsFactory.getAllEntriesGroup(), false, false, null);
+            root.setGroup(GroupsFactory.getAllEntriesGroup(), false, false, null);
         } else {
             // change root group, even though it'll be AllEntries anyway
             root.setGroup(newRoot.getGroup(), false, false, null);

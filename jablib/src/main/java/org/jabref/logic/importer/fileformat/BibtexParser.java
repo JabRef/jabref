@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -290,7 +290,7 @@ public class BibtexParser implements Parser {
                         },
                         // metadata does not contain any groups, so we need to create an AllEntriesGroup and add the other groups as children
                         () -> {
-                            GroupTreeNode rootNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
+                            GroupTreeNode rootNode = new GroupTreeNode(GroupsFactory.getAllEntriesGroup());
                             bibDeskGroupTreeNode.moveTo(rootNode);
                             metaData.setGroups(rootNode);
                         }

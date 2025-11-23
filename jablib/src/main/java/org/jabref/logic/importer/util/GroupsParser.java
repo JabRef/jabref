@@ -7,7 +7,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
@@ -27,7 +27,6 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
@@ -103,6 +102,7 @@ public class GroupsParser {
             return allEntriesGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.SMART_GROUP_ID)) {
+            // Migration: SmartGroup is replaced by ExplicitGroup
             return smartGroupFromString(s, keywordSeparator);
         }
         if (s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
@@ -232,7 +232,11 @@ public class GroupsParser {
         return newGroup;
     }
 
-    private static SmartGroup smartGroupFromString(String input, Character keywordSeparator) throws ParseException {
+    /**
+     * Migration method: Converts old SmartGroup serializations to ExplicitGroup.
+     * SmartGroup has been replaced by ExplicitGroup as they are functionally equivalent.
+     */
+    private static ExplicitGroup smartGroupFromString(String input, Character keywordSeparator) throws ParseException {
         if (!input.startsWith(MetadataSerializationConfiguration.SMART_GROUP_ID)) {
             throw new IllegalArgumentException("SmartGroup cannot be created from \"" + input + "\".");
         }
@@ -242,7 +246,7 @@ public class GroupsParser {
         String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         try {
             int context = Integer.parseInt(tok.nextToken());
-            SmartGroup newGroup = new SmartGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
+            ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
             addGroupDetails(tok, newGroup);
             return newGroup;
         } catch (NumberFormatException exception) {
@@ -303,7 +307,7 @@ public class GroupsParser {
         if (!s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             throw new IllegalArgumentException("AllEntriesGroup cannot be created from \"" + s + "\".");
         }
-        return DefaultGroupsFactory.getAllEntriesGroup();
+        return GroupsFactory.getAllEntriesGroup();
     }
 
     /**

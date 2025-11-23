@@ -17,7 +17,6 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.search.SearchFlags;
 
@@ -26,18 +25,6 @@ public class GroupSerializer {
         return MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID;
     }
 
-    private String serializeSmartGroup(SmartGroup group) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(MetadataSerializationConfiguration.SMART_GROUP_ID);
-        sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
-        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(group.getHierarchicalContext().ordinal());
-        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-
-        appendGroupDetails(sb, group);
-
-        return sb.toString();
-    }
 
     private String serializeExplicitGroup(ExplicitGroup group) {
         StringBuilder sb = new StringBuilder();
@@ -130,8 +117,6 @@ public class GroupSerializer {
         return switch (group) {
             case AllEntriesGroup _ ->
                     serializeAllEntriesGroup();
-            case SmartGroup smartGroup ->
-                    serializeSmartGroup(smartGroup);
             case ExplicitGroup explicitGroup ->
                     serializeExplicitGroup(explicitGroup);
             case KeywordGroup keywordGroup ->

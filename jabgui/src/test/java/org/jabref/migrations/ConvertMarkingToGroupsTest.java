@@ -3,7 +3,7 @@ package org.jabref.migrations;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -24,7 +24,7 @@ class ConvertMarkingToGroupsTest {
 
         new ConvertMarkingToGroups().performMigration(parserResult);
 
-        GroupTreeNode rootExpected = GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup());
+        GroupTreeNode rootExpected = GroupTreeNode.fromGroup(GroupsFactory.getAllEntriesGroup());
         GroupTreeNode markings = rootExpected.addSubgroup(new ExplicitGroup("Markings", GroupHierarchyType.INCLUDING, ','));
         markings.addSubgroup(new ExplicitGroup("Nicolas:6", GroupHierarchyType.INCLUDING, ','));
 
