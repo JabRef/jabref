@@ -2,8 +2,10 @@ package org.jabref.logic.ai.models;
 
 import java.util.List;
 
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.ai.AiProvider;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AiModelServiceTest {
 
     private AiModelService aiModelService;
+
+    @BeforeAll
+    static void ensureUnirestInitialized() {
+        // Ensure URLDownload's static initializer runs before any tests
+        // This configures Unirest and prevents UnirestConfigException
+        try {
+            Class.forName(URLDownload.class.getName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to initialize URLDownload", e);
+        }
+    }
 
     @BeforeEach
     void setUp() {
