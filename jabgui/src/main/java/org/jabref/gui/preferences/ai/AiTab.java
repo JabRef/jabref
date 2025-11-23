@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -45,6 +46,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private Spinner<Integer> followUpQuestionsCountSpinner;
     @FXML private Tab followUpQuestionsTab;
     @FXML private TextArea followUpQuestionsTextArea;
+    @FXML private Label followUpQuestionsCountLabel;
 
     @FXML private ComboBox<AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
@@ -256,6 +258,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         generateFollowUpQuestions.selectedProperty().bindBidirectional(viewModel.generateFollowUpQuestions());
         followUpQuestionsCountSpinner.setValueFactory(AiTabViewModel.followUpQuestionsCountValueFactory);
         followUpQuestionsCountSpinner.getValueFactory().valueProperty().bindBidirectional(viewModel.followUpQuestionsCountProperty().asObject());
+        followUpQuestionsCountSpinner.disableProperty().bind(generateFollowUpQuestions.selectedProperty().not());
+        followUpQuestionsCountLabel.disableProperty().bind(generateFollowUpQuestions.selectedProperty().not());
     }
 
     @Override
@@ -300,6 +304,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             return Optional.of(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE);
         } else if (selectedTab == citationParsingUserMessageTab) {
             return Optional.of(AiTemplate.CITATION_PARSING_USER_MESSAGE);
+        } else if (selectedTab == followUpQuestionsTab) {
+            return Optional.of(AiTemplate.FOLLOW_UP_QUESTIONS);
         }
 
         return Optional.empty();

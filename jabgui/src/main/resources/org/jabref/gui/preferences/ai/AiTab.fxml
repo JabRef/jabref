@@ -340,7 +340,7 @@
 
     <CheckBox fx:id="generateFollowUpQuestions"
               mnemonicParsing="false"
-              text="%Automatically generate follow-up questions"
+              text="%Generate follow-up questions"
               HBox.hgrow="ALWAYS"
               maxWidth="Infinity"/>
 
@@ -348,7 +348,8 @@
         <padding>
             <Insets left="20.0"/>
         </padding>
-        <Label alignment="BASELINE_CENTER"
+        <Label fx:id="followUpQuestionsCountLabel"
+               alignment="BASELINE_CENTER"
                text="%Number of follow-up questions"/>
         <Spinner fx:id="followUpQuestionsCountSpinner"
                  editable="true"

@@ -232,9 +232,13 @@ public class AiChatComponent extends VBox {
             if (questions.isEmpty()) {
                 followUpQuestionsBox.setVisible(false);
                 followUpQuestionsBox.setManaged(false);
+                exQuestionBox.setVisible(true);
+                exQuestionBox.setManaged(true);
             } else {
                 followUpQuestionsBox.setVisible(true);
                 followUpQuestionsBox.setManaged(true);
+                exQuestionBox.setVisible(false);
+                exQuestionBox.setManaged(false);
 
                 for (String question : questions) {
                     Hyperlink link = new Hyperlink(question);

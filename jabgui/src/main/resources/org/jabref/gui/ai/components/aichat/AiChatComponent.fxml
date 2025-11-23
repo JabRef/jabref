@@ -25,14 +25,14 @@
     </Loadable>
 
     <HBox spacing="10" alignment="CENTER" fx:id="exQuestionBox">
-        <Label text="%Try with examples" BorderPane.alignment="CENTER"/>
+        <Label text="%Try with examples:" BorderPane.alignment="CENTER"/>
         <Hyperlink fx:id="exQuestion1" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
         <Hyperlink fx:id="exQuestion2" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
         <Hyperlink fx:id="exQuestion3" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
     </HBox>
 
     <HBox spacing="10" alignment="CENTER" fx:id="followUpQuestionsBox" managed="false" visible="false">
-        <Label text="%Follow-up questions" BorderPane.alignment="CENTER"/>
+        <Label text="%Follow-up questions:" BorderPane.alignment="CENTER"/>
     </HBox>
 
     <HBox spacing="10">
