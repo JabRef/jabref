@@ -32,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to change the Git username and PAT in Network Preferences. [#14509](https://github.com/JabRef/jabref/pull/14509)
 - When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
+- We added pseudonymization of groups [#14117](https://github.com/JabRef/jabref/issues/14117)
 
 ### Changed
 
