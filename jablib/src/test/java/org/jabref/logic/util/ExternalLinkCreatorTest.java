@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 class ExternalLinkCreatorTest {
     private static final String DEFAULT_GOOGLE_SCHOLAR_URL = "https://scholar.google.com/scholar";
+    private static final String DEFAULT_SEMANTIC_SCHOLAR_URL = "https://www.semanticscholar.org/search";
     private static final String DEFAULT_SHORTSCIENCE_URL = "https://www.shortscience.org/internalsearch";
 
     private ImporterPreferences mockPreferences;
@@ -125,6 +126,78 @@ class ExternalLinkCreatorTest {
             assertTrue(url.isPresent());
             assertTrue(URLUtil.isValidHttpUrl(url.get()));
             assertTrue(url.get().contains("author=Alice%20Smith"));
+        }
+    }
+
+    @Nested
+    class SemanticScholarTests {
+
+        @Test
+        void getSemanticScholarSearchURLReturnsEmptyOnMissingTitle() {
+            BibEntry entry = new BibEntry();
+            assertEquals(Optional.empty(), linkCreator.getSemanticScholarSearchURL(entry));
+        }
+
+        @Test
+        void getSemanticScholarSearchURLReturnsEmptyOnEmptyString() {
+            BibEntry entry = createEntryWithTitle("");
+            assertEquals(Optional.empty(), linkCreator.getSemanticScholarSearchURL(entry));
+        }
+
+        @Test
+        void getSemanticScholarSearchURLRemovesLatexBraces() {
+            // Equivalent test for Semantic Scholar
+            BibEntry entry = createEntryWithTitle("{The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages}");
+            Optional<String> url = linkCreator.getSemanticScholarSearchURL(entry);
+
+            String expectedUrl = "https://www.semanticscholar.org/search?q=The%20Difference%20Between%20Graph-Based%20and%20Block-Structured%20Business%20Process%20Modelling%20Languages";
+            assertEquals(Optional.of(expectedUrl), url);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+                "' ', 'https://www.semanticscholar.org/search?q='",
+                "'   ', 'https://www.semanticscholar.org/search?q=%C2%A0%20%C2%A0'"
+        })
+        void getSemanticScholarSearchURLHandlesWhitespace(String title, String expectedUrl) {
+            BibEntry entry = createEntryWithTitle(title);
+            Optional<String> url = linkCreator.getSemanticScholarSearchURL(entry);
+
+            assertTrue(url.isPresent());
+            assertEquals(expectedUrl, url.get());
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+                // Expect %20
+                "'JabRef bibliography management', 'https://www.semanticscholar.org/search?q=JabRef%20bibliography%20management'",
+                "'Machine learning', 'https://www.semanticscholar.org/search?q=Machine%20learning'"
+        })
+        void getSemanticScholarSearchURLLinksToSearchResults(String title, String expectedUrl) {
+            BibEntry entry = createEntryWithTitle(title);
+            Optional<String> url = linkCreator.getSemanticScholarSearchURL(entry);
+
+            assertEquals(Optional.of(expectedUrl), url);
+            assertTrue(url.get().startsWith(DEFAULT_SEMANTIC_SCHOLAR_URL));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"!*'();:@&=+$,/?#[]", "100% Complete", "Question?"})
+        void getSemanticScholarSearchURLEncodesSpecialCharacters(String title) {
+            BibEntry entry = createEntryWithTitle(title);
+            Optional<String> url = linkCreator.getSemanticScholarSearchURL(entry);
+            assertTrue(url.isPresent());
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
+        }
+
+        @Test
+        void getSemanticScholarSearchURLIncludesAuthor() {
+            BibEntry entry = createEntryWithTitleAndAuthor("Quantum Computing", "Alice Smith");
+            Optional<String> url = linkCreator.getSemanticScholarSearchURL(entry);
+
+            assertTrue(url.isPresent());
+            assertTrue(URLUtil.isValidHttpUrl(url.get()));
+            assertTrue(url.get().contains("author%5B0%5D=Alice%20Smith"));
         }
     }
 

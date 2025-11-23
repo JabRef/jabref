@@ -20,6 +20,7 @@ public class ExternalLinkCreator {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalLinkCreator.class);
 
     private static final String DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL = "https://scholar.google.com/scholar";
+    private static final String DEFAULT_SEMANTIC_SCHOLAR_SEARCH_URL = "https://www.semanticscholar.org/search";
     private static final String DEFAULT_SHORTSCIENCE_SEARCH_URL = "https://www.shortscience.org/internalsearch";
 
     private final ImporterPreferences importerPreferences;
@@ -41,7 +42,22 @@ public class ExternalLinkCreator {
             String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
                                                 .getOrDefault("Google Scholar", DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL);
             String author = entry.getField(StandardField.AUTHOR).orElse(null);
-            return buildSearchUrl(baseUrl, DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL, title, author, "Google Scholar");
+            return buildSearchUrl(baseUrl, DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL, title, author, "Google Scholar", false);
+        });
+    }
+
+    /**
+     * Get a URL to the search results of Semantic Scholar for the BibEntry's title
+     *
+     * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
+     * @return The URL if it was successfully created
+     */
+    public Optional<String> getSemanticScholarSearchURL(BibEntry entry) {
+        return entry.getField(StandardField.TITLE).flatMap(title -> {
+            String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
+                                                .getOrDefault("Semantic Scholar", DEFAULT_SEMANTIC_SCHOLAR_SEARCH_URL);
+            String author = entry.getField(StandardField.AUTHOR).orElse(null);
+            return buildSearchUrl(baseUrl, DEFAULT_SEMANTIC_SCHOLAR_SEARCH_URL, title, author, "Semantic Scholar", true);
         });
     }
 
@@ -56,7 +72,7 @@ public class ExternalLinkCreator {
             String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
                                                 .getOrDefault("Short Science", DEFAULT_SHORTSCIENCE_SEARCH_URL);
             String author = entry.getField(StandardField.AUTHOR).orElse(null);
-            return buildSearchUrl(baseUrl, DEFAULT_SHORTSCIENCE_SEARCH_URL, title, author, "ShortScience");
+            return buildSearchUrl(baseUrl, DEFAULT_SHORTSCIENCE_SEARCH_URL, title, author, "ShortScience", false);
         });
     }
 
@@ -70,7 +86,7 @@ public class ExternalLinkCreator {
      * @param serviceName Name of the service for logging
      * @return Optional containing the constructed URL, or empty if construction failed
      */
-    private Optional<String> buildSearchUrl(String baseUrl, String defaultUrl, String title, @Nullable String author, String serviceName) {
+    private Optional<String> buildSearchUrl(String baseUrl, String defaultUrl, String title, @Nullable String author, String serviceName, boolean addAuthorIndex) {
         // Converting LaTeX-formatted titles (e.g., containing braces) to plain Unicode to ensure compatibility with ShortScience's search URL.
         // LatexToUnicodeAdapter.format() is being used because it attempts to parse LaTeX, but gracefully degrades to a normalized title on failure.
         // This avoids sending malformed or literal LaTeX syntax titles that would give the wrong result.
@@ -81,13 +97,13 @@ public class ExternalLinkCreator {
         String lowerUrl = baseUrl.toLowerCase().trim();
         if (StringUtil.isBlank(lowerUrl) || !(lowerUrl.startsWith("http://") || lowerUrl.startsWith("https://"))) {
             LOGGER.warn("Invalid URL scheme in {} preference: {}. Using default URL.", serviceName, baseUrl);
-            return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName);
+            return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName, addAuthorIndex);
         }
 
         // If URL doesn't contain {title}, it's not a valid template, use query parameters
         if (!baseUrl.contains("{title}")) {
             LOGGER.warn("URL template for {} doesn't contain {{title}} placeholder. Using query parameters.", serviceName);
-            return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName);
+            return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName, addAuthorIndex);
         }
 
         // Replace placeholders with URL-encoded values
@@ -109,24 +125,30 @@ public class ExternalLinkCreator {
                 return Optional.of(finalUrl);
             } else {
                 LOGGER.warn("Constructed URL for {} is invalid: {}. Using default URL.", serviceName, finalUrl);
-                return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName);
+                return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName, addAuthorIndex);
             }
         } catch (Exception ex) {
             LOGGER.error("Error constructing URL for {}: {}", serviceName, ex.getMessage(), ex);
-            return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName);
+            return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName, addAuthorIndex);
         }
     }
 
     /**
-     * Builds a URL using query parameters (fallback method)
+     * Builds a URL using query parameters (fallback method).
+     * <p>
+     * The parameter addAuthorIndex is used for Semantic Scholar service because it does not understand "author=XYZ", but it uses "author[0]=XYZ&author[1]=ABC".
      */
-    private Optional<String> buildUrlWithQueryParams(String baseUrl, String title, @Nullable String author, String serviceName) {
+    private Optional<String> buildUrlWithQueryParams(String baseUrl, String title, @Nullable String author, String serviceName, boolean addAuthorIndex) {
         try {
             URIBuilder uriBuilder = new URIBuilder(baseUrl);
             // Title is already converted to Unicode by buildSearchUrl before reaching here
             uriBuilder.addParameter("q", title.trim());
             if (author != null) {
-                uriBuilder.addParameter("author", author.trim());
+                if (addAuthorIndex) {
+                    uriBuilder.addParameter("author[0]", author.trim());
+		} else {
+                    uriBuilder.addParameter("author", author.trim());
+	        }
             }
             return Optional.of(uriBuilder.toString());
         } catch (URISyntaxException ex) {
