@@ -65,7 +65,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
 
                 try {
                     return dateFormatter.parse(text);
-                } catch (DateTimeException e) {  // ✔ FIX multi-catch
+                } catch (DateTimeException e) {
                     LOGGER.error("Error while parsing date {}", text, e);
                     return RANGE_SENTINEL;
                 }
