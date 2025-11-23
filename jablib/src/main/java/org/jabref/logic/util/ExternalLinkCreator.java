@@ -5,8 +5,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
@@ -29,12 +32,12 @@ public class ExternalLinkCreator {
         this.importerPreferences = importerPreferences;
     }
 
-    // Note: We use configurable templates due to requirement stated at https://github.com/JabRef/jabref/issues/12268#issuecomment-2523108605
+    // Note: We use configurable templates due to the requirement stated at https://github.com/JabRef/jabref/issues/12268#issuecomment-2523108605
 
     /**
      * Get a URL to the search results of Google Scholar for the BibEntry's title
      *
-     * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
+     * @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
      * @return The URL if it was successfully created
      */
     public Optional<String> getGoogleScholarSearchURL(BibEntry entry) {
@@ -49,7 +52,7 @@ public class ExternalLinkCreator {
     /**
      * Get a URL to the search results of Semantic Scholar for the BibEntry's title
      *
-     * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
+     * @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
      * @return The URL if it was successfully created
      */
     public Optional<String> getSemanticScholarSearchURL(BibEntry entry) {
@@ -64,7 +67,7 @@ public class ExternalLinkCreator {
     /**
      * Get a URL to the search results of ShortScience for the BibEntry's title
      *
-     * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
+     * @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
      * @return The URL if it was successfully created
      */
     public Optional<String> getShortScienceSearchURL(BibEntry entry) {
@@ -84,6 +87,7 @@ public class ExternalLinkCreator {
      * @param title The title to search for
      * @param author Optional author to include in search (null if not present)
      * @param serviceName Name of the service for logging
+     * @paramm addAuthorIndex formats all authors as separate keys with indexing ("author[0]", "author[1]", etc.)
      * @return Optional containing the constructed URL, or empty if construction failed
      */
     private Optional<String> buildSearchUrl(String baseUrl, String defaultUrl, String title, @Nullable String author, String serviceName, boolean addAuthorIndex) {
@@ -116,7 +120,7 @@ public class ExternalLinkCreator {
                 String encodedAuthor = URLEncoder.encode(author.trim(), StandardCharsets.UTF_8);
                 finalUrl = urlWithTitle.replace("{author}", encodedAuthor);
             } else {
-                // Remove {author} placeholder if no author is present
+                // Remove the {author} placeholder if no author is present
                 finalUrl = urlWithTitle.replace("{author}", "");
             }
 
@@ -145,10 +149,17 @@ public class ExternalLinkCreator {
             uriBuilder.addParameter("q", title.trim());
             if (author != null) {
                 if (addAuthorIndex) {
-                    uriBuilder.addParameter("author[0]", author.trim());
-		} else {
+                    AuthorListParser authorListParser = new AuthorListParser();
+                    AuthorList authors = authorListParser.parse(author);
+
+                    int idx = 0;
+                    for (Author authorObject : authors) {
+                        uriBuilder.addParameter("author[" + idx + "]", authorObject.getNameForAlphabetization());
+                        ++idx;
+                    }
+                } else {
                     uriBuilder.addParameter("author", author.trim());
-	        }
+                }
             }
             return Optional.of(uriBuilder.toString());
         } catch (URISyntaxException ex) {
