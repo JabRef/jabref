@@ -16,12 +16,7 @@ import org.slf4j.LoggerFactory;
 public class AiModelService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiModelService.class);
 
-    private final List<AiModelProvider> modelProviders;
-
-    public AiModelService() {
-        this.modelProviders = new ArrayList<>();
-        this.modelProviders.add(new OpenAiCompatibleModelProvider());
-    }
+    private final List<AiModelProvider> modelProviders = List.of(new OpenAiCompatibleModelProvider());
 
     /**
      * Gets the list of available models for the given provider.
