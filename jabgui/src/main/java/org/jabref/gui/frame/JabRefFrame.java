@@ -128,8 +128,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
-                       GitHandlerRegistry gitHandlerRegistry
-    ) {
+                       GitHandlerRegistry gitHandlerRegistry) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -145,7 +144,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         setId("frame");
 
         // Create components
-        this.viewModel = new JabRefFrameViewModel(preferences,
+        this.viewModel = new JabRefFrameViewModel(
+                preferences,
                 aiService,
                 stateManager,
                 dialogService,
@@ -155,23 +155,22 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 undoManager,
                 clipBoardManager,
-                taskExecutor
-        );
+                taskExecutor);
         Injector.setModelOrService(UiMessageHandler.class, viewModel);
 
-        FrameDndHandler frameDndHandler = new FrameDndHandler(tabbedPane,
+        FrameDndHandler frameDndHandler = new FrameDndHandler(
+                tabbedPane,
                 mainStage::getScene,
                 this::getOpenDatabaseAction,
-                stateManager
-        );
+                stateManager);
 
-        this.globalSearchBar = new GlobalSearchBar(this,
+        this.globalSearchBar = new GlobalSearchBar(
+                this,
                 stateManager,
                 this.preferences,
                 undoManager,
                 dialogService,
-                SearchType.NORMAL_SEARCH
-        );
+                SearchType.NORMAL_SEARCH);
 
         this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
                 // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
@@ -191,21 +190,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager
-        );
+                undoManager);
 
         this.pushToApplicationCommand = new GuiPushToApplicationCommand(
                 stateManager,
                 dialogService,
                 this.preferences,
-                taskExecutor
-        );
+                taskExecutor);
 
         this.fileHistory = new FileHistoryMenu(
                 this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
                 dialogService,
-                getOpenDatabaseAction()
-        );
+                getOpenDatabaseAction());
 
         fileHistory.disableProperty().bind(Bindings.isEmpty(fileHistory.getItems()));
 
@@ -236,8 +232,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager
-        );
+                undoManager);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -256,8 +251,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this::getOpenDatabaseAction,
                 aiService,
                 entryEditor,
-                gitHandlerRegistry
-        );
+                gitHandlerRegistry);
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
@@ -307,27 +301,26 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void updateHorizontalDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition() / horizontalSplit.getWidth());
-            horizontalDividerSubscription = EasyBind
-                    .valueAt(horizontalSplit.getDividers(), 0)
-                    .mapObservable(SplitPane.Divider::positionProperty)
-                    .listenToValues(
-                            (_, newValue) -> preferences.getGuiPreferences()
-                                                        .setHorizontalDividerPosition(newValue.doubleValue())
-                    );
+            horizontalSplit.setDividerPositions(preferences.getGuiPreferences()
+                                                           .getHorizontalDividerPosition() / horizontalSplit.getWidth());
+            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
+                                                    .mapObservable(SplitPane.Divider::positionProperty)
+                                                    .listenToValues((_, newValue) ->
+                                                            preferences.getGuiPreferences()
+                                                                       .setHorizontalDividerPosition(newValue.doubleValue())
+                                                    );
         }
     }
 
     public void updateVerticalDividerPosition() {
         if (mainStage.isShowing() && panelMode.get() == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
             verticalSplit.setDividerPositions(preferences.getGuiPreferences().getVerticalDividerPosition());
-            verticalDividerSubscription = EasyBind
-                    .valueAt(verticalSplit.getDividers(), 0)
-                    .mapObservable(SplitPane.Divider::positionProperty)
-                    .listenToValues(
-                            (_, newValue) -> preferences.getGuiPreferences()
-                                                        .setVerticalDividerPosition(newValue.doubleValue())
-                    );
+            verticalDividerSubscription = EasyBind.valueAt(verticalSplit.getDividers(), 0)
+                                                  .mapObservable(SplitPane.Divider::positionProperty)
+                                                  .listenToValues((_, newValue) ->
+                                                          preferences.getGuiPreferences()
+                                                                     .setVerticalDividerPosition(newValue.doubleValue())
+                                                  );
         }
     }
 
@@ -416,10 +409,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         });
 
         // Wait for the scene to be created, otherwise focusOwnerProperty is not provided
-        Platform.runLater(() ->
-                stateManager.focusOwnerProperty()
-                            .bind(EasyBind.map(mainStage.getScene().focusOwnerProperty(), Optional::ofNullable))
-        );
+        Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
+                EasyBind.map(mainStage.getScene().focusOwnerProperty(), Optional::ofNullable)));
 
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), selectedTab -> {
             if (selectedTab instanceof LibraryTab libraryTab) {
@@ -443,22 +434,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 Platform.runLater(() -> libraryTab.getMainTable().requestFocus());
 
                 // Set window title dynamically
-                mainStage.titleProperty().bind(
-                        Bindings.createStringBinding(
-                                () -> libraryTab.textProperty().getValue() + " – " + FRAME_TITLE,  // not a minus, but codepoint 2013
-                                libraryTab.textProperty()
-                        )
-                );
+                mainStage.titleProperty().bind(Bindings.createStringBinding(
+                        () -> libraryTab.textProperty().getValue() + " – " + FRAME_TITLE,  // not a minus, but codepoint 2013
+                        libraryTab.textProperty()));
             } else {
                 // Check if the previously active database was closed
                 if (stateManager.getActiveDatabase().isPresent()) {
                     String activeUID = stateManager.getActiveDatabase().get().getUid();
                     boolean wasClosed = tabbedPane.getTabs().stream()
                                                   .filter(tab -> tab instanceof LibraryTab)
-                                                  .noneMatch(ltab ->
-                                                          ((LibraryTab) ltab).getBibDatabaseContext()
-                                                                             .getUid()
-                                                                             .equals(activeUID)
+                                                  .noneMatch(ltab -> ((LibraryTab) ltab).getBibDatabaseContext()
+                                                                                        .getUid()
+                                                                                        .equals(activeUID)
                                                   );
 
                     if (wasClosed) {
@@ -475,15 +462,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             }
         });
 
-        BindingsHelper.bindBidirectional(
-                (ObservableValue<Boolean>) stateManager.getEditorShowing(),
-                panelMode,
-                mode -> stateManager.getEditorShowing()
-                                    .setValue(mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR),
-                showing -> panelMode.setValue(
-                        showing ? PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR : PanelMode.MAIN_TABLE
-                )
-        );
+        BindingsHelper.bindBidirectional((ObservableValue<Boolean>) stateManager.getEditorShowing(), panelMode,
+                mode -> stateManager.getEditorShowing().setValue(mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR),
+                showing -> panelMode.setValue(showing ? PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR : PanelMode.MAIN_TABLE));
 
         EasyBind.subscribe(panelMode, mode -> {
             updateEditorPane();
@@ -496,25 +477,21 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
         tabbedPane.getTabs().addListener((ListChangeListener<Tab>) _ -> updateTabBarVisible());
 
-        stateManager.canGoBackProperty()
-                    .bind(
-                            stateManager.activeTabProperty()
-                                        .flatMap(
-                                                optionalTab -> optionalTab
-                                                        .map(LibraryTab::canGoBackProperty)
-                                                        .orElse(new SimpleBooleanProperty(false))
-                                        )
-                    );
+        stateManager.canGoBackProperty().bind(
+                stateManager.activeTabProperty().flatMap(
+                        optionalTab -> optionalTab
+                                .map(LibraryTab::canGoBackProperty)
+                                .orElse(new SimpleBooleanProperty(false))
+                )
+        );
 
-        stateManager.canGoForwardProperty()
-                    .bind(
-                            stateManager.activeTabProperty()
-                                        .flatMap(
-                                                optionalTab -> optionalTab
-                                                        .map(LibraryTab::canGoForwardProperty)
-                                                        .orElse(new SimpleBooleanProperty(false))
-                                        )
-                    );
+        stateManager.canGoForwardProperty().bind(
+                stateManager.activeTabProperty().flatMap(
+                        optionalTab -> optionalTab
+                                .map(LibraryTab::canGoForwardProperty)
+                                .orElse(new SimpleBooleanProperty(false))
+                )
+        );
     }
 
     private void updateTabBarVisible() {
@@ -580,9 +557,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor,
                 fileHistory,
                 Injector.instantiateModelOrService(BuildInfo.class),
-                preferences.getWorkspacePreferences()
-        );
-
+                preferences.getWorkspacePreferences());
         tabbedPane.getTabs().add(welcomeTab);
         tabbedPane.getSelectionModel().select(welcomeTab);
     }
@@ -604,9 +579,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
-                taskExecutor
-        );
-
+                taskExecutor);
         addTab(libraryTab, raisePanel);
     }
 
@@ -627,25 +600,19 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES,
-                        new LibraryPropertiesAction(tab::getBibDatabaseContext, stateManager)
-                ),
+                        new LibraryPropertiesAction(tab::getBibDatabaseContext, stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER,
-                        new OpenDatabaseFolder(dialogService, stateManager, preferences, tab::getBibDatabaseContext)
-                ),
+                        new OpenDatabaseFolder(dialogService, stateManager, preferences, tab::getBibDatabaseContext)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE,
                         new OpenConsoleAction(() -> {
                             LibraryTab currentTab = getCurrentLibraryTab();
                             return (currentTab == null) ? null : currentTab.getBibDatabaseContext();
                         }, stateManager, preferences, dialogService)),
                 new SeparatorMenuItem(),
-                factory.createMenuItem(
-                        StandardActions.CLOSE_LIBRARY,
-                        new CloseDatabaseAction(this, tab, stateManager)
-                ),
-                factory.createMenuItem(
-                        StandardActions.CLOSE_OTHER_LIBRARIES,
-                        new CloseOthersDatabaseAction(tab)
-                )
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY,
+                        new CloseDatabaseAction(this, tab, stateManager)),
+                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES,
+                        new CloseOthersDatabaseAction(tab))
         );
 
         return contextMenu;
@@ -702,8 +669,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
-                taskExecutor
-        );
+                taskExecutor);
     }
 
     /**
@@ -810,44 +776,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                                      .toList();
             for (LibraryTab tab : libraryTabs) {
                 Platform.runLater(() -> closeTab(tab));
-            }
-        }
-    }
-
-    protected class CloseOthersFromMenuAction extends SimpleCommand {
-
-        public CloseOthersFromMenuAction() {
-            this.executable.bind(Bindings.createBooleanBinding(() -> ActionHelper.needsMultipleDatabases(stateManager).get() && getCurrentLibraryTab() != null, stateManager.getOpenDatabases(), stateManager.activeTabProperty()));
-        }
-
-        @Override
-        public void execute() {
-            LibraryTab currentTab = getCurrentLibraryTab();
-            if (currentTab != null) {
-                new CloseOthersDatabaseAction(currentTab).execute();
-            }
-        }
-    }
-
-    protected class CloseAllFromMenuAction extends SimpleCommand {
-
-        public CloseAllFromMenuAction() {
-            this.executable.bind(ActionHelper.needsDatabase(stateManager));
-        }
-
-        @Override
-        public void execute() {
-            new CloseAllDatabaseAction().execute();
-        }
-    }
-
-    protected class CloseAllDatabaseAction extends SimpleCommand {
-
-        @Override
-        public void execute() {
-            tabbedPane.getTabs().removeIf(t -> t instanceof WelcomeTab);
-            for (Tab tab : tabbedPane.getTabs()) {
-                Platform.runLater(() -> closeTab((LibraryTab) tab));
             }
         }
     }
