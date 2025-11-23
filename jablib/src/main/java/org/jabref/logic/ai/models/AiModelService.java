@@ -1,11 +1,11 @@
 package org.jabref.logic.ai.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.model.ai.AiProvider;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
  * Service for managing AI models from different providers.
  * Provides both static (hardcoded) and dynamic (API-fetched) model lists.
  */
+@NullMarked
 public class AiModelService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiModelService.class);
 
@@ -65,7 +66,7 @@ public class AiModelService {
             if (provider.supports(aiProvider)) {
                 try {
                     List<String> models = provider.fetchModels(aiProvider, apiBaseUrl, apiKey);
-                    if (models != null && !models.isEmpty()) {
+                    if (models.isEmpty()) {
                         return models;
                     }
                 } catch (Exception e) {

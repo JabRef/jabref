@@ -11,6 +11,7 @@ import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,18 +20,19 @@ import org.slf4j.LoggerFactory;
  * Fetches available models from the /v1/models endpoint.
  * Mistral provides an OpenAI-compatible API, so this works for Mistral as well.
  */
+@NullMarked
 public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAiCompatibleModelProvider.class);
 
     @Override
     public List<String> fetchModels(AiProvider aiProvider, String apiBaseUrl, String apiKey) {
-        List<String> models = new ArrayList<>();
-
-        if (apiKey == null || apiKey.isBlank()) {
+        if (apiKey.isBlank()) {
             LOGGER.debug("API key is not provided for {}, skipping model fetch", aiProvider.getLabel());
-            return models;
+            return List.of();
         }
+
+        List<String> models = List.of();
 
         try {
             String modelsEndpoint = buildModelsEndpoint(apiBaseUrl);
@@ -39,7 +41,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
                                                      .header("accept", "application/json")
                                                      .asJson();
 
-            if (response.getStatus() == 200 && response.getBody() != null) {
+            if (response.getStatus() == 200) {
                 models = parseModelsFromResponse(response.getBody());
                 LOGGER.info("Successfully fetched {} models from {}", models.size(), aiProvider.getLabel());
             } else {

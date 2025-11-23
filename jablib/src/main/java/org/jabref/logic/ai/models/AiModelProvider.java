@@ -4,10 +4,13 @@ import java.util.List;
 
 import org.jabref.model.ai.AiProvider;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interface for fetching available AI models from different providers.
  * Implementations should handle API calls to retrieve model lists dynamically.
  */
+@NullMarked
 public interface AiModelProvider {
     /**
      * Fetches the list of available models for the given AI provider.
