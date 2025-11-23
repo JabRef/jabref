@@ -235,7 +235,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private GroupsPreferences groupsPreferences;
     private SpecialFieldsPreferences specialFieldsPreferences;
     private PreviewPreferences previewPreferences;
-    private PushToApplicationPreferences pushToApplicationPreferences;
     private NameDisplayPreferences nameDisplayPreferences;
     private MainTablePreferences mainTablePreferences;
     private ColumnPreferences mainTableColumnPreferences;
