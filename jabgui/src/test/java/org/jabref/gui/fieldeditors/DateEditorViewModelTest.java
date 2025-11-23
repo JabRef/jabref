@@ -1,7 +1,12 @@
 package org.jabref.gui.fieldeditors;
 
 import java.time.LocalDate;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+
 import javax.swing.undo.UndoManager;
+
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -10,11 +15,8 @@ import org.jabref.model.entry.field.Field;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import java.time.Year;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -36,6 +38,7 @@ class DateEditorViewModelTest {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
         viewModel = new DateEditorViewModel(field, suggestionProvider, formatter, fieldCheckers, undoManager);
+        dateToStringConverter = viewModel.getDateToStringConverter();
     }
 
     @Test
