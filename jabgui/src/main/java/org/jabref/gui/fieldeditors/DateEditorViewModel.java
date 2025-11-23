@@ -1,11 +1,8 @@
 package org.jabref.gui.fieldeditors;
 
 import java.time.DateTimeException;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
-import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -14,8 +11,12 @@ import javafx.util.StringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
+
+import org.jabref.model.entry.DateRangeUtil;
+
+import java.time.LocalDate;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,73 +24,50 @@ import org.slf4j.LoggerFactory;
 public class DateEditorViewModel extends AbstractEditorViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DateEditorViewModel.class);
-    private static final TemporalAccessor RANGE_SENTINEL = LocalDate.of(1, 1, 1);
 
     private final DateTimeFormatter dateFormatter;
+    private static final TemporalAccessor RANGE_SENTINEL = LocalDate.of(1, 1, 1);
 
-    public DateEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, DateTimeFormatter dateFormatter,
-                               FieldCheckers fieldCheckers, UndoManager undoManager) {
+    public DateEditorViewModel(Field field,
+                               SuggestionProvider<?> suggestionProvider,
+                               DateTimeFormatter dateFormatter,
+                               FieldCheckers fieldCheckers,
+                               UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dateFormatter = dateFormatter;
     }
 
-    public StringConverter<TemporalAccessor> getDateToStringConverter() {
+    public Optional<String> getText() {
+        return Optional.ofNullable(text.get());
+    }
+
+    public void setText(String newValue) {
+        String sanitized = DateRangeUtil.sanitizeIncompleteRange(newValue);
+        text.set(sanitized);
+    }
+
+    public StringConverter<TemporalAccessor> getToStringConverter() {
         return new StringConverter<>() {
             @Override
-            public String toString(TemporalAccessor date) {
-                String currentText = textProperty().get();
-                if (currentText != null && !currentText.isEmpty()) {
-                    Optional<Date> parsedDate = Date.parse(currentText);
-                    if (parsedDate.isPresent() && parsedDate.get().getEndDate().isPresent()) {
-                        return currentText;
-                    }
-                }
-                if (date != null && date != RANGE_SENTINEL) {
-                    try {
-                        return dateFormatter.format(date);
-                    } catch (DateTimeException ex) {
-                        LOGGER.debug("Cannot format date", ex);
-                        return "";
-                    }
-                }
-                return "";
-            }
-
-            private String sanitizeIncompleteRange(String dateString) {
-                String trimmed = dateString.trim();
-
-                if (trimmed.endsWith("/") && !trimmed.matches(".*\\d+/\\d+.*")) {
-                    LOGGER.debug("Sanitizing incomplete range (trailing slash): {}", trimmed);
-                    return trimmed.substring(0, trimmed.length() - 1).trim();
+            public String toString(TemporalAccessor value) {
+                if (value == null || value.equals(RANGE_SENTINEL)) {
+                    return "";
                 }
 
-                if (trimmed.startsWith("/") && !trimmed.matches(".*\\d+/\\d+.*")) {
-                    LOGGER.debug("Sanitizing incomplete range (leading slash): {}", trimmed);
-                    return trimmed.substring(1).trim();
-                }
-
-                return dateString;
+                return dateFormatter.format(value);
             }
 
             @Override
-            public TemporalAccessor fromString(String string) {
-                if (StringUtil.isNotBlank(string)) {
-                    String sanitizedString = sanitizeIncompleteRange(string);
+            public TemporalAccessor fromString(String text) {
+                if (StringUtil.isBlank(text)) {
+                    return RANGE_SENTINEL;
+                }
 
-                    Optional<Date> parsedDate = Date.parse(sanitizedString);
-                    if (parsedDate.isPresent() && parsedDate.get().getEndDate().isPresent()) {
-                        return RANGE_SENTINEL;
-                    }
-                    try {
-                        return dateFormatter.parse(sanitizedString);
-                    } catch (DateTimeParseException exception) {
-                        return parsedDate
-                                .filter(date -> date.getEndDate().isEmpty())
-                                .map(Date::toTemporalAccessor)
-                                .orElse(null);
-                    }
-                } else {
-                    return null;
+                try {
+                    return dateFormatter.parse(text);
+                } catch (DateTimeException e) {  // ✔ FIX multi-catch
+                    LOGGER.error("Error while parsing date {}", text, e);
+                    return RANGE_SENTINEL;
                 }
             }
         };

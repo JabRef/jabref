@@ -24,9 +24,7 @@ class DateEditorViewModelTest {
     private DateEditorViewModel viewModel;
     private StringConverter<TemporalAccessor> dateToStringConverter;
 
-    private TemporalAccessor sentinel() {
-        return LocalDate.of(1, 1, 1);
-    }
+    private static final TemporalAccessor SENTINEL = LocalDate.of(1, 1, 1);
 
     @BeforeEach
     void setup() {
@@ -44,7 +42,7 @@ class DateEditorViewModelTest {
     void fromStringRecognizesDateRangeAndReturnsSentinel() {
         StringConverter<TemporalAccessor> converter = viewModel.getDateToStringConverter();
         TemporalAccessor result = converter.fromString("2020-01-01/2020-12-31");
-        assertEquals(sentinel(), result);
+        assertEquals(SENTINEL, result);
     }
 
     @Test
@@ -52,7 +50,7 @@ class DateEditorViewModelTest {
         viewModel.textProperty().set("2020-01-01/2020-12-31");
         StringConverter<TemporalAccessor> converter = viewModel.getDateToStringConverter();
 
-        String output = converter.toString(sentinel());
+        String output = converter.toString(SENTINEL);
         assertEquals("2020-01-01/2020-12-31", output);
     }
 
