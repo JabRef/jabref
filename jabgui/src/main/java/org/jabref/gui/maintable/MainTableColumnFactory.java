@@ -24,6 +24,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.maintable.columns.ContentSelectorColumn;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.FileColumn;
 import org.jabref.gui.maintable.columns.LibraryColumn;
@@ -122,7 +123,14 @@ public class MainTableColumnFactory {
                 break;
             case NORMALFIELD:
                 if (!column.getQualifier().isBlank()) {
-                    returnColumn = createFieldColumn(column, tooltip);
+                    Field field = FieldFactory.parseField(column.getQualifier());
+                    List<String> values = database.getMetaData().getContentSelectorValuesForField(field);
+
+                    if (values != null && !values.isEmpty()) {
+                        returnColumn = createContentSelectorColumn(column, values);
+                    } else {
+                        returnColumn = createFieldColumn(column, tooltip);
+                    }
                 }
                 break;
             default:
@@ -295,6 +303,13 @@ public class MainTableColumnFactory {
      */
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
         return new SpecialFieldColumn(columnModel, preferences, undoManager);
+    }
+
+    /**
+     * Creates a column for fields with content selectors.
+     */
+    private TableColumn<BibEntryTableViewModel, ?> createContentSelectorColumn(MainTableColumnModel columnModel, List<String> values) {
+        return new ContentSelectorColumn(columnModel, values, undoManager);
     }
 
     /**
