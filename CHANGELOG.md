@@ -40,6 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional. [#14224](https://github.com/JabRef/jabref/pull/14224)
 - Correct fallback window height (786 → 768) in JabRefGUI. [#14295](https://github.com/JabRef/jabref/pull/14295)
 - We fixed an issue where keybindings could not be edited and saved. [#14237](https://github.com/JabRef/jabref/issues/14237)
+- We fixed issues with BibLaTeX date range handling and improved the DateEditorViewModel tests. [#8902](https://github.com/JabRef/jabref/issues/8902)
 
 ### Removed
 
