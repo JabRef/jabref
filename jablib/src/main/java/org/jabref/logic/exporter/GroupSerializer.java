@@ -25,7 +25,6 @@ public class GroupSerializer {
         return MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID;
     }
 
-
     private String serializeExplicitGroup(ExplicitGroup group) {
         StringBuilder sb = new StringBuilder();
         sb.append(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID);
