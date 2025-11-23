@@ -194,7 +194,6 @@ class ExternalLinkCreatorTest {
         void getSemanticScholarSearchURLIncludesAuthor() {
             BibEntry entry = createEntryWithTitleAndAuthor("Quantum Computing", "Alice Smith");
             Optional<String> url = linkCreator.getSemanticScholarSearchURL(entry);
-            System.err.println(url.get());
             assertTrue(url.isPresent());
             assertTrue(URLUtil.isValidHttpUrl(url.get()));
             assertTrue(url.get().contains("author%5B0%5D=Smith%2C%20A."));
@@ -204,7 +203,6 @@ class ExternalLinkCreatorTest {
         void getSemanticScholarSearchURLIncludesSeveralAuthors() {
             BibEntry entry = createEntryWithTitleAndAuthor("Quantum Computing", "Alice Smith and Bob Jones");
             Optional<String> url = linkCreator.getSemanticScholarSearchURL(entry);
-            System.err.println(url.get());
             assertTrue(url.isPresent());
             assertTrue(URLUtil.isValidHttpUrl(url.get()));
             assertTrue(url.get().contains("author%5B0%5D=Smith%2C%20A.&author%5B1%5D=Jones%2C%20B."));
