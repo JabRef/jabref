@@ -118,7 +118,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private Subscription horizontalDividerSubscription;
     private Subscription verticalDividerSubscription;
 
-    public JabRefFrame(Stage mainStage, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, GuiPreferences preferences, AiService aiService, StateManager stateManager, CountingUndoManager undoManager, BibEntryTypesManager entryTypesManager, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor, GitHandlerRegistry gitHandlerRegistry) {
+    public JabRefFrame(Stage mainStage,
+                       DialogService dialogService,
+                       FileUpdateMonitor fileUpdateMonitor,
+                       GuiPreferences preferences,
+                       AiService aiService,
+                       StateManager stateManager,
+                       CountingUndoManager undoManager,
+                       BibEntryTypesManager entryTypesManager,
+                       ClipBoardManager clipBoardManager,
+                       TaskExecutor taskExecutor,
+                       GitHandlerRegistry gitHandlerRegistry
+    ) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -134,12 +145,33 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         setId("frame");
 
         // Create components
-        this.viewModel = new JabRefFrameViewModel(preferences, aiService, stateManager, dialogService, this, this::getOpenDatabaseAction, entryTypesManager, fileUpdateMonitor, undoManager, clipBoardManager, taskExecutor);
+        this.viewModel = new JabRefFrameViewModel(preferences,
+                aiService,
+                stateManager,
+                dialogService,
+                this,
+                this::getOpenDatabaseAction,
+                entryTypesManager,
+                fileUpdateMonitor,
+                undoManager,
+                clipBoardManager,
+                taskExecutor
+        );
         Injector.setModelOrService(UiMessageHandler.class, viewModel);
 
-        FrameDndHandler frameDndHandler = new FrameDndHandler(tabbedPane, mainStage::getScene, this::getOpenDatabaseAction, stateManager);
+        FrameDndHandler frameDndHandler = new FrameDndHandler(tabbedPane,
+                mainStage::getScene,
+                this::getOpenDatabaseAction,
+                stateManager
+        );
 
-        this.globalSearchBar = new GlobalSearchBar(this, stateManager, this.preferences, undoManager, dialogService, SearchType.NORMAL_SEARCH);
+        this.globalSearchBar = new GlobalSearchBar(this,
+                stateManager,
+                this.preferences,
+                undoManager,
+                dialogService,
+                SearchType.NORMAL_SEARCH
+        );
 
         this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
                 // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
