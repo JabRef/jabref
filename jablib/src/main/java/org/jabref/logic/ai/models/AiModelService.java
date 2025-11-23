@@ -74,7 +74,7 @@ public class AiModelService {
                         return models;
                     }
                 } catch (Exception e) {
-                    LOGGER.debug("Failed to fetch models for {}: {}", aiProvider.getLabel(), e.getMessage());
+                    LOGGER.debug("Failed to fetch models for {}", aiProvider.getLabel(), e);
                 }
             }
         }
