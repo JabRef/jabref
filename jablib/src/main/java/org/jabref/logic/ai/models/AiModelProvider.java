@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.models;
 
 import java.util.List;
+
 import org.jabref.model.ai.AiProvider;
 
 /**

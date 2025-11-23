@@ -1,10 +1,5 @@
 package org.jabref.gui.preferences.ai;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
