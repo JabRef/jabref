@@ -88,82 +88,63 @@ class CitationKeyGeneratorTest {
     }
 
     static String generateKey(BibEntry entry, String pattern) {
-        return generateKey(entry, pattern, new BibDatabase());
+        return generateKey(entry, true, pattern, new BibDatabase());
+    }
+
+    static String generateKey(BibEntry entry, boolean transliterate, String pattern) {
+        return generateKey(entry, transliterate, pattern, new BibDatabase());
     }
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
+        return generateKey(entry, true, pattern, database);
+    }
+
+    static String generateKey(BibEntry entry, boolean transliterate, String pattern, BibDatabase database) {
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(pattern);
-        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "",
-                "",
-                DEFAULT_UNWANTED_CHARACTERS,
-                keyPattern,
-                "",
-                ',');
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(transliterate, false, false, false, CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A, "", "", DEFAULT_UNWANTED_CHARACTERS, keyPattern, "", ',');
 
         return new CitationKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
     }
 
     @Test
     void andInAuthorName() throws ParseException {
-        Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}",
-                importFormatPreferences);
-        assertEquals("Holland",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}", importFormatPreferences);
+        assertEquals("Holland", CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void crossrefAndInAuthorNames() {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "Simon Holland");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2").withField(StandardField.AUTHOR, "Simon Holland");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
-        assertEquals("Holland",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
-                        database), DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("Holland", CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]", database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void andAuthorNames() throws ParseException {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
-        assertEquals("HerlandHaugeHelgeland",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[authors3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("HerlandHaugeHelgeland", CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[authors3]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void crossrefAndAuthorNames() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2").withField(StandardField.AUTHOR, "Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
-        assertEquals("HerlandHaugeHelgeland",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "[authors3]",
-                        database), DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("HerlandHaugeHelgeland", CitationKeyGenerator.cleanKey(generateKey(entry1, "[authors3]", database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void specialLatexCharacterInAuthorName() throws ParseException {
-        Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences);
-        assertEquals("Popovicova",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        Optional<BibEntry> entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences);
+        assertEquals("Popovicova", CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @ParameterizedTest(name = "bibtexString={0}, expectedResult={1}")
@@ -196,8 +177,7 @@ class CitationKeyGeneratorTest {
             "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "Al-",
             "@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}", "DAl",
             "@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}", "Arn"
-            """
-    )
+            """)
     void makeLabelAndCheckLegalKeys(String bibtexString, String expectedResult) throws ParseException {
         BibEntry bibEntry = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
         String citationKey = generateKey(bibEntry, "[auth3]", new BibDatabase());
@@ -224,11 +204,8 @@ class CitationKeyGeneratorTest {
 
     @Test
     void university() throws ParseException {
-        Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences);
-        assertEquals("UniLinkoeping",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        Optional<BibEntry> entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences);
+        assertEquals("UniLinkoeping", CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     /**
@@ -267,8 +244,7 @@ class CitationKeyGeneratorTest {
             "Ḛ ḛ Ḭ ḭ Ṵ ṵ", "EeIiUu",
             "Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   ", "CcEeGgIiZzAaEeIiOoUu",
             "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   ", "DdHhLlLlMmNnRrRrSsTt"
-            """
-    )
+            """)
     void checkLegalKey(String accents, String expectedResult) {
         assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
     }
@@ -276,114 +252,75 @@ class CitationKeyGeneratorTest {
     @Test
     void crossrefUniversity() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2").withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
-        assertEquals("UniLinkoeping",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
-                        database), DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("UniLinkoeping", CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]", database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void department() throws ParseException {
-        Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}",
-                importFormatPreferences);
-        assertEquals("UniLinkoepingEE",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        Optional<BibEntry> entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}", importFormatPreferences);
+        assertEquals("UniLinkoepingEE", CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void crossrefDepartment() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2").withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
-        assertEquals("UniLinkoepingEE",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
-                        database), DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("UniLinkoepingEE", CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]", database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void school() throws ParseException {
-        Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}",
-                importFormatPreferences);
-        assertEquals("UniLinkoepingCE",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        Optional<BibEntry> entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}", importFormatPreferences);
+        assertEquals("UniLinkoepingCE", CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void generateKeyAbbreviateCorporateAuthorDepartmentWithoutAcademicInstitute() throws ParseException {
-        Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{null, author={{Department of Localhost NullGenerators}}}",
-                importFormatPreferences);
-        assertEquals("DLN",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        Optional<BibEntry> entry = BibtexParser.singleFromString("@ARTICLE{null, author={{Department of Localhost NullGenerators}}}", importFormatPreferences);
+        assertEquals("DLN", CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void generateKeyAbbreviateCorporateAuthorSchoolWithoutAcademicInstitute() throws ParseException {
-        Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{null, author={{The School of Null}}}",
-                importFormatPreferences);
-        assertEquals("SchoolNull",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        Optional<BibEntry> entry = BibtexParser.singleFromString("@ARTICLE{null, author={{The School of Null}}}", importFormatPreferences);
+        assertEquals("SchoolNull", CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void crossrefSchool() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2").withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
-        assertEquals("UniLinkoepingCE",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
-                        database), DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("UniLinkoepingCE", CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]", database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void instituteOfTechnology() throws ParseException {
-        Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences);
-        assertEquals("MIT",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        Optional<BibEntry> entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences);
+        assertEquals("MIT", CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void crossrefInstituteOfTechnology() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Massachusetts Institute of Technology}");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2").withField(StandardField.AUTHOR, "{Massachusetts Institute of Technology}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
-        assertEquals("MIT",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
-                        database), DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("MIT", CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]", database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
     private static Stream<Arguments> authIniN() {
@@ -552,25 +489,11 @@ class CitationKeyGeneratorTest {
     }
 
     static Stream<Arguments> authors() {
-        return Stream.of(
-                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authors]"),
-                Arguments.of("NewtonMaxwell", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authors]"),
-                Arguments.of("NewtonMaxwellEinstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors]"),
-                Arguments.of("Newton-Maxwell-Einstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors:regex(\"(.)([A-Z])\",\"$1-$2\")]")
-        );
+        return Stream.of(Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authors]"), Arguments.of("NewtonMaxwell", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authors]"), Arguments.of("NewtonMaxwellEinstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors]"), Arguments.of("Newton-Maxwell-Einstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors:regex(\"(.)([A-Z])\",\"$1-$2\")]"));
     }
 
     static Stream<Arguments> authorsAlpha() {
-        return Stream.of(
-                Arguments.of("New", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHA),
-                Arguments.of("NM", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHA),
-                Arguments.of("NME", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORSALPHA),
-                Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORSALPHA),
-                Arguments.of("NME+", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORSALPHA),
-                Arguments.of("vdAal", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORSALPHA),
-                Arguments.of("vdAvL", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORSALPHA),
-                Arguments.of("NM+", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3, AUTHORSALPHA)
-        );
+        return Stream.of(Arguments.of("New", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHA), Arguments.of("NM", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHA), Arguments.of("NME", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORSALPHA), Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORSALPHA), Arguments.of("NME+", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORSALPHA), Arguments.of("vdAal", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORSALPHA), Arguments.of("vdAvL", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORSALPHA), Arguments.of("NM+", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3, AUTHORSALPHA));
     }
 
     @ParameterizedTest
@@ -580,16 +503,7 @@ class CitationKeyGeneratorTest {
     }
 
     static Stream<Arguments> authorsAlphaLNI() {
-        return Stream.of(
-                Arguments.of("Ne", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHALNI),
-                Arguments.of("NM", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHALNI),
-                Arguments.of("NME", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORSALPHALNI),
-                Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORSALPHALNI),
-                Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORSALPHALNI),
-                Arguments.of("Aa", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORSALPHALNI),
-                Arguments.of("AL", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORSALPHALNI),
-                Arguments.of("Ne", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3, AUTHORSALPHALNI)
-        );
+        return Stream.of(Arguments.of("Ne", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHALNI), Arguments.of("NM", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHALNI), Arguments.of("NME", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORSALPHALNI), Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORSALPHALNI), Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORSALPHALNI), Arguments.of("Aa", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORSALPHALNI), Arguments.of("AL", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORSALPHALNI), Arguments.of("Ne", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3, AUTHORSALPHALNI));
     }
 
     @ParameterizedTest
@@ -901,10 +815,8 @@ class CitationKeyGeneratorTest {
     @Test
     void crossrefkeywordNKeywordsSeparatedBySpace() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
         entry2.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
@@ -933,11 +845,8 @@ class CitationKeyGeneratorTest {
     @Test
     void crossrefkeywordsNKeywordsSeparatedBySpace() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2")
-                .withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2").withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
 
@@ -994,26 +903,19 @@ class CitationKeyGeneratorTest {
     @Test
     void crossrefShorttitle() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2")
-                .withField(StandardField.TITLE, "Green Scheduling of Whatever");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2").withField(StandardField.TITLE, "Green Scheduling of Whatever");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
 
-        assertEquals("GreenSchedulingWhatever", generateKey(entry1, "[shorttitle]",
-                database));
+        assertEquals("GreenSchedulingWhatever", generateKey(entry1, "[shorttitle]", database));
     }
 
     @Test
     void crossrefShorttitleInitials() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry()
-                .withCitationKey("entry2")
-                .withField(StandardField.TITLE, "Green Scheduling of Whatever");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry().withCitationKey("entry2").withField(StandardField.TITLE, "Green Scheduling of Whatever");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
 
@@ -1074,37 +976,28 @@ class CitationKeyGeneratorTest {
 
     @Test
     void generateKeyWithAuthUpperYearShortTitleCapitalizeModifier() {
-        BibEntry entry = new BibEntry()
-                .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1)
-                .withField(StandardField.YEAR, "2019")
-                .withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1).withField(StandardField.YEAR, "2019").withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
 
         assertEquals("NEWTON2019InterestingTitleLonger", generateKey(entry, "[auth:upper][year][shorttitle:capitalize]"));
     }
 
     @Test
     void generateKeyWithYearAuthUpperTitleSentenceCaseModifier() {
-        BibEntry entry = new BibEntry()
-                .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3)
-                .withField(StandardField.YEAR, "2019")
-                .withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3).withField(StandardField.YEAR, "2019").withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
 
         assertEquals("NewtonMaxwellEtAl_2019_TheInterestingTitleLongerThanThreeWords", generateKey(entry, "[authors2]_[year]_[title:capitalize]"));
     }
 
     @Test
     void generateKeyWithMinusInCitationStyleOutsideAField() {
-        BibEntry entry = new BibEntry()
-                .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1)
-                .withField(StandardField.YEAR, "2019");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1).withField(StandardField.YEAR, "2019");
 
         assertEquals("Newton-2019", generateKey(entry, "[auth]-[year]"));
     }
 
     @Test
     void generateKeyWithWithFirstNCharacters() {
-        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Newton, Isaac")
-                                       .withField(StandardField.YEAR, "2019");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Newton, Isaac").withField(StandardField.YEAR, "2019");
 
         assertEquals("newt-2019", generateKey(entry, "[auth4:lower]-[year]"));
     }
@@ -1141,21 +1034,11 @@ class CitationKeyGeneratorTest {
     void generateKeyDoesNotModifyTheKeyWithIncorrectRegexReplacement() {
         String pattern = "[title]";
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(pattern);
-        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "[", // Invalid regexp
-                "",
-                DEFAULT_UNWANTED_CHARACTERS,
-                keyPattern,
-                "",
-                ',');
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(true, false, false, false, CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A, "[", // Invalid regexp
+                "", DEFAULT_UNWANTED_CHARACTERS, keyPattern, "", ',');
 
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
-        assertEquals("WickednessManaging",
-                new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(bibEntry));
+        assertEquals("WickednessManaging", new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(bibEntry));
     }
 
     @Test
@@ -1185,6 +1068,20 @@ class CitationKeyGeneratorTest {
         BibEntry entry = createABibEntryAuthor("Alexander Artemenko and others");
         entry.setField(StandardField.YEAR, "2019");
         assertEquals("Artemenko2019", generateKey(entry, "[auth][year]"));
+    }
+
+    @Test
+    void generateKeyWithTransliteration() {
+        BibEntry entry = createABibEntryAuthor("Надежда Карпенко");
+        entry.setField(StandardField.YEAR, "2025");
+        assertEquals("Karpenko2025", generateKey(entry, "[auth][year]"));
+    }
+
+    @Test
+    void generateKeyWithoutTransliteration() {
+        BibEntry entry = createABibEntryAuthor("Надежда Карпенко");
+        entry.setField(StandardField.YEAR, "2025");
+        assertEquals("Karpenko2025", generateKey(entry, "[auth][year]"));
     }
 }
 

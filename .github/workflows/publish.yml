@@ -3,6 +3,8 @@ name: Publish to maven central
 on:
   # On releases
   push:
+    branches:
+      - main
     tags:
       - '**'
 
@@ -62,6 +64,11 @@ jobs:
           files: |
             jablib/src/main/java/**/*.java
             .github/workflows/publish.yml
+      - name: List changed files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed.outputs.all_changed_files }}
+        run: |
+          echo $ALL_CHANGED_FILES
 
   publish:
     name: jablib
@@ -101,9 +108,9 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}

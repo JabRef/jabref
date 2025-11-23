@@ -128,17 +128,10 @@ class URLUtilTest {
     }
 
     @Test
-    void nullUrl() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                URLUtil.create(null));
-        assertTrue(exception.getMessage().contains("null or empty"));
-    }
-
-    @Test
     void emptyUrl() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 URLUtil.create("   "));
-        assertTrue(exception.getMessage().contains("null or empty"));
+        assertTrue(exception.getMessage().contains("URL must not be empty."));
     }
 
     @Test
