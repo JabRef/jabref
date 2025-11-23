@@ -307,8 +307,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                                     .mapObservable(SplitPane.Divider::positionProperty)
                                                     .listenToValues((_, newValue) ->
                                                             preferences.getGuiPreferences()
-                                                                       .setHorizontalDividerPosition(newValue.doubleValue())
-                                                    );
+                                                                       .setHorizontalDividerPosition(newValue.doubleValue()));
         }
     }
 
@@ -319,8 +318,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                                   .mapObservable(SplitPane.Divider::positionProperty)
                                                   .listenToValues((_, newValue) ->
                                                           preferences.getGuiPreferences()
-                                                                     .setVerticalDividerPosition(newValue.doubleValue())
-                                                  );
+                                                                     .setVerticalDividerPosition(newValue.doubleValue()));
         }
     }
 
@@ -435,7 +433,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
                 // Set window title dynamically
                 mainStage.titleProperty().bind(Bindings.createStringBinding(
-                        () -> libraryTab.textProperty().getValue() + " – " + FRAME_TITLE,  // not a minus, but codepoint 2013
+                        () -> libraryTab.textProperty().getValue() + " – " + FRAME_TITLE, // not a minus, but codepoint 2013
                         libraryTab.textProperty()));
             } else {
                 // Check if the previously active database was closed
@@ -445,9 +443,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                                   .filter(tab -> tab instanceof LibraryTab)
                                                   .noneMatch(ltab -> ((LibraryTab) ltab).getBibDatabaseContext()
                                                                                         .getUid()
-                                                                                        .equals(activeUID)
-                                                  );
-
+                                                                                        .equals(activeUID));
                     if (wasClosed) {
                         tabbedPane.getSelectionModel().selectNext();
                     }
