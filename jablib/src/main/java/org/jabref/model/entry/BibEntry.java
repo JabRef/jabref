@@ -918,17 +918,6 @@ public class BibEntry {
         return sharedBibEntryData;
     }
 
-    public BibEntry withSharedBibEntryData(int sharedId, int version) {
-        sharedBibEntryData.setSharedID(sharedId);
-        sharedBibEntryData.setVersion(version);
-        return this;
-    }
-
-    public BibEntry withSharedBibEntryData(SharedBibEntryData sharedBibEntryData) {
-        sharedBibEntryData = sharedBibEntryData;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
