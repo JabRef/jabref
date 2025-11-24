@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,7 +17,11 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -55,7 +61,6 @@ public class UnlinkedFilesDialogViewModelTest {
         // Mock a base directory
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
-        when(filePreferences.getWorkingDirectory()).thenReturn(Path.of("C:/test/base"));
 
         // Mock the state manager to provide an active database
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(bibDatabaseContext));
@@ -112,5 +117,356 @@ public class UnlinkedFilesDialogViewModelTest {
                 fileList,
                 "fileList should contain exactly the relative paths of file1.pdf and file2.txt"
         );
+    }
+
+    @Test
+    void fixBrokenLinkForSingleExactMatch(@TempDir Path tempDir) throws IOException {
+        Path directory = tempDir.resolve("files");
+        Path oldPath = directory.resolve("old/minimal.pdf");
+        Files.createDirectories(oldPath.getParent());
+        Files.createFile(oldPath);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Misc);
+        LinkedFile brokenLink = new LinkedFile("", oldPath.toString(), "PDF");
+        entry.addFile(brokenLink);
+
+        Path newPath = directory.resolve("new/minimal.pdf");
+        Files.createDirectories(newPath.getParent());
+        Files.move(oldPath, newPath);
+
+        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(entry)));
+        when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(directory));
+
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        viewModel.findAndFixBrokenLinks(directory);
+        assertEquals(1, viewModel.resultListSize());
+        assertEquals(Optional.of(newPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+    }
+
+    @Test
+    void noFixForBrokenLinkOfFileAlreadyLink(@TempDir Path tempDir) throws IOException {
+        Path directory = tempDir.resolve("files");
+        Path oldPath = directory.resolve("old/minimal.pdf");
+        Files.createDirectories(oldPath.getParent());
+        Files.createFile(oldPath);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Misc);
+        LinkedFile brokenLink = new LinkedFile("", oldPath.toString(), "PDF");
+        entry.addFile(brokenLink);
+
+        Path newPath = directory.resolve("new/minimal.pdf");
+        Files.createDirectories(newPath.getParent());
+        Files.move(oldPath, newPath);
+
+        BibEntry entry2 = new BibEntry(StandardEntryType.Misc);
+        entry2.addFile(new LinkedFile("", newPath.toString(), "PDF"));
+
+        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(entry, entry2)));
+        when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(directory));
+
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newPath.toString()), entry2.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        viewModel.findAndFixBrokenLinks(directory);
+        assertEquals(0, viewModel.resultListSize());
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newPath.toString()), entry2.getFiles().stream().findFirst().map(LinkedFile::getLink));
+    }
+
+    @Test
+    void fixBrokenLinksOfMultipleFileTypes(@TempDir Path tempDir) throws IOException {
+        // Entry has multiple broken links of different file types
+        Path directory = tempDir.resolve("files");
+        Path oldPdfPath = directory.resolve("old/document.pdf");
+        Path oldTxtPath = directory.resolve("old/notes.txt");
+        Path oldDocxPath = directory.resolve("old/report.docx");
+        Files.createDirectories(oldPdfPath.getParent());
+        Files.createFile(oldPdfPath);
+        Files.createFile(oldTxtPath);
+        Files.createFile(oldDocxPath);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Misc);
+        entry.addFile(new LinkedFile("", oldPdfPath.toString(), "PDF"));
+        entry.addFile(new LinkedFile("", oldTxtPath.toString(), "Text"));
+        entry.addFile(new LinkedFile("", oldDocxPath.toString(), "Word"));
+
+        Path newPdfPath = directory.resolve("new/document.pdf");
+        Path newTxtPath = directory.resolve("new/notes.txt");
+        Path newDocxPath = directory.resolve("new/report.docx");
+        Files.createDirectories(newPdfPath.getParent());
+
+        Files.move(oldPdfPath, newPdfPath);
+        Files.move(oldTxtPath, newTxtPath);
+        Files.move(oldDocxPath, newDocxPath);
+
+        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(entry)));
+        when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(directory));
+
+        // Should link each broken link to the correct new file based on type
+        entry.getFiles().forEach(file -> {
+            String link = file.getLink();
+            if (link.endsWith(".pdf")) {
+                assertEquals(oldPdfPath.toString(), link);
+            } else if (link.endsWith(".txt")) {
+                assertEquals(oldTxtPath.toString(), link);
+            } else if (link.endsWith(".docx")) {
+                assertEquals(oldDocxPath.toString(), link);
+            }
+        });
+        viewModel.findAndFixBrokenLinks(directory);
+        assertEquals(3, viewModel.resultListSize());
+        entry.getFiles().forEach(file -> {
+            String link = file.getLink();
+            if (link.endsWith(".pdf")) {
+                assertEquals(newPdfPath.toString(), link);
+            } else if (link.endsWith(".txt")) {
+                assertEquals(newTxtPath.toString(), link);
+            } else if (link.endsWith(".docx")) {
+                assertEquals(newDocxPath.toString(), link);
+            }
+        });
+    }
+
+    @Test
+    void fixBrokenLinksOfMultiplePotentialMatches(@TempDir Path tempDir) throws IOException {
+        Path directory = tempDir.resolve("files");
+        Path oldPath = directory.resolve("old/minimal.pdf");
+        Files.createDirectories(oldPath.getParent());
+        Files.createFile(oldPath);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Misc);
+        LinkedFile brokenLink = new LinkedFile("", oldPath.toString(), "PDF");
+        entry.addFile(brokenLink);
+
+        Path newPath = directory.resolve("new/minimal.pdf");
+        Files.createDirectories(newPath.getParent());
+        Files.move(oldPath, newPath);
+
+        Path ambiguousPath = directory.resolve("new-1/minimal.pdf");
+        Path ambiguousPath2 = directory.resolve("new-2/minimal.pdf");
+        Path ambiguousPath3 = directory.resolve("new-3/minimal.txt");
+        Files.createDirectories(ambiguousPath.getParent());
+        Files.createDirectories(ambiguousPath2.getParent());
+        Files.createDirectories(ambiguousPath3.getParent());
+        Files.createFile(ambiguousPath);
+        Files.createFile(ambiguousPath2);
+        Files.createFile(ambiguousPath3);
+
+        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(entry)));
+        when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(directory));
+
+        // searching in the original directory, it should not link (because of multiple matches)
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        viewModel.findAndFixBrokenLinks(directory);
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(0, viewModel.resultListSize());
+
+        // searching in a more restricted directory, it should link successfully (because only one match exists)
+        viewModel.findAndFixBrokenLinks(newPath.getParent());
+        assertEquals(Optional.of(newPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(1, viewModel.resultListSize());
+    }
+
+    @Test
+    void fixBrokenLinksInMixedScenario(@TempDir Path tempDir) throws IOException {
+        // Database with multiple entries:
+        Path directory = tempDir.resolve("files");
+        Path oldFixablePath = directory.resolve("old/fixable.pdf");
+        Path oldUnFixablePath = directory.resolve("old/unFixable.pdf");
+        Path untouchedPath = directory.resolve("old/untouched.pdf");
+        Files.createDirectories(oldFixablePath.getParent());
+        Files.createFile(oldFixablePath);
+        Files.createFile(oldUnFixablePath);
+        Files.createFile(untouchedPath);
+
+        // - fixable broken links (single matches)
+        BibEntry fixableEntry = new BibEntry(StandardEntryType.Misc);
+        fixableEntry.addFile(new LinkedFile("", oldFixablePath.toString(), "PDF"));
+
+        // - unfixable broken links (multiple/no matches)
+        BibEntry unfixableEntry = new BibEntry(StandardEntryType.Misc);
+        unfixableEntry.addFile(new LinkedFile("", oldUnFixablePath.toString(), "PDF"));
+
+        // - valid links (should remain untouched)
+        BibEntry untouchedEntry = new BibEntry(StandardEntryType.Misc);
+        untouchedEntry.addFile(new LinkedFile("", untouchedPath.toString(), "PDF"));
+
+        Path newFixablePath = directory.resolve("new/fixable.pdf");
+        Path newUnFixablePath = directory.resolve("new/unFixable.pdf");
+        Files.createDirectories(newFixablePath.getParent());
+        Files.move(oldFixablePath, newFixablePath);
+        Files.move(oldUnFixablePath, newUnFixablePath);
+
+        Path ambiguousPath = directory.resolve("new-1/unFixable.pdf");
+        Files.createDirectories(ambiguousPath.getParent());
+        Files.createFile(ambiguousPath);
+
+        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(fixableEntry, unfixableEntry, untouchedEntry)));
+        when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(directory));
+
+        // Should only fix the fixable ones
+        assertEquals(Optional.of(oldFixablePath.toString()), fixableEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(oldUnFixablePath.toString()), unfixableEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(untouchedPath.toString()), untouchedEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+
+        viewModel.findAndFixBrokenLinks(directory);
+
+        assertEquals(1, viewModel.resultListSize());
+        assertEquals(Optional.of(newFixablePath.toString()), fixableEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(oldUnFixablePath.toString()), unfixableEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(untouchedPath.toString()), untouchedEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+    }
+
+    @Test
+    void fixBrokenLinksInLargeDatabase(@TempDir Path tempDir) throws IOException {
+        Path testRoot = tempDir.resolve("test");
+        List<BibEntry> entries = new ArrayList<>();
+        int entryCount = 100;
+        int filesPerEntry = 3;
+
+        for (int i = 0; i < entryCount; i++) {
+            BibEntry entry = new BibEntry(StandardEntryType.Misc);
+
+            for (int j = 0; j < filesPerEntry; j++) {
+                Path dir = testRoot.resolve(String.format("category_%d/subcategory_%d/level_%d", i % 100, i % 50, i % 10));
+                Path originalFile = dir.resolve(String.format("original_file_%d_%d.pdf", i, j));
+                Files.createDirectories(originalFile.getParent());
+                Files.createFile(originalFile);
+
+                entry.addFile(new LinkedFile("", originalFile.toString(), "PDF"));
+
+                Path newLocation = testRoot.resolve(String.format("new_location_%d/original_file_%d_%d.pdf", i % 200, i, j));
+                Files.createDirectories(newLocation.getParent());
+                Files.move(originalFile, newLocation);
+            }
+            entries.add(entry);
+        }
+
+        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(entries));
+        when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(testRoot));
+
+        viewModel.findAndFixBrokenLinks(testRoot);
+
+        assertEquals(entryCount * filesPerEntry, viewModel.resultListSize());
+    }
+
+    @Test
+    void fixBrokenLinksOfFilesInSubdirectories(@TempDir Path tempDir) throws IOException {
+        // Create a comprehensive directory structure to test deep traversal
+        Path rootDirectory = tempDir.resolve("test-files");
+
+        // Create complex nested directory structure
+        Path projectsDir = rootDirectory.resolve("projects");
+        Path archiveDir = rootDirectory.resolve("archive");
+        Path backupDir = rootDirectory.resolve("backup");
+        Path referencesDir = rootDirectory.resolve("references");
+
+        // Create subdirectories with multiple levels of nesting
+        Path project1Dir = projectsDir.resolve("project1/papers/drafts");
+        Path project2Dir = projectsDir.resolve("project2/final/submissions");
+        Path yearlyArchive = archiveDir.resolve("2082/research/publications");
+        Path monthlyBackup = backupDir.resolve("monthly/december/papers");
+        Path categoryRefs = referencesDir.resolve("category-a/subcategory-x/documents");
+        Path deepNested = rootDirectory.resolve("level1/level2/level3/level4/level5");
+
+        // Create all directory structures
+        Files.createDirectories(project1Dir);
+        Files.createDirectories(project2Dir);
+        Files.createDirectories(yearlyArchive);
+        Files.createDirectories(monthlyBackup);
+        Files.createDirectories(categoryRefs);
+        Files.createDirectories(deepNested);
+
+        // Create original files in various locations (simulating old broken paths)
+        Path originalPdf1 = tempDir.resolve("old-location/research-paper.pdf");
+        Path originalPdf2 = tempDir.resolve("old-docs/thesis.pdf");
+        Path originalDoc = tempDir.resolve("old-files/notes.docx");
+        Path originalTxt = tempDir.resolve("old-text/summary.txt");
+        Path originalPresentation = tempDir.resolve("old-ppt/presentation.pptx");
+
+        Files.createDirectories(originalPdf1.getParent());
+        Files.createDirectories(originalPdf2.getParent());
+        Files.createDirectories(originalDoc.getParent());
+        Files.createDirectories(originalTxt.getParent());
+        Files.createDirectories(originalPresentation.getParent());
+
+        Files.createFile(originalPdf1);
+        Files.createFile(originalPdf2);
+        Files.createFile(originalDoc);
+        Files.createFile(originalTxt);
+        Files.createFile(originalPresentation);
+
+        // Create BibEntries with broken links pointing to original locations
+        BibEntry entry1 = new BibEntry(StandardEntryType.Article);
+        entry1.addFile(new LinkedFile("Research Paper", originalPdf1.toString(), "PDF"));
+        entry1.addFile(new LinkedFile("Supporting Notes", originalDoc.toString(), "Word"));
+
+        BibEntry entry2 = new BibEntry(StandardEntryType.Thesis);
+        entry2.addFile(new LinkedFile("Thesis Document", originalPdf2.toString(), "PDF"));
+        entry2.addFile(new LinkedFile("Summary", originalTxt.toString(), "Text"));
+
+        BibEntry entry3 = new BibEntry(StandardEntryType.InProceedings);
+        entry3.addFile(new LinkedFile("Conference Presentation", originalPresentation.toString(), "PowerPoint"));
+
+        // Move files to various deep nested locations (simulating file reorganization)
+        Path newPdf1Location = project1Dir.resolve("research-paper.pdf");
+        Path newDocLocation = project2Dir.resolve("notes.docx");
+        Path newPdf2Location = yearlyArchive.resolve("thesis.pdf");
+        Path newTxtLocation = monthlyBackup.resolve("summary.txt");
+        Path newPptLocation = deepNested.resolve("presentation.pptx");
+
+        Files.move(originalPdf1, newPdf1Location);
+        Files.move(originalDoc, newDocLocation);
+        Files.move(originalPdf2, newPdf2Location);
+        Files.move(originalTxt, newTxtLocation);
+        Files.move(originalPresentation, newPptLocation);
+
+        // Add some additional files with similar names to test specificity
+        Files.createFile(categoryRefs.resolve("research-paper-old.pdf"));
+        Files.createFile(categoryRefs.resolve("research-paper-v2.pdf"));
+        Files.createFile(backupDir.resolve("thesis-backup.pdf"));
+        Files.createFile(archiveDir.resolve("notes-archived.docx"));
+
+        // Add files with same name but different extensions to test type matching
+        Files.createFile(projectsDir.resolve("research-paper.txt"));
+        Files.createFile(archiveDir.resolve("thesis.docx"));
+        Files.createFile(referencesDir.resolve("presentation.pdf"));
+
+        // Create some symbolic links to test link resolution
+        try {
+            Path symlinkDir = rootDirectory.resolve("symlinks");
+            Files.createDirectories(symlinkDir);
+            Files.createSymbolicLink(symlinkDir.resolve("linked-thesis.pdf"), newPdf2Location);
+        } catch (UnsupportedOperationException | SecurityException e) {
+            // Symbolic links might not be supported on all systems, continue without them
+        }
+
+        // Setup mock database and context
+        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(entry1, entry2, entry3)));
+        when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(rootDirectory));
+
+        // Verify initial broken state
+        assertEquals(Optional.of(originalPdf1.toString()), entry1.getFiles().stream().filter(file -> file.getLink().equals(originalPdf1.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(originalDoc.toString()), entry1.getFiles().stream().filter(file -> file.getLink().equals(originalDoc.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(originalPdf2.toString()), entry2.getFiles().stream().filter(file -> file.getLink().equals(originalPdf2.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(originalTxt.toString()), entry2.getFiles().stream().filter(file -> file.getLink().equals(originalTxt.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(originalPresentation.toString()), entry3.getFiles().stream().filter(file -> file.getLink().equals(originalPresentation.toString())).findFirst().map(LinkedFile::getLink));
+
+        // Execute the fix operation
+        viewModel.findAndFixBrokenLinks(rootDirectory);
+
+        // Verify that all broken links were found and fixed
+        assertEquals(5, viewModel.resultListSize());
+
+        // Verify specific file links were updated to correct relative paths
+        assertEquals(Optional.of(newPdf1Location.toString()), entry1.getFiles().stream().filter(file -> file.getLink().equals(newPdf1Location.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newDocLocation.toString()), entry1.getFiles().stream().filter(file -> file.getLink().equals(newDocLocation.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newPdf2Location.toString()), entry2.getFiles().stream().filter(file -> file.getLink().equals(newPdf2Location.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newTxtLocation.toString()), entry2.getFiles().stream().filter(file -> file.getLink().equals(newTxtLocation.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newPptLocation.toString()), entry3.getFiles().stream().filter(file -> file.getLink().equals(newPptLocation.toString())).findFirst().map(LinkedFile::getLink));
+
+        // Verify that files with similar names but different extensions were not incorrectly matched
+        assertEquals(Optional.empty(), entry1.getFiles().stream().filter(file -> file.getLink().contains("research-paper.txt")).findFirst().map(LinkedFile::getLink));
+
+        assertEquals(Optional.empty(), entry2.getFiles().stream().filter(file -> file.getLink().contains("thesis.docx")).findFirst().map(LinkedFile::getLink));
     }
 }
