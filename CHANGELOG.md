@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added `--provider=crossref` to `get-cited-works` at `JabKit`. [#14357](https://github.com/JabRef/jabref/pull/14357)
 - We added [unpaywall](https://unpaywall.org/) as fulltext fetcher. [#14340](https://github.com/JabRef/jabref/pull/14340)
 - We added the possibility to configure the email provided to unpaywall. [#14340](https://github.com/JabRef/jabref/pull/14340)
+- We added "Close library" to the File menu. [#14381](https://github.com/JabRef/jabref/issues/14381)
 - We added a "Regenerate" button for the AI chat allowing the user to make the language model reformulate its response to the previous prompt. [#12191](https://github.com/JabRef/jabref/issues/12191)
 - We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377)
 - We added support for "Search Google Scholar" and "Search Semantic Scholar" to quickly search for a selected entry's title in Google Scholar or Semantic Scholar directly from the main table's context menu [#12268](https://github.com/JabRef/jabref/issues/12268)
