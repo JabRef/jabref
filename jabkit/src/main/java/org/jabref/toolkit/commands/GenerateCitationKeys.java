@@ -29,10 +29,10 @@ class GenerateCitationKeys implements Runnable {
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
+    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input .bib file", required = true)
     private Path inputFile;
 
-    @Option(names = "--output", description = "The output .bib file.")
+    @Option(names = "--output", description = "The output .bib file")
     private Path outputFile;
 
     @Override
