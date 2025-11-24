@@ -381,7 +381,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // endregion
 
         // region NewEntryUnifierPreferences
-        defaults.put(CREATEi_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(NewEntryDialogTab.CHOOSE_ENTRY_TYPE));
+        defaults.put(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(NewEntryDialogTab.CHOOSE_ENTRY_TYPE));
         defaults.put(CREATE_ENTRY_EXPAND_RECOMMENDED, true);
         defaults.put(CREATE_ENTRY_EXPAND_OTHER, false);
         defaults.put(CREATE_ENTRY_EXPAND_CUSTOM, true);
