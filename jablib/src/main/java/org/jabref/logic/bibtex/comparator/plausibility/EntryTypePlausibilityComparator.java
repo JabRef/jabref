@@ -2,9 +2,8 @@ package org.jabref.logic.bibtex.comparator.plausibility;
 
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.model.entry.types.StandardEntryType;
-/**
-*  If the left entry type is misc then prefer the the right value 
-**/
+
+/// If the left entry type is misc then prefer the the right value 
 public class EntryTypePlausibilityComparator implements FieldValuePlausibilityComparator {
 
     // Only the factory may instantiate this
