@@ -36,12 +36,12 @@ public class CoreGuiPreferences {
     private CoreGuiPreferences() {
         this(
                 0,             // Main window position x
-                0,                      // Main window position y
-                1024,                   // Main window size x
-                768,                    // Main window size y
-                true,                   // Main window maximized
-                0.15,                   // Horizontal divider position
-                0.65);                  // Vertical divider position
+                0,             // Main window position y
+                1024,          // Main window size x
+                768,           // Main window size y
+                true,          // Main window maximized
+                0.15,          // Horizontal divider position
+                0.65);         // Vertical divider position
     }
 
     public static CoreGuiPreferences getDefault() {
