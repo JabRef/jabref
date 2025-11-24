@@ -24,7 +24,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
@@ -142,7 +141,6 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
-
     public static final String LANGUAGE = "language";
 
     public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
@@ -969,12 +967,20 @@ public class JabRefCliPreferences implements CliPreferences {
         return prefs.getInt(key, getIntDefault(key));
     }
 
-    public double getDouble(String key) {
-        return prefs.getDouble(key, getDoubleDefault(key));
+    public int getInt(String key, int def) {
+        return prefs.getInt(key, def);
     }
 
     public int getIntDefault(String key) {
         return (Integer) defaults.get(key);
+    }
+
+    public double getDouble(String key) {
+        return prefs.getDouble(key, getDoubleDefault(key));
+    }
+
+    public double getDouble(String key, double def) {
+        return prefs.getDouble(key, def);
     }
 
     private double getDoubleDefault(String key) {
@@ -1670,10 +1676,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     protected Language getLanguage() {
-        return Stream.of(Language.values())
-                     .filter(language -> language.getId().equalsIgnoreCase(get(LANGUAGE)))
-                     .findFirst()
-                     .orElse(Language.ENGLISH);
+        return Language.getLanguageFor(get(LANGUAGE));
     }
 
     @Override
@@ -2252,7 +2255,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
                 getStringList(SEARCH_CATALOGS),
                 defaultPlainCitationParser,
-                getInt(CITATIONS_RELATIONS_STORE_TTL)
+                getInt(CITATIONS_RELATIONS_STORE_TTL),
+                Map.of()
         );
 
         EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
