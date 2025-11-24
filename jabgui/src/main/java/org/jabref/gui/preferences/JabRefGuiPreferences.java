@@ -381,7 +381,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // endregion
 
         // region NewEntryUnifierPreferences
-        defaults.put(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(NewEntryDialogTab.CHOOSE_ENTRY_TYPE));
+        defaults.put(CREATEi_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(NewEntryDialogTab.CHOOSE_ENTRY_TYPE));
         defaults.put(CREATE_ENTRY_EXPAND_RECOMMENDED, true);
         defaults.put(CREATE_ENTRY_EXPAND_OTHER, false);
         defaults.put(CREATE_ENTRY_EXPAND_CUSTOM, true);
@@ -681,15 +681,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private WorkspacePreferences getWorkspacePreferencesFromBackingStore(WorkspacePreferences defaults) {
         return new WorkspacePreferences(
                 getLanguage(),
-                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
-                getInt(MAIN_FONT_SIZE, defaults.getMainFontSize()),
-                defaults.getDefaultFontSize(), // FixMe
-                new Theme(get(THEME, Theme.BASE_CSS)),
-                getBoolean(THEME_SYNC_OS, defaults.shouldThemeSyncOs()),
-                getBoolean(OPEN_LAST_EDITED, defaults.shouldOpenLastEdited()),
-                getBoolean(SHOW_ADVANCED_HINTS, defaults.shouldShowAdvancedHints()),
-                getBoolean(CONFIRM_DELETE, defaults.shouldConfirmDelete()),
-                getBoolean(CONFIRM_HIDE_TAB_BAR, defaults.shouldHideTabBar()),
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
+                getInt(MAIN_FONT_SIZE),
+                (Integer) defaults.getMainFontSize(),
+                new Theme(get(THEME)),
+                getBoolean(THEME_SYNC_OS),
+                getBoolean(OPEN_LAST_EDITED),
+                getBoolean(SHOW_ADVANCED_HINTS),
+                getBoolean(CONFIRM_DELETE),
+                getBoolean(CONFIRM_HIDE_TAB_BAR),
                 getStringList(SELECTED_SLR_CATALOGS));
     }
 
