@@ -21,6 +21,10 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -128,5 +132,38 @@ class PseudonymizationTest {
         PseudonymizationResultCsvWriter.writeValuesMappingAsCsv(mappingInfoTarget, result);
 
         assertTrue(Files.exists(target));
+    }
+
+    @Test
+    void pseudonymizeGroups() {
+        // given
+        var root = new GroupTreeNode(new AllEntriesGroup("Root"));
+        var used = root.addSubgroup(new ExplicitGroup("Used", GroupHierarchyType.INDEPENDENT, ','));
+        used.addSubgroup(new ExplicitGroup("Sub", GroupHierarchyType.INDEPENDENT, ','));
+
+        var databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.getMetaData().setGroups(root);
+
+        var pseudonymization = new Pseudonymization();
+
+        // when
+        Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
+        var newRoot = result.bibDatabaseContext().getMetaData().getGroups().orElseThrow();
+
+        // then
+        assertEquals("groups-1", newRoot.getName());
+        assertTrue(newRoot.getFirstChild().isPresent());
+
+        var newUsed = newRoot.getFirstChild().orElseThrow();
+        assertEquals("groups-2", newUsed.getName());
+        assertTrue(newUsed.getFirstChild().isPresent());
+
+        var newSub = newUsed.getFirstChild().orElseThrow();
+        assertEquals("groups-3", newSub.getName());
+
+        var mapping = result.valueMapping();
+        assertEquals("Root", mapping.get("groups-1"));
+        assertEquals("Used", mapping.get("groups-2"));
+        assertEquals("Sub", mapping.get("groups-3"));
     }
 }
