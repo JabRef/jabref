@@ -318,6 +318,12 @@ public class AiChatComponent extends VBox {
 
     private void onSendMessage(String userPrompt) {
         aiChatLogic.getFollowUpQuestions().clear();
+
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            exQuestionBox.setVisible(false);
+            exQuestionBox.setManaged(false);
+        });
+
         UserMessage userMessage = new UserMessage(userPrompt);
         updatePromptHistory();
         setLoading(true);
