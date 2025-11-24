@@ -430,7 +430,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         super.importPreferences(file);
 
         // in case of incomplete or corrupt xml fall back to current preferences
-        getWorkspacePreferences().setAll(getWorkspacePreferencesFromLowLevelApi(getWorkspacePreferences()));
+        getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
     }
 
     // region EntryEditorPreferences
@@ -645,7 +645,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return workspacePreferences;
         }
 
-        workspacePreferences = getWorkspacePreferencesFromLowLevelApi(WorkspacePreferences.getDefault());
+        workspacePreferences = getWorkspacePreferencesFromBackingStore(WorkspacePreferences.getDefault());
 
         EasyBind.listen(workspacePreferences.languageProperty(), (_, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -676,7 +676,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return workspacePreferences;
     }
 
-    private WorkspacePreferences getWorkspacePreferencesFromLowLevelApi(WorkspacePreferences defaults) {
+    private WorkspacePreferences getWorkspacePreferencesFromBackingStore(WorkspacePreferences defaults) {
         return new WorkspacePreferences(
                 getLanguage(),
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
