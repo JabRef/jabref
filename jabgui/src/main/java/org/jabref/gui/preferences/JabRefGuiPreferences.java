@@ -129,9 +129,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String MAIN_WINDOW_POS_Y = "mainWindowPosY";
     private static final String MAIN_WINDOW_WIDTH = "mainWindowSizeX";
     private static final String MAIN_WINDOW_HEIGHT = "mainWindowSizeY";
-    private static final String WINDOW_MAXIMISED = "windowMaximised";
-    private static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
-    private static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
+    private static final String MAIN_WINDOW_MAXIMISED = "windowMaximised";
+    private static final String MAIN_WINDOW_SIDEPANE_WIDTH = "sidePaneWidthFX";
+    private static final String MAIN_WINDOW_EDITOR_HEIGHT = "entryEditorHeightFX";
     // endregion
 
     private static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
@@ -617,9 +617,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(coreGuiPreferences.positionYProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_POS_Y, newValue.doubleValue()));
         EasyBind.listen(coreGuiPreferences.sizeXProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_WIDTH, newValue.doubleValue()));
         EasyBind.listen(coreGuiPreferences.sizeYProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_HEIGHT, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.windowMaximisedProperty(), (_, _, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
-        EasyBind.listen(coreGuiPreferences.horizontalDividerPositionProperty(), (_, _, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.getVerticalDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.windowMaximisedProperty(), (_, _, newValue) -> putBoolean(MAIN_WINDOW_MAXIMISED, newValue));
+        EasyBind.listen(coreGuiPreferences.horizontalDividerPositionProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_SIDEPANE_WIDTH, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.getVerticalDividerPositionProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_EDITOR_HEIGHT, newValue.doubleValue()));
 
         return coreGuiPreferences;
     }
@@ -630,9 +630,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getDouble(MAIN_WINDOW_POS_Y, defaults.getPositionY()),
                 getDouble(MAIN_WINDOW_WIDTH, defaults.getSizeX()),
                 getDouble(MAIN_WINDOW_HEIGHT, defaults.getSizeY()),
-                getBoolean(WINDOW_MAXIMISED, defaults.isWindowMaximised()),
-                getDouble(SIDE_PANE_WIDTH, defaults.getHorizontalDividerPosition()),
-                getDouble(ENTRY_EDITOR_HEIGHT, defaults.getVerticalDividerPosition()));
+                getBoolean(MAIN_WINDOW_MAXIMISED, defaults.isWindowMaximised()),
+                getDouble(MAIN_WINDOW_SIDEPANE_WIDTH, defaults.getHorizontalDividerPosition()),
+                getDouble(MAIN_WINDOW_EDITOR_HEIGHT, defaults.getVerticalDividerPosition()));
     }
     // endregion
 
