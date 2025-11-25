@@ -44,6 +44,23 @@ public class CommonArchitectureTest {
     }
 
     @ArchTest
+    public void doNotUseSwing(JavaClasses classes) {
+        // This checks for all Swing packages, but not the UndoManager
+        ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseSwing.class)
+                          .should().accessClassesThat()
+                          .resideInAnyPackage("javax.swing",
+                                  "javax.swing.border..",
+                                  "javax.swing.colorchooser..",
+                                  "javax.swing.event..",
+                                  "javax.swing.filechooser..",
+                                  "javax.swing.plaf..",
+                                  "javax.swing.table..",
+                                  "javax.swing.text..",
+                                  "javax.swing.tree..")
+                          .check(classes);
+    }
+
+    @ArchTest
     public void doNotUseJackson2(JavaClasses classes) {
         // annotations still reside in com.fasterxml package:
         ArchRuleDefinition.noClasses()
