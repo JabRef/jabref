@@ -80,9 +80,7 @@ open module org.jabref {
     // region: data mapping
     requires jdk.xml.dom;
     // requires com.google.gson;
-    requires com.fasterxml.jackson.databind;
-    // requires com.fasterxml.jackson.dataformat.yaml;
-    // requires com.fasterxml.jackson.datatype.jsr310;
+    requires tools.jackson.databind;
     // endregion
 
     // dependency injection using HK2
