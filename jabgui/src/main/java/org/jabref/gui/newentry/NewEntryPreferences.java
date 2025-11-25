@@ -88,7 +88,7 @@ private NewEntryPreferences(){
         return typesRecommendedExpanded.get();
     }
 
-    public void setTypesRecommendedExpanded(boolean expanded) {
+    public void getTypesRecommendedExpanded(boolean expanded) {
         typesRecommendedExpanded.set(expanded);
     }
 
