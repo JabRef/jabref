@@ -366,7 +366,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(DONATION_NEVER_SHOW, Boolean.FALSE);
         defaults.put(DONATION_LAST_SHOWN_EPOCH_DAY, -1);
         // endregion
-
     }
 
     /**

@@ -11,7 +11,6 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-/*-----*/
 
 public class NewEntryPreferences {
     private final ObjectProperty<NewEntryDialogTab> latestApproach;
