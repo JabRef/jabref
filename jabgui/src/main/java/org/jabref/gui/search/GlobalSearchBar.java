@@ -317,6 +317,7 @@ public class GlobalSearchBar extends HBox {
         });
 
         //maybe we should follow this track?
+        // yes
         filterModeButton.setSelected(searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FILTER);
         filterModeButton.setTooltip(new Tooltip(Localization.lang("Filter search results")));
         initSearchModifierButton(filterModeButton);
