@@ -56,9 +56,9 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -533,14 +533,15 @@ public class ImportHandler {
 
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
-            // Only one SmartGroup
-            this.targetBibDatabaseContext.getMetaData()
-                                         .getGroups()
-                                         .flatMap(grp -> grp.getChildren()
-                                                            .stream()
-                                                            .filter(node -> node.getGroup() instanceof SmartGroup)
-                                                            .findFirst())
-                                         .ifPresent(smtGrp -> smtGrp.addEntriesToGroup(entriesToInsert));
+            String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
+            this.bibDatabaseContext.getMetaData()
+                                   .getGroups()
+                                   .flatMap(grp -> grp.getChildren()
+                                                      .stream()
+                                                      .filter(node -> node.getGroup() instanceof ExplicitGroup
+                                                              && node.getGroup().getName().equals(groupName))
+                                                      .findFirst())
+                                   .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
         }
     }
 }
