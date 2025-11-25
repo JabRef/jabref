@@ -596,7 +596,6 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.xmlunit")
     requires.add("org.xmlunit.matchers")
 
-
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")
 }
