@@ -1,7 +1,9 @@
 package org.jabref.gui.preferences;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import javafx.beans.property.BooleanProperty;
@@ -93,25 +95,26 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         return new ReadOnlyListWrapper<>(preferenceTabs);
     }
 
-    public void importPreferences() {
+    public boolean importPreferences() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
                 .withInitialDirectory(preferences.getInternalPreferences().getLastPreferencesExportPath()).build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration)
-                     .ifPresent(file -> {
-                         try {
-                             preferences.importPreferences(file);
-                             setValues();
+        Optional<Path> importFileOpt = dialogService.showFileOpenDialog(fileDialogConfiguration);
+        if (importFileOpt.isPresent()) {
+            try {
+                preferences.importPreferences(importFileOpt.get());
+                setValues();
 
-                             dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
-                                     Localization.lang("You must restart JabRef for this to come into effect."));
-                         } catch (JabRefException ex) {
-                             LOGGER.error("Error while importing preferences", ex);
-                             dialogService.showErrorDialogAndWait(Localization.lang("Import preferences"), ex);
-                         }
-                     });
+                return true;
+            } catch (JabRefException ex) {
+                LOGGER.error("Error while importing preferences", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Import preferences"), ex);
+            }
+        }
+
+        return false;
     }
 
     public void exportPreferences() {
@@ -138,7 +141,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         dialogService.showCustomDialogAndWait(new PreferencesFilterDialog(new PreferencesFilter(preferences)));
     }
 
-    public void resetPreferences() {
+    /// returns true if the preferences have been reset
+    public boolean resetPreferences() {
         boolean resetPreferencesConfirmed = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Reset preferences"),
                 Localization.lang("Are you sure you want to reset all settings to default values?"),
@@ -147,14 +151,16 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         if (resetPreferencesConfirmed) {
             try {
                 preferences.clear();
-                dialogService.showWarningDialogAndWait(Localization.lang("Reset preferences"),
-                        Localization.lang("You must restart JabRef for this to come into effect."));
+                setValues();
+
+                return true;
             } catch (BackingStoreException ex) {
                 LOGGER.error("Error while resetting preferences", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Reset preferences"), ex);
             }
-            setValues();
         }
+
+        return false;
     }
 
     /**
