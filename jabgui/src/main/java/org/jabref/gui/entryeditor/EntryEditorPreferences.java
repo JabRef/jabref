@@ -104,7 +104,7 @@ public class EntryEditorPreferences {
                 true,                                // Show validation messages
                 false,                               // Allow integers in edition in Bibtex
                 true,                                // Auto search and show unlinked files in entry editor
-                JournalPopupEnabled.DISABLED,        // JournalPopupEnabled
+                JournalPopupEnabled.DISABLED,     // JournalPopupEnabled
                 true,                                // Show citation info tab
                 true,                                // Show user comments field
                 0.5                                  // previewWidthDividerPosition
@@ -131,7 +131,7 @@ public class EntryEditorPreferences {
         this.enablementStatus.set(preferences.shouldEnableJournalPopup());
         this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
         this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
-        this.previewWidthDividerPosition.set(preferences.getPreviewDividerPos());
+        this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
     }
 
     public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
@@ -319,13 +319,5 @@ public class EntryEditorPreferences {
 
     public Double getPreviewWidthDividerPosition() {
         return previewWidthDividerPosition.get();
-    }
-
-    public double getPreviewDividerPos() {
-        return previewWidthDividerPosition.get();
-    }
-
-    public String getJournalPopUp() {
-        return enablementStatus.get().toString();
     }
 }

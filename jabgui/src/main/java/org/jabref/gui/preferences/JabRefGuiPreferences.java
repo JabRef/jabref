@@ -463,20 +463,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return new EntryEditorPreferences(
                 getEntryEditorTabs(),
                 getDefaultEntryEditorTabs(),
-                getBoolean(AUTO_OPEN_FORM),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(SHOW_AI_SUMMARY),
-                getBoolean(SHOW_AI_CHAT),
-                getBoolean(SHOW_LATEX_CITATIONS),
-                getBoolean(SMART_FILE_ANNOTATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getBoolean(AUTOLINK_FILES_ENABLED),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.getJournalPopUp())),
-                getBoolean(SHOW_SCITE_TAB),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewDividerPos()));
+                getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
+                getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
+                getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
+                getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
+                getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
+                getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
+                getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
+                getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().toString())),
+                getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
+                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition()));
     }
 
     /**
