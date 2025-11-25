@@ -248,8 +248,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private JabRefGuiPreferences() {
         super();
 
-        defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
-
         // region mergeDialogPreferences
         defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
         defaults.put(MERGE_ENTRIES_SHOULD_SHOW_DIFF, Boolean.TRUE);
@@ -463,22 +461,22 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     public EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
         return new EntryEditorPreferences(
-            getEntryEditorTabs(),
-            getDefaultEntryEditorTabs(),
-            getBoolean(AUTO_OPEN_FORM),
-            getBoolean(SHOW_RECOMMENDATIONS),
-            getBoolean(SHOW_AI_SUMMARY),
-            getBoolean(SHOW_AI_CHAT),
-            getBoolean(SHOW_LATEX_CITATIONS),
-            getBoolean(SMART_FILE_ANNOTATIONS),
-            getBoolean(DEFAULT_SHOW_SOURCE),
-            getBoolean(VALIDATE_IN_ENTRY_EDITOR),
-            getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-            getBoolean(AUTOLINK_FILES_ENABLED),
-            EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.getJournalPopUp())),
-            getBoolean(SHOW_SCITE_TAB),
-            getBoolean(SHOW_USER_COMMENTS_FIELDS),
-            getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewDividerPos()));
+                getEntryEditorTabs(),
+                getDefaultEntryEditorTabs(),
+                getBoolean(AUTO_OPEN_FORM),
+                getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(SHOW_AI_SUMMARY),
+                getBoolean(SHOW_AI_CHAT),
+                getBoolean(SHOW_LATEX_CITATIONS),
+                getBoolean(SMART_FILE_ANNOTATIONS),
+                getBoolean(DEFAULT_SHOW_SOURCE),
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
+                getBoolean(AUTOLINK_FILES_ENABLED),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.getJournalPopUp())),
+                getBoolean(SHOW_SCITE_TAB),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS),
+                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewDividerPos()));
     }
 
     /**
