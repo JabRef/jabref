@@ -535,13 +535,13 @@ public class ImportHandler {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
             String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
             this.targetBibDatabaseContext.getMetaData()
-                                   .getGroups()
-                                   .flatMap(grp -> grp.getChildren()
-                                                      .stream()
-                                                      .filter(node -> node.getGroup() instanceof ExplicitGroup
-                                                              && node.getGroup().getName().equals(groupName))
-                                                      .findFirst())
-                                   .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
+                                         .getGroups()
+                                         .flatMap(grp -> grp.getChildren()
+                                                            .stream()
+                                                            .filter(node -> node.getGroup() instanceof ExplicitGroup
+                                                                    && node.getGroup().getName().equals(groupName))
+                                                            .findFirst())
+                                         .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
         }
     }
 }
