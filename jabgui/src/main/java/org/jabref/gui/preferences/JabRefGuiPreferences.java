@@ -349,7 +349,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // endregion
 
         // region: Main table, main table column, and search dialog column preferences
-        defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
+
         defaults.put(COLUMN_NAMES, "groups;group_icons;files;linked_id;field:citationkey;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
         defaults.put(COLUMN_WIDTHS, "28;40;28;28;100;75;300;470;60;130;50;50;50");
 
@@ -357,8 +357,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
         // endregion
 
-        // By default disable "Fit table horizontally on the screen"
-        defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
+    
 
         defaults.put(ASK_FOR_INCLUDING_CROSS_REFERENCES, Boolean.TRUE);
         defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
@@ -414,6 +413,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
+        getMainTablePreferences().setAll(MainTablePreferences.getDefault());
     }
 
     @Override
@@ -423,6 +423,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // in case of incomplete or corrupt xml fall back to current preferences
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
+        getMainTablePreferences().setAll(getMainTablePreferencesFromLowLevelApi(getMainTablePreferences()));
+
     }
 
     // region EntryEditorPreferences
@@ -999,22 +1001,26 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region: Main table, main table column, and search dialog column preferences
 
     public MainTablePreferences getMainTablePreferences() {
-        if (mainTablePreferences != null) {
-            return mainTablePreferences;
-        }
-
-        mainTablePreferences = new MainTablePreferences(
-                getMainTableColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE),
-                getBoolean(EXTRA_FILE_COLUMNS));
-
-        EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
-                (obs, oldValue, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
-        EasyBind.listen(mainTablePreferences.extraFileColumnsEnabledProperty(),
-                (obs, oldValue, newValue) -> putBoolean(EXTRA_FILE_COLUMNS, newValue));
-
+    if (mainTablePreferences != null) {
         return mainTablePreferences;
     }
+
+    mainTablePreferences = getMainTablePreferencesFromLowLevelApi(MainTablePreferences.getDefault());
+
+    EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
+            (obs, oldValue, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
+    EasyBind.listen(mainTablePreferences.extraFileColumnsEnabledProperty(),
+            (obs, oldValue, newValue) -> putBoolean(EXTRA_FILE_COLUMNS, newValue));
+
+    return mainTablePreferences;
+}
+
+    private MainTablePreferences getMainTablePreferencesFromLowLevelApi(MainTablePreferences defaults) {
+    return new MainTablePreferences(
+            getMainTableColumnPreferences(),
+            getBoolean(AUTO_RESIZE_MODE, defaults.getResizeColumnsToFit()),
+            getBoolean(EXTRA_FILE_COLUMNS, defaults.getExtraFileColumnsEnabled()));
+}
 
     public ColumnPreferences getMainTableColumnPreferences() {
         if (mainTableColumnPreferences != null) {
