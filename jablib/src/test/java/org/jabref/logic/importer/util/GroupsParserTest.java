@@ -9,6 +9,7 @@ import java.util.List;
 import javafx.scene.paint.Color;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
+import org.jabref.logic.exporter.GroupSerializer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.StandardField;
@@ -173,5 +174,28 @@ class GroupsParserTest {
         expected.setDescription("Group by publication year");
         AbstractGroup parsed = GroupsParser.fromString("AutomaticDateGroup:Publications;0;year;YEAR;1;0x0000ffff;calendar;Group by publication year;", ',', fileMonitor, metaData, "userAndHost");
         assertEquals(expected, parsed);
+    }
+
+    @Test
+    void fromStringParsesSmartGroupAsExplicitGroup() throws ParseException {
+        ExplicitGroup expected = new ExplicitGroup("legacySmart", GroupHierarchyType.INDEPENDENT, ',');
+        expected.setExpanded(true);
+        expected.setColor(Color.AQUA.toString());
+        expected.setIconName("smart-icon");
+        expected.setDescription("legacy description");
+
+        AbstractGroup parsed = GroupsParser.fromString("SmartGroup:legacySmart;0;1;0x00ffffff;smart-icon;legacy description;", ',', fileMonitor, metaData, "userAndHost");
+
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void smartGroupRoundtripResultsInExplicitSerialization() throws ParseException {
+        AbstractGroup parsed = GroupsParser.fromString("SmartGroup:roundtrip;2;0;0x00ff00ff;icon;desc;", ',', fileMonitor, metaData, "userAndHost");
+
+        GroupSerializer serializer = new GroupSerializer();
+        List<String> serialization = serializer.serializeTree(GroupTreeNode.fromGroup(parsed));
+
+        assertEquals(List.of("0 StaticGroup:roundtrip;2;0;0x00ff00ff;icon;desc;"), serialization);
     }
 }
