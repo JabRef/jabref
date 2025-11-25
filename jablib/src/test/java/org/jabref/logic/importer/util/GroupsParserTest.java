@@ -9,6 +9,7 @@ import java.util.List;
 import javafx.scene.paint.Color;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
+import org.jabref.logic.exporter.GroupSerializer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.StandardField;
@@ -193,7 +194,7 @@ class GroupsParserTest {
         assertEquals(ExplicitGroup.class, parsed.getClass());
 
         // Store in new format (serialize)
-        org.jabref.logic.exporter.GroupSerializer serializer = new org.jabref.logic.exporter.GroupSerializer();
+        GroupSerializer serializer = new GroupSerializer();
         List<String> serialized = serializer.serializeTree(GroupTreeNode.fromGroup(parsed));
         String serializedString = serialized.get(0).substring(2); // Remove level prefix "0 "
 
