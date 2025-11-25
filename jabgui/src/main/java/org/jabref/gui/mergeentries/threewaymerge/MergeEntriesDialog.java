@@ -3,6 +3,7 @@ package org.jabref.gui.mergeentries.threewaymerge;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -13,16 +14,16 @@ public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
     private final BibEntry one;
     private final BibEntry two;
 
-    public MergeEntriesDialog(BibEntry one, BibEntry two, GuiPreferences preferences) {
-        threeWayMergeView = new ThreeWayMergeView(one, two, preferences);
+    public MergeEntriesDialog(BibEntry one, BibEntry two, GuiPreferences preferences, StateManager stateManager) {
+        threeWayMergeView = new ThreeWayMergeView(one, two, preferences, stateManager);
         this.one = one;
         this.two = two;
 
         init();
     }
 
-    public MergeEntriesDialog(BibEntry one, BibEntry two, String leftHeader, String rightHeader, GuiPreferences preferences) {
-        threeWayMergeView = new ThreeWayMergeView(one, two, leftHeader, rightHeader, preferences);
+    public MergeEntriesDialog(BibEntry one, BibEntry two, String leftHeader, String rightHeader, GuiPreferences preferences, StateManager stateManager) {
+        threeWayMergeView = new ThreeWayMergeView(one, two, leftHeader, rightHeader, preferences, stateManager);
         this.one = one;
         this.two = two;
 
