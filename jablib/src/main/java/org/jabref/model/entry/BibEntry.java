@@ -1268,4 +1268,10 @@ public class BibEntry {
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
     }
+
+    /// Trims whitespaces at the beginning of the BibEntry
+    public void trimLeft() {
+        this.parsedSerialization = parsedSerialization.trim(); // we should do "trimLeft", but currently, it is OK as is.
+        this.commentsBeforeEntry = commentsBeforeEntry.trim(); // we should do "trimLeft", but currently, it is OK as is.
+    }
 }

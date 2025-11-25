@@ -32,6 +32,32 @@ public class CoreGuiPreferences {
         this.verticalDividerPosition = new SimpleDoubleProperty(verticalDividerPosition);
     }
 
+    /// Creates object with default values
+    private CoreGuiPreferences() {
+        this(
+                0,             // Main window position x
+                0,             // Main window position y
+                1024,          // Main window size x
+                768,           // Main window size y
+                true,          // Main window maximized
+                0.15,          // Horizontal divider position
+                0.65);         // Vertical divider position
+    }
+
+    public static CoreGuiPreferences getDefault() {
+        return new CoreGuiPreferences();
+    }
+
+    public void setAll(CoreGuiPreferences preferences) {
+        this.positionX.set(preferences.getPositionX());
+        this.positionY.set(preferences.getPositionY());
+        this.sizeX.set(preferences.getSizeX());
+        this.sizeY.set(preferences.getSizeY());
+        this.windowMaximised.set(preferences.isWindowMaximised());
+        this.horizontalDividerPosition.set(preferences.getHorizontalDividerPosition());
+        this.verticalDividerPosition.set(preferences.getVerticalDividerPosition());
+    }
+
     public double getPositionX() {
         return positionX.get();
     }
