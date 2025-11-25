@@ -28,6 +28,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -60,7 +61,7 @@ import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -171,15 +172,14 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
 
         stateManager.getSelectedEntries().addListener((InvalidationListener) _ -> {
-                    if (stateManager.getSelectedEntries().isEmpty()) {
-                        // [impl->req~entry-editor.keep-showing~1]
-                        // No change in the entry editor
-                        // We allow users to edit the "old" entry
-                    } else {
-                        setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
-                    }
-                }
-        );
+            if (stateManager.getSelectedEntries().isEmpty()) {
+                // [impl->req~entry-editor.keep-showing~1]
+                // No change in the entry editor
+                // We allow users to edit the "old" entry
+            } else {
+                setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
+            }
+        });
 
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (_, _, newValue) -> {
@@ -248,6 +248,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
                         break;
+                    case JUMP_TO_FIELD:
+                        selectFieldDialog();
+                        event.consume();
+                        break;
                     case HELP:
                         new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
                         event.consume();
@@ -266,6 +270,15 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 }
             }
         });
+    }
+
+    public void selectFieldDialog() {
+        if (getCurrentlyEditedEntry() == null) {
+            return;
+        }
+        JumpToFieldDialog dialog = new JumpToFieldDialog(this);
+        dialog.initModality(Modality.NONE);
+        dialog.show();
     }
 
     @FXML
@@ -420,6 +433,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         return currentlyEditedEntry;
     }
 
+    public List<EntryEditorTab> getAllPossibleTabs() {
+        return allPossibleTabs;
+    }
+
     public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
         if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
             return;
@@ -434,14 +451,25 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
 
         typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
-            typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+            typeLabel.setText(new TypedBibEntry(this.currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
             adaptVisibleTabs();
             setupToolBar();
-            getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
+            getSelectedTab().notifyAboutFocus(this.currentlyEditedEntry);
         });
+
+        typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+
+        adaptVisibleTabs();
+
+        setupToolBar();
 
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
+        }
+
+        EntryEditorTab selectedTab = getSelectedTab();
+        if (selectedTab != null) {
+            Platform.runLater(() -> selectedTab.notifyAboutFocus(currentlyEditedEntry));
         }
     }
 
@@ -492,29 +520,37 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(currentlyEditedEntry, fetcher);
     }
 
+    public void selectField(String fieldName) {
+        setFocusToField(org.jabref.model.entry.field.FieldFactory.parseField(fieldName));
+    }
+
     public void setFocusToField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> {
-            Field actualField = field;
-            boolean fieldFound = false;
-            for (Tab tab : tabbed.getTabs()) {
-                tabbed.getSelectionModel().select(tab);
-                if ((tab instanceof FieldsEditorTab fieldsEditorTab)
-                        && fieldsEditorTab.getShownFields().contains(actualField)) {
-                    tabbed.getSelectionModel().select(tab);
-                    Platform.runLater(() -> fieldsEditorTab.requestFocus(actualField));
-                    // This line explicitly brings focus back to the main window containing the Entry Editor.
-                    getScene().getWindow().requestFocus();
-                    fieldFound = true;
-                    break;
-                }
-            }
-            if (!fieldFound) {
-                Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                if (aliasField != null) {
-                    setFocusToField(aliasField);
-                }
-            }
+            getTabContainingField(field).ifPresentOrElse(
+                    tab -> selectTabAndField(tab, field),
+                    () -> {
+                        Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
+                        getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
+                    }
+            );
         });
+    }
+
+    private void selectTabAndField(FieldsEditorTab tab, Field field) {
+        Platform.runLater(() -> {
+            tabbed.getSelectionModel().select(tab);
+            tab.requestFocus(field);
+        });
+        // This line explicitly brings focus back to the main window containing the Entry Editor.
+        getScene().getWindow().requestFocus();
+    }
+
+    private Optional<FieldsEditorTab> getTabContainingField(Field field) {
+        return tabbed.getTabs().stream()
+                     .filter(FieldsEditorTab.class::isInstance)
+                     .map(FieldsEditorTab.class::cast)
+                     .filter(tab -> tab.getShownFields().contains(field))
+                     .findFirst();
     }
 
     @Override

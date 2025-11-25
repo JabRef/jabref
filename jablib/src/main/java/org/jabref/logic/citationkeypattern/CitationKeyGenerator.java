@@ -7,12 +7,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.logic.util.strings.Transliteration;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class CitationKeyGenerator extends BracketedPattern {
 
     /// Source of disallowed characters: <https://tex.stackexchange.com/a/408548/9075>
     /// These characters are disallowed in BibTeX keys.
-    private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
+    public static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
 
@@ -109,7 +110,8 @@ public class CitationKeyGenerator extends BracketedPattern {
         String newKey = createCitationKeyFromPattern(entry);
         newKey = replaceWithRegex(newKey);
         newKey = appendLettersToKey(newKey, currentKey);
-        return cleanKey(newKey, unwantedCharacters);
+        newKey = cleanKey(newKey, unwantedCharacters);
+        return transliterateIfNeeded(newKey);
     }
 
     /**
@@ -153,6 +155,15 @@ public class CitationKeyGenerator extends BracketedPattern {
             key = moddedKey;
         }
         return key;
+    }
+
+    public String transliterateIfNeeded(String key) {
+        if (!citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKey()) {
+            return key;
+        }
+
+        String result = Transliteration.transliterate(key);
+        return result.replace(" ", "");
     }
 
     /**

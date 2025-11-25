@@ -43,25 +43,19 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     protected static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralTabViewModel.class);
 
     private final ReadOnlyListProperty<Language> languagesListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.getSorted()));
@@ -81,7 +75,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
-    private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldAskForIncludingCrossReferencesProperty = new SimpleBooleanProperty();
     private final BooleanProperty hideTabBarProperty = new SimpleBooleanProperty();
@@ -102,6 +95,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
+    private final HttpServerManager httpServerManager;
+    private final LanguageServerController languageServerController;
+    private final UiMessageHandler uiMessageHandler;
+    private final RemoteListenerServerManager remoteListenerServerManager;
+    private final StateManager stateManager;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -118,20 +116,28 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final StringProperty languageServerPortProperty = new SimpleStringProperty("");
     private final TrustStoreManager trustStoreManager;
 
-    private final FileUpdateMonitor fileUpdateMonitor;
-
-    public GeneralTabViewModel(DialogService dialogService, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
+    public GeneralTabViewModel(DialogService dialogService,
+                               GuiPreferences preferences,
+                               HttpServerManager httpServerManager,
+                               LanguageServerController languageServerController,
+                               UiMessageHandler uiMessageHandler,
+                               RemoteListenerServerManager remoteListenerServerManager,
+                               StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.workspacePreferences = preferences.getWorkspacePreferences();
         this.libraryPreferences = preferences.getLibraryPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
-        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.httpServerManager = httpServerManager;
+        this.languageServerController = languageServerController;
+        this.uiMessageHandler = uiMessageHandler;
+        this.remoteListenerServerManager = remoteListenerServerManager;
+        this.stateManager = stateManager;
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
-                input -> {
+                _ -> {
                     try {
                         return Integer.parseInt(fontSizeProperty().getValue()) > 8;
                     } catch (NumberFormatException ex) {
@@ -207,7 +213,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());
         showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
-        inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
 
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
         shouldAskForIncludingCrossReferencesProperty.setValue(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences());
@@ -257,7 +262,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
-        workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
 
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
         preferences.getCopyToPreferences().setShouldAskForIncludingCrossReferences(shouldAskForIncludingCrossReferencesProperty.getValue());
@@ -284,15 +288,12 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        UiMessageHandler uiMessageHandler = Injector.instantiateModelOrService(UiMessageHandler.class);
         CLIMessageHandler messageHandler = new CLIMessageHandler(uiMessageHandler, preferences);
-        RemoteListenerServerManager remoteListenerServerManager = Injector.instantiateModelOrService(RemoteListenerServerManager.class);
         // stop in all cases, because the port might have changed
         remoteListenerServerManager.stop();
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            remoteListenerServerManager.openAndStart(messageHandler,
-                    remotePreferences.getPort());
+            remoteListenerServerManager.openAndStart(messageHandler, remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
             remoteListenerServerManager.stop();
@@ -310,19 +311,17 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        HttpServerManager httpServerManager = Injector.instantiateModelOrService(HttpServerManager.class);
         // stop in all cases, because the port might have changed
         httpServerManager.stop();
         if (enableHttpServerProperty.getValue()) {
             remotePreferences.setEnableHttpServer(true);
             URI uri = remotePreferences.getHttpServerUri();
-            httpServerManager.start(Injector.instantiateModelOrService(StateManager.class), uri);
+            httpServerManager.start(stateManager, uri);
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();
         }
 
-        LanguageServerController languageServerController = Injector.instantiateModelOrService(LanguageServerController.class);
         // stop in all cases, because the port might have changed (or other settings that can't be easily tracked https://github.com/JabRef/jabref/pull/13697#discussion_r2285997003)
         languageServerController.stop();
         if (enableLanguageServerProperty.getValue()) {
@@ -433,10 +432,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty showAdvancedHintsProperty() {
         return this.showAdvancedHintsProperty;
-    }
-
-    public BooleanProperty inspectionWarningDuplicateProperty() {
-        return this.inspectionWarningDuplicateProperty;
     }
 
     public BooleanProperty confirmDeleteProperty() {

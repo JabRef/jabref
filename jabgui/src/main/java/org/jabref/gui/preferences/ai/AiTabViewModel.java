@@ -18,6 +18,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.AiDefaultPreferences;
@@ -27,9 +28,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbers;
 import org.jabref.logic.util.OptionalObjectProperty;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
-import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -37,6 +38,8 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
+    protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
+
     private final Locale oldLocale;
 
     private final BooleanProperty enableAi = new SimpleBooleanProperty();
@@ -44,6 +47,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableAutoGenerateEmbeddings = new SimpleBooleanProperty();
     private final BooleanProperty autoGenerateSummaries = new SimpleBooleanProperty();
     private final BooleanProperty disableAutoGenerateSummaries = new SimpleBooleanProperty();
+    private final BooleanProperty generateFollowUpQuestions = new SimpleBooleanProperty();
+    private final IntegerProperty followUpQuestionsCount = new SimpleIntegerProperty();
 
     private final ListProperty<AiProvider> aiProvidersList =
             new SimpleListProperty<>(FXCollections.observableArrayList(AiProvider.values()));
@@ -91,7 +96,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(),
             AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(),
             AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty()
+            AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(),
+            AiTemplate.FOLLOW_UP_QUESTIONS, new SimpleStringProperty()
     );
 
     private final OptionalObjectProperty<AiTemplate> selectedTemplate = OptionalObjectProperty.empty();
@@ -341,6 +347,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         enableAi.setValue(aiPreferences.getEnableAi());
         autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());
+        generateFollowUpQuestions.setValue(aiPreferences.getGenerateFollowUpQuestions());
+        followUpQuestionsCount.setValue(aiPreferences.getFollowUpQuestionsCount());
 
         selectedAiProvider.setValue(aiPreferences.getAiProvider());
 
@@ -364,6 +372,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setEnableAi(enableAi.get());
         aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
         aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
+        aiPreferences.setGenerateFollowUpQuestions(generateFollowUpQuestions.get());
+        aiPreferences.setFollowUpQuestionsCount(followUpQuestionsCount.get());
 
         aiPreferences.setAiProvider(selectedAiProvider.get());
 
@@ -414,6 +424,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         documentSplitterOverlapSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         ragMaxResultsCount.set(AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         ragMinScore.set(LocalizedNumbers.doubleToString(AiDefaultPreferences.RAG_MIN_SCORE));
+        followUpQuestionsCount.set(AiDefaultPreferences.FOLLOW_UP_QUESTIONS_COUNT);
     }
 
     public void resetTemplates() {
@@ -485,6 +496,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty disableAutoGenerateSummaries() {
         return disableAutoGenerateSummaries;
+    }
+
+    public BooleanProperty generateFollowUpQuestions() {
+        return generateFollowUpQuestions;
+    }
+
+    public IntegerProperty followUpQuestionsCountProperty() {
+        return followUpQuestionsCount;
+    }
+
+    public StringProperty followUpQuestionsTemplateProperty() {
+        return aiPreferences.templateProperty(AiTemplate.FOLLOW_UP_QUESTIONS);
     }
 
     public ReadOnlyListProperty<AiProvider> aiProvidersProperty() {

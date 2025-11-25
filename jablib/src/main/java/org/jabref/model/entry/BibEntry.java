@@ -28,6 +28,7 @@ import javafx.collections.ObservableMap;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -43,7 +44,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -918,17 +918,6 @@ public class BibEntry {
         return sharedBibEntryData;
     }
 
-    public BibEntry withSharedBibEntryData(int sharedId, int version) {
-        sharedBibEntryData.setSharedID(sharedId);
-        sharedBibEntryData.setVersion(version);
-        return this;
-    }
-
-    public BibEntry withSharedBibEntryData(SharedBibEntryData sharedBibEntryData) {
-        sharedBibEntryData = sharedBibEntryData;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -1278,5 +1267,11 @@ public class BibEntry {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
+    }
+
+    /// Trims whitespaces at the beginning of the BibEntry
+    public void trimLeft() {
+        this.parsedSerialization = parsedSerialization.trim(); // we should do "trimLeft", but currently, it is OK as is.
+        this.commentsBeforeEntry = commentsBeforeEntry.trim(); // we should do "trimLeft", but currently, it is OK as is.
     }
 }
