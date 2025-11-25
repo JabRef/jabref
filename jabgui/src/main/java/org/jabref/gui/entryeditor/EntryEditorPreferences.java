@@ -111,6 +111,10 @@ public class EntryEditorPreferences {
         );
     }
 
+    public static EntryEditorPreferences getDefault() {
+        return new EntryEditorPreferences();
+    }
+
     public void setAll(EntryEditorPreferences preferences) {
         setEntryEditorTabList(preferences.getEntryEditorTabs());
         this.defaultEntryEditorTabList.set(preferences.getDefaultEntryEditorTabs());
@@ -128,10 +132,6 @@ public class EntryEditorPreferences {
         this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
         this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
         this.previewWidthDividerPosition.set(preferences.getPreviewDividerPos());
-    }
-
-    public static EntryEditorPreferences getDefault() {
-        return new EntryEditorPreferences();
     }
 
     public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
