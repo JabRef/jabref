@@ -62,7 +62,7 @@ E.g., by `brew install jbangdev/tap/jbang` or `choco install jbang`
 `jbang` also enables to install `jabkit` permanently in your `PATH`:
 
 ```console
-jbang app install jabkit@jabref
+jbang app install --fresh --force jabkit@jabref
 ```
 
 Then, you can run JabKit:
@@ -71,7 +71,9 @@ Then, you can run JabKit:
 jabkit --help
 ```
 
-[JBang takes care about updating JabKit automatically](https://github.com/orgs/jbangdev/discussions/1636#discussioncomment-6150992).
+> [!NOTE]
+> You can use the command above to update JabKit, too.
+> Background: Although [JBang takes care about updating JabKit automatically](https://github.com/orgs/jbangdev/discussions/1636#discussioncomment-6150992), it does not update the `-SNAPSHOT` dependencies.
 
 ### Running JabKit without installation
 
