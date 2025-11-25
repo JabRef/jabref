@@ -88,7 +88,7 @@ By using [gg.cmd](https://github.com/eirikb/gg#ggcmd) you can "just run" JabKit 
 You can also put `gg.cmd` on your `PATH` and make it executable.
 Then you enable `alias jabkit='gg.cmd jbang jabkit@jabref`.
 
-## Running JabLs
+## Running JabLS
 
 In case you have [JBang installed], just run following command:
 
