@@ -534,7 +534,7 @@ public class ImportHandler {
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
             String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
-            this.bibDatabaseContext.getMetaData()
+            this.targetBibDatabaseContext.getMetaData()
                                    .getGroups()
                                    .flatMap(grp -> grp.getChildren()
                                                       .stream()
