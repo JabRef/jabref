@@ -6,7 +6,7 @@ This directory contains JBang scripts for JabRef.
 Four use cases:
 
 - Runing `JabKit` - JabRef's CLI tool.
-- Runing JabLs - JabRef's Language Server.
+- Runing JabLS - JabRef's Language Server.
 - Runing JabSrv - JabRef's HTTP server.
 - Try out any pull request with minimal installation. See [our blog entry](https://blog.jabref.org/2025/05/31/run-pr/) for details.
 
