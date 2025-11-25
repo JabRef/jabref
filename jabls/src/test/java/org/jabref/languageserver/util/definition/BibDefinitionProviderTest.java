@@ -48,7 +48,7 @@ class BibDefinitionProviderTest {
                                 number       = {1},
                                 pages        = {1--11},
                                 volume       = {99},
-                                file         = {:C\\\\:/Users/Philip/Downloads/corti-et-al-2009-cocoa-and-cardiovascular-health.pdf:PDF;:corti-et-al-2009-cocoa-and-cardiovascular-health.pdf:PDF},
+                                file         = {:C\\:/Users/Philip/Downloads/corti-et-al-2009-cocoa-and-cardiovascular-health.pdf:PDF;:corti-et-al-2009-cocoa-and-cardiovascular-health.pdf:PDF},
                                 publisher    = {Cambridge University Press (CUP)}
                                 ,
                         }
