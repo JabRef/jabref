@@ -286,7 +286,7 @@ public class JabRefGUI extends Application {
             mainStage.setX(bounds.getMinX());
             mainStage.setY(bounds.getMinY());
             mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));
-            mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));
+            mainStage.setHeight(Math.min(bounds.getHeight(), 768.0));
             LOGGER.debug("Saving window positions");
             saveWindowState();
         }

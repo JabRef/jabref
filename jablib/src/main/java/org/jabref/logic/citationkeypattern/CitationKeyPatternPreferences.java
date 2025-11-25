@@ -18,6 +18,7 @@ public class CitationKeyPatternPreferences {
         SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
     }
 
+    private final BooleanProperty shouldTransliterateFieldsForCitationKey = new SimpleBooleanProperty();
     private final BooleanProperty shouldAvoidOverwriteCiteKey = new SimpleBooleanProperty();
     private final BooleanProperty shouldWarnBeforeOverwriteCiteKey = new SimpleBooleanProperty();
     private final BooleanProperty shouldGenerateCiteKeysBeforeSaving = new SimpleBooleanProperty();
@@ -29,7 +30,8 @@ public class CitationKeyPatternPreferences {
     private final String defaultPattern;
     private final ReadOnlyObjectProperty<Character> keywordDelimiter;
 
-    public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
+    public CitationKeyPatternPreferences(boolean shouldTransliterateFieldsForCitationKey,
+                                         boolean shouldAvoidOverwriteCiteKey,
                                          boolean shouldWarnBeforeOverwriteCiteKey,
                                          boolean shouldGenerateCiteKeysBeforeSaving,
                                          KeySuffix keySuffix,
@@ -40,6 +42,7 @@ public class CitationKeyPatternPreferences {
                                          String defaultPattern,
                                          ReadOnlyObjectProperty<Character> keywordDelimiter) {
 
+        this.shouldTransliterateFieldsForCitationKey.set(shouldTransliterateFieldsForCitationKey);
         this.shouldAvoidOverwriteCiteKey.set(shouldAvoidOverwriteCiteKey);
         this.shouldWarnBeforeOverwriteCiteKey.set(shouldWarnBeforeOverwriteCiteKey);
         this.shouldGenerateCiteKeysBeforeSaving.set(shouldGenerateCiteKeysBeforeSaving);
@@ -54,7 +57,8 @@ public class CitationKeyPatternPreferences {
     }
 
     @VisibleForTesting
-    public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
+    public CitationKeyPatternPreferences(boolean shouldTransliterateFieldsForCitationKey,
+                                         boolean shouldAvoidOverwriteCiteKey,
                                          boolean shouldWarnBeforeOverwriteCiteKey,
                                          boolean shouldGenerateCiteKeysBeforeSaving,
                                          KeySuffix keySuffix,
@@ -65,7 +69,8 @@ public class CitationKeyPatternPreferences {
                                          String defaultPattern,
                                          Character keywordDelimiter) {
 
-        this(shouldAvoidOverwriteCiteKey,
+        this(shouldTransliterateFieldsForCitationKey,
+                shouldAvoidOverwriteCiteKey,
                 shouldWarnBeforeOverwriteCiteKey,
                 shouldGenerateCiteKeysBeforeSaving,
                 keySuffix,
@@ -75,6 +80,18 @@ public class CitationKeyPatternPreferences {
                 keyPatterns,
                 defaultPattern,
                 new SimpleObjectProperty<>(keywordDelimiter));
+    }
+
+    public boolean shouldTransliterateFieldsForCitationKey() {
+        return shouldTransliterateFieldsForCitationKey.get();
+    }
+
+    public BooleanProperty shouldTransliterateFieldsForCitationKeyProperty() {
+        return shouldTransliterateFieldsForCitationKey;
+    }
+
+    public void setShouldTransliterateFieldsForCitationKey(boolean shouldTransliterateFieldsForCitationKey) {
+        this.shouldTransliterateFieldsForCitationKey.set(shouldTransliterateFieldsForCitationKey);
     }
 
     public boolean shouldAvoidOverwriteCiteKey() {
