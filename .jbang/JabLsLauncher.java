@@ -14,19 +14,14 @@
 //DEPS info.picocli:picocli:4.7.7
 
 // from jabls
+//DEPS com.fasterxml.jackson.core:jackson-annotations:2.20
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.2
 //DEPS org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0
-//DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
 //DEPS org.slf4j:slf4j-api:2.0.17
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
-//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
-//DEPS org.apache.commons:commons-lang3:3.20.0
-//DEPS tools.jackson.core:jackson-core:3.0.2
-//DEPS tools.jackson.core:jackson-databind:3.0.2
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.2
 
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/BibtexTextDocumentService.java
 //SOURCES ../jabls/src/main/java/org/jabref/languageserver/BibtexWorkspaceService.java
