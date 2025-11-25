@@ -1,4 +1,4 @@
-package org.jabref.logic.cleanup;
+package org.jabref.logic.formatter;
 
 import org.jspecify.annotations.NonNull;
 

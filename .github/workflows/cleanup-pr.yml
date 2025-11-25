@@ -22,7 +22,7 @@ jobs:
         with:
           ignore_sha: true
           workflow_id: 160969125
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: "Check for 'dev: binaries' label"
         id: check_label
         run: |
