@@ -76,6 +76,15 @@ public class AiTemplatesService {
         return makeTemplate(AiTemplate.CITATION_PARSING_USER_MESSAGE, context);
     }
 
+    public String makeFollowUpQuestionsPrompt(String userMessage, String aiResponse, int count) {
+        VelocityContext context = new VelocityContext(baseContext);
+        context.put("userMessage", userMessage);
+        context.put("aiResponse", aiResponse);
+        context.put("count", count);
+
+        return makeTemplate(AiTemplate.FOLLOW_UP_QUESTIONS, context);
+    }
+
     private String makeTemplate(AiTemplate template, VelocityContext context) {
         StringWriter writer = new StringWriter();
 

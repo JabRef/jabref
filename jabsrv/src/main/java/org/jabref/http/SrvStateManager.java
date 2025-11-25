@@ -14,17 +14,17 @@ import org.jabref.model.entry.BibEntry;
 
 public interface SrvStateManager {
 
-    ObservableList<BibDatabaseContext> getOpenDatabases();
-
-    OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty();
-
     ObservableList<BibEntry> getSelectedEntries();
-
-    Optional<IndexManager> getIndexManager(BibDatabaseContext database);
 
     Optional<BibDatabaseContext> getActiveDatabase();
 
-    List<String> getAllDatabasePaths();
+    OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty();
+
+    ObservableList<BibDatabaseContext> getOpenDatabases();
 
     ObjectBinding<Optional<CommandSelectionTab>> getActiveSelectionTabProperty();
+
+    List<String> getAllDatabasePaths();
+
+    Optional<IndexManager> getIndexManager(BibDatabaseContext database);
 }

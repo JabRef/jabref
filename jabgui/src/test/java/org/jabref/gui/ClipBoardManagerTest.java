@@ -1,18 +1,19 @@
 package org.jabref.gui;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.input.Clipboard;
 
-import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.TransferMode;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
@@ -21,16 +22,16 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jooq.lambda.Unchecked;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@AllowedToUseAwt("Requires AWT for clipboard access")
-class ClipBoardManagerTest {
+class ClipBoardManagerTest extends ApplicationTest {
 
     private BibEntryTypesManager entryTypesManager;
     private ClipBoardManager clipBoardManager;
@@ -43,88 +44,77 @@ class ClipBoardManagerTest {
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         List<Field> fields = List.of(StandardField.URL);
         ObservableList<Field> nonWrappableFields = FXCollections.observableArrayList(fields);
-        // set up mock behaviours for preferences service
         when(fieldPreferences.getNonWrappableFields()).thenReturn(nonWrappableFields);
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
 
-        // create mock clipboard
-        Clipboard clipboard = mock(Clipboard.class);
-        // create primary clipboard and set a temporary value
-        StringSelection selection = new StringSelection("test");
-        java.awt.datatransfer.Clipboard clipboardPrimary = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboardPrimary.setContents(selection, selection);
-
-        // create mock entry manager and set up behaviour for mock
         entryTypesManager = new BibEntryTypesManager();
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getOpenDatabases()).thenReturn(FXCollections.emptyObservableList());
 
-        // initialize a clipBoardManager
-        clipBoardManager = new ClipBoardManager(clipboard, clipboardPrimary);
+        AtomicReference<Clipboard> clipboard = new AtomicReference<>();
+        interact(() -> {
+            clipboard.set(Clipboard.getSystemClipboard());
+        });
+        clipBoardManager = new ClipBoardManager(stateManager, clipboard.get(), mock(java.awt.datatransfer.Clipboard.class));
     }
 
-    @DisplayName("Check that the ClipBoardManager can set a bibentry as its content from the clipboard")
     @Test
     void copyStringBibEntry() throws IOException {
-        // Arrange
-        String expected = "@Article{,\n author = {Claudepierre, S. G.},\n journal = {IEEE},\n}";
+        String expected = """
+                @Article{,
+                  author  = {Claudepierre, S. G.},
+                  journal = {IEEE},
+                }
+                """;
 
-        // create BibEntry
-        BibEntry bibEntry = new BibEntry();
-        // construct an entry
-        bibEntry.setType(StandardEntryType.Article);
-        bibEntry.setField(StandardField.JOURNAL, "IEEE");
-        bibEntry.setField(StandardField.AUTHOR, "Claudepierre, S. G.");
-        // add entry to list
-        List<BibEntry> bibEntries = new ArrayList<>();
-        bibEntries.add(bibEntry);
+        BibEntry bibEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "IEEE")
+                .withField(StandardField.AUTHOR, "Claudepierre, S. G.")
+                .withChanged(true);
 
-        // Act
-        clipBoardManager.setContent(bibEntries, entryTypesManager);
+        AtomicReference<String> actual = new AtomicReference<>();
+        interact(Unchecked.runnable(() -> {
+            clipBoardManager.setContent(
+                    TransferMode.NONE,
+                    new BibDatabaseContext(new BibDatabase(List.of(bibEntry))),
+                    List.of(bibEntry),
+                    entryTypesManager,
+                    List.of());
 
-        // Assert
-        String actual = ClipBoardManager.getContentsPrimary();
-        // clean strings
-        actual = actual.replaceAll("\\s+", " ").trim();
-        expected = expected.replaceAll("\\s+", " ").trim();
-
-        assertEquals(expected, actual);
+            actual.set(ClipBoardManager.getContents());
+        }));
+        assertEquals(expected, actual.get().replace("\r\n", "\n"));
     }
 
     @Test
-    @DisplayName("Check that the ClipBoardManager can handle a bibentry with string constants correctly from the clipboard")
     void copyStringBibEntryWithStringConstants() throws IOException {
-        // Arrange
-        String expected = "@String{grl = \"Geophys. Res. Lett.\"}@Article{,\n" + " author = {Claudepierre, S. G.},\n" +
-                " journal = {grl},\n" + "}";
-        // create BibEntry
-        BibEntry bibEntry = new BibEntry();
-        // construct an entry
-        bibEntry.setType(StandardEntryType.Article);
-        bibEntry.setField(StandardField.JOURNAL, "grl");
-        bibEntry.setField(StandardField.AUTHOR, "Claudepierre, S. G.");
-        // add entry to list
-        List<BibEntry> bibEntries = new ArrayList<>();
-        bibEntries.add(bibEntry);
+        String expected = """
+                @String{grl = "Geophys. Res. Lett."}
 
-        // string constants
-        List<BibtexString> constants = new ArrayList<>();
+                @Article{,
+                  author  = {Claudepierre, S. G.},
+                  journal = {grl},
+                }
+                """;
+        BibEntry bibEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "grl")
+                .withField(StandardField.AUTHOR, "Claudepierre, S. G.")
+                .withChanged(true);
 
-        // Mock BibtexString
         BibtexString bibtexString = mock(BibtexString.class);
-
-        // define return value for getParsedSerialization()
         when(bibtexString.getParsedSerialization()).thenReturn("@String{grl = \"Geophys. Res. Lett.\"}");
-        // add the constant
-        constants.add(bibtexString);
 
-        // Act
-        clipBoardManager.setContent(bibEntries, entryTypesManager, constants);
+        AtomicReference<String> actual = new AtomicReference<>();
+        interact(Unchecked.runnable(() -> {
+            clipBoardManager.setContent(
+                    TransferMode.NONE,
+                    new BibDatabaseContext(new BibDatabase(List.of(bibEntry))),
+                    List.of(bibEntry),
+                    entryTypesManager,
+                    List.of(bibtexString));
 
-        // Assert
-        String actual = ClipBoardManager.getContentsPrimary();
-        // clean strings
-        actual = actual.replaceAll("\\s+", " ").trim();
-        expected = expected.replaceAll("\\s+", " ").trim();
-
-        assertEquals(expected, actual);
+            actual.set(ClipBoardManager.getContents());
+        }));
+        assertEquals(expected, actual.get().replace("\r\n", "\n"));
     }
 }
