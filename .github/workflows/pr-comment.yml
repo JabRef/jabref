@@ -90,12 +90,22 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # This step runs in both cases using the proper variables.
+      - name: Get Month
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        id: get-date
+        run: |
+          echo "date=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v4
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        with:
+          path: ~/.cache/gg
+          key: ${{ runner.os }}-gg.cmd-${{ steps.get-date.outputs.date }}
       - name: ghprcomment@main
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
-        uses: jbangdev/jbang-action@v0.132.1
-        with:
-          script: https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
-          scriptargs: "-r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}"
-          trust: https://github.com/koppor/ghprcomment/
+        run: |
+          curl -L ggcmd.io > gg.cmd
+          sh gg.cmd jbang trust add https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
+          sh gg.cmd jbang https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java -r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}
         env:
           GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
