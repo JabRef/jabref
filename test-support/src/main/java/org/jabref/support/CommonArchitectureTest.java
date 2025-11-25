@@ -18,6 +18,9 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import com.tngtech.archunit.library.GeneralCodingRules;
 
+import static com.tngtech.archunit.base.DescribedPredicate.not;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
+
 /**
  * This class checks JabRef's shipped classes for architecture quality.
  * Does not analyze test classes. Hint from <a href="https://stackoverflow.com/a/44681895/873282">StackOverflow</a>
@@ -41,19 +44,15 @@ public class CommonArchitectureTest {
     }
 
     @ArchTest
-    public void doNotUseSwing(JavaClasses classes) {
-        // This checks for all Swing packages, but not the UndoManager
-        ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseSwing.class)
-                          .should().accessClassesThat()
-                          .resideInAnyPackage("javax.swing",
-                                  "javax.swing.border..",
-                                  "javax.swing.colorchooser..",
-                                  "javax.swing.event..",
-                                  "javax.swing.filechooser..",
-                                  "javax.swing.plaf..",
-                                  "javax.swing.table..",
-                                  "javax.swing.text..",
-                                  "javax.swing.tree..")
+    public void doNotUseJackson2(JavaClasses classes) {
+        // annotations still reside in com.fasterxml package:
+        ArchRuleDefinition.noClasses()
+                          .should()
+                          .dependOnClassesThat(
+                                  resideInAnyPackage("com.fasterxml..")
+                                          //   https://github.com/FasterXML/jackson-databind/blob/37b593e4836af62a267f09d2193414078df36eb0/src/test/java/tools/jackson/databind/deser/AnySetterTest.java#L7C8-L7C42
+                                          .and(not(resideInAnyPackage("com.fasterxml.jackson.annotation..")))
+                          )
                           .check(classes);
     }
 
@@ -66,7 +65,7 @@ public class CommonArchitectureTest {
     @ArchTest
     public void doNotUseJavaAWT(JavaClasses classes) {
         ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseAwt.class)
-                          .should().accessClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
+                          .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
                           .check(classes);
     }
 
