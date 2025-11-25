@@ -66,6 +66,7 @@ import org.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
 import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
 import org.jabref.logic.layout.format.NotFoundFormatter;
 import org.jabref.logic.layout.format.Number;
+import org.jabref.logic.layout.format.NumberMonthFormatter;
 import org.jabref.logic.layout.format.Ordinal;
 import org.jabref.logic.layout.format.RTFChars;
 import org.jabref.logic.layout.format.RemoveBrackets;
@@ -565,6 +566,8 @@ class LayoutEntry {
                     new ReplaceWithEscapedDoubleQuotes();
             case "HayagrivaType" ->
                     new HayagrivaType();
+            case "NumberMonth" ->
+                new NumberMonthFormatter();
             default ->
                     null;
         };
