@@ -55,8 +55,6 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
@@ -70,11 +68,12 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.model.entry.types.EntryTypeFactory;
+
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -368,7 +367,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(DONATION_LAST_SHOWN_EPOCH_DAY, -1);
         // endregion
 
-
     }
 
     /**
@@ -382,6 +380,30 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             JabRefGuiPreferences.singleton = new JabRefGuiPreferences();
         }
         return JabRefGuiPreferences.singleton;
+    }
+
+    private static List<String> getColumnNamesAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumns().stream()
+                                .map(MainTableColumnModel::getName)
+                                .toList();
+    }
+
+    private static List<String> getColumnWidthsAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumns().stream()
+                                .map(column -> column.widthProperty().getValue().toString())
+                                .toList();
+    }
+
+    private static List<String> getColumnSortTypesAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumns().stream()
+                                .map(column -> column.sortTypeProperty().getValue().toString())
+                                .toList();
+    }
+
+    private static List<String> getColumnSortOrderAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumnSortOrder().stream()
+                                .map(MainTableColumnModel::getName)
+                                .collect(Collectors.toList());
     }
 
     public CopyToPreferences getCopyToPreferences() {
@@ -406,7 +428,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
-
     }
 
     @Override
@@ -417,8 +438,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromLowLevelApi(getNewEntryPreferences()));
-
     }
+    // endregion
 
     // region EntryEditorPreferences
     public EntryEditorPreferences getEntryEditorPreferences() {
@@ -627,7 +648,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getDouble(MAIN_WINDOW_SIDEPANE_WIDTH, defaults.getHorizontalDividerPosition()),
                 getDouble(MAIN_WINDOW_EDITOR_HEIGHT, defaults.getVerticalDividerPosition()));
     }
-    // endregion
 
     @Override
     public WorkspacePreferences getWorkspacePreferences() {
@@ -744,6 +764,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return sidePanePreferences;
     }
+    // endregion
 
     private Set<SidePaneType> getVisibleSidePanes() {
         Set<SidePaneType> visiblePanes = new HashSet<>();
@@ -799,7 +820,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         putStringList(SIDE_PANE_COMPONENT_NAMES, names);
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
-    // endregion
 
     @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
@@ -907,6 +927,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         previewPreferences.getBstPreviewLayoutPaths().addListener((InvalidationListener) c -> storeBstPaths(previewPreferences.getBstPreviewLayoutPaths()));
         return this.previewPreferences;
     }
+    // endregion
+
+    // region NameDisplayPreferences
 
     private void storeBstPaths(List<Path> bstPaths) {
         putStringList(PREVIEW_BST_LAYOUT_PATHS, bstPaths.stream().map(Path::toAbsolutePath).map(Path::toString).toList());
@@ -956,6 +979,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         );
     }
 
+    // endregion
+
+    // region: Main table, main table column, and search dialog column preferences
+
     private int getPreviewCyclePosition(List<PreviewLayout> layouts) {
         int storedCyclePos = getInt(CYCLE_PREVIEW_POS);
         if (storedCyclePos < layouts.size()) {
@@ -964,9 +991,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return 0; // fallback if stored position is no longer valid
         }
     }
-    // endregion
-
-    // region NameDisplayPreferences
 
     @Override
     public NameDisplayPreferences getNameDisplayPreferences() {
@@ -1012,10 +1036,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
         return displayStyle;
     }
-
-    // endregion
-
-    // region: Main table, main table column, and search dialog column preferences
 
     public MainTablePreferences getMainTablePreferences() {
         if (mainTablePreferences != null) {
@@ -1120,30 +1140,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return columnsOrdered;
     }
-
-    private static List<String> getColumnNamesAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumns().stream()
-                                .map(MainTableColumnModel::getName)
-                                .toList();
-    }
-
-    private static List<String> getColumnWidthsAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumns().stream()
-                                .map(column -> column.widthProperty().getValue().toString())
-                                .toList();
-    }
-
-    private static List<String> getColumnSortTypesAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumns().stream()
-                                .map(column -> column.sortTypeProperty().getValue().toString())
-                                .toList();
-    }
-
-    private static List<String> getColumnSortOrderAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumnSortOrder().stream()
-                                .map(MainTableColumnModel::getName)
-                                .collect(Collectors.toList());
-    }
     // endregion
 
     /**
@@ -1210,7 +1206,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
 
         newEntryPreferences = getNewEntryPreferencesFromLowLevelApi(NewEntryPreferences.getDefault());
-
 
         EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)));
         EasyBind.listen(newEntryPreferences.typesRecommendedExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, newValue));

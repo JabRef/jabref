@@ -7,11 +7,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.model.entry.types.EntryType;
-/*these were added*/
-import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 /*-----*/
 
 public class NewEntryPreferences {
@@ -23,25 +22,27 @@ public class NewEntryPreferences {
     private final BooleanProperty idLookupGuessing;
     private final StringProperty latestIdFetcherName;
     private final StringProperty latestInterpretParserName;
-private NewEntryPreferences(){
-    this(
-            NewEntryDialogTab.CHOOSE_ENTRY_TYPE,
 
-            true,
+    private NewEntryPreferences() {
+        this(
+                NewEntryDialogTab.CHOOSE_ENTRY_TYPE,
 
-            false,
+                true,
 
-            true,
+                false,
 
-            StandardEntryType.Article,
+                true,
 
-            true,
+                StandardEntryType.Article,
 
-            DoiFetcher.NAME,
+                true,
 
-            PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName()
-    );
-}
+                DoiFetcher.NAME,
+
+                PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName()
+        );
+    }
+
     public NewEntryPreferences(NewEntryDialogTab approach,
                                boolean expandRecommended,
                                boolean expandOther,
@@ -59,9 +60,11 @@ private NewEntryPreferences(){
         this.latestIdFetcherName = new SimpleStringProperty(idFetcherName);
         this.latestInterpretParserName = new SimpleStringProperty(interpretParserName);
     }
-    public static NewEntryPreferences getDefault(){
+
+    public static NewEntryPreferences getDefault() {
         return new NewEntryPreferences();
     }
+
     public void setAll(NewEntryPreferences other) {
         this.latestApproach.set(other.getLatestApproach());
         this.typesRecommendedExpanded.set(other.getTypesRecommendedExpanded());
@@ -72,6 +75,7 @@ private NewEntryPreferences(){
         this.latestIdFetcherName.set(other.getLatestIdFetcher());
         this.latestInterpretParserName.set(other.getLatestInterpretParser());
     }
+
     public NewEntryDialogTab getLatestApproach() {
         return latestApproach.get();
     }
