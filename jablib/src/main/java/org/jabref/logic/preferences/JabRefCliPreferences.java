@@ -969,6 +969,10 @@ public class JabRefCliPreferences implements CliPreferences {
         return prefs.getDouble(key, getDoubleDefault(key));
     }
 
+    public double getDouble(String key, double def) {
+        return prefs.getDouble(key, def);
+    }
+
     private double getDoubleDefault(String key) {
         return ((Number) defaults.get(key)).doubleValue();
     }

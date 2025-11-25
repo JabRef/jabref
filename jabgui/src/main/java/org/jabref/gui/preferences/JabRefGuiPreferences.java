@@ -248,10 +248,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private JabRefGuiPreferences() {
         super();
 
-        defaults.put(JOURNAL_POPUP, EntryEditorPreferences.JournalPopupEnabled.FIRST_START.toString());
-
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
-        defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
 
         // region mergeDialogPreferences
         defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
@@ -425,6 +422,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         super.clear();
 
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
+        getEntryEditorPreferences().setAll(EntryEditorPreferences.getDefault());
     }
 
     @Override
@@ -433,6 +431,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
+        getEntryEditorPreferences().setAll(getEntryEditorPreferencesFromBackingStore(getEntryEditorPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -441,23 +440,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return entryEditorPreferences;
         }
 
-        entryEditorPreferences = new EntryEditorPreferences(
-                getEntryEditorTabs(),
-                getDefaultEntryEditorTabs(),
-                getBoolean(AUTO_OPEN_FORM),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(SHOW_AI_SUMMARY),
-                getBoolean(SHOW_AI_CHAT),
-                getBoolean(SHOW_LATEX_CITATIONS),
-                getBoolean(SMART_FILE_ANNOTATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getBoolean(AUTOLINK_FILES_ENABLED),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
-                getBoolean(SHOW_SCITE_TAB),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS));
+        entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
@@ -476,6 +459,26 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
         return entryEditorPreferences;
+    }
+
+    public EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
+        return new EntryEditorPreferences(
+            getEntryEditorTabs(),
+            getDefaultEntryEditorTabs(),
+            getBoolean(AUTO_OPEN_FORM),
+            getBoolean(SHOW_RECOMMENDATIONS),
+            getBoolean(SHOW_AI_SUMMARY),
+            getBoolean(SHOW_AI_CHAT),
+            getBoolean(SHOW_LATEX_CITATIONS),
+            getBoolean(SMART_FILE_ANNOTATIONS),
+            getBoolean(DEFAULT_SHOW_SOURCE),
+            getBoolean(VALIDATE_IN_ENTRY_EDITOR),
+            getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
+            getBoolean(AUTOLINK_FILES_ENABLED),
+            EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.getJournalPopUp())),
+            getBoolean(SHOW_SCITE_TAB),
+            getBoolean(SHOW_USER_COMMENTS_FIELDS),
+            getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewDividerPos()));
     }
 
     /**

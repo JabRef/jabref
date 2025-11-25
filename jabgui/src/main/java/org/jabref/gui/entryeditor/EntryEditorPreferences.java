@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,6 +87,51 @@ public class EntryEditorPreferences {
         this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
         this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
+    }
+
+    /// Creates Object with default values
+    private EntryEditorPreferences() {
+        this(
+                Collections.emptyMap(),              // Default entryEditorTabList
+                Collections.emptyMap(),              // Default defaultEntryEditorTabList
+                true,                                // shouldOpenOnNewEntry
+                false,                               // shouldShowRecommendationsTab
+                true,                                // shouldShowAiSummaryTab
+                true,                                // shouldShowAiChatTab
+                true,                                // shouldShowLatexCitationsTab
+                true,                                // shouldShowFileAnnotationsTab
+                false,                               // showSourceTabByDefault
+                true,                                // enableValidation
+                false,                               // allowIntegerEditionBibtex
+                true,                                // autolinkFilesEnabled
+                JournalPopupEnabled.ENABLED,         // JournalPopupEnabled
+                false,                               // showSciteTab
+                false,                               // showUserCommentsFields
+                0.5                                  // previewWidthDividerPosition
+        );
+    }
+
+    public void setAll(EntryEditorPreferences preferences) {
+        setEntryEditorTabList(preferences.getEntryEditorTabs());
+        this.defaultEntryEditorTabList.set(preferences.getDefaultEntryEditorTabs());
+        this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
+        this.shouldShowRecommendationsTab.set(preferences.shouldShowRecommendationsTab());
+        this.shouldShowAiSummaryTab.set(preferences.shouldShowAiSummaryTab());
+        this.shouldShowAiChatTab.set(preferences.shouldShowAiChatTab());
+        this.shouldShowLatexCitationsTab.set(preferences.shouldShowLatexCitationsTab());
+        this.shouldShowFileAnnotationsTab.set(preferences.shouldShowFileAnnotationsTab());
+        this.showSourceTabByDefault.set(preferences.showSourceTabByDefault());
+        this.enableValidation.set(preferences.shouldEnableValidation());
+        this.allowIntegerEditionBibtex.set(preferences.shouldAllowIntegerEditionBibtex());
+        this.autoLinkFiles.set(preferences.autoLinkFilesEnabled());
+        this.enablementStatus.set(preferences.shouldEnableJournalPopup());
+        this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
+        this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
+        this.previewWidthDividerPosition.set(preferences.getPreviewDividerPos());
+    }
+
+    public static EntryEditorPreferences getDefault() {
+        return new EntryEditorPreferences();
     }
 
     public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
@@ -273,5 +319,13 @@ public class EntryEditorPreferences {
 
     public Double getPreviewWidthDividerPosition() {
         return previewWidthDividerPosition.get();
+    }
+
+    public double getPreviewDividerPos() {
+        return previewWidthDividerPosition.get();
+    }
+
+    public String getJournalPopUp() {
+        return enablementStatus.get().toString();
     }
 }
