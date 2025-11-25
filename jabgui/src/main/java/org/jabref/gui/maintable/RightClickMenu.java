@@ -7,13 +7,13 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.CopyTo;
 import org.jabref.gui.edit.EditAction;
@@ -153,7 +153,7 @@ public class RightClickMenu {
                     factory.createCustomMenuItem(
                             StandardActions.COPY_TO,
                             new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
-                                    importHandler, sourceDatabaseContext, targetDatabaseContext),
+                                    preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext),
                             targetDatabaseName
                     )
             );
