@@ -104,7 +104,7 @@ public class EntryEditorPreferences {
                 true,                                // Show validation messages
                 false,                               // Allow integers in edition in Bibtex
                 true,                                // Auto search and show unlinked files in entry editor
-                JournalPopupEnabled.DISABLED,     // JournalPopupEnabled
+                JournalPopupEnabled.DISABLED,        // JournalPopupEnabled
                 true,                                // Show citation info tab
                 true,                                // Show user comments field
                 0.5                                  // previewWidthDividerPosition
