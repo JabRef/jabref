@@ -3,7 +3,7 @@ package org.jabref.gui.maintable;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
+
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -25,23 +25,16 @@ public class MainTableTooltip extends Tooltip {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
 
-        // Configuration simple
         fieldValueLabel.setWrapText(true);
         fieldValueLabel.setMaxWidth(400);
 
         tooltipContent.getChildren().addAll(fieldValueLabel, preview);
         tooltipContent.setSpacing(5);
-        tooltipContent.setStyle("-fx-padding: 8;");
 
-        // Tooltip configuré pour le scroll
+
         this.setMaxWidth(400);
         this.setWrapText(true);
-        this.setShowDelay(Duration.millis(100));
-        this.setHideDelay(Duration.seconds(10));
-        //this.setShowDuration(Duration.seconds(30));
-        //this.setAutoHide(false);
-        //this.setHideOnEscape(true);
-        //this.setConsumeAutoHidingEvents(false);
+
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
@@ -52,8 +45,8 @@ public class MainTableTooltip extends Tooltip {
             preview.setDatabaseContext(databaseContext);
             preview.setEntry(entry);
 
-            // Taille fixe simple et efficace
-            preview.setMaxHeight(200); // Hauteur constante
+
+            preview.setMaxHeight(200); 
             this.setGraphic(tooltipContent);
         } else {
             this.setGraphic(fieldValueLabel);
