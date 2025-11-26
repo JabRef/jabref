@@ -34,7 +34,7 @@ public class ISBNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel
     @Override
     public void fetchBibliographyInformation(BibEntry bibEntry) {
         stateManager.getActiveDatabase().ifPresentOrElse(
-                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager)
+                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager)
                         .fetchAndMerge(entry, field),
                 () -> dialogService.notify(Localization.lang("No library selected"))
         );

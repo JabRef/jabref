@@ -17,9 +17,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebView;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -307,10 +307,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        String plainText = (String) previewView.getEngine().executeScript("document.body.innerText");
-        ClipboardContent content = new ClipboardContent();
-        content.putString(plainText);
-        clipBoardManager.setContent(content);
+        clipBoardManager.setContent((String) previewView.getEngine().executeScript("document.body.innerText"));
     }
 
     public void copySelectionToClipBoard() {

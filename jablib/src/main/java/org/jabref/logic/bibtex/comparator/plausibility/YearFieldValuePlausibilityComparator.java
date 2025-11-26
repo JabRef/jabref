@@ -1,16 +1,21 @@
-package org.jabref.logic.bibtex.comparator;
+package org.jabref.logic.bibtex.comparator.plausibility;
 
 import java.time.Year;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.integrity.YearChecker;
 import org.jabref.logic.util.strings.StringUtil;
 
-public class YearFieldValuePlausibilityComparator extends FieldValuePlausibilityComparator {
+public class YearFieldValuePlausibilityComparator implements FieldValuePlausibilityComparator {
 
     private static final Pattern YEAR_PATTERN = Pattern.compile("(\\d{4})");
+
+    // Only the factor may instantiate this
+    YearFieldValuePlausibilityComparator() {
+    }
 
     /**
      * Compares the plausibility of two field values.

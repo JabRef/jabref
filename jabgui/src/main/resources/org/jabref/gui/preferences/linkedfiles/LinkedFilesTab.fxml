@@ -94,4 +94,7 @@
     <Label styleClass="sectionHeader" text="%Attached files"/>
     <CheckBox fx:id="confirmLinkedFileDelete" text="%Show confirmation dialog when deleting attached files"/>
     <CheckBox fx:id="moveToTrash" text="%Move deleted files to trash (instead of deleting them)"/>
+    <CheckBox fx:id="adjustLinkedFilesOnTransfer" text="%Update linked file paths during entry transfer if the files are accessible"/>
+    <CheckBox fx:id="copyLinkedFilesOnTransfer" text="%Copy linked files on entry transfer when they would otherwise be inaccessible"/>
+    <CheckBox fx:id="moveLinkedFilesOnTransfer" text="%Move linked files on entry transfer when they would otherwise be inaccessible"/>
 </fx:root>
