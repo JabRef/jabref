@@ -24,21 +24,14 @@ public class NewEntryPreferences {
 
     private NewEntryPreferences() {
         this(
-                NewEntryDialogTab.CHOOSE_ENTRY_TYPE,
-
-                true,
-
-                false,
-
-                true,
-
-                StandardEntryType.Article,
-
-                true,
-
-                DoiFetcher.NAME,
-
-                PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName()
+                NewEntryDialogTab.CHOOSE_ENTRY_TYPE, // Default latest approach
+                true,                                // Default expanded recommended
+                false,                               // Default expanded other
+                true,                                // Default expanded custom
+                StandardEntryType.Article,           // Default immediate type
+                true,                                // Default Id lookup guessing
+                DoiFetcher.NAME,                     // Default fetcher
+                PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName() // Default parser
         );
     }
 
