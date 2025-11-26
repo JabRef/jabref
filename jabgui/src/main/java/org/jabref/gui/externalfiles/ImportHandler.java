@@ -431,7 +431,7 @@ public class ImportHandler {
         LOGGER.trace("Checking if URL is a PDF: {}", data);
 
         if (URLUtil.isURL(data)) {
-            String fileName = FileUtil.getFileNameFromUrl(data);
+            String fileName = FileUtil.getFileNameFromUrl(data).orElse("downloaded.pdf");
             if (FileUtil.isPDFFile(Path.of(fileName))) {
                 try {
                     return handlePdfUrl(data);
@@ -498,10 +498,7 @@ public class ImportHandler {
             return List.of();
         }
         URLDownload urlDownload = new URLDownload(pdfUrl);
-        String filename = FileUtil.getFileNameFromUrl(pdfUrl);
-        if (filename.isBlank()) {
-            filename = "downloaded.pdf";
-        }
+        String filename = FileUtil.getFileNameFromUrl(pdfUrl).orElse("downloaded.pdf");
         Path targetFile = targetDirectory.get().resolve(filename);
         try {
             urlDownload.toFile(targetFile);

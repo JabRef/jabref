@@ -110,22 +110,24 @@ public class FileUtil {
     }
 
     /**
-     * Extracts the filename from a URL.
-     * If the URL doesn't have a filename (ends with '/'), returns an empty string.
+     * Extracts the filename from a URL, which is found between the last slash '/' and first query '?'.
+     * Does not check that the file is a vaild URL.
      *
      * @param link the URL string to extract the filename from
-     * @return the extracted filename
+     * @return the extracted filename, or Optional.empty if there is none.
      */
-    public static String getFileNameFromUrl(String link) {
+    public static Optional<String> getFileNameFromUrl(String link) {
         int slash = link.lastIndexOf('/');
-        if (slash >= 0 && slash < link.length()) {
-            link = link.substring(slash + 1);
+        slash = slash >= 0 ? slash+1 : 0;
+
+        int query = link.indexOf('?', slash);
+        query = (query >= 0 ? query : link.length()-1);
+
+        if (slash < query) {
+            return Optional.of(getValidFileName(link.substring(slash, query)));
+        } else {
+            return Optional.empty();
         }
-        int query = link.indexOf('?');
-        if (query >= 0) {
-            link = link.substring(0, query);
-        }
-        return getValidFileName(link);
     }
 
     /**

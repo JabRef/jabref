@@ -233,7 +233,7 @@ public class LinkedFile implements Serializable {
     public String getFileName() {
         String linkedName = link.get();
         if (isOnlineLink(linkedName)) {
-            return FileUtil.getFileNameFromUrl(linkedName);
+            return FileUtil.getFileNameFromUrl(linkedName).orElse("");
         } else {
             try {
                 Path pathname = Path.of(linkedName).getFileName();
@@ -253,13 +253,11 @@ public class LinkedFile implements Serializable {
         return findIn(dirs);
     }
 
-    /**
-     * Tries to locate the file.
-     * In case the path is absolute, the path is checked.
-     * In case the path is relative, the given directories are used as base directories.
-     *
-     * @return absolute path if found.
-     */
+    /// Tries to locate the file.
+    /// In case the path is absolute, the path is checked.
+    /// In case the path is relative, the given directories are used as base directories.
+    ///
+    /// @return absolute path if found.
     public Optional<Path> findIn(List<Path> directories) {
         try {
             if (link.get().isEmpty()) {

@@ -58,7 +58,7 @@ public class BookCoverFetcher {
     }
 
     private void downloadCoverImage(String url, final String name, final Path directory) {
-        Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
+        Optional<String> extension = FileUtil.getFileNameFromUrl(url).flatMap(FileUtil::getFileExtension);
 
         try {
             Files.createDirectories(directory);
