@@ -33,7 +33,7 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Remove all assignees
         run: |
           ASSIGNEES=$(gh issue view ${{ github.event.issue.number }} --json assignees --template '{{range .assignees}}{{.login}} {{end}}')
