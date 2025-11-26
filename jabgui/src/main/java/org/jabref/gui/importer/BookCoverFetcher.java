@@ -67,6 +67,7 @@ public class BookCoverFetcher {
             Files.createDirectories(directory);
         } catch (IOException e) {
             LOGGER.error("Could not access cover image directories", e);
+            return;
         }
 
         try {
@@ -80,10 +81,11 @@ public class BookCoverFetcher {
 
             Optional<Path> destination = resolveNameWithType(directory, name, inferedFromMime.orElse(inferedFromExtension.orElse(StandardExternalFileType.JPG)));
             if (destination.isPresent()) {
-                download.toFile(destination.get()); 
+                download.toFile(destination.get());
             }
         } catch (FetcherException | MalformedURLException e) {
             LOGGER.error("Error while downloading cover image file", e);
+            return;
         }
     }
     
