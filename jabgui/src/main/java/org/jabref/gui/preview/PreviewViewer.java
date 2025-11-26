@@ -234,11 +234,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        String coverIfAny = "";
-        Optional<String> image = getCoverImageURL();
-        if (image.isPresent()) {
-            coverIfAny = "<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>".formatted(image);
-        }
+        String coverIfAny = getCoverImageURL().map(url -> "<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>".formatted(url)).orElse("");
 
         layoutText = """
                     <html>

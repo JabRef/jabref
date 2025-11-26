@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.FetcherException;
@@ -59,20 +60,14 @@ public class BookCoverFetcher {
         }
     }
 
-    private Optional<Path> findExistingImage(String name, Path directory) {
-        for (ExternalFileType filetype : externalApplicationsPreferences.getExternalFileTypes()) {
-            if (filetype.getMimeType().startsWith("image/")) {
-                Path path = directory.resolve(FileUtil.getValidFileName(name + "." + filetype.getExtension()));
-                if (Files.exists(path)) {
-                    return Optional.of(path);
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    private void downloadCoverImage(String url, String name, Path directory) {
+    private void downloadCoverImage(String url, final String name, final Path directory) {
         Optional<String> extension = FileUtil.getFileExtension(FileUtil.getFileNameFromUrl(url));
+
+        try {
+            Files.createDirectories(directory);
+        } catch (IOException e) {
+            LOGGER.error("Could not access cover image directories", e);
+        }
 
         try {
             LOGGER.info("Downloading cover image file from {}", url);
@@ -80,16 +75,31 @@ public class BookCoverFetcher {
             URLDownload download = new URLDownload(url);
             Optional<String> mime = download.getMimeType();
 
-            inferExtensionOfImage(mime, extension).map(x -> directory.resolve(FileUtil.getValidFileName(name + "." + x))).ifPresent(p -> download.toFile(p));
+            Optional<ExternalFileType> inferedFromMime = mime.flatMap(m -> ExternalFileTypes.getExternalFileTypeByMimeType(m, externalApplicationsPreferences)).filter(t -> t.getMimeType().startsWith("image/"));
+            Optional<ExternalFileType> inferedFromExtension = extension.flatMap(x -> ExternalFileTypes.getExternalFileTypeByExt(x, externalApplicationsPreferences)).filter(t -> t.getMimeType().startsWith("image/"));
+
+            Optional<Path> destination = resolveNameWithType(directory, name, inferedFromMime.orElse(inferedFromExtension.orElse(StandardExternalFileType.JPG)));
+            if (destination.isPresent()) {
+                download.toFile(destination.get()); 
+            }
         } catch (FetcherException | MalformedURLException e) {
             LOGGER.error("Error while downloading cover image file", e);
         }
     }
+    
+    private static Optional<Path> resolveNameWithType(Path directory, String name, ExternalFileType filetype) {
+        try {
+            return Optional.of(directory.resolve(FileUtil.getValidFileName(name + "." + filetype.getExtension())));
+        } catch (InvalidPathException e) {
+            return Optional.empty();
+        }
+    }
 
-    private Optional<String> inferExtensionOfImage(Optional<String> mime, Optional<String> extension) {
-        return mime.map(m -> ExternalFileTypes.getExternalFileTypeByMimeType(m, externalApplicationsPreferences))
-                   .orElse(extension.flatMap(x -> ExternalFileTypes.getExternalFileTypeByExt(x, externalApplicationsPreferences)))
-                   .filter(t -> t.getMimeType().startsWith("image/")).map(t -> t.getExtension());
+    private Optional<Path> findExistingImage(final String name, final Path directory) {
+        return externalApplicationsPreferences.getExternalFileTypes().stream()
+                                              .filter(filetype -> filetype.getMimeType().startsWith("image/"))
+                                              .flatMap(filetype -> resolveNameWithType(directory, name, filetype).stream())
+                                              .filter(Files::exists).findFirst();
     }
 
     private static String getSourceForIsbn(ISBN isbn) {
