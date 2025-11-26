@@ -196,7 +196,7 @@ class GroupsParserTest {
         // Store in new format (serialize)
         GroupSerializer serializer = new GroupSerializer();
         List<String> serialized = serializer.serializeTree(GroupTreeNode.fromGroup(parsed));
-        String serializedString = serialized.get(0).substring(2); // Remove level prefix "0 "
+        String serializedString = serialized.getFirst().substring(2); // Remove level prefix "0 "
 
         // Verify it's stored as StaticGroup (ExplicitGroup format), not SmartGroup
         assertTrue(serializedString.startsWith("StaticGroup:"));
