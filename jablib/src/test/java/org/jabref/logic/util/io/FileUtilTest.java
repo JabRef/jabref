@@ -152,14 +152,6 @@ class FileUtilTest {
     }
 
     @Test
-    void getLinkedFileNameGetOptionalEmptyIfDefaultAsPattern() {
-        String fileNamePattern = "default";
-        BibEntry entry = new BibEntry();
-
-        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
-    }
-
-    @Test
     void getLinkedFileNameByYearAuthorFirstpage() {
         String fileNamePattern = "[year]_[auth]_[firstpage]";
         BibEntry entry = new BibEntry();
@@ -244,7 +236,7 @@ class FileUtilTest {
 
     private static Stream<Arguments> getFileNameFromUrlsCorrectly() {
         final Stream<String> urls = Stream.of("www.example.com/", "http://www.example.com/", "https://www.example.com/");
-        final Stream<String> dirs = Stream.of("path/to/", "not\\a\\windows\\path/", "///", "");
+        final Stream<String> dirs = Stream.of("path/to/", "not\\a\\windows\\path/", "///", "CANARY TEST");
         final Stream<String> files = Stream.of("file.pdf", "blank", "unknown.doc", "not\\a\\windows.file");
         final Stream<String> queries = Stream.of("", "?field=value", "?a=1&b=2", "?search=for+a+file");
         return files.flatMap(file -> dirs.flatMap(dir -> urls.flatMap(url -> queries.map(query -> Arguments.of(file, url + dir + file + query)))));

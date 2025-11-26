@@ -118,10 +118,10 @@ public class FileUtil {
      */
     public static Optional<String> getFileNameFromUrl(String link) {
         int slash = link.lastIndexOf('/');
-        slash = slash >= 0 ? slash+1 : 0;
+        slash = slash >= 0 ? slash + 1 : 0;
 
         int query = link.indexOf('?', slash);
-        query = (query >= 0 ? query : link.length()-1);
+        query = (query >= 0 ? query : link.length());
 
         if (slash < query) {
             return Optional.of(getValidFileName(link.substring(slash, query)));
