@@ -414,6 +414,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
+                getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
     }
 
     @Override
@@ -423,6 +424,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // in case of incomplete or corrupt xml fall back to current preferences
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
+                getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -854,6 +856,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
 
         return specialFieldsPreferences;
+    }
+
+        private SpecialFieldsPreferences getSpecialFieldsPreferencesFromBackingStore(SpecialFieldsPreferences defaults) {
+        return new SpecialFieldsPreferences(
+                getBoolean(SPECIALFIELDSENABLED, defaults.isSpecialFieldsEnabled()));
     }
 
     // region Preview preferences
