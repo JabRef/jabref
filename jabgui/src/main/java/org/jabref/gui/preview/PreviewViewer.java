@@ -2,7 +2,6 @@ package org.jabref.gui.preview;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,13 +16,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebView;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
-import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.Highlighter;
@@ -35,11 +32,9 @@ import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.SearchQuery;
 
@@ -307,7 +302,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        clipBoardManager.setContent((String) previewView.getEngine().executeScript("document.body.innerText"));
+        String plainText = (String) previewView.getEngine().executeScript("document.body.innerText");
+        ClipboardContent content = new ClipboardContent();
+        content.putString(plainText);
+        clipBoardManager.setContent(content);
     }
 
     public void copySelectionToClipBoard() {

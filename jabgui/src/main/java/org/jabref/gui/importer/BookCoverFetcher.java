@@ -2,8 +2,8 @@ package org.jabref.gui.importer;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -13,13 +13,10 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.identifier.ISBN;
 
 import org.slf4j.Logger;
@@ -88,7 +85,7 @@ public class BookCoverFetcher {
             return;
         }
     }
-    
+
     private static Optional<Path> resolveNameWithType(Path directory, String name, ExternalFileType filetype) {
         try {
             return Optional.of(directory.resolve(FileUtil.getValidFileName(name + "." + filetype.getExtension())));

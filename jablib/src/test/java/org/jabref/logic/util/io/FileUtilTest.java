@@ -247,7 +247,7 @@ class FileUtilTest {
         final Stream<String> dirs = Stream.of("path/to/", "not\\a\\windows\\path/", "///", "");
         final Stream<String> files = Stream.of("file.pdf", "blank", "unknown.doc", "");
         final Stream<String> queries = Stream.of("", "?field=value", "?a=1&b=2", "?search=for+a+file");
-        return files.flatMap(file -> dirs.flatMap(dir -> urls.flatMap(url -> queries.flatMap(query -> Arguments.of(file, url + dir + file + query)))));
+        return files.flatMap(file -> dirs.flatMap(dir -> urls.flatMap(url -> queries.map(query -> Arguments.of(file, url + dir + file + query)))));
     }
 
     @Test
