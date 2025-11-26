@@ -114,9 +114,9 @@ public class JabKitLauncher {
                                           List<Pair<String, String>> outputFormats,
                                           Set<SearchBasedFetcher> fetchers) {
 
-        final String INPUT_FOOTER_LABEL = "Available import formats:";
-        final String OUTPUT_FOOTER_LABEL = "Available output formats:";
-        final String EXPORT_FOOTER_LABEL = "Available export formats:";
+        final String INPUT_FOOTER_LABEL = Localization.lang("Available import formats:");
+        final String OUTPUT_FOOTER_LABEL = Localization.lang("Available output formats:");
+        final String EXPORT_FOOTER_LABEL = Localization.lang("Available export formats:");
 
         String inputFooter = "\n"
                 + INPUT_FOOTER_LABEL + "\n"
