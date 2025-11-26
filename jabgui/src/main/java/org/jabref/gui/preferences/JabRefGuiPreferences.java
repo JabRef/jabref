@@ -349,6 +349,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // endregion
 
         // region: Main table, main table column, and search dialog column preferences
+        defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
 
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
@@ -422,8 +423,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // in case of incomplete or corrupt xml fall back to current preferences
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
-        getMainTablePreferences().setAll(getMainTablePreferencesFromLowLevelApi(getMainTablePreferences()));
-        getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromLowLevelApi(getMainTableColumnPreferences()));
+        getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
+        getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -999,7 +1000,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     // region: Main table, main table column, and search dialog column preferences
 
-    private MainTablePreferences getMainTablePreferencesFromLowLevelApi(MainTablePreferences defaults) {
+    private MainTablePreferences getMainTablePreferencesFromBackingStore(MainTablePreferences defaults) {
         return new MainTablePreferences(
                 getMainTableColumnPreferences(),
                 getBoolean(AUTO_RESIZE_MODE, defaults.getResizeColumnsToFit()),
@@ -1007,7 +1008,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         );
     }
 
-    private ColumnPreferences getMainTableColumnPreferencesFromLowLevelApi(ColumnPreferences defaults) {
+    private ColumnPreferences getMainTableColumnPreferencesFromBackingStore(ColumnPreferences defaults) {
         List<String> storedColumnNames = getStringList(COLUMN_NAMES);
 
         if (storedColumnNames.isEmpty()) {
@@ -1024,7 +1025,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTablePreferences;
         }
 
-        mainTablePreferences = getMainTablePreferencesFromLowLevelApi(MainTablePreferences.getDefault());
+        mainTablePreferences = getMainTablePreferencesFromBackingStore(MainTablePreferences.getDefault());
 
         EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
                 (obs, oldValue, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
@@ -1039,7 +1040,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTableColumnPreferences;
         }
 
-        mainTableColumnPreferences = getMainTableColumnPreferencesFromLowLevelApi(ColumnPreferences.getDefault());
+        mainTableColumnPreferences = getMainTableColumnPreferencesFromBackingStore(ColumnPreferences.getDefault());
 
         mainTableColumnPreferences.getColumns().addListener((InvalidationListener) change -> {
             putStringList(COLUMN_NAMES, getColumnNamesAsStringList(mainTableColumnPreferences));
