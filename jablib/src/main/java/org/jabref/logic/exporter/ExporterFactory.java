@@ -12,6 +12,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jspecify.annotations.NonNull;
@@ -64,6 +65,7 @@ public class ExporterFactory {
         exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, preferences.getCustomEntryTypesRepository(), fieldPreferences));
         exporters.add(new CffExporter());
         exporters.add(new EndnoteXmlExporter(preferences.getBibEntryPreferences()));
+        exporters.add(new AcademicPagesExporter(layoutPreferences, saveOrder));
 
         // Now add custom export formats
         exporters.addAll(customFormats);
