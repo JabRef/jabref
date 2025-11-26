@@ -136,9 +136,12 @@ public class JabKitLauncher {
             );
 
             String footerText = "";
-            footerText += hasOptions.get("input") ? inputFooter : "";
-            footerText += hasOptions.get("output") ? outputFooter : "";
-            footerText += hasOptions.get("export") ? exportFooter : "";
+            // Skip format footers for check-consistency since formats are already documented in option description
+            if (!"check-consistency".equals(subCommand.getCommandSpec().name())) {
+                footerText += hasOptions.get("input") ? inputFooter : "";
+                footerText += hasOptions.get("output") ? outputFooter : "";
+                footerText += hasOptions.get("export") ? exportFooter : "";
+            }
             subCommand.getCommandSpec().usageMessage().footer(footerText);
         });
 
