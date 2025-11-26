@@ -203,7 +203,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
 
   # - org.openrewrite.java.testing.junit5.JUnit5BestPractices -- cannot be used directly, because one recipe is not working (see below)
-  # - org.openrewrite.java.testing.cleanup.AssertLiteralBooleanToFailRecipe
+  - org.openrewrite.java.testing.cleanup.AssertLiteralBooleanToFailRecipe
   - org.openrewrite.java.testing.cleanup.RemoveTestPrefix
   # - org.openrewrite.java.testing.cleanup.TestsShouldNotBePublic -- does not work due to https://github.com/openrewrite/rewrite-testing-frameworks/issues/458
   - org.openrewrite.java.testing.junit5.CleanupAssertions
