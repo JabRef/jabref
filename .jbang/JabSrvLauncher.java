@@ -21,7 +21,7 @@
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.2
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.postgresql:postgresql:42.7.8
-//DEPS org.bouncycastle:bcprov-jdk18on:1.82
+//DEPS org.bouncycastle:bcprov-jdk18on:1.83
 //DEPS com.konghq:unirest-modules-gson:4.6.0
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS org.glassfish.jersey.core:jersey-server:4.0.0
