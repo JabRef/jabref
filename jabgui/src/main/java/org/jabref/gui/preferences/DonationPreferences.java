@@ -14,6 +14,22 @@ public class DonationPreferences {
         this.lastShownEpochDay.set(lastShownEpochDay);
     }
 
+    ///  Creates object with default values
+    private DonationPreferences() {
+        this(
+                false,      // Donation never show again
+                -1);                      // Donation last shown epoch day
+    }
+
+    public static DonationPreferences getDefault() {
+        return new DonationPreferences();
+    }
+
+    public void setAll(DonationPreferences preferences) {
+        this.neverShowAgain.set(preferences.isNeverShowAgain());
+        this.lastShownEpochDay.set(preferences.getLastShownEpochDay());
+    }
+
     public boolean isNeverShowAgain() {
         return neverShowAgain.get();
     }
