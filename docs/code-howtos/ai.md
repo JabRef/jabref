@@ -4,7 +4,7 @@ parent: Code Howtos
 
 # AI
 
-The AI feature of JabRef is build on [LangChain4j](https://github.com/langchain4j/langchain4j) and [Deep Java Library](https://djl.ai/).
+The AI feature of JabRef is built on [LangChain4j](https://github.com/langchain4j/langchain4j) and [Deep Java Library](https://djl.ai/).
 
 ## Architectural Decisions
 
