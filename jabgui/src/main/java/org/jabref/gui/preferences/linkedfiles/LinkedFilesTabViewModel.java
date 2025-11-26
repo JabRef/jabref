@@ -49,6 +49,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty openFileExplorerInFilesDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastDirectory = new SimpleBooleanProperty();
+
     private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
     private final StringProperty coversDownloadLocation = new SimpleStringProperty("");
 
@@ -142,11 +143,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
-        filePreferences.setAdjustFileLinksOnTransfer(
-          
-          
-          
-          .getValue());
+
+        filePreferences.setAdjustFileLinksOnTransfer(adjustLinkedFilesOnTransferProperty.getValue());
         filePreferences.setCopyLinkedFilesOnTransfer(copyLinkedFilesOnTransferProperty.getValue());
         filePreferences.setMoveLinkedFilesOnTransfer(moveFilesOnTransferProperty.getValue());
     }
