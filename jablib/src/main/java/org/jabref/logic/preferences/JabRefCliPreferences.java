@@ -24,7 +24,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
@@ -142,7 +141,6 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
-
     public static final String LANGUAGE = "language";
 
     public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
@@ -240,6 +238,12 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
     public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
+
+    public static final String ADJUST_FILE_LINKS_ON_TRANSFER = "adjustFileLinksOnTransfer";
+    public static final String COPY_LINKED_FILES_ON_TRANSFER = "copyLinkedFilesOnTransfer";
+    public static final String MOVE_LINKED_FILES_ON_TRANSFER = "moveLinkedFilesOnTransfer";
+
+    public static final String TRANSLITERATE_FIELDS_FOR_CITATION_KEY = "transliterateFields";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -380,6 +384,9 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
     private static final String AI_AUTO_GENERATE_SUMMARIES = "aiAutoGenerateSummaries";
+    private static final String AI_GENERATE_FOLLOW_UP_QUESTIONS = "aiGenerateFollowUpQuestions";
+    private static final String AI_FOLLOW_UP_QUESTIONS_COUNT = "aiFollowUpQuestionsCount";
+    private static final String AI_FOLLOW_UP_QUESTIONS_TEMPLATE = "aiFollowUpQuestionsTemplate";
     private static final String AI_PROVIDER = "aiProvider";
     private static final String AI_OPEN_AI_CHAT_MODEL = "aiOpenAiChatModel";
     private static final String AI_MISTRAL_AI_CHAT_MODEL = "aiMistralAiChatModel";
@@ -649,9 +656,15 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
+        defaults.put(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, Boolean.FALSE);
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);
+
+        defaults.put(ADJUST_FILE_LINKS_ON_TRANSFER, Boolean.TRUE);
+        defaults.put(COPY_LINKED_FILES_ON_TRANSFER, Boolean.TRUE);
+        defaults.put(MOVE_LINKED_FILES_ON_TRANSFER, Boolean.FALSE); // Defensive setting not to cause the impression of files being lost
+
         defaults.put(KEEP_DOWNLOAD_URL, Boolean.TRUE);
         defaults.put(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, Boolean.TRUE);
         defaults.put(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE);
@@ -728,6 +741,9 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, AiDefaultPreferences.AUTO_GENERATE_EMBEDDINGS);
         defaults.put(AI_AUTO_GENERATE_SUMMARIES, AiDefaultPreferences.AUTO_GENERATE_SUMMARIES);
+        defaults.put(AI_GENERATE_FOLLOW_UP_QUESTIONS, AiDefaultPreferences.GENERATE_FOLLOW_UP_QUESTIONS);
+        defaults.put(AI_FOLLOW_UP_QUESTIONS_COUNT, AiDefaultPreferences.FOLLOW_UP_QUESTIONS_COUNT);
+        defaults.put(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.FOLLOW_UP_QUESTIONS));
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
         defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI).getName());
         defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI).getName());
@@ -957,12 +973,20 @@ public class JabRefCliPreferences implements CliPreferences {
         return prefs.getInt(key, getIntDefault(key));
     }
 
-    public double getDouble(String key) {
-        return prefs.getDouble(key, getDoubleDefault(key));
+    public int getInt(String key, int def) {
+        return prefs.getInt(key, def);
     }
 
     public int getIntDefault(String key) {
         return (Integer) defaults.get(key);
+    }
+
+    public double getDouble(String key) {
+        return prefs.getDouble(key, getDoubleDefault(key));
+    }
+
+    public double getDouble(String key, double def) {
+        return prefs.getDouble(key, def);
     }
 
     private double getDoubleDefault(String key) {
@@ -1541,6 +1565,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
+                getBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY),
                 getBoolean(AVOID_OVERWRITING_KEY),
                 getBoolean(WARN_BEFORE_OVERWRITING_KEY),
                 getBoolean(GENERATE_KEYS_BEFORE_SAVING),
@@ -1552,6 +1577,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN),
                 getBibEntryPreferences().keywordSeparatorProperty());
 
+        EasyBind.listen(citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKeyProperty(),
+                (_, _, newValue) -> putBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, newValue));
         EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
                 (_, _, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
         EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
@@ -1655,10 +1682,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     protected Language getLanguage() {
-        return Stream.of(Language.values())
-                     .filter(language -> language.getId().equalsIgnoreCase(get(LANGUAGE)))
-                     .findFirst()
-                     .orElse(Language.ENGLISH);
+        return Language.getLanguageFor(get(LANGUAGE));
     }
 
     @Override
@@ -1715,6 +1739,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
+                getBoolean(ADJUST_FILE_LINKS_ON_TRANSFER),
+                getBoolean(COPY_LINKED_FILES_ON_TRANSFER),
+                getBoolean(MOVE_LINKED_FILES_ON_TRANSFER),
                 getBoolean(KEEP_DOWNLOAD_URL),
                 getPath(LAST_USED_DIRECTORY, getDefaultPath()),
                 getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY),
@@ -1733,6 +1760,10 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(filePreferences.backupDirectoryProperty(), (_, _, newValue) -> put(BACKUP_DIRECTORY, newValue.toString()));
         EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (_, _, newValue) -> putBoolean(CONFIRM_LINKED_FILE_DELETE, newValue));
         EasyBind.listen(filePreferences.moveToTrashProperty(), (_, _, newValue) -> putBoolean(TRASH_INSTEAD_OF_DELETE, newValue));
+        EasyBind.listen(filePreferences.adjustFileLinksOnTransferProperty(), (_, _, newValue) -> putBoolean(ADJUST_FILE_LINKS_ON_TRANSFER, newValue));
+        EasyBind.listen(filePreferences.copyLinkedFilesOnTransferProperty(), (_, _, newValue) -> putBoolean(COPY_LINKED_FILES_ON_TRANSFER, newValue));
+        EasyBind.listen(filePreferences.moveLinkedFilesOnTransferPropertyProperty(), (_, _, newValue) -> putBoolean(MOVE_LINKED_FILES_ON_TRANSFER, newValue));
+        EasyBind.listen(filePreferences.moveLinkedFilesOnTransferPropertyProperty(), (_, _, newValue) -> putBoolean(MOVE_LINKED_FILES_ON_TRANSFER, newValue));
         EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (_, _, newValue) -> putBoolean(KEEP_DOWNLOAD_URL, newValue));
         EasyBind.listen(filePreferences.lastUsedDirectoryProperty(), (_, _, newValue) -> put(LAST_USED_DIRECTORY, newValue.toString()));
         EasyBind.listen(filePreferences.openFileExplorerInFileDirectoryProperty(), (_, _, newValue) -> putBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, newValue));
@@ -2019,6 +2050,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 aiEnabled,
                 getBoolean(AI_AUTO_GENERATE_EMBEDDINGS),
                 getBoolean(AI_AUTO_GENERATE_SUMMARIES),
+                getBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS),
+                getInt(AI_FOLLOW_UP_QUESTIONS_COUNT),
                 AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),
                 get(AI_MISTRAL_AI_CHAT_MODEL),
@@ -2046,12 +2079,15 @@ public class JabRefCliPreferences implements CliPreferences {
                         AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, get(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE),
                         AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, get(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE),
                         AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, get(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE),
-                        AiTemplate.CITATION_PARSING_USER_MESSAGE, get(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE)
+                        AiTemplate.CITATION_PARSING_USER_MESSAGE, get(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE),
+                        AiTemplate.FOLLOW_UP_QUESTIONS, get(AI_FOLLOW_UP_QUESTIONS_TEMPLATE)
                 ));
 
         EasyBind.listen(aiPreferences.enableAiProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
         EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
         EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));
+        EasyBind.listen(aiPreferences.generateFollowUpQuestionsProperty(), (_, _, newValue) -> putBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS, newValue));
+        EasyBind.listen(aiPreferences.followUpQuestionsCountProperty(), (_, _, newValue) -> putInt(AI_FOLLOW_UP_QUESTIONS_COUNT, newValue));
 
         EasyBind.listen(aiPreferences.aiProviderProperty(), (_, _, newValue) -> put(AI_PROVIDER, newValue.name()));
 
@@ -2085,6 +2121,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE), (_, _, newValue) -> put(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE, newValue));
         EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE), (_, _, newValue) -> put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, newValue));
         EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CITATION_PARSING_USER_MESSAGE), (_, _, newValue) -> put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.FOLLOW_UP_QUESTIONS), (_, _, newValue) -> put(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, newValue));
 
         return aiPreferences;
     }
@@ -2230,7 +2267,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
                 getStringList(SEARCH_CATALOGS),
                 defaultPlainCitationParser,
-                getInt(CITATIONS_RELATIONS_STORE_TTL)
+                getInt(CITATIONS_RELATIONS_STORE_TTL),
+                Map.of()
         );
 
         EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
@@ -2317,21 +2355,21 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Map<String, String> getDefaultFetcherKeys() {
-        // TODO: We do not want to have a depdency on afterburner.fx (because of huge JavaFX depdencny tree). - Should be rewritten to new DI framework
+        // We do not want to have a dependency on afterburner.fx (because of huge JavaFX dependency tree). Therefore, we do not use following line, but instantiate "BuildInfo" directly.
         // BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        // if (buildInfo == null) {
+        //     LOGGER.warn("Could not instantiate BuildInfo.");
+        //     return Map.of();
+        // }
         BuildInfo buildInfo = new BuildInfo();
-        if (buildInfo == null) {
-            LOGGER.warn("Could not instantiate BuildInfo.");
-            return Map.of();
-        }
 
         Map<String, String> keys = new HashMap<>();
-        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
         keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
         keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);
-        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         // SpringerLink uses the same key and fetcher name as SpringerFetcher
+        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
 
         return keys;
     }

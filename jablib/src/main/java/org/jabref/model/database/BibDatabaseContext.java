@@ -12,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.SequencedCollection;
+import java.util.SequencedSet;
 import java.util.UUID;
 
 import org.jabref.architecture.AllowedToUseLogic;
@@ -33,6 +33,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,10 +64,15 @@ public class BibDatabaseContext {
     /**
      * The path where this database was last saved to.
      */
+    @Nullable
     private Path path;
 
+    @Nullable
     private DatabaseSynchronizer dbmsSynchronizer;
+
+    @Nullable
     private CoarseChangeFilter dbmsListener;
+
     private DatabaseLocation location;
 
     public BibDatabaseContext() {
@@ -170,7 +176,7 @@ public class BibDatabaseContext {
      */
     public @NonNull List<@NonNull Path> getFileDirectories(@NonNull FilePreferences preferences) {
         // Paths are a) ordered and b) should be contained only once in the result
-        SequencedCollection<Path> fileDirs = new LinkedHashSet<>(3);
+        SequencedSet<Path> fileDirs = new LinkedHashSet<>(3);
 
         Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(this::getFileDirectoryPath);
         userFileDirectory.ifPresent(fileDirs::add);
@@ -195,7 +201,6 @@ public class BibDatabaseContext {
             });
         } else {
             preferences.getMainFileDirectory()
-                       .filter(path -> !fileDirs.contains(path))
                        .ifPresent(fileDirs::add);
         }
 
@@ -224,10 +229,15 @@ public class BibDatabaseContext {
 
         // If this path is relative, we try to interpret it as relative to the file path of this BIB file:
         return getDatabasePath()
-                .map(databaseFile -> databaseFile.getParent().resolve(path).normalize().toAbsolutePath())
+                .map(databaseFile -> Optional.ofNullable(databaseFile.getParent())
+                                             .orElse(Path.of(""))
+                                             .resolve(path)
+                                             .normalize()
+                                             .toAbsolutePath())
                 .orElse(path);
     }
 
+    @Nullable
     public DatabaseSynchronizer getDBMSSynchronizer() {
         return this.dbmsSynchronizer;
     }
@@ -251,7 +261,9 @@ public class BibDatabaseContext {
 
     public void convertToLocalDatabase() {
         if (dbmsListener != null && (location == DatabaseLocation.SHARED)) {
-            dbmsListener.unregisterListener(dbmsSynchronizer);
+            if (dbmsSynchronizer != null) {
+                dbmsListener.unregisterListener(dbmsSynchronizer);
+            }
             dbmsListener.shutdown();
         }
 

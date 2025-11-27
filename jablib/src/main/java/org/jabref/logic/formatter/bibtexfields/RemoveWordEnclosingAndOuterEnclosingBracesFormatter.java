@@ -2,7 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.StringJoiner;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 

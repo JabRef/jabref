@@ -60,6 +60,7 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("ScholarArchive", false),
                 new StudyCatalogItem("SemanticScholar", false),
                 new StudyCatalogItem("Springer", true),
+                new StudyCatalogItem("Unpaywall", false),
                 new StudyCatalogItem("zbMATH", false)
         ), manageStudyDefinitionViewModel.getCatalogs());
     }
@@ -91,6 +92,7 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("ScholarArchive", false),
                 new StudyCatalogItem("SemanticScholar", false),
                 new StudyCatalogItem("Springer", false),
+                new StudyCatalogItem("Unpaywall", false),
                 new StudyCatalogItem("zbMATH", false)
         ), manageStudyDefinitionViewModel.getCatalogs());
     }

@@ -36,6 +36,7 @@ public enum KeyBinding {
     CLOSE("Close dialog", Localization.lang("Close dialog"), "Esc", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl+C", KeyBindingCategory.EDIT),
     COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl+shift+alt+T", KeyBindingCategory.EDIT),
+    JUMP_TO_FIELD("Jump to field", Localization.lang("Jump to field"), "ctrl+J", KeyBindingCategory.EDIT),
 
     // We migrated from "Copy \\cite{citation key}" to "Copy citation key with configured cite command", therefore we keep the "old string" for backwards comppatibility
     COPY_CITE_CITATION_KEY("Copy \\cite{citation key}", Localization.lang("Copy citation key with configured cite command"), "ctrl+K", KeyBindingCategory.EDIT),

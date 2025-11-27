@@ -3,6 +3,7 @@ package org.jabref.gui.ai.components.aichat;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.beans.Observable;
@@ -14,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -43,6 +45,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.google.common.annotations.VisibleForTesting;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.UserMessage;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
@@ -76,6 +79,7 @@ public class AiChatComponent extends VBox {
     @FXML private Hyperlink exQuestion2;
     @FXML private Hyperlink exQuestion3;
     @FXML private HBox exQuestionBox;
+    @FXML private HBox followUpQuestionsBox;
 
     private String noticeTemplate;
 
@@ -112,6 +116,7 @@ public class AiChatComponent extends VBox {
         initializeNotifications();
         sendExampleQuestions();
         initializeExampleQuestions();
+        initializeFollowUpQuestions();
     }
 
     private void initializeNotifications() {
@@ -191,9 +196,61 @@ public class AiChatComponent extends VBox {
             onSendMessage(userMessage);
         });
 
+        chatPrompt.setRegenerateCallback(() -> {
+            setLoading(true);
+            Optional<UserMessage> lastUserPrompt = Optional.empty();
+            if (!aiChatLogic.getChatHistory().isEmpty()) {
+                lastUserPrompt = getLastUserMessage();
+            }
+            if (lastUserPrompt.isPresent()) {
+                while (aiChatLogic.getChatHistory().getLast().type() != ChatMessageType.USER) {
+                    deleteLastMessage();
+                }
+                deleteLastMessage();
+                chatPrompt.switchToNormalState();
+                onSendMessage(lastUserPrompt.get().singleText());
+            }
+        });
+
         chatPrompt.requestPromptFocus();
 
         updatePromptHistory();
+    }
+
+    private void initializeFollowUpQuestions() {
+        aiChatLogic.getFollowUpQuestions().addListener((javafx.collections.ListChangeListener<String>) change -> {
+            updateFollowUpQuestions();
+        });
+    }
+
+    private void updateFollowUpQuestions() {
+        List<String> questions = new ArrayList<>(aiChatLogic.getFollowUpQuestions());
+
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            followUpQuestionsBox.getChildren().removeIf(node -> node instanceof Hyperlink);
+
+            if (questions.isEmpty()) {
+                followUpQuestionsBox.setVisible(false);
+                followUpQuestionsBox.setManaged(false);
+                exQuestionBox.setVisible(true);
+                exQuestionBox.setManaged(true);
+            } else {
+                followUpQuestionsBox.setVisible(true);
+                followUpQuestionsBox.setManaged(true);
+                exQuestionBox.setVisible(false);
+                exQuestionBox.setManaged(false);
+
+                for (String question : questions) {
+                    Hyperlink link = new Hyperlink(question);
+                    link.getStyleClass().add("exampleQuestionStyle");
+                    link.setTooltip(new Tooltip(question));
+                    link.setOnAction(event -> {
+                        onSendMessage(question);
+                    });
+                    followUpQuestionsBox.getChildren().add(link);
+                }
+            }
+        });
     }
 
     private void updateNotifications() {
@@ -260,6 +317,13 @@ public class AiChatComponent extends VBox {
     }
 
     private void onSendMessage(String userPrompt) {
+        aiChatLogic.getFollowUpQuestions().clear();
+
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            exQuestionBox.setVisible(false);
+            exQuestionBox.setManaged(false);
+        });
+
         UserMessage userMessage = new UserMessage(userPrompt);
         updatePromptHistory();
         setLoading(true);
@@ -333,5 +397,17 @@ public class AiChatComponent extends VBox {
             int index = aiChatLogic.getChatHistory().size() - 1;
             aiChatLogic.getChatHistory().remove(index);
         }
+    }
+
+    private Optional<UserMessage> getLastUserMessage() {
+        int messageIndex = aiChatLogic.getChatHistory().size() - 1;
+        while (messageIndex >= 0) {
+            ChatMessage chat = aiChatLogic.getChatHistory().get(messageIndex);
+            if (chat.type() == ChatMessageType.USER) {
+                return Optional.of((UserMessage) chat);
+            }
+            messageIndex--;
+        }
+        return Optional.empty();
     }
 }
