@@ -67,7 +67,7 @@ public class CommonArchitectureTest {
                           .should()
                           .dependOnClassesThat(
                                   resideInAnyPackage("com.fasterxml..")
-                                          //   https://github.com/FasterXML/jackson-databind/blob/37b593e4836af62a267f09d2193414078df36eb0/src/test/java/tools/jackson/databind/deser/AnySetterTest.java#L7C8-L7C42
+                                          // https://github.com/FasterXML/jackson-databind/blob/37b593e4836af62a267f09d2193414078df36eb0/src/test/java/tools/jackson/databind/deser/AnySetterTest.java#L7C8-L7C42
                                           .and(not(resideInAnyPackage("com.fasterxml.jackson.annotation..")))
                           )
                           .check(classes);
