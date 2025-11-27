@@ -28,7 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377)
 - We added the generation of follow-up questions in AI chat. [#12243](https://github.com/JabRef/jabref/issues/12243)
 - We added support for "Search Google Scholar" and "Search Semantic Scholar" to quickly search for a selected entry's title in Google Scholar or Semantic Scholar directly from the main table's context menu [#12268](https://github.com/JabRef/jabref/issues/12268)
-- When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#todo](...)
+- When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
 
 ### Changed
@@ -46,7 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where pressing <kbd>ESC</kbd> in the preferences dialog would not always close the dialog. [#8888](https://github.com/JabRef/jabref/issues/8888)
 - We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional. [#14224](https://github.com/JabRef/jabref/pull/14224)
 - Correct fallback window height (786 → 768) in JabRefGUI. [#14295](https://github.com/JabRef/jabref/pull/14295)
-- We fixed localization of the "New Entries" dialog. [#todo](...)
+- We fixed localization of the "New Entries" dialog. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We fixed an issue where keybindings could not be edited and saved. [#14237](https://github.com/JabRef/jabref/issues/14237)
 
 ### Removed
