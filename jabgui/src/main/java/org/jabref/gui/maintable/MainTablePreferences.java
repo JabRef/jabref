@@ -43,4 +43,20 @@ public class MainTablePreferences {
     public void setExtraFileColumnsEnabled(boolean extraFileColumnsEnabled) {
         this.extraFileColumnsEnabled.set(extraFileColumnsEnabled);
     }
+
+        private MainTablePreferences() {
+        this.columnPreferences = new ColumnPreferences();
+        this.resizeColumnsToFit.set(false);
+        this.extraFileColumnsEnabled.set(false);
+    }
+
+    public static MainTablePreferences getDefault() {
+        return new MainTablePreferences();
+    }
+
+    public void setAll(MainTablePreferences other) {
+        this.columnPreferences = other.columnPreferences;
+        this.resizeColumnsToFit.set(other.getResizeColumnsToFit());
+        this.extraFileColumnsEnabled.set(other.getExtraFileColumnsEnabled());
+    }
 }
