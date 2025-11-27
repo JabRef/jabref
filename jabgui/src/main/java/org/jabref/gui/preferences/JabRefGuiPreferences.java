@@ -1000,26 +1000,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     // region: Main table, main table column, and search dialog column preferences
 
-    private MainTablePreferences getMainTablePreferencesFromBackingStore(MainTablePreferences defaults) {
-        return new MainTablePreferences(
-                getMainTableColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE, defaults.getResizeColumnsToFit()),
-                getBoolean(EXTRA_FILE_COLUMNS, defaults.getExtraFileColumnsEnabled())
-        );
-    }
-
-    private ColumnPreferences getMainTableColumnPreferencesFromBackingStore(ColumnPreferences defaults) {
-        List<String> storedColumnNames = getStringList(COLUMN_NAMES);
-
-        if (storedColumnNames.isEmpty()) {
-            return defaults;
-        }
-
-        List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-        List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(COLUMN_SORT_ORDER, columns);
-        return new ColumnPreferences(columns, columnSortOrder);
-    }
-
     public MainTablePreferences getMainTablePreferences() {
         if (mainTablePreferences != null) {
             return mainTablePreferences;
@@ -1073,6 +1053,28 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return searchDialogColumnPreferences;
     }
+
+    private MainTablePreferences getMainTablePreferencesFromBackingStore(MainTablePreferences defaults) {
+        return new MainTablePreferences(
+                getMainTableColumnPreferences(),
+                getBoolean(AUTO_RESIZE_MODE, defaults.getResizeColumnsToFit()),
+                getBoolean(EXTRA_FILE_COLUMNS, defaults.getExtraFileColumnsEnabled())
+        );
+    }
+
+    private ColumnPreferences getMainTableColumnPreferencesFromBackingStore(ColumnPreferences defaults) {
+        List<String> storedColumnNames = getStringList(COLUMN_NAMES);
+
+        if (storedColumnNames.isEmpty()) {
+            return defaults;
+        }
+
+        List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+        List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(COLUMN_SORT_ORDER, columns);
+        return new ColumnPreferences(columns, columnSortOrder);
+    }
+
+    // end region
 
     // --- Generic column handling ---
     @SuppressWarnings("SameParameterValue")
