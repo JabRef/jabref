@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 
@@ -25,7 +26,7 @@ public class EprintCleanup implements CleanupJob {
         Optional<String> version = entry.getField(StandardField.VERSION);
         Optional<String> institution = entry.getField(StandardField.INSTITUTION);
 
-        for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE, StandardField.EID)) {
+        for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE, StandardField.EID, FieldFactory.parseField("arxiv"))) {
             Optional<ArXivIdentifier> arXivIdentifier = entry.getField(field).flatMap(ArXivIdentifier::parse);
 
             if (arXivIdentifier.isPresent()) {
