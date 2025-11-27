@@ -1227,16 +1227,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return newEntryPreferences;
     }
+
     // region Donation preferences
     public DonationPreferences getDonationPreferences() {
         if (donationPreferences != null) {
             return donationPreferences;
         }
+
         donationPreferences = getDonationPreferencesFromBackingStore(DonationPreferences.getDefault());
+
         EasyBind.listen(donationPreferences.neverShowAgainProperty(), (_, _, newValue) -> putBoolean(DONATION_NEVER_SHOW, newValue));
         EasyBind.listen(donationPreferences.lastShownEpochDayProperty(), (_, _, newValue) -> putInt(DONATION_LAST_SHOWN_EPOCH_DAY, newValue.intValue()));
         return donationPreferences;
     }
+
     private DonationPreferences getDonationPreferencesFromBackingStore(DonationPreferences defaults) {
         return new DonationPreferences(
                 getBoolean(DONATION_NEVER_SHOW, defaults.isNeverShowAgain()),
