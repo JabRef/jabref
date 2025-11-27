@@ -3,6 +3,7 @@ package org.jabref.languageserver.util;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,12 @@ public class LspParserHandler {
         // Otherwise, we could use `OpenDatabase.loadDatabase(path, importFormatPreferences, new DummyFileUpdateMonitor())`
         BibtexParser parser = new BibtexParser(importFormatPreferences);
         ParserResult parserResult = parser.parse(Reader.of(content));
-        URI uri = URI.create(fileUri);
+        URI uri;
+        try {
+            uri = new URI(fileUri);
+        } catch (URISyntaxException e) {
+            return ParserResult.fromError(e);
+        }
         Path path = Path.of(uri);
         parserResult.getDatabaseContext().setDatabasePath(path);
         parserResults.put(fileUri, parserResult);
