@@ -1,7 +1,6 @@
 # JabRef Bibliography Management [![APIdia](https://apidia.net/java/JabRef/main/badge.svg)](https://apidia.net/java/JabRef/main)
 
-JabRef is an open-source, cross-platform citation and reference management tool.
-
+JabRef is an open-source, cross-platform citation and reference management tool for organizing bibliographic data in BibTeX and BibLaTeX formats.
 Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
 
 ![main table](docs/images/jabref-mainscreen.png)
