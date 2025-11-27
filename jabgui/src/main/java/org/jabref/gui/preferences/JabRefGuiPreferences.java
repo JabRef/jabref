@@ -68,7 +68,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrder;
@@ -1166,20 +1165,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return newEntryPreferences;
         }
 
-        final int approachIndex = getInt(CREATE_ENTRY_APPROACH);
-        NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
-                                     ? NewEntryDialogTab.values()[approachIndex]
-                                     : NewEntryDialogTab.values()[0];
-
-        final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE);
-        EntryType immediateType = StandardEntryType.Article;
-        for (StandardEntryType type : StandardEntryType.values()) {
-            if (type.getDisplayName().equals(immediateTypeName)) {
-                immediateType = type;
-                break;
-            }
-        }
-
         newEntryPreferences = getNewEntryPreferencesFromBackingStore(NewEntryPreferences.getDefault());
 
         EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)));
@@ -1195,26 +1180,30 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private NewEntryPreferences getNewEntryPreferencesFromBackingStore(NewEntryPreferences defaults) {
-        int approachIndex = getInt("createEntryApproach", defaults.getLatestApproach().ordinal());
-        NewEntryDialogTab approach;
-        if (approachIndex >= 0 && approachIndex < NewEntryDialogTab.values().length) {
-            approach = NewEntryDialogTab.values()[approachIndex];
-        } else {
-            approach = defaults.getLatestApproach();
-        }
+        // moved the same snippet form public to private
+        final int approachIndex = getInt(CREATE_ENTRY_APPROACH);
+        NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
+                                     ? NewEntryDialogTab.values()[approachIndex]
+                                     : NewEntryDialogTab.values()[0];
 
-        String typeName = get("createEntryImmediateType", defaults.getLatestImmediateType().getDisplayName());
-        EntryType immediateType = EntryTypeFactory.parse(typeName);
+        final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE);
+        EntryType immediateType = StandardEntryType.Article;
+        for (StandardEntryType type : StandardEntryType.values()) {
+            if (type.getDisplayName().equals(immediateTypeName)) {
+                immediateType = type;
+                break;
+            }
+        }
 
         return new NewEntryPreferences(
                 approach,
-                getBoolean("createEntryExpandRecommended", defaults.getTypesRecommendedExpanded()),
-                getBoolean("createEntryExpandOther", defaults.getTypesOtherExpanded()),
-                getBoolean("createEntryExpandCustom", defaults.getTypesCustomExpanded()),
+                getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, defaults.getTypesRecommendedExpanded()),
+                getBoolean(CREATE_ENTRY_EXPAND_OTHER, defaults.getTypesOtherExpanded()),
+                getBoolean(CREATE_ENTRY_EXPAND_CUSTOM, defaults.getTypesCustomExpanded()),
                 immediateType,
-                getBoolean("createEntryIdLookupGuessing", defaults.getIdLookupGuessing()),
-                get("createEntryIdFetcherName", defaults.getLatestIdFetcher()),
-                get("createEntryInterpretParserName", defaults.getLatestInterpretParser())
+                getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING, defaults.getIdLookupGuessing()),
+                get(CREATE_ENTRY_ID_FETCHER_NAME, defaults.getLatestIdFetcher()),
+                get(CREATE_ENTRY_INTERPRET_PARSER_NAME, defaults.getLatestInterpretParser())
         );
     }
 
