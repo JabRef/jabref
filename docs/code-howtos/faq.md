@@ -163,12 +163,46 @@ git push
 
 ### Prevention
 
-To avoid this, avoid staging using `git add .` from CLI. Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
+To avoid this, avoid staging using any of these commands:
+
+* `git add .`
+* `git add jablib/src/main` (or any path prefix)
+* `git commit -a`
+
+Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
 
 ## Q: I get `java: package org.jabref.logic.journals does not exist`
 
 A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
 Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
+
+## IDE import issues
+
+One might see following error:
+
+```text
+Could not apply requested plugin [id: 'org.jabref.gradle.module'] as it does not provide a plugin with id 'org.jabref.gradle.module'. This is caused by an incorrect plugin implementation. Please contact the plugin author(s).
+> Plugin with id 'org.jabref.gradle.module' not found.
+```
+
+This happened on Debian 12, with IntelliJ IDEA 2025.2.4 (Ultimate Edition).
+The workaround is to compile JabRef once from the command line.
+
+* Linux: Execute `./gradlew :jabgui:compileJava`
+* Windows (Powershell): Execute `.\gradlew :jabgui:compileJava`
+
+In case Gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg) as follows:
+
+1. Download <https://github.com/eirikb/gg/releases/latest/download/gg.cmd>
+2. Move the file to your JabRef project directory
+3. Compile JabRef
+
+   * Windows: `.\gg.cmd gradle:java@24 jabgui:compileJava`
+   * Linux: `sh -x ./gg.cmd gradle:java@24 jabgui:compileJava`
+
+4. Wait until the command execution completes.
+
+After about one minute, however, you can continue setting up IntelliJ, because the initial Gradle setup succeeded.
 
 <!-- markdownlint-disable-file MD033 -->

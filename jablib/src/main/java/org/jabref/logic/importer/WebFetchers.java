@@ -48,9 +48,10 @@ import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerNatureFullTextFetcher;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
+import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -136,6 +137,8 @@ public class WebFetchers {
         set.add(new LOBIDFetcher());
         set.add(new ScholarArchiveFetcher());
         set.add(new EuropePmcFetcher());
+        // Even though Unpaywall is used differently, adding it here enables "smooth" setting of the email (as fetcher key) in the preferences UI
+        set.add(new UnpaywallFetcher(importerPreferences));
         return set;
     }
 
@@ -222,14 +225,15 @@ public class WebFetchers {
         fetchers.add(new IacrEprintFetcher(importFormatPreferences));
 
         // Meta search
+        fetchers.add(new CiteSeer());
         // fetchers.add(new JstorFetcher(importFormatPreferences));
         // fetchers.add(new GoogleScholar(importFormatPreferences));
-        fetchers.add(new CiteSeer());
         fetchers.add(new OpenAccessDoi());
-        fetchers.add(new SemanticScholar(importerPreferences));
-        fetchers.add(new ResearchGate(importFormatPreferences));
         // OpenAlex provides OA locations and direct PDF links via its API
         fetchers.add(new OpenAlex());
+        fetchers.add(new ResearchGate(importFormatPreferences));
+        fetchers.add(new SemanticScholar(importerPreferences));
+        fetchers.add(new UnpaywallFetcher(importerPreferences));
         return fetchers;
     }
 
@@ -244,6 +248,7 @@ public class WebFetchers {
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));
         fetchers.add(new MedlineFetcher(importerPreferences));
+        fetchers.add(new UnpaywallFetcher(importerPreferences));
         return fetchers;
     }
 }

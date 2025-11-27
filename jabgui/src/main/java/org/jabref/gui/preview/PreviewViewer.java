@@ -1,8 +1,6 @@
 package org.jabref.gui.preview;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +15,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebView;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -210,13 +208,17 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private String formatError(BibEntry entry, Throwable exception) {
-        StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        return "%s\n\n%s\n\nBibTeX (internal):\n%s\n\nStack Trace:\n%s".formatted(
+        LOGGER.error("Error generating preview for entry: {}", entry.getCitationKey(), exception);
+
+        return """
+                <div class="error">
+                    <h3>%s</h3>
+                    <p>%s</p>
+                    <p><small>Check the event logs for details.</small></p>
+                </div>
+                """.formatted(
                 Localization.lang("Error while generating citation style"),
-                exception.getLocalizedMessage(),
-                entry,
-                sw);
+                exception.getLocalizedMessage() != null ? exception.getLocalizedMessage() : "Unknown error");
     }
 
     private void setPreviewText(String text) {
@@ -283,10 +285,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        String plainText = (String) previewView.getEngine().executeScript("document.body.innerText");
-        ClipboardContent content = new ClipboardContent();
-        content.putString(plainText);
-        clipBoardManager.setContent(content);
+        clipBoardManager.setContent((String) previewView.getEngine().executeScript("document.body.innerText"));
     }
 
     public void copySelectionToClipBoard() {
