@@ -3,6 +3,10 @@
 We welcome contributions to JabRef and encourage you to follow the [GitHub workflow](https://docs.github.com/en/get-started/using-github/github-flow).
 You can also check out the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
+## Getting Started
+
+New contributors should start by exploring JabRef's [good first issues](https://github.com/JabRef/jabref/labels/good%20first%20issue), which are carefully selected tasks perfect for learning the codebase and understanding our development workflow.
+
 JabRef regards its contributors as **[software engineers, not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html)**.
 As one consequence, for non-basic issues, you will have to work on the requirements side, too.
 
