@@ -409,6 +409,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
+        getDonationPreferences().setAll(DonationPreferences.getDefault());
     }
 
     @Override
@@ -418,6 +419,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // in case of incomplete or corrupt xml fall back to current preferences
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
+        getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
     }
@@ -1225,17 +1227,22 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return newEntryPreferences;
     }
-
+    // region Donation preferences
     public DonationPreferences getDonationPreferences() {
         if (donationPreferences != null) {
             return donationPreferences;
         }
-
-        donationPreferences = new DonationPreferences(getBoolean(DONATION_NEVER_SHOW), getInt(DONATION_LAST_SHOWN_EPOCH_DAY));
+        donationPreferences = getDonationPreferencesFromBackingStore(DonationPreferences.getDefault());
         EasyBind.listen(donationPreferences.neverShowAgainProperty(), (_, _, newValue) -> putBoolean(DONATION_NEVER_SHOW, newValue));
         EasyBind.listen(donationPreferences.lastShownEpochDayProperty(), (_, _, newValue) -> putInt(DONATION_LAST_SHOWN_EPOCH_DAY, newValue.intValue()));
         return donationPreferences;
     }
+    private DonationPreferences getDonationPreferencesFromBackingStore(DonationPreferences defaults) {
+        return new DonationPreferences(
+                getBoolean(DONATION_NEVER_SHOW, defaults.isNeverShowAgain()),
+                getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaults.getLastShownEpochDay()));
+    }
+    // endregion
 
     /**
      * In GUI mode, we can lookup the directory better
