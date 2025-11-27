@@ -87,7 +87,7 @@ class EprintCleanupTest {
                                 .withField(StandardField.TITLE, "Which Prompting Technique Should I Use? An Empirical Investigation of Prompting Techniques for Software Engineering Tasks")
                                 .withField(StandardField.YEAR, "2025")
                                 .withField(StandardField.MONTH, "jun")
-                                .withField(StandardField.JOURNAL, "arxiv")
+                                .withField(StandardField.JOURNAL, "arXiv")
                                 .withField(StandardField.VOLUME, "2506.05614"),
                         new BibEntry()
                                 .withField(StandardField.AUTHOR, "E. G. Santana Jr. and G. Benjamin and M. Araujo and H. Santos")
