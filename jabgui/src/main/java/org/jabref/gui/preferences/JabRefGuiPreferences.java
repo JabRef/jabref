@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn;
 
@@ -467,7 +468,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
         return new EntryEditorPreferences(
                 getEntryEditorTabs(),
-                getDefaultEntryEditorTabs(),
+                getDefaultEntryEditorTabs(defaults.getDefaultEntryEditorTabs()),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
                 getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
                 getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
@@ -530,8 +531,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getEntryEditorTabs();
     }
 
-    private SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        SequencedMap<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
+    private SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs(ObservableMap<String, Set<Field>> defaultEntryEditorTabs) {
+        SequencedMap<String, Set<Field>> customTabsMap = new LinkedHashMap<>(defaultEntryEditorTabs);
 
         int defNumber = 0;
         while (true) {
