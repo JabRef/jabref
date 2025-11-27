@@ -37,6 +37,7 @@ class EprintCleanupTest {
                                 .withField(StandardField.EPRINTCLASS, "math")
                                 .withField(StandardField.EPRINTTYPE, "arxiv")
                 ),
+
                 // cleanupEntryWithVersionAndInstitutionAndEid
                 Arguments.of(
                         new BibEntry()
@@ -48,6 +49,7 @@ class EprintCleanupTest {
                                 .withField(StandardField.EPRINT, "1503.05173v1")
                                 .withField(StandardField.EPRINTTYPE, "arxiv")
                 ),
+
                 // cleanupEntryWithOtherInstitution
                 Arguments.of(
                         new BibEntry()
@@ -60,7 +62,8 @@ class EprintCleanupTest {
                                 .withField(StandardField.EPRINTTYPE, "arxiv")
                                 .withField(StandardField.INSTITUTION, "OtherInstitution")
                 ),
-                // cleanUpFieldArxiv
+
+                // LLM-generated BibEntry with "arxiv" field
                 Arguments.of(
                         new BibEntry()
                                 .withField(StandardField.AUTHOR, "E. G. Santana Jr. and G. Benjamin and M. Araujo and H. Santos")
@@ -68,6 +71,24 @@ class EprintCleanupTest {
                                 .withField(StandardField.YEAR, "2025")
                                 .withField(StandardField.MONTH, "jun")
                                 .withField(FieldFactory.parseField("arxiv"), "2506.05614"),
+                        new BibEntry()
+                                .withField(StandardField.AUTHOR, "E. G. Santana Jr. and G. Benjamin and M. Araujo and H. Santos")
+                                .withField(StandardField.TITLE, "Which Prompting Technique Should I Use? An Empirical Investigation of Prompting Techniques for Software Engineering Tasks")
+                                .withField(StandardField.YEAR, "2025")
+                                .withField(StandardField.MONTH, "jun")
+                                .withField(StandardField.EPRINT, "2506.05614")
+                                .withField(StandardField.EPRINTTYPE, "arxiv")
+                ),
+
+                // LLM-generated BibEntry with journal "arxiv" and volume with arXiv ID
+                Arguments.of(
+                        new BibEntry()
+                                .withField(StandardField.AUTHOR, "E. G. Santana Jr. and G. Benjamin and M. Araujo and H. Santos")
+                                .withField(StandardField.TITLE, "Which Prompting Technique Should I Use? An Empirical Investigation of Prompting Techniques for Software Engineering Tasks")
+                                .withField(StandardField.YEAR, "2025")
+                                .withField(StandardField.MONTH, "jun")
+                                .withField(StandardField.JOURNAL, "arxiv")
+                                .withField(StandardField.VOLUME, "2506.05614"),
                         new BibEntry()
                                 .withField(StandardField.AUTHOR, "E. G. Santana Jr. and G. Benjamin and M. Araujo and H. Santos")
                                 .withField(StandardField.TITLE, "Which Prompting Technique Should I Use? An Empirical Investigation of Prompting Techniques for Software Engineering Tasks")
