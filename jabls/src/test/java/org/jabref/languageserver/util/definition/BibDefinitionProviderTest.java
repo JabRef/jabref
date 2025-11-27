@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,10 +32,11 @@ class BibDefinitionProviderTest {
         when(importFormatPreferences.filePreferences().getUserAndHost()).thenReturn("MockedUser-mockedhost");
     }
 
+    /// The functionality itself should be tested elsewhere. We keep this test, because we want to have an end-to-end test
     @Test
     void provideDefinition() throws JabRefException, IOException {
         ParserResult parserResult = lspParserHandler.parserResultFromString(
-                "some-uri",
+                "file:///tmp/some-uri.bib",
                 """
                         @Article{Cooper_2007,
                                 author       = {Cooper, Karen A. and Donovan, Jennifer L. and Waterhouse, Andrew L. and Williamson, Gary},
@@ -55,7 +55,10 @@ class BibDefinitionProviderTest {
                         """,
                 importFormatPreferences);
         List<LinkedFile> files = parserResult.getDatabaseContext().getEntries().getFirst().getFiles();
-        assertEquals(2, files.size());
-        assertNotNull(files.getLast().getLink());
+        List<LinkedFile> expected = List.of(
+                new LinkedFile("", "C:/Users/Philip/Downloads/corti-et-al-2009-cocoa-and-cardiovascular-health.pdf", "PDF"),
+                new LinkedFile("", "corti-et-al-2009-cocoa-and-cardiovascular-health.pdf", "PDF")
+        );
+        assertEquals(expected, files);
     }
 }
