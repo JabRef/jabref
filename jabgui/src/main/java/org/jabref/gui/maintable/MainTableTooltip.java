@@ -26,13 +26,13 @@ public class MainTableTooltip extends Tooltip {
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
 
         fieldValueLabel.setWrapText(true);
-        fieldValueLabel.setMaxWidth(400);
+        fieldValueLabel.setMaxWidth(450);
 
         tooltipContent.getChildren().addAll(fieldValueLabel, preview);
         tooltipContent.setSpacing(5);
 
 
-        this.setMaxWidth(400);
+        this.setMaxWidth(500);
         this.setWrapText(true);
 
     }
@@ -46,7 +46,7 @@ public class MainTableTooltip extends Tooltip {
             preview.setEntry(entry);
 
 
-            preview.setMaxHeight(200); 
+            preview.setMaxHeight(200);
             this.setGraphic(tooltipContent);
         } else {
             this.setGraphic(fieldValueLabel);
