@@ -166,7 +166,6 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-open-ai")
     implementation("dev.langchain4j:langchain4j-mistral-ai")
     implementation("dev.langchain4j:langchain4j-google-ai-gemini")
-    implementation("dev.langchain4j:langchain4j-hugging-face")
     implementation("dev.langchain4j:langchain4j-http-client")
     implementation("dev.langchain4j:langchain4j-http-client-jdk")
 
