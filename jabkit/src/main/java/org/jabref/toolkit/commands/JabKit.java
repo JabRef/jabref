@@ -78,6 +78,10 @@ public class JabKit implements Runnable {
 
     @Override
     public void run() {
+        if (versionInfoRequested) {
+            System.out.println(new BuildInfo().version);
+            return;
+        }
         System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
     }
 

@@ -161,7 +161,7 @@ public class UnlinkedFilesDialogViewModel {
         resultList.clear();
 
         importFilesBackgroundTask = importHandler
-                .importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)
+                .importFilesInBackground(fileList, TransferMode.LINK)
                 .onRunning(() -> {
                     progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
                     progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
