@@ -222,8 +222,8 @@ class FileFieldParserTest {
                 ),
                 // Mixed path
                 Arguments.of(
-                        List.of(new LinkedFile("", "C:/Users/Philip/Downloads/corti-et-al-2009-cocoa-and-cardiovascular-health.pdf", "")),
-                        ":C\\\\:/Users/Philip/Downloads/corti-et-al-2009-cocoa-and-cardiovascular-health.pdf:PDF"
+                        List.of(new LinkedFile("", "C:/Users/Philip/Downloads/corti-et-al-2009-cocoa-and-cardiovascular-health.pdf", "PDF")),
+                        ":C\\:/Users/Philip/Downloads/corti-et-al-2009-cocoa-and-cardiovascular-health.pdf:PDF"
                 )
         );
     }
