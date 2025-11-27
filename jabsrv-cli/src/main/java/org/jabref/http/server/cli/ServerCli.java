@@ -1,6 +1,7 @@
 package org.jabref.http.server.cli;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -67,7 +68,13 @@ public class ServerCli implements Callable<Void> {
         LOGGER.debug("Libraries to serve: {}", filesToServe);
 
         String url = "http://" + host + ":" + port + "/";
-        URI uri = URI.create(url);
+        URI uri;
+        try {
+            uri = new URI(url);
+        } catch (URISyntaxException e) {
+            LOGGER.error("Invalid URL: {}", url);
+            return null;
+        }
 
         Server server = new Server();
         HttpServer httpServer = server.run(filesToServe, uri);

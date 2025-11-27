@@ -88,6 +88,8 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
 ///
 /// **Opposite class:**
 /// [`BibDatabaseWriter`](org.jabref.logic.exporter.BibDatabaseWriter)
+///
+/// FIXME: This class relies on `char`, but should use [java.lang.Character] to be fully Unicode compliant.
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
     private static final int LOOKAHEAD = 1024;
@@ -759,7 +761,7 @@ public class BibtexParser implements Parser {
         Field field = FieldFactory.parseField(parseTextToken());
 
         skipWhitespace();
-        consume('=');
+        consume(field, '=');
         String content = parseFieldContent(field);
         if (!content.isEmpty()) {
             if (entry.hasField(field)) {
@@ -1169,6 +1171,19 @@ public class BibtexParser implements Parser {
         if (character != expected) {
             throw new IOException(
                     "Error in line " + line + ": Expected " + expected + " but received " + (char) character);
+        }
+    }
+
+    private void consume(Field field, char expected) throws IOException {
+        int character = read();
+
+        if (character != expected) {
+            throw new IOException(
+                    "Error at line " + line
+                            + " after column " + column
+                            + " (" + field.getName() + "): Expected "
+                            + expected + " but received "
+                            + (char) character + " (" + character + ")");
         }
     }
 
