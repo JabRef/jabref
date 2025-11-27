@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +29,7 @@ public class LspParserHandler {
         BibtexParser parser = new BibtexParser(importFormatPreferences);
         ParserResult parserResult = parser.parse(Reader.of(content));
         URI uri = URI.create(fileUri);
-        Path path = Paths.get(uri);
+        Path path = Path.of(uri);
         parserResult.getDatabaseContext().setDatabasePath(path);
         parserResults.put(fileUri, parserResult);
         return parserResult;
@@ -49,10 +48,5 @@ public class LspParserHandler {
             }
         });
         return result;
-    }
-
-    public boolean citationKeyExists(String citationKey) {
-        return parserResults.values().stream()
-                            .anyMatch(parserResult -> !parserResult.getDatabase().getEntriesByCitationKey(citationKey).isEmpty());
     }
 }
