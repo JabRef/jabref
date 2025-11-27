@@ -4,7 +4,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
@@ -12,7 +11,6 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-
 
 public class MainTableTooltip extends Tooltip {
 
@@ -31,10 +29,8 @@ public class MainTableTooltip extends Tooltip {
         tooltipContent.getChildren().addAll(fieldValueLabel, preview);
         tooltipContent.setSpacing(5);
 
-
         this.setMaxWidth(500);
         this.setWrapText(true);
-
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
@@ -44,8 +40,6 @@ public class MainTableTooltip extends Tooltip {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setDatabaseContext(databaseContext);
             preview.setEntry(entry);
-
-
             preview.setMaxHeight(200);
             this.setGraphic(tooltipContent);
         } else {
