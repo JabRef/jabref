@@ -52,7 +52,7 @@ public class NewEntryPreferences {
                 PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName() // Default parser
         );
     }
-    
+
     public static NewEntryPreferences getDefault() {
         return new NewEntryPreferences();
     }
