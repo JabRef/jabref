@@ -32,7 +32,7 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input .bib file", required = true)
     private Path inputFile;
 
-    @Option(names = "--output", description = "The output .bib file")
+    @Option(names = "--output", description = "Output .bib file")
     private Path outputFile;
 
     @Override
