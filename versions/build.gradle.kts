@@ -14,6 +14,7 @@ val arch = DefaultNativePlatform.getCurrentArchitecture()
 val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
 
 val lucene = "10.3.2"
+
 val pdfbox = "3.0.6"
 
 dependencies {
