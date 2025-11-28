@@ -6,7 +6,7 @@ This directory contains JBang scripts for JabRef.
 Four use cases:
 
 - Runing `JabKit` - JabRef's CLI tool.
-- Runing JabLS - JabRef's Language Server.
+- Runing JabLs - JabRef's Language Server.
 - Runing JabSrv - JabRef's HTTP server.
 - Try out any pull request with minimal installation. See [our blog entry](https://blog.jabref.org/2025/05/31/run-pr/) for details.
 
@@ -88,7 +88,7 @@ By using [gg.cmd](https://github.com/eirikb/gg#ggcmd) you can "just run" JabKit 
 You can also put `gg.cmd` on your `PATH` and make it executable.
 Then you enable `alias jabkit='gg.cmd jbang jabkit@jabref`.
 
-## Running JabLS
+## Running JabLs
 
 In case you have [JBang installed], just run following command:
 
