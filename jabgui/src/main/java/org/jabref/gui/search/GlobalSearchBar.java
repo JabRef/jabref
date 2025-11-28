@@ -87,6 +87,7 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton keepSearchString;
     private final ToggleButton filterModeButton;
     private final ToggleButton regexButton;
+    private final ToggleButton dateRangeButton;
     private final ToggleButton caseSensitiveButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final StateManager stateManager;
@@ -170,6 +171,8 @@ public class GlobalSearchBar extends HBox {
         });
 
         regexButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
+        // TODO: change icon for dateRangeButton
+        dateRangeButton = IconTheme.JabRefIcons.SUCCESS.asToggleButton();
         caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
         openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
@@ -180,6 +183,7 @@ public class GlobalSearchBar extends HBox {
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
                                                     .or(regexButton.focusedProperty())
+                                                    .or(dateRangeButton.focusedProperty())
                                                     .or(caseSensitiveButton.focusedProperty())
                                                     .or(fulltextButton.focusedProperty())
                                                     .or(keepSearchString.focusedProperty())
@@ -188,6 +192,8 @@ public class GlobalSearchBar extends HBox {
 
         regexButton.visibleProperty().unbind();
         regexButton.visibleProperty().bind(focusedOrActive);
+        dateRangeButton.visibleProperty().unbind();
+        dateRangeButton.visibleProperty().bind(focusedOrActive);
         caseSensitiveButton.visibleProperty().unbind();
         caseSensitiveButton.visibleProperty().bind(focusedOrActive);
         fulltextButton.visibleProperty().unbind();
@@ -199,9 +205,9 @@ public class GlobalSearchBar extends HBox {
 
         StackPane modifierButtons;
         if (searchType == SearchType.NORMAL_SEARCH) {
-            modifierButtons = new StackPane(new HBox(regexButton, caseSensitiveButton, fulltextButton, keepSearchString, filterModeButton));
+            modifierButtons = new StackPane(new HBox(regexButton, dateRangeButton, caseSensitiveButton, fulltextButton, keepSearchString, filterModeButton));
         } else {
-            modifierButtons = new StackPane(new HBox(regexButton, caseSensitiveButton, fulltextButton));
+            modifierButtons = new StackPane(new HBox(regexButton, dateRangeButton, caseSensitiveButton, fulltextButton));
         }
 
         modifierButtons.setAlignment(Pos.CENTER);
@@ -291,6 +297,22 @@ public class GlobalSearchBar extends HBox {
             updateSearchQuery();
         });
 
+        dateRangeButton.setSelected(searchPreferences.isDateRange());
+        dateRangeButton.setTooltip(new Tooltip(Localization.lang("Date range") + "\n" + Localization.lang("This only affects unfielded terms. For using RegEx in a fielded term, use =~ operator.")));
+        initSearchModifierButton(dateRangeButton);
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) change -> {
+            if (change.wasAdded() && change.getElementAdded() == SearchFlags.DATE_RANGE) {
+                dateRangeButton.setSelected(true);
+            } else if (change.wasRemoved() && change.getElementRemoved() == SearchFlags.DATE_RANGE) {
+                dateRangeButton.setSelected(false);
+            }
+        });
+        dateRangeButton.setOnAction(_ -> {
+            searchPreferences.setSearchFlag(SearchFlags.DATE_RANGE, dateRangeButton.isSelected());
+            searchField.requestFocus();
+            updateSearchQuery();
+        });
+
         caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
         caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive") + "\n" + Localization.lang("This only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator.")));
         initSearchModifierButton(caseSensitiveButton);
@@ -334,6 +356,7 @@ public class GlobalSearchBar extends HBox {
 
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener.Change<? extends SearchFlags> change) -> {
             regexButton.setSelected(searchPreferences.isRegularExpression());
+            //dateRangeButton.setSelected(searchPreferences.isDateRange());
             caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
             fulltextButton.setSelected(searchPreferences.isFulltext());
         });
