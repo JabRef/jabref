@@ -60,7 +60,7 @@ public class EprintCleanup implements CleanupJob {
                      entry.clearField(field)
                           .ifPresent(changes::add);
 
-                     if (StandardField.URL.equals(field)) {
+                     if (StandardField.URL == field) {
                          // If we clear the URL field, we should also clear the URL-date field
                          entry.clearField(StandardField.URLDATE)
                               .ifPresent(changes::add);
@@ -72,7 +72,7 @@ public class EprintCleanup implements CleanupJob {
 
         // Remove `journal = {arXiv}` if present
         entry.getField(StandardField.JOURNAL)
-             .filter(journal -> journal.toLowerCase().equals("arxiv"))
+             .filter(journal -> "arxiv".equals(journal.toLowerCase()))
              .ifPresent(_ -> entry.clearField(StandardField.JOURNAL).ifPresent(changes::add));
 
         return changes;
