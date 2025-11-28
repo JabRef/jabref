@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -48,6 +49,7 @@ public class FetchAndMergeEntry {
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
     private final DialogService dialogService;
     private final UndoManager undoManager;
+    private final StateManager stateManager;
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
@@ -56,12 +58,14 @@ public class FetchAndMergeEntry {
                               TaskExecutor taskExecutor,
                               GuiPreferences preferences,
                               DialogService dialogService,
-                              UndoManager undoManager) {
+                              UndoManager undoManager,
+                              StateManager stateManager) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
+        this.stateManager = stateManager;
     }
 
     public void fetchAndMerge(BibEntry entry) {
@@ -105,7 +109,7 @@ public class FetchAndMergeEntry {
     }
 
     private void showMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
-        MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferences);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferences, stateManager);
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));

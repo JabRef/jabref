@@ -12,6 +12,7 @@ import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.icon.IconTheme;
@@ -64,6 +65,12 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
                         .mapObservable(TreeItem::valueProperty)
         );
         keyBindingsTable.setOnKeyPressed(viewModel::setNewBindingForCurrent);
+
+        keyBindingsTable.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            event.consume();
+            viewModel.setNewBindingForCurrent(event);
+        });
+
         keyBindingsTable.rootProperty().bind(
                 EasyBind.map(viewModel.rootKeyBindingProperty(),
                         keybinding -> new RecursiveTreeItem<>(keybinding, KeyBindingViewModel::getChildren))

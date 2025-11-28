@@ -1,3 +1,5 @@
+- label: 'status: changes-required'
+
 # Compilation, tests, and code style
 
 - jobName: windows installer and portable version

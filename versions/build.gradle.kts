@@ -14,7 +14,7 @@ val arch = DefaultNativePlatform.getCurrentArchitecture()
 // in case this is updated, also .github/workflows/binaries.yml (look for "eaJdkJmodsUrl" and its use)
 val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
 
-val lucene = "10.3.1"
+val lucene = "10.3.2"
 
 val pdfbox = "3.0.6"
 
@@ -59,6 +59,10 @@ dependencies.constraints {
     api("org.openjfx:javafx-graphics:${javafx}")
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
+    // from JavaFX25 onwards
+    api("org.openjfx:jdk-jsobject:$javafx")
+
+    api("cc.jilt:jilt:1.8.4")
 
     api("com.dlsc.gemsfx:gemsfx:3.6.2")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")

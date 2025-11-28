@@ -107,6 +107,12 @@ extraJavaModuleInfo {
         uses("ai.djl.repository.RepositoryFactory")
     }
     module("at.favre.lib:hkdf", "hkdf")
+
+    module("cc.jilt:jilt", "jilt")         {
+        exportAllPackages()
+        requires("java.compiler") // Reason: javax.annotation.processor
+    }
+
     module("com.github.javakeyring:java-keyring", "java.keyring")
 
     module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode") {

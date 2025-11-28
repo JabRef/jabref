@@ -39,6 +39,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML private ListView<PreferencesTab> preferenceTabList;
     @FXML private ScrollPane preferencesContainer;
     @FXML private ButtonType saveButton;
+    @FXML private ButtonType cancelButton;
     @FXML private ToggleButton memoryStickMode;
 
     @Inject private DialogService dialogService;
@@ -55,7 +56,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
+        ControlHelper.setAction(saveButton, getDialogPane(), _ -> savePreferencesAndCloseDialog());
 
         // Stop the default button from firing when the user hits enter within the search box
         searchBox.setOnKeyPressed(event -> {
@@ -149,7 +150,11 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     void importPreferences() {
-        viewModel.importPreferences();
+        if (viewModel.importPreferences()) {
+            // Hint the user that preferences are already loaded into the UI
+            // ToDo: Import into the ui directly and save changes on click on Save button
+            this.getDialogPane().lookupButton(cancelButton).setDisable(true);
+        }
     }
 
     @FXML
@@ -159,6 +164,10 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     void resetPreferences() {
-        viewModel.resetPreferences();
+        if (viewModel.resetPreferences()) {
+            // Hint the user that preferences are already loaded into the UI
+            // ToDo: Reset the ui and save changes on click on Save button
+            this.getDialogPane().lookupButton(cancelButton).setDisable(true);
+        }
     }
 }

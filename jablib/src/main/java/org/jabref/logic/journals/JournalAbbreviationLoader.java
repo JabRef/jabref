@@ -49,7 +49,7 @@ public class JournalAbbreviationLoader {
                 repository = new JournalAbbreviationRepository(tempJournalList, loadLtwaRepository());
                 tempDir.toFile().deleteOnExit();
                 tempJournalList.toFile().deleteOnExit();
-                LOGGER.info("Loaded journal abbreviations from {}", tempJournalList.toAbsolutePath());
+                LOGGER.debug("Loaded journal abbreviations from {}", tempJournalList.toAbsolutePath());
             }
         } catch (IOException e) {
             LOGGER.error("Error while loading journal abbreviation repository", e);
