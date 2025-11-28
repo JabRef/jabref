@@ -396,8 +396,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
-        getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getDonationPreferences().setAll(DonationPreferences.getDefault());
+        getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
     }
 
     @Override
