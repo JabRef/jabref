@@ -23,10 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<DOI> {
-    public static final Logger LOGGER = LoggerFactory.getLogger(DoiIdentifierEditorViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DoiIdentifierEditorViewModel.class);
 
-    private final UndoManager undoManager;
-    private final StateManager stateManager;
     private final ShortenDOIFormatter shortenDOIFormatter;
 
     public DoiIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
@@ -36,9 +34,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
                                         GuiPreferences preferences,
                                         UndoManager undoManager,
                                         StateManager stateManager) {
-        super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
-        this.undoManager = undoManager;
-        this.stateManager = stateManager;
+        super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
         this.shortenDOIFormatter = new ShortenDOIFormatter();
         configure(true, true, true);
     }
