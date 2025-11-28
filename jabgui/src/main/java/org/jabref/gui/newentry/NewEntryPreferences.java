@@ -22,19 +22,6 @@ public class NewEntryPreferences {
     private final StringProperty latestIdFetcherName;
     private final StringProperty latestInterpretParserName;
 
-    private NewEntryPreferences() {
-        this(
-                NewEntryDialogTab.CHOOSE_ENTRY_TYPE, // Default latest approach
-                true,                                // Default expanded recommended
-                false,                               // Default expanded other
-                true,                                // Default expanded custom
-                StandardEntryType.Article,           // Default immediate type
-                true,                                // Default Id lookup guessing
-                DoiFetcher.NAME,                     // Default fetcher
-                PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName() // Default parser
-        );
-    }
-
     public NewEntryPreferences(NewEntryDialogTab approach,
                                boolean expandRecommended,
                                boolean expandOther,
@@ -53,6 +40,19 @@ public class NewEntryPreferences {
         this.latestInterpretParserName = new SimpleStringProperty(interpretParserName);
     }
 
+    private NewEntryPreferences() {
+        this(
+                NewEntryDialogTab.CHOOSE_ENTRY_TYPE, // Default latest approach
+                true,                                // Default expanded recommended
+                false,                               // Default expanded other
+                true,                                // Default expanded custom
+                StandardEntryType.Article,           // Default immediate type
+                true,                                // Default Id lookup guessing
+                DoiFetcher.NAME,                     // Default fetcher
+                PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName() // Default parser
+        );
+    }
+    
     public static NewEntryPreferences getDefault() {
         return new NewEntryPreferences();
     }
