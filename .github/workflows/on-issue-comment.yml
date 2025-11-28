@@ -14,14 +14,15 @@ jobs:
     steps:
       - name: Assign the user or unassign stale assignments
         id: assign
-        uses: takanome-dev/assign-issue-action@edge
+        # uses: takanome-dev/assign-issue-action@edge
+        uses: takanome-dev/assign-issue-action@feat/github-teams-support
         with:
-          github_token: '${{ secrets.GITHUB_TOKEN }}'
+          github_token: '${{ secrets.GH_TOKEN_ASSIGN_ISSUE_ACTION }}'
           # If this is updated, also update the number at unassign-issues.yml
           days_until_unassign: 21
           # One person should work on one issue only
           max_assignments: 1
-          maintainers: 'koppor,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan,palukku'
+          maintainers: '@JabRef/developers'
           assigned_comment: >
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 
