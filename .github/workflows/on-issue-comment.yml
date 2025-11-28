@@ -22,7 +22,7 @@ jobs:
           days_until_unassign: 21
           # One person should work on one issue only
           max_assignments: 1
-          maintainers: '@JabRef/developers,palukku'
+          maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
           assigned_comment: >
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 
