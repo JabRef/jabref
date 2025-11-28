@@ -33,16 +33,15 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter;
-import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
-import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
-import org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -336,7 +335,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -356,16 +355,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            final PlainCitationParser parser = switch (parserChoice) {
-                case PlainCitationParserChoice.RULE_BASED_GENERAL ->
-                        new RuleBasedPlainCitationParser();
-                case PlainCitationParserChoice.RULE_BASED_IEEE ->
-                        new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
-                case PlainCitationParserChoice.GROBID ->
-                        new GrobidPlainCitationParser(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
-                case PlainCitationParserChoice.LLM ->
-                        new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
-            };
+            final PlainCitationParser parser = PlainCitationParserFactory.getPlainCitationParser(parserChoice, preferences.getCitationKeyPatternPreferences(), preferences.getGrobidPreferences(), preferences.getImportFormatPreferences(), aiService);
 
             final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
 
@@ -433,7 +423,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntriesWithDuplicateCheck(null, result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -518,7 +508,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntriesWithDuplicateCheck(null, result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);

@@ -8,9 +8,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -18,6 +20,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
+
+// TODO: This is only available in the context menu; and not when using copy and paste.
+//       This is an inconsistency in the UI.
+//       Should be merged with [org.jabref.gui.LibraryTab#pasteEntry]; maybe integrate in [org.jabref.gui.util.CopyUtil]
 public class CopyTo extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyTo.class);
@@ -25,6 +32,7 @@ public class CopyTo extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final CopyToPreferences copyToPreferences;
+    private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final BibDatabaseContext sourceDatabaseContext;
     private final BibDatabaseContext targetDatabaseContext;
@@ -32,12 +40,14 @@ public class CopyTo extends SimpleCommand {
     public CopyTo(DialogService dialogService,
                   StateManager stateManager,
                   CopyToPreferences copyToPreferences,
+                  FilePreferences filePreferences,
                   ImportHandler importHandler,
                   BibDatabaseContext sourceDatabaseContext,
                   BibDatabaseContext targetDatabaseContext) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.copyToPreferences = copyToPreferences;
+        this.filePreferences = filePreferences;
         this.importHandler = importHandler;
         this.sourceDatabaseContext = sourceDatabaseContext;
         this.targetDatabaseContext = targetDatabaseContext;
@@ -75,37 +85,29 @@ public class CopyTo extends SimpleCommand {
                                                             .flatMap(entry -> getCrossRefEntry(entry, sourceDatabaseContext).stream()).toList();
         entriesToAdd.addAll(entriesWithCrossRef);
 
-        copyEntriesWithFeedback(entriesToAdd, targetDatabaseContext,
+        addEntriesWithFeedback(
+                new TransferInformation(sourceDatabaseContext, TransferMode.COPY),
+                entriesToAdd,
+                targetDatabaseContext,
                 Localization.lang("Copied %0 entry(s) to %1, including cross-references"),
-                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"));
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"),
+                dialogService,
+                importHandler,
+                stateManager
+        );
     }
 
     public void copyEntriesWithoutCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
-        copyEntriesWithFeedback(selectedEntries, targetDatabaseContext,
-                Localization.lang("Copied %0 entry(s) to %1 without cross-references"),
-                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"));
-    }
-
-    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd, BibDatabaseContext targetDatabaseContext, String successMessage, String partialMessage) {
-        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(entriesToAdd.size());
-        tracker.setOnFinish(() -> {
-            int importedCount = tracker.getImportedCount();
-            int skippedCount = tracker.getSkippedCount();
-
-            String targetName = targetDatabaseContext.getDatabasePath()
-                                                     .map(path -> path.getFileName().toString())
-                                                     .orElse(Localization.lang("target library"));
-
-            if (importedCount == entriesToAdd.size()) {
-                dialogService.notify(Localization.lang(successMessage, String.valueOf(importedCount), targetName));
-            } else if (importedCount == 0) {
-                dialogService.notify(Localization.lang("No entry was copied to %0", targetName));
-            } else {
-                dialogService.notify(Localization.lang(partialMessage, String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
-            }
-        });
-
-        importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
+        addEntriesWithFeedback(
+                new TransferInformation(sourceDatabaseContext, TransferMode.COPY),
+                selectedEntries,
+                targetDatabaseContext,
+                Localization.lang("Copied %0 entry(s) to %1, without cross-references"),
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"),
+                dialogService,
+                importHandler,
+                stateManager
+        );
     }
 
     public Optional<BibEntry> getCrossRefEntry(BibEntry bibEntryToCheck, BibDatabaseContext sourceDatabaseContext) {

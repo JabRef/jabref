@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -78,6 +79,7 @@ public class AiChatComponent extends VBox {
     @FXML private Hyperlink exQuestion2;
     @FXML private Hyperlink exQuestion3;
     @FXML private HBox exQuestionBox;
+    @FXML private HBox followUpQuestionsBox;
 
     private String noticeTemplate;
 
@@ -114,6 +116,7 @@ public class AiChatComponent extends VBox {
         initializeNotifications();
         sendExampleQuestions();
         initializeExampleQuestions();
+        initializeFollowUpQuestions();
     }
 
     private void initializeNotifications() {
@@ -214,6 +217,42 @@ public class AiChatComponent extends VBox {
         updatePromptHistory();
     }
 
+    private void initializeFollowUpQuestions() {
+        aiChatLogic.getFollowUpQuestions().addListener((javafx.collections.ListChangeListener<String>) change -> {
+            updateFollowUpQuestions();
+        });
+    }
+
+    private void updateFollowUpQuestions() {
+        List<String> questions = new ArrayList<>(aiChatLogic.getFollowUpQuestions());
+
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            followUpQuestionsBox.getChildren().removeIf(node -> node instanceof Hyperlink);
+
+            if (questions.isEmpty()) {
+                followUpQuestionsBox.setVisible(false);
+                followUpQuestionsBox.setManaged(false);
+                exQuestionBox.setVisible(true);
+                exQuestionBox.setManaged(true);
+            } else {
+                followUpQuestionsBox.setVisible(true);
+                followUpQuestionsBox.setManaged(true);
+                exQuestionBox.setVisible(false);
+                exQuestionBox.setManaged(false);
+
+                for (String question : questions) {
+                    Hyperlink link = new Hyperlink(question);
+                    link.getStyleClass().add("exampleQuestionStyle");
+                    link.setTooltip(new Tooltip(question));
+                    link.setOnAction(event -> {
+                        onSendMessage(question);
+                    });
+                    followUpQuestionsBox.getChildren().add(link);
+                }
+            }
+        });
+    }
+
     private void updateNotifications() {
         notifications.clear();
         notifications.addAll(entries.stream().map(this::updateNotificationsForEntry).flatMap(List::stream).toList());
@@ -278,6 +317,13 @@ public class AiChatComponent extends VBox {
     }
 
     private void onSendMessage(String userPrompt) {
+        aiChatLogic.getFollowUpQuestions().clear();
+
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            exQuestionBox.setVisible(false);
+            exQuestionBox.setManaged(false);
+        });
+
         UserMessage userMessage = new UserMessage(userPrompt);
         updatePromptHistory();
         setLoading(true);

@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -106,26 +107,43 @@ public class JabKitLauncher {
         }
     }
 
+    /**
+     * Applies appropriate usage footers to each subcommand based on their supported options.
+     * Distinguishes between input formats, output formats, and export formats.
+     */
     private static void applyUsageFooters(CommandLine commandLine,
                                           List<Pair<String, String>> inputFormats,
                                           List<Pair<String, String>> outputFormats,
                                           Set<SearchBasedFetcher> fetchers) {
+
+        final String INPUT_FOOTER_LABEL = Localization.lang("Available import formats:");
+        final String OUTPUT_FOOTER_LABEL = Localization.lang("Available output formats:");
+        final String EXPORT_FOOTER_LABEL = Localization.lang("Available export formats:");
+
         String inputFooter = "\n"
-                + Localization.lang("Available import formats:") + "\n"
+                + INPUT_FOOTER_LABEL + "\n"
                 + StringUtil.alignStringTable(inputFormats);
         String outputFooter = "\n"
-                + Localization.lang("Available export formats:") + "\n"
+                + OUTPUT_FOOTER_LABEL + "\n"
+                + StringUtil.alignStringTable(outputFormats);
+        String exportFooter = "\n"
+                + EXPORT_FOOTER_LABEL + "\n"
                 + StringUtil.alignStringTable(outputFormats);
 
         commandLine.getSubcommands().values().forEach(subCommand -> {
-            boolean hasInputOption = subCommand.getCommandSpec().options().stream()
-                                               .anyMatch(opt -> Arrays.asList(opt.names()).contains("--input-format"));
-            boolean hasOutputOption = subCommand.getCommandSpec().options().stream()
-                                                .anyMatch(opt -> Arrays.asList(opt.names()).contains("--output-format"));
+            Map<String, Boolean> hasOptions = Map.of(
+                    "input", hasCommandOption(subCommand.getCommandSpec(), "--input-format"),
+                    "output", hasCommandOption(subCommand.getCommandSpec(), "--output-format"),
+                    "export", hasCommandOption(subCommand.getCommandSpec(), "--export-format")
+            );
 
             String footerText = "";
-            footerText += hasInputOption ? inputFooter : "";
-            footerText += hasOutputOption ? outputFooter : "";
+            // Skip format footers for check-consistency since formats are already documented in option description
+            if (!"check-consistency".equals(subCommand.getCommandSpec().name())) {
+                footerText += hasOptions.get("input") ? inputFooter : "";
+                footerText += hasOptions.get("output") ? outputFooter : "";
+                footerText += hasOptions.get("export") ? exportFooter : "";
+            }
             subCommand.getCommandSpec().usageMessage().footer(footerText);
         });
 
@@ -135,6 +153,11 @@ public class JabKitLauncher {
                                      .map(WebFetcher::getName)
                                      .filter(name -> !"Search pre-configured".equals(name))
                                      .collect(Collectors.joining(", ")));
+    }
+
+    private static boolean hasCommandOption(CommandLine.Model.CommandSpec commandSpec, String optionName) {
+        return commandSpec.options().stream()
+                          .anyMatch(opt -> Arrays.asList(opt.names()).contains(optionName));
     }
 
     /// This needs to be called as early as possible. After the first log writing, it
