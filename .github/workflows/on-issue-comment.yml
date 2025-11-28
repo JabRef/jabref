@@ -19,7 +19,9 @@ jobs:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           # If this is updated, also update the number at unassign-issues.yml
           days_until_unassign: 21
-          maintainers: 'koppor,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan,LinusDietz'
+          # One person should work on one issue only
+          max_assignments: 1
+          maintainers: 'koppor,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan,palukku'
           assigned_comment: >
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 
