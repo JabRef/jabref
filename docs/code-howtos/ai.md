@@ -26,7 +26,7 @@ The class implementing it using AI is [org.jabref.logic.importer.plaincitation.L
 
 ## Feature "Reference Extractor"
 
-Extracts the list of references (Section "References") from the last page of the PDF to a List of BibEntry.
+Extracts the list of references (Section ["References"](../glossary/references.md)) from the last page of the PDF to a List of BibEntry.
 
 The general interface is [org.jabref.logic.importer.fileformat.pdf.BibliographyFromPdfImporter].
 The class implementing it using AI is [org.jabref.logic.importer.plaincitation.LlmPlainCitationParser].
