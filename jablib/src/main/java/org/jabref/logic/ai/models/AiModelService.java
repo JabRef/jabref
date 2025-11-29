@@ -6,6 +6,7 @@ import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.model.ai.AiProvider;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +27,10 @@ public class AiModelService {
      *
      * @param aiProvider The AI provider
      * @param apiBaseUrl The base URL for the API
-     * @param apiKey The API key for authentication
+     * @param apiKey The API key for authentication (may be null)
      * @return A list of available model names
      */
-    public List<String> getAvailableModels(AiProvider aiProvider, String apiBaseUrl, String apiKey) {
+    public List<String> getAvailableModels(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         List<String> dynamicModels = fetchModelsSynchronously(aiProvider, apiBaseUrl, apiKey);
 
         if (!dynamicModels.isEmpty()) {
@@ -58,10 +59,10 @@ public class AiModelService {
      *
      * @param aiProvider The AI provider
      * @param apiBaseUrl The base URL for the API
-     * @param apiKey The API key for authentication
+     * @param apiKey The API key for authentication (may be null)
      * @return A list of model names, or an empty list if the fetch fails
      */
-    public List<String> fetchModelsSynchronously(AiProvider aiProvider, String apiBaseUrl, String apiKey) {
+    public List<String> fetchModelsSynchronously(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         for (AiModelProvider provider : modelProviders) {
             if (provider.supports(aiProvider)) {
                 try {

@@ -39,7 +39,10 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class AiTabViewModel implements PreferenceTabViewModel {
     protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
 
@@ -458,7 +461,15 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         }
 
         String apiKey = currentApiKey.get();
-        String apiBaseUrl = customizeExpertSettings.get() ? currentApiBaseUrl.get() : provider.getApiUrl();
+
+        // Get API base URL, defaulting to provider's default URL if not customized
+        String apiBaseUrl;
+        if (customizeExpertSettings.get()) {
+            String customUrl = currentApiBaseUrl.get();
+            apiBaseUrl = (customUrl != null && !customUrl.isBlank()) ? customUrl : provider.getApiUrl();
+        } else {
+            apiBaseUrl = provider.getApiUrl();
+        }
 
         List<String> staticModels = aiModelService.getStaticModels(provider);
         chatModelsList.setAll(staticModels);
@@ -468,7 +479,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         fetchTask.executeWith(taskExecutor);
     }
 
-    private FetchAiModelsBackgroundTask getAiModelsBackgroundTask(AiProvider provider, String apiBaseUrl, String apiKey) {
+    private FetchAiModelsBackgroundTask getAiModelsBackgroundTask(AiProvider provider, String apiBaseUrl, @Nullable String apiKey) {
         FetchAiModelsBackgroundTask fetchTask = new FetchAiModelsBackgroundTask(
                 aiModelService,
                 provider,

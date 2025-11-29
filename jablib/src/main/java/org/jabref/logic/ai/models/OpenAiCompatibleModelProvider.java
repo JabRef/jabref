@@ -12,6 +12,7 @@ import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +27,8 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAiCompatibleModelProvider.class);
 
     @Override
-    public List<String> fetchModels(AiProvider aiProvider, String apiBaseUrl, String apiKey) {
-        if (apiKey.isBlank()) {
+    public List<String> fetchModels(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
+        if (apiKey == null || apiKey.isBlank()) {
             LOGGER.debug("API key is not provided for {}, skipping model fetch", aiProvider.getLabel());
             return List.of();
         }
