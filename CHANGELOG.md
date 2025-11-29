@@ -20,7 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [6.0-alpha.3] – 2025-11-29
 
 ### Added
-- We added another custom Exporter "AcademciPagesExporter" and a new layout academicpages.layout as well as the corresponding line in ExporterFactory.java. [#12727](...)
+- We added another custom Exporter 'AcademicPagesExporter.java' and a new layout 'academicpages.layout' as well as the corresponding line in 'ExporterFactory.java'. [#12727](...)
 - We added an initial [cite as you write](https://retorque.re/zotero-better-bibtex/citing/cayw/) ("CAYW") endpoint. [#13187](https://github.com/JabRef/jabref/issues/13187)
 - We added a field for the latest ICORE conference ranking lookup on the General Tab. [#13476](https://github.com/JabRef/jabref/issues/13476)
 - We added the option to enable the language server in the preferences. [#13697](https://github.com/JabRef/jabref/pull/13697)
