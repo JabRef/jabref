@@ -1,41 +1,25 @@
 package org.jabref.http.server.resources;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import org.jabref.http.JabrefMediaType;
 import org.jabref.http.SrvStateManager;
-import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.http.dto.LinkedPdfFileDTO;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
-import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("libraries/{id}")
 public class LibraryResource {
