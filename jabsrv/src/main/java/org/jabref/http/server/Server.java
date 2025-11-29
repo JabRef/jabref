@@ -14,7 +14,6 @@ import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
-import org.jabref.http.server.resources.BibEntryResource;
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
@@ -102,7 +101,6 @@ public class Server {
         resourceConfig.register(RootResource.class);
         resourceConfig.register(LibrariesResource.class);
         resourceConfig.register(LibraryResource.class);
-        resourceConfig.register(BibEntryResource.class);
         resourceConfig.register(MapResource.class);
 
         // Other resources
