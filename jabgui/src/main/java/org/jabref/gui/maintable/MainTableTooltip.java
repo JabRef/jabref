@@ -13,7 +13,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 public class MainTableTooltip extends Tooltip {
-
     private final PreviewViewer preview;
     private final GuiPreferences preferences;
     private final VBox tooltipContent = new VBox();
