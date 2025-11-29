@@ -40,6 +40,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -333,7 +335,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -370,13 +372,13 @@ public class NewEntryViewModel {
         cancel();
         interpretWorker = new WorkerInterpretCitations();
 
-        interpretWorker.setOnFailed(event -> {
+        interpretWorker.setOnFailed(_ -> {
             final Throwable exception = interpretWorker.getException();
             final String exceptionMessage = exception.getMessage();
             final String parserName = interpretParser.getValue().getLocalizedName();
+            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
 
             final String dialogTitle = Localization.lang("Failed to interpret citations");
-
             if (exception instanceof FetcherException) {
                 dialogService.showInformationDialogAndWait(
                         dialogTitle,
@@ -393,8 +395,6 @@ public class NewEntryViewModel {
                                         "%0",
                                 exceptionMessage));
             }
-
-            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
 
             executing.set(false);
         });
@@ -421,7 +421,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntriesWithDuplicateCheck(null, result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -506,7 +506,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntriesWithDuplicateCheck(null, result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
