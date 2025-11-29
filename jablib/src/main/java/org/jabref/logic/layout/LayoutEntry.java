@@ -78,6 +78,7 @@ import org.jabref.logic.layout.format.ReplaceWithEscapedDoubleQuotes;
 import org.jabref.logic.layout.format.RisAuthors;
 import org.jabref.logic.layout.format.RisKeywords;
 import org.jabref.logic.layout.format.RisMonth;
+import org.jabref.logic.layout.format.SafeFileName;
 import org.jabref.logic.layout.format.ShortMonthFormatter;
 import org.jabref.logic.layout.format.ToLowerCase;
 import org.jabref.logic.layout.format.ToUpperCase;
@@ -568,6 +569,8 @@ class LayoutEntry {
                     new HayagrivaType();
             case "NumberMonth" ->
                 new NumberMonthFormatter();
+            case "SafeFileName" ->
+                new SafeFileName();
             default ->
                     null;
         };

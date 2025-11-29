@@ -2,7 +2,7 @@
 title: "\format[RemoveLatexCommands,HTMLChars]{\title}"
 collection: publications
 category: \format{\entrytype}
-permalink: /publication/\format{\year}-\begin{month}\format{\month}\end{month}\begin{!month}01\end{!month}-\begin{day}\format{\day}\end{day}\begin{!day}01\end{!day}-\format[RemoveLatexCommands,HTMLChars,Replace(\s,-)]{\title}
+permalink: /publication/\format[RemoveLatexCommands,HTMLChars,Replace(\s,-),SafeFileName]{\title}
 excerpt: '\begin{note}\format[RemoveLatexCommands,HTMLChars]{\note}\end{note}'
 date: \format{\year}-\begin{month}\format[NumberMonth]{\month}\end{month}\begin{!month}01\end{!month}-\begin{day}\format{\day}\end{day}\begin{!day}01\end{!day}
 venue: '\format[RemoveLatexCommands,HTMLChars]{\journal}\begin{!journal}Unknown\end{!journal}'
