@@ -396,8 +396,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
-        getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getDonationPreferences().setAll(DonationPreferences.getDefault());
+        getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
     }
 
     @Override
@@ -1178,13 +1178,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private NewEntryPreferences getNewEntryPreferencesFromBackingStore(NewEntryPreferences defaults) {
         // moved the same snippet form public to private
-        final int approachIndex = getInt(CREATE_ENTRY_APPROACH);
+        final int approachIndex = getInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(defaults.getLatestApproach()));
         NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
                                      ? NewEntryDialogTab.values()[approachIndex]
-                                     : NewEntryDialogTab.values()[0];
+                                     // if any values not match it assign this value
+                                     : defaults.getLatestApproach();
 
-        final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE);
-        EntryType immediateType = StandardEntryType.Article;
+        final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE, defaults.getLatestImmediateType().getDisplayName());
+        // logic change to assign default values at the start
+        EntryType immediateType = defaults.getLatestImmediateType();
+
         for (StandardEntryType type : StandardEntryType.values()) {
             if (type.getDisplayName().equals(immediateTypeName)) {
                 immediateType = type;
