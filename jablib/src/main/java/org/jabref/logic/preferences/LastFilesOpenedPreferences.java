@@ -14,20 +14,23 @@ public class LastFilesOpenedPreferences {
 
     // the last libraries that were open when jabref closes and should be reopened on startup
     private final ObservableList<Path> lastFilesOpened;
-
     private final ObjectProperty<Path> lastFocusedFile;
 
     // observable list last files opened in the file menu
     private final FileHistory fileHistory;
 
     public LastFilesOpenedPreferences(List<Path> lastFilesOpened, Path lastFocusedFile, FileHistory fileHistory) {
-        this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
-        this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
+        this.lastFilesOpened = FXCollections.observableArrayList(
+                lastFilesOpened.stream().map(this::toRelative).toList()
+        );
+        this.lastFocusedFile = new SimpleObjectProperty<>(toRelative(lastFocusedFile));
         this.fileHistory = fileHistory;
     }
 
     public ObservableList<Path> getLastFilesOpened() {
-        return lastFilesOpened;
+        return FXCollections.observableArrayList(
+                lastFilesOpened.stream().map(this::toAbsolute).toList()
+        );
     }
 
     public void setLastFilesOpened(List<Path> files) {
@@ -35,7 +38,7 @@ public class LastFilesOpenedPreferences {
     }
 
     public Path getLastFocusedFile() {
-        return lastFocusedFile.get();
+        return toAbsolute(lastFocusedFile.get());
     }
 
     public ObjectProperty<Path> lastFocusedFileProperty() {
@@ -43,10 +46,37 @@ public class LastFilesOpenedPreferences {
     }
 
     public void setLastFocusedFile(Path lastFocusedFile) {
-        this.lastFocusedFile.set(lastFocusedFile);
+        this.lastFocusedFile.set(toRelative(lastFocusedFile));
     }
 
     public FileHistory getFileHistory() {
         return fileHistory;
+    }
+
+    // -------------------------
+    // Relative / Absolute helpers
+    // -------------------------
+
+    private Path toRelative(Path absolutePath) {
+        if (absolutePath == null) {
+            return null;
+        }
+        Path workingDir = Path.of("").toAbsolutePath();
+        try {
+            return workingDir.relativize(absolutePath);
+        } catch (Exception e) {
+            return absolutePath; // fallback
+        }
+    }
+
+    private Path toAbsolute(Path storedPath) {
+        if (storedPath == null) {
+            return null;
+        }
+        Path workingDir = Path.of("").toAbsolutePath();
+        if (!storedPath.isAbsolute()) {
+            return workingDir.resolve(storedPath).normalize();
+        }
+        return storedPath;
     }
 }
