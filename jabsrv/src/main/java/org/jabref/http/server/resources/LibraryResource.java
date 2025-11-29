@@ -3,6 +3,7 @@ package org.jabref.http.server.resources;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.LinkedPdfFileDTO;
 import org.jabref.http.server.services.FilesToServe;
@@ -75,7 +76,6 @@ public class LibraryResource {
         }
         return gson.toJson(response);
     }
-
 
     /// @param id - also "demo" for the Chocolate.bib file
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
