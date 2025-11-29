@@ -1,36 +1,16 @@
 package org.jabref.logic.exporter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.nio.file.Paths;
-import java.util.Map;
+import java.util.List;
 
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.layout.format.Number;
-import org.jabref.logic.os.OS;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jspecify.annotations.NonNull;
@@ -56,7 +36,7 @@ public class AcademicPagesExporter extends Exporter {
     private final SelfContainedSaveOrder saveOrder;
     private boolean customExport;
     private List<BibEntry> entries;
-    private TemplateExporter academicPagesTemplate;
+    private final TemplateExporter academicPagesTemplate;
 
     /**
      * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
