@@ -17,10 +17,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
-## [6.0-alpha.3] – 2025-10-30
+## [6.0-alpha.3] – 2025-11-29
 
 ### Added
-
+- We added another custom Exporter "AcademciPagesExporter" and a new layout academicpages.layout as well as the corresponding line in ExporterFactory.java. [#12727](...)
 - We added an initial [cite as you write](https://retorque.re/zotero-better-bibtex/citing/cayw/) ("CAYW") endpoint. [#13187](https://github.com/JabRef/jabref/issues/13187)
 - We added a field for the latest ICORE conference ranking lookup on the General Tab. [#13476](https://github.com/JabRef/jabref/issues/13476)
 - We added the option to enable the language server in the preferences. [#13697](https://github.com/JabRef/jabref/pull/13697)
@@ -82,7 +82,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Bibliography Heading" to the available CSL bibliography header formats in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
 
 ### Changed
-
 - We merged the 'New Entry', 'Import by ID', and 'New Entry from Plain Text' tools into a single 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 - We moved all sorting options into a dedicated “Sort” sub-menu in the Groups menu. ([#14017](https://github.com/JabRef/jabref/issues/14017))
 - We merged `Citation information` and `Citation relations` into a singular tab. [#13618](https://github.com/JabRef/jabref/issues/13618)
