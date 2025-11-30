@@ -62,19 +62,19 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
     }
 
     private Path toRelative(Path absolutePath) {
-    Path workingDir = Path.of("").toAbsolutePath();
-    try {
-        return workingDir.relativize(absolutePath);
-    } catch (Exception e) {
-        return absolutePath; // fallback
+        Path workingDir = Path.of("").toAbsolutePath();
+        try {
+            return workingDir.relativize(absolutePath);
+        } catch (Exception e) {
+            return absolutePath; // fallback
+        }
     }
-}
 
-private Path toAbsolute(Path storedPath) {
-    Path workingDir = Path.of("").toAbsolutePath();
-    if (!storedPath.isAbsolute()) {
-        return workingDir.resolve(storedPath).normalize();
+    private Path toAbsolute(Path storedPath) {
+        Path workingDir = Path.of("").toAbsolutePath();
+        if (!storedPath.isAbsolute()) {
+            return workingDir.resolve(storedPath).normalize();
+        }
+        return storedPath;
     }
-    return storedPath;
-}
 }
