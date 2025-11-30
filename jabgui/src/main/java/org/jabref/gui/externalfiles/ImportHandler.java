@@ -534,6 +534,8 @@ public class ImportHandler {
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
             String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
+            // We cannot add the new group here directly because we don't have access to the group node viewmoel stuff here
+            // We would need to add the groups to the metadata first which is a bit more complicated, thus we decided against it atm
             this.targetBibDatabaseContext.getMetaData()
                                          .getGroups()
                                          .flatMap(grp -> grp.getChildren()
