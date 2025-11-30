@@ -53,10 +53,6 @@ public class LastFilesOpenedPreferences {
         return fileHistory;
     }
 
-    // -------------------------
-    // Relative / Absolute helpers
-    // -------------------------
-
     private Path toRelative(Path absolutePath) {
         if (absolutePath == null) {
             return null;
