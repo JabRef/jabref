@@ -187,8 +187,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
             return;
         }
 
+        char keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
         String grpName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
-        AbstractGroup importEntriesGroup = new ExplicitGroup(grpName, GroupHierarchyType.INDEPENDENT, ',');
+        AbstractGroup importEntriesGroup = new ExplicitGroup(grpName, GroupHierarchyType.INDEPENDENT, keywordSeparator);
         boolean isGrpExist = parent.getGroupNode()
                                    .getChildren()
                                    .stream()
