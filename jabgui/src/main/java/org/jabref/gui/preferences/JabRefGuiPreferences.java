@@ -1071,8 +1071,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return new ColumnPreferences(columns, columnSortOrder);
     }
 
-    // end region
-
     // --- Generic column handling ---
     @SuppressWarnings("SameParameterValue")
     private List<MainTableColumnModel> getColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
