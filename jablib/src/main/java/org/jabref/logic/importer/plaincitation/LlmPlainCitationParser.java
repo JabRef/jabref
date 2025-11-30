@@ -1,15 +1,13 @@
 package org.jabref.logic.importer.plaincitation;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.ai.templates.AiTemplatesService;
+import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.fileformat.pdf.PdfImporterWithPlainCitationParser;
 import org.jabref.logic.l10n.Localization;
@@ -23,6 +21,7 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser i
     private final AiTemplatesService aiTemplatesService;
     private final ImportFormatPreferences importFormatPreferences;
     private final ChatModel llm;
+    private final EprintCleanup eprintCleanup = new EprintCleanup();
 
     public LlmPlainCitationParser(AiTemplatesService aiTemplatesService, ImportFormatPreferences importFormatPreferences, ChatModel llm) {
         this.aiTemplatesService = aiTemplatesService;
@@ -48,7 +47,11 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser i
     @Override
     public Optional<BibEntry> parsePlainCitation(String text) throws FetcherException {
         try {
-            return BibtexParser.singleFromString(getBibtexStringFromLlm(text), importFormatPreferences);
+            return BibtexParser.singleFromString(getBibtexStringFromLlm(text), importFormatPreferences)
+                               .map(entry -> {
+                                   eprintCleanup.cleanup(entry);
+                                   return entry;
+                               });
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX returned from LLM", e);
         }
@@ -66,16 +69,15 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser i
                 )
         ).aiMessage().text();
 
-        Reader reader = Reader.of(llmResult);
         BibtexParser parser = new BibtexParser(importFormatPreferences);
-        ParserResult result;
+        List<BibEntry> entries;
         try {
-            result = parser.parse(reader);
-        } catch (IOException e) {
+            entries = parser.parseEntries(llmResult);
+        } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX returned from LLM", e);
         }
-
-        return result.getDatabase().getEntries();
+        entries.forEach(entry -> eprintCleanup.cleanup(entry));
+        return entries;
     }
 
     private String getBibtexStringFromLlm(String searchQuery) {

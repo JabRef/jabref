@@ -377,13 +377,13 @@ public class NewEntryViewModel {
         cancel();
         interpretWorker = new WorkerInterpretCitations();
 
-        interpretWorker.setOnFailed(event -> {
+        interpretWorker.setOnFailed(_ -> {
             final Throwable exception = interpretWorker.getException();
             final String exceptionMessage = exception.getMessage();
             final String parserName = interpretParser.getValue().getLocalizedName();
+            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
 
             final String dialogTitle = Localization.lang("Failed to interpret citations");
-
             if (exception instanceof FetcherException) {
                 dialogService.showInformationDialogAndWait(
                         dialogTitle,
@@ -400,8 +400,6 @@ public class NewEntryViewModel {
                                         "%0",
                                 exceptionMessage));
             }
-
-            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
 
             executing.set(false);
         });

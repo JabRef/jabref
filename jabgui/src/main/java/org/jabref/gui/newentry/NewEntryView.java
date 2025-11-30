@@ -378,7 +378,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (generateButton != null) {
             generateButton.disableProperty().unbind();
             generateButton.setDisable(true);
-            generateButton.setText("Select");
+            generateButton.setText(Localization.lang("Select"));
         }
     }
 
@@ -397,7 +397,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(idErrorInvalidText.visibleProperty().or(idErrorInvalidFetcher.visibleProperty()));
-            generateButton.setText("Search");
+            generateButton.setText(Localization.lang("Search"));
         }
     }
 
@@ -416,7 +416,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(viewModel.interpretTextValidatorProperty().not());
-            generateButton.setText("Parse");
+            generateButton.setText(Localization.lang("Parse"));
         }
     }
 
@@ -435,7 +435,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(viewModel.bibtexTextValidatorProperty().not());
-            generateButton.setText("Create");
+            generateButton.setText(Localization.lang("Create"));
         }
     }
 
@@ -460,17 +460,17 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 // We do nothing here.
                 break;
             case NewEntryDialogTab.ENTER_IDENTIFIER:
-                generateButton.setText("Searching...");
+                generateButton.setText(Localization.lang("Searching..."));
                 viewModel.executeLookupIdentifier(idLookupGuess.isSelected());
                 switchLookupIdentifier();
                 break;
             case NewEntryDialogTab.INTERPRET_CITATIONS:
-                generateButton.setText("Parsing...");
+                generateButton.setText(Localization.lang("Parsing..."));
                 viewModel.executeInterpretCitations();
                 switchInterpretCitations();
                 break;
             case NewEntryDialogTab.SPECIFY_BIBTEX:
-                generateButton.setText("Parsing...");
+                generateButton.setText(Localization.lang("Parsing..."));
                 viewModel.executeSpecifyBibtex();
                 switchSpecifyBibtex();
                 break;

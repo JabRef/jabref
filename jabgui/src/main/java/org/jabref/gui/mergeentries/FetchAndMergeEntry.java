@@ -20,7 +20,6 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
-import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -80,28 +79,30 @@ public class FetchAndMergeEntry {
         for (Field field : fields) {
             Optional<String> fieldContent = entry.getField(field);
             if (fieldContent.isPresent()) {
-                Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences());
-                fetcher.ifPresent(idBasedFetcher -> BackgroundTask.wrap(() -> idBasedFetcher.performSearchById(fieldContent.get()))
-                                                                  .onSuccess(fetchedEntry -> {
-                                                                      ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-                                                                      if (fetchedEntry.isPresent()) {
-                                                                          cleanup.doPostCleanup(fetchedEntry.get());
-                                                                          showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
-                                                                      } else {
-                                                                          dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", FieldTextMapper.getDisplayName(field), fieldContent.get()));
-                                                                      }
-                                                                  })
-                                                                  .onFailure(exception -> {
-                                                                      LOGGER.error("Error while fetching bibliographic information", exception);
-                                                                      if (exception instanceof FetcherClientException) {
-                                                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("No data was found for the identifier"));
-                                                                      } else if (exception instanceof FetcherServerException) {
-                                                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Server not available"));
-                                                                      } else {
-                                                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Error occurred %0", exception.getMessage()));
-                                                                      }
-                                                                  })
-                                                                  .executeWith(taskExecutor));
+                WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences())
+                           .ifPresentOrElse(idBasedFetcher ->
+                                           BackgroundTask.wrap(() -> idBasedFetcher.performSearchById(fieldContent.get()))
+                                                         .onSuccess(fetchedEntry -> {
+                                                             ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
+                                                             if (fetchedEntry.isPresent()) {
+                                                                 cleanup.doPostCleanup(fetchedEntry.get());
+                                                                 showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
+                                                             } else {
+                                                                 dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", FieldTextMapper.getDisplayName(field), fieldContent.get()));
+                                                             }
+                                                         })
+                                                         .onFailure(exception -> {
+                                                             LOGGER.error("Error while fetching bibliographic information", exception);
+                                                             if (exception instanceof FetcherClientException) {
+                                                                 dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("No data was found for the identifier"));
+                                                             } else if (exception instanceof FetcherServerException) {
+                                                                 dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Server not available"));
+                                                             } else {
+                                                                 dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Error occurred %0", exception.getMessage()));
+                                                             }
+                                                         })
+                                                         .executeWith(taskExecutor),
+                                   () -> LOGGER.warn("No fetcher available for '{}'", FieldTextMapper.getDisplayName(field)));
             } else {
                 dialogService.notify(Localization.lang("No %0 found", FieldTextMapper.getDisplayName(field)));
             }
