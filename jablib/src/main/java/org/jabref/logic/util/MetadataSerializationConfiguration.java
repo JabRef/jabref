@@ -49,9 +49,11 @@ public class MetadataSerializationConfiguration {
     public static final String EXPLICIT_GROUP_ID = "StaticGroup:";
 
     /**
-     * Identifier for {@link SmartGroup} (deprecated, replaced by {@link ExplicitGroup}).
+     * Identifier for SmartGroup (deprecated, replaced by {@link ExplicitGroup}).
      * Kept for backward compatibility during migration.
+     *
      */
+    @Deprecated
     public static final String SMART_GROUP_ID = "SmartGroup:";
 
     /**

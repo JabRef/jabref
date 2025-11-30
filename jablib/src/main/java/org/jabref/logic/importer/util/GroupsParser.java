@@ -234,7 +234,7 @@ public class GroupsParser {
 
     /**
      * Migration method: Converts old SmartGroup serializations to ExplicitGroup.
-     * SmartGroup has been replaced by ExplicitGroup as they are functionally equivalent.
+     * SmartGroup has been replaced by ExplicitGroup for the "Imported Entries" group <a href="https://github.com/JabRef/jabref/issues/14143">Issue 14143</a>.
      */
     private static ExplicitGroup smartGroupFromString(String input, Character keywordSeparator) throws ParseException {
         if (!input.startsWith(MetadataSerializationConfiguration.SMART_GROUP_ID)) {
