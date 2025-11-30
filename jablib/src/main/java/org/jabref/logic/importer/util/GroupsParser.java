@@ -43,8 +43,8 @@ public class GroupsParser {
 
     /**
      * Identifier for SmartGroup (deprecated, replaced by {@link ExplicitGroup}).
-     * Kept for backward compatibility during migration.
      *
+     * @deprecated Kept for backward compatibility during migration.
      */
     @Deprecated
     private static final String SMART_GROUP_ID_FOR_MIGRATION = "SmartGroup:";
