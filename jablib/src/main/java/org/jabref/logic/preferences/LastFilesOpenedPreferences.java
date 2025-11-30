@@ -14,6 +14,7 @@ public class LastFilesOpenedPreferences {
 
     // the last libraries that were open when jabref closes and should be reopened on startup
     private final ObservableList<Path> lastFilesOpened;
+
     private final ObjectProperty<Path> lastFocusedFile;
 
     // observable list last files opened in the file menu
