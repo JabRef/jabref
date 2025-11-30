@@ -30,11 +30,18 @@ jobs:
           MERGEABLE=$(gh pr view --json mergeable $PR_NUMBER --template '{{.mergeable}}')
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
-            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
+            gh issue edit --repo $REPO $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
 
             # "workflow dispatch" does not trigger subsequent "on completion" runs
             # Therefore, we emulate ghprcomment here
             if [ "$EVENT" = "workflow_dispatch" ]; then
+              HAS_CONFLICT_COMMENT=$(gh issue comment "$PR_NUMBER" --json body --jq '.[].body | contains("Conflicts with target branch")' | grep true || true)
+
+              if [ -n "$HAS_CONFLICT_COMMENT" ]; then
+                echo "Already commented about conflicts."
+                exit 1;
+              fi
+
               echo "Commenting on PR..."
               cat > body.txt <<EOF
           Your pull request conflicts with the target branch.
