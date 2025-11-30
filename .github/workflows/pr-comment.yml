@@ -35,7 +35,7 @@ jobs:
           PR_NUMBER: ${{ github.event.inputs.pr_number }}
           WORKFLOW_RUN_ID: ${{ github.event.inputs.workflow_run_id }}
           EVENT_NAME: ${{ github.event_name }}
-          WORKFLOW: ${{ github.workflow }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
           RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
         run: |
@@ -45,6 +45,7 @@ jobs:
           echo "WORKFLOW=${WORKFLOW}"
           echo "RUN_ID=${RUN_ID}"
           echo "RUN_NUMBER=${RUN_NUMBER}"
+          echo "Workflow $WORKFLOW" >> $GITHUB_STEP_SUMMARY
 
       - name: Download PR number
         if: ${{ github.event_name != 'workflow_dispatch' }}
@@ -63,6 +64,7 @@ jobs:
           PR_NUMBER=$(cat pr_number.txt)
           echo "Read PR number $PR_NUMBER"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "PR #" >> $GITHUB_STEP_SUMMARY
 
       - name: Checkout
         # required for gh tool and .github/ghprcomment.yml
