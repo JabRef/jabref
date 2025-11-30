@@ -30,6 +30,22 @@ jobs:
       pull-requests: write
     timeout-minutes: 10
     steps:
+      - name: Show GitHub context
+        env:
+          PR_NUMBER: ${{ github.event.inputs.pr_number }}
+          WORKFLOW_RUN_ID: ${{ github.event.inputs.workflow_run_id }}
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW: ${{ github.workflow }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          echo "PR_NUMBER=${PR_NUMBER}"
+          echo "WORKFLOW_RUN_ID=${WORKFLOW_RUN_ID}"
+          echo "EVENT_NAME=${EVENT_NAME}"
+          echo "WORKFLOW=${WORKFLOW}"
+          echo "RUN_ID=${RUN_ID}"
+          echo "RUN_NUMBER=${RUN_NUMBER}"
+
       - name: Download PR number
         if: ${{ github.event_name != 'workflow_dispatch' }}
         uses: actions/download-artifact@v6
@@ -122,3 +138,28 @@ jobs:
           jbang https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java -r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}
         env:
           GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+
+      - name: 'Adapt label "status: changes-required"'
+        if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.name == 'Source Code Tests') && (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        run: |
+          echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
+
+          REPO="${{ github.repository }}"
+
+          COMMENTS=$(gh api \
+            repos/$REPO/issues/$PR_NUMBER/comments \
+            --jq '.[] | select(.user.login=="jabref-machine")')
+
+          if [[ -n "$COMMENTS" ]]; then
+            echo "Bot comments - adding label changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review"
+            gh issue --repo $REPO edit $PR_NUMBER --add-label "status: changes-required"
+            echo "Added label \"status: changes-required\"" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No bot comments - removing label changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required"
+            echo "Removed label \"status: changes-required\"" >> $GITHUB_STEP_SUMMARY
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
