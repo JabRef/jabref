@@ -63,9 +63,9 @@ public class ImportFormatReader {
                               DirectoryUpdateMonitor directoryUpdateMonitor) {
         this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.directoryUpdateMonitor = directoryUpdateMonitor;
-        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         reset();
     }
 
