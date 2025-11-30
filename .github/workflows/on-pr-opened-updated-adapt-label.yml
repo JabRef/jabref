@@ -1,6 +1,11 @@
 name: On PR opened/updated (adapt label)
 
 on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number'
+        required: true
   workflow_run:
     # This workflow is triggered after other workflows on update of a PR
     # The one running the longest at pr-comment.yml
@@ -10,33 +15,65 @@ on:
 
 jobs:
    apply-labels:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.event != 'merge_group' }}
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
       pull-requests: write
     steps:
-      - name: Download artifact from triggering run
+      - name: Download PR number
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         uses: actions/download-artifact@v6
-        with:
-            name: pr_number
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            run-id: ${{ github.event.workflow_run.id }}
         continue-on-error: true
-      - name: Check for pr_number.txt
-        id: check
+        with:
+          name: pr_number
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Read pr_number.txt
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        id: read-pr_number
         run: |
-          if [ -f pr_number.txt ]; then
-            echo "continue=true" >> "$GITHUB_OUTPUT"
-            echo "pr_number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+          touch pr_number.txt
+          PR_NUMBER=$(cat pr_number.txt)
+          echo "Read PR number $PR_NUMBER"
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        # required for gh tool and .github/ghprcomment.yml
+        uses: actions/checkout@v6
+        with:
+          show-progress: 'false'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Is PR from forked?
+        if: ${{ github.event_name != 'workflow_dispatch' && steps.read-pr_number.outputs.pr_number != '' }}
+        id: isCrossRepository
+        run: |
+          isCrossRepository=$(gh pr view $pr_number --json isCrossRepository --jq '.isCrossRepository')
+          echo "Got isCrossRepository $isCrossRepository"
+          echo isCrossRepository=$isCrossRepository >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+          pr_number: ${{ steps.read-pr_number.outputs.pr_number }}
+
+      - name: Set variables
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        id: set-vars
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "pr_number=$INPUT_PR_NUMBER" >> $GITHUB_OUTPUT
           else
-            echo "continue=false" >> "$GITHUB_OUTPUT"
+            echo "pr_number=$READ_PR_NUMBER" >> $GITHUB_OUTPUT
           fi
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          INPUT_PR_NUMBER: ${{ github.event.inputs.pr_number }}
+          READ_PR_NUMBER: ${{ steps.read-pr_number.outputs.pr_number }}
       - name: 'Adapt label "status: changes-required"'
-        if: steps.check.outputs.continue == 'true'
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
-          PR_NUMBER="${{ steps.check.outputs.pr_number }}"
           REPO="${{ github.repository }}"
 
           COMMENTS=$(gh api \
@@ -45,12 +82,13 @@ jobs:
 
           if [[ -n "$COMMENTS" ]]; then
             echo "Bot comments - adding label changes-required"
-            gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --add-label "status: changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --add-label "status: changes-required"
             echo "Added label \"status: changes-required\"" >> $GITHUB_STEP_SUMMARY
           else
             echo "No bot comments - removing label changes-required"
-            gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --remove-label "status: changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required"
             echo "Removed label \"status: changes-required\"" >> $GITHUB_STEP_SUMMARY
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
