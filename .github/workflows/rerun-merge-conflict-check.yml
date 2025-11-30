@@ -1,0 +1,25 @@
+name: Rerun PR merge conclicts check
+
+on:
+  push:
+    branches: [main, add-rerun]
+  workflow_dispatch:
+
+jobs:
+  rerun:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger "On PR opened/updated (check)" for all open PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          workflow_name="On PR opened/updated (check)"
+
+          gh pr list --state open --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"' |
+          while read pr branch; do
+            echo "Triggering '$workflow_name' for PR #$pr on ref '$branch'"
+
+            gh workflow run "$workflow_name" \
+              --ref "$branch" \
+              --field pr_number="$pr"
+          done
