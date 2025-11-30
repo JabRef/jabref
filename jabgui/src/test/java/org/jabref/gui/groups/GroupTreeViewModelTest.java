@@ -17,6 +17,7 @@ import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
@@ -64,6 +65,9 @@ class GroupTreeViewModelTest {
                 true,
                 true,
                 GroupHierarchyType.INDEPENDENT));
+        BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
+        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
+        when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
         groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
     }
 
