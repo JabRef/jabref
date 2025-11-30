@@ -62,12 +62,15 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         id: set-vars
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "pr_number=$INPUT_PR_NUMBER" >> $GITHUB_OUTPUT
           else
-            echo "pr_number=${{ steps.read-pr_number.outputs.pr_number }}" >> $GITHUB_OUTPUT
+            echo "pr_number=$READ_PR_NUMBER" >> $GITHUB_OUTPUT
           fi
-
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          INPUT_PR_NUMBER: ${{ github.event.inputs.pr_number }}
+          READ_PR_NUMBER: ${{ steps.read-pr_number.outputs.pr_number }}
       - name: 'Adapt label "status: changes-required"'
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
