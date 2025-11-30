@@ -303,7 +303,7 @@ public class GroupsParser {
     private static AbstractGroup allEntriesGroupFromString(String input) {
         assert input.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID);
 
-        return GroupsFactory.getAllEntriesGroup();
+        return GroupsFactory.createAllEntriesGroup();
     }
 
     /**

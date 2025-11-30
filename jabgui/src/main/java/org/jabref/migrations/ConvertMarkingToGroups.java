@@ -48,7 +48,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
             }
 
             if (parserResult.getMetaData().getGroups().isEmpty()) {
-                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.getAllEntriesGroup()));
+                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
             }
             GroupTreeNode root = parserResult.getMetaData().getGroups().get();
             root.addChild(markingRoot, 0);

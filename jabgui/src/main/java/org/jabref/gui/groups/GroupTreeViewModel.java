@@ -179,7 +179,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(null);
         }
         currentDatabase = newDatabase;
-        newDatabase.ifPresent(db -> addGroupImportEntries(rootGroup.get()));
+        newDatabase.ifPresent(_ -> addGroupImportEntries(rootGroup.get()));
     }
 
     private void addGroupImportEntries(GroupNodeViewModel parent) {
@@ -187,15 +187,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
             return;
         }
 
-        String grpName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
-        AbstractGroup importEntriesGroup = new ExplicitGroup(grpName, GroupHierarchyType.INDEPENDENT, ',');
-        boolean isGrpExist = parent.getGroupNode()
+        String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
+        boolean groupExists = parent.getGroupNode()
                                    .getChildren()
                                    .stream()
                                    .map(GroupTreeNode::getGroup)
-                                   .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equals(grpName));
-        if (!isGrpExist) {
+                                   .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equals(groupName));
+        if (!groupExists) {
             currentDatabase.ifPresent(db -> {
+                char keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
+                AbstractGroup importEntriesGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator);
                 GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);
                 newSubgroup.moveTo(parent.getGroupNode(), 0);
                 selectedGroups.setAll(new GroupNodeViewModel(db, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));

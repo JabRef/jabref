@@ -290,7 +290,7 @@ public class BibtexParser implements Parser {
                         },
                         // metadata does not contain any groups, so we need to create an AllEntriesGroup and add the other groups as children
                         () -> {
-                            GroupTreeNode rootNode = new GroupTreeNode(GroupsFactory.getAllEntriesGroup());
+                            GroupTreeNode rootNode = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
                             bibDeskGroupTreeNode.moveTo(rootNode);
                             metaData.setGroups(rootNode);
                         }

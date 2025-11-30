@@ -24,7 +24,7 @@ class ConvertMarkingToGroupsTest {
 
         new ConvertMarkingToGroups().performMigration(parserResult);
 
-        GroupTreeNode rootExpected = GroupTreeNode.fromGroup(GroupsFactory.getAllEntriesGroup());
+        GroupTreeNode rootExpected = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
         GroupTreeNode markings = rootExpected.addSubgroup(new ExplicitGroup("Markings", GroupHierarchyType.INCLUDING, ','));
         markings.addSubgroup(new ExplicitGroup("Nicolas:6", GroupHierarchyType.INCLUDING, ','));
 
