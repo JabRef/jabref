@@ -36,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Delete folder on builds.jabref.org
         if: steps.check_label.outputs.has_label_binaries == 'yes'
-        uses: appleboy/ssh-action@v1.2.3
+        uses: appleboy/ssh-action@v1.2.4
         with:
           script: rm -rf /var/www/builds.jabref.org/www/pull/${{ github.event.pull_request.number }} || true
           host: build-upload.jabref.org
