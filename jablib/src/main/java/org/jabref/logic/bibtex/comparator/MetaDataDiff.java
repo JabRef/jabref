@@ -94,7 +94,7 @@ public class MetaDataDiff {
         if (!groupRoot.getChildren().isEmpty()) {
             return false;
         }
-        return groupRoot.getGroup().equals(GroupsFactory.getAllEntriesGroup());
+        return groupRoot.getGroup().equals(GroupsFactory.createAllEntriesGroup());
     }
 
     /**

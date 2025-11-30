@@ -307,7 +307,7 @@ public class GroupsParser {
         if (!s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             throw new IllegalArgumentException("AllEntriesGroup cannot be created from \"" + s + "\".");
         }
-        return GroupsFactory.getAllEntriesGroup();
+        return GroupsFactory.createAllEntriesGroup();
     }
 
     /**

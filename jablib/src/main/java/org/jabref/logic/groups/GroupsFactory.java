@@ -8,9 +8,6 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.SearchFlags;
 
-/**
- * This factory creates groups.
- */
 public class GroupsFactory {
 
     public static final String ALL_ENTRIES_GROUP_DEFAULT_ICON = "ALL_ENTRIES_GROUP_ICON";
@@ -18,7 +15,7 @@ public class GroupsFactory {
     private GroupsFactory() {
     }
 
-    public static AllEntriesGroup getAllEntriesGroup() {
+    public static AllEntriesGroup createAllEntriesGroup() {
         AllEntriesGroup group = new AllEntriesGroup(Localization.lang("All entries"));
         group.setIconName(ALL_ENTRIES_GROUP_DEFAULT_ICON);
         return group;
