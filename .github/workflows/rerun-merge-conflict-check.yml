@@ -9,6 +9,9 @@ jobs:
   rerun:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v6
+        with:
+          show-progress: 'false'
       - name: Trigger "On PR opened/updated (check)" for all open PRs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
