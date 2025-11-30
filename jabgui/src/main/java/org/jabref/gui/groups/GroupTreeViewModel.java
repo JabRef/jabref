@@ -251,7 +251,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         int nbPDFs = allPDFs.size();
                         if (nbPDFs > 0) {
                             ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, directoryUpdateMonitor, undoManager, stateManager, dialogService, taskExecutor);
-                            importHandler.importFilesInBackground(allPDFs, database, preferences.getFilePreferences(), TransferMode.LINK)
+                            importHandler.importFilesInBackground(allPDFs, TransferMode.LINK)
                                          .onSuccess(_ -> {
                                              selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
                                              if (nbPDFs == 1) {

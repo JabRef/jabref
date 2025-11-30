@@ -137,7 +137,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         int nbPDFs = files.size();
         if (nbPDFs > 0) {
             ImportHandler importHandler = new ImportHandler(database, preferences, fileUpdateMonitor, this, undoManager, stateManager, dialogService, taskExecutor);
-            importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), TransferMode.LINK)
+            importHandler.importFilesInBackground(files, TransferMode.LINK)
                          .onSuccess(_ -> {
                              if (nbPDFs == 1) {
                                  dialogService.notify(Localization.lang("Successfully imported %0 PDF.", nbPDFs));
