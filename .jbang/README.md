@@ -6,8 +6,8 @@ This directory contains JBang scripts for JabRef.
 Four use cases:
 
 - Runing `JabKit` - JabRef's CLI tool.
-- Runing JabLs - JabRef's Language Server.
-- Runing JabSrv - JabRef's HTTP server.
+- Runing `JabLs` - JabRef's Language Server.
+- Runing `JabSrv` - JabRef's HTTP server.
 - Try out any pull request with minimal installation. See [our blog entry](https://blog.jabref.org/2025/05/31/run-pr/) for details.
 
 ## Running `JabKit`
@@ -54,7 +54,7 @@ Commands:
 >
 > `jbang --fresh jabkit@jabref --help`
 
-### Installing and Running JabKit with JBang
+### Installing and Running `JabKit` with JBang
 
 To have `jbang` working, you need to [install jbang](https://www.jbang.dev/download/).
 E.g., by `brew install jbangdev/tap/jbang` or `choco install jbang`
@@ -62,7 +62,7 @@ E.g., by `brew install jbangdev/tap/jbang` or `choco install jbang`
 `jbang` also enables to install `jabkit` permanently in your `PATH`:
 
 ```console
-jbang app install jabkit@jabref
+jbang app install --fresh --force jabkit@jabref
 ```
 
 Then, you can run JabKit:
@@ -71,9 +71,11 @@ Then, you can run JabKit:
 jabkit --help
 ```
 
-[JBang takes care about updating JabKit automatically](https://github.com/orgs/jbangdev/discussions/1636#discussioncomment-6150992).
+> [!NOTE]
+> You can use the command above to update JabKit, too.
+> Background: Although [JBang takes care about updating JabKit automatically](https://github.com/orgs/jbangdev/discussions/1636#discussioncomment-6150992), it does not update the `-SNAPSHOT` dependencies.
 
-### Running JabKit without installation
+### Running `JabKit` without installation
 
 By using [gg.cmd](https://github.com/eirikb/gg#ggcmd) you can "just run" JabKit with minimal setup:
 
@@ -86,7 +88,7 @@ By using [gg.cmd](https://github.com/eirikb/gg#ggcmd) you can "just run" JabKit 
 You can also put `gg.cmd` on your `PATH` and make it executable.
 Then you enable `alias jabkit='gg.cmd jbang jabkit@jabref`.
 
-## Running JabLs
+## Running `JabLs`
 
 In case you have [JBang installed], just run following command:
 
@@ -108,7 +110,7 @@ npx @jbangdev/jbang jabls@jabref
 
 One can add `--help` to see available options.
 
-## Running JabSrv
+## Running `JabSrv`
 
 In case you have [JBang installed], just run following command:
 

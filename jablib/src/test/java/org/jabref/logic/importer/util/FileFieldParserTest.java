@@ -219,6 +219,11 @@ class FileFieldParserTest {
                 Arguments.of(
                         List.of(new LinkedFile("", "A:\\Zotero\\storage\\test.pdf", "")),
                         "A:\\Zotero\\storage\\test.pdf"
+                ),
+                // Mixed path
+                Arguments.of(
+                        List.of(new LinkedFile("", "C:/Users/Philip/Downloads/corti-et-al-2009-cocoa-and-cardiovascular-health.pdf", "PDF")),
+                        ":C\\:/Users/Philip/Downloads/corti-et-al-2009-cocoa-and-cardiovascular-health.pdf:PDF"
                 )
         );
     }

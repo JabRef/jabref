@@ -74,10 +74,10 @@ public class WebFetchers {
         switch (field) {
             case DOI ->
                     fetcher = new DoiFetcher(importFormatPreferences);
-            case ISBN ->
-                    fetcher = new IsbnFetcher(importFormatPreferences);
             case EPRINT ->
                     fetcher = new ArXivFetcher(importFormatPreferences);
+            case ISBN ->
+                    fetcher = new IsbnFetcher(importFormatPreferences);
             case ISSN ->
                     fetcher = new IssnFetcher();
             case null,
