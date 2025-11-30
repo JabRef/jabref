@@ -21,5 +21,5 @@ jobs:
           gh pr list --state open --json number --jq '.[] | "\(.number)"' |
           while read pr; do
             echo "Triggering '$workflow_name' for PR #$pr"
-            gh workflow run "$workflow_name" --ref main --field pr_number="$pr"
+            gh workflow run "$workflow_name" --ref add-rerun --field pr_number="$pr"
           done
