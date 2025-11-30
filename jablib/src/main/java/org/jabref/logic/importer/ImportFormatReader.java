@@ -52,9 +52,9 @@ public class ImportFormatReader {
 
     private final ImporterPreferences importerPreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DirectoryUpdateMonitor directoryUpdateMonitor;
-    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
