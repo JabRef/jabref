@@ -18,11 +18,8 @@ jobs:
         run: |
           workflow_name="On PR opened/updated (check)"
 
-          gh pr list --state open --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"' |
-          while read pr branch; do
-            echo "Triggering '$workflow_name' for PR #$pr on ref '$branch'"
-
-            gh workflow run "$workflow_name" \
-              --ref "$branch" \
-              --field pr_number="$pr"
+          gh pr list --state open --json number --jq '.[] | "\(.number)"' |
+          while read pr; do
+            echo "Triggering '$workflow_name' for PR #$pr"
+            gh workflow run "$workflow_name" --ref main --field pr_number="$pr"
           done
