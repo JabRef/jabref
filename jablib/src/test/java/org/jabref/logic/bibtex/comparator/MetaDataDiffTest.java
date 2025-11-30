@@ -43,7 +43,7 @@ class MetaDataDiffTest {
     @Test
     void allEntriesGroupIgnored() {
         MetaData one = new MetaData();
-        one.setGroups(GroupTreeNode.fromGroup(GroupsFactory.getAllEntriesGroup()));
+        one.setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
         MetaData two = new MetaData();
 
         assertEquals(Optional.empty(), MetaDataDiff.compare(one, two));
@@ -52,7 +52,7 @@ class MetaDataDiffTest {
     @Test
     void allEntriesGroupContainingGroupNotIgnored() {
         MetaData one = new MetaData();
-        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.getAllEntriesGroup());
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
         one.setGroups(root);
 

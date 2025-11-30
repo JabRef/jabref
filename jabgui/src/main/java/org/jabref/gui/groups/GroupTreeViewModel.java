@@ -179,7 +179,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(null);
         }
         currentDatabase = newDatabase;
-        newDatabase.ifPresent(db -> addGroupImportEntries(rootGroup.get()));
+        newDatabase.ifPresent(_ -> addGroupImportEntries(rootGroup.get()));
     }
 
     private void addGroupImportEntries(GroupNodeViewModel parent) {

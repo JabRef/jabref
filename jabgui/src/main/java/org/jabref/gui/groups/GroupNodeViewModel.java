@@ -140,7 +140,7 @@ public class GroupNodeViewModel {
     }
 
     static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
-        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, GroupsFactory.getAllEntriesGroup(), localDragBoard, preferences);
+        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, GroupsFactory.createAllEntriesGroup(), localDragBoard, preferences);
     }
 
     private GroupNodeViewModel toViewModel(GroupTreeNode child) {

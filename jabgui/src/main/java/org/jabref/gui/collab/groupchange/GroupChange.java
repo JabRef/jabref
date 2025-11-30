@@ -27,7 +27,7 @@ public final class GroupChange extends DatabaseChange {
         GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
 
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
-            GroupTreeNode groupTreeNode = new GroupTreeNode(GroupsFactory.getAllEntriesGroup());
+            GroupTreeNode groupTreeNode = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
             databaseContext.getMetaData().setGroups(groupTreeNode);
             return groupTreeNode;
         });
@@ -38,7 +38,7 @@ public final class GroupChange extends DatabaseChange {
         root.removeAllChildren();
         if (newRoot == null) {
             // I think setting root to null is not possible
-            root.setGroup(GroupsFactory.getAllEntriesGroup(), false, false, null);
+            root.setGroup(GroupsFactory.createAllEntriesGroup(), false, false, null);
         } else {
             // change root group, even though it'll be AllEntries anyway
             root.setGroup(newRoot.getGroup(), false, false, null);
