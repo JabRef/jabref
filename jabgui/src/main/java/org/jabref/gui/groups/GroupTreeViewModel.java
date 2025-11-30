@@ -189,10 +189,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
         boolean groupExists = parent.getGroupNode()
-                                   .getChildren()
-                                   .stream()
-                                   .map(GroupTreeNode::getGroup)
-                                   .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equals(groupName));
+                                    .getChildren()
+                                    .stream()
+                                    .map(GroupTreeNode::getGroup)
+                                    .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equals(groupName));
         if (!groupExists) {
             currentDatabase.ifPresent(db -> {
                 char keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
