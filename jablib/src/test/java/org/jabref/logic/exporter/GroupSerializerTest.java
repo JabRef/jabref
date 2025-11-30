@@ -54,14 +54,6 @@ class GroupSerializerTest {
     }
 
     @Test
-    void serializeExplicitGroupReplacesSmartGroup() {
-        // SmartGroup has been replaced by ExplicitGroup
-        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
-        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
-        assertEquals(List.of("0 StaticGroup:myExplicitGroup;0;1;;;;"), serialization);
-    }
-
-    @Test
     void serializeSingleExplicitGroup() {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
