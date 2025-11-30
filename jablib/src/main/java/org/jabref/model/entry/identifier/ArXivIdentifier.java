@@ -20,7 +20,8 @@ import org.slf4j.LoggerFactory;
 public class ArXivIdentifier extends EprintIdentifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivIdentifier.class);
 
-    private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|pdf|html)/|arxiv|arXiv";    private final String identifier;
+    private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|pdf|html)/|arxiv|arXiv";
+    private final String identifier;
     private final String classification;
     private final String version;
 
