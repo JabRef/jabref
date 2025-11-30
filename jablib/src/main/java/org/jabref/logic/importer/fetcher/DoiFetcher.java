@@ -32,6 +32,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -149,7 +150,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         HttpURLConnection connection = (HttpURLConnection) download.openConnection();
         InputStream inputStream = download.asInputStream(connection);
 
-        BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
+        BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
         try {
             fetchedEntry = bibtexParser.parseEntries(inputStream).stream().findFirst();
         } catch (ParseException e) {

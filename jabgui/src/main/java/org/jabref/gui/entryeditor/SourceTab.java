@@ -51,6 +51,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
@@ -74,6 +75,7 @@ public class SourceTab extends EntryEditorTab {
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
@@ -86,6 +88,7 @@ public class SourceTab extends EntryEditorTab {
                      FieldPreferences fieldPreferences,
                      ImportFormatPreferences importFormatPreferences,
                      FileUpdateMonitor fileMonitor,
+                     DirectoryUpdateMonitor directoryUpdateMonitor,
                      DialogService dialogService,
                      BibEntryTypesManager entryTypesManager,
                      KeyBindingRepository keyBindingRepository,
@@ -96,6 +99,7 @@ public class SourceTab extends EntryEditorTab {
         this.fieldPreferences = fieldPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.dialogService = dialogService;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
@@ -287,7 +291,7 @@ public class SourceTab extends EntryEditorTab {
             return;
         }
 
-        BibtexParser bibtexParser = new BibtexParser(importFormatPreferences, fileMonitor);
+        BibtexParser bibtexParser = new BibtexParser(importFormatPreferences, fileMonitor, directoryUpdateMonitor);
         try {
             ParserResult parserResult = bibtexParser.parse(Reader.of(text));
             BibDatabase database = parserResult.getDatabase();

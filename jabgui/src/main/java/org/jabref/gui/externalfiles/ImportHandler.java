@@ -59,6 +59,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SmartGroup;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -77,6 +78,7 @@ public class ImportHandler {
     private final BibDatabaseContext targetBibDatabaseContext;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final ExternalFilesEntryLinker fileLinker;
     private final ExternalFilesContentImporter contentImporter;
     private final UndoManager undoManager;
@@ -88,6 +90,7 @@ public class ImportHandler {
     public ImportHandler(BibDatabaseContext targetBibDatabaseContext,
                          GuiPreferences preferences,
                          FileUpdateMonitor fileupdateMonitor,
+                         DirectoryUpdateMonitor directoryUpdateMonitor,
                          UndoManager undoManager,
                          StateManager stateManager,
                          DialogService dialogService,
@@ -95,6 +98,7 @@ public class ImportHandler {
         this.targetBibDatabaseContext = targetBibDatabaseContext;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileupdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -177,7 +181,7 @@ public class ImportHandler {
                                 });
                             }
                         } else if (FileUtil.isBibFile(file)) {
-                            ParserResult bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
+                            ParserResult bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor, directoryUpdateMonitor);
                             List<BibEntry> entries = bibtexParserResult.getDatabaseContext().getEntries();
                             entriesToAdd.addAll(entries);
                             boolean success = !bibtexParserResult.hasWarnings();
@@ -392,7 +396,7 @@ public class ImportHandler {
     }
 
     public List<BibEntry> handleBibTeXData(String entries) {
-        BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor);
+        BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor, directoryUpdateMonitor);
         try {
             List<BibEntry> result = parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
             Collection<BibtexString> stringConstants = parser.getStringValues();
@@ -457,7 +461,8 @@ public class ImportHandler {
                     preferences.getImporterPreferences(),
                     preferences.getImportFormatPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
-                    fileUpdateMonitor
+                    fileUpdateMonitor,
+                    directoryUpdateMonitor
             );
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
             return unknownFormatImport.parserResult().getDatabase().getEntries();

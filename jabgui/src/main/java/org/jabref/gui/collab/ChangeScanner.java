@@ -10,6 +10,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public class ChangeScanner {
             // Parse the modified file
             // Important: apply all post-load actions
             ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
+            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             return DatabaseChangeList.compareAndGetChanges(database, databaseOnDisk, databaseChangeResolverFactory);

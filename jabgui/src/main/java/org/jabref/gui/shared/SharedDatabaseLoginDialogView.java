@@ -25,6 +25,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -62,6 +63,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private DirectoryUpdateMonitor directoryUpdateMonitor;
     @Inject private UndoManager undoManager;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private TaskExecutor taskExecutor;
@@ -106,6 +108,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 stateManager,
                 entryTypesManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 undoManager,
                 clipBoardManager,
                 taskExecutor);

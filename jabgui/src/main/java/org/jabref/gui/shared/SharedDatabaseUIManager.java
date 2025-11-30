@@ -39,6 +39,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.Subscribe;
@@ -53,6 +54,7 @@ public class SharedDatabaseUIManager {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
@@ -64,6 +66,7 @@ public class SharedDatabaseUIManager {
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,
                                    FileUpdateMonitor fileUpdateMonitor,
+                                   DirectoryUpdateMonitor directoryUpdateMonitor,
                                    UndoManager undoManager,
                                    ClipBoardManager clipBoardManager,
                                    TaskExecutor taskExecutor) {
@@ -74,6 +77,7 @@ public class SharedDatabaseUIManager {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -179,6 +183,7 @@ public class SharedDatabaseUIManager {
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
@@ -222,6 +227,7 @@ public class SharedDatabaseUIManager {
                 preferences.getFieldPreferences(),
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 preferences.getFilePreferences().getUserAndHost());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
         return bibDatabaseContext;

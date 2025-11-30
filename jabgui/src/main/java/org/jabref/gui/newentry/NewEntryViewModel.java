@@ -45,6 +45,7 @@ import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -65,6 +66,7 @@ public class NewEntryViewModel {
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
 
     private final BooleanProperty executing;
     private final BooleanProperty executedSuccessfully;
@@ -95,7 +97,8 @@ public class NewEntryViewModel {
                              StateManager stateManager,
                              UiTaskExecutor taskExecutor,
                              AiService aiService,
-                             FileUpdateMonitor fileUpdateMonitor) {
+                             FileUpdateMonitor fileUpdateMonitor,
+                             DirectoryUpdateMonitor directoryUpdateMonitor) {
         this.preferences = preferences;
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
@@ -103,6 +106,7 @@ public class NewEntryViewModel {
         this.taskExecutor = taskExecutor;
         this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
 
         executing = new SimpleBooleanProperty(false);
         executedSuccessfully = new SimpleBooleanProperty(false);
@@ -331,6 +335,7 @@ public class NewEntryViewModel {
                     libraryTab.getBibDatabaseContext(),
                     preferences,
                     fileUpdateMonitor,
+                    directoryUpdateMonitor,
                     libraryTab.getUndoManager(),
                     stateManager,
                     dialogService,
@@ -417,6 +422,7 @@ public class NewEntryViewModel {
                     libraryTab.getBibDatabaseContext(),
                     preferences,
                     fileUpdateMonitor,
+                    directoryUpdateMonitor,
                     libraryTab.getUndoManager(),
                     stateManager,
                     dialogService,
@@ -502,6 +508,7 @@ public class NewEntryViewModel {
                     libraryTab.getBibDatabaseContext(),
                     preferences,
                     fileUpdateMonitor,
+                    directoryUpdateMonitor,
                     libraryTab.getUndoManager(),
                     stateManager,
                     dialogService,

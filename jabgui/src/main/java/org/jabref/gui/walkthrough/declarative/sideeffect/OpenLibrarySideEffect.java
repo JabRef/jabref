@@ -17,6 +17,7 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -78,6 +79,7 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
                     Injector.instantiateModelOrService(GuiPreferences.class),
                     stateManager,
                     Injector.instantiateModelOrService(FileUpdateMonitor.class),
+                    Injector.instantiateModelOrService(DirectoryUpdateMonitor.class),
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
                     Injector.instantiateModelOrService(CountingUndoManager.class),
                     Injector.instantiateModelOrService(ClipBoardManager.class),
@@ -151,7 +153,8 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
 
             return Optional.of(OpenDatabase.loadDatabase(in,
                     Injector.instantiateModelOrService(GuiPreferences.class).getImportFormatPreferences(),
-                    Injector.instantiateModelOrService(FileUpdateMonitor.class)).getDatabaseContext());
+                    Injector.instantiateModelOrService(FileUpdateMonitor.class),
+                    Injector.instantiateModelOrService(DirectoryUpdateMonitor.class)).getDatabaseContext());
         } catch (IOException e) {
             LOGGER.error("Failed to load \"{}\" library from resource", libraryName, e);
             return Optional.empty();

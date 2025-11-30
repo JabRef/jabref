@@ -80,6 +80,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.sciteTallies.TalliesResponse;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -118,6 +119,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 UndoManager undoManager,
                                 StateManager stateManager,
                                 FileUpdateMonitor fileUpdateMonitor,
+                                DirectoryUpdateMonitor directoryUpdateMonitor,
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
                                 BibEntryTypesManager bibEntryTypesManager,
@@ -141,6 +143,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 stateManager,
                 dialogService,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 taskExecutor
         );
 

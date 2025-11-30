@@ -42,6 +42,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jooq.lambda.Unchecked;
@@ -59,6 +60,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     private final Supplier<OpenDatabaseAction> openDatabaseAction;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
@@ -71,6 +73,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                                 Supplier<OpenDatabaseAction> openDatabaseAction,
                                 BibEntryTypesManager entryTypesManager,
                                 FileUpdateMonitor fileUpdateMonitor,
+                                DirectoryUpdateMonitor directoryUpdateMonitor,
                                 UndoManager undoManager,
                                 ClipBoardManager clipBoardManager,
                                 TaskExecutor taskExecutor) {
@@ -82,6 +85,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         this.openDatabaseAction = openDatabaseAction;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -290,7 +294,8 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                 parserResults.add(OpenDatabase.loadDatabase(
                         file,
                         preferences.getImportFormatPreferences(),
-                        fileUpdateMonitor));
+                        fileUpdateMonitor,
+                        directoryUpdateMonitor));
             }
         } catch (IOException e) {
             LOGGER.error("Could not open bib file {}", libraries, e);

@@ -33,6 +33,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -51,6 +52,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final CliPreferences preferences;
     private final FileUpdateMonitor fileMonitor;
+    private final DirectoryUpdateMonitor directoryUpdateMonitor;
     private final StringProperty latexFileDirectory;
     private final Validator latexDirectoryValidator;
     private final ObjectProperty<FileNodeViewModel> root;
@@ -63,12 +65,14 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
                                      DialogService dialogService,
                                      TaskExecutor taskExecutor,
                                      CliPreferences preferences,
-                                     FileUpdateMonitor fileMonitor) {
+                                     FileUpdateMonitor fileMonitor,
+                                     DirectoryUpdateMonitor directoryUpdateMonitor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.fileMonitor = fileMonitor;
+        this.directoryUpdateMonitor = directoryUpdateMonitor;
         this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
                                                                           .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()))
                                                                           .toAbsolutePath().toString());
@@ -205,7 +209,8 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(
                 databaseContext.getDatabase(),
                 preferences.getImportFormatPreferences(),
-                fileMonitor);
+                fileMonitor,
+                directoryUpdateMonitor);
 
         BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))

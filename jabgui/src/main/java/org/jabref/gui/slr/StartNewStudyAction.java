@@ -16,6 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.study.Study;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -41,6 +42,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
     public StartNewStudyAction(LibraryTabContainer tabContainer,
                                Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                                FileUpdateMonitor fileUpdateMonitor,
+                               DirectoryUpdateMonitor directoryUpdateMonitor,
                                TaskExecutor taskExecutor,
                                CliPreferences preferences,
                                StateManager stateManager,
@@ -49,6 +51,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
                 openDatabaseActionSupplier,
                 dialogService,
                 fileUpdateMonitor,
+                directoryUpdateMonitor,
                 taskExecutor,
                 preferences,
                 stateManager,

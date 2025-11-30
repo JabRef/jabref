@@ -17,6 +17,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +49,7 @@ public class OpenDatabaseActionTest {
                 dialogService,
                 mock(StateManager.class),
                 mock(FileUpdateMonitor.class),
+                mock(DirectoryUpdateMonitor.class),
                 mock(BibEntryTypesManager.class),
                 mock(CountingUndoManager.class),
                 mock(ClipBoardManager.class),

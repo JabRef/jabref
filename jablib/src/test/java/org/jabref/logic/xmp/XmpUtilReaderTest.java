@@ -12,6 +12,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.schema.DublinCoreSchemaCustom;
+import org.jabref.model.util.DummyDirectoryUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.xmpbox.XMPMetadata;
@@ -39,7 +40,7 @@ class XmpUtilReaderTest {
 
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
-        bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor(), new DummyDirectoryUpdateMonitor());
     }
 
     @Test
