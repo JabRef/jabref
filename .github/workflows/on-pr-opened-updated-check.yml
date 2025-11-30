@@ -1,4 +1,4 @@
-name: On PR opened/updated (Check)
+name: On PR opened/updated (check)
 
 on:
   # _target is required
@@ -28,13 +28,3 @@ jobs:
           echo "✅ No merge conflicts"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  upload-pr-number:
-    if: github.repository == 'JabRef/jabref'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create pr_number.txt
-        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v5
-        with:
-          name: pr_number
-          path: pr_number.txt
