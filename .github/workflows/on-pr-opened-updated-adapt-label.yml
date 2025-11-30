@@ -74,6 +74,8 @@ jobs:
       - name: 'Adapt label "status: changes-required"'
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         run: |
+          echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
+
           REPO="${{ github.repository }}"
 
           COMMENTS=$(gh api \
