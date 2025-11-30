@@ -1,7 +1,7 @@
 name: Rerun PR merge conclicts check
+
 permissions:
   contents: read
-  workflows: write
 
 on:
   push:
