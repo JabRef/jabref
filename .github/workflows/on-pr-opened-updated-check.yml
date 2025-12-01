@@ -37,7 +37,7 @@ jobs:
             # "workflow dispatch" does not trigger subsequent "on completion" runs
             # Therefore, we emulate ghprcomment here
             if [ "$EVENT" = "workflow_dispatch" ]; then
-              HAS_CONFLICT_COMMENT=$(gh issue comment "$PR_NUMBER" --json body --jq '.[].body | contains("Conflicts with target branch")' | grep true || true)
+              HAS_CONFLICT_COMMENT=$(gh api repos/jabref/JabRef/issues/$PR_NUMBER/comments | jq '.[].body | contains("Conflicts with target branch")' | grep true || true)
 
               if [ -n "$HAS_CONFLICT_COMMENT" ]; then
                 echo "Already commented about conflicts."
