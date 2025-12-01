@@ -115,6 +115,8 @@ public class BibtexParser implements Parser {
     private final MetaDataParser metaDataParser;
     private final Map<String, String> parsedBibDeskGroups;
 
+    private final StringBuilder currentEntryBuffer = new StringBuilder();
+
     private GroupTreeNode bibDeskGroupTreeNode;
 
     public BibtexParser(@NonNull ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
@@ -359,11 +361,10 @@ public class BibtexParser implements Parser {
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
             if (msg != null && msg.startsWith("RECOVER:")) {
-
                 int safePos = Integer.parseInt(msg.substring("RECOVER:".length()));
                 int consumed = currentEntryBuffer.length();
 
-                //roll back to the start
+                // roll back to the start
                 for (int i = 0; i < consumed; i++) {
                     unread(currentEntryBuffer.charAt(consumed - 1 - i));
                 }
@@ -1101,8 +1102,6 @@ public class BibtexParser implements Parser {
         }
     }
 
-    private final StringBuilder currentEntryBuffer = new StringBuilder();
-
     /**
      * This is called if a field in the form of <code>field = {content}</code> is parsed.
      * The global variable <code>character</code> contains <code>{</code>.
@@ -1166,7 +1165,6 @@ public class BibtexParser implements Parser {
     }
 
     private int findRecoveryStart(String buffer, int failPos) {
-
         char[] chars = buffer.toCharArray();
         int unmatched = 0;
         int lastEntryStart = -1;
