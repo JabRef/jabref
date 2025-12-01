@@ -104,6 +104,10 @@ dependencies {
 
     implementation("de.undercouch:citeproc-java")
 
+    // OAuth2 for CiteDrive
+    implementation("com.nimbusds:oauth2-oidc-sdk")
+    implementation("net.minidev:json-smart")
+
     testImplementation(project(":test-support"))
 
     testImplementation("io.github.classgraph:classgraph")
