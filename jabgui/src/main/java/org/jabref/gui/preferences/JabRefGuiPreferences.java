@@ -1177,16 +1177,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private NewEntryPreferences getNewEntryPreferencesFromBackingStore(NewEntryPreferences defaults) {
-        // moved the same snippet form public to private
         final int approachIndex = getInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(defaults.getLatestApproach()));
         NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
                                      ? NewEntryDialogTab.values()[approachIndex]
-                                     // if any values not match it assign this value
-                                     : defaults.getLatestApproach();
+                                     : NewEntryDialogTab.values()[0];
 
         final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE, defaults.getLatestImmediateType().getDisplayName());
-        // logic change to assign default values at the start
-        EntryType immediateType = defaults.getLatestImmediateType();
+        EntryType immediateType = StandardEntryType.Article;
 
         for (StandardEntryType type : StandardEntryType.values()) {
             if (type.getDisplayName().equals(immediateTypeName)) {
