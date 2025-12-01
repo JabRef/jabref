@@ -14,15 +14,15 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.layout.StackPane?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="600" xmlns="http://javafx.com/javafx/8.0.171"
             fx:controller="org.jabref.gui.newentry.NewEntryView">
     <buttonTypes>
         <ButtonType fx:constant="CANCEL"/>
-        <ButtonType fx:id="generateButtonType" buttonData="OK_DONE" text="%Generate"/>
+        <ButtonType fx:id="generateButtonType" buttonData="OK_DONE" text="%Create"/>
     </buttonTypes>
     <content>
         <TabPane fx:id="tabs">

@@ -36,6 +36,7 @@ public enum KeyBinding {
     CLOSE("Close dialog", Localization.lang("Close dialog"), "Esc", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl+C", KeyBindingCategory.EDIT),
     COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl+shift+alt+T", KeyBindingCategory.EDIT),
+    JUMP_TO_FIELD("Jump to field", Localization.lang("Jump to field"), "ctrl+J", KeyBindingCategory.EDIT),
 
     // We migrated from "Copy \\cite{citation key}" to "Copy citation key with configured cite command", therefore we keep the "old string" for backwards comppatibility
     COPY_CITE_CITATION_KEY("Copy \\cite{citation key}", Localization.lang("Copy citation key with configured cite command"), "ctrl+K", KeyBindingCategory.EDIT),
@@ -121,7 +122,7 @@ public enum KeyBinding {
     UNABBREVIATE("Unabbreviate", Localization.lang("Unabbreviate"), "ctrl+alt+shift+A", KeyBindingCategory.TOOLS),
     UNDO("Undo", Localization.lang("Undo"), "ctrl+Z", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt+4", KeyBindingCategory.SEARCH),
-    WRITE_METADATA_TO_PDF("Write metadata to PDF files", Localization.lang("Write metadata to PDF files"), "F6", KeyBindingCategory.TOOLS),
+    WRITE_METADATA_TO_PDF("Write metadata to PDF file(s)", Localization.lang("Write metadata to PDF file(s)"), "F6", KeyBindingCategory.TOOLS),
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "Esc", KeyBindingCategory.SEARCH),
     CLEAR_READ_STATUS("Clear read status", Localization.lang("Clear read status"), "", KeyBindingCategory.EDIT),
     READ("Set read status to read", Localization.lang("Set read status to read"), "", KeyBindingCategory.EDIT),

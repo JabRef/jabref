@@ -25,12 +25,17 @@ jobs:
       issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
     steps:
       - name: echo PR data
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          echo "PR Number: ${{ github.event.pull_request.number }}"
-          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+          echo "PR Number: $PR_NUMBER"
+          echo "PR URL: $PR_URL"
+          echo "PR [#$PR_NUMBER]($PR_URL)" >> $GITHUB_STEP_SUMMARY
           cat <<EOF
           PR Body:
-          ${{ github.event.pull_request.body }}
+          $PR_BODY
           EOF
       - name: Determine issue number
         id: get_issue_number
@@ -45,7 +50,9 @@ jobs:
           bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!13109\b)\d+)'
           bodyRegexFlags: 'i'
           outputOnly: true
-      - run: echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
+      - run: |
+          echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
+          echo "Determined issue [#${{ steps.get_issue_number.outputs.ticketNumber }}](https://github.com/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }})" >> $GITHUB_STEP_SUMMARY
   unassign_issue:
     name: Mark issue as available
     runs-on: ubuntu-latest
@@ -56,8 +63,9 @@ jobs:
     permissions:
       contents: read
       issues: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Remove assignee
         run: |
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
@@ -111,6 +119,11 @@ jobs:
           default-column: "Free to take"
           issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           skip-if-not-in-project: true
+      - name: Comment on PR that unassigned
+        if: steps.check_assignee.outputs.assigned == 'no'
+        run: |
+          echo "Commenting on PR..."
+          gh issue comment "$PR_NUMBER" -b "This pull requests was closed without merging. You have been unassigned from the respective issue #${{ needs.determine_issue_number.outputs.issue_number }}."
   comment_on_resolved_issue:
     name: Comment on resolved issue
     runs-on: ubuntu-latest

@@ -918,17 +918,6 @@ public class BibEntry {
         return sharedBibEntryData;
     }
 
-    public BibEntry withSharedBibEntryData(int sharedId, int version) {
-        sharedBibEntryData.setSharedID(sharedId);
-        sharedBibEntryData.setVersion(version);
-        return this;
-    }
-
-    public BibEntry withSharedBibEntryData(SharedBibEntryData sharedBibEntryData) {
-        sharedBibEntryData = sharedBibEntryData;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -1278,5 +1267,11 @@ public class BibEntry {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
+    }
+
+    /// Trims whitespaces at the beginning of the BibEntry
+    public void trimLeft() {
+        this.parsedSerialization = parsedSerialization.trim(); // we should do "trimLeft", but currently, it is OK as is.
+        this.commentsBeforeEntry = commentsBeforeEntry.trim(); // we should do "trimLeft", but currently, it is OK as is.
     }
 }

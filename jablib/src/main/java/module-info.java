@@ -30,6 +30,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.protectedterms;
     exports org.jabref.logic.remote;
     exports org.jabref.logic.remote.client;
+    exports org.jabref.logic.remote.server;
     exports org.jabref.logic.net.ssl;
     exports org.jabref.logic.citationstyle;
     exports org.jabref.architecture;
@@ -68,6 +69,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.auxparser;
     exports org.jabref.logic.cleanup;
     exports org.jabref.logic.formatter;
+    exports org.jabref.logic.importer.fetcher.citation.crossref;
     exports org.jabref.logic.importer.fetcher.citation.semanticscholar;
     exports org.jabref.logic.formatter.bibtexfields;
     exports org.jabref.model.pdf;
@@ -84,7 +86,6 @@ open module org.jabref.jablib {
     exports org.jabref.logic.biblog;
     exports org.jabref.model.biblog;
     exports org.jabref.model.http;
-    exports org.jabref.logic.remote.server;
     exports org.jabref.logic.util.strings;
     exports org.jabref.model.openoffice;
     exports org.jabref.logic.openoffice;
@@ -119,6 +120,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.merge.planning;
     exports org.jabref.logic.git.merge.execution;
     exports org.jabref.model.sciteTallies;
+    exports org.jabref.logic.bibtex.comparator.plausibility;
 
     requires java.base;
 
@@ -155,9 +157,9 @@ open module org.jabref.jablib {
     // region: data mapping
     requires jdk.xml.dom;
     requires com.google.gson;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.dataformat.yaml;
-    requires com.fasterxml.jackson.datatype.jsr310;
+    requires tools.jackson.databind;
+    requires tools.jackson.dataformat.yaml;
+    requires tools.jackson.core;
     // endregion
 
     // region HTTP clients
@@ -257,7 +259,7 @@ open module org.jabref.jablib {
     requires cuid;
     requires dd.plist;
     requires io.github.adr;
-    requires textFormatter;
+    requires io.github.darvil.terminal.textformatter;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;

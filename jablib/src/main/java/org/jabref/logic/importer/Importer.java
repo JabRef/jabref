@@ -37,7 +37,7 @@ public abstract class Importer implements Comparable<Importer> {
      * The effect of this method is primarily to avoid unnecessary processing of files when searching for a suitable
      * import format. If this method returns false, the import routine will move on to the next import format.
      * <p>
-     * Thus, the correct behaviour is to return false if it is certain that the file is not of the suitable type, and
+     * Thus, the correct behavior is to return false if it is certain that the file is not of the suitable type, and
      * true otherwise. Returning true is the safe choice if not certain.
      */
     public abstract boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException;

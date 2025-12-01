@@ -74,6 +74,9 @@
                GridPane.columnIndex="0" GridPane.rowIndex="8"/>
         <TextField fx:id="unwantedCharacters"
                 GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+
+        <CheckBox fx:id="transliterateFieldsForCitationKey" text="%Transliterate fields for citation key"
+                GridPane.columnIndex="0" GridPane.rowIndex="9"/>
     </GridPane>
 
     <HBox spacing="8.0">
