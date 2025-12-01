@@ -31,6 +31,7 @@ jobs:
           MERGEABLE=$(gh pr view --json mergeable $PR_NUMBER --template '{{.mergeable}}')
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
+            echo "❌ Merge conflicts" >> $GITHUB_STEP_SUMMARY
             gh issue edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
 
             # "workflow dispatch" does not trigger subsequent "on completion" runs
@@ -56,11 +57,13 @@ jobs:
           -->
           EOF
               gh issue comment "$PR_NUMBER" --body-file body.txt
+              echo "Commented on PR" >> $GITHUB_STEP_SUMMARY
             fi;
 
             exit 1
           fi
           echo "✅ No merge conflicts"
+          echo "✅ No merge conflicts" >> $GITHUB_STEP_SUMMARY
         env:
           EVENT: ${{ github.event_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
