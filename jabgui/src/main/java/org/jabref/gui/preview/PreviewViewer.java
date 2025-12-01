@@ -108,10 +108,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightLayoutText());
-        
+
         setFitToHeight(false);
         setFitToWidth(false);
-        
+
         setHbarPolicy(ScrollBarPolicy.NEVER);
         setVbarPolicy(ScrollBarPolicy.NEVER);
         previewView = WebViewStore.get();
@@ -152,22 +152,22 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 }, false);
             }
 
-                
+
                 try {
                     Object heightObj = previewView.getEngine().executeScript("document.getElementById('content').scrollHeight || document.body.scrollHeight");
-                    if (heightObj instanceof java.lang.Number) {
-                        double height = ((java.lang.Number) heightObj).doubleValue();
-                        
+                    if (heightObj instanceof java.lang.Number heightNum) {
+                        double height = heightNum.doubleValue();
+
                         javafx.application.Platform.runLater(() -> {
                             contentHeight.set(height);
-                            
+
                             this.setPrefHeight(height + 8);
                         });
                     }
 
                     Object widthObj = previewView.getEngine().executeScript("document.getElementById('content').scrollWidth || document.body.scrollWidth");
-                    if (widthObj instanceof java.lang.Number) {
-                        double width = ((java.lang.Number) widthObj).doubleValue();
+                    if (widthObj instanceof java.lang.Number widthNum) {
+                        double width = widthNum.doubleValue();
                         javafx.application.Platform.runLater(() -> {
                             contentWidth.set(width);
                             this.setPrefWidth(width + 8);
