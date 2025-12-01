@@ -20,6 +20,7 @@ import org.jabref.http.server.resources.MapResource;
 import org.jabref.http.server.resources.RootResource;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -34,6 +35,11 @@ import org.slf4j.LoggerFactory;
 
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
+    private final CliPreferences preferences;
+
+    public Server(CliPreferences preferences) {
+        this.preferences = preferences;
+    }
 
     /// Entry point for the CLI
     public HttpServer run(List<Path> files, URI uri) {
@@ -90,7 +96,7 @@ public class Server {
     private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
-        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory());
+        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory(preferences));
 
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();

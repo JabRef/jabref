@@ -6,9 +6,16 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.glassfish.hk2.api.Factory;
 
 public class PreferencesFactory implements Factory<CliPreferences> {
+
+    private final CliPreferences preferences;
+
+    public PreferencesFactory(CliPreferences preferences) {
+        this.preferences = preferences;
+    }
+
     @Override
     public CliPreferences provide() {
-        return JabRefCliPreferences.getInstance();
+        return preferences;
     }
 
     @Override
