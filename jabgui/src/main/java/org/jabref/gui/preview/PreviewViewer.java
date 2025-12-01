@@ -107,7 +107,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
-        this.searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightLayoutText());
+        this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
 
         setFitToHeight(false);
         setFitToWidth(false);
@@ -125,7 +125,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.getEngine().setJavaScriptEnabled(true);
         themeManager.installCss(previewView.getEngine());
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldState, newValue) -> {
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
