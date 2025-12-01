@@ -76,7 +76,7 @@ public class Server {
         return httpServer;
     }
 
-    ///  Entry point for the GUI
+    /// Entry point for the GUI
     public HttpServer run(SrvStateManager srvStateManager, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
