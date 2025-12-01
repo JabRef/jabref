@@ -67,7 +67,7 @@ public class JabKit implements Runnable {
     @Mixin
     private SharedOptions sharedOptions = new SharedOptions();
 
-    @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
+    @Option(names = {"-v", "--version"}, versionHelp = true, description = "Display version info.")
     private boolean versionInfoRequested;
 
     public JabKit(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
@@ -251,13 +251,13 @@ public class JabKit implements Runnable {
     }
 
     public static class SharedOptions {
-        @Option(names = {"-d", "--debug"}, description = "Enable debug output")
+        @Option(names = {"-d", "--debug"}, description = "Enable debug output.")
         boolean debug;
 
-        @Option(names = {"-p", "--porcelain"}, description = "Enable script-friendly output")
+        @Option(names = {"-p", "--porcelain"}, description = "Enable script-friendly output.")
         boolean porcelain;
 
-        @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message")
+        @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message.")
         private boolean usageHelpRequested = true;
     }
 }
