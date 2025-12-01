@@ -31,7 +31,7 @@ jobs:
           MERGEABLE=$(gh pr view --json mergeable $PR_NUMBER --template '{{.mergeable}}')
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
-            gh issue edit --repo $REPO $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
+            gh issue edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
 
             # "workflow dispatch" does not trigger subsequent "on completion" runs
             # Therefore, we emulate ghprcomment here
