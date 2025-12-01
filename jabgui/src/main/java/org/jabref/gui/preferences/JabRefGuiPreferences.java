@@ -1184,7 +1184,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE, defaults.getLatestImmediateType().getDisplayName());
         EntryType immediateType = StandardEntryType.Article;
-
         for (StandardEntryType type : StandardEntryType.values()) {
             if (type.getDisplayName().equals(immediateTypeName)) {
                 immediateType = type;
