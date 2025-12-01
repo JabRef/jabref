@@ -23,7 +23,6 @@ public class MainTableTooltip extends Tooltip {
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
 
         fieldValueLabel.setWrapText(true);
-        
         fieldValueLabel.setMaxWidth(Double.MAX_VALUE);
 
         tooltipContent.getChildren().addAll(fieldValueLabel, preview);
@@ -39,7 +38,7 @@ public class MainTableTooltip extends Tooltip {
             if (contentH <= 0) {
                 return;
             }
-            
+
             preview.setPrefHeight(contentH + 8);
         });
 
@@ -48,9 +47,9 @@ public class MainTableTooltip extends Tooltip {
             if (contentW <= 0) {
                 return;
             }
-            
+
             double desired = Math.max(contentW + previewWidthPadding, 200.0);
-            
+
             this.setMaxWidth(Double.MAX_VALUE);
             this.setPrefWidth(desired);
         });
