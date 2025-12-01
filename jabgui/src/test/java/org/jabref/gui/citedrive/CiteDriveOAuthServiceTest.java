@@ -43,7 +43,6 @@ class CiteDriveOAuthServiceTest {
 
     @Test
     @Disabled
-    // @Timeout(value = 2, unit = TimeUnit.SECONDS)
     void getToken() throws ExecutionException, InterruptedException {
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
