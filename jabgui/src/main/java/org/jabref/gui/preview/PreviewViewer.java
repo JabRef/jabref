@@ -154,8 +154,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
             try {
                 Object heightObj = previewView.getEngine().executeScript("document.getElementById('content').scrollHeight || document.body.scrollHeight");
-                if (heightObj instanceof java.lang.Number) {
-                    double height = ((java.lang.Number) heightObj).doubleValue();
+                if (heightObj instanceof java.lang.Number number) {
+                    double height = number.doubleValue();
 
                     javafx.application.Platform.runLater(() -> {
                         contentHeight.set(height);
@@ -165,8 +165,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 }
 
                 Object widthObj = previewView.getEngine().executeScript("document.getElementById('content').scrollWidth || document.body.scrollWidth");
-                if (widthObj instanceof java.lang.Number) {
-                    double width = ((java.lang.Number) widthObj).doubleValue();
+                if (widthObj instanceof java.lang.Number number) {
+                    double width = number.doubleValue();
                     javafx.application.Platform.runLater(() -> {
                         contentWidth.set(width);
                         this.setPrefWidth(width + 8);
