@@ -27,6 +27,7 @@ jobs:
       - name: Check PR mergeability
         id: check_mergeable
         run: |
+          set -ex
           MERGEABLE=$(gh pr view --json mergeable $PR_NUMBER --template '{{.mergeable}}')
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
