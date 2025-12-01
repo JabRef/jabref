@@ -27,11 +27,11 @@ jobs:
       - name: Check PR mergeability
         id: check_mergeable
         run: |
-          set -ex
+          set -e
           MERGEABLE=$(gh pr view --json mergeable $PR_NUMBER --template '{{.mergeable}}')
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
-            echo "❌ Merge conflicts" >> $GITHUB_STEP_SUMMARY
+            echo "❌ Merge conflicts at PR [#$PR_NUMBER](https://github.com/JabRef/jabref/pull/$PR_NUMBER)" >> $GITHUB_STEP_SUMMARY
             gh issue edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
 
             # "workflow dispatch" does not trigger subsequent "on completion" runs
