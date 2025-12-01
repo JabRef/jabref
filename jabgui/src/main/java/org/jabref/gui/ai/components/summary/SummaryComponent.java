@@ -3,6 +3,8 @@ package org.jabref.gui.ai.components.summary;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
 import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
@@ -10,6 +12,7 @@ import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponen
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.ai.AiExporter;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
@@ -22,21 +25,16 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.field.Field;
+
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.util.StandardFileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 
 
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummaryComponent.class);
@@ -126,11 +124,9 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                 assert processingInfo.getData().isPresent(); // When the state is SUCCESS, the data must be present.
                 yield showSummary(processingInfo.getData().get());
             }
-            case ERROR ->
-                    showErrorWhileSummarizing(processingInfo);
+            case ERROR -> showErrorWhileSummarizing(processingInfo);
             case PROCESSING,
-                 STOPPED ->
-                    showErrorNotSummarized();
+                 STOPPED -> showErrorNotSummarized();
         };
     }
 
@@ -170,8 +166,8 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
             aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext);
             // No need to rebuildUi(), because this class listens to the state of ProcessingInfo of the summary.
         },
-        () ->exportMarkdown(summary),
-        () ->exportJson(summary));
+                () -> exportMarkdown(summary),
+                () -> exportJson(summary));
     }
 
     private void exportJson(Summary summary) {
@@ -189,49 +185,24 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                 .ifPresent(path -> {
                     try {
-                        Map<String, Object> root = new HashMap<>();
-                        root.put("latest_provider", summary.aiProvider().getLabel());
-                        root.put("latest_model", summary.model());
-                        root.put("timestamp", summary.timestamp().toString());
-
-                        Map<String, String> entryMap = new HashMap<>();
-                        for (Field field : entry.getFields()) {
-                            entryMap.put(field.getName(), entry.getField(field).orElse(""));
-                        }
-                        root.put("entry", entryMap);
-
-
-                        StringBuilder bibtex = new StringBuilder();
-                        bibtex.append("@").append(entry.getType().getName()).append("{").append(entry.getCitationKey().orElse("")).append(",\n");
-                        for (Field field : entry.getFields()) {
-                            bibtex.append("  ").append(field.getName()).append(" = {").append(entry.getField(field).orElse("")).append("},\n");
-                        }
-                        bibtex.append("}");
-                        root.put("entry_bibtex", bibtex.toString());
-
-
-                        List<Map<String, String>> conversation = new ArrayList<>();
-                        Map<String, String> message = new HashMap<>();
-                        message.put("role", "assistant");
-                        message.put("content", summary.content());
-                        conversation.add(message);
-                        root.put("conversation", conversation);
-
-
-                        ObjectMapper mapper = new ObjectMapper();
-                        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-                        String jsonString = mapper.writeValueAsString(root);
+                        List<ChatMessage> dummyChat = List.of(new AiMessage(summary.content()));
+                        AiExporter exporter = new AiExporter(entry);
+                        String jsonString = exporter.buildJsonExport(
+                                summary.aiProvider().getLabel(),
+                                summary.model(),
+                                summary.timestamp().toString(),
+                                dummyChat
+                        );
 
                         Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                         dialogService.notify(Localization.lang("Export successful"));
-
-                    } catch (java.io.IOException e) {
+                    } catch (Exception e) {
                         LOGGER.error("Problem occurred while writing the export file", e);
                         dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
                     }
                 });
     }
+
     private void exportMarkdown(Summary summary) {
         if (summary == null) {
             dialogService.notify(Localization.lang("No summary available to export"));
@@ -243,24 +214,13 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                 .withInitialDirectory(Path.of(System.getProperty("user.home")))
                 .build();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("## Bibtex\n\n```bibtex\n");
-        sb.append("@").append(entry.getType().getName()).append("{").append(entry.getCitationKey().orElse("")).append(",\n");
-
-        for (Field field : entry.getFields()) {
-            String value = entry.getField(field).orElse("");
-            sb.append("  ").append(field.getName()).append(" = {").append(value).append("},\n");
-        }
-        sb.append("}\n```\n\n");
-        sb.append("## Summary\n\n");
-        sb.append(summary.content());
-
-        String finalContent = sb.toString();
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                 .ifPresent(path -> {
                     try {
-                        Files.writeString(path, finalContent, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                        dialogService.notify("Export successful");
+                        AiExporter exporter = new AiExporter(entry);
+                        String content = exporter.buildMarkdownExport("Summary", summary.content());
+                        Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                        dialogService.notify(Localization.lang("Export successful"));
                     } catch (Exception e) {
                         LOGGER.error("Problem occurred while writing the export file", e);
                         dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
@@ -268,3 +228,4 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                 });
     }
 }
+
