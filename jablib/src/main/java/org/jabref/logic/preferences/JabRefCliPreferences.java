@@ -1193,13 +1193,14 @@ public class JabRefCliPreferences implements CliPreferences {
     /**
      * Imports Preferences from an XML file.
      *
-     * @param file Path of file to import from
+     * @param path Path of file to import from
      * @throws JabRefException thrown if importing the preferences failed due to an
      *                         InvalidPreferencesFormatException or an IOException
      */
     @Override
-    public void importPreferences(Path file) throws JabRefException {
-        try (InputStream is = Files.newInputStream(file)) {
+    public void importPreferences(Path path) throws JabRefException {
+        LOGGER.debug("Importing preferences {}", path.toAbsolutePath());
+        try (InputStream is = Files.newInputStream(path)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException
                  | IOException ex) {

@@ -413,8 +413,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     @Override
-    public void importPreferences(Path file) throws JabRefException {
-        super.importPreferences(file);
+    public void importPreferences(Path path) throws JabRefException {
+        super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
