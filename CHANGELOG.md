@@ -21,7 +21,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added another custom Exporter AcademicPagesExporter and a new layout as well as the corresponding line in ExporterFactory. [#12727](...)
 - We added an initial [cite as you write](https://retorque.re/zotero-better-bibtex/citing/cayw/) ("CAYW") endpoint. [#13187](https://github.com/JabRef/jabref/issues/13187)
 - We added a field for the latest ICORE conference ranking lookup on the General Tab. [#13476](https://github.com/JabRef/jabref/issues/13476)
 - We added the option to enable the language server in the preferences. [#13697](https://github.com/JabRef/jabref/pull/13697)
