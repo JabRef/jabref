@@ -46,15 +46,15 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.ListUtil;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.controlsfx.control.PopOver;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.google.common.annotations.VisibleForTesting;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.UserMessage;
+import org.controlsfx.control.PopOver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
