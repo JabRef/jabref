@@ -17,7 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
-## [6.0-alpha.3] – 2025-11-29
+## [6.0-alpha.3] – 2025-10-30
 
 ### Added
 
