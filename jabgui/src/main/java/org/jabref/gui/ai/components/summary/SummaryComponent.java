@@ -1,17 +1,14 @@
 package org.jabref.gui.ai.components.summary;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import javafx.scene.Node;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.ai.AiExporter;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
@@ -21,17 +18,17 @@ import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-
-import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.util.StandardFileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
@@ -196,7 +193,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
 
                         Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                         dialogService.notify(Localization.lang("Export successful"));
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         LOGGER.error("Problem occurred while writing the export file", e);
                         dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
                     }
