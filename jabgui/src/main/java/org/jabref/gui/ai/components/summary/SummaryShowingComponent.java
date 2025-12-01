@@ -1,22 +1,20 @@
 package org.jabref.gui.ai.components.summary;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
-
+import com.airhacks.afterburner.views.ViewLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
-
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.logic.ai.summarization.Summary;
 import org.jabref.logic.layout.format.MarkdownFormatter;
 
-import com.airhacks.afterburner.views.ViewLoader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 public class SummaryShowingComponent extends VBox {
     private static final MarkdownFormatter MARKDOWN_FORMATTER = new MarkdownFormatter();
