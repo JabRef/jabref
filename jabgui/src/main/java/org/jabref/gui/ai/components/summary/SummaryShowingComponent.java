@@ -18,8 +18,10 @@ import java.util.Locale;
 
 public class SummaryShowingComponent extends VBox {
     private static final MarkdownFormatter MARKDOWN_FORMATTER = new MarkdownFormatter();
-    @FXML private Text summaryInfoText;
-    @FXML private CheckBox markdownCheckbox;
+    @FXML
+    private Text summaryInfoText;
+    @FXML
+    private CheckBox markdownCheckbox;
 
     private WebView contentWebView;
     private final Summary summary;
@@ -34,8 +36,8 @@ public class SummaryShowingComponent extends VBox {
         this.exportJsonCallback = exportJsonCallback;
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
     }
 
     @FXML
@@ -90,11 +92,15 @@ public class SummaryShowingComponent extends VBox {
 
     @FXML
     private void onExportMarkdown() {
-        if (exportMarkdownCallback != null) {exportMarkdownCallback.run();}
+        if (exportMarkdownCallback != null) {
+            exportMarkdownCallback.run();
+        }
     }
 
     @FXML
     private void onExportJson() {
-        if (exportJsonCallback != null) {exportJsonCallback.run();}
+        if (exportJsonCallback != null) {
+            exportJsonCallback.run();
+        }
     }
 }

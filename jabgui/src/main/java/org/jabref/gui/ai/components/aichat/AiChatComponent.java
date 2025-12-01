@@ -57,7 +57,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
 public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
 
@@ -77,16 +76,26 @@ public class AiChatComponent extends VBox {
 
     private final ObservableList<Notification> notifications = FXCollections.observableArrayList();
 
-    @FXML private Loadable uiLoadableChatHistory;
-    @FXML private ChatHistoryComponent uiChatHistory;
-    @FXML private Button notificationsButton;
-    @FXML private ChatPromptComponent chatPrompt;
-    @FXML private Label noticeText;
-    @FXML private Hyperlink exQuestion1;
-    @FXML private Hyperlink exQuestion2;
-    @FXML private Hyperlink exQuestion3;
-    @FXML private HBox exQuestionBox;
-    @FXML private HBox followUpQuestionsBox;
+    @FXML
+    private Loadable uiLoadableChatHistory;
+    @FXML
+    private ChatHistoryComponent uiChatHistory;
+    @FXML
+    private Button notificationsButton;
+    @FXML
+    private ChatPromptComponent chatPrompt;
+    @FXML
+    private Label noticeText;
+    @FXML
+    private Hyperlink exQuestion1;
+    @FXML
+    private Hyperlink exQuestion2;
+    @FXML
+    private Hyperlink exQuestion3;
+    @FXML
+    private HBox exQuestionBox;
+    @FXML
+    private HBox followUpQuestionsBox;
 
     private String noticeTemplate;
 
@@ -111,8 +120,8 @@ public class AiChatComponent extends VBox {
         aiService.getIngestionService().ingest(name, ListUtil.getLinkedFiles(entries).toList(), bibDatabaseContext);
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
     }
 
     @FXML
@@ -147,7 +156,7 @@ public class AiChatComponent extends VBox {
     }
 
     private Observable[] noticeDependencies() {
-        return new Observable[] {
+        return new Observable[]{
                 aiPreferences.aiProviderProperty(),
                 aiPreferences.openAiChatModelProperty(),
                 aiPreferences.mistralAiChatModelProperty(),
@@ -300,11 +309,10 @@ public class AiChatComponent extends VBox {
 
         entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
             switch (ingestionStatus.getState()) {
-                case PROCESSING ->
-                        notifications.add(new Notification(
-                                Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
-                                Localization.lang("After the file is ingested, you will be able to chat with it.")
-                        ));
+                case PROCESSING -> notifications.add(new Notification(
+                        Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
+                        Localization.lang("After the file is ingested, you will be able to chat with it.")
+                ));
 
                 case ERROR -> {
                     assert ingestionStatus.getException().isPresent(); // When the state is ERROR, the exception must be present.
