@@ -41,7 +41,8 @@ jobs:
 
               if [ -n "$HAS_CONFLICT_COMMENT" ]; then
                 echo "Already commented about conflicts."
-                exit 1;
+                # When triggered by another workflow, success is also if there is a merge conflict
+                exit 0;
               fi
 
               echo "Commenting on PR..."
@@ -58,6 +59,9 @@ jobs:
           EOF
               gh issue comment "$PR_NUMBER" --body-file body.txt
               echo "Commented on PR" >> $GITHUB_STEP_SUMMARY
+
+              # When triggered by another workflow, success is also if there is a merge conflict
+              exit 0;
             fi;
 
             exit 1

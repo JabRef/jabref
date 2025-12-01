@@ -22,4 +22,5 @@ jobs:
           while read pr; do
             echo "Triggering '$workflow_name' for PR #$pr"
             gh workflow run "$workflow_name" --ref add-rerun --field pr_number="$pr"
+            echo "Triggered '$workflow_name' for PR #$pr >> $GITHUB_STEP_SUMMARY
           done
