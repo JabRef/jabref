@@ -9,6 +9,8 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
@@ -85,6 +87,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
     private String layoutText;
+    private final ReadOnlyDoubleWrapper contentHeight = new ReadOnlyDoubleWrapper(0);
+    private final ReadOnlyDoubleWrapper contentWidth = new ReadOnlyDoubleWrapper(0);
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
@@ -103,10 +107,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
-        this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
-
-        setFitToHeight(true);
-        setFitToWidth(true);
+        this.searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightLayoutText());
+        
+        setFitToHeight(false);
+        setFitToWidth(false);
+        
+        setHbarPolicy(ScrollBarPolicy.NEVER);
+        setVbarPolicy(ScrollBarPolicy.NEVER);
         previewView = WebViewStore.get();
         setContent(previewView);
 
@@ -118,7 +125,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.getEngine().setJavaScriptEnabled(true);
         themeManager.installCss(previewView.getEngine());
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldState, newValue) -> {
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
@@ -144,8 +151,47 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     evt.preventDefault();
                 }, false);
             }
+
+                
+                try {
+                    Object heightObj = previewView.getEngine().executeScript("document.getElementById('content').scrollHeight || document.body.scrollHeight");
+                    if (heightObj instanceof java.lang.Number) {
+                        double height = ((java.lang.Number) heightObj).doubleValue();
+                        
+                        javafx.application.Platform.runLater(() -> {
+                            contentHeight.set(height);
+                            
+                            this.setPrefHeight(height + 8);
+                        });
+                    }
+
+                    Object widthObj = previewView.getEngine().executeScript("document.getElementById('content').scrollWidth || document.body.scrollWidth");
+                    if (widthObj instanceof java.lang.Number) {
+                        double width = ((java.lang.Number) widthObj).doubleValue();
+                        javafx.application.Platform.runLater(() -> {
+                            contentWidth.set(width);
+                            this.setPrefWidth(width + 8);
+                        });
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug("Could not compute preview content size", e);
+                }
         });
     }
+
+        /**
+         * Expose the measured content height of the rendered preview. Value is in CSS pixels.
+         */
+        public ReadOnlyDoubleProperty contentHeightProperty() {
+            return contentHeight.getReadOnlyProperty();
+        }
+
+        /**
+         * Expose the measured content width of the rendered preview. Value is in CSS pixels.
+         */
+        public ReadOnlyDoubleProperty contentWidthProperty() {
+            return contentWidth.getReadOnlyProperty();
+        }
 
     public void setLayout(PreviewLayout newLayout) {
         // Change listeners might set the layout to null while the update method is executing, therefore, we need to prevent this here

@@ -23,13 +23,37 @@ public class MainTableTooltip extends Tooltip {
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
 
         fieldValueLabel.setWrapText(true);
-        fieldValueLabel.setMaxWidth(450);
+        
+        fieldValueLabel.setMaxWidth(Double.MAX_VALUE);
 
         tooltipContent.getChildren().addAll(fieldValueLabel, preview);
         tooltipContent.setSpacing(5);
 
         this.setMaxWidth(500);
         this.setWrapText(true);
+
+        final double previewWidthPadding = 16.0;
+
+        preview.contentHeightProperty().addListener((obs, old, val) -> {
+            double contentH = val == null ? 0 : val.doubleValue();
+            if (contentH <= 0) {
+                return;
+            }
+            
+            preview.setPrefHeight(contentH + 8);
+        });
+
+        preview.contentWidthProperty().addListener((obs, old, val) -> {
+            double contentW = val == null ? 0 : val.doubleValue();
+            if (contentW <= 0) {
+                return;
+            }
+            
+            double desired = Math.max(contentW + previewWidthPadding, 200.0);
+            
+            this.setMaxWidth(Double.MAX_VALUE);
+            this.setPrefWidth(desired);
+        });
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
@@ -39,7 +63,6 @@ public class MainTableTooltip extends Tooltip {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setDatabaseContext(databaseContext);
             preview.setEntry(entry);
-            preview.setMaxHeight(200);
             this.setGraphic(tooltipContent);
         } else {
             this.setGraphic(fieldValueLabel);
