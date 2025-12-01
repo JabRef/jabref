@@ -1,9 +1,10 @@
 package org.jabref.gui.preview;
 
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import org.junit.jupiter.api.Test;
-
 import java.lang.reflect.Method;
+
+import javafx.beans.property.ReadOnlyDoubleProperty;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

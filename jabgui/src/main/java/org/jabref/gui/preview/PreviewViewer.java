@@ -108,10 +108,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightLayoutText());
-        
+
         setFitToHeight(false);
         setFitToWidth(false);
-        
+
         setHbarPolicy(ScrollBarPolicy.NEVER);
         setVbarPolicy(ScrollBarPolicy.NEVER);
         previewView = WebViewStore.get();
@@ -152,15 +152,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 }, false);
             }
 
-                
                 try {
                     Object heightObj = previewView.getEngine().executeScript("document.getElementById('content').scrollHeight || document.body.scrollHeight");
                     if (heightObj instanceof java.lang.Number) {
                         double height = ((java.lang.Number) heightObj).doubleValue();
-                        
+
                         javafx.application.Platform.runLater(() -> {
                             contentHeight.set(height);
-                            
+
                             this.setPrefHeight(height + 8);
                         });
                     }
