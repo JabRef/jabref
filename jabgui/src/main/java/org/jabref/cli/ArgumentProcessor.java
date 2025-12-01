@@ -103,7 +103,7 @@ public class ArgumentProcessor {
             preferences.clear();
             new SharedDatabasePreferences().clear();
         } catch (BackingStoreException e) {
-            System.err.println(e.getLocalizedMessage());
+            System.err.println(Localization.lang("Unable to clear preferences."));
             LOGGER.error("Unable to clear preferences", e);
         }
     }
