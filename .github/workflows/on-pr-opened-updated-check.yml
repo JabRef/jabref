@@ -66,7 +66,7 @@ jobs:
             exit 1
           fi
           echo "✅ No merge conflicts"
-          echo "✅ No merge conflicts" >> $GITHUB_STEP_SUMMARY
+          echo "✅ No merge conflicts at PR [#$PR_NUMBER](https://github.com/JabRef/jabref/pull/$PR_NUMBER)" >> $GITHUB_STEP_SUMMARY
         env:
           EVENT: ${{ github.event_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
