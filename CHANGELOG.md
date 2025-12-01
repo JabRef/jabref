@@ -32,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for `html` when parsing the arXiv identifiers. [#14451](https://github.com/JabRef/jabref/issues/14451)
 - When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
+- We added export options (Markdown and JSON) for AI Summary and AI Chat. [#13868](https://github.com/JabRef/jabref/issues/13868)
 
 ### Changed
 
