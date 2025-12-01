@@ -26,6 +26,7 @@ import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
+import com.nimbusds.openid.connect.sdk.OIDCScopeValue;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class CiteDriveOAuthService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CiteDriveOAuthService.class);
 
     private static final ClientID CLIENT_ID = new ClientID("jabref-desktop");
-    private static final Scope SCOPE_WRITE = new Scope("write");
+    private static final Scope SCOPE = new Scope(OIDCScopeValue.OPENID);
 
     private static final URI AUTH_ENDPOINT;
     private static final URI TOKEN_ENDPOINT;
@@ -80,7 +81,7 @@ public class CiteDriveOAuthService {
     private URI buildAuthUrl(String state) {
         return new AuthenticationRequest.Builder(
                 new ResponseType(ResponseType.Value.CODE),
-                SCOPE_WRITE,
+                SCOPE,
                 CLIENT_ID,
                 getCallBackUri())
                 .endpointURI(AUTH_ENDPOINT)
@@ -97,7 +98,7 @@ public class CiteDriveOAuthService {
     private Optional<Tokens> exchangeCodeForToken(String code) {
         AuthorizationCode authCode = new AuthorizationCode(code);
         AuthorizationGrant codeGrant = new AuthorizationCodeGrant(authCode, getCallBackUri());
-        TokenRequest request = new TokenRequest(TOKEN_ENDPOINT, CLIENT_ID, codeGrant, SCOPE_WRITE);
+        TokenRequest request = new TokenRequest(TOKEN_ENDPOINT, CLIENT_ID, codeGrant, SCOPE);
         TokenResponse response;
         try {
             response = TokenResponse.parse(request.toHTTPRequest().send());
