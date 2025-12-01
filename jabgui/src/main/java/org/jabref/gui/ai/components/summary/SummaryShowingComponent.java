@@ -92,6 +92,7 @@ public class SummaryShowingComponent extends VBox {
     private void onExportMarkdown() {
         if (exportMarkdownCallback != null) {exportMarkdownCallback.run();}
     }
+
     @FXML
     private void onExportJson() {
         if (exportJsonCallback != null) {exportJsonCallback.run();}

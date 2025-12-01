@@ -1,8 +1,13 @@
 package org.jabref.gui.ai.components.summary;
 
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
+
 import javafx.scene.Node;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
@@ -23,15 +28,12 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
-
 
 public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummaryComponent.class);
@@ -194,7 +196,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                         Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                         dialogService.notify(Localization.lang("Export successful"));
                     } catch (IOException e) {
-                        LOGGER.error("Problem occurred while writing the export file", e);
+                        LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
                         dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
                     }
                 });
@@ -219,7 +221,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                         Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                         dialogService.notify(Localization.lang("Export successful"));
                     } catch (Exception e) {
-                        LOGGER.error("Problem occurred while writing the export file", e);
+                        LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
                         dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
                     }
                 });
