@@ -35,7 +35,7 @@ public class HttpServerThread extends Thread {
         try {
             httpServer = this.server.run(srvStateManager, uri);
         } catch (ProcessingException e) {
-            LOGGER.error("Failed to start HTTP server thread: {}", e);
+            LOGGER.error("Failed to start HTTP server thread", e);
         }
     }
 
