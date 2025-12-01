@@ -7,10 +7,10 @@ import java.util.Objects;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
@@ -152,46 +152,45 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 }, false);
             }
 
+            try {
+                Object heightObj = previewView.getEngine().executeScript("document.getElementById('content').scrollHeight || document.body.scrollHeight");
+                if (heightObj instanceof java.lang.Number) {
+                    double height = ((java.lang.Number) heightObj).doubleValue();
 
-                try {
-                    Object heightObj = previewView.getEngine().executeScript("document.getElementById('content').scrollHeight || document.body.scrollHeight");
-                    if (heightObj instanceof java.lang.Number heightNum) {
-                        double height = heightNum.doubleValue();
+                    javafx.application.Platform.runLater(() -> {
+                        contentHeight.set(height);
 
-                        javafx.application.Platform.runLater(() -> {
-                            contentHeight.set(height);
-
-                            this.setPrefHeight(height + 8);
-                        });
-                    }
-
-                    Object widthObj = previewView.getEngine().executeScript("document.getElementById('content').scrollWidth || document.body.scrollWidth");
-                    if (widthObj instanceof java.lang.Number widthNum) {
-                        double width = widthNum.doubleValue();
-                        javafx.application.Platform.runLater(() -> {
-                            contentWidth.set(width);
-                            this.setPrefWidth(width + 8);
-                        });
-                    }
-                } catch (Exception e) {
-                    LOGGER.debug("Could not compute preview content size", e);
+                        this.setPrefHeight(height + 8);
+                    });
                 }
+
+                Object widthObj = previewView.getEngine().executeScript("document.getElementById('content').scrollWidth || document.body.scrollWidth");
+                if (widthObj instanceof java.lang.Number) {
+                    double width = ((java.lang.Number) widthObj).doubleValue();
+                    javafx.application.Platform.runLater(() -> {
+                        contentWidth.set(width);
+                        this.setPrefWidth(width + 8);
+                    });
+                }
+            } catch (Exception e) {
+                LOGGER.debug("Could not compute preview content size", e);
+            }
         });
     }
 
-        /**
-         * Expose the measured content height of the rendered preview. Value is in CSS pixels.
-         */
-        public ReadOnlyDoubleProperty contentHeightProperty() {
-            return contentHeight.getReadOnlyProperty();
-        }
+    /**
+     * Expose the measured content height of the rendered preview. Value is in CSS pixels.
+     */
+    public ReadOnlyDoubleProperty contentHeightProperty() {
+        return contentHeight.getReadOnlyProperty();
+    }
 
-        /**
-         * Expose the measured content width of the rendered preview. Value is in CSS pixels.
-         */
-        public ReadOnlyDoubleProperty contentWidthProperty() {
-            return contentWidth.getReadOnlyProperty();
-        }
+    /**
+     * Expose the measured content width of the rendered preview. Value is in CSS pixels.
+     */
+    public ReadOnlyDoubleProperty contentWidthProperty() {
+        return contentWidth.getReadOnlyProperty();
+    }
 
     public void setLayout(PreviewLayout newLayout) {
         // Change listeners might set the layout to null while the update method is executing, therefore, we need to prevent this here
