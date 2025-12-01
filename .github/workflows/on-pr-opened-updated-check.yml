@@ -23,6 +23,7 @@ jobs:
           MERGEABLE=$(gh pr view --json mergeable ${{ github.event.pull_request.number }} --template '{{.mergeable}}')
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
             exit 1
           fi
           echo "✅ No merge conflicts"
