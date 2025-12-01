@@ -94,9 +94,9 @@ public class Server {
     }
 
     private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
-        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
-        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory(preferences));
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences);
+        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
