@@ -20,7 +20,11 @@ class UnitsToLatexFormatterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"1~{A}, 1 A", "1\\mbox{-}{mA}, 1-mA"})
+    @CsvSource({"""
+               1~{A}, 1 A,
+               1\\mbox{-}{mA}, 1-mA
+            """
+    })
     void test(String expected, String text) {
         assertEquals(expected, formatter.format(text));
     }

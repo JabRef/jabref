@@ -25,15 +25,15 @@ class UnicodeConverterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            // combining accents
-            "{\\\"{a}}, a\u0308",
-            "{\\\"{a}}b, a\u0308b",
+    @CsvSource(textBlock = """
+            # combining accents
+            {\\"{a}}, a\u0308
+            {\\"{a}}b, a\u0308b
 
-            // plain unicode letters
-            "{\\\"{a}}, ä",
-            "{{$\\Epsilon$}}, \u0395"
-    })
+            # plain unicode letters
+            {\\"{a}}, ä
+            {{$\\Epsilon$}}, \u0395
+            """)
     void unicode(String expected, String text) {
         assertEquals(expected, formatter.format(text));
     }
