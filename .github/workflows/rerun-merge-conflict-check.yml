@@ -1,8 +1,5 @@
 name: Rerun PR merge conclicts check
 
-permissions:
-  contents: read
-
 on:
   push:
     branches: [main, add-rerun]
