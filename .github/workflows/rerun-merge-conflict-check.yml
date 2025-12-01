@@ -1,8 +1,8 @@
 name: Rerun PR merge conclicts check
 
 on:
-  push:
-    branches: [main, add-rerun]
+  schedule:
+    - cron: "0 3 * * *"
   workflow_dispatch:
 
 jobs:
