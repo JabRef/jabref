@@ -220,7 +220,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                         String content = exporter.buildMarkdownExport("Summary", summary.content());
                         Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                         dialogService.notify(Localization.lang("Export successful"));
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
                         dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
                     }

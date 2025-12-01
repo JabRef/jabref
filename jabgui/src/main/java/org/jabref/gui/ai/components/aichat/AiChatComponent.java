@@ -1,5 +1,6 @@
 package org.jabref.gui.ai.components.aichat;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -445,7 +446,7 @@ public class AiChatComponent extends VBox {
                         String content = exporter.buildMarkdownForChat(aiChatLogic.getChatHistory());
                         Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                         dialogService.notify(Localization.lang("Export successful"));
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
                         dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
                     }
@@ -477,7 +478,7 @@ public class AiChatComponent extends VBox {
                         );
                         Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                         dialogService.notify(Localization.lang("Export successful"));
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
                         dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
                     }
