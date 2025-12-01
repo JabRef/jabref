@@ -1,17 +1,19 @@
 package org.jabref.logic.ai;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.UserMessage;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.UserMessage;
 
 public class AiExporter {
 
@@ -41,7 +43,6 @@ public class AiExporter {
         for (ChatMessage msg : messages) {
             String role = "";
             String content = "";
-
             if (msg instanceof UserMessage userMessage) {
                 role = "User";
                 content = userMessage.singleText();
