@@ -1,5 +1,6 @@
 package org.jabref.gui.ai.components.summary;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javafx.scene.Node;
@@ -21,9 +22,21 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-
+import org.jabref.model.entry.field.Field;
+import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.util.StandardFileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+
+
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummaryComponent.class);
@@ -33,6 +46,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
     private final AiPreferences aiPreferences;
+    private final DialogService dialogService;
 
     public SummaryComponent(BibDatabaseContext bibDatabaseContext,
                             BibEntry entry,
@@ -50,6 +64,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
         this.aiService = aiService;
         this.aiPreferences = aiPreferences;
+        this.dialogService = dialogService;
 
         aiService.getSummariesService().summarize(entry, bibDatabaseContext).stateProperty().addListener(o -> rebuildUi());
 
@@ -154,6 +169,102 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
 
             aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext);
             // No need to rebuildUi(), because this class listens to the state of ProcessingInfo of the summary.
-        });
+        },
+        () ->exportMarkdown(summary),
+        () ->exportJson(summary));
+    }
+
+    private void exportJson(Summary summary) {
+        if (summary == null) {
+            dialogService.notify(Localization.lang("No summary available to export"));
+            return;
+        }
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.JSON)
+                .withDefaultExtension(StandardFileType.JSON)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                .ifPresent(path -> {
+                    try {
+                        Map<String, Object> root = new HashMap<>();
+                        root.put("latest_provider", summary.aiProvider().getLabel());
+                        root.put("latest_model", summary.model());
+                        root.put("timestamp", summary.timestamp().toString());
+
+                        Map<String, String> entryMap = new HashMap<>();
+                        for (Field field : entry.getFields()) {
+                            entryMap.put(field.getName(), entry.getField(field).orElse(""));
+                        }
+                        root.put("entry", entryMap);
+
+
+                        StringBuilder bibtex = new StringBuilder();
+                        bibtex.append("@").append(entry.getType().getName()).append("{").append(entry.getCitationKey().orElse("")).append(",\n");
+                        for (Field field : entry.getFields()) {
+                            bibtex.append("  ").append(field.getName()).append(" = {").append(entry.getField(field).orElse("")).append("},\n");
+                        }
+                        bibtex.append("}");
+                        root.put("entry_bibtex", bibtex.toString());
+
+
+                        List<Map<String, String>> conversation = new ArrayList<>();
+                        Map<String, String> message = new HashMap<>();
+                        message.put("role", "assistant");
+                        message.put("content", summary.content());
+                        conversation.add(message);
+                        root.put("conversation", conversation);
+
+
+                        ObjectMapper mapper = new ObjectMapper();
+                        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+                        String jsonString = mapper.writeValueAsString(root);
+
+                        Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                        dialogService.notify(Localization.lang("Export successful"));
+
+                    } catch (java.io.IOException e) {
+                        LOGGER.error("Problem occurred while writing the export file", e);
+                        dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                    }
+                });
+    }
+    private void exportMarkdown(Summary summary) {
+        if (summary == null) {
+            dialogService.notify(Localization.lang("No summary available to export"));
+            return;
+        }
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.MARKDOWN)
+                .withDefaultExtension(StandardFileType.MARKDOWN)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("## Bibtex\n\n```bibtex\n");
+        sb.append("@").append(entry.getType().getName()).append("{").append(entry.getCitationKey().orElse("")).append(",\n");
+
+        for (Field field : entry.getFields()) {
+            String value = entry.getField(field).orElse("");
+            sb.append("  ").append(field.getName()).append(" = {").append(value).append("},\n");
+        }
+        sb.append("}\n```\n\n");
+        sb.append("## Summary\n\n");
+        sb.append(summary.content());
+
+        String finalContent = sb.toString();
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                .ifPresent(path -> {
+                    try {
+                        Files.writeString(path, finalContent, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                        dialogService.notify("Export successful");
+                    } catch (Exception e) {
+                        LOGGER.error("Problem occurred while writing the export file", e);
+                        dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                    }
+                });
     }
 }

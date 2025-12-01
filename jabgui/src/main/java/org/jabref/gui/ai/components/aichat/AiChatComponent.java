@@ -1,11 +1,14 @@
 package org.jabref.gui.ai.components.aichat;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
@@ -27,6 +30,7 @@ import org.jabref.gui.ai.components.util.Loadable;
 import org.jabref.gui.ai.components.util.notifications.Notification;
 import org.jabref.gui.ai.components.util.notifications.NotificationsComponent;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
@@ -35,10 +39,12 @@ import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.ListUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -409,5 +415,132 @@ public class AiChatComponent extends VBox {
             messageIndex--;
         }
         return Optional.empty();
+    }
+    @FXML
+    private void exportMarkdown() {
+        if (aiChatLogic.getChatHistory().isEmpty()) {
+            dialogService.notify(Localization.lang("No chat history to export"));
+            return;
+        }
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.MARKDOWN)
+                .withDefaultExtension(StandardFileType.MARKDOWN)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                .ifPresent(path -> {
+                    try {
+                        StringBuilder sb = new StringBuilder();
+                        BibEntry entry = entries.getFirst();
+
+                        sb.append("## Bibtex\n\n```bibtex\n");
+                        sb.append("@").append(entry.getType().getName()).append("{").append(entry.getCitationKey().orElse("")).append(",\n");
+
+                        for (Field field : entry.getFields()) {
+                            String value = entry.getField(field).orElse("");
+                            sb.append("  ")
+                                    .append(field.getName())
+                                    .append(" = {")
+                                    .append(value)
+                                    .append("},\n");
+                        }
+                        sb.append("}\n```\n\n");
+                        sb.append("## Conversation\n\n");
+
+                        for (ChatMessage msg : aiChatLogic.getChatHistory()) {
+                            String role = "";
+                            String content = "";
+                            if (msg instanceof UserMessage) {
+                                role = "User";
+                                content = ((UserMessage) msg).singleText(); // UserMessage 用 singleText()
+                            } else if (msg instanceof AiMessage) {
+                                role = "AI";
+                                content = ((AiMessage) msg).text();
+                            } else {
+                                continue;
+                            }
+
+                            sb.append("**").append(role).append(":**\n\n");
+                            sb.append(content).append("\n\n");
+                        }
+                        Files.writeString(path, sb.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                        dialogService.notify(Localization.lang("Export successful"));
+
+                    } catch (IOException e) {
+                        LOGGER.error("Problem occurred while writing the export file", e);
+                        dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                    }
+                });
+    }
+
+    @FXML
+    private void exportJson() {
+        if (aiChatLogic.getChatHistory().isEmpty()) {
+            dialogService.notify(Localization.lang("No chat history to export"));
+            return;
+        }
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.JSON)
+                .withDefaultExtension(StandardFileType.JSON)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                .ifPresent(path -> {
+                    try {
+                        Map<String, Object> root = new HashMap<>();
+                        BibEntry entry = entries.getFirst();
+                        root.put("latest_provider", aiPreferences.getAiProvider().getLabel());
+                        root.put("latest_model", aiPreferences.getSelectedChatModel());
+                        root.put("timestamp", java.time.LocalDateTime.now().toString());
+                        Map<String, String> entryMap = new HashMap<>();
+                        for (Field field : entry.getFields()) {
+                            entryMap.put(field.getName(), entry.getField(field).orElse(""));
+                        }
+                        root.put("entry", entryMap);
+
+                        StringBuilder bibtex = new StringBuilder();
+                        bibtex.append("@").append(entry.getType().getName()).append("{").append(entry.getCitationKey().orElse("")).append(",\n");
+                        for (Field field : entry.getFields()) { bibtex.append("  ").append(field.getName()).append(" = {").append(entry.getField(field).orElse("")).append("},\n");}
+                        bibtex.append("}");
+                        root.put("entry_bibtex", bibtex.toString());
+
+                        List<Map<String, String>> conversation = new ArrayList<>();
+
+                        for (ChatMessage msg : aiChatLogic.getChatHistory()) {
+                            String role = "";
+                            String content = "";
+
+                            if (msg instanceof UserMessage) {
+                                role = "user";
+                                content = ((UserMessage) msg).singleText();
+                            } else if (msg instanceof AiMessage) {
+                                role = "assistant";
+                                content = ((AiMessage) msg).text();
+                            } else {
+                                continue;
+                            }
+
+                            Map<String, String> messageMap = new HashMap<>();
+                            messageMap.put("role", role);
+                            messageMap.put("content", content);
+                            conversation.add(messageMap);
+                        }
+                        root.put("conversation", conversation);
+                        ObjectMapper mapper = new ObjectMapper();
+                        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+                        String jsonString = mapper.writeValueAsString(root);
+                        Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                        dialogService.notify(Localization.lang("Export successful"));
+
+                    } catch (IOException e) {
+                        LOGGER.error("Problem occurred while writing the export file", e);
+                        dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                    }
+                });
     }
 }
