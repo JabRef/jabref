@@ -308,7 +308,8 @@ public class MainTableColumnFactory {
     /**
      * Creates a column for fields with content selectors.
      */
-    private TableColumn<BibEntryTableViewModel, ?> createContentSelectorColumn(MainTableColumnModel columnModel, List<String> values) {
+    private TableColumn<BibEntryTableViewModel, ?> createContentSelectorColumn(MainTableColumnModel columnModel,
+                                                                               List<String> values) {
         return new ContentSelectorColumn(columnModel, values, undoManager);
     }
 
