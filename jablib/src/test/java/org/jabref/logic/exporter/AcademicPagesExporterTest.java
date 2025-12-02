@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.jgitunit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class AcademicPagesExporterTest {
