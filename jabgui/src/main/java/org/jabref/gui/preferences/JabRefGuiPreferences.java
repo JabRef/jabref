@@ -11,13 +11,13 @@ import java.util.Objects;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.prefs.BackingStoreException;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn;
-import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
