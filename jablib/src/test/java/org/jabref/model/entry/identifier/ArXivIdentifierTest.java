@@ -171,4 +171,25 @@ class ArXivIdentifierTest {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("0706.0001v1");
         assertEquals(Optional.of(new URI("https://arxiv.org/abs/0706.0001v1")), parsed.get().getExternalURI());
     }
+
+    @Test
+    void parseHtmlUrl() {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("https://arxiv.org/html/2511.01348v2");
+
+        assertEquals(Optional.of(new ArXivIdentifier("2511.01348", "2", "")), parsed);
+    }
+
+    @Test
+    void parseHtmlUrlWithoutVersion() {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("https://arxiv.org/html/2511.01348");
+
+        assertEquals(Optional.of(new ArXivIdentifier("2511.01348", "", "")), parsed);
+    }
+
+    @Test
+    void parseHttpHtmlUrl() {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("http://arxiv.org/html/1502.05795v1");
+
+        assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "1", "")), parsed);
+    }
 }
