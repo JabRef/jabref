@@ -50,6 +50,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty openFileExplorerInFilesDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastDirectory = new SimpleBooleanProperty();
 
+    private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
+    private final StringProperty coversDownloadLocation = new SimpleStringProperty("");
+
     private final Validator mainFileDirValidator;
 
     private final DialogService dialogService;
@@ -93,11 +96,13 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
-        openFileExplorerInFilesDirectory.setValue(filePreferences.shouldOpenFileExplorerInFileDirectory());
-        openFileExplorerInLastDirectory.setValue(filePreferences.shouldOpenFileExplorerInLastUsedDirectory());
         adjustLinkedFilesOnTransferProperty.setValue(filePreferences.shouldAdjustFileLinksOnTransfer());
         copyLinkedFilesOnTransferProperty.setValue(filePreferences.shouldCopyLinkedFilesOnTransfer());
         moveFilesOnTransferProperty.setValue(filePreferences.shouldMoveLinkedFilesOnTransfer());
+        openFileExplorerInFilesDirectory.setValue(filePreferences.shouldOpenFileExplorerInFileDirectory());
+        openFileExplorerInLastDirectory.setValue(filePreferences.shouldOpenFileExplorerInLastUsedDirectory());
+        shouldDownloadCovers.setValue(filePreferences.shouldDownloadCovers());
+        coversDownloadLocation.setValue(filePreferences.coversDownloadLocation());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -123,6 +128,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
         filePreferences.setOpenFileExplorerInFileDirectory(openFileExplorerInFilesDirectory.getValue());
         filePreferences.setOpenFileExplorerInLastUsedDirectory(openFileExplorerInLastDirectory.getValue());
+        filePreferences.setShouldDownloadCovers(shouldDownloadCovers.getValue());
+        filePreferences.setOpenFileExplorerInLastUsedDirectory(coversDownloadLocation.getValue());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
@@ -136,6 +143,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
+
         filePreferences.setAdjustFileLinksOnTransfer(adjustLinkedFilesOnTransferProperty.getValue());
         filePreferences.setCopyLinkedFilesOnTransfer(copyLinkedFilesOnTransferProperty.getValue());
         filePreferences.setMoveLinkedFilesOnTransfer(moveFilesOnTransferProperty.getValue());
@@ -238,6 +246,14 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty openFileExplorerInLastDirectoryProperty() {
         return openFileExplorerInLastDirectory;
+    }
+
+    public BooleanProperty shouldDownloadCoversProperty() {
+        return shouldDownloadCovers;
+    }
+
+    public StringProperty coversDownloadLocationProperty() {
+        return coversDownloadLocation;
     }
 }
 

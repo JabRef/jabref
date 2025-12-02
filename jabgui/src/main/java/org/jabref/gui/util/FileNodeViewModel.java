@@ -63,7 +63,7 @@ public class FileNodeViewModel {
      * Return a string for displaying a node name (and its number of children if it is a directory).
      */
     public String getDisplayText() {
-        if (path.toFile().isDirectory()) {
+        if (Files.isDirectory(path)) {
             return "%s (%s)".formatted(path.getFileName(), Localization.lang("%0 file(s)", fileCount));
         }
         return path.getFileName().toString();
@@ -74,7 +74,7 @@ public class FileNodeViewModel {
      * along with the last edited time
      */
     public String getDisplayTextWithEditDate() {
-        if (path.toFile().isDirectory()) {
+        if (Files.isDirectory(path)) {
             return "%s (%s)".formatted(path.getFileName(), Localization.lang("%0 file(s)", fileCount));
         }
         FileTime lastEditedTime = null;

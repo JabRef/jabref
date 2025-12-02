@@ -224,6 +224,29 @@ public class LinkedFile implements Serializable {
         return isOnlineLink(link.get());
     }
 
+    /**
+     * Extracts the file name, including basename and extension, from the link.
+     *
+     * @return extracted file name
+     */
+    public String getFileName() {
+        String linkedName = link.get();
+        if (isOnlineLink(linkedName)) {
+            return FileUtil.getFileNameFromUrl(linkedName).orElse("");
+        } else {
+            try {
+                Path pathname = Path.of(linkedName).getFileName();
+                if (pathname != null) {
+                    return pathname.toString();
+                } else {
+                    return "";
+                }
+            } catch (InvalidPathException ex) {
+                return "";
+            }
+        }
+    }
+
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> dirs = databaseContext.getFileDirectories(filePreferences);
         return findIn(dirs);
