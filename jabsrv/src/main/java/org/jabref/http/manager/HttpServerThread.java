@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.Server;
+import org.jabref.logic.preferences.CliPreferences;
 
 import jakarta.ws.rs.ProcessingException;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -23,10 +24,10 @@ public class HttpServerThread extends Thread {
 
     private HttpServer httpServer;
 
-    public HttpServerThread(SrvStateManager srvStateManager, URI uri) {
+    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, URI uri) {
         this.srvStateManager = srvStateManager;
         this.uri = uri;
-        this.server = new Server();
+        this.server = new Server(cliPreferences);
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
     }
 
@@ -35,7 +36,7 @@ public class HttpServerThread extends Thread {
         try {
             httpServer = this.server.run(srvStateManager, uri);
         } catch (ProcessingException e) {
-            LOGGER.error("Failed to start HTTP server thread: {}", e);
+            LOGGER.error("Failed to start HTTP server thread", e);
         }
     }
 
