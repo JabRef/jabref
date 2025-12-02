@@ -3,6 +3,7 @@ name: Mark and close stale change-request PRs
 on:
   schedule:
     - cron: "0 3 * * *"
+  workflow_dispatch:
 
 permissions:
   pull-requests: write
