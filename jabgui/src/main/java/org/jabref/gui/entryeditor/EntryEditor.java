@@ -30,6 +30,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
@@ -233,16 +234,28 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     private void setupNavigationForTab(FieldsEditorTab tab) {
         Node content = tab.getContent();
         if (content instanceof Parent parent) {
-            findAndSetupEditorTextFields(parent);
+            findAndSetupTabNavigableNodes(parent);
         }
     }
 
-    private void findAndSetupEditorTextFields(Parent parent) {
+    private void findAndSetupTabNavigableNodes(Parent parent) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof EditorTextField editor) {
                 editor.setupTabNavigation(this::isLastFieldInCurrentTab, this::moveToNextTabAndFocus);
-            } else if (child instanceof Parent childParent) {
-                findAndSetupEditorTextFields(childParent);
+            } else {
+                // Generic handler for other focusable controls (e.g., Button, ComboBox, CheckBox, etc.)
+                child.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (event.getCode() == KeyCode.TAB && !event.isShiftDown()) {
+                        if (isLastFieldInCurrentTab(child)) {
+                            moveToNextTabAndFocus();
+                            event.consume();
+                        }
+                    }
+                });
+            }
+
+            if (child instanceof Parent childParent) {
+                findAndSetupTabNavigableNodes(childParent);
             }
         }
     }
@@ -612,20 +625,27 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
 
         Collection<Field> shownFields = currentTab.getShownFields();
-        if (shownFields.isEmpty() || node.getId() == null) {
-            return false;
+        // Try field-based check first (preferred for standard field editors)
+        if (!shownFields.isEmpty() && node.getId() != null) {
+            Optional<Field> lastField = shownFields.stream()
+                                                   .reduce((first, second) -> second);
+
+            boolean matchesLastFieldId = lastField.map(Field::getName)
+                                                  .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
+                                                  .orElse(false);
+            if (matchesLastFieldId) {
+                return true;
+            }
         }
 
-        Optional<Field> lastField = shownFields.stream()
-                                               .reduce((first, second) -> second);
-
-        if (node instanceof Button) {
-            return true;
+        // Fallback: determine if the node is the last focusable control within the editor grid of the current tab
+        if (currentTab.getContent() instanceof Parent parent) {
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            Optional<Node> lastFocusable = findLastFocusableNode(searchRoot);
+            return lastFocusable.map(n -> n == node).orElse(false);
         }
 
-        return lastField.map(Field::getName)
-                        .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
-                        .orElse(false);
+        return false;
     }
 
     /**
@@ -660,7 +680,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             Optional<TextInputControl> anyTextInput = findAnyTextInput(parent);
             if (anyTextInput.isPresent()) {
                 anyTextInput.get().requestFocus();
+                return;
             }
+
+            // Final fallback: focus first focusable node within the editor grid (e.g., a button-only tab)
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            findFirstFocusableNode(searchRoot).ifPresent(Node::requestFocus);
         }
     }
 
@@ -685,6 +710,59 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 return Optional.of(textInput);
             } else if (child instanceof Parent childParent) {
                 Optional<TextInputControl> found = findAnyTextInput(childParent);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    // Returns the first focusable, visible, managed, and enabled node in depth-first order
+    private Optional<Node> findFirstFocusableNode(Parent parent) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (isNodeFocusable(child)) {
+                return Optional.of(child);
+            } else if (child instanceof Parent childParent) {
+                Optional<Node> found = findFirstFocusableNode(childParent);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    // Returns the last focusable, visible, managed, and enabled node in depth-first order
+    private Optional<Node> findLastFocusableNode(Parent parent) {
+        Optional<Node> last = Optional.empty();
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof Parent childParent) {
+                Optional<Node> sub = findLastFocusableNode(childParent);
+                if (sub.isPresent()) {
+                    last = sub;
+                }
+            }
+            if (isNodeFocusable(child)) {
+                last = Optional.of(child);
+            }
+        }
+        return last;
+    }
+
+    private boolean isNodeFocusable(Node node) {
+        return node.isFocusTraversable() && node.isVisible() && !node.isDisabled() && node.isManaged();
+    }
+
+    // Tries to locate the editor grid (with style class "editorPane") inside the tab content to avoid
+    // including preview or other sibling panels when determining focus order boundaries.
+    private Optional<Parent> findEditorGridParent(Parent root) {
+        if (root.getStyleClass().contains("editorPane")) {
+            return Optional.of(root);
+        }
+        for (Node child : root.getChildrenUnmodifiable()) {
+            if (child instanceof Parent p) {
+                Optional<Parent> found = findEditorGridParent(p);
                 if (found.isPresent()) {
                     return found;
                 }

@@ -56,8 +56,6 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
                 undoManager,
                 dialogService);
 
-        textField.setId(field.getName());
-
         establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
         textField.initContextMenu(Collections::emptyList, keyBindingRepository);
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);

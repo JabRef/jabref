@@ -12,10 +12,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
@@ -140,7 +137,6 @@ public class CommentsTab extends FieldsEditorTab {
                 if (shouldShowHideButton) {
                     Button hideDefaultOwnerCommentButton = new Button(Localization.lang("Hide user-specific comments field"));
                     hideDefaultOwnerCommentButton.setId("HIDE_COMMENTS_BUTTON");
-                    setupButtonTabNavigation(hideDefaultOwnerCommentButton);
                     hideDefaultOwnerCommentButton.setOnAction(e -> {
                         gridPane.getChildren().removeIf(node ->
                                 (node instanceof FieldNameLabel fieldNameLabel && fieldNameLabel.getText().equals(userSpecificCommentField.getName()))
@@ -158,7 +154,6 @@ public class CommentsTab extends FieldsEditorTab {
                     // Show "Show" button when user comments field is hidden
                     Button showDefaultOwnerCommentButton = new Button(Localization.lang("Show user-specific comments field"));
                     showDefaultOwnerCommentButton.setId("SHOW_COMMENTS_BUTTON");
-                    setupButtonTabNavigation(showDefaultOwnerCommentButton);
                     showDefaultOwnerCommentButton.setOnAction(e -> {
                         shouldShowHideButton = true;
                         setupPanel(bibDatabaseContext, entry, false);
@@ -168,24 +163,5 @@ public class CommentsTab extends FieldsEditorTab {
                 }
             }
         }
-    }
-
-    private void setupButtonTabNavigation(Button button) {
-        button.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.TAB && !event.isShiftDown()) {
-                // Find the EntryEditor in the parent hierarchy
-                Node parent = button.getParent();
-                while (parent != null && !(parent instanceof EntryEditor)) {
-                    parent = parent.getParent();
-                }
-
-                if (parent instanceof EntryEditor entryEditor) {
-                    if (entryEditor.isLastFieldInCurrentTab(button)) {
-                        entryEditor.moveToNextTabAndFocus();
-                        event.consume();
-                    }
-                }
-            }
-        });
     }
 }
