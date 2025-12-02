@@ -28,6 +28,7 @@ import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -41,7 +42,6 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
@@ -179,7 +179,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(null);
         }
         currentDatabase = newDatabase;
-        newDatabase.ifPresent(db -> addGroupImportEntries(rootGroup.get()));
+        newDatabase.ifPresent(_ -> addGroupImportEntries(rootGroup.get()));
     }
 
     private void addGroupImportEntries(GroupNodeViewModel parent) {
@@ -187,15 +187,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
             return;
         }
 
-        String grpName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
-        AbstractGroup importEntriesGroup = new SmartGroup(grpName, GroupHierarchyType.INDEPENDENT, ',');
-        boolean isGrpExist = parent.getGroupNode()
-                                   .getChildren()
-                                   .stream()
-                                   .map(GroupTreeNode::getGroup)
-                                   .anyMatch(grp -> grp instanceof SmartGroup);
-        if (!isGrpExist) {
+        String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
+        boolean groupExists = parent.getGroupNode()
+                                    .getChildren()
+                                    .stream()
+                                    .map(GroupTreeNode::getGroup)
+                                    .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equals(groupName));
+        if (!groupExists) {
             currentDatabase.ifPresent(db -> {
+                char keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
+                AbstractGroup importEntriesGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator);
                 GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);
                 newSubgroup.moveTo(parent.getGroupNode(), 0);
                 selectedGroups.setAll(new GroupNodeViewModel(db, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
@@ -251,14 +252,14 @@ public class GroupTreeViewModel extends AbstractViewModel {
             List<GroupTreeNode> newSuggestedSubgroups = new ArrayList<>();
 
             // 1. Create "Entries without linked files" group if it doesn't exist
-            SearchGroup withoutFilesGroup = JabRefSuggestedGroups.createWithoutFilesGroup();
+            SearchGroup withoutFilesGroup = GroupsFactory.createWithoutFilesGroup();
             if (!parent.hasSimilarSearchGroup(withoutFilesGroup)) {
                 GroupTreeNode subGroup = rootNode.addSubgroup(withoutFilesGroup);
                 newSuggestedSubgroups.add(subGroup);
             }
 
             // 2. Create "Entries without groups" group if it doesn't exist
-            SearchGroup withoutGroupsGroup = JabRefSuggestedGroups.createWithoutGroupsGroup();
+            SearchGroup withoutGroupsGroup = GroupsFactory.createWithoutGroupsGroup();
             if (!parent.hasSimilarSearchGroup(withoutGroupsGroup)) {
                 GroupTreeNode subGroup = rootNode.addSubgroup(withoutGroupsGroup);
                 newSuggestedSubgroups.add(subGroup);

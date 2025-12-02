@@ -55,8 +55,6 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
@@ -362,17 +360,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         defaults.put(ASK_FOR_INCLUDING_CROSS_REFERENCES, Boolean.TRUE);
         defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
-
-        // region NewEntryUnifierPreferences
-        defaults.put(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(NewEntryDialogTab.CHOOSE_ENTRY_TYPE));
-        defaults.put(CREATE_ENTRY_EXPAND_RECOMMENDED, true);
-        defaults.put(CREATE_ENTRY_EXPAND_OTHER, false);
-        defaults.put(CREATE_ENTRY_EXPAND_CUSTOM, true);
-        defaults.put(CREATE_ENTRY_IMMEDIATE_TYPE, StandardEntryType.Article.getDisplayName());
-        defaults.put(CREATE_ENTRY_ID_LOOKUP_GUESSING, true);
-        defaults.put(CREATE_ENTRY_ID_FETCHER_NAME, DoiFetcher.NAME);
-        defaults.put(CREATE_ENTRY_INTERPRET_PARSER_NAME, PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName());
-        // endregion
     }
 
     /**
@@ -410,16 +397,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getDonationPreferences().setAll(DonationPreferences.getDefault());
+        getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
     }
 
     @Override
-    public void importPreferences(Path file) throws JabRefException {
-        super.importPreferences(file);
+    public void importPreferences(Path path) throws JabRefException {
+        super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
+        getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -1173,29 +1162,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return newEntryPreferences;
         }
 
-        final int approachIndex = getInt(CREATE_ENTRY_APPROACH);
-        NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
-                                     ? NewEntryDialogTab.values()[approachIndex]
-                                     : NewEntryDialogTab.values()[0];
-
-        final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE);
-        EntryType immediateType = StandardEntryType.Article;
-        for (StandardEntryType type : StandardEntryType.values()) {
-            if (type.getDisplayName().equals(immediateTypeName)) {
-                immediateType = type;
-                break;
-            }
-        }
-
-        newEntryPreferences = new NewEntryPreferences(
-                approach,
-                getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED),
-                getBoolean(CREATE_ENTRY_EXPAND_OTHER),
-                getBoolean(CREATE_ENTRY_EXPAND_CUSTOM),
-                immediateType,
-                getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING),
-                get(CREATE_ENTRY_ID_FETCHER_NAME),
-                get(CREATE_ENTRY_INTERPRET_PARSER_NAME));
+        newEntryPreferences = getNewEntryPreferencesFromBackingStore(NewEntryPreferences.getDefault());
 
         EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)));
         EasyBind.listen(newEntryPreferences.typesRecommendedExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, newValue));
@@ -1207,6 +1174,33 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(newEntryPreferences.latestInterpretParserProperty(), (_, _, newValue) -> put(CREATE_ENTRY_INTERPRET_PARSER_NAME, newValue));
 
         return newEntryPreferences;
+    }
+
+    private NewEntryPreferences getNewEntryPreferencesFromBackingStore(NewEntryPreferences defaults) {
+        final int approachIndex = getInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(defaults.getLatestApproach()));
+        NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
+                                     ? NewEntryDialogTab.values()[approachIndex]
+                                     : NewEntryDialogTab.values()[0];
+
+        final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE, defaults.getLatestImmediateType().getDisplayName());
+        EntryType immediateType = StandardEntryType.Article;
+        for (StandardEntryType type : StandardEntryType.values()) {
+            if (type.getDisplayName().equals(immediateTypeName)) {
+                immediateType = type;
+                break;
+            }
+        }
+
+        return new NewEntryPreferences(
+                approach,
+                getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, defaults.getTypesRecommendedExpanded()),
+                getBoolean(CREATE_ENTRY_EXPAND_OTHER, defaults.getTypesOtherExpanded()),
+                getBoolean(CREATE_ENTRY_EXPAND_CUSTOM, defaults.getTypesCustomExpanded()),
+                immediateType,
+                getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING, defaults.getIdLookupGuessing()),
+                get(CREATE_ENTRY_ID_FETCHER_NAME, defaults.getLatestIdFetcher()),
+                get(CREATE_ENTRY_INTERPRET_PARSER_NAME, defaults.getLatestInterpretParser())
+        );
     }
 
     // region Donation preferences

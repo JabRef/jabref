@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -48,7 +48,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
             }
 
             if (parserResult.getMetaData().getGroups().isEmpty()) {
-                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));
+                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
             }
             GroupTreeNode root = parserResult.getMetaData().getGroups().get();
             root.addChild(markingRoot, 0);

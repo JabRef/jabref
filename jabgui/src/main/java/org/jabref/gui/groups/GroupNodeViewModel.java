@@ -26,7 +26,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -48,7 +48,6 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.LastNameGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
@@ -141,7 +140,7 @@ public class GroupNodeViewModel {
     }
 
     static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
-        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard, preferences);
+        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, GroupsFactory.createAllEntriesGroup(), localDragBoard, preferences);
     }
 
     private GroupNodeViewModel toViewModel(GroupTreeNode child) {
@@ -437,15 +436,13 @@ public class GroupNodeViewModel {
     }
 
     public boolean hasAllSuggestedGroups() {
-        return hasSimilarSearchGroup(JabRefSuggestedGroups.createWithoutFilesGroup())
-                && hasSimilarSearchGroup(JabRefSuggestedGroups.createWithoutGroupsGroup());
+        return hasSimilarSearchGroup(GroupsFactory.createWithoutFilesGroup())
+                && hasSimilarSearchGroup(GroupsFactory.createWithoutGroupsGroup());
     }
 
     public boolean canAddEntriesIn() {
         AbstractGroup group = groupNode.getGroup();
         if (group instanceof AllEntriesGroup) {
-            return false;
-        } else if (group instanceof SmartGroup) {
             return false;
         } else if (group instanceof ExplicitGroup) {
             return true;
@@ -477,8 +474,7 @@ public class GroupNodeViewModel {
     public boolean canBeDragged() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _,
-                 SmartGroup _ ->
+            case AllEntriesGroup _ ->
                     false;
             case ExplicitGroup _,
                  SearchGroup _,
@@ -513,8 +509,7 @@ public class GroupNodeViewModel {
             case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
-                 DateGroup _,
-                 SmartGroup _ ->
+                 DateGroup _ ->
                     false;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -532,8 +527,7 @@ public class GroupNodeViewModel {
     public boolean canRemove() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _,
-                 SmartGroup _ ->
+            case AllEntriesGroup _ ->
                     false;
             case ExplicitGroup _,
                  SearchGroup _,
@@ -560,8 +554,7 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
             case AllEntriesGroup _,
-                 DateGroup _,
-                 SmartGroup _ ->
+                 DateGroup _ ->
                     false;
             case ExplicitGroup _,
                  SearchGroup _,
