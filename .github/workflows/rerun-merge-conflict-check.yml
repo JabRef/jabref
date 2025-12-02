@@ -1,4 +1,4 @@
-name: Rerun PR merge conclicts check
+name: Rerun PR merge conflicts check
 
 on:
   schedule:
@@ -8,6 +8,10 @@ on:
 jobs:
   rerun:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
         with:
