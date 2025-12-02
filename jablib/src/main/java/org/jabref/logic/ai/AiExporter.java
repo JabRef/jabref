@@ -10,7 +10,6 @@ import org.jabref.model.entry.field.Field;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;

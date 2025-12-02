@@ -31,7 +31,6 @@ import org.jabref.model.entry.LinkedFile;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,24 +181,24 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
-                .ifPresent(path -> {
-                    try {
-                        List<ChatMessage> dummyChat = List.of(new AiMessage(summary.content()));
-                        AiExporter exporter = new AiExporter(entry);
-                        String jsonString = exporter.buildJsonExport(
-                                summary.aiProvider().getLabel(),
-                                summary.model(),
-                                summary.timestamp().toString(),
-                                dummyChat
-                        );
+                    .ifPresent(path -> {
+                        try {
+                            List<ChatMessage> dummyChat = List.of(new AiMessage(summary.content()));
+                            AiExporter exporter = new AiExporter(entry);
+                            String jsonString = exporter.buildJsonExport(
+                                    summary.aiProvider().getLabel(),
+                                    summary.model(),
+                                    summary.timestamp().toString(),
+                                    dummyChat
+                            );
 
-                        Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                        dialogService.notify(Localization.lang("Export successful"));
-                    } catch (IOException e) {
-                        LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
-                        dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
-                    }
-                });
+                            Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                            dialogService.notify(Localization.lang("Export successful"));
+                        } catch (IOException e) {
+                            LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
+                            dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                        }
+                    });
     }
 
     private void exportMarkdown(Summary summary) {
@@ -227,4 +226,3 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                 });
     }
 }
-
