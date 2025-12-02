@@ -38,8 +38,8 @@ public class SummaryShowingComponent extends VBox {
         this.exportJsonCallback = exportJsonCallback;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @FXML

@@ -120,8 +120,8 @@ public class AiChatComponent extends VBox {
         aiService.getIngestionService().ingest(name, ListUtil.getLinkedFiles(entries).toList(), bibDatabaseContext);
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @FXML
@@ -156,7 +156,7 @@ public class AiChatComponent extends VBox {
     }
 
     private Observable[] noticeDependencies() {
-        return new Observable[]{
+        return new Observable[] {
                 aiPreferences.aiProviderProperty(),
                 aiPreferences.openAiChatModelProperty(),
                 aiPreferences.mistralAiChatModelProperty(),
@@ -309,10 +309,11 @@ public class AiChatComponent extends VBox {
 
         entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
             switch (ingestionStatus.getState()) {
-                case PROCESSING -> notifications.add(new Notification(
-                        Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
-                        Localization.lang("After the file is ingested, you will be able to chat with it.")
-                ));
+                case PROCESSING ->
+                        notifications.add(new Notification(
+                                Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
+                                Localization.lang("After the file is ingested, you will be able to chat with it.")
+                        ));
 
                 case ERROR -> {
                     assert ingestionStatus.getException().isPresent(); // When the state is ERROR, the exception must be present.
@@ -440,17 +441,17 @@ public class AiChatComponent extends VBox {
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
-                    .ifPresent(path -> {
-                        try {
-                            AiExporter exporter = new AiExporter(entries.getFirst());
-                            String content = exporter.buildMarkdownForChat(aiChatLogic.getChatHistory());
-                            Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                            dialogService.notify(Localization.lang("Export successful"));
-                        } catch (IOException e) {
-                            LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
-                            dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
-                        }
-                    });
+                     .ifPresent(path -> {
+                         try {
+                             AiExporter exporter = new AiExporter(entries.getFirst());
+                             String content = exporter.buildMarkdownForChat(aiChatLogic.getChatHistory());
+                             Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export successful"));
+                         } catch (IOException e) {
+                             LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                         }
+                     });
     }
 
     @FXML
@@ -467,21 +468,21 @@ public class AiChatComponent extends VBox {
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
-                    .ifPresent(path -> {
-                        try {
-                            AiExporter exporter = new AiExporter(entries.getFirst());
-                            String jsonString = exporter.buildJsonExport(
-                                    aiPreferences.getAiProvider().getLabel(),
-                                    aiPreferences.getSelectedChatModel(),
-                                    java.time.LocalDateTime.now().toString(),
-                                    aiChatLogic.getChatHistory()
-                            );
-                            Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                            dialogService.notify(Localization.lang("Export successful"));
-                        } catch (IOException e) {
-                            LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
-                            dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
-                        }
-                    });
+                     .ifPresent(path -> {
+                         try {
+                             AiExporter exporter = new AiExporter(entries.getFirst());
+                             String jsonString = exporter.buildJsonExport(
+                                     aiPreferences.getAiProvider().getLabel(),
+                                     aiPreferences.getSelectedChatModel(),
+                                     java.time.LocalDateTime.now().toString(),
+                                     aiChatLogic.getChatHistory()
+                             );
+                             Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export successful"));
+                         } catch (IOException e) {
+                             LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                         }
+                     });
     }
 }

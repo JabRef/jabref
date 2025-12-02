@@ -122,9 +122,11 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                 assert processingInfo.getData().isPresent(); // When the state is SUCCESS, the data must be present.
                 yield showSummary(processingInfo.getData().get());
             }
-            case ERROR -> showErrorWhileSummarizing(processingInfo);
+            case ERROR ->
+                    showErrorWhileSummarizing(processingInfo);
             case PROCESSING,
-                 STOPPED -> showErrorNotSummarized();
+                 STOPPED ->
+                    showErrorNotSummarized();
         };
     }
 
@@ -181,24 +183,24 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
-                    .ifPresent(path -> {
-                        try {
-                            List<ChatMessage> dummyChat = List.of(new AiMessage(summary.content()));
-                            AiExporter exporter = new AiExporter(entry);
-                            String jsonString = exporter.buildJsonExport(
-                                    summary.aiProvider().getLabel(),
-                                    summary.model(),
-                                    summary.timestamp().toString(),
-                                    dummyChat
-                            );
+                     .ifPresent(path -> {
+                         try {
+                             List<ChatMessage> dummyChat = List.of(new AiMessage(summary.content()));
+                             AiExporter exporter = new AiExporter(entry);
+                             String jsonString = exporter.buildJsonExport(
+                                     summary.aiProvider().getLabel(),
+                                     summary.model(),
+                                     summary.timestamp().toString(),
+                                     dummyChat
+                             );
 
-                            Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                            dialogService.notify(Localization.lang("Export successful"));
-                        } catch (IOException e) {
-                            LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
-                            dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
-                        }
-                    });
+                             Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export successful"));
+                         } catch (IOException e) {
+                             LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                         }
+                     });
     }
 
     private void exportMarkdown(Summary summary) {
@@ -213,16 +215,16 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
-                .ifPresent(path -> {
-                    try {
-                        AiExporter exporter = new AiExporter(entry);
-                        String content = exporter.buildMarkdownExport("Summary", summary.content());
-                        Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                        dialogService.notify(Localization.lang("Export successful"));
-                    } catch (IOException e) {
-                        LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
-                        dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
-                    }
-                });
+                     .ifPresent(path -> {
+                         try {
+                             AiExporter exporter = new AiExporter(entry);
+                             String content = exporter.buildMarkdownExport("Summary", summary.content());
+                             Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export successful"));
+                         } catch (IOException e) {
+                             LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                         }
+                     });
     }
 }
