@@ -456,8 +456,6 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     public final Map<String, Object> defaults = new HashMap<>();
 
-    private final Preferences prefs;
-
     /**
      * Cache variables
      */
@@ -506,9 +504,6 @@ public class JabRefCliPreferences implements CliPreferences {
         } catch (JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
-
-        // load user preferences
-        prefs = PREFS_NODE;
 
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
@@ -933,16 +928,16 @@ public class JabRefCliPreferences implements CliPreferences {
      * @return true if the key is set, false otherwise.
      */
     public boolean hasKey(String key) {
-        return prefs.get(key, null) != null;
+        return PREFS_NODE.get(key, null) != null;
     }
 
     public String get(String key) {
-        return prefs.get(key, (String) defaults.get(key));
+        return PREFS_NODE.get(key, (String) defaults.get(key));
     }
 
     public String getEmptyIsDefault(String key) {
         String defaultValue = (String) defaults.get(key);
-        String result = prefs.get(key, defaultValue);
+        String result = PREFS_NODE.get(key, defaultValue);
         if ("".equals(result)) {
             return defaultValue;
         }
@@ -950,19 +945,19 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     public Optional<String> getAsOptional(String key) {
-        return Optional.ofNullable(prefs.get(key, (String) defaults.get(key)));
+        return Optional.ofNullable(PREFS_NODE.get(key, (String) defaults.get(key)));
     }
 
     public String get(String key, String def) {
-        return prefs.get(key, def);
+        return PREFS_NODE.get(key, def);
     }
 
     public boolean getBoolean(String key) {
-        return prefs.getBoolean(key, getBooleanDefault(key));
+        return PREFS_NODE.getBoolean(key, getBooleanDefault(key));
     }
 
     public boolean getBoolean(String key, boolean def) {
-        return prefs.getBoolean(key, def);
+        return PREFS_NODE.getBoolean(key, def);
     }
 
     private boolean getBooleanDefault(String key) {
@@ -970,11 +965,11 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     public int getInt(String key) {
-        return prefs.getInt(key, getIntDefault(key));
+        return PREFS_NODE.getInt(key, getIntDefault(key));
     }
 
     public int getInt(String key, int def) {
-        return prefs.getInt(key, def);
+        return PREFS_NODE.getInt(key, def);
     }
 
     public int getIntDefault(String key) {
@@ -982,11 +977,11 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     public double getDouble(String key) {
-        return prefs.getDouble(key, getDoubleDefault(key));
+        return PREFS_NODE.getDouble(key, getDoubleDefault(key));
     }
 
     public double getDouble(String key, double def) {
-        return prefs.getDouble(key, def);
+        return PREFS_NODE.getDouble(key, def);
     }
 
     private double getDoubleDefault(String key) {
@@ -994,27 +989,27 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     public void put(String key, String value) {
-        prefs.put(key, value);
+        PREFS_NODE.put(key, value);
     }
 
     public void putBoolean(String key, boolean value) {
-        prefs.putBoolean(key, value);
+        PREFS_NODE.putBoolean(key, value);
     }
 
     public void putInt(String key, int value) {
-        prefs.putInt(key, value);
+        PREFS_NODE.putInt(key, value);
     }
 
     public void putInt(String key, Number value) {
-        prefs.putInt(key, value.intValue());
+        PREFS_NODE.putInt(key, value.intValue());
     }
 
     public void putDouble(String key, double value) {
-        prefs.putDouble(key, value);
+        PREFS_NODE.putDouble(key, value);
     }
 
     protected void remove(String key) {
-        prefs.remove(key);
+        PREFS_NODE.remove(key);
     }
 
     /**
@@ -1058,7 +1053,7 @@ public class JabRefCliPreferences implements CliPreferences {
         clearCitationKeyPatterns();
         clearTruststoreFromCustomCertificates();
         clearCustomFetcherKeys();
-        prefs.clear();
+        PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
     }
 
@@ -1095,7 +1090,7 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
         try {
-            prefs.flush();
+            PREFS_NODE.flush();
         } catch (BackingStoreException ex) {
             LOGGER.warn("Cannot communicate with backing store", ex);
         }
@@ -1106,7 +1101,7 @@ public class JabRefCliPreferences implements CliPreferences {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            addPrefsRecursively(this.prefs, result);
+            addPrefsRecursively(PREFS_NODE, result);
         } catch (BackingStoreException e) {
             LOGGER.info("could not retrieve preference keys", e);
         }
@@ -1180,7 +1175,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public void exportPreferences(Path path) throws JabRefException {
         LOGGER.debug("Exporting preferences {}", path.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(path)) {
-            prefs.exportSubtree(os);
+            PREFS_NODE.exportSubtree(os);
         } catch (BackingStoreException
                  | IOException ex) {
             throw new JabRefException(
@@ -1193,21 +1188,24 @@ public class JabRefCliPreferences implements CliPreferences {
     /**
      * Imports Preferences from an XML file.
      *
-     * @param file Path of file to import from
+     * @param path Path of file to import from
      * @throws JabRefException thrown if importing the preferences failed due to an
      *                         InvalidPreferencesFormatException or an IOException
      */
     @Override
-    public void importPreferences(Path file) throws JabRefException {
-        try (InputStream is = Files.newInputStream(file)) {
+    public void importPreferences(Path path) throws JabRefException {
+        LOGGER.debug("Importing preferences {}", path.toAbsolutePath());
+        try (InputStream is = Files.newInputStream(path)) {
             Preferences.importPreferences(is);
-        } catch (InvalidPreferencesFormatException
-                 | IOException ex) {
+        } catch (InvalidPreferencesFormatException | IOException ex) {
             throw new JabRefException(
                     "Could not import preferences",
                     Localization.lang("Could not import preferences"),
                     ex);
         }
+
+        // TODO: We need to load all CLI-preferences from the backing store
+        //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
     }
 
     //*************************************************************************************************************

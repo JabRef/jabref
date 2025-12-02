@@ -11,8 +11,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
 
-public class ISBNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<ISBN> {
-    public ISBNIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
+public class ISSNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<ISBN> {
+    public ISSNIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
                                          FieldCheckers fieldCheckers,
                                          DialogService dialogService,
                                          TaskExecutor taskExecutor,

@@ -1,5 +1,3 @@
-- label: 'status: changes-required'
-
 # Compilation, tests, and code style
 
 - jobName: windows installer and portable version
@@ -150,7 +148,7 @@
 
     In future, **please avoid that**. For now, you can continue working.
 - jobName: 'Conflicts with target branch'
-  workflowName: 'On PR opened/updated'
+  workflowName: 'On PR opened/updated (check)'
   message: >
     Your pull request conflicts with the target branch.
 

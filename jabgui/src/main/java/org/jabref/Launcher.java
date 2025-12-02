@@ -135,6 +135,7 @@ public class Launcher {
         Configuration.set("writerFile.level", logLevel.name().toLowerCase());
         // We need to manually join the path, because ".resolve" does not work on Windows,
         // because ":" is not allowed in file names on Windows
+        // Idea is to have a clean console, but to have the log file ready to be sent to maintainers for debug
         Configuration.set("writerFile.file", directory + File.separator + "log_{date:yyyy-MM-dd_HH-mm-ss}.txt");
         Configuration.set("writerFile.charset", "UTF-8");
         Configuration.set("writerFile.policies", "startup");
