@@ -19,7 +19,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +109,7 @@ public class AcademicPagesExporter extends Exporter {
         }
     }
 
-    private static @NotNull Path getPath(BibEntry entry, Path exportDirectory) {
+    private static @NonNull Path getPath(BibEntry entry, Path exportDirectory) {
         Replace replace_formatter = new Replace();
         replace_formatter.setArgument(" ,-");
         RemoveLatexCommandsFormatter commands_formatter = new RemoveLatexCommandsFormatter();
