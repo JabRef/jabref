@@ -19,6 +19,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,17 +98,8 @@ public class AcademicPagesExporter extends Exporter {
                     LOGGER.warn("Skipping entry with no type: {}", entry);
                     continue;
                 }
-                //formatting the title of each entry to match the file names format demanded by academic pages (applying the same formatters applied to the title in the academicpages.layout)
-                Replace replace_formatter = new Replace();
-                replace_formatter.setArgument(" ,-");
-                RemoveLatexCommandsFormatter commands_formatter = new RemoveLatexCommandsFormatter();
-                HTMLChars html_formatter = new HTMLChars();
-                String title = entry.getTitle().get();
-                String formatted_title = commands_formatter.format(html_formatter.format(replace_formatter.format(title)));
-                SafeFileName safe_formatter = new SafeFileName(); // added custom formatter to remove all characters that are not allowed in filenames
-                String safe_title = safe_formatter.format(formatted_title);
-
-                Path path = exportDirectory.resolve(safe_title + ".md");
+                // formatting the title of each entry to match the file names format demanded by academic pages (applying the same formatters applied to the title in the academicpages.layout)
+                Path path = getPath(entry, exportDirectory);
 
                 List<BibEntry> individual_entry = new ArrayList<BibEntry>();
                 individual_entry.add(entry);
@@ -116,5 +108,17 @@ public class AcademicPagesExporter extends Exporter {
         } catch (IOException e) {
             throw new SaveException("could not export");
         }
+    }
+
+    private static @NotNull Path getPath(BibEntry entry, Path exportDirectory) {
+        Replace replace_formatter = new Replace();
+        replace_formatter.setArgument(" ,-");
+        RemoveLatexCommandsFormatter commands_formatter = new RemoveLatexCommandsFormatter();
+        HTMLChars html_formatter = new HTMLChars();
+        String title = entry.getTitle().get();
+        String formatted_title = commands_formatter.format(html_formatter.format(replace_formatter.format(title)));
+        SafeFileName safe_formatter = new SafeFileName(); // added custom formatter to remove all characters that are not allowed in filenames
+        String safe_title = safe_formatter.format(formatted_title);
+        return exportDirectory.resolve(safe_title + ".md");
     }
 }
