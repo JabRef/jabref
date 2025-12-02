@@ -77,7 +77,10 @@ public class MetaData {
     private BibDatabaseMode mode;
     private boolean isProtected;
     private String librarySpecificFileDirectory;
+
+    @NonNull
     private final ContentSelectors contentSelectors = new ContentSelectors();
+
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
@@ -196,25 +199,25 @@ public class MetaData {
         return isProtected;
     }
 
-    public ContentSelectors getContentSelectors() {
+    public @NonNull ContentSelectors getContentSelectors() {
         return contentSelectors;
     }
 
-    public SortedSet<ContentSelector> getContentSelectorsSorted() {
+    public @NonNull SortedSet<@NonNull ContentSelector> getContentSelectorsSorted() {
         return contentSelectors.getContentSelectors();
     }
 
-    public void addContentSelector(ContentSelector contentSelector) {
+    public void addContentSelector(@NonNull ContentSelector contentSelector) {
         this.contentSelectors.addContentSelector(contentSelector);
         postChange();
     }
 
-    public void clearContentSelectors(Field field) {
+    public void clearContentSelectors(@NonNull Field field) {
         contentSelectors.removeSelector(field);
         postChange();
     }
 
-    public List<String> getContentSelectorValuesForField(Field field) {
+    public @NonNull List<@NonNull String> getContentSelectorValuesForField(Field field) {
         return contentSelectors.getSelectorValuesForField(field);
     }
 
