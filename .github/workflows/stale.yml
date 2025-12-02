@@ -15,7 +15,7 @@ jobs:
       - uses: actions/stale@v10
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          exempt-pr-labels: "📌 Pinned"
+          exempt-pr-labels: "📌 Pinned,dev: no-bot-comments"
 
           days-before-issue-stale: -1
           days-before-issue-close: -1
