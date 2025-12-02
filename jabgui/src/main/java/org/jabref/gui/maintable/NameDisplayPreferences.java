@@ -22,6 +22,14 @@ public class NameDisplayPreferences {
         this.abbreviationStyle.set(abbreviationStyle);
     }
 
+    private NameDisplayPreferences() {
+        this(DisplayStyle.LASTNAME_FIRSTNAME, AbbreviationStyle.NONE);
+    }
+
+    public static NameDisplayPreferences getDefault() {
+        return new NameDisplayPreferences();
+    }
+
     public DisplayStyle getDisplayStyle() {
         return displayStyle.get();
     }
@@ -45,4 +53,10 @@ public class NameDisplayPreferences {
     public void setAbbreviationStyle(AbbreviationStyle abbreviationStyle) {
         this.abbreviationStyle.set(abbreviationStyle);
     }
+
+    public void setAll(NameDisplayPreferences other) {
+        setDisplayStyle(other.getDisplayStyle());
+        setAbbreviationStyle(other.getAbbreviationStyle());
+    }
 }
+
