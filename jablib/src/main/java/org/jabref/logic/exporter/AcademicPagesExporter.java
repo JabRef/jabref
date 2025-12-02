@@ -35,7 +35,7 @@ public class AcademicPagesExporter extends Exporter {
     private static final String BEGIN_INFIX = ".begin";
     private static final String END_INFIX = ".end";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AcademicPagesExporter.class);
 
     private final String lfFileName;
     private final String directory;
@@ -101,7 +101,7 @@ public class AcademicPagesExporter extends Exporter {
                 // formatting the title of each entry to match the file names format demanded by academic pages (applying the same formatters applied to the title in the academicpages.layout)
                 Path path = getPath(entry, exportDirectory);
 
-                List<BibEntry> individual_entry = new ArrayList<BibEntry>();
+                List<BibEntry> individual_entry = new ArrayList<>();
                 individual_entry.add(entry);
                 academicPagesTemplate.export(databaseContext, path, individual_entry, fileDirForDataBase, abbreviationRepository);
             }
