@@ -568,9 +568,9 @@ class LayoutEntry {
             case "HayagrivaType" ->
                     new HayagrivaType();
             case "NumberMonth" ->
-                new NumberMonthFormatter();
+                    new NumberMonthFormatter();
             case "SafeFileName" ->
-                new SafeFileName();
+                    new SafeFileName();
             default ->
                     null;
         };
