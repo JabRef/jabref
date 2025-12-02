@@ -71,10 +71,10 @@ public final class BuildInfo {
         biodiversityHeritageApiKey = BuildInfo.getValue(properties, "biodiversityHeritageApiKey", "36b910b6-2eb3-46f2-b64c-9abc149925ba");
         ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");
         medlineApiKey = BuildInfo.getValue(properties, "medlineApiKey", "");
-        unpaywallEmail = BuildInfo.getValue(properties, "unpaywallEmail", "");
         scienceDirectApiKey = BuildInfo.getValue(properties, "scienceDirectApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
         semanticScholarApiKey = BuildInfo.getValue(properties, "semanticScholarApiKey", "");
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
+        unpaywallEmail = BuildInfo.getValue(properties, "unpaywallEmail", "");
     }
 
     private static String getValue(Properties properties, String key, String defaultValue) {

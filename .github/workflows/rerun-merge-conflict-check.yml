@@ -1,0 +1,30 @@
+name: Rerun PR merge conflicts check
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  rerun:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          show-progress: 'false'
+      - name: Trigger "On PR opened/updated (check)" for all open PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          workflow_name="On PR opened/updated (check)"
+
+          gh pr list --state open --json number --jq '.[] | "\(.number)"' |
+          while read pr; do
+            echo "Triggering '$workflow_name' for PR #$pr"
+            gh workflow run "$workflow_name" --ref main --field pr_number="$pr"
+            echo "Triggered '$workflow_name' for PR [#$pr](https://github.com/JabRef/jabref/pull/$pr)" >> $GITHUB_STEP_SUMMARY
+          done
