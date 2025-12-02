@@ -4,6 +4,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -50,6 +52,21 @@
         <Label fx:id="noticeText"
                text="%Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided."
                BorderPane.alignment="CENTER"/>
+        <MenuButton alignment="CENTER"
+                fx:id="exportButton"
+                styleClass="icon-button,narrow"
+                textAlignment="CENTER">
+            <graphic>
+                <JabRefIconView glyph="EXPORT"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Export chat"/>
+            </tooltip>
+            <items>
+                <MenuItem onAction="#onExportMarkdown" text="%Export in human-readable format (Markdown)"/>
+                <MenuItem onAction="#onExportJson" text="%Export in machine-readable format (JSON)"/>
+            </items>
+        </MenuButton>
         <Button alignment="CENTER"
                 onAction="#onClearChatHistory"
                 styleClass="icon-button,narrow"

@@ -1,8 +1,18 @@
 package org.jabref.gui.ai.components.aichat;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -15,6 +25,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -27,6 +38,8 @@ import org.jabref.gui.ai.components.util.Loadable;
 import org.jabref.gui.ai.components.util.notifications.Notification;
 import org.jabref.gui.ai.components.util.notifications.NotificationsComponent;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
@@ -35,10 +48,13 @@ import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.ListUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -73,6 +89,7 @@ public class AiChatComponent extends VBox {
     @FXML private Loadable uiLoadableChatHistory;
     @FXML private ChatHistoryComponent uiChatHistory;
     @FXML private Button notificationsButton;
+    @FXML private MenuButton exportButton;
     @FXML private ChatPromptComponent chatPrompt;
     @FXML private Label noticeText;
     @FXML private Hyperlink exQuestion1;
@@ -409,5 +426,198 @@ public class AiChatComponent extends VBox {
             messageIndex--;
         }
         return Optional.empty();
+    }
+
+    @FXML
+    private void onExportMarkdown() {
+        if (entries.isEmpty()) {
+            return;
+        }
+        BibEntry entry = entries.getFirst();
+        String citationKey = entry.getCitationKey().orElse("entry");
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileFilterConverter.toExtensionFilter(StandardFileType.MARKDOWN))
+                .withDefaultExtension(StandardFileType.MARKDOWN)
+                .withInitialFileName(citationKey + "_chat.md")
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration).ifPresent(path -> {
+            try {
+                String markdownContent = generateMarkdownExport(entry);
+                Files.writeString(path, markdownContent, StandardCharsets.UTF_8);
+                dialogService.notify(Localization.lang("Chat exported successfully to %0", path.toString()));
+            } catch (IOException e) {
+                LOGGER.error("Error exporting chat to Markdown", e);
+                dialogService.showErrorDialogAndWait(Localization.lang("Export error"), Localization.lang("Could not export chat: %0", e.getMessage()));
+            }
+        });
+    }
+
+    @FXML
+    private void onExportJson() {
+        if (entries.isEmpty()) {
+            return;
+        }
+        BibEntry entry = entries.getFirst();
+        String citationKey = entry.getCitationKey().orElse("entry");
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileFilterConverter.toExtensionFilter(StandardFileType.JSON))
+                .withDefaultExtension(StandardFileType.JSON)
+                .withInitialFileName(citationKey + "_chat.json")
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration).ifPresent(path -> {
+            try {
+                String jsonContent = generateJsonExport(entry);
+                Files.writeString(path, jsonContent, StandardCharsets.UTF_8);
+                dialogService.notify(Localization.lang("Chat exported successfully to %0", path.toString()));
+            } catch (IOException e) {
+                LOGGER.error("Error exporting chat to JSON", e);
+                dialogService.showErrorDialogAndWait(Localization.lang("Export error"), Localization.lang("Could not export chat: %0", e.getMessage()));
+            }
+        });
+    }
+
+    private String generateMarkdownExport(BibEntry entry) {
+        StringBuilder markdown = new StringBuilder();
+
+        // BibTeX section
+        markdown.append("## Bibtex\n\n");
+        markdown.append("```bibtex\n");
+        markdown.append(entry.getParsedSerialization());
+        markdown.append("\n```\n\n");
+
+        // Conversation section
+        markdown.append("## Conversation\n\n");
+
+        for (ChatMessage message : aiChatLogic.getChatHistory()) {
+            if (message instanceof ErrorMessage errorMessage) {
+                markdown.append("**Error:** ").append(errorMessage.text()).append("\n\n");
+            } else if (message instanceof UserMessage userMessage) {
+                markdown.append("**User:**\n\n").append(userMessage.singleText()).append("\n\n");
+            } else if (message instanceof AiMessage aiMessage) {
+                markdown.append("**AI:**\n\n").append(aiMessage.text()).append("\n\n");
+            }
+        }
+
+        return markdown.toString();
+    }
+
+    private String generateJsonExport(BibEntry entry) {
+        Map<String, Object> json = new LinkedHashMap<>();
+
+        // Entry BibTeX source code
+        json.put("entry_bibtex", entry.getParsedSerialization());
+
+        // Entry as dictionary
+        Map<String, String> entryDict = new LinkedHashMap<>();
+        for (Field field : entry.getFields()) {
+            entry.getField(field).ifPresent(value -> entryDict.put(field.getName(), value));
+        }
+        json.put("entry", entryDict);
+
+        // Latest provider and model
+        json.put("latest_provider", aiPreferences.getAiProvider().getLabel());
+        json.put("latest_model", aiPreferences.getSelectedChatModel());
+
+        // Timestamp is not available for chats as noted in the issue
+        // json.put("timestamp", ...);
+
+        // Conversation array in OpenAI format
+        List<Map<String, String>> conversation = new ArrayList<>();
+        for (ChatMessage message : aiChatLogic.getChatHistory()) {
+            if (message instanceof ErrorMessage errorMessage) {
+                Map<String, String> errorMsg = new HashMap<>();
+                errorMsg.put("role", "system");
+                errorMsg.put("content", "Error: " + errorMessage.text());
+                conversation.add(errorMsg);
+            } else if (message instanceof UserMessage userMessage) {
+                Map<String, String> userMsg = new HashMap<>();
+                userMsg.put("role", "user");
+                userMsg.put("content", userMessage.singleText());
+                conversation.add(userMsg);
+            } else if (message instanceof AiMessage aiMessage) {
+                Map<String, String> aiMsg = new HashMap<>();
+                aiMsg.put("role", "assistant");
+                aiMsg.put("content", aiMessage.text());
+                conversation.add(aiMsg);
+            }
+        }
+        json.put("conversation", conversation);
+
+        // Simple JSON serialization (without external library dependency)
+        return formatJson(json);
+    }
+
+    private String formatJson(Object obj) {
+        if (obj == null) {
+            return "null";
+        }
+        if (obj instanceof String str) {
+            return "\"" + escapeJsonString(str) + "\"";
+        }
+        if (obj instanceof Number || obj instanceof Boolean) {
+            return obj.toString();
+        }
+        if (obj instanceof Map<?, ?> map) {
+            StringBuilder sb = new StringBuilder("{\n");
+            boolean first = true;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                if (!first) {
+                    sb.append(",\n");
+                }
+                first = false;
+                sb.append("    \"").append(entry.getKey()).append("\": ");
+                String valueStr = formatJson(entry.getValue());
+                // Indent multi-line values
+                if (valueStr.contains("\n")) {
+                    String[] lines = valueStr.split("\n");
+                    sb.append(lines[0]);
+                    for (int i = 1; i < lines.length; i++) {
+                        sb.append("\n    ").append(lines[i]);
+                    }
+                } else {
+                    sb.append(valueStr);
+                }
+            }
+            sb.append("\n}");
+            return sb.toString();
+        }
+        if (obj instanceof List<?> list) {
+            StringBuilder sb = new StringBuilder("[\n");
+            boolean first = true;
+            for (Object item : list) {
+                if (!first) {
+                    sb.append(",\n");
+                }
+                first = false;
+                String itemStr = formatJson(item);
+                // Indent multi-line items
+                if (itemStr.contains("\n")) {
+                    String[] lines = itemStr.split("\n");
+                    sb.append("    ").append(lines[0]);
+                    for (int i = 1; i < lines.length; i++) {
+                        sb.append("\n    ").append(lines[i]);
+                    }
+                } else {
+                    sb.append("    ").append(itemStr);
+                }
+            }
+            sb.append("\n]");
+            return sb.toString();
+        }
+        return "\"" + escapeJsonString(obj.toString()) + "\"";
+    }
+
+    private String escapeJsonString(String str) {
+        return str.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+                  .replace("\b", "\\b")
+                  .replace("\f", "\\f")
+                  .replace("\n", "\\n")
+                  .replace("\r", "\\r")
+                  .replace("\t", "\\t");
     }
 }

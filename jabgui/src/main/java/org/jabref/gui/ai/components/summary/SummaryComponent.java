@@ -141,19 +141,24 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     }
 
     private Node showSummary(Summary summary) {
-        return new SummaryShowingComponent(summary, () -> {
-            if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-                LOGGER.error("Bib database path is not set, but it was expected to be present. Unable to regenerate summary");
-                return;
-            }
+        return new SummaryShowingComponent(
+                summary,
+                entry,
+                getDialogService(),
+                () -> {
+                    if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+                        LOGGER.error("Bib database path is not set, but it was expected to be present. Unable to regenerate summary");
+                        return;
+                    }
 
-            if (entry.getCitationKey().isEmpty()) {
-                LOGGER.error("Citation key is not set, but it was expected to be present. Unable to regenerate summary");
-                return;
-            }
+                    if (entry.getCitationKey().isEmpty()) {
+                        LOGGER.error("Citation key is not set, but it was expected to be present. Unable to regenerate summary");
+                        return;
+                    }
 
-            aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext);
-            // No need to rebuildUi(), because this class listens to the state of ProcessingInfo of the summary.
-        });
+                    aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext);
+                    // No need to rebuildUi(), because this class listens to the state of ProcessingInfo of the summary.
+                }
+        );
     }
 }
