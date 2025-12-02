@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -154,24 +155,38 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
             try {
                 Object heightObj = previewView.getEngine().executeScript("document.getElementById('content').scrollHeight || document.body.scrollHeight");
-                if (heightObj instanceof java.lang.Number number) {
-                    double height = number.doubleValue();
-
-                    javafx.application.Platform.runLater(() -> {
-                        contentHeight.set(height);
-
-                        this.setPrefHeight(height + 8);
-                    });
-                }
-
                 Object widthObj = previewView.getEngine().executeScript("document.getElementById('content').scrollWidth || document.body.scrollWidth");
-                if (widthObj instanceof java.lang.Number number) {
-                    double width = number.doubleValue();
-                    javafx.application.Platform.runLater(() -> {
-                        contentWidth.set(width);
-                        this.setPrefWidth(width + 8);
-                    });
+
+                Double height = null;
+                if (heightObj instanceof java.lang.Number heightNum) {
+                    height = heightNum.doubleValue();
                 }
+
+                Double width = null;
+                if (widthObj instanceof java.lang.Number widthNum) {
+                    width = widthNum.doubleValue();
+                }
+
+                // Use a single runLater to update both properties at once. We store the
+                // measured values as Optionals to make the intent explicit.
+                Optional<Double> optHeight = Optional.ofNullable(height);
+                Optional<Double> optWidth = Optional.ofNullable(width);
+
+                javafx.application.Platform.runLater(() -> {
+                    optHeight.ifPresent(h -> {
+                        // small padding so the rendered content is not clipped at edges
+                        contentHeight.set(h);
+                        this.setPrefHeight(h + 8);
+                    });
+                    optWidth.ifPresent(w -> {
+                        contentWidth.set(w);
+                        this.setPrefWidth(w + 8);
+                    });
+                });
+
+                setHvalue(0);
+
+
             } catch (Exception e) {
                 LOGGER.debug("Could not compute preview content size", e);
             }
