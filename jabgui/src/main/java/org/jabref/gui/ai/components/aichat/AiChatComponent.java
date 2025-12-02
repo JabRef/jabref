@@ -4,14 +4,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -48,7 +44,6 @@ import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -433,7 +428,7 @@ public class AiChatComponent extends VBox {
         if (entries.isEmpty()) {
             return;
         }
-        BibEntry entry = entries.getFirst();
+        BibEntry entry = entries.get(0);
         String citationKey = entry.getCitationKey().orElse("entry");
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -459,7 +454,7 @@ public class AiChatComponent extends VBox {
         if (entries.isEmpty()) {
             return;
         }
-        BibEntry entry = entries.getFirst();
+        BibEntry entry = entries.get(0);
         String citationKey = entry.getCitationKey().orElse("entry");
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
