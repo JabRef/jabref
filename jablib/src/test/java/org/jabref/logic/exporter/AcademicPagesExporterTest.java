@@ -17,7 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
-import static org.jgitunit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class AcademicPagesExporterTest {
@@ -46,17 +47,27 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir, List.of(entry));
 
-        // Verify file name follows pattern: YYYY-MM-DD-title.md
-        Path expectedFile = tempDir.resolve("2023-05-12-test-title.md");
+        // Verify file name follows pattern: title.md (SafeFileName)
+        Path expectedFile = tempDir.resolve("Test-Title.md");
         assertTrue(Files.exists(expectedFile));
 
-        String content = Files.readString(expectedFile);
+        List<String> expected = List.of(
+                "---",
+                "title: \"Test Title\"",
+                "collection: publications",
+                "category: Article",
+                "permalink: /publication/Test-Title",
+                "excerpt: ''",
+                "date: 2023-05-12",
+                "venue: 'Test Journal'",
+                "slidesurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "paperurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "bibtexurl: 'https://[insert username].github.io/files/[insert filename].bib'",
+                "citation: 'Test Author. (2023). \"&quot;Test Title.&quot; <i>Test Journal</i>.'",
+                "---",
+                "");
 
-        // Verify YAML front matter fields
-        assertTrue(content.contains("title: \"Test Title\""));
-        assertTrue(content.contains("date: 2023-05-12"));
-        assertTrue(content.contains("venue: 'Test Journal'"));
-        assertTrue(content.contains("citation: 'Test Author (2023). \"Test Title.\" <i>Test Journal</i>.'"));
+        assertEquals(expected, Files.readAllLines(expectedFile));
     }
 
     @Test
@@ -69,11 +80,26 @@ class AcademicPagesExporterTest {
         exporter.export(databaseContext, tempDir, List.of(entry));
 
         // Expect default date 2023-01-01
-        Path expectedFile = tempDir.resolve("2023-01-01-no-date.md");
+        Path expectedFile = tempDir.resolve("No-Date.md");
         assertTrue(Files.exists(expectedFile));
 
-        String content = Files.readString(expectedFile);
-        assertTrue(content.contains("date: 2023-01-01"));
+        List<String> expected = List.of(
+                "---",
+                "title: \"No Date\"",
+                "collection: publications",
+                "category: Article",
+                "permalink: /publication/No-Date",
+                "excerpt: ''",
+                "date: 2023-01-01",
+                "venue: 'Unknown'",
+                "slidesurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "paperurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "bibtexurl: 'https://[insert username].github.io/files/[insert filename].bib'",
+                "citation: '. (2023). \"&quot;No Date.&quot; <i></i>.'",
+                "---",
+                "");
+
+        assertEquals(expected, Files.readAllLines(expectedFile));
     }
 
     @Test
@@ -86,14 +112,26 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir, List.of(entry));
 
-        Path expectedFile = tempDir.resolve("2023-01-01-abstract-paper.md");
+        Path expectedFile = tempDir.resolve("Abstract-Paper.md");
         assertTrue(Files.exists(expectedFile));
 
-        String content = Files.readString(expectedFile);
+        List<String> expected = List.of(
+                "---",
+                "title: \"Abstract Paper\"",
+                "collection: publications",
+                "category: Article",
+                "permalink: /publication/Abstract-Paper",
+                "excerpt: ''",
+                "date: 2023-01-01",
+                "venue: 'Unknown'",
+                "slidesurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "paperurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "bibtexurl: 'https://[insert username].github.io/files/[insert filename].bib'",
+                "citation: '. (2023). \"&quot;Abstract Paper.&quot; <i></i>.'",
+                "---",
+                "This is a test abstract.");
 
-        // Abstract should be outside the YAML block (after the second '---')
-        assertTrue(content.contains("---"));
-        assertTrue(content.endsWith("\nThis is a test abstract.\n"));
+        assertEquals(expected, Files.readAllLines(expectedFile));
     }
 
     @Test
@@ -111,8 +149,44 @@ class AcademicPagesExporterTest {
         exporter.export(databaseContext, tempDir, List.of(entry1, entry2));
 
         // Verify both files exist
-        assertTrue(Files.exists(tempDir.resolve("2023-01-01-paper-one.md")));
-        assertTrue(Files.exists(tempDir.resolve("2022-01-01-book-two.md")));
+        Path file1 = tempDir.resolve("Paper-One.md");
+        Path file2 = tempDir.resolve("Book-Two.md");
+        assertTrue(Files.exists(file1));
+        assertTrue(Files.exists(file2));
+
+        List<String> expected1 = List.of(
+                "---",
+                "title: \"Paper One\"",
+                "collection: publications",
+                "category: Article",
+                "permalink: /publication/Paper-One",
+                "excerpt: ''",
+                "date: 2023-01-01",
+                "venue: 'Unknown'",
+                "slidesurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "paperurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "bibtexurl: 'https://[insert username].github.io/files/[insert filename].bib'",
+                "citation: '. (2023). \"&quot;Paper One.&quot; <i></i>.'",
+                "---",
+                "");
+        assertEquals(expected1, Files.readAllLines(file1));
+
+        List<String> expected2 = List.of(
+                "---",
+                "title: \"Book Two\"",
+                "collection: publications",
+                "category: Book",
+                "permalink: /publication/Book-Two",
+                "excerpt: ''",
+                "date: 2022-01-01",
+                "venue: 'Unknown'",
+                "slidesurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "paperurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "bibtexurl: 'https://[insert username].github.io/files/[insert filename].bib'",
+                "citation: '. (2022). \"&quot;Book Two.&quot; <i></i>.'",
+                "---",
+                "");
+        assertEquals(expected2, Files.readAllLines(file2));
     }
 
     @Test
@@ -125,12 +199,25 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir, List.of(entry));
 
-        Path expectedFile = tempDir.resolve("2023-01-01-conference-paper.md");
+        Path expectedFile = tempDir.resolve("Conference-Paper.md");
         assertTrue(Files.exists(expectedFile));
 
-        String content = Files.readString(expectedFile);
+        List<String> expected = List.of(
+                "---",
+                "title: \"Conference Paper\"",
+                "collection: publications",
+                "category: InProceedings",
+                "permalink: /publication/Conference-Paper",
+                "excerpt: ''",
+                "date: 2023-01-01",
+                "venue: 'Unknown'",
+                "slidesurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "paperurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
+                "bibtexurl: 'https://[insert username].github.io/files/[insert filename].bib'",
+                "citation: '. (2023). \"&quot;Conference Paper.&quot; <i></i>.'",
+                "---",
+                "");
 
-        // 'venue' should be populated from 'booktitle' since 'journal' is missing
-        assertTrue(content.contains("venue: 'Conference Proceedings'"));
+        assertEquals(expected, Files.readAllLines(expectedFile));
     }
 }
