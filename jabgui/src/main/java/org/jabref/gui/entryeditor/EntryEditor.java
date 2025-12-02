@@ -549,7 +549,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(currentlyEditedEntry, fetcher);
+        new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager, stateManager).fetchAndMerge(currentlyEditedEntry, fetcher);
     }
 
     public void selectField(String fieldName) {

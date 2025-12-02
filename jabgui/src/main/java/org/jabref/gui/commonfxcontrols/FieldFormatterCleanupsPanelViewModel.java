@@ -16,7 +16,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;

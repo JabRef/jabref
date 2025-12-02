@@ -21,7 +21,7 @@
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.2
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.postgresql:postgresql:42.7.8
-//DEPS org.bouncycastle:bcprov-jdk18on:1.82
+//DEPS org.bouncycastle:bcprov-jdk18on:1.83
 //DEPS com.konghq:unirest-modules-gson:4.6.0
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS org.glassfish.jersey.core:jersey-server:4.0.0
@@ -40,9 +40,9 @@
 //DEPS net.harawata:appdirs:1.5.0
 //DEPS de.undercouch:citeproc-java:3.4.0
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.3 
-//DEPS tools.jackson.core:jackson-core:3.0.2
-//DEPS tools.jackson.core:jackson-databind:3.0.2
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.2
+//DEPS tools.jackson.core:jackson-core:3.0.3
+//DEPS tools.jackson.core:jackson-databind:3.0.3
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.3
 //DEPS org.apache.commons:commons-lang3:3.20.0
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java

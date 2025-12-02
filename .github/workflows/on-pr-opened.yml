@@ -16,15 +16,17 @@ jobs:
         with:
           labels: first contrib
           pr-opened-msg: >
-            ### Hey @{fc-author}!
+            Hey @{fc-author}! 👋
 
 
-            Thank you for contributing to JabRef! Your help is truly appreciated :heart:.
+            Thank you for contributing to JabRef!
 
 
-            We have automatic checks in place, based on which you will soon get automated feedback if any of them are failing.
-            Later on in the review process, one of our maintainers will also go through your contribution.
-            In the "Files changed" tab, you can go through his comments and just click on "Resolve conversation" if you resolved the comment, or answer him on the conversation if you have further input regarding his comment.
+            We have automated checks in place, based on which you will soon get feedback if any of them are failing.
 
 
-            Please re-check our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) in case of any other doubts related to our contribution workflow.
+            After all automated checks pass, a maintainer will also review your contribution.
+            Once that happens, you can go through their comments in the "Files changed" tab and act on them, or reply to the conversation if you have further inputs.
+
+
+            Please re-check our [AI Usage Policy](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md) to ensure that your pull request is in line with it. It also contains links to our contribution guide in case of any other doubts related to our contribution workflow.
