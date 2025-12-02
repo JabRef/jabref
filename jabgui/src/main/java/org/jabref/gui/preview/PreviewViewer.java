@@ -186,7 +186,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
                 setHvalue(0);
 
-
             } catch (Exception e) {
                 LOGGER.debug("Could not compute preview content size", e);
             }
