@@ -22,7 +22,7 @@
             fx:controller="org.jabref.gui.newentry.NewEntryView">
     <buttonTypes>
         <ButtonType fx:constant="CANCEL"/>
-        <ButtonType fx:id="generateButtonType" buttonData="OK_DONE" text="%Generate"/>
+        <ButtonType fx:id="generateButtonType" buttonData="OK_DONE" text="%Create"/>
     </buttonTypes>
     <content>
         <TabPane fx:id="tabs">
