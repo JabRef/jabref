@@ -70,7 +70,8 @@ jobs:
           Conflicts with target branch
           -->
           EOF
-              gh issue comment "$PR_NUMBER" --body-file body.txt
+              # Commenting disabled, as we cannot reliably detect the old comments yet
+              # gh issue comment "$PR_NUMBER" --body-file body.txt
               echo "Commented on PR" >> $GITHUB_STEP_SUMMARY
 
               # When triggered by another workflow, success is also if there is a merge conflict
