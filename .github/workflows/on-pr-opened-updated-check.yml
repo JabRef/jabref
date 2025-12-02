@@ -28,9 +28,21 @@ jobs:
         id: check_mergeable
         run: |
           set -ex
+
           echo "Checking PR [#$PR_NUMBER](https://github.com/JabRef/jabref/pull/$PR_NUMBER)" >> $GITHUB_STEP_SUMMARY
-          MERGEABLE=$(gh pr view --json mergeable $PR_NUMBER --template '{{.mergeable}}')
+
+          # Retry a few times until mergeable != UNKNOWN
+          # See https://github.com/cli/cli/discussions/8020#discussioncomment-7057040 for details
+          for i in 1 2 3 4 5; do
+            MERGEABLE=$(gh pr view "$PR_NUMBER" --json mergeable --template '{{.mergeable}}')
+            echo "Attempt $i: $MERGEABLE"
+            if [ "$MERGEABLE" != "UNKNOWN" ]; then
+              break
+            fi
+            sleep 5
+          done
           echo "Result: $MERGEABLE" >> $GITHUB_STEP_SUMMARY
+
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
             echo "❌ Merge conflicts" >> $GITHUB_STEP_SUMMARY
