@@ -28,7 +28,6 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
     @Override
     protected void doAdd(int index, Path element) {
         history.add(index, toRelative(element.toAbsolutePath()));
-
     }
 
     @Override
@@ -42,7 +41,8 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
     }
 
     /**
-     * Adds the file to the top of the list. If it already is in the list, it is merely moved to the top.
+     * Adds the file to the top of the list. If it already is in the list, it is
+     * merely moved to the top.
      */
     public void newFile(Path file) {
         removeItem(file);
