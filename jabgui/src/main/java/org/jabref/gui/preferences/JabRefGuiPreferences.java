@@ -348,8 +348,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // region: Main table, main table column, and search dialog column preferences
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
-        defaults.put(COLUMN_NAMES, "groups;group_icons;files;linked_id;field:citationkey;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
-        defaults.put(COLUMN_WIDTHS, "28;40;28;28;100;75;300;470;60;130;50;50;50");
 
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
@@ -398,6 +396,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getDonationPreferences().setAll(DonationPreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
+        getMainTablePreferences().setAll(MainTablePreferences.getDefault());
+        getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
     }
 
     @Override
@@ -409,6 +409,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
+        getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
+        getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -989,10 +991,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTablePreferences;
         }
 
-        mainTablePreferences = new MainTablePreferences(
-                getMainTableColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE),
-                getBoolean(EXTRA_FILE_COLUMNS));
+        mainTablePreferences = getMainTablePreferencesFromBackingStore(MainTablePreferences.getDefault());
 
         EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
                 (obs, oldValue, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
@@ -1007,9 +1006,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTableColumnPreferences;
         }
 
-        List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-        List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(COLUMN_SORT_ORDER, columns);
-        mainTableColumnPreferences = new ColumnPreferences(columns, columnSortOrder);
+        mainTableColumnPreferences = getMainTableColumnPreferencesFromBackingStore(ColumnPreferences.getDefault());
 
         mainTableColumnPreferences.getColumns().addListener((InvalidationListener) change -> {
             putStringList(COLUMN_NAMES, getColumnNamesAsStringList(mainTableColumnPreferences));
@@ -1041,6 +1038,26 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(searchDialogColumnPreferences)));
 
         return searchDialogColumnPreferences;
+    }
+
+    private MainTablePreferences getMainTablePreferencesFromBackingStore(MainTablePreferences defaults) {
+        return new MainTablePreferences(
+                getMainTableColumnPreferences(),
+                getBoolean(AUTO_RESIZE_MODE, defaults.getResizeColumnsToFit()),
+                getBoolean(EXTRA_FILE_COLUMNS, defaults.getExtraFileColumnsEnabled())
+        );
+    }
+
+    private ColumnPreferences getMainTableColumnPreferencesFromBackingStore(ColumnPreferences defaults) {
+        List<String> storedColumnNames = getStringList(COLUMN_NAMES);
+
+        if (storedColumnNames.isEmpty()) {
+            return defaults;
+        }
+
+        List<MainTableColumnModel> columns = defaults.getColumns();
+        List<MainTableColumnModel> columnSortOrder = defaults.getColumnSortOrder();
+        return new ColumnPreferences(columns, columnSortOrder);
     }
 
     // --- Generic column handling ---
