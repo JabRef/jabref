@@ -29,6 +29,8 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
+import static javafx.beans.binding.Bindings.not;
+
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
     @FXML private CheckBox versionCheck;
 
@@ -130,7 +132,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
 
         gitUsername.textProperty().bindBidirectional(viewModel.gitUsernameProperty());
         gitPat.textProperty().bindBidirectional(viewModel.gitPatProperty());
-        gitPersistPat.disableProperty().bind(viewModel.passwordPersistAvailable());
+        gitPersistPat.disableProperty().bind(not(viewModel.passwordPersistAvailable()));
         EasyBind.subscribe(viewModel.passwordPersistAvailable(), available -> {
             if (available) {
                 persistGitPatTooltipWrapper.setTooltip(null);

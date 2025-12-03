@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 
 import org.eclipse.jgit.api.CreateBranchCommand;
@@ -26,9 +27,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class GitHandlerTest {
     @TempDir
@@ -41,7 +44,8 @@ class GitHandlerTest {
 
     @BeforeEach
     void setUpGitHandler() throws IOException, GitAPIException, URISyntaxException {
-        gitHandler = new GitHandler(repositoryPath);
+        GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        gitHandler = new GitHandler(repositoryPath, gitPreferences);
 
         SystemReader.setInstance(new NoopGitSystemReader());
 
@@ -143,7 +147,8 @@ class GitHandlerTest {
         Path nested = repositoryPath.resolve("src/org/jabref");
         Files.createDirectories(nested);
 
-        Optional<GitHandler> handlerOpt = GitHandler.fromAnyPath(nested);
+        GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        Optional<GitHandler> handlerOpt = GitHandler.fromAnyPath(nested, gitPreferences);
 
         assertTrue(handlerOpt.isPresent(), "Expected GitHandler to be created");
         assertEquals(repositoryPath.toRealPath(), handlerOpt.get().repositoryPath.toRealPath(),

@@ -132,23 +132,15 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
 
         // TODO: Read remove from the git configuration - and only prompt for a repository if there is none
         String url = gitPreferences.getRepositoryUrl();
-        String user = gitPreferences.getUsername();
-        String pat = gitPreferences.getPat();
 
         Path bibPath = bibFilePathOpt.get();
-
         GitInitService.initRepoAndSetRemote(bibPath, url, gitHandlerRegistry);
         GitHandler handler = gitHandlerRegistry.get(bibPath.getParent());
-        handler.setCredentials(user, pat);
-
         GitStatusSnapshot status = GitStatusChecker.checkStatusAndFetch(handler);
-
         if (status.syncStatus() == SyncStatus.BEHIND) {
             throw new JabRefException(Localization.lang("Remote repository is not empty. Please pull changes before pushing."));
         }
-
         handler.createCommitOnCurrentBranch(Localization.lang("Share library to GitHub"), false);
-
         if (status.syncStatus() == SyncStatus.REMOTE_EMPTY) {
             handler.pushCurrentBranchCreatingUpstream();
         } else {

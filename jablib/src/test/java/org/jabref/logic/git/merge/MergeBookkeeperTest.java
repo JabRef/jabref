@@ -11,6 +11,7 @@ import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.merge.execution.MergeBookkeeper;
 import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.PullPlan;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -70,7 +71,8 @@ public class MergeBookkeeperTest {
         importPrefs = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importPrefs.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        handlerRegistry = new GitHandlerRegistry();
+        GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        handlerRegistry = new GitHandlerRegistry(gitPreferences);
 
         // 1) Remote bare repository
         remoteDir = tempDir.resolve("remote.git");

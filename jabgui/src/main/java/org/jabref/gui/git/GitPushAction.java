@@ -91,13 +91,7 @@ public class GitPushAction extends SimpleCommand {
                               Path bibPath,
                               GitStatusViewModel gitStatusViewModel,
                               GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
-
         GitSyncService syncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), registry);
-        GitHandler handler = registry.get(bibPath.getParent());
-        String user = guiPreferences.getGitPreferences().getUsername();
-        String pat = guiPreferences.getGitPreferences().getPat();
-        handler.setCredentials(user, pat);
-
         PushResult result = syncService.push(databaseContext, bibPath);
 
         if (result.successful()) {

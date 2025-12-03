@@ -158,10 +158,6 @@ public class GitPullAction extends SimpleCommand {
     ///         or Optional.empty() if the local library is already up-to-date or ahead of the remote branch.
     private Optional<PullPlan> prepareMergeResult(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
         GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), registry);
-        GitHandler handler = registry.get(bibPath.getParent());
-        String user = guiPreferences.getGitPreferences().getUsername();
-        String pat = guiPreferences.getGitPreferences().getPat();
-        handler.setCredentials(user, pat);
         return gitSyncService.prepareMerge(databaseContext, bibPath);
     }
 
