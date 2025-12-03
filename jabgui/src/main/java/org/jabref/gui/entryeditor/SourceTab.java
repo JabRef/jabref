@@ -293,21 +293,23 @@ public class SourceTab extends EntryEditorTab {
             BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {
-                throw new IllegalStateException("More than one entry found.");
+                LOGGER.error("More than one entry found.");
+                return;
             }
 
             if (!database.hasEntries()) {
                 if (parserResult.hasWarnings()) {
-                    // put the warning into as exception text -> it will be displayed to the user
-                    throw new IllegalStateException(parserResult.warnings().getFirst());
+                    LOGGER.warn("Could not store entry", parserResult.warnings());
+                    dialogService.notify(parserResult.warnings().getFirst());
                 } else {
-                    throw new IllegalStateException("No entries found.");
+                    LOGGER.warn("No entries found.");
+                    dialogService.notify(Localization.lang("No entries available"));
                 }
             }
 
             if (parserResult.hasWarnings()) {
-                // put the warning into as exception text -> it will be displayed to the user
-                throw new IllegalStateException(parserResult.getErrorMessage());
+                LOGGER.warn("Could not store entry", parserResult.warnings());
+                dialogService.notify(parserResult.getErrorMessage());
             }
 
             NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
