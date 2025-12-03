@@ -33,6 +33,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
     private final AiPreferences aiPreferences;
+    private final DialogService dialogService;
 
     public SummaryComponent(BibDatabaseContext bibDatabaseContext,
                             BibEntry entry,
@@ -50,6 +51,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
         this.aiService = aiService;
         this.aiPreferences = aiPreferences;
+        this.dialogService = dialogService;
 
         aiService.getSummariesService().summarize(entry, bibDatabaseContext).stateProperty().addListener(o -> rebuildUi());
 
@@ -144,7 +146,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
         return new SummaryShowingComponent(
                 summary,
                 entry,
-                getDialogService(),
+                dialogService,
                 () -> {
                     if (bibDatabaseContext.getDatabasePath().isEmpty()) {
                         LOGGER.error("Bib database path is not set, but it was expected to be present. Unable to regenerate summary");

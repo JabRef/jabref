@@ -489,7 +489,7 @@ public class AiChatComponent extends VBox {
 
         for (ChatMessage message : aiChatLogic.getChatHistory()) {
             if (message instanceof ErrorMessage errorMessage) {
-                markdown.append("**Error:** ").append(errorMessage.text()).append("\n\n");
+                markdown.append("**Error:** ").append(errorMessage.getText()).append("\n\n");
             } else if (message instanceof UserMessage userMessage) {
                 markdown.append("**User:**\n\n").append(userMessage.singleText()).append("\n\n");
             } else if (message instanceof AiMessage aiMessage) {
@@ -526,7 +526,7 @@ public class AiChatComponent extends VBox {
             if (message instanceof ErrorMessage errorMessage) {
                 Map<String, String> errorMsg = new HashMap<>();
                 errorMsg.put("role", "system");
-                errorMsg.put("content", "Error: " + errorMessage.text());
+                errorMsg.put("content", "Error: " + errorMessage.getText());
                 conversation.add(errorMsg);
             } else if (message instanceof UserMessage userMessage) {
                 Map<String, String> userMsg = new HashMap<>();
