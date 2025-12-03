@@ -314,13 +314,10 @@ public class SourceTab extends EntryEditorTab {
 
             NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().getFirst();
-            String newKey = newEntry.getCitationKey().orElse(null);
-
-            if (newKey != null) {
-                outOfFocusEntry.setCitationKey(newKey);
-            } else {
-                outOfFocusEntry.clearCiteKey();
-            }
+            newEntry.getCitationKey()
+                    .ifPresentOrElse(
+                            outOfFocusEntry::setCitationKey,
+                            () -> outOfFocusEntry.clearCiteKey());
 
             // First, remove fields that the user has removed.
             for (Map.Entry<Field, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
