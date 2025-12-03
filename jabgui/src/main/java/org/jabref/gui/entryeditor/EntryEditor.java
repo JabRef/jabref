@@ -754,8 +754,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         return node.isFocusTraversable() && node.isVisible() && !node.isDisabled() && node.isManaged();
     }
 
-    // Tries to locate the editor grid (with style class "editorPane") inside the tab content to avoid
-    // including preview or other sibling panels when determining focus order boundaries.
+    /// Tries to locate the editor grid (with style class "editorPane") inside the tab content to avoid
+    /// including preview or other sibling panels when determining focus order boundaries.
     private Optional<Parent> findEditorGridParent(Parent root) {
         if (root.getStyleClass().contains("editorPane")) {
             return Optional.of(root);
