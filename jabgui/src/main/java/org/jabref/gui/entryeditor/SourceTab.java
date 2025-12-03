@@ -126,18 +126,20 @@ public class SourceTab extends EntryEditorTab {
 
         SearchQuery searchQuery = new SearchQuery(stateManager.searchQueryProperty().get());
         Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQuery);
-        searchTermsMap.forEach((optionalField, terms) -> {
-            Highlighter.buildSearchPattern(terms).ifPresent(
-                    searchPattern -> {
-                        if (optionalField.isPresent()) {
-                            highlightField(optionalField.get(), searchPattern);
-                        } else {
-                            // User did not specify any field, thus we need to go through all fields
-                            fieldPositions.keySet().forEach(field -> highlightField(field, searchPattern));
-                        }
+        searchTermsMap.forEach(this::highlightField);
+    }
+
+    private void highlightField(Optional<Field> optionalField, List<String> terms) {
+        Highlighter.buildSearchPattern(terms).ifPresent(
+                searchPattern -> {
+                    if (optionalField.isPresent()) {
+                        highlightField(optionalField.get(), searchPattern);
+                    } else {
+                        // User did not specify any field, thus we need to go through all fields
+                        fieldPositions.keySet().forEach(field -> highlightField(field, searchPattern));
                     }
-            );
-        });
+                }
+        );
     }
 
     private void highlightField(Field field, String searchPattern) {
