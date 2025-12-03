@@ -44,7 +44,6 @@ import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
-import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -240,19 +239,15 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private void findAndSetupTabNavigableNodes(Parent parent) {
         for (Node child : parent.getChildrenUnmodifiable()) {
-            if (child instanceof EditorTextField editor) {
-                editor.setupTabNavigation(this::isLastFieldInCurrentTab, this::moveToNextTabAndFocus);
-            } else {
-                // Generic handler for other focusable controls (e.g., Button, ComboBox, CheckBox, etc.)
-                child.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                    if (event.getCode() == KeyCode.TAB && !event.isShiftDown()) {
-                        if (isLastFieldInCurrentTab(child)) {
-                            moveToNextTabAndFocus();
-                            event.consume();
-                        }
+            // Generic handler for other focusable controls (e.g., Button, ComboBox, CheckBox, etc.)
+            child.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                if (event.getCode() == KeyCode.TAB && !event.isShiftDown()) {
+                    if (isLastFieldInCurrentTab(child)) {
+                        moveToNextTabAndFocus();
+                        event.consume();
                     }
-                });
-            }
+                }
+            });
 
             if (child instanceof Parent childParent) {
                 findAndSetupTabNavigableNodes(childParent);
@@ -570,15 +565,13 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     public void setFocusToField(Field field) {
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            getTabContainingField(field).ifPresentOrElse(
-                    tab -> selectTabAndField(tab, field),
-                    () -> {
-                        Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                        getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
-                    }
-            );
-        });
+        UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
+                tab -> selectTabAndField(tab, field),
+                () -> {
+                    Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
+                    getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
+                }
+        ));
     }
 
     private void selectTabAndField(FieldsEditorTab tab, Field field) {

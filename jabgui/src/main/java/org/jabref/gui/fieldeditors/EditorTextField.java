@@ -3,15 +3,12 @@ package org.jabref.gui.fieldeditors;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -23,8 +20,6 @@ import org.jspecify.annotations.NonNull;
 
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
-    private Runnable nextTabSelector;
-    private Predicate<TextField> isLastFieldChecker;
     private final ContextMenu contextMenu = new ContextMenu();
 
     private Runnable additionalPasteActionHandler = () -> {
@@ -33,16 +28,6 @@ public class EditorTextField extends TextField implements Initializable, Context
 
     public EditorTextField() {
         this("");
-        this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.TAB &&
-                    isLastFieldChecker != null &&
-                    isLastFieldChecker.test(this)) {
-                if (nextTabSelector != null) {
-                    nextTabSelector.run();
-                }
-                event.consume();
-            }
-        });
     }
 
     public EditorTextField(final String text) {
@@ -53,11 +38,6 @@ public class EditorTextField extends TextField implements Initializable, Context
         HBox.setHgrow(this, Priority.ALWAYS);
 
         ClipBoardManager.addX11Support(this);
-    }
-
-    public void setupTabNavigation(Predicate<TextField> isLastFieldChecker, Runnable nextTabSelector) {
-        this.isLastFieldChecker = isLastFieldChecker;
-        this.nextTabSelector = nextTabSelector;
     }
 
     @Override
