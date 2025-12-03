@@ -32,4 +32,4 @@ jobs:
 
           days-before-pr-close: 7
           close-pr-message: >
-            Closing this PR, because there were 21 days of inactivity without any work on the requested changes.
+            This PR is being closed due to continued inactivity.
