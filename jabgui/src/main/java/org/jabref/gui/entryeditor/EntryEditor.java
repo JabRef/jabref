@@ -718,7 +718,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         return Optional.empty();
     }
 
-    // Returns the first focusable, visible, managed, and enabled node in depth-first order
+    /// Returns the first focusable, visible, managed, and enabled node in depth-first order
     private Optional<Node> findFirstFocusableNode(Parent parent) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (isNodeFocusable(child)) {
