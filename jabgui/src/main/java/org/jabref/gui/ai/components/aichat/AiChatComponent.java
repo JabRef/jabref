@@ -1,5 +1,6 @@
 package org.jabref.gui.ai.components.aichat;
 
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,6 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import java.util.StringJoiner;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -476,143 +481,72 @@ public class AiChatComponent extends VBox {
     }
 
     private String generateMarkdownExport(BibEntry entry) {
-        StringBuilder markdown = new StringBuilder();
-
+        StringJoiner sj = new StringJoiner("\n\n");
+    
         // BibTeX section
-        markdown.append("## Bibtex\n\n");
-        markdown.append("```bibtex\n");
-        markdown.append(entry.getParsedSerialization());
-        markdown.append("\n```\n\n");
-
+        sj.add("## Bibtex");
+        sj.add("```bibtex\n" + entry.getParsedSerialization() + "\n```");
+    
         // Conversation section
-        markdown.append("## Conversation\n\n");
-
+        sj.add("## Conversation");
+    
         for (ChatMessage message : aiChatLogic.getChatHistory()) {
             if (message instanceof ErrorMessage errorMessage) {
-                markdown.append("**Error:** ").append(errorMessage.getText()).append("\n\n");
+                sj.add("**Error:** " + errorMessage.getText());
             } else if (message instanceof UserMessage userMessage) {
-                markdown.append("**User:**\n\n").append(userMessage.singleText()).append("\n\n");
+                sj.add("**User:**\n" + userMessage.singleText());
             } else if (message instanceof AiMessage aiMessage) {
-                markdown.append("**AI:**\n\n").append(aiMessage.text()).append("\n\n");
+                sj.add("**AI:**\n" + aiMessage.text());
             }
         }
-
-        return markdown.toString();
+    
+        // StringJoiner uses double newlines between blocks already
+        return sj.toString();
     }
+    
 
     private String generateJsonExport(BibEntry entry) {
         Map<String, Object> json = new LinkedHashMap<>();
-
+    
         // Entry BibTeX source code
         json.put("entry_bibtex", entry.getParsedSerialization());
-
+    
         // Entry as dictionary
         Map<String, String> entryDict = new LinkedHashMap<>();
         for (Field field : entry.getFields()) {
             entry.getField(field).ifPresent(value -> entryDict.put(field.getName(), value));
         }
         json.put("entry", entryDict);
-
+    
         // Latest provider and model
         json.put("latest_provider", aiPreferences.getAiProvider().getLabel());
         json.put("latest_model", aiPreferences.getSelectedChatModel());
-
-        // Timestamp is not available for chats as noted in the issue
-        // json.put("timestamp", ...);
-
-        // Conversation array in OpenAI format
+    
+        // Conversation array
         List<Map<String, String>> conversation = new ArrayList<>();
         for (ChatMessage message : aiChatLogic.getChatHistory()) {
             if (message instanceof ErrorMessage errorMessage) {
-                Map<String, String> errorMsg = new HashMap<>();
+                Map<String, String> errorMsg = new LinkedHashMap<>();
                 errorMsg.put("role", "system");
                 errorMsg.put("content", "Error: " + errorMessage.getText());
                 conversation.add(errorMsg);
             } else if (message instanceof UserMessage userMessage) {
-                Map<String, String> userMsg = new HashMap<>();
+                Map<String, String> userMsg = new LinkedHashMap<>();
                 userMsg.put("role", "user");
                 userMsg.put("content", userMessage.singleText());
                 conversation.add(userMsg);
             } else if (message instanceof AiMessage aiMessage) {
-                Map<String, String> aiMsg = new HashMap<>();
+                Map<String, String> aiMsg = new LinkedHashMap<>();
                 aiMsg.put("role", "assistant");
                 aiMsg.put("content", aiMessage.text());
                 conversation.add(aiMsg);
             }
         }
         json.put("conversation", conversation);
-
-        // Simple JSON serialization (without external library dependency)
-        return formatJson(json);
+    
+        // Use Gson for serialization (pretty printed)
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(json);
     }
-
-    private String formatJson(Object obj) {
-        if (obj == null) {
-            return "null";
-        }
-        if (obj instanceof String str) {
-            return "\"" + escapeJsonString(str) + "\"";
-        }
-        if (obj instanceof Number || obj instanceof Boolean) {
-            return obj.toString();
-        }
-        if (obj instanceof Map<?, ?> map) {
-            StringBuilder sb = new StringBuilder("{\n");
-            boolean first = true;
-            for (Map.Entry<?, ?> entry : map.entrySet()) {
-                if (!first) {
-                    sb.append(",\n");
-                }
-                first = false;
-                sb.append("    \"").append(entry.getKey()).append("\": ");
-                String valueStr = formatJson(entry.getValue());
-                // Indent multi-line values
-                if (valueStr.contains("\n")) {
-                    String[] lines = valueStr.split("\n");
-                    sb.append(lines[0]);
-                    for (int i = 1; i < lines.length; i++) {
-                        sb.append("\n    ").append(lines[i]);
-                    }
-                } else {
-                    sb.append(valueStr);
-                }
-            }
-            sb.append("\n}");
-            return sb.toString();
-        }
-        if (obj instanceof List<?> list) {
-            StringBuilder sb = new StringBuilder("[\n");
-            boolean first = true;
-            for (Object item : list) {
-                if (!first) {
-                    sb.append(",\n");
-                }
-                first = false;
-                String itemStr = formatJson(item);
-                // Indent multi-line items
-                if (itemStr.contains("\n")) {
-                    String[] lines = itemStr.split("\n");
-                    sb.append("    ").append(lines[0]);
-                    for (int i = 1; i < lines.length; i++) {
-                        sb.append("\n    ").append(lines[i]);
-                    }
-                } else {
-                    sb.append("    ").append(itemStr);
-                }
-            }
-            sb.append("\n]");
-            return sb.toString();
-        }
-        return "\"" + escapeJsonString(obj.toString()) + "\"";
-    }
-
-    private String escapeJsonString(String str) {
-        return str.replace("\\", "\\\\")
-                  .replace("\"", "\\\"")
-                  .replace("\b", "\\b")
-                  .replace("\f", "\\f")
-                  .replace("\n", "\\n")
-                  .replace("\r", "\\r")
-                  .replace("\t", "\\t");
-    }
+    
 }
