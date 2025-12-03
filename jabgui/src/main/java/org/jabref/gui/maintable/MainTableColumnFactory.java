@@ -125,11 +125,10 @@ public class MainTableColumnFactory {
                 if (!column.getQualifier().isBlank()) {
                     Field field = FieldFactory.parseField(column.getQualifier());
                     List<String> values = database.getMetaData().getContentSelectorValuesForField(field);
-
-                    if (values != null && !values.isEmpty()) {
-                        returnColumn = createContentSelectorColumn(column, values);
-                    } else {
+                    if (values.isEmpty()) {
                         returnColumn = createFieldColumn(column, tooltip);
+                    } else {
+                        returnColumn = createContentSelectorColumn(column, values);
                     }
                 }
                 break;
