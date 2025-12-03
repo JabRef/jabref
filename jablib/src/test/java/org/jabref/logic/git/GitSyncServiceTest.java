@@ -129,7 +129,9 @@ class GitSyncServiceTest {
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         gitConflictResolverStrategy = mock(GitConflictResolverStrategy.class);
-        GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getUsername()).thenReturn("");
+        when(gitPreferences.getPat()).thenReturn("");
         gitHandlerRegistry = new GitHandlerRegistry(gitPreferences);
 
         // create fake remote repo

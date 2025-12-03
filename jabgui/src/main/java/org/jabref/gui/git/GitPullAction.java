@@ -12,7 +12,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;

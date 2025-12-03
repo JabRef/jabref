@@ -32,6 +32,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class GitHandlerTest {
     @TempDir
@@ -44,7 +45,9 @@ class GitHandlerTest {
 
     @BeforeEach
     void setUpGitHandler() throws IOException, GitAPIException, URISyntaxException {
-        GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getUsername()).thenReturn("");
+        when(gitPreferences.getPat()).thenReturn("");
         gitHandler = new GitHandler(repositoryPath, gitPreferences);
 
         SystemReader.setInstance(new NoopGitSystemReader());

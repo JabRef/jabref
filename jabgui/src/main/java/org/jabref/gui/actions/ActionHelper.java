@@ -56,11 +56,11 @@ public class ActionHelper {
                                 .filter(context -> context.getLocation() == DatabaseLocation.LOCAL)
                                 .map(context ->
                                         context.getDatabasePath()
-                                                          // TODO: This dependency should be passed more directly. Maybe as part of StateManager - or similar to AiChatService
-                                                          .flatMap(path -> Injector.instantiateModelOrService(GitHandlerRegistry.class)
-                                                                                   .fromAnyPath(path))
-                                                          .map(handler -> handler.hasRemote("origin"))
-                                                          .orElse(false))
+                                               // TODO: This dependency should be passed more directly. Maybe as part of StateManager - or similar to AiChatService
+                                               .flatMap(path -> Injector.instantiateModelOrService(GitHandlerRegistry.class)
+                                                                        .fromAnyPath(path))
+                                               .map(handler -> handler.hasRemote("origin"))
+                                               .orElse(false))
                                 .orElse(false))
         );
     }

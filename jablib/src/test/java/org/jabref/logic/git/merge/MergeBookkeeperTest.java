@@ -71,7 +71,9 @@ public class MergeBookkeeperTest {
         importPrefs = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importPrefs.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getUsername()).thenReturn("");
+        when(gitPreferences.getPat()).thenReturn("");
         handlerRegistry = new GitHandlerRegistry(gitPreferences);
 
         // 1) Remote bare repository
