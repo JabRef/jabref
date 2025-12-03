@@ -1,5 +1,7 @@
 package org.jabref.model.entry;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,11 +28,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -703,6 +710,7 @@ public class BibEntry {
     }
 
     // region String representations
+
     /// Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
     ///
     /// We do it this way to
@@ -720,6 +728,28 @@ public class BibEntry {
     @Override
     public String toString() {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
+    }
+
+    /// Uses `\n` as newline separator
+    ///
+    /// Method similar to [org.jabref.gui.entryeditor.SourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences)]
+    ///
+    /// @return String representation - empty string in case of an error (to ease calling)
+    public @NonNull String getStringRepresentation(
+            BibEntry entry,
+            BibDatabaseMode type,
+            BibEntryTypesManager entryTypesManager,
+            FieldPreferences fieldPreferences) {
+        try (StringWriter writer = new StringWriter()) {
+            BibWriter bibWriter = new BibWriter(writer, "\n");
+            FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+            BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
+            bibEntryWriter.write(entry, bibWriter, type, true);
+            return writer.toString();
+        } catch (IOException e) {
+            LOGGER.error("Could not write entry", e);
+            return "";
+        }
     }
 
     public String getParsedSerialization() {

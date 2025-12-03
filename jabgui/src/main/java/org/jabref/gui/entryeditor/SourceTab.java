@@ -155,21 +155,19 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
+    /// Method similar to [BibEntry#getStringRepresentation(BibEntry, BibDatabaseMode, BibEntryTypesManager, FieldPreferences)]. This method additionally updates [#fieldPositions].
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences) throws IOException {
-        StringWriter writer = new StringWriter();
-        BibWriter bibWriter = new BibWriter(writer, "\n"); // JavaFX works with LF only
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
-        BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
-        bibEntryWriter.write(entry, bibWriter, type, true);
-        fieldPositions = bibEntryWriter.getFieldPositions();
-        String sourceString = writer.toString();
-        writer.close();
-        return sourceString;
+        try (StringWriter writer = new StringWriter()) {
+            BibWriter bibWriter = new BibWriter(writer, "\n"); // JavaFX works with LF only
+            FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+            BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
+            bibEntryWriter.write(entry, bibWriter, type, true);
+            fieldPositions = bibEntryWriter.getFieldPositions();
+            return writer.toString();
+        }
     }
 
-    /* Work around for different input methods.
-     * https://github.com/FXMisc/RichTextFX/issues/146
-     */
+    /// Work around for different input methods. <https://github.com/FXMisc/RichTextFX/issues/146>
     private static class InputMethodRequestsObject implements InputMethodRequests {
 
         @Override
