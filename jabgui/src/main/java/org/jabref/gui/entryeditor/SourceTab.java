@@ -232,7 +232,7 @@ public class SourceTab extends EntryEditorTab {
             }
         });
 
-        codeArea.focusedProperty().addListener((obs, oldValue, onFocus) -> {
+        codeArea.focusedProperty().addListener((_, _, onFocus) -> {
             if (!onFocus && (currentEntry != null)) {
                 storeSource(currentEntry, codeArea.textProperty().getValue());
             }
@@ -294,6 +294,7 @@ public class SourceTab extends EntryEditorTab {
 
             if (database.getEntryCount() > 1) {
                 LOGGER.error("More than one entry found.");
+                dialogService.notify(Localization.lang("More than one entry found."));
                 return;
             }
 
@@ -301,14 +302,16 @@ public class SourceTab extends EntryEditorTab {
                 if (parserResult.hasWarnings()) {
                     LOGGER.warn("Could not store entry", parserResult.warnings());
                     dialogService.notify(parserResult.warnings().getFirst());
+                    return;
                 } else {
                     LOGGER.warn("No entries found.");
                     dialogService.notify(Localization.lang("No entries available"));
+                    return;
                 }
             }
 
             if (parserResult.hasWarnings()) {
-                LOGGER.warn("Could not store entry", parserResult.warnings());
+                LOGGER.warn("Failed to parse Bib(La)TeX", parserResult.warnings());
                 dialogService.notify(parserResult.getErrorMessage());
             }
 
