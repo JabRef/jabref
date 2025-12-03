@@ -702,6 +702,7 @@ public class BibEntry {
         return fields.stream().allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
 
+    // region String representations
     /// Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
     ///
     /// We do it this way to
@@ -720,6 +721,16 @@ public class BibEntry {
     public String toString() {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
     }
+
+    public String getParsedSerialization() {
+        return parsedSerialization;
+    }
+
+    public void setParsedSerialization(String parsedSerialization) {
+        changed = false;
+        this.parsedSerialization = parsedSerialization;
+    }
+    // endregion
 
     public String getAuthorTitleYear() {
         return getAuthorTitleYear(0);
@@ -788,15 +799,6 @@ public class BibEntry {
      */
     public Optional<Date> getPublicationDate() {
         return getFieldOrAlias(StandardField.DATE).flatMap(Date::parse);
-    }
-
-    public String getParsedSerialization() {
-        return parsedSerialization;
-    }
-
-    public void setParsedSerialization(String parsedSerialization) {
-        changed = false;
-        this.parsedSerialization = parsedSerialization;
     }
 
     public void setCommentsBeforeEntry(String parsedComments) {
