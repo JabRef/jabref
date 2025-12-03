@@ -61,7 +61,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final StringProperty gitPatProperty = new SimpleStringProperty("");
     private final BooleanProperty gitPersistPatProperty = new SimpleBooleanProperty();
 
-
     private final DialogService dialogService;
     private final CliPreferences preferences;
 
@@ -238,7 +237,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * Check the connection by using the given url. Used for validating the http proxy. The checking result will be appear when request finished. The checking result could be either success or fail, if fail, the cause will be displayed.
+     * Check the connection by using the given url. Used for validating the http proxy. The checking result will be appearing when request finished.
+     * The checking result could be either success or fail.
+     * If fail, the cause will be displayed.
      */
     public void checkConnection() {
         final String connectionSuccessText = Localization.lang("Connection successful!");
