@@ -19,6 +19,9 @@ dependencies {
     // implementation("org.openjfx:javafx-controls")
     // implementation("org.openjfx:javafx-fxml")
     // implementation("org.openjfx:javafx-graphics")
+    implementation("com.google.code.gson:gson:2.10.1")
+   
+
 
     implementation(project(":jabls"))
     implementation(project(":jabsrv"))
