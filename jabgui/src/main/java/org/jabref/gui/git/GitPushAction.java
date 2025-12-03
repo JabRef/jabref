@@ -39,8 +39,7 @@ public class GitPushAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = handlerRegistry;
 
-        this.executable.bind(ActionHelper.needsDatabase(stateManager)
-                                         .and(ActionHelper.needsGitRemoteConfigured(stateManager)));
+        this.executable.bind(ActionHelper.needsGitRemoteConfigured(stateManager));
     }
 
     @Override

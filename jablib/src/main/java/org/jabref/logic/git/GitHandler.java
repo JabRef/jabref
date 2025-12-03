@@ -332,32 +332,32 @@ public class GitHandler {
         }
     }
 
-    public void fetchOnCurrentBranch() throws IOException {
+    public void fetchOnCurrentBranch() throws JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
-            Optional<CredentialsProvider> credsOpt = resolveCredentials();
-
-            boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
-            if (needCreds && credsOpt.isEmpty()) {
-                throw new IOException("Missing Git credentials (username and Personal Access Token).");
+            Optional<CredentialsProvider> credentials = resolveCredentials();
+            boolean needCredentials = currentRemoteUrl(git.getRepository())
+                    .map(GitHandler::requiresCredentialsForUrl)
+                    .orElse(false);
+            if (needCredentials && credentials.isEmpty()) {
+                throw new JabRefException("Missing Git credentials (username and Personal Access Token).");
             }
             FetchCommand fetchCommand = git.fetch();
-            if (credsOpt.isPresent()) {
-                fetchCommand.setCredentialsProvider(credsOpt.get());
-            }
+            credentials.ifPresent(fetchCommand::setCredentialsProvider);
             fetchCommand.call();
         } catch (TransportException e) {
+            LOGGER.error("Error during transport", e);
             Throwable throwable = e;
             while (throwable != null) {
                 if (throwable instanceof NoRemoteRepositoryException) {
-                    throw new IOException("No repository found at the configured remote. Please check the URL or your token settings.", e);
+                    throw new JabRefException("No repository found at the configured remote. Please check the URL or your token settings.", e);
                 }
                 throwable = throwable.getCause();
             }
             String message = e.getMessage();
-            throw new IOException("Failed to fetch from remote: " + (message == null ? "unknown transport error" : message), e);
-        } catch (GitAPIException e) {
-            throw new IOException("Failed to fetch from remote: " + e.getMessage(), e);
+            throw new JabRefException("Failed to fetch from remote: " + (message == null ? "unknown transport error" : message), e);
+        } catch (GitAPIException | IOException e) {
+            LOGGER.error("Failed to fetch", e);
+            throw new JabRefException("Failed to fetch from remote: " + e.getMessage(), e);
         }
     }
 

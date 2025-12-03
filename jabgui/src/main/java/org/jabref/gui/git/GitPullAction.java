@@ -51,7 +51,7 @@ public class GitPullAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
 
-        this.executable.bind(ActionHelper.needsDatabase(stateManager).and(ActionHelper.needsGitRemoteConfigured(stateManager)));
+        this.executable.bind(ActionHelper.needsGitRemoteConfigured(stateManager));
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 
 public class GitCommitAction extends SimpleCommand {
 
@@ -17,7 +18,7 @@ public class GitCommitAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 
-        this.executable.bind(ActionHelper.needsDatabase(stateManager));
+        this.executable.bind(ActionHelper.needsSavedLocalDatabase(stateManager));
     }
 
     @Override
@@ -34,7 +35,7 @@ public class GitCommitAction extends SimpleCommand {
 
     private boolean hasNothingToCommit() {
         return stateManager.getActiveDatabase()
-                           .flatMap(context -> context.getDatabasePath())
+                           .flatMap(BibDatabaseContext::getDatabasePath)
                            .flatMap(GitHandler::fromAnyPath)
                            .map(GitStatusChecker::checkStatus)
                            .map(status -> !status.uncommittedChanges())
