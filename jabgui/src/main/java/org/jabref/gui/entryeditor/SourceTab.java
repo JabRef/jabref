@@ -70,7 +70,7 @@ public class SourceTab extends EntryEditorTab {
     private static final String SEARCH_STYLE = "search";
     private final FieldPreferences fieldPreferences;
     private final UndoManager undoManager;
-    private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
+    private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
@@ -218,7 +218,7 @@ public class SourceTab extends EntryEditorTab {
         contextMenu.getStyleClass().add("context-menu");
         codeArea.setContextMenu(contextMenu);
 
-        sourceValidator.addRule(sourceIsValid);
+        sourceValidator.addRule(validationMessage);
 
         sourceValidator.getValidationStatus().getMessages().addListener((InvalidationListener) c -> {
             ValidationStatus sourceValidationStatus = sourceValidator.getValidationStatus();
@@ -294,25 +294,32 @@ public class SourceTab extends EntryEditorTab {
 
             if (database.getEntryCount() > 1) {
                 LOGGER.error("More than one entry found.");
-                dialogService.notify(Localization.lang("More than one entry found."));
+                // We use the error dialog as the notification is hidden
+                dialogService.showErrorDialogAndWait(Localization.lang("More than one entry found."));
                 return;
             }
 
             if (!database.hasEntries()) {
                 if (parserResult.hasWarnings()) {
                     LOGGER.warn("Could not store entry", parserResult.warnings());
-                    dialogService.notify(parserResult.warnings().getFirst());
+                    String errors = parserResult.getErrorMessage();
+                    dialogService.showErrorDialogAndWait(errors);
+                    validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
                     return;
                 } else {
                     LOGGER.warn("No entries found.");
-                    dialogService.notify(Localization.lang("No entries available"));
+                    String errors = Localization.lang("No entries available");
+                    dialogService.showErrorDialogAndWait(errors);
+                    validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
                     return;
                 }
             }
 
             if (parserResult.hasWarnings()) {
                 LOGGER.warn("Failed to parse Bib(La)TeX", parserResult.warnings());
-                dialogService.notify(parserResult.getErrorMessage());
+                String errors = parserResult.getErrorMessage();
+                dialogService.showErrorDialogAndWait(errors);
+                validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
             }
 
             NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
@@ -355,9 +362,9 @@ public class SourceTab extends EntryEditorTab {
             compound.end();
             undoManager.addEdit(compound);
 
-            sourceIsValid.setValue(null);
-        } catch (InvalidFieldValueException | IllegalStateException | IOException ex) {
-            sourceIsValid.setValue(ValidationMessage.error(Localization.lang("Problem with parsing entry") + ": " + ex.getMessage()));
+            validationMessage.setValue(null);
+        } catch (InvalidFieldValueException | IOException ex) {
+            validationMessage.setValue(ValidationMessage.error(Localization.lang("Problem with parsing entry") + ": " + ex.getMessage()));
             LOGGER.debug("Incorrect source", ex);
         }
     }
