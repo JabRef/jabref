@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,6 +36,12 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = "--output", description = "The output .bib file.")
     private Path outputFile;
 
+    @Option(
+            names = "--pattern",
+            description = "Override the default citation key pattern (Example: [auth][year])"
+    )
+    private String defaultPattern;
+
     @Override
     public void run() {
         Optional<ParserResult> parserResult = JabKit.importFile(
@@ -58,9 +65,27 @@ class GenerateCitationKeys implements Runnable {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
         }
 
+        var prefs = argumentProcessor.cliPreferences.getCitationKeyPatternPreferences();
+
+        if (defaultPattern != null) {
+            prefs = new CitationKeyPatternPreferences(
+                    prefs.shouldTransliterateFieldsForCitationKey(),
+                    prefs.shouldAvoidOverwriteCiteKey(),
+                    prefs.shouldWarnBeforeOverwriteCiteKey(),
+                    prefs.shouldGenerateCiteKeysBeforeSaving(),
+                    prefs.getKeySuffix(),
+                    prefs.getKeyPatternRegex(),
+                    prefs.getKeyPatternReplacement(),
+                    prefs.getUnwantedCharacters(),
+                    prefs.getKeyPatterns(),
+                    defaultPattern,
+                    prefs.getKeywordDelimiter()
+            );
+        }
+
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                 databaseContext,
-                argumentProcessor.cliPreferences.getCitationKeyPatternPreferences());
+                prefs);
         for (BibEntry entry : databaseContext.getEntries()) {
             keyGenerator.generateAndSetKey(entry);
         }
