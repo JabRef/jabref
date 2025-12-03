@@ -47,11 +47,11 @@ public class GitPreferences {
         this.repositoryUrl.set(repositoryUrl);
     }
 
-    public boolean getRememberPat() {
+    public boolean getPersistPat() {
         return this.rememberPat.get();
     }
 
-    public void setRememberPat(boolean remember) {
+    public void setPersistPat(boolean remember) {
         this.rememberPat.set(remember);
     }
 
