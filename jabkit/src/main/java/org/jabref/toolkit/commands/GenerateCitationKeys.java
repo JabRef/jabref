@@ -19,12 +19,14 @@ import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
-@Command(name = "generate-citation-keys", description = "Generate citation keys for entries in a .bib file.")
+@Command(
+        name = "generate", description = "Generate citation keys for entries in a .bib file."
+)
 class GenerateCitationKeys implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
 
     @ParentCommand
-    private JabKit argumentProcessor;
+    private CitationKeyCommands parentMid;
 
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
@@ -44,11 +46,14 @@ class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
+        JabKit parentTop = parentMid.getParent();
+
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
-                argumentProcessor.cliPreferences,
+                parentTop.cliPreferences,
                 sharedOptions.porcelain);
+
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
@@ -65,39 +70,37 @@ class GenerateCitationKeys implements Runnable {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
         }
 
-        var prefs = argumentProcessor.cliPreferences.getCitationKeyPatternPreferences();
+        var preferences = parentTop.cliPreferences.getCitationKeyPatternPreferences();
 
         if (defaultPattern != null) {
-            prefs = new CitationKeyPatternPreferences(
-                    prefs.shouldTransliterateFieldsForCitationKey(),
-                    prefs.shouldAvoidOverwriteCiteKey(),
-                    prefs.shouldWarnBeforeOverwriteCiteKey(),
-                    prefs.shouldGenerateCiteKeysBeforeSaving(),
-                    prefs.getKeySuffix(),
-                    prefs.getKeyPatternRegex(),
-                    prefs.getKeyPatternReplacement(),
-                    prefs.getUnwantedCharacters(),
-                    prefs.getKeyPatterns(),
+            preferences = new CitationKeyPatternPreferences(
+                    preferences.shouldTransliterateFieldsForCitationKey(),
+                    preferences.shouldAvoidOverwriteCiteKey(),
+                    preferences.shouldWarnBeforeOverwriteCiteKey(),
+                    preferences.shouldGenerateCiteKeysBeforeSaving(),
+                    preferences.getKeySuffix(),
+                    preferences.getKeyPatternRegex(),
+                    preferences.getKeyPatternReplacement(),
+                    preferences.getUnwantedCharacters(),
+                    preferences.getKeyPatterns(),
                     defaultPattern,
-                    prefs.getKeywordDelimiter()
+                    preferences.getKeywordDelimiter()
             );
         }
 
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                databaseContext,
-                prefs);
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences);
         for (BibEntry entry : databaseContext.getEntries()) {
             keyGenerator.generateAndSetKey(entry);
         }
 
         if (outputFile != null) {
             JabKit.saveDatabase(
-                    argumentProcessor.cliPreferences,
-                    argumentProcessor.entryTypesManager,
+                    parentTop.cliPreferences,
+                    parentTop.entryTypesManager,
                     parserResult.get().getDatabase(),
                     outputFile);
         } else {
-            JabKit.outputDatabaseContext(argumentProcessor.cliPreferences, parserResult.get().getDatabaseContext());
+            JabKit.outputDatabaseContext(parentTop.cliPreferences, parserResult.get().getDatabaseContext());
         }
     }
 }

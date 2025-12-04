@@ -46,11 +46,11 @@ import static picocli.CommandLine.Option;
         subcommands = {
                 CheckConsistency.class,
                 CheckIntegrity.class,
+                CitationKeyCommands.class,
                 Convert.class,
                 DoiToBibtex.class,
                 Fetch.class,
                 GenerateBibFromAux.class,
-                GenerateCitationKeys.class,
                 GetCitedWorks.class,
                 GetCitingWorks.class,
                 Pdf.class,
