@@ -27,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for getting bibliographic information based on the arXiv ID or the ISSN. [#14458](https://github.com/JabRef/jabref/pull/14458)
 - We added support for "Search Google Scholar" and "Search Semantic Scholar" to quickly search for a selected entry's title in Google Scholar or Semantic Scholar directly from the main table's context menu [#12268](https://github.com/JabRef/jabref/issues/12268)
 - We added support for `html` when parsing the arXiv identifiers. [#14451](https://github.com/JabRef/jabref/issues/14451)
+- We added the option to change the Git username and PAT in Network Preferences. [#14509](https://github.com/JabRef/jabref/pull/14509)
 - When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
 
