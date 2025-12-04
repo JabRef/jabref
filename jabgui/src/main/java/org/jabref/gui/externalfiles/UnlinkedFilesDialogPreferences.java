@@ -14,7 +14,7 @@ public class UnlinkedFilesDialogPreferences {
     private final ObjectProperty<DateRange> unlinkedFilesSelectedDateRange;
     private final ObjectProperty<ExternalFileSorter> unlinkedFilesSelectedSort;
 
-    private UnlinkedFilesDialogPreferences(){
+    private UnlinkedFilesDialogPreferences() {
         this(
                 StandardFileType.ANY_FILE.getName(),
                 DateRange.ALL_TIME,
@@ -30,11 +30,11 @@ public class UnlinkedFilesDialogPreferences {
         this.unlinkedFilesSelectedSort = new SimpleObjectProperty<>(unlinkedFilesSelectedSort);
     }
 
-    public static UnlinkedFilesDialogPreferences getDefault(){
+    public static UnlinkedFilesDialogPreferences getDefault() {
         return new UnlinkedFilesDialogPreferences();
     }
 
-    public void setAll(UnlinkedFilesDialogPreferences preferences){
+    public void setAll(UnlinkedFilesDialogPreferences preferences) {
         this.unlinkedFilesSelectedExtension.set(preferences.getUnlinkedFilesSelectedExtension());
         this.unlinkedFilesSelectedDateRange.set(preferences.getUnlinkedFilesSelectedDateRange());
         this.unlinkedFilesSelectedSort.set(preferences.getUnlinkedFilesSelectedSort());

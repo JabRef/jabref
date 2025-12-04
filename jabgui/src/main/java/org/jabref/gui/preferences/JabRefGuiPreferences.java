@@ -64,7 +64,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
@@ -679,11 +678,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getStringList(SELECTED_SLR_CATALOGS));
     }
 
-    private UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferencesFromBackingStore(UnlinkedFilesDialogPreferences defaults){
+    private UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferencesFromBackingStore(UnlinkedFilesDialogPreferences defaults) {
         return new UnlinkedFilesDialogPreferences(
-                get(UNLINKED_FILES_SELECTED_EXTENSION,defaults.getUnlinkedFilesSelectedExtension()),
-                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE,defaults.getUnlinkedFilesSelectedDateRange().name())),
-                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT,defaults.getUnlinkedFilesSelectedSort().name()))
+                get(UNLINKED_FILES_SELECTED_EXTENSION, defaults.getUnlinkedFilesSelectedExtension()),
+                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE, defaults.getUnlinkedFilesSelectedDateRange().name())),
+                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT, defaults.getUnlinkedFilesSelectedSort().name()))
         );
     }
 
