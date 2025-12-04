@@ -39,7 +39,7 @@
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.5.0
 //DEPS de.undercouch:citeproc-java:3.4.0
-//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3 
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 //DEPS tools.jackson.core:jackson-core:3.0.3
 //DEPS tools.jackson.core:jackson-databind:3.0.3
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.3
@@ -78,7 +78,6 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/PreferencesFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties
