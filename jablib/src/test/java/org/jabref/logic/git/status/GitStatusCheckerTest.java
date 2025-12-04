@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 
 import org.eclipse.jgit.api.CreateBranchCommand;
@@ -21,10 +22,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class GitStatusCheckerTest {
     private Path localLibrary;
@@ -73,7 +76,8 @@ class GitStatusCheckerTest {
 
     @BeforeEach
     void setup(@TempDir Path tempDir) throws Exception {
-        gitHandlerRegistry = new GitHandlerRegistry();
+        GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        gitHandlerRegistry = new GitHandlerRegistry(gitPreferences);
         Path remoteDir = tempDir.resolve("remote.git");
         remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
 
@@ -136,7 +140,9 @@ class GitStatusCheckerTest {
     @Test
     void untrackedStatusWhenNotGitRepo(@TempDir Path tempDir) {
         Path nonRepoPath = tempDir.resolve("somefile.bib");
-        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(nonRepoPath);
+
+        GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(nonRepoPath, gitPreferences);
 
         assertFalse(snapshot.tracking());
         assertEquals(SyncStatus.UNTRACKED, snapshot.syncStatus());
