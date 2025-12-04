@@ -398,6 +398,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getDonationPreferences().setAll(DonationPreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
+        getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
     }
 
     @Override
@@ -409,6 +410,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
+        getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -835,11 +837,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return specialFieldsPreferences;
         }
 
-        specialFieldsPreferences = new SpecialFieldsPreferences(getBoolean(SPECIALFIELDSENABLED));
+        specialFieldsPreferences = getSpecialFieldsPreferencesFromBackingStore(SpecialFieldsPreferences.getDefault());
 
         EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
 
         return specialFieldsPreferences;
+    }
+
+    private SpecialFieldsPreferences getSpecialFieldsPreferencesFromBackingStore(SpecialFieldsPreferences defaults) {
+        return new SpecialFieldsPreferences(
+                getBoolean(SPECIALFIELDSENABLED, defaults.isSpecialFieldsEnabled())
+        );
     }
 
     // region Preview preferences
