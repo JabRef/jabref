@@ -56,9 +56,9 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -533,14 +533,17 @@ public class ImportHandler {
 
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
-            // Only one SmartGroup
+            String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
+            // We cannot add the new group here directly because we don't have access to the group node viewmoel stuff here
+            // We would need to add the groups to the metadata first which is a bit more complicated, thus we decided against it atm
             this.targetBibDatabaseContext.getMetaData()
                                          .getGroups()
                                          .flatMap(grp -> grp.getChildren()
                                                             .stream()
-                                                            .filter(node -> node.getGroup() instanceof SmartGroup)
+                                                            .filter(node -> node.getGroup() instanceof ExplicitGroup
+                                                                    && node.getGroup().getName().equals(groupName))
                                                             .findFirst())
-                                         .ifPresent(smtGrp -> smtGrp.addEntriesToGroup(entriesToInsert));
+                                         .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
         }
     }
 }
