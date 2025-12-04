@@ -208,6 +208,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
             dialogService.notify(Localization.lang("No summary available to export"));
             return;
         }
+
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.MARKDOWN)
                 .withDefaultExtension(StandardFileType.MARKDOWN)

@@ -17,13 +17,12 @@ import org.jabref.logic.ai.summarization.Summary;
 import org.jabref.logic.layout.format.MarkdownFormatter;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jspecify.annotations.NonNull;
 
 public class SummaryShowingComponent extends VBox {
     private static final MarkdownFormatter MARKDOWN_FORMATTER = new MarkdownFormatter();
-    @FXML
-    private Text summaryInfoText;
-    @FXML
-    private CheckBox markdownCheckbox;
+    @FXML private Text summaryInfoText;
+    @FXML private CheckBox markdownCheckbox;
 
     private WebView contentWebView;
     private final Summary summary;
@@ -31,7 +30,7 @@ public class SummaryShowingComponent extends VBox {
     private final Runnable exportMarkdownCallback;
     private final Runnable exportJsonCallback;
 
-    public SummaryShowingComponent(Summary summary, Runnable regenerateCallback, Runnable exportMarkdownCallback, Runnable exportJsonCallback) {
+    public SummaryShowingComponent(@NonNull Summary summary, @NonNull Runnable regenerateCallback, @NonNull Runnable exportMarkdownCallback, @NonNull Runnable exportJsonCallback) {
         this.summary = summary;
         this.regenerateCallback = regenerateCallback;
         this.exportMarkdownCallback = exportMarkdownCallback;
@@ -94,15 +93,11 @@ public class SummaryShowingComponent extends VBox {
 
     @FXML
     private void onExportMarkdown() {
-        if (exportMarkdownCallback != null) {
             exportMarkdownCallback.run();
-        }
     }
 
     @FXML
     private void onExportJson() {
-        if (exportJsonCallback != null) {
             exportJsonCallback.run();
-        }
     }
 }
