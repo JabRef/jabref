@@ -4,41 +4,23 @@ parent: Code Howtos
 # Useful development tooling
 
 This page lists some software we consider useful.
-
-## Run `gradle` from command line
-
-1. [Install mise](https://mise.jdx.dev/installing-mise.html). `mise` is an SDK manager for all popular operating systems.
-2. Run `gradle`:
-
-   * Linux/macOS: `mise exec java@21 -- ./gradlew run`
-   * Windows: `mise exec java@21 -- gradlew run`
+Tool usage hints are provided at the [FAQ page](faq.md).
 
 ## Browser plugins
 
-* [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
-* [GitHub Issue Link Status](https://github.com/fregante/github-issue-link-status) - proper coloring of linked issues and PRs.
-* [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
-* [Sourcegraph Browser Extension](https://sourcegraph.com/docs/integration/browser_extension) - Navigate through source on GitHub
+* (strongly recommened) [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
+* (recommended) [GitHub Issue Link Status](https://github.com/fregante/github-issue-link-status) - proper coloring of linked issues and PRs.
+* (optional) [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
+* (optional) [Sourcegraph Browser Extension](https://sourcegraph.com/docs/integration/browser_extension) - Navigate through source on GitHub
 
-## git hints
+## Drawing diagrams
 
-Here, we collect some helpful git hints
+* A free tool to make UI mockups: <https://draw.io> with `Software -> Mockups` shapes.
 
-* <https://github.com/blog/2019-how-to-undo-almost-anything-with-git>
-* [So you need to change your commit](https://github.com/RichardLitt/knowledge/blob/master/github/amending-a-commit-guide.md#so-you-need-to-change-your-commit)
-* awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
+## Screenshots
 
-### Rebase everything as one commit on main
-
-* Precondition: `JabRef/jabref` is [configured as upstream](https://help.github.com/articles/configuring-a-remote-for-a-fork/).
-* Fetch recent commits and prune non-existing branches: `git fetch upstream --prune`
-* Merge recent commits: `git merge upstream/main`
-* If there are conflicts, resolve them
-* Reset index to upstream/main: `git reset upstream/main`
-* Review the changes and create a new commit using git gui: `git gui`
-* Do a force push: `git push -f origin`
-
-See also: <https://help.github.com/articles/syncing-a-fork/>
+* We recommend [Flameshot](https://flameshot.org/) and [Greenshot](https://getgreenshot.org/) to enable proper annotation of screenshots.
+  GitHub allows direct paste of images from the clipboard. Thus, copy the annotated image and paste it directly in your PR description.
 
 ## Tooling for Windows
 

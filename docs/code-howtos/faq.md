@@ -9,6 +9,21 @@ Following is a list of common errors encountered by developers which lead to fai
 
 * Sync your fork with the JabRef repository: [General howto by GitHub](https://help.github.com/articles/syncing-a-fork/)
 * Branches and pull requests (🇩🇪): [https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md)
+* <https://github.com/blog/2019-how-to-undo-almost-anything-with-git>
+* [So you need to change your commit](https://github.com/RichardLitt/knowledge/blob/master/github/amending-a-commit-guide.md#so-you-need-to-change-your-commit)
+* awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
+
+### Rebase everything as one commit on main
+
+* Precondition: `JabRef/jabref` is [configured as upstream](https://help.github.com/articles/configuring-a-remote-for-a-fork/).
+* Fetch recent commits and prune non-existing branches: `git fetch upstream --prune`
+* Merge recent commits: `git merge upstream/main`
+* If there are conflicts, resolve them
+* Reset index to upstream/main: `git reset upstream/main`
+* Review the changes and create a new commit using git gui: `git gui`
+* Do a force push: `git push -f origin`
+
+See also: <https://help.github.com/articles/syncing-a-fork/>
 
 ## Failing GitHub workflow "Sync fork with upstream"
 
@@ -204,5 +219,18 @@ In case Gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg)
 4. Wait until the command execution completes.
 
 After about one minute, however, you can continue setting up IntelliJ, because the initial Gradle setup succeeded.
+
+## Gradle
+
+### Run `gradle` from command line
+
+Sometimes, one needs to double-check that there is an IDE setup issue - and not an issue with modified Gradle builds files.
+It is easily possible to run Gradle from the command line without installing a separate JDK manually.
+
+1. Download [gg.cmd](https://github.com/eirikb/gg/releases/latest/download/gg.cmd). [`gg.cmd`](https://github.com/eirikb/gg) is an easy-to-use toolchain downloading all requirements.
+2. Run `gradle`:
+
+   * Linux/macOS: `sh -x ./gg.cmd gradle :jabgui:run`
+   * Windows: `.\gg.cmd gradle :jabgui:run`
 
 <!-- markdownlint-disable-file MD033 -->
