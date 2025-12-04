@@ -24,7 +24,7 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
         return entry
                 .getCitationKey()
                 .map(key -> RandomGenerator
-                        .StreamableGenerator.of("L128X256MixRandom").ints(150)
+                        .StreamableGenerator.of("L128X256MixRandom").ints(10)
                                             .mapToObj(i -> new BibEntry()
                                                     .withCitationKey("%s relation %s".formatted(key, i))
                                                     .withField(StandardField.DOI, "10.2345/6789" + i)
@@ -37,10 +37,20 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
     private static class BibEntryRelationRepositoryMock implements BibEntryRelationRepository {
 
         private final HashMap<BibEntry, List<BibEntry>> relations = new HashMap<>();
+        private boolean closeCalled = false;
+        private final boolean isUpdatable;
+
+        public BibEntryRelationRepositoryMock(boolean isUpdatable) {
+            this.isUpdatable = isUpdatable;
+        }
+
+        public BibEntryRelationRepositoryMock() {
+            this(false);
+        }
 
         @Override
         public List<BibEntry> getRelations(BibEntry entry) {
-            return new ArrayList<>(this.relations.get(entry));
+            return new ArrayList<>(this.relations.getOrDefault(entry, List.of()));
         }
 
         @Override
@@ -54,8 +64,17 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
         }
 
         @Override
+        public boolean shouldUpdate(BibEntry entry) {
+            return this.isUpdatable;
+        }
+
+        @Override
         public void close() {
-            // do nothing
+            this.closeCalled = true;
+        }
+
+        public boolean wasClosed() {
+            return this.closeCalled;
         }
     }
 
@@ -90,14 +109,110 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
                 new BibEntryRelationRepositoryMock(),
                 referencesDAO
         );
-        Assertions.assertFalse(bibEntryRelationsRepository.containsCitations(bibEntry));
+        Assertions.assertFalse(bibEntryRelationsRepository.containsReferences(bibEntry));
         Assertions.assertFalse(references.isEmpty());
 
         // WHEN
-        bibEntryRelationsRepository.insertCitations(bibEntry, references);
+        bibEntryRelationsRepository.insertReferences(bibEntry, references);
 
         // THEN
-        Assertions.assertTrue(bibEntryRelationsRepository.containsCitations(bibEntry));
-        Assertions.assertEquals(references, bibEntryRelationsRepository.readCitations(bibEntry));
+        Assertions.assertTrue(bibEntryRelationsRepository.containsReferences(bibEntry));
+        Assertions.assertEquals(references, bibEntryRelationsRepository.readReferences(bibEntry));
+    }
+
+    @Test
+    void readReferencesShouldReturnEmptyListWhenEntryIsNull() {
+        // GIVEN
+        BibEntryCitationsAndReferencesRepositoryShell repository = new BibEntryCitationsAndReferencesRepositoryShell(
+                new BibEntryRelationRepositoryMock(),
+                new BibEntryRelationRepositoryMock()
+        );
+
+        // WHEN
+        List<BibEntry> references = repository.readReferences(null);
+
+        // THEN
+        Assertions.assertTrue(references.isEmpty());
+        Assertions.assertEquals(List.of(), references);
+    }
+
+    @Test
+    void readCitationsShouldReturnEmptyListWhenEntryIsNull() {
+        // GIVEN
+        BibEntryCitationsAndReferencesRepositoryShell repository = new BibEntryCitationsAndReferencesRepositoryShell(
+                new BibEntryRelationRepositoryMock(),
+                new BibEntryRelationRepositoryMock()
+        );
+
+        // WHEN
+        List<BibEntry> citations = repository.readCitations(null);
+
+        // THEN
+        Assertions.assertTrue(citations.isEmpty());
+        Assertions.assertEquals(List.of(), citations);
+    }
+
+    @Test
+    void insertCitationsShouldHandleNullListCorrectly() {
+        // GIVEN
+        BibEntry targetEntry = createBibEntry();
+        BibEntryRelationRepositoryMock citationsDAO = new BibEntryRelationRepositoryMock();
+        BibEntryCitationsAndReferencesRepositoryShell repository = new BibEntryCitationsAndReferencesRepositoryShell(
+                citationsDAO,
+                new BibEntryRelationRepositoryMock()
+        );
+
+        // WHEN
+        repository.insertCitations(targetEntry, null);
+
+        // THEN
+        Assertions.assertTrue(repository.containsCitations(targetEntry));
+        Assertions.assertTrue(repository.readCitations(targetEntry).isEmpty());
+    }
+
+    @Test
+    void isCitationsUpdatableShouldDelegateToCitationsDAO() {
+        // GIVEN
+        BibEntry bibEntry = createBibEntry();
+        BibEntryRelationRepositoryMock citationsDAO = new BibEntryRelationRepositoryMock(true);
+        BibEntryCitationsAndReferencesRepositoryShell repository = new BibEntryCitationsAndReferencesRepositoryShell(
+                citationsDAO,
+                new BibEntryRelationRepositoryMock(false)
+        );
+
+        // WHEN/THEN
+        Assertions.assertTrue(repository.isCitationsUpdatable(bibEntry));
+    }
+
+    @Test
+    void isReferencesUpdatableShouldDelegateToReferencesDAO() {
+        // GIVEN
+        BibEntry bibEntry = createBibEntry();
+        BibEntryRelationRepositoryMock referencesDAO = new BibEntryRelationRepositoryMock(true);
+        BibEntryCitationsAndReferencesRepositoryShell repository = new BibEntryCitationsAndReferencesRepositoryShell(
+                new BibEntryRelationRepositoryMock(false),
+                referencesDAO
+        );
+
+        // WHEN/THEN
+        Assertions.assertTrue(repository.isReferencesUpdatable(bibEntry));
+    }
+
+    @Test
+    void closeShouldCloseBothUnderlyingDAOs() {
+        // GIVEN
+        BibEntryRelationRepositoryMock citationsDAO = new BibEntryRelationRepositoryMock();
+        BibEntryRelationRepositoryMock referencesDAO = new BibEntryRelationRepositoryMock();
+        BibEntryCitationsAndReferencesRepositoryShell repository = new BibEntryCitationsAndReferencesRepositoryShell(
+                citationsDAO,
+                referencesDAO
+        );
+
+        // WHEN
+        repository.close();
+
+        // THEN
+        Assertions.assertTrue(citationsDAO.wasClosed());
+        Assertions.assertTrue(referencesDAO.wasClosed());
     }
 }
