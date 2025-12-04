@@ -18,7 +18,7 @@ jobs:
     if: (github.event.pull_request.user.login != 'dependabot[bot]') && (github.event.pull_request.user.login != 'renovate-bot')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Check PR body for changelog note
@@ -27,7 +27,7 @@ jobs:
           BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
           echo "Body: $BODY"
 
-          if echo "$BODY" | grep -q '\- \[x\] I described the change in `CHANGELOG.md`'; then
+          if echo "$BODY" | grep -q '\- \[x\] I described the change in'; then
             echo "found"
             echo "found=yes" >> $GITHUB_OUTPUT
           else

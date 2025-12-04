@@ -13,8 +13,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;
@@ -41,7 +40,7 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
  * Currently, Springer, and IEEE formats are supported.
  * <p>
  * In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
- * please see {@link BibliographyFromPdfImporter}.
+ * please see {@link RuleBasedBibliographyPdfImporter}.
  * <p>
  * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
@@ -188,13 +187,14 @@ public class PdfContentImporter extends PdfImporter {
         return removeNonLettersAtEnd(title);
     }
 
-    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException {
+    @Override
+    public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
         List<BibEntry> result = new ArrayList<>(1);
         String firstPageContents = PdfUtils.getFirstPageContents(document);
         Optional<String> titleByFontSize = extractTitleFromDocument(document);
         Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE, titleByFontSize);
         entry.ifPresent(result::add);
-        return result;
+        return new ParserResult(result);
     }
 
     private static Optional<String> extractTitleFromDocument(PDDocument document) throws IOException {

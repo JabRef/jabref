@@ -1,0 +1,45 @@
+name: Adapt PR status
+
+on:
+  workflow_run:
+    workflows: ["On PR labeled"]
+    types: [completed]
+
+jobs:
+   mark-pr-ready-for-review:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Download artifact from triggering run
+        uses: actions/download-artifact@v6
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          name: pr_number
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      - name: Check for pr_number.txt
+        id: check
+        run: |
+          if [ -f pr_number.txt ]; then
+            echo "continue=true" >> "$GITHUB_OUTPUT"
+            echo "pr_number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+          else
+            echo "continue=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Mark PR ready for review
+        if: steps.check.outputs.continue == 'true'
+        run: |
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ steps.check.outputs.pr_number }}/labels --jq '.[].name')
+
+          if echo "$LABELS" | grep -q "^status: ready-for-review$"; then
+            echo "✅ label ready-for-review found"
+            gh pr ready --repo ${{ github.repository }} ${{ steps.check.outputs.pr_number }}
+          else
+            echo "⊘ label ready-for-review not found"
+          fi;
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -72,25 +72,24 @@ import org.xml.sax.SAXException;
 import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_QUOTE_CHAR;
 import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYPE_SUFFIX;
 
-/**
- * Class for importing BibTeX-files.
- * <p>
- * Use:
- * <p>
- * <code>BibtexParser parser = new BibtexParser(reader);</code>
- * <p>
- * <code>ParserResult result = parser.parse();</code>
- * <p>
- * or
- * <p>
- * <code>ParserResult result = BibtexParser.parse(reader);</code>
- * <p>
- * Can be used stand-alone.
- * <p>
- * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
- * <p>
- * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
- */
+/// Class for importing BibTeX files.
+///
+/// **Usage**
+///
+/// <code><pre>
+/// BibtexParser parser = new BibtexParser(importFormatPreferences);
+/// ParserResult result = parser.parse();
+/// </pre></code>
+///
+/// Can be used standalone.
+///
+/// **Main using method:**
+/// [`OpenDatabase.loadDatabase`](org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor))
+///
+/// **Opposite class:**
+/// [`BibDatabaseWriter`](org.jabref.logic.exporter.BibDatabaseWriter)
+///
+/// FIXME: This class relies on `char`, but should use [java.lang.Character] to be fully Unicode compliant.
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
     private static final int LOOKAHEAD = 1024;
@@ -293,7 +292,7 @@ public class BibtexParser implements Parser {
                         },
                         // metadata does not contain any groups, so we need to create an AllEntriesGroup and add the other groups as children
                         () -> {
-                            GroupTreeNode rootNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
+                            GroupTreeNode rootNode = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
                             bibDeskGroupTreeNode.moveTo(rootNode);
                             metaData.setGroups(rootNode);
                         }
@@ -762,7 +761,7 @@ public class BibtexParser implements Parser {
         Field field = FieldFactory.parseField(parseTextToken());
 
         skipWhitespace();
-        consume('=');
+        consume(field, '=');
         String content = parseFieldContent(field);
         if (!content.isEmpty()) {
             if (entry.hasField(field)) {
@@ -1172,6 +1171,19 @@ public class BibtexParser implements Parser {
         if (character != expected) {
             throw new IOException(
                     "Error in line " + line + ": Expected " + expected + " but received " + (char) character);
+        }
+    }
+
+    private void consume(Field field, char expected) throws IOException {
+        int character = read();
+
+        if (character != expected) {
+            throw new IOException(
+                    "Error at line " + line
+                            + " after column " + column
+                            + " (" + field.getName() + "): Expected "
+                            + expected + " but received "
+                            + (char) character + " (" + character + ")");
         }
     }
 

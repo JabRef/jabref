@@ -12,10 +12,12 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
@@ -63,6 +65,9 @@ class GroupTreeViewModelTest {
                 true,
                 true,
                 GroupHierarchyType.INDEPENDENT));
+        BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
+        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
+        when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
         groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
     }
 
@@ -173,7 +178,7 @@ class GroupTreeViewModelTest {
     void shouldAddOnlyMissingGroup() {
         GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
-        rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutFilesGroup());
+        rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutFilesGroup());
         assertEquals(1, rootGroup.getChildren().size());
 
         model.addSuggestedGroups(rootGroup);
@@ -186,8 +191,8 @@ class GroupTreeViewModelTest {
     void shouldNotAddSuggestedGroupsWhenAllExist() {
         GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
-        rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutFilesGroup());
-        rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutGroupsGroup());
+        rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutFilesGroup());
+        rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutGroupsGroup());
         assertEquals(2, rootGroup.getChildren().size());
 
         model.addSuggestedGroups(rootGroup);

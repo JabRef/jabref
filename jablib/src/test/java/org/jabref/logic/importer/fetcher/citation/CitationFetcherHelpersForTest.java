@@ -16,17 +16,17 @@ public class CitationFetcherHelpersForTest {
         ) {
             return new CitationFetcher() {
                 @Override
-                public List<BibEntry> searchCitedBy(BibEntry entry) {
+                public List<BibEntry> getCitations(BibEntry entry) {
                     return retrieveCitedBy.apply(entry);
                 }
 
                 @Override
-                public List<BibEntry> searchCiting(BibEntry entry) {
+                public List<BibEntry> getReferences(BibEntry entry) {
                     return retrieveCiting.apply(entry);
                 }
 
                 @Override
-                public Optional<Integer> searchCitationCount(BibEntry entry) throws FetcherException {
+                public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
                     return retrieveCitationCount.apply(entry);
                 }
 

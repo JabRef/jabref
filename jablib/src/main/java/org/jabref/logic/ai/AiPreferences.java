@@ -35,6 +35,8 @@ public class AiPreferences {
     private final BooleanProperty enableAi;
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
+    private final BooleanProperty generateFollowUpQuestions;
+    private final IntegerProperty followUpQuestionsCount;
 
     private final ObjectProperty<AiProvider> aiProvider;
 
@@ -67,6 +69,8 @@ public class AiPreferences {
     public AiPreferences(boolean enableAi,
                          boolean autoGenerateEmbeddings,
                          boolean autoGenerateSummaries,
+                         boolean generateFollowUpQuestions,
+                         int followUpQuestionsCount,
                          AiProvider aiProvider,
                          String openAiChatModel,
                          String mistralAiChatModel,
@@ -91,6 +95,8 @@ public class AiPreferences {
         this.enableAi = new SimpleBooleanProperty(enableAi);
         this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
         this.autoGenerateSummaries = new SimpleBooleanProperty(autoGenerateSummaries);
+        this.generateFollowUpQuestions = new SimpleBooleanProperty(generateFollowUpQuestions);
+        this.followUpQuestionsCount = new SimpleIntegerProperty(followUpQuestionsCount);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
 
@@ -116,6 +122,9 @@ public class AiPreferences {
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
 
+        this.apiKeyChangeListener = () -> {
+        };
+
         this.templates = Map.of(
                 AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_SYSTEM_MESSAGE)),
                 AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_USER_MESSAGE)),
@@ -124,7 +133,8 @@ public class AiPreferences {
                 AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE)),
                 AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE)),
                 AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE)),
-                AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_USER_MESSAGE))
+                AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_USER_MESSAGE)),
+                AiTemplate.FOLLOW_UP_QUESTIONS, new SimpleStringProperty(templates.get(AiTemplate.FOLLOW_UP_QUESTIONS))
         );
     }
 
@@ -190,6 +200,30 @@ public class AiPreferences {
 
     public void setAutoGenerateSummaries(boolean autoGenerateSummaries) {
         this.autoGenerateSummaries.set(autoGenerateSummaries);
+    }
+
+    public BooleanProperty generateFollowUpQuestionsProperty() {
+        return generateFollowUpQuestions;
+    }
+
+    public IntegerProperty followUpQuestionsCountProperty() {
+        return followUpQuestionsCount;
+    }
+
+    public int getFollowUpQuestionsCount() {
+        return followUpQuestionsCount.get();
+    }
+
+    public void setFollowUpQuestionsCount(int followUpQuestionsCount) {
+        this.followUpQuestionsCount.set(followUpQuestionsCount);
+    }
+
+    public boolean getGenerateFollowUpQuestions() {
+        return generateFollowUpQuestions.get();
+    }
+
+    public void setGenerateFollowUpQuestions(boolean generateFollowUpQuestions) {
+        this.generateFollowUpQuestions.set(generateFollowUpQuestions);
     }
 
     public ObjectProperty<AiProvider> aiProviderProperty() {
@@ -550,14 +584,14 @@ public class AiPreferences {
     }
 
     public void setTemplate(AiTemplate aiTemplate, String template) {
-        templates.get(aiTemplate).set(template);
+        templateProperty(aiTemplate).set(template);
     }
 
     public String getTemplate(AiTemplate aiTemplate) {
-        return templates.get(aiTemplate).get();
+        return templateProperty(aiTemplate).get();
     }
 
     public StringProperty templateProperty(AiTemplate aiTemplate) {
-        return templates.get(aiTemplate);
+        return templates.getOrDefault(aiTemplate, new SimpleStringProperty(""));
     }
 }

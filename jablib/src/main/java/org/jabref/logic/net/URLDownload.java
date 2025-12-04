@@ -39,6 +39,8 @@ import javax.net.ssl.SSLContext;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
@@ -47,23 +49,25 @@ import org.jabref.model.http.SimpleHttpResponse;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * URL download to a string.
- * <p>
- * Example:
- * <code>
- * URLDownload dl = new URLDownload(URL);
- * String content = dl.asString(ENCODING);
- * dl.toFile(Path); // available in FILE
- * String contentType = dl.getMimeType();
- * </code>
- * <br/><br/>
- * Almost each call to a public method creates a new HTTP connection (except for {@link #asString(Charset, URLConnection) asString},
- * which uses an already opened connection). Nothing is cached.
- */
+/// ## Example
+///
+/// ``java
+/// URLDownload dl = new URLDownload(URL);
+/// String content = dl.asString(ENCODING);
+/// dl.toFile(Path);              // available in FILE
+/// String contentType = dl.getMimeType();
+/// ``
+///
+/// Almost every call to a public method creates a new HTTP connection
+/// (except for {@link #asString(Charset, URLConnection) asString},
+/// which uses an already opened connection).
+///
+/// Nothing is cached.
 public class URLDownload {
 
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0";
@@ -73,6 +77,10 @@ public class URLDownload {
 
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
+
+    // In case Unpaywall should be supported, this should be non-null
+    private @Nullable ImporterPreferences importerPreferences;
+
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
     private SSLContext sslContext;
@@ -109,6 +117,11 @@ public class URLDownload {
         }
     }
 
+    public URLDownload(@NonNull ImporterPreferences importerPreferences, @NonNull URL citationsUrl) {
+        this(citationsUrl);
+        this.importerPreferences = importerPreferences;
+    }
+
     public URL getSource() {
         return source;
     }
@@ -126,7 +139,7 @@ public class URLDownload {
                 // @formatter:on
                 retries++;
                 HttpResponse<String> response = Unirest.head(urlToCheck).asString();
-                // Check if we have redirects, e.g. arxiv will give otherwise content type html for the original url
+                // Check if we have redirects, e.g. arxiv will give otherwise content type HTML for the original url
                 // We need to do it "manually", because ".followRedirects(true)" only works for GET not for HEAD
                 locationHeader = response.getHeaders().getFirst("location");
                 if (!StringUtil.isNullOrEmpty(locationHeader)) {
@@ -208,31 +221,11 @@ public class URLDownload {
     /**
      * Downloads the web resource to a String.
      *
-     * @param encoding the desired String encoding
-     * @return the downloaded string
-     */
-    public String asString(Charset encoding) throws FetcherException {
-        return asString(encoding, this.openConnection());
-    }
-
-    /**
-     * Downloads the web resource to a String from an existing connection. Uses UTF-8 as encoding.
-     *
-     * @param existingConnection an existing connection
-     * @return the downloaded string
-     */
-    public static String asString(URLConnection existingConnection) throws FetcherException {
-        return asString(StandardCharsets.UTF_8, existingConnection);
-    }
-
-    /**
-     * Downloads the web resource to a String.
-     *
      * @param encoding   the desired String encoding
      * @param connection an existing connection
      * @return the downloaded string
      */
-    public static String asString(Charset encoding, URLConnection connection) throws FetcherException {
+    private static String asString(Charset encoding, URLConnection connection) throws FetcherException {
         try (InputStream input = new BufferedInputStream(connection.getInputStream());
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
@@ -272,12 +265,16 @@ public class URLDownload {
         }
     }
 
-    /**
-     * Takes the web resource as the source for a monitored input stream.
-     */
+    /// Uses the web resource as source and creates a monitored input stream.
     public ProgressInputStream asInputStream() throws FetcherException {
         HttpURLConnection urlConnection = (HttpURLConnection) this.openConnection();
+        return asInputStream(urlConnection);
+    }
 
+    /// Uses the web resource as source and creates a monitored input stream.
+    ///
+    /// Exposing the urlConnection is required for dynamic API limiting of CrossRef
+    public ProgressInputStream asInputStream(HttpURLConnection urlConnection) throws FetcherException {
         int responseCode;
         try {
             responseCode = urlConnection.getResponseCode();
@@ -373,6 +370,20 @@ public class URLDownload {
                     || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
+
+                if (newUrl.startsWith("https://api.unpaywall.org/")) {
+                    if (importerPreferences == null) {
+                        LOGGER.warn("importerPreferences not set, but call to Unpaywall");
+                    } else {
+                        Optional<String> apiKey = importerPreferences.getApiKey(UnpaywallFetcher.FETCHER_NAME);
+                        if (StringUtil.isBlank(apiKey)) { // No checking for enablement of Unpaywall, because used differently
+                            LOGGER.warn("No email configured for Unpaywall");
+                        } else {
+                            newUrl = newUrl.replace("<INSERT_YOUR_EMAIL>", apiKey.get());
+                        }
+                    }
+                }
+
                 // open the new connection again
                 try {
                     httpURLConnection.disconnect();
