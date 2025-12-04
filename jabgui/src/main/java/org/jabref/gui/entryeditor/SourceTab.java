@@ -364,7 +364,7 @@ public class SourceTab extends EntryEditorTab {
 
             validationMessage.setValue(null);
         } catch (InvalidFieldValueException | IOException ex) {
-            validationMessage.setValue(ValidationMessage.error(Localization.lang("Problem with parsing entry") + ": " + ex.getMessage()));
+            validationMessage.setValue(ValidationMessage.error(Localization.lang("ailed to parse Bib(La)TeX: %0", ex.getMessage())));
             LOGGER.debug("Incorrect source", ex);
         }
     }
