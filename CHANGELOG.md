@@ -39,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> now opens the terminal in the active library directory. [#14130](https://github.com/JabRef/jabref/issues/14130)
 - After importing, now all imported entries are marked. [#13535](https://github.com/JabRef/jabref/pull/13535)
 - The URL integrity check now checks the complete URL syntax. [#14370](https://github.com/JabRef/jabref/pull/14370)
+- <kbd>Tab</kbd> in the last text field of a tab moves the focus to the next tab in the entry editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
 - We changed fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
 
 ### Fixed
