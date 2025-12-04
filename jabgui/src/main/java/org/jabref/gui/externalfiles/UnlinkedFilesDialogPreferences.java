@@ -30,6 +30,16 @@ public class UnlinkedFilesDialogPreferences {
         this.unlinkedFilesSelectedSort = new SimpleObjectProperty<>(unlinkedFilesSelectedSort);
     }
 
+    public static UnlinkedFilesDialogPreferences getDefault(){
+        return new UnlinkedFilesDialogPreferences();
+    }
+
+    public void setAll(UnlinkedFilesDialogPreferences preferences){
+        this.unlinkedFilesSelectedExtension.set(preferences.getUnlinkedFilesSelectedExtension());
+        this.unlinkedFilesSelectedDateRange.set(preferences.getUnlinkedFilesSelectedDateRange());
+        this.unlinkedFilesSelectedSort.set(preferences.getUnlinkedFilesSelectedSort());
+    }
+
     public String getUnlinkedFilesSelectedExtension() {
         return unlinkedFilesSelectedExtension.get();
     }
