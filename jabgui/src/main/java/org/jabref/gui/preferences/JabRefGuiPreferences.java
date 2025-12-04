@@ -268,12 +268,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
         // endregion
 
-        // region unlinkedFilesDialogPreferences
-        defaults.put(UNLINKED_FILES_SELECTED_EXTENSION, StandardFileType.ANY_FILE.getName());
-        defaults.put(UNLINKED_FILES_SELECTED_DATE_RANGE, DateRange.ALL_TIME.name());
-        defaults.put(UNLINKED_FILES_SELECTED_SORT, ExternalFileSorter.DEFAULT.name());
-        // endregion
-
         // region ExternalApplicationsPreferences
         defaults.put(EXTERNAL_FILE_TYPES, "");
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
