@@ -495,7 +495,6 @@ class CitationKeyGeneratorTest {
         );
     }
 
-
     static Stream<Arguments> lastAuthor() {
         return Stream.of(
                 Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton"),
