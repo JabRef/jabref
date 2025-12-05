@@ -11,7 +11,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added ScienceDirect as a SearchBasedFetcher to enable API key configuration in the UI. [#14421](https://github.com/JabRef/jabref/issues/14421)
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
@@ -31,6 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to change the Git username and PAT in Network Preferences. [#14509](https://github.com/JabRef/jabref/pull/14509)
 - When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
+- We added ScienceDirect as a search-based fetcher, enabling users to configure their Elsevier API key in preferences and search for bibliographic entries directly from JabRef. [#14421](https://github.com/JabRef/jabref/issues/14421)
 
 ### Changed
 
