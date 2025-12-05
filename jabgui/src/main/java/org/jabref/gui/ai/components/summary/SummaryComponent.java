@@ -20,6 +20,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.summarization.Summary;
 import org.jabref.logic.ai.util.CitationKeyCheck;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -27,6 +28,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 
 import dev.langchain4j.data.message.AiMessage;
@@ -43,6 +45,8 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private final AiService aiService;
     private final AiPreferences aiPreferences;
     private final DialogService dialogService;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
     public SummaryComponent(BibDatabaseContext bibDatabaseContext,
                             BibEntry entry,
@@ -51,7 +55,9 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                             ExternalApplicationsPreferences externalApplicationsPreferences,
                             CitationKeyPatternPreferences citationKeyPatternPreferences,
                             DialogService dialogService,
-                            AdaptVisibleTabs adaptVisibleTabs
+                            AdaptVisibleTabs adaptVisibleTabs,
+                            BibEntryTypesManager entryTypesManager,
+                            FieldPreferences fieldPreferences
     ) {
         super(aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);
 
@@ -61,6 +67,8 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
         this.aiService = aiService;
         this.aiPreferences = aiPreferences;
         this.dialogService = dialogService;
+        this.entryTypesManager = entryTypesManager;
+        this.fieldPreferences = fieldPreferences;
 
         aiService.getSummariesService().summarize(entry, bibDatabaseContext).stateProperty().addListener(o -> rebuildUi());
 
@@ -186,7 +194,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                      .ifPresent(path -> {
                          try {
                              List<ChatMessage> dummyChat = List.of(new AiMessage(summary.content()));
-                             AiExporter exporter = new AiExporter(entry);
+                             AiExporter exporter = new AiExporter(entry, entryTypesManager, fieldPreferences);
                              String jsonString = exporter.buildJsonExport(
                                      summary.aiProvider().getLabel(),
                                      summary.model(),
@@ -218,7 +226,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(path -> {
                          try {
-                             AiExporter exporter = new AiExporter(entry);
+                             AiExporter exporter = new AiExporter(entry, entryTypesManager, fieldPreferences);
                              String content = exporter.buildMarkdownExport("Summary", summary.content());
                              Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                              dialogService.notify(Localization.lang("Export successful"));

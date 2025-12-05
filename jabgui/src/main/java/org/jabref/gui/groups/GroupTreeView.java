@@ -70,6 +70,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -97,6 +98,7 @@ public class GroupTreeView extends BorderPane {
     private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final KeyBindingRepository keyBindingRepository;
+    private final BibEntryTypesManager entryTypesManager;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -125,7 +127,8 @@ public class GroupTreeView extends BorderPane {
                          DialogService dialogService,
                          AiService aiService,
                          UndoManager undoManager,
-                         FileUpdateMonitor fileUpdateMonitor) {
+                         FileUpdateMonitor fileUpdateMonitor,
+                         BibEntryTypesManager entryTypesManager) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.adaptVisibleTabs = adaptVisibleTabs;
@@ -134,6 +137,7 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
         this.disableProperty().bind(groupsDisabledProperty());
         createNodes();
@@ -191,7 +195,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, adaptVisibleTabs, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, adaptVisibleTabs, taskExecutor, localDragboard,entryTypesManager,preferences.getFieldPreferences());
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

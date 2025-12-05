@@ -10,12 +10,14 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.BaseWindow;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import dev.langchain4j.data.message.ChatMessage;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 public class AiChatWindow extends BaseWindow {
     private final AiService aiService;
@@ -24,6 +26,8 @@ public class AiChatWindow extends BaseWindow {
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final TaskExecutor taskExecutor;
     private final AdaptVisibleTabs adaptVisibleTabs;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
     // This field is used for finding an existing AI chat window when user wants to chat with the same group again.
     private String chatName;
@@ -33,7 +37,9 @@ public class AiChatWindow extends BaseWindow {
                         AiPreferences aiPreferences,
                         ExternalApplicationsPreferences externalApplicationsPreferences,
                         AdaptVisibleTabs adaptVisibleTabs,
-                        TaskExecutor taskExecutor
+                        TaskExecutor taskExecutor,
+                        BibEntryTypesManager entryTypesManager,
+                        FieldPreferences fieldPreferences
     ) {
         this.aiService = aiService;
         this.dialogService = dialogService;
@@ -41,6 +47,8 @@ public class AiChatWindow extends BaseWindow {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.adaptVisibleTabs = adaptVisibleTabs;
         this.taskExecutor = taskExecutor;
+        this.entryTypesManager = entryTypesManager;
+        this.fieldPreferences = fieldPreferences;
     }
 
     public void setChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
@@ -58,7 +66,9 @@ public class AiChatWindow extends BaseWindow {
                                 aiPreferences,
                                 externalApplicationsPreferences,
                                 adaptVisibleTabs,
-                                taskExecutor
+                                taskExecutor,
+                                entryTypesManager,
+                                fieldPreferences
                         ),
                         800,
                         600

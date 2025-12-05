@@ -20,6 +20,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -27,6 +28,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 
 public class AiChatTab extends EntryEditorTab {
@@ -39,6 +41,8 @@ public class AiChatTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final AdaptVisibleTabs adaptVisibleTabs;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
     private Optional<BibEntry> previousBibEntry = Optional.empty();
 
@@ -47,7 +51,8 @@ public class AiChatTab extends EntryEditorTab {
                      GuiPreferences preferences,
                      StateManager stateManager,
                      AdaptVisibleTabs adaptVisibleTabs,
-                     TaskExecutor taskExecutor) {
+                     TaskExecutor taskExecutor,
+                     BibEntryTypesManager entryTypesManager) {
         this.aiService = aiService;
         this.dialogService = dialogService;
 
@@ -59,6 +64,8 @@ public class AiChatTab extends EntryEditorTab {
         this.adaptVisibleTabs = adaptVisibleTabs;
 
         this.taskExecutor = taskExecutor;
+        this.entryTypesManager = entryTypesManager;
+        this.fieldPreferences = preferences.getFieldPreferences();
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
@@ -143,7 +150,10 @@ public class AiChatTab extends EntryEditorTab {
                 aiPreferences,
                 externalApplicationsPreferences,
                 adaptVisibleTabs,
-                taskExecutor
+                taskExecutor,
+                entryTypesManager,
+                fieldPreferences
+
         ));
     }
 }

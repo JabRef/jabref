@@ -38,6 +38,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.ai.util.ErrorMessage;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
@@ -45,6 +46,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.ListUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -71,6 +73,8 @@ public class AiChatComponent extends VBox {
     private final AiPreferences aiPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
     private final AiChatLogic aiChatLogic;
 
@@ -96,7 +100,9 @@ public class AiChatComponent extends VBox {
                            BibDatabaseContext bibDatabaseContext,
                            AiPreferences aiPreferences,
                            DialogService dialogService,
-                           TaskExecutor taskExecutor
+                           TaskExecutor taskExecutor,
+                           BibEntryTypesManager entryTypesManager,
+                           FieldPreferences fieldPreferences
     ) {
         this.aiService = aiService;
         this.entries = entries;
@@ -104,6 +110,8 @@ public class AiChatComponent extends VBox {
         this.aiPreferences = aiPreferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.entryTypesManager = entryTypesManager;
+        this.fieldPreferences = fieldPreferences;
 
         this.aiChatLogic = aiService.getAiChatService().makeChat(name, chatHistory, entries, bibDatabaseContext);
 
@@ -433,7 +441,7 @@ public class AiChatComponent extends VBox {
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(path -> {
                          try {
-                             AiExporter exporter = new AiExporter(entries.getFirst());
+                             AiExporter exporter = new AiExporter(entries.getFirst(), entryTypesManager, fieldPreferences);
                              String content = exporter.buildMarkdownForChat(aiChatLogic.getChatHistory());
                              Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                              dialogService.notify(Localization.lang("Export successful"));
@@ -460,7 +468,7 @@ public class AiChatComponent extends VBox {
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(path -> {
                          try {
-                             AiExporter exporter = new AiExporter(entries.getFirst());
+                             AiExporter exporter = new AiExporter(entries.getFirst(), entryTypesManager, fieldPreferences);
                              String jsonString = exporter.buildJsonExport(
                                      aiPreferences.getAiProvider().getLabel(),
                                      aiPreferences.getSelectedChatModel(),

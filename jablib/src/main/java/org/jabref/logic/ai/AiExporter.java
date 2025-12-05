@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 
 import com.google.gson.Gson;
@@ -17,23 +20,23 @@ import dev.langchain4j.data.message.UserMessage;
 public class AiExporter {
 
     private final BibEntry entry;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
-    public AiExporter(BibEntry entry) {
+    public AiExporter(BibEntry entry, BibEntryTypesManager entryTypesManager, FieldPreferences fieldPreferences) {
         this.entry = entry;
+        this.entryTypesManager = entryTypesManager;
+        this.fieldPreferences = fieldPreferences;
     }
 
     public String buildMarkdownExport(String contentTitle, String contentBody) {
         StringBuilder sb = new StringBuilder();
+        String bibtex = entry.getStringRepresentation(entry, BibDatabaseMode.BIBTEX, entryTypesManager, fieldPreferences);
         sb.append("## Bibtex\n\n```bibtex\n");
-        sb.append("@").append(entry.getType().getName()).append("{").append(entry.getCitationKey().orElse("")).append(",\n");
-        for (Field field : entry.getFields()) {
-            String value = entry.getField(field).orElse("");
-            sb.append("  ").append(field.getName()).append(" = {").append(value).append("},\n");
-        }
-        sb.append("}\n```\n\n");
+        sb.append(bibtex);
+        sb.append("\n```\n\n");
         sb.append("## ").append(contentTitle).append("\n\n");
         sb.append(contentBody);
-
         return sb.toString();
     }
 
@@ -70,13 +73,8 @@ public class AiExporter {
         }
         root.put("entry", entryMap);
 
-        StringBuilder bibtex = new StringBuilder();
-        bibtex.append("@").append(entry.getType().getName()).append("{").append(entry.getCitationKey().orElse("")).append(",\n");
-        for (Field field : entry.getFields()) {
-            bibtex.append("  ").append(field.getName()).append(" = {").append(entry.getField(field).orElse("")).append("},\n");
-        }
-        bibtex.append("}");
-        root.put("entry_bibtex", bibtex.toString());
+        String bibtex = entry.getStringRepresentation(entry, BibDatabaseMode.BIBTEX, entryTypesManager, fieldPreferences);
+        root.put("entry_bibtex", bibtex);
 
         List<Map<String, String>> conversationList = new ArrayList<>();
         for (ChatMessage msg : messages) {

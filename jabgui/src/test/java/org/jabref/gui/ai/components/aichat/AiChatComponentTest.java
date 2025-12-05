@@ -14,12 +14,14 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.ingestion.IngestionService;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -101,7 +103,9 @@ class AiChatComponentTest {
                     bibDatabaseContext,
                     prefs,
                     dialogService,
-                    taskExecutor
+                    taskExecutor,
+                    mock(BibEntryTypesManager.class),
+                    mock(FieldPreferences.class)
             );
             latch.countDown();
         });
