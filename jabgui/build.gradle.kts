@@ -13,116 +13,131 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
+    // --- Project Modules ---
     implementation(project(":jablib"))
-    // Following already provided by jablib
+    implementation(project(":jabls"))
+    implementation(project(":jabsrv"))
+
+    // Following already provided by jablib (kept commented for reference)
     // implementation("org.openjfx:javafx-base")
     // implementation("org.openjfx:javafx-controls")
     // implementation("org.openjfx:javafx-fxml")
     // implementation("org.openjfx:javafx-graphics")
 
-    implementation(project(":jabls"))
-    implementation(project(":jabsrv"))
-
+    // --- JavaFX & UI Frameworks (Core, Controls, MVVM) ---
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
+    implementation("org.openjfx:jdk-jsobject") // From JavaFX25 onwards
 
     implementation("com.pixelduke:fxthemes")
-
-    // From JavaFX25 onwards
-    implementation("org.openjfx:jdk-jsobject")
-
-    implementation("org.slf4j:slf4j-api")
-    implementation("org.tinylog:tinylog-api")
-    implementation("org.tinylog:slf4j-tinylog")
-    implementation("org.tinylog:tinylog-impl")
-    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation("org.slf4j:jul-to-slf4j")
-    // route all requests to log4j to SLF4J
-    implementation("org.apache.logging.log4j:log4j-to-slf4j")
-
     implementation("org.jabref:afterburner.fx")
+    implementation("de.saxsys:mvvmfx")
+    implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") // jitpack
+
+    implementation("org.controlsfx:controlsfx")
+    implementation("org.jabref:easybind")
     implementation("org.kordamp.ikonli:ikonli-javafx")
     implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack")
-    implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
-    implementation("de.saxsys:mvvmfx")
+
+    // --- Specialized UI Controls & Viewers ---
     implementation("org.fxmisc.flowless:flowless")
     implementation("org.fxmisc.richtext:richtextfx")
     implementation("com.dlsc.gemsfx:gemsfx")
     implementation("com.dlsc.pdfviewfx:pdfviewfx")
 
-    // Required by gemsfx
-    implementation("tech.units:indriya")
-    // Required by gemsfx and langchain4j
-    implementation ("com.squareup.retrofit2:retrofit")
+    // --- Logging ---
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.tinylog:tinylog-api")
+    implementation("org.tinylog:slf4j-tinylog")
+    implementation("org.tinylog:tinylog-impl")
 
-    implementation("org.controlsfx:controlsfx")
-    implementation("org.jabref:easybind")
+    // Logging bridges/adapters
+    implementation("org.slf4j:jul-to-slf4j") // java.util.logging to SLF4J
+    implementation("org.apache.logging.log4j:log4j-to-slf4j") // log4j to SLF4J
 
+    // --- Utility & Core Libraries ---
+    implementation("com.google.guava:guava")
+    implementation("commons-io:commons-io")
+    implementation("io.github.java-diff-utils:java-diff-utils")
+    implementation("org.jooq:jool")
+    implementation("org.jspecify:jspecify") // For GraalVM quirks
+
+    // --- Search & Indexing (Lucene) ---
     implementation("org.apache.lucene:lucene-core")
     implementation("org.apache.lucene:lucene-queryparser")
     implementation("org.apache.lucene:lucene-queries")
     implementation("org.apache.lucene:lucene-analysis-common")
     implementation("org.apache.lucene:lucene-highlighter")
 
+    // --- External Integrations (API, Web, AI, PDF) ---
+    implementation("com.squareup.retrofit2:retrofit") // Required by gemsfx and langchain4j
+    implementation("tech.units:indriya") // Required by gemsfx
+
     implementation("org.jsoup:jsoup")
-
-    // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
-    implementation("org.jspecify:jspecify")
-
-    implementation("com.google.guava:guava")
+    implementation("com.konghq:unirest-java-core")
+    implementation("org.apache.httpcomponents.client5:httpclient5")
 
     implementation("dev.langchain4j:langchain4j")
 
-    implementation("io.github.java-diff-utils:java-diff-utils")
+    implementation("org.apache.pdfbox:pdfbox")
 
-    implementation("org.jooq:jool")
+    // External Tools Integration
+    implementation("io.github.adr:e-adr")
+    implementation("org.libreoffice:unoloader")
+    implementation("org.libreoffice:libreoffice")
+    implementation("com.vladsch.flexmark:flexmark-html2md-converter")
+    implementation("org.eclipse.jgit:org.eclipse.jgit")
 
-    implementation("commons-io:commons-io")
+    // --- Command Line & Security ---
+    implementation("info.picocli:picocli")
+    implementation("com.github.javakeyring:java-keyring")
 
-    implementation ("org.apache.pdfbox:pdfbox")
+    // --- Citation Processing ---
+    implementation("de.undercouch:citeproc-java")
 
+    // --- Native Libraries (JNA) ---
     implementation("net.java.dev.jna:jna-jpms")
     implementation("net.java.dev.jna:jna-platform")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit")
+    // =========================================================================
 
-    implementation("com.konghq:unirest-java-core")
-
-    implementation("org.apache.httpcomponents.client5:httpclient5")
-
-    implementation("com.vladsch.flexmark:flexmark-html2md-converter")
-
-    implementation("io.github.adr:e-adr")
-
-    implementation("org.libreoffice:unoloader")
-    implementation("org.libreoffice:libreoffice")
-
-    implementation("com.github.javakeyring:java-keyring")
-
-    implementation("info.picocli:picocli")
+    // --- Annotation Processor Dependencies ---
     annotationProcessor("info.picocli:picocli-codegen")
 
-    implementation("de.undercouch:citeproc-java")
-
+    // --- Test Implementation Dependencies ---
     testImplementation(project(":test-support"))
 
+    // Testing Utilities
     testImplementation("io.github.classgraph:classgraph")
+    testImplementation("org.hamcrest:hamcrest")
+    testImplementation("org.ow2.asm:asm")
+
+    // Mocking
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("net.bytebuddy:byte-buddy")
+
+    // UI Testing
     testImplementation("org.testfx:testfx-core")
     testImplementation("org.testfx:testfx-junit5")
 
-    testImplementation("org.mockito:mockito-core")
-    mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
-    testImplementation("net.bytebuddy:byte-buddy")
-
-    testImplementation("org.hamcrest:hamcrest")
-
-    testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
-    testImplementation("org.ow2.asm:asm")
-
+    // Architecture Testing
     testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
 
+    // Code/Symbol Analysis
+    testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
+
+    // Web/API Testing
+    testImplementation("org.wiremock:wiremock") {
+        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
+    }
+
+    // --- Mockito Agent Configuration ---
+    // Note: This configuration is specifically created for the Mockito agent
+    mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
+
+    // --- Test Runtime Only Dependencies ---
+    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
 }
 
 application {
@@ -155,7 +170,6 @@ javaModulePackaging {
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
-    jlinkOptions.addAll("--generate-cds-archive")
     targetsWithOs("windows") {
         options.addAll(
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
@@ -220,6 +234,9 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("org.testfx")
     requires.add("org.testfx.junit5")
+
+    requires.add("wiremock")
+    requires.add("wiremock.slf4j.spi.shim")
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")
