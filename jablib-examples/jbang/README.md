@@ -4,7 +4,7 @@ This directory contains [`JBang`](https://www.jbang.dev/) examples to show how t
 
 ## Running the examples
 
-If you have node installed:
+In case you have [Node.js](https://nodejs.org/) installed:
 
 ```terminal
 npx @jbangdev/jbang doi_to_bibtex.java
