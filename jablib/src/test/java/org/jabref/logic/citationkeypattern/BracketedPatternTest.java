@@ -87,7 +87,15 @@ class BracketedPatternTest {
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"),
+                Arguments.of("New", "I. Newton"),
+                Arguments.of("NM", "I. Newton and J. Maxwell"),
+                Arguments.of("NME", "I. Newton and J. Maxwell and A. Einstein"),
+                Arguments.of("NMEB", "I. Newton and J. Maxwell and A. Einstein and N. Bohr"),
+                Arguments.of("NME+", "I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown"),
+                Arguments.of("vdAal", "Wil van der Aalst"),
+                Arguments.of("vdAvL", "Wil van der Aalst and Tammo van Lessen"),
+                Arguments.of("NM+", "Isaac Newton and James Maxwell and others")
         );
     }
 
@@ -119,7 +127,15 @@ class BracketedPatternTest {
                 Arguments.of("Aa", "van der Aalst"),
                 Arguments.of("AW", "van der Aalst and Weske"),
                 Arguments.of("GI", "{Gesellschaft für Informatik e.V.}"),
-                Arguments.of("AF", "{Apache Foundation}"));
+                Arguments.of("AF", "{Apache Foundation}"),
+                Arguments.of("Ne", "I. Newton"),
+                Arguments.of("NM", "I. Newton and J. Maxwell"),
+                Arguments.of("NME", "I. Newton and J. Maxwell and A. Einstein"),
+                Arguments.of("NMEB", "I. Newton and J. Maxwell and A. Einstein and N. Bohr"),
+                Arguments.of("NMEB", "I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown"),
+                Arguments.of("Aa", "Wil van der Aalst"),
+                Arguments.of("AL", "Wil van der Aalst and Tammo van Lessen"),
+                Arguments.of("Ne", "Isaac Newton and James Maxwell and others"));
     }
 
     @ParameterizedTest
