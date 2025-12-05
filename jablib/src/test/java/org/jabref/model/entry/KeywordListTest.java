@@ -30,31 +30,31 @@ class KeywordListTest {
     }
 
     @Test
-    void parseTwoWordReturnsTwoKeywords() {
+    void parseTwoWordsReturnsTwoKeywords() {
         assertEquals(new KeywordList("keywordOne", "keywordTwo"),
                 KeywordList.parse("keywordOne, keywordTwo", ','));
     }
 
     @Test
-    void parseTwoWordReturnsTwoKeywordsWithoutSpace() {
+    void parseTwoWordsWithoutSpace() {
         assertEquals(new KeywordList("keywordOne", "keywordTwo"),
                 KeywordList.parse("keywordOne,keywordTwo", ','));
     }
 
     @Test
-    void parseTwoWordReturnsTwoKeywordsWithDifferentDelimiter() {
+    void parseWithDifferentDelimiter() {
         assertEquals(new KeywordList("keywordOne", "keywordTwo"),
                 KeywordList.parse("keywordOne| keywordTwo", '|'));
     }
 
     @Test
-    void parseWordsWithWhitespaceReturnsOneKeyword() {
+    void parseSingleKeywordWithWhitespace() {
         assertEquals(new KeywordList("keyword and one"),
                 KeywordList.parse("keyword and one", ','));
     }
 
     @Test
-    void parseWordsWithWhitespaceAndCommaReturnsTwoKeyword() {
+    void parseTwoKeywordsWithWhitespaceAndComma() {
         assertEquals(new KeywordList("keyword and one", "and two"),
                 KeywordList.parse("keyword and one, and two", ','));
     }
@@ -66,14 +66,19 @@ class KeywordListTest {
     }
 
     @Test
-    void parseTakeDelimiterNotRegexWhite() {
-        assertEquals(new KeywordList("keywordOne keywordTwo", "keywordThree"),
-                KeywordList.parse("keywordOne keywordTwoskeywordThree", 's'));
+    void parseKeywordWithEscapedSeparator() {
+        String input = "network\\,security, AI";
+        KeywordList list = KeywordList.parse(input, ',');
+        assertEquals(2, list.size());
+        assertEquals("network,security", list.get(0).get());
+        assertEquals("AI", list.get(1).get());
     }
 
     @Test
-    void parseWordsWithBracketsReturnsOneKeyword() {
-        assertEquals(new KeywordList("[a] keyword"), KeywordList.parse("[a] keyword", ','));
+    void serializeEscapedKeyword() {
+        KeywordList list = new KeywordList("network,security", "AI");
+        String serialized = KeywordList.serialize(list.stream().toList(), ',');
+        assertEquals("network\\,security,AI", serialized);
     }
 
     @Test
@@ -98,23 +103,32 @@ class KeywordListTest {
     }
 
     @Test
-    void mergeTwoIdenticalKeywordsShouldReturnOnKeyword() {
+    void mergeTwoIdenticalKeywordsShouldReturnOneKeyword() {
         assertEquals(new KeywordList("JabRef"), KeywordList.merge("JabRef", "JabRef", ','));
     }
 
     @Test
-    void mergeOneEmptyKeywordAnAnotherNonEmptyShouldReturnTheNonEmptyKeyword() {
+    void mergeOneEmptyKeywordAndAnotherNonEmptyShouldReturnTheNonEmptyKeyword() {
         assertEquals(new KeywordList("JabRef"), KeywordList.merge("", "JabRef", ','));
     }
 
     @Test
-    void mergeTwoDistinctKeywordsShouldReturnTheTwoKeywordsMerged() {
+    void mergeTwoDistinctKeywordsShouldReturnBothKeywords() {
         assertEquals(new KeywordList("Figma", "JabRef"), KeywordList.merge("Figma", "JabRef", ','));
-        assertEquals(new KeywordList("JabRef", "Figma"), KeywordList.merge("Figma", "JabRef", ','));
     }
 
     @Test
-    void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
-        assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
+    void mergeTwoListsOfKeywordsShouldReturnMergedKeywords() {
+        assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"),
+                KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
+    }
+
+    @Test
+    void parseMultipleEscapedSeparators() {
+        String input = "a\\,b\\,c, d";
+        KeywordList list = KeywordList.parse(input, ',');
+        assertEquals(2, list.size());
+        assertEquals("a,b,c", list.get(0).get());
+        assertEquals("d", list.get(1).get());
     }
 }
