@@ -1,5 +1,11 @@
 # `jablib`
 
+`jablib` offers JabRef's model and logic code as a Java library.
+All code in `src/main/java` is published as a Maven artifact at `org.jabref:jablib`.
+Example code is made available at <https://github.com/JabRef/jabref/tree/main/jablib-examples>.
+
+You can browse JavaDoc at APIdia: <https://apidia.net/java/JabRef/6.0-snapshot-2025-12-02/?cls=org.jabref.jablib-module>.
+
 ## Development information
 
 ### Publish on Maven Central
