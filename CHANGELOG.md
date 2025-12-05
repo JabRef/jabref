@@ -8,7 +8,7 @@ In case, there is no issue present, the pull request implementing the feature is
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
-
+- Fixed a problem where JabRef could crash during startup if certain preference data was missing. [#14497](https://github.com/JabRef/jabref/issues/14497)
 ### Added
 
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
@@ -150,7 +150,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where a NullPointerException was thrown when userAndHost was not initialized in the preferences. The initialization now correctly falls back to getUserHostInfo() to prevent the error. [#14497](https://github.com/JabRef/jabref/issues/14497)
 - We fixed an issue where search results would show stale entries after deleting entries from search results. [#13984](https://github.com/JabRef/jabref/issues/13984)
 - When filename pattern is missing for linked files, pattern handling has been introduced to avoid suggesting meaningless filenames like "-". [#13735](https://github.com/JabRef/jabref/issues/13735)
 - We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
