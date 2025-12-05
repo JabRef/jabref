@@ -41,8 +41,7 @@ jobs:
       - name: Build project
         run: ./gradlew build --no-daemon
 
-      - name: Run SonarQube analysis
+      - name: Build (sem testes) e analisar no SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: ./gradlew sonar --no-daemon --info
+        run: ./gradlew clean build sonar -x test --info
