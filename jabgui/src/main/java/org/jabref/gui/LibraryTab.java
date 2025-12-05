@@ -897,7 +897,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 dialogService.showErrorDialogAndWait(exception);
             }
             BibEntry fallBack = new BibEntry(StandardEntryType.Misc)
-                    .withField(StandardField.COMMENT, data);
+                    .withField(StandardField.COMMENT, data)
+                    .withChanged(true);
             return List.of(fallBack);
         }
     }
