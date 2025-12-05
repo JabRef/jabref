@@ -399,6 +399,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getDonationPreferences().setAll(DonationPreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
+        getMainTablePreferences().setAll(MainTablePreferences.getDefault());
     }
 
     @Override
@@ -411,6 +412,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
+        getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
     }
 
     // region EntryEditorPreferences
@@ -997,10 +999,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTablePreferences;
         }
 
-        mainTablePreferences = new MainTablePreferences(
-                getMainTableColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE),
-                getBoolean(EXTRA_FILE_COLUMNS));
+        mainTablePreferences = getMainTablePreferencesFromBackingStore(MainTablePreferences.getDefault());
 
         EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
                 (obs, oldValue, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
@@ -1008,6 +1007,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 (obs, oldValue, newValue) -> putBoolean(EXTRA_FILE_COLUMNS, newValue));
 
         return mainTablePreferences;
+    }
+
+    private MainTablePreferences getMainTablePreferencesFromBackingStore(MainTablePreferences defaults) {
+        return new MainTablePreferences(
+                getMainTableColumnPreferences(),
+                getBoolean(AUTO_RESIZE_MODE, defaults.getResizeColumnsToFit()),
+                getBoolean(EXTRA_FILE_COLUMNS, defaults.getExtraFileColumnsEnabled())
+        );
     }
 
     public ColumnPreferences getMainTableColumnPreferences() {
