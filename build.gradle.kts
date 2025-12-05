@@ -11,6 +11,11 @@ sonar {
     properties {
         property("sonar.projectKey", "EnzoHirotani_ES2_2025-2_JabRef")
         property("sonar.organization", "enzohirotani")
+        property("sonar.sources", "jablib/src/main,jabls/src/main,jabkit/src/main,jabgui/src/main,jabsrv/src/main")
+        property("sonar.tests", "jablib/src/test,jabls/src/test,jabkit/src/test,jabgui/src/test,jabsrv/src/test")
+        property("sonar.java.source", "17")
+        property("sonar.java.target", "17")
+        property("sonar.sourceEncoding", "UTF-8")
     }
 }
 
