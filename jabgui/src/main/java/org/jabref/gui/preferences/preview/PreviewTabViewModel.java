@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -74,6 +75,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
 
     private final ListProperty<Path> bstStylesPaths = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final Set<Path> manuallyAddedBstPaths = new HashSet<>();
 
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
     private final ObjectProperty<PreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
@@ -89,6 +91,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private ListProperty<PreviewLayout> dragSourceList = null;
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
 
+    @SuppressWarnings("unused")
     public PreviewTabViewModel(DialogService dialogService,
                                PreviewPreferences previewPreferences,
                                TaskExecutor taskExecutor,
@@ -98,15 +101,15 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         this.localDragboard = stateManager.getLocalDragboard();
         this.previewPreferences = previewPreferences;
 
-        sourceTextProperty.addListener((observable, oldValue, newValue) -> {
+        sourceTextProperty.addListener((_observable, _oldValue, newValue) -> {
             if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {
-                layout.setText(sourceTextProperty.getValue());
+                layout.setText(newValue);
             }
         });
 
         chosenListValidator = new FunctionBasedValidator<>(
                 chosenListProperty,
-                input -> !chosenListProperty.getValue().isEmpty(),
+                _input -> !chosenListProperty.getValue().isEmpty(),
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                                 Localization.lang("Entry preview"),
                                 Localization.lang("Selected"),
@@ -143,6 +146,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                       })
                       .executeWith(taskExecutor);
         bstStylesPaths.clear();
+        manuallyAddedBstPaths.clear(); // Reset the set of manually added files
         bstStylesPaths.addAll(previewPreferences.getBstPreviewLayoutPaths());
         bstStylesPaths.forEach(path -> {
             BstPreviewLayout layout = new BstPreviewLayout(path);
@@ -180,6 +184,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
     }
 
+    @SuppressWarnings("SameParameterValue")
     private PreviewLayout findLayoutByName(String name) {
         return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                                     .findAny()
@@ -501,7 +506,45 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     public void addBstStyle(Path bstFile) {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(bstFile);
         bstStylesPaths.add(bstFile);
+        manuallyAddedBstPaths.add(bstFile); // Mark as manually added
         availableListProperty().add(bstPreviewLayout);
         chosenListProperty().add(bstPreviewLayout);
+    }
+
+    public void removeBstStyle(PreviewLayout layout) {
+        if (!(layout instanceof BstPreviewLayout bstLayout)) {
+            return;
+        }
+
+        // Find the corresponding path by matching the file name
+        String layoutName = bstLayout.getName();
+        Path pathToRemove = bstStylesPaths.stream()
+                                          .filter(path -> path.getFileName().toString().equals(layoutName))
+                                          .findFirst()
+                                          .orElse(null);
+
+        // Only remove if it was manually added in this session
+        if (pathToRemove != null && manuallyAddedBstPaths.contains(pathToRemove)) {
+            bstStylesPaths.remove(pathToRemove);
+            manuallyAddedBstPaths.remove(pathToRemove);
+
+            // Remove from both lists
+            availableListProperty().remove(layout);
+            chosenListProperty().remove(layout);
+        }
+    }
+
+    public boolean canRemoveBstStyle(PreviewLayout layout) {
+        if (!(layout instanceof BstPreviewLayout bstLayout)) {
+            return false;
+        }
+
+        String layoutName = bstLayout.getName();
+        Path pathToCheck = bstStylesPaths.stream()
+                                         .filter(path -> path.getFileName().toString().equals(layoutName))
+                                         .findFirst()
+                                         .orElse(null);
+
+        return pathToCheck != null && manuallyAddedBstPaths.contains(pathToCheck);
     }
 }
