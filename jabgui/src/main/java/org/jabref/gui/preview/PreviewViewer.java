@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.script.ScriptException;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -185,8 +187,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 });
 
                 setHvalue(0);
-            } catch (ScriptException | IllegalStateException e) {
-                LOGGER.debug("Could not compute preview content size", e);
+
+            } catch (NullPointerException e) {
+                LOGGER.debug("Null value encountered while computing preview content size", e);
+
+            } catch (ClassCastException e) {
+                LOGGER.debug("Unexpected type returned from JavaScript while computing preview content size", e);
+
+            } catch (IllegalStateException e) {
+                LOGGER.debug("JavaFX thread not ready while computing preview content size", e);
+
             }
         });
     }
