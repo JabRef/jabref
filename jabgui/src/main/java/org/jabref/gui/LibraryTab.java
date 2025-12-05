@@ -92,6 +92,8 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -894,7 +896,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             } else {
                 dialogService.showErrorDialogAndWait(exception);
             }
-            return List.of();
+            BibEntry fallBack = new BibEntry(StandardEntryType.Misc)
+                    .withField(StandardField.COMMENT, data);
+            return List.of(fallBack);
         }
     }
 
