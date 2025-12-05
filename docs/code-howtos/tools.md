@@ -8,7 +8,7 @@ Tool usage hints are provided at the [FAQ page](faq.md).
 
 ## Browser plugins
 
-* (strongly recommened) [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
+* (strongly recommended) [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
 * (recommended) [GitHub Issue Link Status](https://github.com/fregante/github-issue-link-status) - proper coloring of linked issues and PRs.
 * (optional) [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
 * (optional) [Sourcegraph Browser Extension](https://sourcegraph.com/docs/integration/browser_extension) - Navigate through source on GitHub
