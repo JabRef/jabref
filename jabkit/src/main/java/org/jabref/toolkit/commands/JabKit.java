@@ -41,6 +41,7 @@ import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 
 @Command(name = "jabkit",
+        version = { "JabKit " + BuildInfo.VERSION },
         mixinStandardHelpOptions = true,
         // sorted alphabetically
         subcommands = {
