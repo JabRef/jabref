@@ -17,7 +17,7 @@ On Windows, it is:
 .\gg.cmd jbang doi_to_bibtex.java
 ```
 
-One can also [download and install JBang](https://www.jbang.dev/download/) and then just run:
+You can also [download and install JBang](https://www.jbang.dev/download/) and then just run:
 
 ```terminal
 jbang doi_to_bibtex.java
