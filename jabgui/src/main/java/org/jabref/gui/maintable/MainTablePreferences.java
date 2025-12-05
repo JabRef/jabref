@@ -18,11 +18,12 @@ public class MainTablePreferences {
         this.extraFileColumnsEnabled.set(extraFileColumnsEnabled);
     }
 
+    /// Creates Object with default values
     private MainTablePreferences() {
         this(
-                new ColumnPreferences(Collections.emptyList(), Collections.emptyList()),
-                false,
-                false
+                new ColumnPreferences(Collections.emptyList(), Collections.emptyList()),  // Default column preferences
+                false,                                                                    // Default resize columns to fit
+                false                                                                     // Default extra file columns disabled
         );
     }
 
