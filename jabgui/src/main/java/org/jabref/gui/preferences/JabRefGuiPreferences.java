@@ -183,6 +183,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
     // endregion
 
+    // region CitationProviderPreferences
+    private static final String CITATION_PROVIDER = "citationProvider";
+    // endregion
+
     // region GroupsPreferences
     private static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     private static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
@@ -299,6 +303,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(SELECTED_FETCHER_INDEX, 0);
         defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
+        // endregion
+
+        // region CitationProviderPreferences
+        defaults.put(CITATION_PROVIDER, "Semantic Scholar");
         // endregion
 
         // region GroupsPreferences
@@ -1228,6 +1236,22 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return new DonationPreferences(
                 getBoolean(DONATION_NEVER_SHOW, defaults.isNeverShowAgain()),
                 getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaults.getLastShownEpochDay()));
+    }
+    // endregion
+
+    // region CitationProviderPreferences
+    /**
+     * Gets the selected citation provider name
+     */
+    public String getCitationProvider() {
+        return get(CITATION_PROVIDER);
+    }
+
+    /**
+     * Sets the selected citation provider name
+     */
+    public void setCitationProvider(String providerName) {
+        put(CITATION_PROVIDER, providerName);
     }
     // endregion
 

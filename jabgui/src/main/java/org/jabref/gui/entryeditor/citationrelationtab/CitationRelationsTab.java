@@ -25,6 +25,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -66,6 +67,7 @@ import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
+import org.jabref.logic.importer.fetcher.citation.CitationProviderFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
@@ -628,11 +630,36 @@ public class CitationRelationsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         citationsRelationsTabViewModel.bindToEntry(entry);
 
+        // Create provider selection dropdown
+        HBox providerSelectionBox = new HBox(10);
+        providerSelectionBox.setPadding(new Insets(5, 10, 5, 10));
+        providerSelectionBox.setAlignment(Pos.CENTER_LEFT);
+        
+        Label providerLabel = new Label(Localization.lang("Citation Provider:"));
+        ComboBox<String> providerComboBox = new ComboBox<>();
+        providerComboBox.getItems().addAll(CitationProviderFactory.getAvailableProviders());
+        providerComboBox.setValue(preferences.getCitationProvider());
+        providerComboBox.setTooltip(new Tooltip(Localization.lang("Select the citation provider to use for fetching citations")));
+        
+        // Save preference when selection changes and update the service
+        providerComboBox.setOnAction(event -> {
+            String selectedProvider = providerComboBox.getValue();
+            if (selectedProvider != null) {
+                preferences.setCitationProvider(selectedProvider);
+                // Update the service with the new provider
+                searchCitationsRelationsService.updateProvider(selectedProvider);
+                dialogService.notify(Localization.lang("Citation provider changed to %0", selectedProvider));
+            }
+        });
+        
+        providerSelectionBox.getChildren().addAll(providerLabel, providerComboBox);
+
         SplitPane splitPane = getPaneAndStartSearch(entry);
         splitPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         splitPane.setMinSize(0, 0);
 
         BorderPane root = new BorderPane();
+        root.setTop(providerSelectionBox);
         root.setCenter(splitPane);
         root.setBottom(sciteResultsPane);
         root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);

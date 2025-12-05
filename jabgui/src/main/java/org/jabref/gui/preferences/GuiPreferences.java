@@ -60,4 +60,14 @@ public interface GuiPreferences extends CliPreferences {
     NewEntryPreferences getNewEntryPreferences();
 
     DonationPreferences getDonationPreferences();
+
+    /**
+     * Gets the selected citation provider name
+     */
+    String getCitationProvider();
+
+    /**
+     * Sets the selected citation provider name
+     */
+    void setCitationProvider(String providerName);
 }
