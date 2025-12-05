@@ -191,16 +191,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         });
     }
 
-    /**
-     * Expose the measured content height of the rendered preview. Value is in CSS pixels.
-     */
     public ReadOnlyDoubleProperty contentHeightProperty() {
         return contentHeight.getReadOnlyProperty();
     }
 
-    /**
-     * Expose the measured content width of the rendered preview. Value is in CSS pixels.
-     */
     public ReadOnlyDoubleProperty contentWidthProperty() {
         return contentWidth.getReadOnlyProperty();
     }
