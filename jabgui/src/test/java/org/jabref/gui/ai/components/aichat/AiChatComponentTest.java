@@ -20,8 +20,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.database.BibDatabaseContext;
-
 import org.jabref.model.entry.BibEntryTypesManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

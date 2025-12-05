@@ -85,7 +85,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-
     public GroupTreeViewModel(@NonNull StateManager stateManager,
                               @NonNull DialogService dialogService,
                               @NonNull AiService aiService,

@@ -14,9 +14,9 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import dev.langchain4j.data.message.ChatMessage;
-import org.jabref.model.entry.BibEntryTypesManager;
 
 /**
  * Main class for AI chatting. It checks if the AI features are enabled and if the embedding model is properly set up.

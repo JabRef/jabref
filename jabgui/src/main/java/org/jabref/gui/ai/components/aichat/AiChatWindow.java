@@ -15,9 +15,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import dev.langchain4j.data.message.ChatMessage;
-import org.jabref.model.entry.BibEntryTypesManager;
 
 public class AiChatWindow extends BaseWindow {
     private final AiService aiService;

@@ -195,7 +195,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, adaptVisibleTabs, taskExecutor, localDragboard,entryTypesManager,preferences.getFieldPreferences());
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, adaptVisibleTabs, taskExecutor, localDragboard, entryTypesManager, preferences.getFieldPreferences());
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
