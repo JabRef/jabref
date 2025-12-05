@@ -9,6 +9,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
+- We added a right-click "Delete" option for custom BST styles in the Entry Preview settings, allowing users to easily remove imported styles. [#14352](https://github.com/JabRef/jabref/issues/14352)
+
 ### Added
 
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
