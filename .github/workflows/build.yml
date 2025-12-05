@@ -10,6 +10,10 @@ jobs:
     name: Build and analyze
     runs-on: ubuntu-latest
     steps:
+      - name: Start Xvfb
+        run: |
+          Xvfb :99 -screen 0 1920x1080x24 &
+          export DISPLAY=:99
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
