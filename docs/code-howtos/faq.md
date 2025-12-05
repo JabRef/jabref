@@ -11,19 +11,7 @@ Following is a list of common errors encountered by developers which lead to fai
 * Branches and pull requests (🇩🇪): [https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md)
 * <https://github.com/blog/2019-how-to-undo-almost-anything-with-git>
 * [So you need to change your commit](https://github.com/RichardLitt/knowledge/blob/master/github/amending-a-commit-guide.md#so-you-need-to-change-your-commit)
-* awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
-
-### Rebase everything as one commit on main
-
-* Precondition: `JabRef/jabref` is [configured as upstream](https://help.github.com/articles/configuring-a-remote-for-a-fork/).
-* Fetch recent commits and prune non-existing branches: `git fetch upstream --prune`
-* Merge recent commits: `git merge upstream/main`
-* If there are conflicts, resolve them
-* Reset index to upstream/main: `git reset upstream/main`
-* Review the changes and create a new commit using git gui: `git gui`
-* Do a force push: `git push -f origin`
-
-See also: <https://help.github.com/articles/syncing-a-fork/>
+* Awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
 
 ## Failing GitHub workflow "Sync fork with upstream"
 
