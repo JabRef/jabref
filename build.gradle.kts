@@ -5,7 +5,6 @@ plugins {
     id("org.itsallcode.openfasttrace") version "3.1.0"
     id("org.cyclonedx.bom") version "3.0.0-alpha-1"
     id("org.sonarqube") version "7.1.0.6387"
-
 }
 
 sonar {
