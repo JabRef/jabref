@@ -35,7 +35,7 @@ public class MainTableTooltip extends Tooltip {
         this.setMaxWidth(500);
         this.setWrapText(true);
 
-        final double previewWidthPadding = 16.0;
+        final double PREVIEW_WIDTH_PADDING = 16.0;
         final double PREVIEW_HEIGHT_PADDING = 8.0;  // Padding to avoid bottom clipping of the preview
         final double MIN_TOOLTIP_WIDTH = 200.0; // Minimum width of the tooltip to keep layout stable even with small content
 
@@ -56,7 +56,7 @@ public class MainTableTooltip extends Tooltip {
                 return;
             }
 
-            double desired = Math.max(contentWidth + previewWidthPadding, MIN_TOOLTIP_WIDTH);
+            double desired = Math.max(contentWidth + PREVIEW_WIDTH_PADDING, MIN_TOOLTIP_WIDTH);
 
             // We set a very large max width so that JavaFX does not artificially clamp the tooltip.
             // The effective width is still limited by the window and screen bounds.
