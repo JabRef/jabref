@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a custom exporter for academicpages and added the layout format for academic pages. [#12727](...)
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
