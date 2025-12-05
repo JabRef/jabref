@@ -8,12 +8,10 @@ plugins {
 
 }
 
-sonarqube {
+sonar {
     properties {
-        // Kotlin DSL requires parentheses for function calls with multiple arguments
         property("sonar.projectKey", "EnzoHirotani_ES2_2025-2_JabRef")
         property("sonar.organization", "enzohirotani")
-        property("sonar.host.url", "https://sonarcloud.io")
     }
 }
 
