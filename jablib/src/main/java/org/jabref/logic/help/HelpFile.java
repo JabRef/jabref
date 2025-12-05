@@ -24,6 +24,7 @@ public enum HelpFile {
     // The help page covers both OO and LO.
     OPENOFFICE_LIBREOFFICE("cite/openofficeintegration"),
     FETCHER_ACM("collect/import-using-online-bibliographic-database#acm-portal"),
+    FETCHER_SCIENCE_DIRECT("ScienceDirectHelp", "collect/import-using-online-bibliographic-database"),
     FETCHER_BIBSONOMY_SCRAPER(""),
     FETCHER_BIODIVERSITY_HERITAGE_LIBRARY("collect/import-using-online-bibliographic-database#bibliotheksverbund-bayern-bvb"),
     FETCHER_CITESEERX("collect/import-using-online-bibliographic-database#citeseerx"),
@@ -45,7 +46,7 @@ public enum HelpFile {
     FETCHER_SPRINGER("collect/import-using-online-bibliographic-database#springer"),
     FETCHER_ZBMATH("collect/import-using-online-bibliographic-database#zbmath-open"),
     FETCHER_TITLE("collect/add-entry-using-an-id"),
-    FETCHER_SCIENCEDIRECT(""),
+    //  FETCHER_SCIENCEDIRECT(""),
     DATABASE_PROPERTIES("setup/databaseproperties"),
     FIND_DUPLICATES("finding-sorting-and-cleaning-entries/findduplicates"),
     SQL_DATABASE_MIGRATION("collaborative-work/sqldatabase/sqldatabasemigration"),

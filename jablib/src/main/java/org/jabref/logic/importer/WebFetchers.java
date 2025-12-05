@@ -119,7 +119,6 @@ public class WebFetchers {
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new ACMPortalFetcher());
-        // set.add(new GoogleScholar(importFormatPreferences));
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerNatureWebFetcher(importerPreferences));
         set.add(new CrossRef());
@@ -128,16 +127,14 @@ public class WebFetchers {
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences, importerPreferences));
         set.add(new CompositeSearchBasedFetcher(set, importerPreferences, 30));
-        // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         set.add(new DOABFetcher());
-        // set.add(new JstorFetcher(importFormatPreferences));
         set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
         set.add(new BiodiversityLibrary(importerPreferences));
         set.add(new LOBIDFetcher());
         set.add(new ScholarArchiveFetcher());
         set.add(new EuropePmcFetcher());
-        // Even though Unpaywall is used differently, adding it here enables "smooth" setting of the email (as fetcher key) in the preferences UI
+        set.add(new ScienceDirect(importerPreferences));
         set.add(new UnpaywallFetcher(importerPreferences));
         return set;
     }
