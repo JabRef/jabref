@@ -26,6 +26,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Ensure journal-list.mv exists
+        run: |
+          if [ ! -f "src/main/resources/journals/journal-list.mv" ]; then
+            # Download or generate the file here
+            echo "Missing journal-list.mv" && exit 1
+          fi
+
       - name: Build (assemble + tests)
         run: ./gradlew build --no-daemon --info
 
