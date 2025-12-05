@@ -185,14 +185,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 });
 
                 setHvalue(0);
-
             } catch (NullPointerException e) {
                 LOGGER.debug("Null value encountered while computing preview content size", e);
             } catch (ClassCastException e) {
                 LOGGER.debug("Unexpected type returned from JavaScript while computing preview content size", e);
             } catch (IllegalStateException e) {
                 LOGGER.debug("JavaFX thread not ready while computing preview content size", e);
-
             }
         });
     }
