@@ -8,7 +8,7 @@ In case, there is no issue present, the pull request implementing the feature is
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
-
+- Fixed a problem where JabRef could crash during startup if certain preference data was missing. [#14497](https://github.com/JabRef/jabref/issues/14497)
 ### Added
 
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
