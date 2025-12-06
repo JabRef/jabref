@@ -20,28 +20,16 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A custom exporter to write multiple bib entries as AcademicPages Markdown format.
  */
 public class AcademicPagesExporter extends Exporter {
-    private static final String BLANK_LINE_PATTERN = "\\r\\n|\\n";
-    private static final String LAYOUT_PREFIX = "/resource/layout/";
-    private static final String LAYOUT_EXTENSION = ".layout";
-    private static final String FORMATTERS_EXTENSION = ".formatters";
-    private static final String BEGIN_INFIX = ".begin";
-    private static final String END_INFIX = ".end";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AcademicPagesExporter.class);
 
     private final String layoutFileFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
     private final SelfContainedSaveOrder saveOrder;
-    private boolean customExport;
-    private List<BibEntry> entries;
     private TemplateExporter academicPagesTemplate;
 
     /**
@@ -107,7 +95,7 @@ public class AcademicPagesExporter extends Exporter {
 
     private static @NonNull Path getPath(BibEntry entry, Path exportDirectory) {
         Replace replaceFormatter = new Replace();
-        replaceFormatter.setArgument(" ,-"); // The replaceFormatter expects a "-" instead of " " hence the strange argument.
+        replaceFormatter.setArgument(" ,-"); // expects an expression that has the character to remove and the replacement character separated by a comma.
         RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
         HTMLChars htmlFormatter = new HTMLChars();
         String title = entry.getTitle().get();
