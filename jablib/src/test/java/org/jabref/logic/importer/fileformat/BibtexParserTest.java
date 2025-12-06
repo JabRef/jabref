@@ -2247,4 +2247,38 @@ class BibtexParserTest {
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
     }
+
+    @Test
+    public void testUnmatchedBracketsDoesNotStopParsing() throws Exception {
+        String entries = """
+                @Article{ok1,
+                  title = {AAA},
+                }
+
+                @Article{bad,
+                  title = {accuracy by 3 to 15{{\\%}.
+                }
+
+                @Article{ok2,
+                  title = {BBB},
+                }
+                """;
+
+        ParserResult result = parser.parse(Reader.of(entries));
+        BibDatabase database = result.getDatabase();
+        List<BibEntry> entryList = database.getEntries();
+
+        BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("ok1")
+                .withField(StandardField.TITLE, "AAA");
+
+        BibEntry secondEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("ok2")
+                .withField(StandardField.TITLE, "BBB");
+
+        assertEquals(
+                List.of(firstEntry, secondEntry),
+                result.getDatabase().getEntries()
+        );
+    }
 }

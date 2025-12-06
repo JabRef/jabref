@@ -115,6 +115,8 @@ public class BibtexParser implements Parser {
     private final MetaDataParser metaDataParser;
     private final Map<String, String> parsedBibDeskGroups;
 
+    private final StringBuilder currentEntryBuffer = new StringBuilder();
+
     private GroupTreeNode bibDeskGroupTreeNode;
 
     public BibtexParser(@NonNull ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
@@ -322,7 +324,7 @@ public class BibtexParser implements Parser {
         database.setEpilog(dumpTextReadSoFarToString().trim());
     }
 
-    private void parseAndAddEntry(String type) {
+    private void parseAndAddEntry(String type) throws IOException {
         int startLine = line;
         int startColumn = column;
         try {
@@ -349,13 +351,34 @@ public class BibtexParser implements Parser {
             entry.setParsedSerialization(parsedSerialization);
 
             database.insertEntry(entry);
+            currentEntryBuffer.setLength(0);
         } catch (IOException ex) {
             // This makes the parser more robust:
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
+            String msg = ex.getMessage();
             LOGGER.warn("Could not parse entry", ex);
             String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
+            if (msg != null && msg.startsWith("RECOVER:")) {
+                int safePos = Integer.parseInt(msg.substring("RECOVER:".length()));
+                int consumed = currentEntryBuffer.length();
+
+                // roll back to the start
+                for (int i = 0; i < consumed; i++) {
+                    unread(currentEntryBuffer.charAt(consumed - 1 - i));
+                }
+
+                // go to safePos
+                for (int i = 0; i < safePos; i++) {
+                    read();
+                }
+
+                int next = peek();
+                System.out.println(">>> RECOVERED NEXT CHAR = [" + (char) next + "] @ line " + line);
+                currentEntryBuffer.setLength(0);
+                dumpTextReadSoFarToString();
+            }
         }
     }
 
@@ -1087,6 +1110,7 @@ public class BibtexParser implements Parser {
         StringBuilder value = new StringBuilder();
 
         consume('{');
+        currentEntryBuffer.append('{');
 
         int brackets = 0;
         char character;
@@ -1124,17 +1148,48 @@ public class BibtexParser implements Parser {
             if (isClosingBracket && (brackets == 0)) {
                 return value;
             } else if (isEOFCharacter(character)) {
-                throw new IOException("Error in line " + line + ": EOF in mid-string");
+                String scanned = currentEntryBuffer.toString();
+                int pos = findRecoveryStart(scanned, scanned.length() - 1);
+                throw new IOException("RECOVER:" + pos);
             } else if ((character == '{') && (!isEscapeSymbol(lastCharacter))) {
                 brackets++;
             } else if (isClosingBracket) {
                 brackets--;
             }
 
+            currentEntryBuffer.append(character);
             value.append(character);
 
             lastCharacter = character;
         }
+    }
+
+    private int findRecoveryStart(String buffer, int failPos) {
+        char[] chars = buffer.toCharArray();
+        int unmatched = 0;
+        int lastEntryStart = -1;
+
+        for (int i = failPos; i >= 0; i--) {
+            char c = chars[i];
+
+            if (c == '}') {
+                unmatched++;
+            } else if (c == '{') {
+                if (unmatched > 0) {
+                    unmatched--;
+                } else {
+                    // Found an unmatched '{', safe to stop trimming
+                    return (lastEntryStart >= 0) ? lastEntryStart : failPos;
+                }
+            }
+
+            // detect entry start: @
+            if (c == '@' && unmatched == 0) {
+                lastEntryStart = i;
+            }
+        }
+
+        return 0;
     }
 
     private boolean isEscapeSymbol(char character) {
