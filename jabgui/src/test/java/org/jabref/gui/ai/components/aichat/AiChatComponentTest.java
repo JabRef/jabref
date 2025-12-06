@@ -101,11 +101,11 @@ class AiChatComponentTest {
                     FXCollections.observableArrayList(),
                     FXCollections.observableArrayList(),
                     bibDatabaseContext,
-                    prefs,
-                    dialogService,
                     taskExecutor,
+                    prefs,
                     mock(BibEntryTypesManager.class),
-                    mock(FieldPreferences.class)
+                    mock(FieldPreferences.class),
+                    dialogService
             );
             latch.countDown();
         });

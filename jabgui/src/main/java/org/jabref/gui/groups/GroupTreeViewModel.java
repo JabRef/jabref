@@ -488,13 +488,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
         } else {
             AiChatWindow aiChatWindow = new AiChatWindow(
                     aiService,
-                    dialogService,
-                    preferences.getAiPreferences(),
                     preferences.getExternalApplicationsPreferences(),
                     adaptVisibleTabs,
                     taskExecutor,
+                    preferences.getAiPreferences(),
+                    fieldPreferences,
                     entryTypesManager,
-                    fieldPreferences
+                    dialogService
             );
 
             aiChatWindow.setOnCloseRequest(event ->

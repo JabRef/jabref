@@ -47,25 +47,26 @@ public class AiChatTab extends EntryEditorTab {
     private Optional<BibEntry> previousBibEntry = Optional.empty();
 
     public AiChatTab(AiService aiService,
-                     DialogService dialogService,
-                     GuiPreferences preferences,
                      StateManager stateManager,
-                     AdaptVisibleTabs adaptVisibleTabs,
                      TaskExecutor taskExecutor,
-                     BibEntryTypesManager entryTypesManager) {
+                     GuiPreferences preferences,
+                     BibEntryTypesManager entryTypesManager,
+                     DialogService dialogService,
+                     AdaptVisibleTabs adaptVisibleTabs) {
         this.aiService = aiService;
-        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
 
-        this.aiPreferences = preferences.getAiPreferences();
-        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
         this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
-        this.stateManager = stateManager;
-        this.adaptVisibleTabs = adaptVisibleTabs;
-
-        this.taskExecutor = taskExecutor;
-        this.entryTypesManager = entryTypesManager;
+        this.aiPreferences = preferences.getAiPreferences();
         this.fieldPreferences = preferences.getFieldPreferences();
+        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+
+        this.entryTypesManager = entryTypesManager;
+
+        this.dialogService = dialogService;
+        this.adaptVisibleTabs = adaptVisibleTabs;
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
@@ -146,13 +147,13 @@ public class AiChatTab extends EntryEditorTab {
                 bibDatabaseContext,
                 FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
                 aiService,
-                dialogService,
-                aiPreferences,
-                externalApplicationsPreferences,
-                adaptVisibleTabs,
                 taskExecutor,
+                aiPreferences,
+                fieldPreferences,
                 entryTypesManager,
-                fieldPreferences
+                externalApplicationsPreferences,
+                dialogService,
+                adaptVisibleTabs
 
         ));
     }

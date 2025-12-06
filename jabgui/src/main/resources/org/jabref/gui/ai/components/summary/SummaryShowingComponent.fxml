@@ -24,8 +24,8 @@
                         <JabRefIconView glyph="SAVE"/>
                     </graphic>
                     <items>
-                        <MenuItem text="Export in human-readable format (Markdown)" onAction="#onExportMarkdown"/>
-                        <MenuItem text="Export in machine-readable format (JSON)" onAction="#onExportJson"/>
+                        <MenuItem text="%Export to Markdown" onAction="#exportMarkdown"/>
+                        <MenuItem text="%Export to JSON" onAction="#exportJson"/>
                     </items>
                 </MenuButton>
             </right>

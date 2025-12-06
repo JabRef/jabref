@@ -98,20 +98,20 @@ public class AiChatComponent extends VBox {
                            ObservableList<ChatMessage> chatHistory,
                            ObservableList<BibEntry> entries,
                            BibDatabaseContext bibDatabaseContext,
-                           AiPreferences aiPreferences,
-                           DialogService dialogService,
                            TaskExecutor taskExecutor,
+                           AiPreferences aiPreferences,
                            BibEntryTypesManager entryTypesManager,
-                           FieldPreferences fieldPreferences
+                           FieldPreferences fieldPreferences,
+                           DialogService dialogService
     ) {
         this.aiService = aiService;
         this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.aiPreferences = aiPreferences;
-        this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.aiPreferences = aiPreferences;
         this.entryTypesManager = entryTypesManager;
         this.fieldPreferences = fieldPreferences;
+        this.dialogService = dialogService;
 
         this.aiChatLogic = aiService.getAiChatService().makeChat(name, chatHistory, entries, bibDatabaseContext);
 
@@ -444,10 +444,10 @@ public class AiChatComponent extends VBox {
                              AiExporter exporter = new AiExporter(entries.getFirst(), entryTypesManager, fieldPreferences);
                              String content = exporter.buildMarkdownForChat(aiChatLogic.getChatHistory());
                              Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                             dialogService.notify(Localization.lang("Export successful"));
+                             dialogService.notify(Localization.lang("export operation finished successfully."));
                          } catch (IOException e) {
-                             LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
-                             dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                             LOGGER.error("Problem occurred while writing the export file", e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
                          }
                      });
     }
@@ -476,10 +476,10 @@ public class AiChatComponent extends VBox {
                                      aiChatLogic.getChatHistory()
                              );
                              Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                             dialogService.notify(Localization.lang("Export successful"));
+                             dialogService.notify(Localization.lang("export operation finished successfully."));
                          } catch (IOException e) {
-                             LOGGER.error(Localization.lang("Problem occurred while writing the export file"), e);
-                             dialogService.showErrorDialogAndWait(Localization.lang("Save failed"), e);
+                             LOGGER.error("Problem occurred while writing the export file", e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
                          }
                      });
     }

@@ -91,10 +91,7 @@ public class AiExporter {
                 continue;
             }
 
-            Map<String, String> msgMap = new HashMap<>();
-            msgMap.put("role", role);
-            msgMap.put("content", content);
-            conversationList.add(msgMap);
+            conversationList.add(Map.of("role", role, "content", content));
         }
         root.put("conversation", conversationList);
 
