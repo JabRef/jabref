@@ -164,9 +164,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     /**
      * Holds the horizontal divider position of the preview view when it is shown inside the entry editor
      */
-    private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
-
-    private static final String JOURNAL_POPUP = "journalPopup";
 
     // region Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
@@ -218,6 +215,23 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CREATE_ENTRY_INTERPRET_PARSER_NAME = "latestInterpretParserName";
     // endregion
 
+    // region EntryEditorPreferences
+    private static final String AUTO_OPEN_FORM = "autoOpenForm";
+    private static final String SHOW_RECOMMENDATIONS = "showRecommendations";
+    private static final String SHOW_AI_SUMMARY = "showAiSummary";
+    private static final String SHOW_AI_CHAT = "showAiChat";
+    private static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
+    private static final String SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
+    private static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
+    private static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
+    private static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
+    private static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
+    private static final String SHOW_SCITE_TAB = "showSciteTab";
+    private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
+    private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
+    private static final String JOURNAL_POPUP = "journalPopup";
+    // endregion
+
     private static JabRefGuiPreferences singleton;
 
     private EntryEditorPreferences entryEditorPreferences;
@@ -242,10 +256,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private JabRefGuiPreferences() {
         super();
-
-        defaults.put(JOURNAL_POPUP, EntryEditorPreferences.JournalPopupEnabled.FIRST_START.toString());
-
-        defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
 
         // region mergeDialogPreferences
         defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
@@ -388,6 +398,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         super.clear();
 
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
+        getEntryEditorPreferences().setAll(EntryEditorPreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getDonationPreferences().setAll(DonationPreferences.getDefault());
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
@@ -401,6 +412,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
+        getEntryEditorPreferences().setAll(getEntryEditorPreferencesFromBackingStore(getEntryEditorPreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
@@ -414,23 +426,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return entryEditorPreferences;
         }
 
-        entryEditorPreferences = new EntryEditorPreferences(
-                getEntryEditorTabs(),
-                getDefaultEntryEditorTabs(),
-                getBoolean(AUTO_OPEN_FORM),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(SHOW_AI_SUMMARY),
-                getBoolean(SHOW_AI_CHAT),
-                getBoolean(SHOW_LATEX_CITATIONS),
-                getBoolean(SMART_FILE_ANNOTATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getBoolean(AUTOLINK_FILES_ENABLED),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
-                getBoolean(SHOW_SCITE_TAB),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS));
+        entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
@@ -449,6 +445,26 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
         return entryEditorPreferences;
+    }
+
+    public EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
+        return new EntryEditorPreferences(
+                getEntryEditorTabs(),
+                getDefaultEntryEditorTabs(),
+                getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
+                getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
+                getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
+                getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
+                getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
+                getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
+                getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
+                getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().toString())),
+                getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
+                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition()));
     }
 
     /**
