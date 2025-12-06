@@ -20,8 +20,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A custom exporter to write multiple bib entries as AcademicPages Markdown format.
@@ -31,6 +29,12 @@ public class AcademicPagesExporter extends Exporter {
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
     private final SelfContainedSaveOrder saveOrder;
+
+    private final Replace replaceFormatter = new Replace();
+    private final RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
+    private final HTMLChars htmlFormatter = new HTMLChars();
+    private final SafeFileName safeFormatter = new SafeFileName();
+
     private TemplateExporter academicPagesTemplate;
 
     /**
@@ -94,14 +98,10 @@ public class AcademicPagesExporter extends Exporter {
         }
     }
 
-    private static @NonNull Path getPath(BibEntry entry, Path exportDirectory) {
-        Replace replaceFormatter = new Replace();
+    private @NonNull Path getPath(BibEntry entry, Path exportDirectory) {
         replaceFormatter.setArgument(" ,-"); // expects an expression that has the character to remove and the replacement character separated by a comma.
-        RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
-        HTMLChars htmlFormatter = new HTMLChars();
         String title = entry.getTitle().get();
         String formattedTitle = commandsFormatter.format(htmlFormatter.format(replaceFormatter.format(title)));
-        SafeFileName safeFormatter = new SafeFileName();
         String safeTitle = safeFormatter.format(formattedTitle);
         return exportDirectory.resolve(safeTitle + ".md");
     }
