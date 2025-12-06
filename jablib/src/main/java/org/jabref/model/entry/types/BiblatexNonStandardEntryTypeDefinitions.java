@@ -6,7 +6,21 @@ import java.util.List;
 import org.jabref.model.entry.BibEntryType;
 
 import static org.jabref.model.entry.types.BiblatexEntryTypeDefinitions.MISC;
-import static org.jabref.model.entry.types.StandardEntryType.*;
+import static org.jabref.model.entry.types.StandardEntryType.Artwork;
+import static org.jabref.model.entry.types.StandardEntryType.Audio;
+import static org.jabref.model.entry.types.StandardEntryType.Bibnote;
+import static org.jabref.model.entry.types.StandardEntryType.Commentary;
+import static org.jabref.model.entry.types.StandardEntryType.Image;
+import static org.jabref.model.entry.types.StandardEntryType.Jurisdiction;
+import static org.jabref.model.entry.types.StandardEntryType.Legislation;
+import static org.jabref.model.entry.types.StandardEntryType.Legal;
+import static org.jabref.model.entry.types.StandardEntryType.Letter;
+import static org.jabref.model.entry.types.StandardEntryType.Movie;
+import static org.jabref.model.entry.types.StandardEntryType.Music;
+import static org.jabref.model.entry.types.StandardEntryType.Performance;
+import static org.jabref.model.entry.types.StandardEntryType.Review;
+import static org.jabref.model.entry.types.StandardEntryType.Standard;
+import static org.jabref.model.entry.types.StandardEntryType.Video;
 
 public class BiblatexNonStandardEntryTypeDefinitions {
 
@@ -29,3 +43,4 @@ public class BiblatexNonStandardEntryTypeDefinitions {
     public static final List<BibEntryType> ALL = Arrays.asList(ARTWORK, AUDIO, BIBNOTE, COMMENTARY, IMAGE, JURISDICTION, LEGISLATION, LEGAL,
             LETTER, MOVIE, MUSIC, PERFORMANCE, REVIEW, STANDARD, VIDEO);
 }
+
