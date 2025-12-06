@@ -33,6 +33,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
@@ -111,7 +112,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     }
 
     @FXML
-    private void selectBstFile(ActionEvent event) {
+    private void selectBstFile(@SuppressWarnings("unused") ActionEvent event) {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BST)
                 .withDefaultExtension(StandardFileType.BST)
@@ -121,6 +122,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> viewModel.addBstStyle(bstFile));
     }
 
+    @SuppressWarnings("unused")
     public void initialize() {
         this.viewModel = new PreviewTabViewModel(dialogService, preferences.getPreviewPreferences(), taskExecutor, stateManager);
         lastKeyPressTime = System.currentTimeMillis();
@@ -145,6 +147,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
+                .withContextMenu(this::createContextMenuForLayout)
                 .install(availableListView);
         availableListView.setOnDragOver(this::dragOver);
         availableListView.setOnDragDetected(this::dragDetectedInAvailable);
@@ -152,13 +155,14 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
         availableListView.setOnMouseClicked(this::mouseClickedAvailable);
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_observable, _oldValue, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
         chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
         viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
+                .withContextMenu(this::createContextMenuForLayout)
                 .setOnDragDropped(this::dragDroppedInChosenCell)
                 .install(chosenListView);
         chosenListView.setOnDragOver(this::dragOver);
@@ -167,7 +171,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
         chosenListView.setOnMouseClicked(this::mouseClickedChosen);
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_observable, _oldValue, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
         toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
@@ -198,16 +202,16 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
                     viewModel.refreshPreview();
                 });
 
-        editArea.textProperty().addListener((obs, oldValue, newValue) ->
+        editArea.textProperty().addListener((_observable, _oldValue, newValue) ->
                 editArea.setStyleSpans(0, viewModel.computeHighlighting(newValue)));
 
-        editArea.focusedProperty().addListener((observable, oldValue, newValue) -> {
+        editArea.focusedProperty().addListener((_observable, _oldValue, newValue) -> {
             if (!newValue) {
                 viewModel.refreshPreview();
             }
         });
 
-        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> viewModel.setAvailableFilter(searchTerm));
+        searchBox.textProperty().addListener((_observable, _previousText, searchTerm) -> viewModel.setAvailableFilter(searchTerm));
 
         readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
         resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
@@ -310,5 +314,27 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             viewModel.removeFromChosen();
             event.consume();
         }
+    }
+
+    private ContextMenu createContextMenuForLayout(PreviewLayout layout) {
+        // Only show context menu for BST files that were manually added
+        if (!(layout instanceof BstPreviewLayout) || !viewModel.canRemoveBstStyle(layout)) {
+            return null;
+        }
+
+        ActionFactory factory = new ActionFactory();
+        ContextMenu menu = new ContextMenu();
+        menu.getItems().add(
+                factory.createMenuItem(StandardActions.DELETE, new SimpleCommand() {
+                    @Override
+                    public void execute() {
+                        viewModel.removeBstStyle(layout);
+                    }
+                })
+        );
+        menu.getItems().forEach(item -> item.setGraphic(null));
+        menu.getStyleClass().add("context-menu");
+
+        return menu;
     }
 }
