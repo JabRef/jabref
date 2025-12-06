@@ -96,7 +96,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     }
 
     public void initialize() {
-        this.viewModel = new AiTabViewModel(preferences);
+        this.viewModel = new AiTabViewModel(preferences, taskExecutor);
 
         initializeEnableAi();
         initializeAiProvider();
