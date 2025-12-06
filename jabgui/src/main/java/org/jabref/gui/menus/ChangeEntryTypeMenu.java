@@ -64,12 +64,12 @@ public class ChangeEntryTypeMenu {
         if (bibDatabaseContext.isBiblatexMode()) {
             // Default BibLaTeX - exclude non-standard types to avoid duplicates
             Set<EntryType> nonStandardEntryTypes = BiblatexNonStandardEntryTypeDefinitions.ALL.stream()
-                    .<EntryType>map(BibEntryType::getType)
-                    .collect(Collectors.toSet());
+                                                                                              .<EntryType>map(BibEntryType::getType)
+                                                                                              .collect(Collectors.toSet());
             Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX);
             Collection<BibEntryType> standardTypes = allTypes.stream()
-                    .filter(type -> !nonStandardEntryTypes.contains(type.getType()))
-                    .collect(Collectors.toList());
+                                                             .filter(type -> !nonStandardEntryTypes.contains(type.getType()))
+                                                             .collect(Collectors.toList());
             items.addAll(fromEntryTypes(standardTypes, entries, undoManager));
 
             // Non-standard types
