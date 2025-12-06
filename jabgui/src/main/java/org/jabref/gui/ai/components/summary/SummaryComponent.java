@@ -203,7 +203,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                              );
 
                              Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                             dialogService.notify(Localization.lang("export operation finished successfully."));
+                             dialogService.notify(Localization.lang("Export operation finished successfully."));
                          } catch (IOException e) {
                              LOGGER.error("Problem occurred while writing the export file", e);
                              dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
@@ -229,7 +229,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                              AiExporter exporter = new AiExporter(entry, entryTypesManager, fieldPreferences);
                              String content = exporter.buildMarkdownExport("Summary", summary.content());
                              Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                             dialogService.notify(Localization.lang("export operation finished successfully."));
+                             dialogService.notify(Localization.lang("Export operation finished successfully."));
                          } catch (IOException e) {
                              LOGGER.error("Problem occurred while writing the export file", e);
                              dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
