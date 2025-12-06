@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added 15 non-standard BibLaTeX entry types (Artwork, Audio, Bibnote, Commentary, Image, Jurisdiction, Legislation, Legal, Letter, Movie, Music, Performance, Review, Standard, Video) available in BibLaTeX mode only. These types are displayed in a dedicated "Non-standard types" group in the New Entry dialog and in the context menu. [#12963](https://github.com/JabRef/jabref/issues/12963)
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
