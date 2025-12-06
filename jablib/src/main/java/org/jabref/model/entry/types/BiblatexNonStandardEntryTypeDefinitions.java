@@ -24,21 +24,21 @@ import static org.jabref.model.entry.types.StandardEntryType.Video;
 
 public class BiblatexNonStandardEntryTypeDefinitions {
 
-    private static final BibEntryType ARTWORK = MISC.withType(Artwork);
-    private static final BibEntryType AUDIO = MISC.withType(Audio);
-    private static final BibEntryType BIBNOTE = MISC.withType(Bibnote);
-    private static final BibEntryType COMMENTARY = MISC.withType(Commentary);
-    private static final BibEntryType IMAGE = MISC.withType(Image);
-    private static final BibEntryType JURISDICTION = MISC.withType(Jurisdiction);
-    private static final BibEntryType LEGISLATION = MISC.withType(Legislation);
-    private static final BibEntryType LEGAL = MISC.withType(Legal);
-    private static final BibEntryType LETTER = MISC.withType(Letter);
-    private static final BibEntryType MOVIE = MISC.withType(Movie);
-    private static final BibEntryType MUSIC = MISC.withType(Music);
-    private static final BibEntryType PERFORMANCE = MISC.withType(Performance);
-    private static final BibEntryType REVIEW = MISC.withType(Review);
-    private static final BibEntryType STANDARD = MISC.withType(Standard);
-    private static final BibEntryType VIDEO = MISC.withType(Video);
+    private static final BibEntryType ARTWORK = new BibEntryType(Artwork, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType AUDIO = new BibEntryType(Audio, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType BIBNOTE = new BibEntryType(Bibnote, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType COMMENTARY = new BibEntryType(Commentary, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType IMAGE = new BibEntryType(Image, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType JURISDICTION = new BibEntryType(Jurisdiction, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType LEGISLATION = new BibEntryType(Legislation, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType LEGAL = new BibEntryType(Legal, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType LETTER = new BibEntryType(Letter, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType MOVIE = new BibEntryType(Movie, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType MUSIC = new BibEntryType(Music, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType PERFORMANCE = new BibEntryType(Performance, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType REVIEW = new BibEntryType(Review, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType STANDARD = new BibEntryType(Standard, MISC.getAllBibFields(), MISC.getRequiredFields());
+    private static final BibEntryType VIDEO = new BibEntryType(Video, MISC.getAllBibFields(), MISC.getRequiredFields());
 
     public static final List<BibEntryType> ALL = Arrays.asList(ARTWORK, AUDIO, BIBNOTE, COMMENTARY, IMAGE, JURISDICTION, LEGISLATION, LEGAL,
             LETTER, MOVIE, MUSIC, PERFORMANCE, REVIEW, STANDARD, VIDEO);

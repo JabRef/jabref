@@ -73,7 +73,7 @@ public class ChangeEntryTypeMenu {
             items.addAll(fromEntryTypes(standardTypes, entries, undoManager));
 
             // Non-standard types
-            createSubMenu(Localization.lang("Non-standard Types"), BiblatexNonStandardEntryTypeDefinitions.ALL, entries, undoManager)
+            createSubMenu(Localization.lang("Non-standard types"), BiblatexNonStandardEntryTypeDefinitions.ALL, entries, undoManager)
                     .ifPresent(subMenu -> items.addAll(
                             new SeparatorMenuItem(),
                             subMenu

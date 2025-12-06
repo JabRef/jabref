@@ -44,17 +44,6 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return type;
     }
 
-    /**
-     * Creates a new BibEntryType with the same fields but a different EntryType.
-     * This is useful for creating variants of entry types (e.g., non-standard types based on misc).
-     *
-     * @param newType The new EntryType to use
-     * @return A new BibEntryType instance with the new type but same field definitions
-     */
-    public BibEntryType withType(@NonNull EntryType newType) {
-        return new BibEntryType(newType, this.allFields, this.requiredFields);
-    }
-
     public SequencedSet<BibField> getOptionalFields() {
         return getAllBibFields().stream()
                                 .filter(field -> !isRequired(field.field()))
