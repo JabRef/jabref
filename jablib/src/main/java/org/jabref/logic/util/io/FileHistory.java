@@ -27,7 +27,7 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
 
     @Override
     protected void doAdd(int index, Path element) {
-        history.add(index, element);
+        history.add(index, toRelative(element.toAbsolutePath()));
     }
 
     @Override
@@ -41,11 +41,13 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
     }
 
     /**
-     * Adds the file to the top of the list. If it already is in the list, it is merely moved to the top.
+     * Adds the file to the top of the list. If it already is in the list, it is
+     * merely moved to the top.
      */
     public void newFile(Path file) {
         removeItem(file);
-        this.addFirst(file);
+        this.addFirst(toRelative(file.toAbsolutePath()));
+
         while (size() > HISTORY_SIZE) {
             history.remove(HISTORY_SIZE);
         }
@@ -57,5 +59,22 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
 
     public static FileHistory of(List<Path> list) {
         return new FileHistory(new ArrayList<>(list));
+    }
+
+    private Path toRelative(Path absolutePath) {
+        Path workingDir = Path.of("").toAbsolutePath();
+        try {
+            return workingDir.relativize(absolutePath);
+        } catch (Exception e) {
+            return absolutePath; // fallback
+        }
+    }
+
+    private Path toAbsolute(Path storedPath) {
+        Path workingDir = Path.of("").toAbsolutePath();
+        if (!storedPath.isAbsolute()) {
+            return workingDir.resolve(storedPath).normalize();
+        }
+        return storedPath;
     }
 }
