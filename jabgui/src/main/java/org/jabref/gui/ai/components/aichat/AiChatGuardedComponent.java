@@ -44,13 +44,13 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
                                   BibDatabaseContext bibDatabaseContext,
                                   ObservableList<BibEntry> entries,
                                   AiService aiService,
-                                  DialogService dialogService,
-                                  AiPreferences aiPreferences,
-                                  ExternalApplicationsPreferences externalApplicationsPreferences,
-                                  AdaptVisibleTabs adaptVisibleTabs,
                                   TaskExecutor taskExecutor,
+                                  AiPreferences aiPreferences,
+                                  FieldPreferences fieldPreferences,
                                   BibEntryTypesManager entryTypesManager,
-                                  FieldPreferences fieldPreferences
+                                  ExternalApplicationsPreferences externalApplicationsPreferences,
+                                  DialogService dialogService,
+                                  AdaptVisibleTabs adaptVisibleTabs
     ) {
         super(aiService, aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);
 
@@ -59,11 +59,11 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entries = entries;
         this.aiService = aiService;
-        this.dialogService = dialogService;
-        this.aiPreferences = aiPreferences;
         this.taskExecutor = taskExecutor;
-        this.entryTypesManager = entryTypesManager;
+        this.aiPreferences = aiPreferences;
         this.fieldPreferences = fieldPreferences;
+        this.entryTypesManager = entryTypesManager;
+        this.dialogService = dialogService;
 
         rebuildUi();
     }
@@ -76,11 +76,11 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
                 chatHistory,
                 entries,
                 bibDatabaseContext,
-                aiPreferences,
-                dialogService,
                 taskExecutor,
+                aiPreferences,
                 entryTypesManager,
-                fieldPreferences
+                fieldPreferences,
+                dialogService
         );
     }
 }
