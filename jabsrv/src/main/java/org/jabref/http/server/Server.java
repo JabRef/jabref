@@ -14,11 +14,13 @@ import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
+import org.jabref.http.server.oauth.OAuth;
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
 import org.jabref.http.server.resources.RootResource;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 
@@ -36,9 +38,11 @@ import org.slf4j.LoggerFactory;
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
     private final CliPreferences preferences;
+    private final OAuthSessionRegistry oAuthSessionRegistry;
 
-    public Server(CliPreferences preferences) {
+    public Server(CliPreferences preferences, OAuthSessionRegistry oAuthSessionRegistry) {
         this.preferences = preferences;
+        this.oAuthSessionRegistry = oAuthSessionRegistry;
     }
 
     /// Entry point for the CLI
@@ -110,8 +114,9 @@ public class Server {
         resourceConfig.register(MapResource.class);
 
         // Other resources
-        resourceConfig.register(CommandResource.class);
         resourceConfig.register(CAYWResource.class);
+        resourceConfig.register(OAuth.class);
+        resourceConfig.register(CommandResource.class);
 
         // Supporting classes
         resourceConfig.register(CORSFilter.class);

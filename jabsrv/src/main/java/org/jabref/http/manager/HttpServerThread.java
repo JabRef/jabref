@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.Server;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 
 import jakarta.ws.rs.ProcessingException;
@@ -27,7 +28,8 @@ public class HttpServerThread extends Thread {
     public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, URI uri) {
         this.srvStateManager = srvStateManager;
         this.uri = uri;
-        this.server = new Server(cliPreferences);
+        // TODO: Fix params
+        this.server = new Server(cliPreferences, new OAuthSessionRegistry());
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
     }
 
