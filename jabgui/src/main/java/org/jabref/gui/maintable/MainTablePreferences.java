@@ -1,6 +1,6 @@
 package org.jabref.gui.maintable;
 
-import java.util.Collections;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -21,9 +21,9 @@ public class MainTablePreferences {
     /// Creates Object with default values
     private MainTablePreferences() {
         this(
-                new ColumnPreferences(Collections.emptyList(), Collections.emptyList()),  // Default column preferences
-                false,                                                                    // Default resize columns to fit
-                false                                                                     // Default extra file columns disabled
+                new ColumnPreferences(List.of(), List.of()),  // Default column preferences
+                false,                                        // Default resize columns to fit
+                false                                         // Default extra file columns disabled
         );
     }
 
