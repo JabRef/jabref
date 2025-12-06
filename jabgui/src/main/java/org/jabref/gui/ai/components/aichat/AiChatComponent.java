@@ -1,6 +1,9 @@
 package org.jabref.gui.ai.components.aichat;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,18 +30,23 @@ import org.jabref.gui.ai.components.util.Loadable;
 import org.jabref.gui.ai.components.util.notifications.Notification;
 import org.jabref.gui.ai.components.util.notifications.NotificationsComponent;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiExporter;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.ai.util.ErrorMessage;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.ListUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -65,6 +73,8 @@ public class AiChatComponent extends VBox {
     private final AiPreferences aiPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
     private final AiChatLogic aiChatLogic;
 
@@ -88,16 +98,20 @@ public class AiChatComponent extends VBox {
                            ObservableList<ChatMessage> chatHistory,
                            ObservableList<BibEntry> entries,
                            BibDatabaseContext bibDatabaseContext,
+                           TaskExecutor taskExecutor,
                            AiPreferences aiPreferences,
-                           DialogService dialogService,
-                           TaskExecutor taskExecutor
+                           BibEntryTypesManager entryTypesManager,
+                           FieldPreferences fieldPreferences,
+                           DialogService dialogService
     ) {
         this.aiService = aiService;
         this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.aiPreferences = aiPreferences;
-        this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.aiPreferences = aiPreferences;
+        this.entryTypesManager = entryTypesManager;
+        this.fieldPreferences = fieldPreferences;
+        this.dialogService = dialogService;
 
         this.aiChatLogic = aiService.getAiChatService().makeChat(name, chatHistory, entries, bibDatabaseContext);
 
@@ -409,5 +423,64 @@ public class AiChatComponent extends VBox {
             messageIndex--;
         }
         return Optional.empty();
+    }
+
+    @FXML
+    private void exportMarkdown() {
+        if (aiChatLogic.getChatHistory().isEmpty()) {
+            dialogService.notify(Localization.lang("No chat history to export"));
+            return;
+        }
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.MARKDOWN)
+                .withDefaultExtension(StandardFileType.MARKDOWN)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                     .ifPresent(path -> {
+                         try {
+                             AiExporter exporter = new AiExporter(entries.getFirst(), entryTypesManager, fieldPreferences);
+                             String content = exporter.buildMarkdownForChat(aiChatLogic.getChatHistory());
+                             Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export operation finished successfully."));
+                         } catch (IOException e) {
+                             LOGGER.error("Problem occurred while writing the export file", e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
+                         }
+                     });
+    }
+
+    @FXML
+    private void exportJson() {
+        if (aiChatLogic.getChatHistory().isEmpty()) {
+            dialogService.notify(Localization.lang("No chat history to export"));
+            return;
+        }
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.JSON)
+                .withDefaultExtension(StandardFileType.JSON)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                     .ifPresent(path -> {
+                         try {
+                             AiExporter exporter = new AiExporter(entries.getFirst(), entryTypesManager, fieldPreferences);
+                             String jsonString = exporter.buildJsonExport(
+                                     aiPreferences.getAiProvider().getLabel(),
+                                     aiPreferences.getSelectedChatModel(),
+                                     java.time.LocalDateTime.now().toString(),
+                                     aiChatLogic.getChatHistory()
+                             );
+                             Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export operation finished successfully."));
+                         } catch (IOException e) {
+                             LOGGER.error("Problem occurred while writing the export file", e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
+                         }
+                     });
     }
 }

@@ -20,6 +20,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -27,6 +28,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 
 public class AiChatTab extends EntryEditorTab {
@@ -39,26 +41,32 @@ public class AiChatTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final AdaptVisibleTabs adaptVisibleTabs;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
     private Optional<BibEntry> previousBibEntry = Optional.empty();
 
     public AiChatTab(AiService aiService,
-                     DialogService dialogService,
-                     GuiPreferences preferences,
                      StateManager stateManager,
-                     AdaptVisibleTabs adaptVisibleTabs,
-                     TaskExecutor taskExecutor) {
+                     TaskExecutor taskExecutor,
+                     GuiPreferences preferences,
+                     BibEntryTypesManager entryTypesManager,
+                     DialogService dialogService,
+                     AdaptVisibleTabs adaptVisibleTabs) {
         this.aiService = aiService;
-        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
 
-        this.aiPreferences = preferences.getAiPreferences();
-        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
         this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
-        this.stateManager = stateManager;
-        this.adaptVisibleTabs = adaptVisibleTabs;
+        this.aiPreferences = preferences.getAiPreferences();
+        this.fieldPreferences = preferences.getFieldPreferences();
+        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
 
-        this.taskExecutor = taskExecutor;
+        this.entryTypesManager = entryTypesManager;
+
+        this.dialogService = dialogService;
+        this.adaptVisibleTabs = adaptVisibleTabs;
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
@@ -139,11 +147,14 @@ public class AiChatTab extends EntryEditorTab {
                 bibDatabaseContext,
                 FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
                 aiService,
-                dialogService,
+                taskExecutor,
                 aiPreferences,
+                fieldPreferences,
+                entryTypesManager,
                 externalApplicationsPreferences,
-                adaptVisibleTabs,
-                taskExecutor
+                dialogService,
+                adaptVisibleTabs
+
         ));
     }
 }

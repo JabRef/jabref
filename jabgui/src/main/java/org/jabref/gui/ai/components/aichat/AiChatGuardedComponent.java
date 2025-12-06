@@ -10,9 +10,11 @@ import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import dev.langchain4j.data.message.ChatMessage;
 
@@ -34,17 +36,21 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
     private final DialogService dialogService;
     private final AiPreferences aiPreferences;
     private final TaskExecutor taskExecutor;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
     public AiChatGuardedComponent(StringProperty name,
                                   ObservableList<ChatMessage> chatHistory,
                                   BibDatabaseContext bibDatabaseContext,
                                   ObservableList<BibEntry> entries,
                                   AiService aiService,
-                                  DialogService dialogService,
+                                  TaskExecutor taskExecutor,
                                   AiPreferences aiPreferences,
+                                  FieldPreferences fieldPreferences,
+                                  BibEntryTypesManager entryTypesManager,
                                   ExternalApplicationsPreferences externalApplicationsPreferences,
-                                  AdaptVisibleTabs adaptVisibleTabs,
-                                  TaskExecutor taskExecutor
+                                  DialogService dialogService,
+                                  AdaptVisibleTabs adaptVisibleTabs
     ) {
         super(aiService, aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);
 
@@ -53,9 +59,11 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entries = entries;
         this.aiService = aiService;
-        this.dialogService = dialogService;
-        this.aiPreferences = aiPreferences;
         this.taskExecutor = taskExecutor;
+        this.aiPreferences = aiPreferences;
+        this.fieldPreferences = fieldPreferences;
+        this.entryTypesManager = entryTypesManager;
+        this.dialogService = dialogService;
 
         rebuildUi();
     }
@@ -68,9 +76,11 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
                 chatHistory,
                 entries,
                 bibDatabaseContext,
+                taskExecutor,
                 aiPreferences,
-                dialogService,
-                taskExecutor
+                entryTypesManager,
+                fieldPreferences,
+                dialogService
         );
     }
 }
