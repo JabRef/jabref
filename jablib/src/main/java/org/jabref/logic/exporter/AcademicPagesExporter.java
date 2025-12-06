@@ -107,7 +107,7 @@ public class AcademicPagesExporter extends Exporter {
 
     private static @NonNull Path getPath(BibEntry entry, Path exportDirectory) {
         Replace replaceFormatter = new Replace();
-        replaceFormatter.setArgument(" ,-");
+        replaceFormatter.setArgument(" ,-"); // The replaceFormatter expects a "-" instead of " " hence the strange argument.
         RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
         HTMLChars htmlFormatter = new HTMLChars();
         String title = entry.getTitle().get();
