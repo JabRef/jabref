@@ -44,7 +44,6 @@ public class ConsistencyCheckAction extends SimpleCommand {
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
-
         this.executable.bind(needsDatabase(stateManager));
     }
 
@@ -63,7 +62,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
                 BibDatabaseContext bibContext = databaseContext.get();
 
                 BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-                return consistencyCheck.check(bibContext, (count, total) ->
+                return consistencyCheck.check(bibContext, entryTypesManager, (count, total) ->
                         UiTaskExecutor.runInJavaFXThread(() -> {
                             updateProgress(count, total);
                             updateMessage(Localization.lang("%0/%1 entry types", count + 1, total));
