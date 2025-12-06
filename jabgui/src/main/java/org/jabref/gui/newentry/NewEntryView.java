@@ -357,8 +357,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
-            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
-            // supported Bib(La)Tex source format.
+            // TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
+            // supported Bib(La)TeX source format.
             bibtexText.setText(clipboardText);
             bibtexText.selectAll();
         }
