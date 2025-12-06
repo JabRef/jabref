@@ -174,7 +174,7 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE)
             .build();
 
-    private static final BibEntryType MISC = new BibEntryTypeBuilder()
+    static final BibEntryType MISC = new BibEntryTypeBuilder()
             .withType(StandardEntryType.Misc)
             .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)
             .withImportantFields(

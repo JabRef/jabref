@@ -17,6 +17,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
@@ -36,7 +37,9 @@ public class BibEntryTypesManager {
 
     private final InternalEntryTypes BIBLATEX_ENTRYTYPES = new InternalEntryTypes(
             Stream.concat(BiblatexEntryTypeDefinitions.ALL.stream(),
-                          Stream.concat(BiblatexSoftwareEntryTypeDefinitions.ALL.stream(), BiblatexAPAEntryTypeDefinitions.ALL.stream()))
+                          Stream.concat(BiblatexSoftwareEntryTypeDefinitions.ALL.stream(),
+                                       Stream.concat(BiblatexAPAEntryTypeDefinitions.ALL.stream(),
+                                                    BiblatexNonStandardEntryTypeDefinitions.ALL.stream())))
                   .collect(Collectors.toList()));
 
     public BibEntryTypesManager() {
