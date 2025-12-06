@@ -105,7 +105,7 @@ public class AcademicPagesExporter extends Exporter {
                 academicPagesTemplate.export(databaseContext, path, individual_entry, fileDirForDataBase, abbreviationRepository);
             }
         } catch (IOException e) {
-            throw new SaveException("could not export");
+            throw new SaveException("could not export", e);
         }
     }
 
