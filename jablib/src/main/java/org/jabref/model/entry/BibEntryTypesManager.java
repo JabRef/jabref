@@ -38,8 +38,8 @@ public class BibEntryTypesManager {
     private final InternalEntryTypes BIBLATEX_ENTRYTYPES = new InternalEntryTypes(
             Stream.concat(BiblatexEntryTypeDefinitions.ALL.stream(),
                           Stream.concat(BiblatexSoftwareEntryTypeDefinitions.ALL.stream(),
-                                       Stream.concat(BiblatexAPAEntryTypeDefinitions.ALL.stream(),
-                                                    BiblatexNonStandardEntryTypeDefinitions.ALL.stream())))
+                                  Stream.concat(BiblatexAPAEntryTypeDefinitions.ALL.stream(),
+                                          BiblatexNonStandardEntryTypeDefinitions.ALL.stream())))
                   .collect(Collectors.toList()));
 
     public BibEntryTypesManager() {
