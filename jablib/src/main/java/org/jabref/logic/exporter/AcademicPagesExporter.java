@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * A custom exporter to write multiple bib entries as AcademicPages Markdown format.
  */
 public class AcademicPagesExporter extends Exporter {
+
     private static final String BLANK_LINE_PATTERN = "\\r\\n|\\n";
     private static final String LAYOUT_PREFIX = "/resource/layout/";
     private static final String LAYOUT_EXTENSION = ".layout";
@@ -61,8 +62,9 @@ public class AcademicPagesExporter extends Exporter {
     @Override
     public void export(@NonNull final BibDatabaseContext databaseContext,
                        @NonNull final Path exportDirectory,
-                       @NonNull List<BibEntry> entries) throws SaveException {
-        export(databaseContext, exportDirectory, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
+                       @NonNull List<BibEntry> entries)
+        throws SaveException {
+        export(databaseContext, exportDirectory, entries, List.of(exportDirectory), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 
     /**
@@ -79,7 +81,8 @@ public class AcademicPagesExporter extends Exporter {
                        @NonNull final Path file,
                        @NonNull List<BibEntry> entries,
                        List<Path> fileDirForDataBase,
-                       JournalAbbreviationRepository abbreviationRepository) throws SaveException {
+                       JournalAbbreviationRepository abbreviationRepository)
+        throws SaveException {
         if (entries.isEmpty()) { // Only export if entries exist
             return;
         }
@@ -105,12 +108,12 @@ public class AcademicPagesExporter extends Exporter {
         }
     }
 
-    private static @NonNull Path getPath(BibEntry entry, Path exportDirectory) {
+    private static @NonNull Path getPath(BibEntry entry, Path exportDirectory) throws SaveException {
         Replace replaceFormatter = new Replace();
         replaceFormatter.setArgument(" ,-"); // The replaceFormatter expects a "-" instead of " " hence the strange argument.
         RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
         HTMLChars htmlFormatter = new HTMLChars();
-        String title = entry.getTitle().get();
+        String title = entry.getTitle().orElseThrow(() -> new SaveException("Entry does not contain a title"));
         String formattedTitle = commandsFormatter.format(htmlFormatter.format(replaceFormatter.format(title)));
         SafeFileName safeFormatter = new SafeFileName();
         String safeTitle = safeFormatter.format(formattedTitle);
