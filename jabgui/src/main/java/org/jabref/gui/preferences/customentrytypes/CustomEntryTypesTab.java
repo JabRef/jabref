@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.customentrytypes;
 
+import java.util.stream.Collectors;
+
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -11,6 +13,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.ClipboardContent;
@@ -40,6 +43,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.controlsfx.control.SearchableComboBox;
+import org.controlsfx.control.textfield.TextFields;
 
 public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> implements PreferencesTab {
 
@@ -47,16 +51,14 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     @FXML private TableColumn<EntryTypeViewModel, String> entryTypColumn;
     @FXML private TableColumn<EntryTypeViewModel, String> entryTypeActionsColumn;
     @FXML private TextField addNewEntryType;
-    @FXML private TextField addNewCustomFieldText;
     @FXML private TableView<FieldViewModel> fields;
     @FXML private TableColumn<FieldViewModel, String> fieldNameColumn;
     @FXML private TableColumn<FieldViewModel, Boolean> fieldTypeColumn;
     @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
     @FXML private TableColumn<FieldViewModel, Boolean> fieldTypeMultilineColumn;
-    @FXML private SearchableComboBox<Field> addNewField;
+    @FXML private TextField addNewField;
     @FXML private Button addNewEntryTypeButton;
     @FXML private Button addNewFieldButton;
-    @FXML private Button addNewCustomFieldButton;
 
     @Inject private StateManager stateManager;
 
@@ -89,15 +91,13 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         setupFieldsTable();
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
-        addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
+        addNewFieldButton.disableProperty().bind(viewModel.customFieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
 
-        viewModel.newCustomFieldToAddProperty().bindBidirectional(addNewCustomFieldText.textProperty());
-        addNewCustomFieldButton.disableProperty().bind(viewModel.customFieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
+        viewModel.newCustomFieldToAddProperty().bindBidirectional(addNewField.textProperty());
 
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.entryTypeValidationStatus(), addNewEntryType, true);
             visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);
-            visualizer.initVisualization(viewModel.customFieldValidationStatus(), addNewCustomFieldText, true);
         });
     }
 
@@ -203,12 +203,12 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 .setOnDragExited(this::handleOnDragExited)
                 .install(fields);
 
-        addNewField.setItems(viewModel.fieldsForAdding());
-        addNewField.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
-
-        viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
-        // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
-        // since the enabled/disabled state of addNewFieldButton won't update otherwise
+        TextFields.bindAutoCompletion(
+                addNewField,
+                viewModel.fieldsForAdding().stream()
+                         .map(Field::getName)
+                         .collect(Collectors.toList())
+        );
     }
 
     private void makeRotatedColumnHeader(TableColumn<?, ?> column, String text) {
@@ -267,11 +267,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         EntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();
         this.entryTypesTable.getSelectionModel().select(newlyAdded);
         this.entryTypesTable.scrollTo(newlyAdded);
-    }
-
-    @FXML
-    void addNewField() {
-        viewModel.addNewField();
     }
 
     @FXML
