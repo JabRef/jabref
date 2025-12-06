@@ -130,4 +130,3 @@ This section contains an analysis of ProductMap files. Each file has a link to i
 
 For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
 
-<!-- markdownlint-disable-file MD060 -->

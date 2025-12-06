@@ -5,7 +5,6 @@ import picocli.CommandLine.ParentCommand;
 
 @Command(
         name = "citationkeys",
-        description = "Manage citation key operations.",
         subcommands = {
                 GenerateCitationKeys.class
         }
