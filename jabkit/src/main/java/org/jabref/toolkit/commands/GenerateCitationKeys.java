@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -18,12 +19,14 @@ import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
-@Command(name = "generate-citation-keys", description = "Generate citation keys for entries in a .bib file.")
+@Command(
+        name = "generate", description = "Generate citation keys for entries in a .bib file."
+)
 class GenerateCitationKeys implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
 
     @ParentCommand
-    private JabKit argumentProcessor;
+    private CitationKeyCommands parentMid;
 
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
@@ -35,13 +38,22 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = "--output", description = "Output .bib file")
     private Path outputFile;
 
+    @Option(
+            names = "--pattern",
+            description = "Override the default citation key pattern (Example: [auth][year])"
+    )
+    private String defaultPattern;
+
     @Override
     public void run() {
+        JabKit parentTop = parentMid.getParent();
+
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
-                argumentProcessor.cliPreferences,
+                parentTop.cliPreferences,
                 sharedOptions.porcelain);
+
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
@@ -58,21 +70,37 @@ class GenerateCitationKeys implements Runnable {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
         }
 
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                databaseContext,
-                argumentProcessor.cliPreferences.getCitationKeyPatternPreferences());
+        var preferences = parentTop.cliPreferences.getCitationKeyPatternPreferences();
+
+        if (defaultPattern != null) {
+            preferences = new CitationKeyPatternPreferences(
+                    preferences.shouldTransliterateFieldsForCitationKey(),
+                    preferences.shouldAvoidOverwriteCiteKey(),
+                    preferences.shouldWarnBeforeOverwriteCiteKey(),
+                    preferences.shouldGenerateCiteKeysBeforeSaving(),
+                    preferences.getKeySuffix(),
+                    preferences.getKeyPatternRegex(),
+                    preferences.getKeyPatternReplacement(),
+                    preferences.getUnwantedCharacters(),
+                    preferences.getKeyPatterns(),
+                    defaultPattern,
+                    preferences.getKeywordDelimiter()
+            );
+        }
+
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences);
         for (BibEntry entry : databaseContext.getEntries()) {
             keyGenerator.generateAndSetKey(entry);
         }
 
         if (outputFile != null) {
             JabKit.saveDatabase(
-                    argumentProcessor.cliPreferences,
-                    argumentProcessor.entryTypesManager,
+                    parentTop.cliPreferences,
+                    parentTop.entryTypesManager,
                     parserResult.get().getDatabase(),
                     outputFile);
         } else {
-            JabKit.outputDatabaseContext(argumentProcessor.cliPreferences, parserResult.get().getDatabaseContext());
+            JabKit.outputDatabaseContext(parentTop.cliPreferences, parserResult.get().getDatabaseContext());
         }
     }
 }
