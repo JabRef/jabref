@@ -77,6 +77,10 @@ public class JabKit implements Runnable {
 
     @Override
     public void run() {
+        if (versionInfoRequested) {
+            System.out.println(new BuildInfo().version);
+            return;
+        }
         System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
     }
 
@@ -253,7 +257,7 @@ public class JabKit implements Runnable {
         @Option(names = {"-p", "--porcelain"}, description = "Enable script-friendly output")
         boolean porcelain;
 
-        @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
+        @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message")
         private boolean usageHelpRequested = true;
     }
 }

@@ -1,0 +1,35 @@
+name: Mark and close stale change-request PRs
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          exempt-pr-labels: "📌 Pinned,dev: no-bot-comments"
+
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+
+          only-pr-labels: "status: changes-required"
+          stale-pr-label: "status: changes-required"
+          remove-pr-stale-when-updated: false
+
+          days-before-pr-stale: 14
+          stale-pr-message: >
+            The requested changes were not addressed for 14 days.
+            Please follow-up in the next 7 days or your PR will be automatically closed.
+            You can check the [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for hints on the pull request process.
+
+          days-before-pr-close: 7
+          close-pr-message: >
+            This PR is being closed due to continued inactivity.
