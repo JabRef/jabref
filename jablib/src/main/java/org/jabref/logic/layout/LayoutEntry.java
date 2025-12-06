@@ -66,6 +66,7 @@ import org.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
 import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
 import org.jabref.logic.layout.format.NotFoundFormatter;
 import org.jabref.logic.layout.format.Number;
+import org.jabref.logic.layout.format.NumberMonthFormatter;
 import org.jabref.logic.layout.format.Ordinal;
 import org.jabref.logic.layout.format.RTFChars;
 import org.jabref.logic.layout.format.RemoveBrackets;
@@ -77,6 +78,7 @@ import org.jabref.logic.layout.format.ReplaceWithEscapedDoubleQuotes;
 import org.jabref.logic.layout.format.RisAuthors;
 import org.jabref.logic.layout.format.RisKeywords;
 import org.jabref.logic.layout.format.RisMonth;
+import org.jabref.logic.layout.format.SafeFileName;
 import org.jabref.logic.layout.format.ShortMonthFormatter;
 import org.jabref.logic.layout.format.ToLowerCase;
 import org.jabref.logic.layout.format.ToUpperCase;
@@ -565,6 +567,10 @@ class LayoutEntry {
                     new ReplaceWithEscapedDoubleQuotes();
             case "HayagrivaType" ->
                     new HayagrivaType();
+            case "NumberMonth" ->
+                    new NumberMonthFormatter();
+            case "SafeFileName" ->
+                    new SafeFileName();
             default ->
                     null;
         };
