@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Worker;
@@ -85,6 +88,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
     private String layoutText;
+    private final ReadOnlyDoubleWrapper contentHeight = new ReadOnlyDoubleWrapper(0);
+    private final ReadOnlyDoubleWrapper contentWidth = new ReadOnlyDoubleWrapper(0);
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
@@ -105,8 +110,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
 
-        setFitToHeight(true);
-        setFitToWidth(true);
+        setFitToHeight(false);
+        setFitToWidth(false);
+
+        setHbarPolicy(ScrollBarPolicy.NEVER);
+        setVbarPolicy(ScrollBarPolicy.NEVER);
         previewView = WebViewStore.get();
         setContent(previewView);
 
@@ -144,7 +152,55 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     evt.preventDefault();
                 }, false);
             }
+
+            try {
+                Object heightObj = previewView.getEngine().executeScript("document.getElementById('content').scrollHeight || document.body.scrollHeight");
+                Object widthObj = previewView.getEngine().executeScript("document.getElementById('content').scrollWidth || document.body.scrollWidth");
+
+                Double height = null;
+                if (heightObj instanceof java.lang.Number heightNum) {
+                    height = heightNum.doubleValue();
+                }
+
+                Double width = null;
+                if (widthObj instanceof java.lang.Number widthNum) {
+                    width = widthNum.doubleValue();
+                }
+
+                // Use a single runLater to update both properties at once. We store the
+                // measured values as Optionals to make the intent explicit.
+                Optional<Double> optHeight = Optional.ofNullable(height);
+                Optional<Double> optWidth = Optional.ofNullable(width);
+
+                javafx.application.Platform.runLater(() -> {
+                    optHeight.ifPresent(measuredHeight -> {
+                        contentHeight.set(measuredHeight);
+                        // small padding so the rendered content is not clipped at edges
+                        this.setPrefHeight(measuredHeight + 8);
+                    });
+                    optWidth.ifPresent(measuredWidth -> {
+                        contentWidth.set(measuredWidth);
+                        this.setPrefWidth(measuredWidth + 8);
+                    });
+                });
+
+                setHvalue(0);
+            } catch (NullPointerException e) {
+                LOGGER.debug("Null value encountered while computing preview content size", e);
+            } catch (ClassCastException e) {
+                LOGGER.debug("Unexpected type returned from JavaScript while computing preview content size", e);
+            } catch (IllegalStateException e) {
+                LOGGER.debug("JavaFX thread not ready while computing preview content size", e);
+            }
         });
+    }
+
+    public ReadOnlyDoubleProperty contentHeightProperty() {
+        return contentHeight.getReadOnlyProperty();
+    }
+
+    public ReadOnlyDoubleProperty contentWidthProperty() {
+        return contentWidth.getReadOnlyProperty();
     }
 
     public void setLayout(PreviewLayout newLayout) {

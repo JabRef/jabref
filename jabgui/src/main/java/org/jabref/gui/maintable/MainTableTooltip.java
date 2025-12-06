@@ -12,8 +12,11 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public class MainTableTooltip extends Tooltip {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class MainTableTooltip extends Tooltip {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableTooltip.class);
     private final PreviewViewer preview;
     private final GuiPreferences preferences;
     private final VBox tooltipContent = new VBox();
@@ -22,11 +25,49 @@ public class MainTableTooltip extends Tooltip {
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        this.tooltipContent.getChildren().addAll(fieldValueLabel, preview);
+
+        fieldValueLabel.setWrapText(true);
+        fieldValueLabel.setMaxWidth(Double.MAX_VALUE);
+
+        tooltipContent.getChildren().addAll(fieldValueLabel, preview);
+        tooltipContent.setSpacing(5);
+
+        this.setMaxWidth(500);
+        this.setWrapText(true);
+
+        final double PREVIEW_WIDTH_PADDING = 16.0;
+        final double PREVIEW_HEIGHT_PADDING = 8.0;  // Padding to avoid bottom clipping of the preview
+        final double MIN_TOOLTIP_WIDTH = 200.0; // Minimum width of the tooltip to keep layout stable even with small content
+
+        preview.contentHeightProperty().addListener((_, _, val) -> {
+            double contentHeight = val == null ? 0 : val.doubleValue();
+            if (contentHeight <= 0) {
+                LOGGER.debug("contentHeightProperty emitted non-positive value: {}", contentHeight);
+                return;
+            }
+
+            preview.setPrefHeight(contentHeight + PREVIEW_HEIGHT_PADDING);
+        });
+
+        preview.contentWidthProperty().addListener((_, _, val) -> {
+            double contentWidth = val == null ? 0 : val.doubleValue();
+            if (contentWidth <= 0) {
+                LOGGER.debug("contentWidthProperty emitted non-positive value: {}", contentWidth);
+                return;
+            }
+
+            double desired = Math.max(contentWidth + PREVIEW_WIDTH_PADDING, MIN_TOOLTIP_WIDTH);
+
+            // We set a very large max width so that JavaFX does not artificially clamp the tooltip.
+            // The effective width is still limited by the window and screen bounds.
+            this.setMaxWidth(Double.MAX_VALUE);
+            this.setPrefWidth(desired);
+        });
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
-        fieldValueLabel.setText(fieldValue + "\n");
+        fieldValueLabel.setText(fieldValue);
+
         if (preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setDatabaseContext(databaseContext);
