@@ -36,7 +36,7 @@ public class AcademicPagesExporter extends Exporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AcademicPagesExporter.class);
 
-    private final String lfFileName;
+    private final String layoutFileFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
     private final SelfContainedSaveOrder saveOrder;
@@ -45,22 +45,22 @@ public class AcademicPagesExporter extends Exporter {
     private TemplateExporter academicPagesTemplate;
 
     /**
-     * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
+     * Initialize another export format based on templates stored in directory.
      *
      */
     public AcademicPagesExporter(LayoutFormatterPreferences layoutPreferences, SelfContainedSaveOrder saveOrder) {
         super("academicpages", "academic pages markdowns", StandardFileType.MARKDOWN);
-        this.lfFileName = "academicpages";
+        this.layoutFileFileName = "academicpages";
         this.directory = "academicpages";
         this.layoutPreferences = layoutPreferences;
         this.saveOrder = saveOrder;
         String consoleName = "academicpages";
-        this.academicPagesTemplate = new TemplateExporter("academicpages", consoleName, lfFileName, directory, StandardFileType.MARKDOWN, layoutPreferences, saveOrder);
+        this.academicPagesTemplate = new TemplateExporter("academicpages", consoleName, layoutFileFileName, directory, StandardFileType.MARKDOWN, layoutPreferences, saveOrder);
     }
 
     @Override
     public void export(@NonNull final BibDatabaseContext databaseContext,
-                       final Path exportDirectory,
+                       @NonNull final Path exportDirectory,
                        @NonNull List<BibEntry> entries) throws SaveException {
         export(databaseContext, exportDirectory, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
     }
@@ -76,7 +76,7 @@ public class AcademicPagesExporter extends Exporter {
      */
     @Override
     public void export(@NonNull final BibDatabaseContext databaseContext,
-                       final Path file,
+                       @NonNull final Path file,
                        @NonNull List<BibEntry> entries,
                        List<Path> fileDirForDataBase,
                        JournalAbbreviationRepository abbreviationRepository) throws SaveException {
@@ -93,16 +93,12 @@ public class AcademicPagesExporter extends Exporter {
             Files.createDirectories(exportDirectory);
 
             for (BibEntry entry : entries) {
-                if (entry.getType() == null) {
-                    LOGGER.warn("Skipping entry with no type: {}", entry);
-                    continue;
-                }
                 // formatting the title of each entry to match the file names format demanded by academic pages (applying the same formatters applied to the title in the academicpages.layout)
                 Path path = getPath(entry, exportDirectory);
 
-                List<BibEntry> individual_entry = new ArrayList<>();
-                individual_entry.add(entry);
-                academicPagesTemplate.export(databaseContext, path, individual_entry, fileDirForDataBase, abbreviationRepository);
+                List<BibEntry> individualEntry = new ArrayList<>();
+                individualEntry.add(entry);
+                academicPagesTemplate.export(databaseContext, path, individualEntry, fileDirForDataBase, abbreviationRepository);
             }
         } catch (IOException e) {
             throw new SaveException("could not export", e);
@@ -110,14 +106,14 @@ public class AcademicPagesExporter extends Exporter {
     }
 
     private static @NonNull Path getPath(BibEntry entry, Path exportDirectory) {
-        Replace replace_formatter = new Replace();
-        replace_formatter.setArgument(" ,-");
-        RemoveLatexCommandsFormatter commands_formatter = new RemoveLatexCommandsFormatter();
-        HTMLChars html_formatter = new HTMLChars();
+        Replace replaceFormatter = new Replace();
+        replaceFormatter.setArgument(" ,-");
+        RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
+        HTMLChars htmlFormatter = new HTMLChars();
         String title = entry.getTitle().get();
-        String formatted_title = commands_formatter.format(html_formatter.format(replace_formatter.format(title)));
-        SafeFileName safe_formatter = new SafeFileName(); // added custom formatter to remove all characters that are not allowed in filenames
-        String safe_title = safe_formatter.format(formatted_title);
-        return exportDirectory.resolve(safe_title + ".md");
+        String formattedTitle = commandsFormatter.format(htmlFormatter.format(replaceFormatter.format(title)));
+        SafeFileName safeFormatter = new SafeFileName();
+        String safeTitle = safeFormatter.format(formattedTitle);
+        return exportDirectory.resolve(safeTitle + ".md");
     }
 }
