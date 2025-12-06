@@ -20,25 +20,17 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A custom exporter to write multiple bib entries as AcademicPages Markdown format.
  */
 public class AcademicPagesExporter extends Exporter {
-
     private final String layoutFileFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
     private final SelfContainedSaveOrder saveOrder;
-<<<<<<< HEAD
-=======
-
-    private final Replace replaceFormatter = new Replace();
-    private final RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
-    private final HTMLChars htmlFormatter = new HTMLChars();
-    private final SafeFileName safeFormatter = new SafeFileName();
-
->>>>>>> 100fe95fd2e80d7e86a23d3ade55de7117501700
     private TemplateExporter academicPagesTemplate;
 
     /**
@@ -58,9 +50,8 @@ public class AcademicPagesExporter extends Exporter {
     @Override
     public void export(@NonNull final BibDatabaseContext databaseContext,
                        @NonNull final Path exportDirectory,
-                       @NonNull List<BibEntry> entries)
-        throws SaveException {
-        export(databaseContext, exportDirectory, entries, List.of(exportDirectory), JournalAbbreviationLoader.loadBuiltInRepository());
+                       @NonNull List<BibEntry> entries) throws SaveException {
+        export(databaseContext, exportDirectory, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 
     /**
@@ -77,8 +68,7 @@ public class AcademicPagesExporter extends Exporter {
                        @NonNull final Path file,
                        @NonNull List<BibEntry> entries,
                        List<Path> fileDirForDataBase,
-                       JournalAbbreviationRepository abbreviationRepository)
-        throws SaveException {
+                       JournalAbbreviationRepository abbreviationRepository) throws SaveException {
         if (entries.isEmpty()) { // Only export if entries exist
             return;
         }
@@ -104,23 +94,15 @@ public class AcademicPagesExporter extends Exporter {
         }
     }
 
-<<<<<<< HEAD
     private static @NonNull Path getPath(BibEntry entry, Path exportDirectory) {
         Replace replaceFormatter = new Replace();
         replaceFormatter.setArgument(" ,-"); // expects an expression that has the character to remove and the replacement character separated by a comma.
         RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
         HTMLChars htmlFormatter = new HTMLChars();
         String title = entry.getTitle().get();
-=======
-    private @NonNull Path getPath(BibEntry entry, Path exportDirectory) throws SaveException {
-
-        replaceFormatter.setArgument(" ,-"); // The replaceFormatter expects a "-" instead of " " hence the strange argument.
-
-        String title = entry.getTitle().orElseThrow(() -> new SaveException("Entry does not contain a title"));
->>>>>>> 100fe95fd2e80d7e86a23d3ade55de7117501700
         String formattedTitle = commandsFormatter.format(htmlFormatter.format(replaceFormatter.format(title)));
+        SafeFileName safeFormatter = new SafeFileName();
         String safeTitle = safeFormatter.format(formattedTitle);
-
         return exportDirectory.resolve(safeTitle + ".md");
     }
 }
