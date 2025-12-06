@@ -90,7 +90,7 @@ public class AiExporter {
                 role = "assistant";
                 content = aiMessage.text();
             } else {
-                // I ignored SystemMessage, ToolExecutionResultMessage and ErrorMessage as they are not part of the conversation exchange.
+                // I ignored SystemMessage, ToolExecutionResultMessage, ErrorMessage and ErrorMessage as they are not part of the conversation exchange.
                 continue;
             }
 
