@@ -52,6 +52,8 @@ public class AiExporter {
                 role = "AI";
                 content = aiMessage.text();
             } else {
+                // System messages and tool execution results are internal details
+                // and are hidden to keep the conversation readable for the user.
                 continue;
             }
             conversation.append("**").append(role).append(":**\n\n");
@@ -88,6 +90,7 @@ public class AiExporter {
                 role = "assistant";
                 content = aiMessage.text();
             } else {
+                // I ignored SystemMessage, ToolExecutionResultMessage and ErrorMessage as they are not part of the conversation exchange.
                 continue;
             }
 
