@@ -1,8 +1,10 @@
 package org.jabref.model.database;
 
+import org.jspecify.annotations.Nullable;
+
 public class KeyCollisionException extends RuntimeException {
 
-    private String id;
+    private @Nullable String id;
 
     public KeyCollisionException() {
         super();
@@ -21,7 +23,7 @@ public class KeyCollisionException extends RuntimeException {
         super(exception);
     }
 
-    public String getId() {
+    public @Nullable String getId() {
         return id;
     }
 }
