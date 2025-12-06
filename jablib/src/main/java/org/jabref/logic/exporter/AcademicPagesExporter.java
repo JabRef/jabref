@@ -20,29 +20,22 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A custom exporter to write multiple bib entries as AcademicPages Markdown format.
  */
 public class AcademicPagesExporter extends Exporter {
 
-    private static final String BLANK_LINE_PATTERN = "\\r\\n|\\n";
-    private static final String LAYOUT_PREFIX = "/resource/layout/";
-    private static final String LAYOUT_EXTENSION = ".layout";
-    private static final String FORMATTERS_EXTENSION = ".formatters";
-    private static final String BEGIN_INFIX = ".begin";
-    private static final String END_INFIX = ".end";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AcademicPagesExporter.class);
-
     private final String layoutFileFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
     private final SelfContainedSaveOrder saveOrder;
-    private boolean customExport;
-    private List<BibEntry> entries;
+
+    private final Replace replaceFormatter = new Replace();
+    private final RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
+    private final HTMLChars htmlFormatter = new HTMLChars();
+    private final SafeFileName safeFormatter = new SafeFileName();
+
     private TemplateExporter academicPagesTemplate;
 
     /**
@@ -108,15 +101,14 @@ public class AcademicPagesExporter extends Exporter {
         }
     }
 
-    private static @NonNull Path getPath(BibEntry entry, Path exportDirectory) throws SaveException {
-        Replace replaceFormatter = new Replace();
+    private @NonNull Path getPath(BibEntry entry, Path exportDirectory) throws SaveException {
+
         replaceFormatter.setArgument(" ,-"); // The replaceFormatter expects a "-" instead of " " hence the strange argument.
-        RemoveLatexCommandsFormatter commandsFormatter = new RemoveLatexCommandsFormatter();
-        HTMLChars htmlFormatter = new HTMLChars();
+
         String title = entry.getTitle().orElseThrow(() -> new SaveException("Entry does not contain a title"));
         String formattedTitle = commandsFormatter.format(htmlFormatter.format(replaceFormatter.format(title)));
-        SafeFileName safeFormatter = new SafeFileName();
         String safeTitle = safeFormatter.format(formattedTitle);
+
         return exportDirectory.resolve(safeTitle + ".md");
     }
 }
