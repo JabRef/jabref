@@ -64,6 +64,7 @@ import org.jabref.model.util.OptionalUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -391,7 +392,11 @@ public class ImportHandler {
         entries.forEach(keyGenerator::generateAndSetKey);
     }
 
-    public List<BibEntry> handleBibTeXData(String entries) {
+    public @NonNull List<@NonNull BibEntry> handleBibTeXData(@NonNull String entries) {
+        if (!entries.contains("@")) {
+            LOGGER.debug("Seems not to be BibTeX data: {}", entries);
+            return List.of();
+        }
         BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor);
         try {
             List<BibEntry> result = parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
@@ -399,7 +404,8 @@ public class ImportHandler {
             importStringConstantsWithDuplicateCheck(stringConstants);
             return result;
         } catch (ParseException ex) {
-            LOGGER.error("Could not paste", ex);
+            LOGGER.info("Data could not be interpreted as Bib(La)TeX", ex);
+            dialogService.notify(Localization.lang("Failed to parse Bib(La)TeX: %0", ex.getLocalizedMessage()));
             return List.of();
         }
     }
