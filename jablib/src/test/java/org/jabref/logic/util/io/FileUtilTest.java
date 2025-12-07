@@ -229,7 +229,7 @@ class FileUtilTest {
     }
 
     @ParameterizedTest
-    // formatter:off
+    // @formatter:off
     @CsvSource(textBlock = """
                test.file, www.example.com/test.file
                test.file, http://www.example.com/test.file
@@ -247,7 +247,7 @@ class FileUtilTest {
                test.file, https://www.example.com/path/to/file.pdf?search=for+a+file
                blank, https://www.example.com/path/to/blank?search=for+a+file
         """)
-    // formatter:on
+    // @formatter:on
     void getFileNameFromUrlsCorrectly(String file, String url) {
         assertEquals(file, FileUtil.getFileNameFromUrl(url).orElse("file.pdf"), "from '" + url + "'");
     }
