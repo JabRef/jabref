@@ -88,9 +88,7 @@ public class AcademicPagesExporter extends Exporter {
                 // formatting the title of each entry to match the file names format demanded by academic pages (applying the same formatters applied to the title in the academicpages.layout)
                 Path path = getPath(entry, exportDirectory);
 
-                List<BibEntry> individualEntry = new ArrayList<>();
-                individualEntry.add(entry);
-                academicPagesTemplate.export(databaseContext, path, individualEntry, fileDirForDataBase, abbreviationRepository);
+                academicPagesTemplate.export(databaseContext, path, List.of(entry), fileDirForDataBase, abbreviationRepository);
             }
         } catch (IOException e) {
             throw new SaveException("could not export", e);
