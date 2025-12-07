@@ -39,7 +39,7 @@ public class LinkedFile implements Serializable {
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
-    
+
     private static final String pathDelimiter = System.getProperty("file.separator");
 
     // We have to mark these properties as transient because they can't be serialized directly
@@ -238,7 +238,7 @@ public class LinkedFile implements Serializable {
         } else if (pathDelimiter != null) {
             int slash = linkedName.lastIndexOf(pathDelimiter);
             if (slash >= 0) {
-                return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash+1)));
+                return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash + 1)));
             } else {
                 return Optional.empty();
             }
