@@ -120,7 +120,7 @@ public class LinkedFileHandler {
     private GetTargetPathResult getTargetPath(Path sourcePath, Path targetDirectory, boolean useSuggestedName) throws IOException {
         Path suggestedFileName;
         if (useSuggestedName) {
-            suggestedFileName = Path.of(FileUtil.getFileExtension(sourcePath).orElse("pdf"));
+            suggestedFileName = Path.of(getSuggestedFileName(FileUtil.getFileExtension(sourcePath).orElse("pdf")));
         } else {
             suggestedFileName = sourcePath.getFileName();
         }

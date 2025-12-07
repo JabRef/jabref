@@ -40,7 +40,7 @@ public class LinkedFile implements Serializable {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
 
-    private static final String pathDelimiter = System.getProperty("file.separator");
+    private static final String PATH_DELIM = System.getProperty("file.separator");
 
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
@@ -235,8 +235,8 @@ public class LinkedFile implements Serializable {
         String linkedName = link.get();
         if (isOnlineLink(linkedName)) {
             return FileUtil.getFileNameFromUrl(linkedName);
-        } else if (pathDelimiter != null) {
-            int slash = linkedName.lastIndexOf(pathDelimiter);
+        } else if (PATH_DELIM != null) {
+            int slash = linkedName.lastIndexOf(PATH_DELIM);
             if (slash >= 0) {
                 return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash + 1)));
             } else {
