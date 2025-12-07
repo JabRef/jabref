@@ -89,7 +89,8 @@ public class LspDiagnosticHandler {
         }
 
         if (clientHandler.getSettings().isConsistencyCheck()) {
-            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult, new BibEntryTypesManager()));
+            BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult, bibEntryTypesManager));
             LOGGER.debug("Cached consistency diagnostics for {}", uri);
         }
 
