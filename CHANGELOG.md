@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
 - We made the "Configure API key" option in the Web Search preferences tab searchable via preferences search. [#13929](https://github.com/JabRef/jabref/issues/13929)
 - We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
@@ -28,25 +29,33 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to enable auto-copying and adjusting of attached files when copy and pasting (Preferences → Linked files → Attached files) [#12267](https://github.com/JabRef/jabref/issues/12267)
 - We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377)
 - We added the generation of follow-up questions in AI chat. [#12243](https://github.com/JabRef/jabref/issues/12243)
+- We added support for getting bibliographic information based on the arXiv ID or the ISSN. [#14458](https://github.com/JabRef/jabref/pull/14458)
 - We added support for "Search Google Scholar" and "Search Semantic Scholar" to quickly search for a selected entry's title in Google Scholar or Semantic Scholar directly from the main table's context menu [#12268](https://github.com/JabRef/jabref/issues/12268)
+- We added support for `html` when parsing the arXiv identifiers. [#14451](https://github.com/JabRef/jabref/issues/14451)
+- We added the option to change the Git username and PAT in Network Preferences. [#14509](https://github.com/JabRef/jabref/pull/14509)
+- When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
 
 ### Changed
 
 - We replaced the standard ComboBox with a SearchableComboBox and added a free text field in custom Entry Types [#14082](https://github.com/JabRef/jabref/issues/14082)
+- In case of invalid BibTeX in the source tab, a notification is displayed (instead of an exception). [#14504](https://github.com/JabRef/jabref/pull/14504)
 - We separated the "Clean up entries" dialog into three tabs for clarity [#13819](https://github.com/JabRef/jabref/issues/13819)
 - `JabKit`: `--porcelain` does not output any logs to the console anymore. [#14244](https://github.com/JabRef/jabref/pull/14244)
 - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> now opens the terminal in the active library directory. [#14130](https://github.com/JabRef/jabref/issues/14130)
 - After importing, now all imported entries are marked. [#13535](https://github.com/JabRef/jabref/pull/13535)
 - The URL integrity check now checks the complete URL syntax. [#14370](https://github.com/JabRef/jabref/pull/14370)
-- We changed  fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
+- <kbd>Tab</kbd> in the last text field of a tab moves the focus to the next tab in the entry editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
+- We changed fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
 
 ### Fixed
 
 - We fixed an issue where pressing <kbd>ESC</kbd> in the preferences dialog would not always close the dialog. [#8888](https://github.com/JabRef/jabref/issues/8888)
 - We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional. [#14224](https://github.com/JabRef/jabref/pull/14224)
-- Correct fallback window height (786 → 768) in JabRefGUI. [#14295](https://github.com/JabRef/jabref/pull/14295)
+- We fixed the fallback window height (786 → 768) in JabRefGUI. [#14295](https://github.com/JabRef/jabref/pull/14295)
+- We fixed localization of the "New Entries" dialog. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We fixed an issue where keybindings could not be edited and saved. [#14237](https://github.com/JabRef/jabref/issues/14237)
+- We readded the missing gui commands for importing and exporting preferences. [#14492](https://github.com/JabRef/jabref/pull/14492)
 
 ### Removed
 

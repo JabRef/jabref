@@ -32,7 +32,6 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
 
-
     api(platform("org.glassfish.grizzly:grizzly-bom:4.0.2"))
     api("org.glassfish.grizzly:grizzly-framework")
     api("org.glassfish.grizzly:grizzly-http-server")
@@ -111,7 +110,7 @@ dependencies.constraints {
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.17.6")
+    api("net.bytebuddy:byte-buddy:1.18.2")
     api("net.harawata:appdirs:1.4.0")
     api("net.java.dev.jna:jna-jpms:5.18.1")
     api("net.java.dev.jna:jna-platform:5.18.1")

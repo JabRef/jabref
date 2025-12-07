@@ -166,7 +166,7 @@ public class JabRefGUI extends Application {
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
-        gitHandlerRegistry = new GitHandlerRegistry();
+        gitHandlerRegistry = new GitHandlerRegistry(preferences.getGitPreferences());
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
@@ -438,7 +438,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.enableHttpServer()) {
-            httpServerManager.start(stateManager, remotePreferences.getHttpServerUri());
+            httpServerManager.start(preferences, stateManager, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.enableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
