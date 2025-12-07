@@ -92,8 +92,8 @@ class BibEntryTypesManagerTest {
                                                                                      .collect(Collectors.toSet());
 
         Set<EntryType> bibtexTypes = entryTypesManager.getAllTypes(BibDatabaseMode.BIBTEX).stream()
-                                                       .map(BibEntryType::getType)
-                                                       .collect(Collectors.toSet());
+                                                      .map(BibEntryType::getType)
+                                                      .collect(Collectors.toSet());
 
         for (EntryType nonStandardType : nonStandardTypes) {
             assertFalse(bibtexTypes.contains(nonStandardType),
