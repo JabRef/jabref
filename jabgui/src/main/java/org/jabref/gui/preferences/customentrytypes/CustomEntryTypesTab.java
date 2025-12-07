@@ -88,13 +88,13 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         setupFieldsTable();
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
-        addNewFieldButton.disableProperty().bind(viewModel.customFieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
+        addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
 
-        viewModel.newCustomFieldToAddProperty().bindBidirectional(addNewField.textProperty());
+        viewModel.newFieldToAddProperty().bindBidirectional(addNewField.textProperty());
 
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.entryTypeValidationStatus(), addNewEntryType, true);
-            visualizer.initVisualization(viewModel.customFieldValidationStatus(), addNewField, true);
+            visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);
         });
     }
 
@@ -268,7 +268,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void addNewCustomField() {
-        viewModel.addNewCustomField();
+        viewModel.addNewField();
     }
 
     @FXML
