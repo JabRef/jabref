@@ -14,6 +14,7 @@ import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.model.PushResult;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -128,7 +129,10 @@ class GitSyncServiceTest {
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         gitConflictResolverStrategy = mock(GitConflictResolverStrategy.class);
-        gitHandlerRegistry = new GitHandlerRegistry();
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getUsername()).thenReturn("");
+        when(gitPreferences.getPat()).thenReturn("");
+        gitHandlerRegistry = new GitHandlerRegistry(gitPreferences);
 
         // create fake remote repo
         remoteDir = tempDir.resolve("remote.git");

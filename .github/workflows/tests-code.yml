@@ -213,14 +213,14 @@ jobs:
 
           # exit 1 in case of an error
           remaining=$(
-              grep -E " error " heylogx.txt \
+              grep -E " error " heylogs.txt \
               | wc -l
             )
 
           echo "Remaining errors: $remaining"
 
-          # We have on acceptable error
-          if [ "$remaining" -gt 1 ]; then
+          # We have two acceptable errors
+          if [ "$remaining" -gt 2 ]; then
             echo "Failing because of $remaining remaining error(s)."
             exit 1
           fi

@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.io.GitRevisionLocator;
+import org.jabref.logic.git.preferences.GitPreferences;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -71,8 +72,8 @@ public class GitStatusChecker {
         }
     }
 
-    public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo) {
-        return GitHandler.fromAnyPath(anyPathInsideRepo)
+    public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo, GitPreferences gitPreferences) {
+        return GitHandler.fromAnyPath(anyPathInsideRepo, gitPreferences)
                          .map(GitStatusChecker::checkStatus)
                          .orElse(new GitStatusSnapshot(
                                  !GitStatusSnapshot.TRACKING,
