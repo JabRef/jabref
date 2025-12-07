@@ -126,6 +126,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
     private boolean backOrForwardNavigationActionTriggered = false;
+    private boolean bulkImportInProgress = false;
 
     private BibDatabaseContext bibDatabaseContext;
 
@@ -239,7 +240,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                this::startBulkImport,
+                this::endBulkImport);
 
         setupMainPanel();
         setupAutoCompletion();
@@ -825,14 +828,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        importHandler.importCleanedEntries(null, entries);
-        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-        markBaseChanged();
-        stateManager.setSelectedEntries(entries);
-        if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-            showAndEdit(entries.getFirst());
-        } else {
-            clearAndSelect(entries.getFirst());
+        startBulkImport();
+        try {
+            importHandler.importCleanedEntries(null, entries);
+            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+            markBaseChanged();
+            stateManager.setSelectedEntries(entries);
+            if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+                showAndEdit(entries.getFirst());
+            } else {
+                clearAndSelect(entries.getFirst());
+            }
+        } finally {
+            endBulkImport();
         }
     }
 
@@ -1025,6 +1033,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
+        // skip history updates if this is from a bulk import operation
+        if (bulkImportInProgress) {
+            return;
+        }
+
         navigationHistory.add(entry);
         updateNavigationState();
     }
@@ -1036,6 +1049,22 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     public void updateNavigationState() {
         canGoBackProperty.set(canGoBack());
         canGoForwardProperty.set(canGoForward());
+    }
+
+    /**
+     * Marks the start of a bulk import operation.
+     * During bulk import, selection changes will not be added to navigation history.
+     */
+    public void startBulkImport() {
+        bulkImportInProgress = true;
+    }
+
+    /**
+     * Marks the end of a bulk import operation.
+     * Normal navigation history tracking resumes after this call.
+     */
+    public void endBulkImport() {
+        bulkImportInProgress = false;
     }
 
     /**
