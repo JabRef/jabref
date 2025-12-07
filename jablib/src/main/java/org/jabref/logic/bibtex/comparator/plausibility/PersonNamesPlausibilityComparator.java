@@ -4,7 +4,6 @@ import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.model.entry.AuthorList;
 
 public class PersonNamesPlausibilityComparator implements FieldValuePlausibilityComparator {
-
     @Override
     public ComparisonResult compare(String left, String right) {
 
