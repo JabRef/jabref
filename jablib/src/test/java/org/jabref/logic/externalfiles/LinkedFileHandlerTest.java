@@ -81,9 +81,9 @@ class LinkedFileHandlerTest {
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
 
         if (extension.isEmpty()) {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension).orElse("file" + "." + extension));
+            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
         } else {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName().orElse("file"));
+            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
         }
     }
 
