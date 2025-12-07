@@ -32,17 +32,6 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.ADDENDUM, StandardField.PUBSTATE)
             .build();
 
-    private static final BibEntryType MISC = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Misc)
-            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)
-            .withImportantFields(
-                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
-                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
-            .withDetailFields(StandardField.LANGUAGE,
-                    StandardField.TYPE, StandardField.VERSION, StandardField.NOTE, StandardField.ORGANIZATION,
-                    StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE)
-            .build();
-
     private static final BibEntryType BOOK = new BibEntryTypeBuilder()
             .withType(StandardEntryType.Book)
             .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)
@@ -183,6 +172,17 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.TYPE, StandardField.SERIES, StandardField.NUMBER, StandardField.VERSION, StandardField.NOTE,
                     StandardField.ORGANIZATION, StandardField.LOCATION,
                     StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE)
+            .build();
+
+    private static final BibEntryType MISC = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.Misc)
+            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)
+            .withImportantFields(
+                    StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.HOWPUBLISHED,
+                    StandardField.LOCATION, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.URL, StandardField.URLDATE)
+            .withDetailFields(StandardField.ADDENDUM,
+                    StandardField.LANGUAGE, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.PAGETOTAL,
+                    StandardField.PUBSTATE, StandardField.TYPE, StandardField.VERSION)
             .build();
 
     private static final BibEntryType ONLINE = new BibEntryTypeBuilder()
