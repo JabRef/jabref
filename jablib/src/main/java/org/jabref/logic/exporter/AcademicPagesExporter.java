@@ -55,7 +55,7 @@ public class AcademicPagesExporter extends Exporter {
     public void export(@NonNull final BibDatabaseContext databaseContext,
                        @NonNull final Path exportDirectory,
                        @NonNull List<BibEntry> entries) throws SaveException {
-        export(databaseContext, exportDirectory, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
+        export(databaseContext, exportDirectory, entries, List.of(exportDirectory), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 
     /**
@@ -98,9 +98,9 @@ public class AcademicPagesExporter extends Exporter {
         }
     }
 
-    private @NonNull Path getPath(BibEntry entry, Path exportDirectory) {
+    private @NonNull Path getPath(BibEntry entry, Path exportDirectory) throws SaveException {
         replaceFormatter.setArgument(" ,-"); // expects an expression that has the character to remove and the replacement character separated by a comma.
-        String title = entry.getTitle().get();
+        String title = entry.getTitle().orElseThrow(() -> new SaveException("Entry is missing a title"));
         String formattedTitle = commandsFormatter.format(htmlFormatter.format(replaceFormatter.format(title)));
         String safeTitle = safeFormatter.format(formattedTitle);
         return exportDirectory.resolve(safeTitle + ".md");
