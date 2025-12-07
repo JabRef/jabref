@@ -83,7 +83,7 @@ class LinkedFileHandlerTest {
         if (extension.isEmpty()) {
             assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension).orElse("file" + "." + extension));
         } else {
-            assertEquals(, expectedFileName, linkedFileHandler.getSuggestedFileName().orElse("file"));
+            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName().orElse("file"));
         }
     }
 
@@ -114,7 +114,7 @@ class LinkedFileHandlerTest {
         if (extension.isEmpty()) {
             assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension).orElse("file" + "." + extension));
         } else {
-            assertEquals(, expectedFileName, linkedFileHandler.getSuggestedFileName().orElse("file"));
+            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName().orElse("file"));
         }
     }
 }
