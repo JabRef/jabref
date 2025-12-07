@@ -2,17 +2,15 @@ package org.jabref.logic.bibtex.comparator.plausibility;
 
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.model.entry.AuthorList;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class PersonNamesPlausibilityComparator implements FieldValuePlausibilityComparator {
     @Override
     public ComparisonResult compare(String left, String right) {
 
-        if (left == null || right == null) {
-            return ComparisonResult.UNDETERMINED;
-        }
-
-        var leftAuthors = AuthorList.parse(left);
-        var rightAuthors = AuthorList.parse(right);
+        AuthorList leftAuthors = AuthorList.parse(left);
+        AuthorList rightAuthors = AuthorList.parse(right);
 
         int leftCount = leftAuthors.getNumberOfAuthors();
         int rightCount = rightAuthors.getNumberOfAuthors();
