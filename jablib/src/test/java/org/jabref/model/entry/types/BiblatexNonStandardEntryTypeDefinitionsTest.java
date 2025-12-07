@@ -4,14 +4,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
-import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BiblatexNonStandardEntryTypeDefinitionsTest {
 
@@ -32,7 +29,7 @@ class BiblatexNonStandardEntryTypeDefinitionsTest {
         );
 
         Set<EntryType> actualTypes = BiblatexNonStandardEntryTypeDefinitions.ALL.stream()
-                                                                                .map(BibEntryType::getType)
+                                                                                .<EntryType>map(BibEntryType::getType)
                                                                                 .collect(Collectors.toSet());
 
         assertEquals(expectedTypes, actualTypes);
@@ -40,7 +37,7 @@ class BiblatexNonStandardEntryTypeDefinitionsTest {
 
     @Test
     void nonStandardTypesHaveSameFieldsAsMisc() {
-        BibEntryType miscType = BiblatexEntryTypeDefinitions.MISC;
+        BibEntryType miscType = BiblatexEntryTypeDefinitions.getMisc();
 
         for (BibEntryType nonStandardType : BiblatexNonStandardEntryTypeDefinitions.ALL) {
             // Check required fields

@@ -32,7 +32,7 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.ADDENDUM, StandardField.PUBSTATE)
             .build();
 
-    static final BibEntryType MISC = new BibEntryTypeBuilder()
+    private static final BibEntryType MISC = new BibEntryTypeBuilder()
             .withType(StandardEntryType.Misc)
             .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)
             .withImportantFields(
@@ -413,4 +413,12 @@ public class BiblatexEntryTypeDefinitions {
             THESIS, UNPUBLISHED, CONFERENCE, ELECTRONIC, MASTERSTHESIS, PHDTHESIS, TECHREPORT, WWW, SOFTWARE, DATASET);
 
     public static final List<BibEntryType> RECOMMENDED = Arrays.asList(ARTICLE, BOOK, INPROCEEDINGS, REPORT, MISC);
+
+    /**
+     * Returns the MISC entry type for use by other classes in the same package.
+     * This getter is provided to maintain package-private access while satisfying Checkstyle's DeclarationOrder rule.
+     */
+    static BibEntryType getMisc() {
+        return MISC;
+    }
 }
