@@ -97,7 +97,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.entryTypeValidationStatus(), addNewEntryType, true);
-            visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);
+            visualizer.initVisualization(viewModel.customFieldValidationStatus(), addNewField, true);
         });
     }
 
