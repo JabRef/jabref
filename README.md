@@ -122,10 +122,12 @@ JabRef development is powered by YourKit Java Profiler
 
 This section contains an analysis of ProductMap files. Each file has a link to its source.
 
-| Github File | ProductMap File URL |
+| GitHub File | ProductMap File URL |
 |-------------|---------------------|
 | [src/main/java/org/jabref/gui/maintable/MainTableTooltip.java](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java) | [View File](https://product-map.ai/app/public?url=https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java ) |
 
 ### ProductMap - Contact Us
 
 For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
+
+<!-- markdownlint-disable-file MD060 -->

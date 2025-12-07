@@ -13,7 +13,7 @@ val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
 
-val lucene = "10.3.1"
+val lucene = "10.3.2"
 val pdfbox = "3.0.6"
 
 dependencies {
@@ -31,7 +31,6 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter-params")
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
-
 
     api(platform("org.glassfish.grizzly:grizzly-bom:4.0.2"))
     api("org.glassfish.grizzly:grizzly-framework")
@@ -59,6 +58,8 @@ dependencies.constraints {
     api("org.openjfx:javafx-web:$javafx")
     // from JavaFX25 onwards
     api("org.openjfx:jdk-jsobject:$javafx")
+
+    api("cc.jilt:jilt:1.8.4")
 
     api("com.dlsc.gemsfx:gemsfx:3.6.2")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
@@ -109,7 +110,7 @@ dependencies.constraints {
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.17.6")
+    api("net.bytebuddy:byte-buddy:1.18.2")
     api("net.harawata:appdirs:1.4.0")
     api("net.java.dev.jna:jna-jpms:5.18.1")
     api("net.java.dev.jna:jna-platform:5.18.1")

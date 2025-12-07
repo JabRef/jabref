@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 
 import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.git.preferences.GitPreferences;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -22,16 +23,19 @@ import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SlrGitHandler extends GitHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlrGitHandler.class);
 
     /**
      * Initialize the handler for the given repository
      *
      * @param repositoryPath The root of the initialized git repository
      */
-    public SlrGitHandler(Path repositoryPath) {
-        super(repositoryPath);
+    public SlrGitHandler(Path repositoryPath, GitPreferences gitPreferences) {
+        super(repositoryPath, gitPreferences);
     }
 
     public void appendLatestSearchResultsOntoCurrentBranch(String patchMessage, String searchBranchName) throws IOException, GitAPIException {
@@ -150,7 +154,7 @@ public class SlrGitHandler extends GitHandler {
                 }
                 Files.writeString(path, prefix + patch.get(path) + currentContent, StandardCharsets.UTF_8);
             } catch (IOException e) {
-                LOGGER.error("Could not apply patch.");
+                LOGGER.error("Could not apply patch.", e);
             }
         });
     }

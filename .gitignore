@@ -28,6 +28,10 @@ structure101-settings.java.hsw
 # private data
 /buildres/jabref-cert-2016.p12
 
+# direnv support
+.envrc
+.direnv/
+
 # GitBook assets
 docs/book.pdf
 docs/_book/

@@ -126,9 +126,9 @@ public enum StandardField implements Field {
     VERSION("version"),
     VOLUME("volume", FieldProperty.NUMERIC),
     VOLUMES("volumes", FieldProperty.NUMERIC),
-    YEAR("year", FieldProperty.NUMERIC),
-    YEARDIVISION("yeardivision", FieldProperty.YEARDIVISION),
-    YEARFILED("yearfiled"),
+    YEAR("year", FieldProperty.NUMERIC, FieldProperty.YEAR),
+    YEARDIVISION("yeardivision"),
+    YEARFILED("yearfiled", FieldProperty.NUMERIC, FieldProperty.YEAR),
     MR_NUMBER("mrnumber"),
     ZBL_NUMBER("zbl"), // needed for fetcher
     XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),

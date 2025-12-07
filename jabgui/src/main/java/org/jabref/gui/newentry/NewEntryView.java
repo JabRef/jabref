@@ -25,10 +25,10 @@ import javafx.scene.layout.TilePane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
@@ -357,8 +357,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
-            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
-            // supported Bib(La)Tex source format.
+            // TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
+            // supported Bib(La)TeX source format.
             bibtexText.setText(clipboardText);
             bibtexText.selectAll();
         }
@@ -376,7 +376,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (generateButton != null) {
             generateButton.disableProperty().unbind();
             generateButton.setDisable(true);
-            generateButton.setText("Select");
+            generateButton.setText(Localization.lang("Select"));
         }
     }
 
@@ -395,7 +395,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(idErrorInvalidText.visibleProperty().or(idErrorInvalidFetcher.visibleProperty()));
-            generateButton.setText("Search");
+            generateButton.setText(Localization.lang("Search"));
         }
     }
 
@@ -414,7 +414,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(viewModel.interpretTextValidatorProperty().not());
-            generateButton.setText("Parse");
+            generateButton.setText(Localization.lang("Parse"));
         }
     }
 
@@ -433,7 +433,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(viewModel.bibtexTextValidatorProperty().not());
-            generateButton.setText("Create");
+            generateButton.setText(Localization.lang("Create"));
         }
     }
 
@@ -458,17 +458,17 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 // We do nothing here.
                 break;
             case NewEntryDialogTab.ENTER_IDENTIFIER:
-                generateButton.setText("Searching...");
+                generateButton.setText(Localization.lang("Searching..."));
                 viewModel.executeLookupIdentifier(idLookupGuess.isSelected());
                 switchLookupIdentifier();
                 break;
             case NewEntryDialogTab.INTERPRET_CITATIONS:
-                generateButton.setText("Parsing...");
+                generateButton.setText(Localization.lang("Parsing..."));
                 viewModel.executeInterpretCitations();
                 switchInterpretCitations();
                 break;
             case NewEntryDialogTab.SPECIFY_BIBTEX:
-                generateButton.setText("Parsing...");
+                generateButton.setText(Localization.lang("Parsing..."));
                 viewModel.executeSpecifyBibtex();
                 switchSpecifyBibtex();
                 break;

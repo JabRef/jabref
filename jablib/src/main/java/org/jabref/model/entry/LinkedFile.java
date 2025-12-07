@@ -28,10 +28,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Represents the link to an external file (e.g. associated PDF file).
- * This class is {@link Serializable} which is needed for drag and drop in gui
- */
+/// Represents the link to an external file (e.g. associated PDF file).
+/// This class is {@link Serializable} which is needed for drag and drop in gui
+/// The conversion from String ([org.jabref.model.entry.field.StandardField.FILE]) is done at [org.jabref.logic.importer.util.FileFieldParser#parse(String)]
 @AllowedToUseLogic("Uses FileUtil from logic")
 @NullMarked
 public class LinkedFile implements Serializable {

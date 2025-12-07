@@ -70,7 +70,7 @@ public class SourceTab extends EntryEditorTab {
     private static final String SEARCH_STYLE = "search";
     private final FieldPreferences fieldPreferences;
     private final UndoManager undoManager;
-    private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
+    private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
@@ -126,18 +126,20 @@ public class SourceTab extends EntryEditorTab {
 
         SearchQuery searchQuery = new SearchQuery(stateManager.searchQueryProperty().get());
         Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQuery);
-        searchTermsMap.forEach((optionalField, terms) -> {
-            Optional<String> searchPattern = Highlighter.buildSearchPattern(terms);
-            if (searchPattern.isEmpty()) {
-                return;
-            }
+        searchTermsMap.forEach(this::buildPatternAndHighlightField);
+    }
 
-            if (optionalField.isPresent()) {
-                highlightField(optionalField.get(), searchPattern.get());
-            } else {
-                fieldPositions.keySet().forEach(field -> highlightField(field, searchPattern.get()));
-            }
-        });
+    private void buildPatternAndHighlightField(Optional<Field> optionalField, List<String> terms) {
+        Highlighter.buildSearchPattern(terms).ifPresent(
+                searchPattern -> {
+                    if (optionalField.isPresent()) {
+                        highlightField(optionalField.get(), searchPattern);
+                    } else {
+                        // User did not specify any field, thus we need to go through all fields
+                        fieldPositions.keySet().forEach(field -> highlightField(field, searchPattern));
+                    }
+                }
+        );
     }
 
     private void highlightField(Field field, String searchPattern) {
@@ -155,21 +157,19 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
+    /// Method similar to [BibEntry#getStringRepresentation(BibEntry, BibDatabaseMode, BibEntryTypesManager, FieldPreferences)]. This method additionally updates [#fieldPositions].
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences) throws IOException {
-        StringWriter writer = new StringWriter();
-        BibWriter bibWriter = new BibWriter(writer, "\n"); // JavaFX works with LF only
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
-        BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
-        bibEntryWriter.write(entry, bibWriter, type, true);
-        fieldPositions = bibEntryWriter.getFieldPositions();
-        String sourceString = writer.toString();
-        writer.close();
-        return sourceString;
+        try (StringWriter writer = new StringWriter()) {
+            BibWriter bibWriter = new BibWriter(writer, "\n"); // JavaFX works with LF only
+            FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+            BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
+            bibEntryWriter.write(entry, bibWriter, type, true);
+            fieldPositions = bibEntryWriter.getFieldPositions();
+            return writer.toString();
+        }
     }
 
-    /* Work around for different input methods.
-     * https://github.com/FXMisc/RichTextFX/issues/146
-     */
+    /// Work around for different input methods. <https://github.com/FXMisc/RichTextFX/issues/146>
     private static class InputMethodRequestsObject implements InputMethodRequests {
 
         @Override
@@ -218,7 +218,7 @@ public class SourceTab extends EntryEditorTab {
         contextMenu.getStyleClass().add("context-menu");
         codeArea.setContextMenu(contextMenu);
 
-        sourceValidator.addRule(sourceIsValid);
+        sourceValidator.addRule(validationMessage);
 
         sourceValidator.getValidationStatus().getMessages().addListener((InvalidationListener) c -> {
             ValidationStatus sourceValidationStatus = sourceValidator.getValidationStatus();
@@ -232,7 +232,7 @@ public class SourceTab extends EntryEditorTab {
             }
         });
 
-        codeArea.focusedProperty().addListener((obs, oldValue, onFocus) -> {
+        codeArea.focusedProperty().addListener((_, _, onFocus) -> {
             if (!onFocus && (currentEntry != null)) {
                 storeSource(currentEntry, codeArea.textProperty().getValue());
             }
@@ -293,32 +293,41 @@ public class SourceTab extends EntryEditorTab {
             BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {
-                throw new IllegalStateException("More than one entry found.");
+                LOGGER.error("More than one entry found.");
+                // We use the error dialog as the notification is hidden
+                dialogService.showErrorDialogAndWait(Localization.lang("More than one entry found."));
+                return;
             }
 
             if (!database.hasEntries()) {
                 if (parserResult.hasWarnings()) {
-                    // put the warning into as exception text -> it will be displayed to the user
-                    throw new IllegalStateException(parserResult.warnings().getFirst());
+                    LOGGER.warn("Could not store entry", parserResult.warnings());
+                    String errors = parserResult.getErrorMessage();
+                    dialogService.showErrorDialogAndWait(errors);
+                    validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
+                    return;
                 } else {
-                    throw new IllegalStateException("No entries found.");
+                    LOGGER.warn("No entries found.");
+                    String errors = Localization.lang("No entries available");
+                    dialogService.showErrorDialogAndWait(errors);
+                    validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
+                    return;
                 }
             }
 
             if (parserResult.hasWarnings()) {
-                // put the warning into as exception text -> it will be displayed to the user
-                throw new IllegalStateException(parserResult.getErrorMessage());
+                LOGGER.warn("Failed to parse Bib(La)TeX", parserResult.warnings());
+                String errors = parserResult.getErrorMessage();
+                dialogService.showErrorDialogAndWait(errors);
+                validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
             }
 
             NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().getFirst();
-            String newKey = newEntry.getCitationKey().orElse(null);
-
-            if (newKey != null) {
-                outOfFocusEntry.setCitationKey(newKey);
-            } else {
-                outOfFocusEntry.clearCiteKey();
-            }
+            newEntry.getCitationKey()
+                    .ifPresentOrElse(
+                            outOfFocusEntry::setCitationKey,
+                            () -> outOfFocusEntry.clearCiteKey());
 
             // First, remove fields that the user has removed.
             for (Map.Entry<Field, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
@@ -353,9 +362,9 @@ public class SourceTab extends EntryEditorTab {
             compound.end();
             undoManager.addEdit(compound);
 
-            sourceIsValid.setValue(null);
-        } catch (InvalidFieldValueException | IllegalStateException | IOException ex) {
-            sourceIsValid.setValue(ValidationMessage.error(Localization.lang("Problem with parsing entry") + ": " + ex.getMessage()));
+            validationMessage.setValue(null);
+        } catch (InvalidFieldValueException | IOException ex) {
+            validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", ex.getMessage())));
             LOGGER.debug("Incorrect source", ex);
         }
     }
