@@ -334,7 +334,9 @@ public class NewEntryViewModel {
                     libraryTab.getUndoManager(),
                     stateManager,
                     dialogService,
-                    taskExecutor);
+                    taskExecutor,
+                    null,
+                    null);
             handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), result.get());
 
             executedSuccessfully.set(true);
@@ -420,7 +422,9 @@ public class NewEntryViewModel {
                     libraryTab.getUndoManager(),
                     stateManager,
                     dialogService,
-                    taskExecutor);
+                    taskExecutor,
+                    null,
+                    null);
             handler.importEntriesWithDuplicateCheck(null, result.get());
 
             executedSuccessfully.set(true);
@@ -505,7 +509,9 @@ public class NewEntryViewModel {
                     libraryTab.getUndoManager(),
                     stateManager,
                     dialogService,
-                    taskExecutor);
+                    taskExecutor,
+                    null,
+                    null);
             handler.importEntriesWithDuplicateCheck(null, result.get());
 
             executedSuccessfully.set(true);

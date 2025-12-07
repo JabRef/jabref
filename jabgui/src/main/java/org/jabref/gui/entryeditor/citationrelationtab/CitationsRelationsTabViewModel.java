@@ -83,7 +83,9 @@ public class CitationsRelationsTabViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                null,
+                null);
         CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
         boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
 

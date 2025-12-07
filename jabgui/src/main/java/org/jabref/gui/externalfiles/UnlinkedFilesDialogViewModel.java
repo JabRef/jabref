@@ -99,7 +99,9 @@ public class UnlinkedFilesDialogViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                null,
+                null);
 
         this.fileFilterList = FXCollections.observableArrayList(
                 new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()),

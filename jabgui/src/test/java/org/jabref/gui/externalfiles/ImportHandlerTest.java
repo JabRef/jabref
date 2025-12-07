@@ -72,7 +72,9 @@ class ImportHandlerTest {
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor());
+                new CurrentThreadTaskExecutor(),
+                null,
+                null);
 
         testEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Test2023")

@@ -85,6 +85,10 @@ public class ImportHandler {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
+    @Nullable
+    private final Runnable onBulkImportStart;
+    @Nullable
+    private final Runnable onBulkImportEnd;
 
     public ImportHandler(BibDatabaseContext targetBibDatabaseContext,
                          GuiPreferences preferences,
@@ -92,13 +96,17 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager,
                          DialogService dialogService,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         @Nullable Runnable onBulkImportStart,
+                         @Nullable Runnable onBulkImportEnd) {
         this.targetBibDatabaseContext = targetBibDatabaseContext;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.onBulkImportStart = onBulkImportStart;
+        this.onBulkImportEnd = onBulkImportEnd;
 
         this.filePreferences = preferences.getFilePreferences();
 
@@ -237,21 +245,31 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries) {
-        targetBibDatabaseContext.getDatabase().insertEntries(entries);
-        generateKeys(entries);
-        setAutomaticFields(entries);
-        addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
-        addToImportEntriesGroup(entries);
-
-        if (transferInformation != null) {
-            entries.stream().forEach(entry -> {
-                LinkedFileTransferHelper
-                        .adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry);
-            });
+        boolean isBulkImport = entries.size() > 1;
+        if (isBulkImport && onBulkImportStart != null) {
+            onBulkImportStart.run();
         }
+        try {
+            targetBibDatabaseContext.getDatabase().insertEntries(entries);
+            generateKeys(entries);
+            setAutomaticFields(entries);
+            addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
+            addToImportEntriesGroup(entries);
 
-        // TODO: Should only be done if NOT copied from other library
-        entries.stream().forEach(entry -> downloadLinkedFiles(entry));
+            if (transferInformation != null) {
+                entries.stream().forEach(entry -> {
+                    LinkedFileTransferHelper
+                            .adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry);
+                });
+            }
+
+            // TODO: Should only be done if NOT copied from other library
+            entries.stream().forEach(entry -> downloadLinkedFiles(entry));
+        } finally {
+            if (isBulkImport && onBulkImportEnd != null) {
+                onBulkImportEnd.run();
+            }
+        }
     }
 
     public void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry) {
@@ -478,21 +496,31 @@ public class ImportHandler {
     }
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
-        boolean firstEntry = true;
-        for (BibEntry entry : entriesToAdd) {
-            if (firstEntry) {
-                LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
-                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
-                firstEntry = false;
-                continue;
+        boolean isBulkImport = entriesToAdd.size() > 1;
+        if (isBulkImport && onBulkImportStart != null) {
+            onBulkImportStart.run();
+        }
+        try {
+            boolean firstEntry = true;
+            for (BibEntry entry : entriesToAdd) {
+                if (firstEntry) {
+                    LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
+                    importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
+                    firstEntry = false;
+                    continue;
+                }
+                if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+                    DuplicateResolverDialog.DuplicateResolverResult decision = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
+                    LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
+                    importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker);
+                } else {
+                    LOGGER.debug("not first entry, not pref flag, break will  be used");
+                    importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
+                }
             }
-            if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
-                DuplicateResolverDialog.DuplicateResolverResult decision = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
-                LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
-                importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker);
-            } else {
-                LOGGER.debug("not first entry, not pref flag, break will  be used");
-                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
+        } finally {
+            if (isBulkImport && onBulkImportEnd != null) {
+                onBulkImportEnd.run();
             }
         }
     }
