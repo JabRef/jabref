@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.query.BaseQueryNode;
 
+import kong.unirest.core.UnirestException;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +78,15 @@ public class UnpaywallFetcher implements SearchBasedFetcher, CustomizableKeyFetc
     }
 
     @Override
-    public @NonNull String getTestUrl() {
-        return getUrl("10.47397/tb/44-3/tb138kopp-jabref", "");
+    public boolean isValidKey(String apiKey) {
+        try {
+            URL testUrl = new URL(getUrl("10.47397/tb/44-3/tb138kopp-jabref", apiKey));
+            HttpURLConnection connection = (HttpURLConnection) testUrl.openConnection();
+            int statusCode = connection.getResponseCode();
+            return (statusCode >= 200) && (statusCode < 300);
+        } catch (IOException | UnirestException e) {
+            return false;
+        }
     }
 
     private static @NonNull String getUrl(String doi, String email) {
