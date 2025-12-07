@@ -39,7 +39,6 @@ public class AcademicPagesExporter extends Exporter {
 
     /**
      * Initialize another export format based on templates stored in directory.
-     *
      */
     public AcademicPagesExporter(LayoutFormatterPreferences layoutPreferences, SelfContainedSaveOrder saveOrder) {
         super("academicpages", "academic pages markdowns", StandardFileType.MARKDOWN);
