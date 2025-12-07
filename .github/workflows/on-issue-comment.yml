@@ -24,6 +24,13 @@ jobs:
           maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
           allow_self_assign_author: false
           assigned_comment: >
+            Thank you for your continued work JabRef.
+            You already know the basics and important links.
+            If not, [Contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) has it all.
+
+
+            Happy coding! 🚀
+          assigned_comment_newcomer: >
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 
 
