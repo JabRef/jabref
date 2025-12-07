@@ -40,6 +40,8 @@ public class LinkedFile implements Serializable {
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
+    
+    private static final String pathDelimiter = System.getProperty("file.separator");
 
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
@@ -230,21 +232,19 @@ public class LinkedFile implements Serializable {
      *
      * @return extracted file name
      */
-    public String getFileName() {
+    public Optional<String> getFileName() {
         String linkedName = link.get();
         if (isOnlineLink(linkedName)) {
-            return FileUtil.getFileNameFromUrl(linkedName).orElse("");
-        } else {
-            try {
-                Path pathname = Path.of(linkedName).getFileName();
-                if (pathname != null) {
-                    return pathname.toString();
-                } else {
-                    return "";
-                }
-            } catch (InvalidPathException ex) {
-                return "";
+            return FileUtil.getFileNameFromUrl(linkedName);
+        } else if (pathDelimiter != null) {
+            int slash = linkedName.lastIndexOf(pathDelimiter);
+            if (slash >= 0) {
+                return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash+1)));
+            } else {
+                return Optional.empty();
             }
+        } else {
+            return Optional.of(FileUtil.getValidFileName(linkedName));
         }
     }
 

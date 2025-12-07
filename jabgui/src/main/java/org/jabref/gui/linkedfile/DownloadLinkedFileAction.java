@@ -246,7 +246,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                     if (this.suggestedName.isEmpty()) {
                         Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
                         ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
-                        suggestedName = linkedFileHandler.getSuggestedFileName(Optional.of(externalFileType.getExtension()));
+                        suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
                     } else {
                         suggestedName = this.suggestedName;
                     }

@@ -120,7 +120,7 @@ public class LinkedFileHandler {
     private GetTargetPathResult getTargetPath(Path sourcePath, Path targetDirectory, boolean useSuggestedName) throws IOException {
         Path suggestedFileName;
         if (useSuggestedName) {
-            suggestedFileName = Path.of(getSuggestedFileName(FileUtil.getFileExtension(sourcePath)));
+            suggestedFileName = Path.of(FileUtil.getFileExtension(sourcePath).orElse("pdf"));
         } else {
             suggestedFileName = sourcePath.getFileName();
         }
@@ -236,7 +236,11 @@ public class LinkedFileHandler {
     }
 
     public String getSuggestedFileName() {
-        return getSuggestedFileName(Optional.empty());
+        String filename = linkedFile.getFileName().orElse("file");
+        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(FileUtil.getBaseName(filename));
+
+        // Cannot get extension from type because would need ExternalApplicationsPreferences, as type is stored as a localisation dependent string.
+        return FileUtil.getValidFileName(FileUtil.getFileExtension(filename).map(x -> targetFileName + "." + x).orElse(targetFileName));
     }
 
     /**
@@ -245,18 +249,11 @@ public class LinkedFileHandler {
      * @param extension The extension of the file. If empty, no extension is added.
      * @return the suggested filename, including extension
      */
-    public String getSuggestedFileName(Optional<String> extension) {
-        String filename = linkedFile.getFileName();
-        String basename = filename.isEmpty() ? "file" : FileUtil.getBaseName(filename);
+    public String getSuggestedFileName(String extension) {
+        String filename = linkedFile.getFileName().orElse("file");
+        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(FileUtil.getBaseName(linkedFile.getLink()));
 
-        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(basename);
-
-        // Cannot get extension from type because would need ExternalApplicationsPreferences, as type is stored as a localisation dependent string.
-        if (extension.isEmpty()) {
-            extension = FileUtil.getFileExtension(filename);
-        }
-
-        return FileUtil.getValidFileName(extension.map(x -> targetFileName + "." + x).orElse(targetFileName));
+        return FileUtil.getValidFileName(targetFileName + "." + extension);
     }
 
     /**

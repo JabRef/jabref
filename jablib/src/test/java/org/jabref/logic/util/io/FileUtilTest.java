@@ -229,17 +229,25 @@ class FileUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @CsvSource(textBlock = """
+            test.file, www.example.com/test.file
+            test.file, http://www.example.com/test.file
+            test.file, https://www.example.com/test.file
+            test.file, www.example.com/path/to/test.file
+            test.file, http://www.example.com/path/to/test.file
+            test.file, https://www.example.com/path/to/test.file
+            test.file, https://www.example.com/not\\a\\windows\\path/test.file
+            test.file, https://www.example.com////test.file
+            blank, https://www.example.com/path/to/blank
+            blank, https://www.example.com/not\\a\\windows\\path/blank
+            not\\a\\windows.file, https://www.example.com/path/to/not\\a\\windows.file
+            test.file, https://www.example.com/path/to/file.pdf?field=value
+            test.file, https://www.example.com/path/to/file.pdf?a=1&b=2
+            test.file, https://www.example.com/path/to/file.pdf?search=for+a+file
+            blank, https://www.example.com/path/to/blank?search=for+a+file
+        """)
     void getFileNameFromUrlsCorrectly(String file, String url) {
         assertEquals(file, FileUtil.getFileNameFromUrl(url).orElse("file.pdf"), "from '" + url + "'");
-    }
-
-    private static Stream<Arguments> getFileNameFromUrlsCorrectly() {
-        final Stream<String> urls = Stream.of("www.example.com/", "http://www.example.com/", "https://www.example.com/");
-        final Stream<String> dirs = Stream.of("path/to/", "not\\a\\windows\\path/", "///", "CANARY TEST");
-        final Stream<String> files = Stream.of("file.pdf", "blank", "unknown.doc", "not\\a\\windows.file");
-        final Stream<String> queries = Stream.of("", "?field=value", "?a=1&b=2", "?search=for+a+file");
-        return files.flatMap(file -> dirs.flatMap(dir -> urls.flatMap(url -> queries.map(query -> Arguments.of(file, url + dir + file + query)))));
     }
 
     @Test

@@ -78,9 +78,9 @@ public class FileUtil {
      * @return the extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
-        int dotPosition = fileName.lastIndexOf('.');
-        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
+        int dot = fileName.lastIndexOf('.');
+        if ((dot > 0) && (dot < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(dot + 1).trim().toLowerCase(Locale.ROOT));
         } else {
             return Optional.empty();
         }
@@ -99,7 +99,9 @@ public class FileUtil {
      * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(String fileNameWithExtension) {
-        return com.google.common.io.Files.getNameWithoutExtension(fileNameWithExtension);
+        int slash = Math.max(0, 1 + fileNameWithExtension.lastIndexOf(File.pathSeparatorChar));
+        int dot = Math.max(0, 1 + fileNameWithExtension.lastIndexOf('.'));
+        return slash < dot ? fileNameWithExtension.substring(slash, dot) : fileNameWithExtension.substring(slash);
     }
 
     /**
@@ -118,7 +120,7 @@ public class FileUtil {
      */
     public static Optional<String> getFileNameFromUrl(String link) {
         int slash = link.lastIndexOf('/');
-        slash = slash >= 0 ? slash + 1 : 0;
+        slash = (slash >= 0 ? slash + 1 : 0);
 
         int query = link.indexOf('?', slash);
         query = (query >= 0 ? query : link.length());
