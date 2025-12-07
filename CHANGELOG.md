@@ -42,6 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - After importing, now all imported entries are marked. [#13535](https://github.com/JabRef/jabref/pull/13535)
 - The URL integrity check now checks the complete URL syntax. [#14370](https://github.com/JabRef/jabref/pull/14370)
 - We changed fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
+- We improved the API key validation for web fetchers by replacing the rigid `getTestUrl()` with a more flexible `isValidKey(String apiKey)` method. This makes the key validation more reliable. [#14016](https://github.com/JabRef/jabref/issues/14016)
 
 ### Fixed
 
