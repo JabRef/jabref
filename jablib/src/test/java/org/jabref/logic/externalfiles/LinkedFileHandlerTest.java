@@ -80,8 +80,11 @@ class LinkedFileHandlerTest {
         final LinkedFile linkedFile = new LinkedFile("", link, "");
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
 
-        final String result = linkedFileHandler.getSuggestedFileName(extension.isEmpty() ? Optional.empty() : Optional.of(extension));
-        assertEquals(expectedFileName, result);
+        if (extension.isEmpty()) {
+            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension).orElse("file" + "." + extension));
+        } else {
+            assertEquals(, expectedFileName, linkedFileHandler.getSuggestedFileName().orElse("file"));
+        }
     }
 
     @ParameterizedTest(name = "{1} with {2} should be {0} with empty citation key")
@@ -108,7 +111,10 @@ class LinkedFileHandlerTest {
         final LinkedFile linkedFile = new LinkedFile("", link, "");
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
 
-        final String result = linkedFileHandler.getSuggestedFileName(extension.isEmpty() ? Optional.empty() : Optional.of(extension));
-        assertEquals(expectedFileName, result);
+        if (extension.isEmpty()) {
+            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension).orElse("file" + "." + extension));
+        } else {
+            assertEquals(, expectedFileName, linkedFileHandler.getSuggestedFileName().orElse("file"));
+        }
     }
 }

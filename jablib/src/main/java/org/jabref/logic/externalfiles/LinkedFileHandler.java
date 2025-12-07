@@ -235,23 +235,29 @@ public class LinkedFileHandler {
         return true;
     }
 
+    /**
+     * Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
+     * Uses file extension from original file.
+     *
+     * @return the suggested filename, including extension
+     */
     public String getSuggestedFileName() {
         String filename = linkedFile.getFileName().orElse("file");
         final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(FileUtil.getBaseName(filename));
 
-        // Cannot get extension from type because would need ExternalApplicationsPreferences, as type is stored as a localisation dependent string.
         return FileUtil.getValidFileName(FileUtil.getFileExtension(filename).map(x -> targetFileName + "." + x).orElse(targetFileName));
     }
 
     /**
      * Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
+     * Uses the provided file extension.
      *
-     * @param extension The extension of the file. If empty, no extension is added.
+     * @param extension The extension of the file.
      * @return the suggested filename, including extension
      */
     public String getSuggestedFileName(String extension) {
         String filename = linkedFile.getFileName().orElse("file");
-        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(FileUtil.getBaseName(linkedFile.getLink()));
+        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).orElse(FileUtil.getBaseName(filename));
 
         return FileUtil.getValidFileName(targetFileName + "." + extension);
     }
