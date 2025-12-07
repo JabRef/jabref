@@ -69,7 +69,7 @@ public class ChangeEntryTypeMenu {
             Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX);
             Collection<BibEntryType> standardTypes = allTypes.stream()
                                                              .filter(type -> !nonStandardEntryTypes.contains(type.getType()))
-                                                             .collect(Collectors.toList());
+                                                             .toList();
             items.addAll(fromEntryTypes(standardTypes, entries, undoManager));
 
             // Non-standard types
