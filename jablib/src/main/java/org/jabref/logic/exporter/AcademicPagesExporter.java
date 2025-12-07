@@ -72,7 +72,7 @@ public class AcademicPagesExporter extends Exporter {
                        @NonNull List<BibEntry> entries,
                        List<Path> fileDirForDataBase,
                        JournalAbbreviationRepository abbreviationRepository) throws SaveException {
-        if (entries.isEmpty()) { // Only export if entries exist
+        if (entries.isEmpty()) {
             return;
         }
         try {
