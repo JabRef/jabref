@@ -7,6 +7,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.model.chat.ChatModel;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.when;
 class LlmPlainCitationParserTest {
 
     @Test
-    void parsePlainCitation() {
+    void parsePlainCitation() throws FetcherException {
         // Given
         String input = "E. G. Santana Jr., G. Benjamin, M. Araujo, and H. Santos, \"Which Prompting Technique Should I Use? An Empirical Investigation of Prompting Techniques for Software Engineering Tasks\", arXiv:2506.05614, Jun. 2025.";
 
@@ -54,17 +55,17 @@ class LlmPlainCitationParserTest {
         LlmPlainCitationParser parser = new LlmPlainCitationParser(aiTemplatesService, importFormatPreferences, chatModel);
 
         // When
-        Optional<BibEntry> result;
-        try {
-            result = parser.parsePlainCitation(input);
-        } catch (FetcherException e) {
-            throw new RuntimeException(e);
-        }
+        Optional<BibEntry> result = parser.parsePlainCitation(input);
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("key")
+                .withField(StandardField.TITLE, "Which Prompting Technique Should I Use? An Empirical Investigation of Prompting Techniques for Software Engineering Tasks")
+                .withField(StandardField.AUTHOR, "Santana Jr., E. G. and Benjamin, G. and Araujo, M. and Santos, H.")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINT, "2506.05614")
+                .withField(StandardField.YEAR, "2025");
 
         // Then
-        BibEntry entry = result.orElseThrow();
-        // arXiv id should be moved from volume to eprint by EprintCleanup
-        assertEquals("2506.05614", entry.getField(StandardField.EPRINT).orElse(""));
-        assertEquals("", entry.getField(StandardField.VOLUME).orElse(""));
+        assertEquals(Optional.of(expected), result);
     }
 }
