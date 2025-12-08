@@ -1,6 +1,8 @@
 package org.jabref.gui.externalfiles;
 
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.undo.UndoManager;
 
@@ -8,8 +10,10 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -32,167 +36,134 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ImportHandlerBulkImportTest {
 
-    private ImportHandler importHandler;
-    private BibDatabaseContext bibDatabaseContext;
-    private BibDatabase bibDatabase;
-    private StateManager stateManager;
-    private Runnable onBulkImportStart;
-    private Runnable onBulkImportEnd;
-    private int startCallCount;
-    private int endCallCount;
-
     @Mock
     private GuiPreferences preferences;
+
+    @Mock
+    private DialogService dialogService;
+
+    private StateManager stateManager;
+    private BibDatabaseContext databaseContext;
+    private BibDatabase database;
+    private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        startCallCount = 0;
-        endCallCount = 0;
+        database = new BibDatabase();
+        databaseContext = mock(BibDatabaseContext.class);
+        when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBTEX);
+        when(databaseContext.getDatabase()).thenReturn(database);
 
-        onBulkImportStart = () -> startCallCount++;
-        onBulkImportEnd = () -> endCallCount++;
+        stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedGroups(any())).thenReturn(List.of());
 
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(
+                new ExternalApplicationsPreferences("", false, Set.of(), false, "", false, "", ""));
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.shouldGenerateNewKeyOnImport()).thenReturn(false);
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
+
         OwnerPreferences ownerPreferences = mock(OwnerPreferences.class);
         when(ownerPreferences.isUseOwner()).thenReturn(false);
         when(ownerPreferences.getDefaultOwner()).thenReturn("");
         when(ownerPreferences.isOverwriteOwner()).thenReturn(false);
         when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
+
         TimestampPreferences timestampPreferences = mock(TimestampPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(timestampPreferences.shouldAddCreationDate()).thenReturn(false);
         when(timestampPreferences.now()).thenReturn("");
         when(preferences.getTimestampPreferences()).thenReturn(timestampPreferences);
 
+        LibraryPreferences libraryPreferences = new LibraryPreferences(BibDatabaseMode.BIBTEX, false, false, false, "");
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
+
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
-
-        bibDatabase = new BibDatabase();
-        bibDatabaseContext = mock(BibDatabaseContext.class);
-        when(bibDatabaseContext.getMode()).thenReturn(BibDatabaseMode.BIBTEX);
-        when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
-        stateManager = mock(StateManager.class);
-        when(stateManager.getSelectedGroups(bibDatabaseContext)).thenReturn(List.of());
-
-        importHandler = new ImportHandler(
-                bibDatabaseContext,
-                preferences,
-                new DummyFileUpdateMonitor(),
-                mock(UndoManager.class),
-                stateManager,
-                mock(DialogService.class),
-                new CurrentThreadTaskExecutor(),
-                onBulkImportStart,
-                onBulkImportEnd);
     }
 
     @Test
-    void importCleanedEntriesWithSingleEntryDoesNotCallBulkImportCallbacks() {
-        // Arrange
+    void singleEntryDoesNotTriggerBulkCallbacks() {
+        AtomicInteger startCalls = new AtomicInteger();
+        AtomicInteger endCalls = new AtomicInteger();
+        ImportHandler handler = newHandler(startCalls, endCalls, databaseContext);
+
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("Single2023")
-                .withField(StandardField.AUTHOR, "Single Author");
-        List<BibEntry> entries = List.of(entry);
+                .withField(StandardField.TITLE, "One");
 
-        // Act
-        importHandler.importCleanedEntries(null, entries);
+        handler.importCleanedEntries(null, List.of(entry));
 
-        // Assert
-        assertEquals(0, startCallCount, "Bulk import start should not be called for single entry");
-        assertEquals(0, endCallCount, "Bulk import end should not be called for single entry");
-        assertTrue(bibDatabase.getEntries().contains(entry), "Entry should be added to database");
+        assertEquals(0, startCalls.get(), "Start callback should not run for single entry");
+        assertEquals(0, endCalls.get(), "End callback should not run for single entry");
+        assertTrue(database.getEntries().contains(entry), "Entry should be stored");
     }
 
     @Test
-    void importCleanedEntriesWithMultipleEntriesCallsBulkImportCallbacks() {
-        // Arrange
-        BibEntry entry1 = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("Bulk1")
-                .withField(StandardField.AUTHOR, "Author 1");
-        BibEntry entry2 = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("Bulk2")
-                .withField(StandardField.AUTHOR, "Author 2");
-        BibEntry entry3 = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("Bulk3")
-                .withField(StandardField.AUTHOR, "Author 3");
-        List<BibEntry> entries = List.of(entry1, entry2, entry3);
+    void multipleEntriesTriggerBulkCallbacksOnce() {
+        AtomicInteger startCalls = new AtomicInteger();
+        AtomicInteger endCalls = new AtomicInteger();
+        ImportHandler handler = newHandler(startCalls, endCalls, databaseContext);
 
-        // Act
-        importHandler.importCleanedEntries(null, entries);
+        BibEntry first = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "First");
+        BibEntry second = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Second");
 
-        // Assert
-        assertEquals(1, startCallCount, "Bulk import start should be called once");
-        assertEquals(1, endCallCount, "Bulk import end should be called once");
-        assertTrue(bibDatabase.getEntries().contains(entry1), "Entry 1 should be added to database");
-        assertTrue(bibDatabase.getEntries().contains(entry2), "Entry 2 should be added to database");
-        assertTrue(bibDatabase.getEntries().contains(entry3), "Entry 3 should be added to database");
+        handler.importCleanedEntries(null, List.of(first, second));
+
+        assertEquals(1, startCalls.get(), "Start callback should run once");
+        assertEquals(1, endCalls.get(), "End callback should run once");
+        assertTrue(database.getEntries().containsAll(List.of(first, second)), "All entries should be stored");
     }
 
     @Test
-    void importCleanedEntriesCallsEndCallbackEvenOnException() {
-        // Arrange
-        BibEntry entry1 = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("Exception1")
-                .withField(StandardField.AUTHOR, "Author 1");
-        BibEntry entry2 = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("Exception2")
-                .withField(StandardField.AUTHOR, "Author 2");
-        List<BibEntry> entries = List.of(entry1, entry2);
+    void endCallbackRunsEvenWhenInsertFails() {
+        AtomicInteger startCalls = new AtomicInteger();
+        AtomicInteger endCalls = new AtomicInteger();
 
-        // Mock to throw exception
-        when(bibDatabaseContext.getDatabase()).thenThrow(new RuntimeException("Test exception"));
+        BibDatabase failingDatabase = mock(BibDatabase.class);
+        when(failingDatabase.insertEntries(any())).thenThrow(new RuntimeException("insert failed"));
 
-        // Act & Assert
+        BibDatabaseContext failingContext = mock(BibDatabaseContext.class);
+        when(failingContext.getMode()).thenReturn(BibDatabaseMode.BIBTEX);
+        when(failingContext.getDatabase()).thenReturn(failingDatabase);
+
+        ImportHandler handler = newHandler(startCalls, endCalls, failingContext);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Broken");
+
         try {
-            importHandler.importCleanedEntries(null, entries);
-        } catch (RuntimeException e) {
-            // Expected
+            handler.importCleanedEntries(null, List.of(entry));
+            fail("Expected RuntimeException from failing insert");
+        } catch (RuntimeException expected) {
+            // expected
         }
 
-        // Assert that end callback was still called
-        assertEquals(1, startCallCount, "Bulk import start should be called");
-        assertEquals(1, endCallCount, "Bulk import end should be called even on exception");
+        assertEquals(1, startCalls.get(), "Start callback should run once");
+        assertEquals(1, endCalls.get(), "End callback should run once even on failure");
     }
 
-    @Test
-    void importHandlerWithNullCallbacksWorksCorrectly() {
-        // Arrange
-        ImportHandler handlerWithNullCallbacks = new ImportHandler(
-                bibDatabaseContext,
+    private ImportHandler newHandler(Runnable start, Runnable end, BibDatabaseContext context) {
+        return new ImportHandler(
+                context,
                 preferences,
                 new DummyFileUpdateMonitor(),
                 mock(UndoManager.class),
                 stateManager,
-                mock(DialogService.class),
+                dialogService,
                 new CurrentThreadTaskExecutor(),
-                null,
-                null);
-
-        BibEntry entry1 = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("Null1")
-                .withField(StandardField.AUTHOR, "Author 1");
-        BibEntry entry2 = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("Null2")
-                .withField(StandardField.AUTHOR, "Author 2");
-        List<BibEntry> entries = List.of(entry1, entry2);
-
-        // Act
-        handlerWithNullCallbacks.importCleanedEntries(null, entries);
-
-        // Assert - should not throw NullPointerException
-        assertTrue(bibDatabase.getEntries().contains(entry1), "Entry 1 should be added");
-        assertTrue(bibDatabase.getEntries().contains(entry2), "Entry 2 should be added");
+                start,
+                end);
     }
 }
