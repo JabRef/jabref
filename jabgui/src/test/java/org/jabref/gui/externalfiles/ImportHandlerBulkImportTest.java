@@ -66,9 +66,12 @@ class ImportHandlerBulkImportTest {
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
         OwnerPreferences ownerPreferences = mock(OwnerPreferences.class);
         when(ownerPreferences.isUseOwner()).thenReturn(false);
+        when(ownerPreferences.getDefaultOwner()).thenReturn("");
+        when(ownerPreferences.isOverwriteOwner()).thenReturn(false);
         when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
         TimestampPreferences timestampPreferences = mock(TimestampPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(timestampPreferences.isUseTimestamps()).thenReturn(false);
+        when(timestampPreferences.shouldAddCreationDate()).thenReturn(false);
+        when(timestampPreferences.now()).thenReturn("");
         when(preferences.getTimestampPreferences()).thenReturn(timestampPreferences);
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
