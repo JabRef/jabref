@@ -375,7 +375,7 @@ public class BibtexParser implements Parser {
                 }
 
                 int next = peek();
-                System.out.println(">>> RECOVERED NEXT CHAR = [" + (char) next + "] @ line " + line);
+                LOGGER.info(">>> RECOVERED NEXT CHAR = [" + (char) next + "] @ line " + line);
                 currentEntryBuffer.setLength(0);
                 dumpTextReadSoFarToString();
             }
