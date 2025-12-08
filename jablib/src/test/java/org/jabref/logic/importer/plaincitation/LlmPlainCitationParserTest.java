@@ -61,7 +61,7 @@ class LlmPlainCitationParserTest {
                 .withCitationKey("key")
                 .withField(StandardField.TITLE, "Which Prompting Technique Should I Use? An Empirical Investigation of Prompting Techniques for Software Engineering Tasks")
                 .withField(StandardField.AUTHOR, "Santana Jr., E. G. and Benjamin, G. and Araujo, M. and Santos, H.")
-                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINTTYPE, "arxiv")
                 .withField(StandardField.EPRINT, "2506.05614")
                 .withField(StandardField.YEAR, "2025");
 
