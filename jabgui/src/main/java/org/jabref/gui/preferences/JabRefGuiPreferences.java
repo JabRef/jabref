@@ -12,6 +12,7 @@ import java.util.SequencedMap;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
@@ -66,6 +67,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -257,14 +259,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, DuplicateResolverDialog.DuplicateResolverResult.BREAK.name());
         // endregion
 
-        // region autoCompletePreferences
-        defaults.put(AUTO_COMPLETE, Boolean.FALSE);
-        defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
-        defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
-        defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
-        // endregion
-
         // region ExternalApplicationsPreferences
         defaults.put(EXTERNAL_FILE_TYPES, "");
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
@@ -393,6 +387,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
+        getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
     }
 
     @Override
@@ -406,6 +401,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
+        getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
     }
 
     // region EntryEditorPreferences
@@ -550,19 +546,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return autoCompletePreferences;
         }
 
-        AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
-        if (getBoolean(AUTOCOMPLETER_LAST_FIRST)) {
-            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
-        } else if (getBoolean(AUTOCOMPLETER_FIRST_LAST)) {
-            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
-        }
-
-        autoCompletePreferences = new AutoCompletePreferences(
-                getBoolean(AUTO_COMPLETE),
-                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
-                nameFormat,
-                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet())
-        );
+        autoCompletePreferences = getAutoCompletePreferencesFromBackingStore(AutoCompletePreferences.getDefault());
 
         EasyBind.listen(autoCompletePreferences.autoCompleteProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_COMPLETE, newValue));
         EasyBind.listen(autoCompletePreferences.firstNameModeProperty(), (obs, oldValue, newValue) -> put(AUTOCOMPLETER_FIRSTNAME_MODE, newValue.name()));
@@ -1229,6 +1213,46 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaults.getLastShownEpochDay()));
     }
     // endregion
+
+    private AutoCompletePreferences getAutoCompletePreferencesFromBackingStore(AutoCompletePreferences defaults) {
+        final String firstNameModeName = get(AUTOCOMPLETER_FIRSTNAME_MODE, defaults.getFirstNameMode().name());
+        AutoCompleteFirstNameMode firstNameMode = AutoCompleteFirstNameMode.parse(firstNameModeName);
+
+        AutoCompletePreferences.NameFormat nameFormat;
+        final boolean firstLast = getBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+        final boolean lastFirst = getBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+        if (firstLast && !lastFirst) {
+            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
+        } else if (!firstLast && lastFirst) {
+            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
+        } else {
+            nameFormat = defaults.getNameFormat();
+        }
+
+        String completeFields = defaults.getCompleteFields()
+                                        .stream()
+                                        .map(Field::getName)
+                                        .collect(Collectors.joining(";"));
+        String completeFieldsFromPrefsNode = get(AUTOCOMPLETER_COMPLETE_FIELDS, completeFields);
+        Set<Field> completeFieldsSet = Stream.of(completeFieldsFromPrefsNode.split(";"))
+                                             .map(String::trim)
+                                             .filter(s -> !s.isEmpty())
+                                             .map(String::toUpperCase)
+                                             .map(name -> {
+                                                 try {
+                                                     return StandardField.valueOf(name);
+                                                 } catch (IllegalArgumentException e) {
+                                                     return null;
+                                                 }
+                                             })
+                                             .filter(Objects::nonNull)
+                                             .collect(Collectors.toCollection(HashSet::new));
+
+        return new AutoCompletePreferences(getBoolean(AUTO_COMPLETE, defaults.shouldAutoComplete()),
+                firstNameMode,
+                nameFormat,
+                completeFieldsSet);
+    }
 
     /**
      * In GUI mode, we can lookup the directory better
