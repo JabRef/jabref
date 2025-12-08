@@ -64,7 +64,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
@@ -266,12 +265,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
-        // endregion
-
-        // region unlinkedFilesDialogPreferences
-        defaults.put(UNLINKED_FILES_SELECTED_EXTENSION, StandardFileType.ANY_FILE.getName());
-        defaults.put(UNLINKED_FILES_SELECTED_DATE_RANGE, DateRange.ALL_TIME.name());
-        defaults.put(UNLINKED_FILES_SELECTED_SORT, ExternalFileSorter.DEFAULT.name());
         // endregion
 
         // region ExternalApplicationsPreferences
@@ -690,17 +683,21 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getStringList(SELECTED_SLR_CATALOGS));
     }
 
+    private UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferencesFromBackingStore(UnlinkedFilesDialogPreferences defaults) {
+        return new UnlinkedFilesDialogPreferences(
+                get(UNLINKED_FILES_SELECTED_EXTENSION, defaults.getUnlinkedFilesSelectedExtension()),
+                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE, defaults.getUnlinkedFilesSelectedDateRange().name())),
+                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT, defaults.getUnlinkedFilesSelectedSort().name()))
+        );
+    }
+
     @Override
     public UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferences() {
         if (unlinkedFilesDialogPreferences != null) {
             return unlinkedFilesDialogPreferences;
         }
 
-        unlinkedFilesDialogPreferences = new UnlinkedFilesDialogPreferences(
-                get(UNLINKED_FILES_SELECTED_EXTENSION),
-                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE)),
-                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT))
-        );
+        unlinkedFilesDialogPreferences = getUnlinkedFilesDialogPreferencesFromBackingStore(UnlinkedFilesDialogPreferences.getDefault());
 
         EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedExtensionProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_EXTENSION, newValue));
         EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedDateRangeProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_DATE_RANGE, newValue.name()));
@@ -853,11 +850,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return specialFieldsPreferences;
         }
 
-        specialFieldsPreferences = new SpecialFieldsPreferences(getBoolean(SPECIALFIELDSENABLED));
+        specialFieldsPreferences = getSpecialFieldsPreferencesFromBackingStore(SpecialFieldsPreferences.getDefault());
 
         EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
 
         return specialFieldsPreferences;
+    }
+
+    private SpecialFieldsPreferences getSpecialFieldsPreferencesFromBackingStore(SpecialFieldsPreferences defaults) {
+        return new SpecialFieldsPreferences(
+                getBoolean(SPECIALFIELDSENABLED, defaults.isSpecialFieldsEnabled())
+        );
     }
 
     // region Preview preferences

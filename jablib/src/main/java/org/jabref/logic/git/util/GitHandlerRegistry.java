@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.preferences.GitPreferences;
 
 import org.jspecify.annotations.NonNull;
 
@@ -21,10 +22,15 @@ import org.jspecify.annotations.NonNull;
 public class GitHandlerRegistry {
 
     private final Map<Path, GitHandler> handlerCache = new ConcurrentHashMap<>();
+    private final GitPreferences gitPreferences;
+
+    public GitHandlerRegistry(GitPreferences gitPreferences) {
+        this.gitPreferences = gitPreferences;
+    }
 
     public GitHandler get(@NonNull Path repoPath) {
         Path normalized = repoPath.toAbsolutePath().normalize();
-        return handlerCache.computeIfAbsent(normalized, GitHandler::new);
+        return handlerCache.computeIfAbsent(normalized, (path) -> new GitHandler(path, gitPreferences));
     }
 
     public Optional<GitHandler> fromAnyPath(@NonNull Path anyPathInsideRepo) {
