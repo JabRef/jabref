@@ -43,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The URL integrity check now checks the complete URL syntax. [#14370](https://github.com/JabRef/jabref/pull/14370)
 - <kbd>Tab</kbd> in the last text field of a tab moves the focus to the next tab in the entry editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
 - We changed fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
+- We combined the SearchableComboBox and the TextField for adding fields in Custom Entry Types. [#14547](https://github.com/JabRef/jabref/issues/14547)
 
 ### Fixed
 
