@@ -60,7 +60,7 @@ public abstract class SendAsEMailAction extends SimpleCommand {
                       .onFailure(e -> {
                           String message = Localization.lang("Error creating email");
                           LOGGER.warn(message, e);
-                          dialogService.notify(message);
+                          dialogService.notifyAll(message);
                       })
                       .executeWith(taskExecutor);
     }
