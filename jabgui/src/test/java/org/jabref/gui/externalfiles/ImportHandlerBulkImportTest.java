@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -26,6 +27,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +68,8 @@ class ImportHandlerBulkImportTest {
         when(databaseContext.getDatabase()).thenReturn(database);
 
         stateManager = mock(StateManager.class);
-        when(stateManager.getSelectedGroups(any())).thenReturn(List.of());
+        ObservableList<GroupTreeNode> noGroups = FXCollections.observableArrayList();
+        when(stateManager.getSelectedGroups(any())).thenReturn(noGroups);
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
@@ -99,7 +104,7 @@ class ImportHandlerBulkImportTest {
     void singleEntryDoesNotTriggerBulkCallbacks() {
         AtomicInteger startCalls = new AtomicInteger();
         AtomicInteger endCalls = new AtomicInteger();
-        ImportHandler handler = newHandler(startCalls, endCalls, databaseContext);
+        ImportHandler handler = newHandler(startCalls::incrementAndGet, endCalls::incrementAndGet, databaseContext);
 
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "One");
@@ -115,7 +120,7 @@ class ImportHandlerBulkImportTest {
     void multipleEntriesTriggerBulkCallbacksOnce() {
         AtomicInteger startCalls = new AtomicInteger();
         AtomicInteger endCalls = new AtomicInteger();
-        ImportHandler handler = newHandler(startCalls, endCalls, databaseContext);
+        ImportHandler handler = newHandler(startCalls::incrementAndGet, endCalls::incrementAndGet, databaseContext);
 
         BibEntry first = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "First");
         BibEntry second = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Second");
@@ -133,13 +138,13 @@ class ImportHandlerBulkImportTest {
         AtomicInteger endCalls = new AtomicInteger();
 
         BibDatabase failingDatabase = mock(BibDatabase.class);
-        when(failingDatabase.insertEntries(any())).thenThrow(new RuntimeException("insert failed"));
+        doThrow(new RuntimeException("insert failed")).when(failingDatabase).insertEntries(anyList());
 
         BibDatabaseContext failingContext = mock(BibDatabaseContext.class);
         when(failingContext.getMode()).thenReturn(BibDatabaseMode.BIBTEX);
         when(failingContext.getDatabase()).thenReturn(failingDatabase);
 
-        ImportHandler handler = newHandler(startCalls, endCalls, failingContext);
+        ImportHandler handler = newHandler(startCalls::incrementAndGet, endCalls::incrementAndGet, failingContext);
 
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Broken");
 
