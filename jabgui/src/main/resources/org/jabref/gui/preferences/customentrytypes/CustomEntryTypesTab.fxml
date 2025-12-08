@@ -66,12 +66,12 @@
                         <TextField fx:id="addNewField" prefWidth="150.0" promptText="Type new field..."/>
                         <Button fx:id="addNewFieldButton"
                                 prefHeight="20.0" prefWidth="20.0"
-                                styleClass="icon-button,narrow" onAction="#addNewCustomField">
+                                styleClass="icon-button,narrow" onAction="#addNewField">
                             <graphic>
                                 <JabRefIconView glyph="ADD_NOBOX"/>
                             </graphic>
                             <tooltip>
-                                <Tooltip text="%Add new custom field"/>
+                                <Tooltip text="%Add new field"/>
                             </tooltip>
                         </Button>
                     </HBox>

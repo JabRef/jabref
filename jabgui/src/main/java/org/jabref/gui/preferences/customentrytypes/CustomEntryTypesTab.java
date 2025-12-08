@@ -267,7 +267,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     }
 
     @FXML
-    void addNewCustomField() {
+    void addNewField() {
         viewModel.addNewField();
     }
 
