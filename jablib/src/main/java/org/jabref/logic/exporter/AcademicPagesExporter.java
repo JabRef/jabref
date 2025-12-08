@@ -3,7 +3,6 @@ package org.jabref.logic.exporter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -19,12 +18,12 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A custom exporter to write multiple bib entries as AcademicPages Markdown format.
  */
-public class AcademicPagesExporter extends Exporter {
+public @NullMarked class AcademicPagesExporter extends Exporter {
     private final String layoutFileFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
@@ -51,9 +50,9 @@ public class AcademicPagesExporter extends Exporter {
     }
 
     @Override
-    public void export(@NonNull final BibDatabaseContext databaseContext,
-                       @NonNull final Path exportDirectory,
-                       @NonNull List<BibEntry> entries) throws SaveException {
+    public void export(final BibDatabaseContext databaseContext,
+                       final Path exportDirectory,
+                       List<BibEntry> entries) throws SaveException {
         export(databaseContext, exportDirectory, entries, List.of(exportDirectory), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 
@@ -61,15 +60,15 @@ public class AcademicPagesExporter extends Exporter {
      * The method that performs the export of all entries by iterating on the entries.
      *
      * @param databaseContext the database to export from
-     * @param file            the directory to write to
-     * @param entries         a list containing all entries that should be exported
+     * @param file the directory to write to
+     * @param entries a list containing all entries that should be exported
      * @param abbreviationRepository the built-in repository
-     * @throws SaveException   Exception thrown if saving goes wrong
+     * @throws SaveException Exception thrown if saving goes wrong
      */
     @Override
-    public void export(@NonNull final BibDatabaseContext databaseContext,
-                       @NonNull final Path file,
-                       @NonNull List<BibEntry> entries,
+    public void export(final BibDatabaseContext databaseContext,
+                       final Path file,
+                       List<BibEntry> entries,
                        List<Path> fileDirForDataBase,
                        JournalAbbreviationRepository abbreviationRepository) throws SaveException {
         if (entries.isEmpty()) {
@@ -95,7 +94,7 @@ public class AcademicPagesExporter extends Exporter {
         }
     }
 
-    private @NonNull Path getPath(BibEntry entry, Path exportDirectory) throws SaveException {
+    private Path getPath(BibEntry entry, Path exportDirectory) throws SaveException {
         replaceFormatter.setArgument(" ,-"); // expects an expression that has the character to remove and the replacement character separated by a comma.
         String title = entry.getTitle().orElseThrow(() -> new SaveException("Entry is missing a title"));
         String formattedTitle = commandsFormatter.format(htmlFormatter.format(replaceFormatter.format(title)));
