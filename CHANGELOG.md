@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- Improved merge dialog decisions for fields containing person names (e.g., `author`, `editor`) by using a new plausibility comparator. JabRef now prefers the side with more detailed/complete author information. [#14454](https://github.com/JabRef/jabref/issues/14454)
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
@@ -34,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We replaced the standard ComboBox with a SearchableComboBox and added a free text field in custom Entry Types [#14082](https://github.com/JabRef/jabref/issues/14082)
+- In case of invalid BibTeX in the source tab, a notification is displayed (instead of an exception). [#14504](https://github.com/JabRef/jabref/pull/14504)
 - We separated the "Clean up entries" dialog into three tabs for clarity [#13819](https://github.com/JabRef/jabref/issues/13819)
 - `JabKit`: `--porcelain` does not output any logs to the console anymore. [#14244](https://github.com/JabRef/jabref/pull/14244)
 - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> now opens the terminal in the active library directory. [#14130](https://github.com/JabRef/jabref/issues/14130)
