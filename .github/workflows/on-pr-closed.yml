@@ -124,6 +124,8 @@ jobs:
         run: |
           echo "Commenting on PR..."
           gh issue comment "$PR_NUMBER" -b "This pull requests was closed without merging. You have been unassigned from the respective issue #${{ needs.determine_issue_number.outputs.issue_number }}."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   comment_on_resolved_issue:
     name: Comment on resolved issue
     runs-on: ubuntu-latest

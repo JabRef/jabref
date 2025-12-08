@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
@@ -62,6 +63,14 @@ public class ArgumentProcessor {
             resetPreferences();
         }
 
+        if (guiCli.importPreferences != null) {
+            importPreferences();
+        }
+
+        if (guiCli.exportPreferences != null) {
+            exportPreferences();
+        }
+
         if (guiCli.blank) {
             uiCommands.add(new UiCommand.BlankWorkspace());
             return uiCommands;
@@ -96,6 +105,26 @@ public class ArgumentProcessor {
         } catch (BackingStoreException e) {
             System.err.println(Localization.lang("Unable to clear preferences."));
             LOGGER.error("Unable to clear preferences", e);
+        }
+    }
+
+    private void importPreferences() {
+        try {
+            System.out.println(Localization.lang("Importing preferences from '%0'.", guiCli.importPreferences));
+            preferences.importPreferences(guiCli.importPreferences);
+        } catch (JabRefException e) {
+            System.err.println(e.getLocalizedMessage());
+            LOGGER.error("Unable to import preferences", e);
+        }
+    }
+
+    private void exportPreferences() {
+        try {
+            System.out.println(Localization.lang("Exporting preferences to '%0'.", guiCli.exportPreferences));
+            preferences.exportPreferences(guiCli.exportPreferences);
+        } catch (JabRefException e) {
+            System.err.println(e.getLocalizedMessage());
+            LOGGER.error("Unable to export preferences", e);
         }
     }
 

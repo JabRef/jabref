@@ -76,7 +76,7 @@ public class ServerCli implements Callable<Void> {
             return null;
         }
 
-        Server server = new Server();
+        Server server = new Server(JabRefCliPreferences.getInstance());
         HttpServer httpServer = server.run(filesToServe, uri);
 
         // Keep the http server running until user kills the process (e.g., presses Ctrl+C)
