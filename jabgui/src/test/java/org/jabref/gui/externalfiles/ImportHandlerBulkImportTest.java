@@ -12,6 +12,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -58,6 +59,9 @@ class ImportHandlerBulkImportTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.shouldGenerateNewKeyOnImport()).thenReturn(false);
+        when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
