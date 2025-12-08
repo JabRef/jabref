@@ -71,7 +71,7 @@
                                 <JabRefIconView glyph="ADD_NOBOX"/>
                             </graphic>
                             <tooltip>
-                                <Tooltip text="%Add new field"/>
+                                <Tooltip text="%Add new Field"/>
                             </tooltip>
                         </Button>
                     </HBox>
