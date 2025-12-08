@@ -2249,7 +2249,7 @@ class BibtexParserTest {
     }
 
     @Test
-    public void testUnmatchedBracketsDoesNotStopParsing() throws Exception {
+    public void unmatchedBracketsDoesNotStopParsing() throws Exception {
         String entries = """
                 @Article{ok1,
                   title = {AAA},
