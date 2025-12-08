@@ -40,6 +40,7 @@ class ImportHandlerBulkImportTest {
     private ImportHandler importHandler;
     private BibDatabaseContext bibDatabaseContext;
     private BibDatabase bibDatabase;
+    private StateManager stateManager;
     private Runnable onBulkImportStart;
     private Runnable onBulkImportEnd;
     private int startCallCount;
@@ -82,13 +83,15 @@ class ImportHandlerBulkImportTest {
         bibDatabaseContext = mock(BibDatabaseContext.class);
         when(bibDatabaseContext.getMode()).thenReturn(BibDatabaseMode.BIBTEX);
         when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
+        stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedGroups(bibDatabaseContext)).thenReturn(List.of());
 
         importHandler = new ImportHandler(
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
                 mock(UndoManager.class),
-                mock(StateManager.class),
+                stateManager,
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor(),
                 onBulkImportStart,
@@ -171,7 +174,7 @@ class ImportHandlerBulkImportTest {
                 preferences,
                 new DummyFileUpdateMonitor(),
                 mock(UndoManager.class),
-                mock(StateManager.class),
+                stateManager,
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor(),
                 null,
