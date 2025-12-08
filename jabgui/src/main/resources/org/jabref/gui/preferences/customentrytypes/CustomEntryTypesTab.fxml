@@ -63,7 +63,7 @@
             <HBox spacing="10.0" alignment="BASELINE_LEFT">
                 <VBox spacing="5.0">
                     <HBox spacing="10.0" alignment="BASELINE_CENTER">
-                        <TextField fx:id="addNewField" prefWidth="150.0" promptText="Type new field..."/>
+                        <TextField fx:id="addNewField" prefWidth="150.0" promptText="%Field..."/>
                         <Button fx:id="addNewFieldButton"
                                 prefHeight="20.0" prefWidth="20.0"
                                 styleClass="icon-button,narrow" onAction="#addNewField">
