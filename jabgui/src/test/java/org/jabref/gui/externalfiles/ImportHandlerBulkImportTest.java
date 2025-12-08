@@ -146,10 +146,11 @@ class ImportHandlerBulkImportTest {
 
         ImportHandler handler = newHandler(startCalls::incrementAndGet, endCalls::incrementAndGet, failingContext);
 
-        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Broken");
+        BibEntry first = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Broken A");
+        BibEntry second = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Broken B");
 
         try {
-            handler.importCleanedEntries(null, List.of(entry));
+            handler.importCleanedEntries(null, List.of(first, second));
             fail("Expected RuntimeException from failing insert");
         } catch (RuntimeException expected) {
             // expected
