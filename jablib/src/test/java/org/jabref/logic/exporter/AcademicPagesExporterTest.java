@@ -192,7 +192,7 @@ class AcademicPagesExporterTest {
                 "permalink: /publication/Conference-Paper",
                 "excerpt: ''",
                 "date: 2023-01-01",
-                "venue: 'Unknown'",
+                "venue: 'Conference Proceedings'",
                 "slidesurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
                 "paperurl: 'https://[insert username].github.io/files/[insert filename].pdf'",
                 "bibtexurl: 'https://[insert username].github.io/files/[insert filename].bib'",
