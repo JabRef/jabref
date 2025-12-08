@@ -20,12 +20,12 @@ class BiblatexNonStandardEntryTypeDefinitionsTest {
 
     @Test
     void allContainsAllNonStandardTypes() {
-        Set<StandardEntryType> expectedTypes = Set.of(
-                StandardEntryType.Artwork, StandardEntryType.Audio, StandardEntryType.Bibnote,
-                StandardEntryType.Commentary, StandardEntryType.Image, StandardEntryType.Jurisdiction,
-                StandardEntryType.Legislation, StandardEntryType.Legal, StandardEntryType.Letter,
-                StandardEntryType.Movie, StandardEntryType.Music, StandardEntryType.Performance,
-                StandardEntryType.Review, StandardEntryType.Standard, StandardEntryType.Video
+        Set<BiblatexNonStandardEntryType> expectedTypes = Set.of(
+                BiblatexNonStandardEntryType.Artwork, BiblatexNonStandardEntryType.Audio, BiblatexNonStandardEntryType.Bibnote,
+                BiblatexNonStandardEntryType.Commentary, BiblatexNonStandardEntryType.Image, BiblatexNonStandardEntryType.Jurisdiction,
+                BiblatexNonStandardEntryType.Legislation, BiblatexNonStandardEntryType.Legal, BiblatexNonStandardEntryType.Letter,
+                BiblatexNonStandardEntryType.Movie, BiblatexNonStandardEntryType.Music, BiblatexNonStandardEntryType.Performance,
+                BiblatexNonStandardEntryType.Review, BiblatexNonStandardEntryType.Standard, BiblatexNonStandardEntryType.Video
         );
 
         Set<EntryType> actualTypes = BiblatexNonStandardEntryTypeDefinitions.ALL.stream()

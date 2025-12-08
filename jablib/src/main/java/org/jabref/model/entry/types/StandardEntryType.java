@@ -42,23 +42,7 @@ public enum StandardEntryType implements EntryType {
     Thesis("Thesis"),
     WWW("WWW"),
     Software("Software"),
-    Dataset("Dataset"),
-    // Non-standard Types (BibLaTeX only)
-    Artwork("Artwork"),
-    Audio("Audio"),
-    Bibnote("Bibnote"),
-    Commentary("Commentary"),
-    Image("Image"),
-    Jurisdiction("Jurisdiction"),
-    Legislation("Legislation"),
-    Legal("Legal"),
-    Letter("Letter"),
-    Movie("Movie"),
-    Music("Music"),
-    Performance("Performance"),
-    Review("Review"),
-    Standard("Standard"),
-    Video("Video");
+    Dataset("Dataset");
 
     private final String displayName;
 

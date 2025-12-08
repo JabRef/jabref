@@ -60,6 +60,7 @@ import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.identifier.SSRN;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
 import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
@@ -519,6 +520,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (type instanceof StandardEntryType entryType) {
             return descriptionOfStandardEntryType(entryType);
         }
+        if (type instanceof BiblatexNonStandardEntryType entryType) {
+            return descriptionOfNonStandardEntryType(entryType);
+        }
         return null;
     }
 
@@ -526,8 +530,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         // These descriptions are taken from subsection 2.1 of the biblatex package documentation.
         // Biblatex is a superset of bibtex, with more elaborate descriptions, so its documentation is preferred.
         // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
-        // Note: This method handles all StandardEntryType enum values, including non-standard types
-        // (which are part of the enum but use the @misc driver in standard bibliography styles).
         return switch (type) {
             case Article ->
                     Localization.lang("An article in a journal, magazine, newspaper, or other periodical which forms a self-contained unit with its own title.");
@@ -593,8 +595,14 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Localization.lang("Computer software. The standard styles will treat this entry type as an alias for \"Misc\".");
             case Dataset ->
                     Localization.lang("A data set or a similar collection of (mostly) raw data.");
-            // Non-standard Types (BibLaTeX only) - these use the @misc driver in standard bibliography styles
-            // Descriptions are taken from subsection 2.1.3 of the biblatex package documentation.
+        };
+    }
+
+    private static String descriptionOfNonStandardEntryType(BiblatexNonStandardEntryType type) {
+        // These descriptions are taken from subsection 2.1.3 of the biblatex package documentation.
+        // Non-standard Types (BibLaTeX only) - these use the @misc driver in standard bibliography styles.
+        // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
+        return switch (type) {
             case Artwork ->
                     Localization.lang("Works of the visual arts such as paintings, sculpture, and installations.");
             case Audio ->
