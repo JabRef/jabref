@@ -13,6 +13,8 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -62,6 +64,12 @@ class ImportHandlerBulkImportTest {
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.shouldGenerateNewKeyOnImport()).thenReturn(false);
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
+        OwnerPreferences ownerPreferences = mock(OwnerPreferences.class);
+        when(ownerPreferences.isUseOwner()).thenReturn(false);
+        when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
+        TimestampPreferences timestampPreferences = mock(TimestampPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(timestampPreferences.isUseTimestamps()).thenReturn(false);
+        when(preferences.getTimestampPreferences()).thenReturn(timestampPreferences);
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
