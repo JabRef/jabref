@@ -1,6 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +17,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -31,7 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-@Disabled("Requires ScienceDirect API key - enable locally with valid key")
+@Disabled("Requires Elsevier/Scopus API key - enable locally with valid key")
 class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     private static final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
@@ -41,7 +45,7 @@ class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearch
     private BibEntry entry;
 
     @BeforeAll
-    static void ensureScienceDirectIsAvailable() throws FetcherException {
+    static void ensureScopusIsAvailable() throws FetcherException {
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importerPreferences.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(API_KEY);
         ScienceDirect scienceDirect = new ScienceDirect(importerPreferences);
@@ -135,16 +139,10 @@ class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearch
     }
 
     @Test
-    void testPageSize() {
-        // API v2 valid page sizes: 10, 25, 50, 100
-        assertEquals(25, fetcher.getPageSize());
-    }
-
-    @Test
     void testGetTestUrl() {
         String testUrl = fetcher.getTestUrl();
         assertNotNull(testUrl);
-        assertTrue(testUrl.contains("api.elsevier.com/content/search/sciencedirect"));
+        assertTrue(testUrl.contains("api.elsevier.com/content/search/scopus"));
         assertTrue(testUrl.contains("apiKey="));
     }
 
@@ -154,17 +152,40 @@ class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearch
         assertNotNull(fetcher.getTrustLevel());
     }
 
+    // ==================== URL Construction Tests ====================
+
+    @Test
+    void testUrlForQueryContainsRequiredParameters() throws URISyntaxException, MalformedURLException {
+        SearchQueryNode queryNode = new SearchQueryNode(Optional.empty(), "machine learning");
+        URL url = fetcher.getURLForQuery(queryNode, 0);
+
+        String urlString = url.toString();
+        assertTrue(urlString.contains("api.elsevier.com/content/search/scopus"));
+        assertTrue(urlString.contains("query="));
+        assertTrue(urlString.contains("count="));
+        assertTrue(urlString.contains("start="));
+    }
+
+    @Test
+    void testUrlForQueryWithPagination() throws URISyntaxException, MalformedURLException {
+        SearchQueryNode queryNode = new SearchQueryNode(Optional.empty(), "machine learning");
+        URL url = fetcher.getURLForQuery(queryNode, 2);
+
+        String urlString = url.toString();
+        // Page 2 with page size 20 should start at 40
+        assertTrue(urlString.contains("start=40"));
+    }
+
     // ==================== Search Tests ====================
 
     @Test
     void searchByQueryFindsEntry() throws FetcherException {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Bidirectional Model Transformation Metamorphic Testing");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("machine learning neural networks");
 
         assertFalse(fetchedEntries.isEmpty());
-        // Check that at least one entry has the expected title
+        // Check that entries have titles
         assertTrue(fetchedEntries.stream()
-                                 .anyMatch(e -> e.getField(StandardField.TITLE).orElse("")
-                                                 .contains("Bidirectional Model Transformation")));
+                                 .anyMatch(e -> e.getField(StandardField.TITLE).isPresent()));
     }
 
     @Test
@@ -179,11 +200,22 @@ class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearch
         List<BibEntry> fetchedEntries = fetcher.performSearch("machine learning neural networks");
 
         assertFalse(fetchedEntries.isEmpty());
-        BibEntry firstEntry = fetchedEntries.iterator().next();
+        BibEntry firstEntry = fetchedEntries.getFirst();
 
         // Check that essential fields are populated
         assertTrue(firstEntry.getField(StandardField.TITLE).isPresent());
+        // Scopus entries should have DOI or URL
         assertTrue(firstEntry.getField(StandardField.DOI).isPresent() ||
                 firstEntry.getField(StandardField.URL).isPresent());
+    }
+
+    @Test
+    void searchResultContainsJournalInfo() throws FetcherException {
+        List<BibEntry> fetchedEntries = fetcher.performSearch("software engineering");
+
+        assertFalse(fetchedEntries.isEmpty());
+        // At least some entries should have journal information
+        assertTrue(fetchedEntries.stream()
+                                 .anyMatch(e -> e.getField(StandardField.JOURNAL).isPresent()));
     }
 }

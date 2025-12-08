@@ -1,26 +1,29 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.PagedSearchBasedFetcher;
+import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.fetcher.transformers.ScopusQueryTransformer;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.search.query.SearchQueryNode;
 
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
@@ -29,6 +32,7 @@ import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
@@ -38,24 +42,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FulltextFetcher and SearchBasedFetcher implementation for <a href="https://www.sciencedirect.com/">ScienceDirect</a>.
- * Uses ScienceDirect Search API v2 with PUT method (recommended).
- * See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>.
+ * FulltextFetcher and SearchBasedFetcher implementation using <a href="https://dev.elsevier.com/">Elsevier's Scopus Search API</a>.
+ * <p>
+ * The Scopus Search API provides access to the largest abstract and citation database of research literature.
+ * It covers 50+ million abstracts from over 20,500 peer-reviewed titles from more than 5,000 publishers.
+ * <p>
+ * API Documentation: <a href="https://dev.elsevier.com/documentation/ScopusSearchAPI.wadl">Scopus Search API</a>
+ * <p>
+ * Note: ScienceDirect Search API requires institutional access, so we use Scopus API instead
+ * which is available to all registered developers.
  */
-public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher, PagedSearchBasedFetcher {
+public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher, PagedSearchBasedParserFetcher {
     public static final String FETCHER_NAME = "ScienceDirect";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
     private static final String ARTICLE_API_URL = "https://api.elsevier.com/content/article/doi/";
-    private static final String SEARCH_API_URL = "https://api.elsevier.com/content/search/sciencedirect";
-
-    // Valid page sizes for API v2: 10, 25, 50, 100
-    private static final int DEFAULT_PAGE_SIZE = 25;
-    // Maximum offset allowed by API v2
-    private static final int MAX_OFFSET = 6000;
+    private static final String SCOPUS_SEARCH_API_URL = "https://api.elsevier.com/content/search/scopus";
 
     private final ImporterPreferences importerPreferences;
+
+    private ScopusQueryTransformer transformer;
 
     public ScienceDirect(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
@@ -181,196 +188,165 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher, P
 
     @Override
     public String getTestUrl() {
-        return SEARCH_API_URL + "?query=test&count=1&apiKey=";
-    }
-
-    @Override
-    public int getPageSize() {
-        return DEFAULT_PAGE_SIZE;
+        return SCOPUS_SEARCH_API_URL + "?query=test&count=1&apiKey=";
     }
 
     /**
-     * Performs a search using the ScienceDirect Search API v2 with the PUT method.
+     * Constructs a URL for querying the Scopus Search API.
      *
-     * @param searchQuery the search query
+     * @param queryNode  the search query node
      * @param pageNumber the page number (0-indexed)
-     * @return Page containing the search results
-     * @throws FetcherException if the search fails
+     * @return URL for the Scopus API request
      */
     @Override
-    public Page<BibEntry> performSearchPaged(BaseQueryNode searchQuery, int pageNumber) throws FetcherException {
-        Optional<String> apiKey = importerPreferences.getApiKey(getName());
-        if (apiKey.isEmpty() || apiKey.get().isBlank()) {
-            throw new FetcherException("ScienceDirect API key is required. Please configure it in Preferences → Web search.");
+    public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        transformer = new ScopusQueryTransformer();
+        String transformedQuery = transformer.transformSearchQuery(queryNode).orElse("");
+
+        URIBuilder uriBuilder = new URIBuilder(SCOPUS_SEARCH_API_URL);
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apiKey", apiKey));
+
+        if (!transformedQuery.isBlank()) {
+            uriBuilder.addParameter("query", transformedQuery);
         }
 
-        int offset = pageNumber * getPageSize();
-        if (offset > MAX_OFFSET) {
-            LOGGER.warn("Requested offset {} exceeds maximum allowed offset {}. Returning empty results.", offset, MAX_OFFSET);
-            return new Page<>(searchQuery.toString(), pageNumber, List.of());
-        }
+        uriBuilder.addParameter("count", String.valueOf(getPageSize()));
+        uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
+        uriBuilder.addParameter("view", "STANDARD");
+        uriBuilder.addParameter("suppressNavLinks", "true");
+        uriBuilder.addParameter("sort", "relevancy");
 
-        try {
-            // Build the request body JSON for API v2 PUT method
-            JSONObject requestBody = buildRequestBody(searchQuery, offset);
+        LOGGER.debug("Scopus Search URL: {}", uriBuilder.build().toString());
 
-            LOGGER.debug("ScienceDirect API v2 request body: {}", requestBody);
+        return uriBuilder.build().toURL();
+    }
 
-            HttpResponse<JsonNode> response = Unirest.put(SEARCH_API_URL)
-                                                     .header("X-ELS-APIKey", apiKey.get())
-                                                     .header("Content-Type", "application/json")
-                                                     .header("Accept", "application/json")
-                                                     .body(requestBody.toString())
-                                                     .asJson();
+    @Override
+    public Parser getParser() {
+        return inputStream -> {
+            String response = new BufferedReader(new InputStreamReader(inputStream))
+                    .lines()
+                    .collect(Collectors.joining(OS.NEWLINE));
 
-            if (response.getStatus() == 401) {
-                throw new FetcherException("Invalid API key. Please check your ScienceDirect API key in Preferences → Web search.");
-            }
+            JSONObject jsonObject = new JSONObject(response);
+            List<BibEntry> entries = new ArrayList<>();
 
-            if (response.getStatus() == 403) {
-                throw new FetcherException("Access denied. Your API key does not have access to ScienceDirect Search API. " +
-                        "This API requires institutional subscription or special authorization from Elsevier.");
-            }
-
-            if (response.getStatus() == 400) {
-                String errorMessage = "Bad request";
-                if (response.getBody() != null && response.getBody().getObject().has("message")) {
-                    errorMessage = response.getBody().getObject().getString("message");
-                }
-                throw new FetcherException("ScienceDirect API error: " + errorMessage);
-            }
-
-            // Check for service-error in response body (can occur with 200 status)
-            if (response.getBody() != null && response.getBody().getObject().has("service-error")) {
-                JSONObject serviceError = response.getBody().getObject().getJSONObject("service-error");
+            if (jsonObject.has("service-error")) {
+                JSONObject serviceError = jsonObject.getJSONObject("service-error");
                 if (serviceError.has("status")) {
                     JSONObject status = serviceError.getJSONObject("status");
                     String statusCode = status.optString("statusCode", "UNKNOWN");
                     String statusText = status.optString("statusText", "Unknown error");
+                    LOGGER.error("Scopus API error: {} - {}", statusCode, statusText);
+                }
+                return entries;
+            }
 
-                    if ("AUTHORIZATION_ERROR".equals(statusCode)) {
-                        throw new FetcherException("Access denied: " + statusText + ". " +
-                                "ScienceDirect Search API requires institutional subscription or authorization from Elsevier.");
+            if (!jsonObject.has("search-results")) {
+                LOGGER.warn("No search-results in Scopus response");
+                return entries;
+            }
+
+            JSONObject searchResults = jsonObject.getJSONObject("search-results");
+
+            String totalResults = searchResults.optString("opensearch:totalResults", "0");
+            LOGGER.debug("Scopus returned {} total results", totalResults);
+
+            if (!searchResults.has("entry")) {
+                return entries;
+            }
+
+            JSONArray resultsArray = searchResults.getJSONArray("entry");
+
+            for (int i = 0; i < resultsArray.length(); i++) {
+                try {
+                    JSONObject jsonEntry = resultsArray.getJSONObject(i);
+
+                    if (jsonEntry.has("error")) {
+                        LOGGER.debug("Scopus entry error: {}", jsonEntry.optString("error"));
+                        continue;
                     }
-                    throw new FetcherException("ScienceDirect API error: " + statusCode + " - " + statusText);
+
+                    BibEntry entry = parseScopusEntry(jsonEntry);
+                    if (entry != null) {
+                        if (shouldIncludeEntry(entry)) {
+                            entries.add(entry);
+                        }
+                    }
+                } catch (JSONException e) {
+                    LOGGER.warn("Error parsing Scopus entry at index {}", i, e);
                 }
             }
 
-            if (response.getStatus() != 200) {
-                throw new FetcherException("ScienceDirect API returned status " + response.getStatus());
-            }
-
-            List<BibEntry> entries = parseSearchResponse(response.getBody().getObject());
-            return new Page<>(searchQuery.toString(), pageNumber, entries);
-        } catch (UnirestException e) {
-            throw new FetcherException("Error connecting to ScienceDirect API", e);
-        }
-    }
-
-    /**
-     * Builds the JSON request body for ScienceDirect Search API v2.
-     *
-     * @param searchQuery the search query
-     * @param offset the starting position for results
-     * @return JSONObject representing the request body
-     */
-    private JSONObject buildRequestBody(BaseQueryNode searchQuery, int offset) {
-        JSONObject requestBody = new JSONObject();
-
-        // Extract query terms and build appropriate fields
-        String queryString = extractQueryString(searchQuery);
-
-        // For general searches, use the "qs" (quick search) field
-        // This searches over all article/book chapter content excluding references
-        requestBody.put("qs", queryString);
-
-        // Add display parameters for pagination and sorting
-        JSONObject display = new JSONObject();
-        display.put("offset", offset);
-        display.put("show", getPageSize());
-        display.put("sortBy", "relevance");
-        requestBody.put("display", display);
-
-        return requestBody;
-    }
-
-    /**
-     * Extracts a plain query string from the search query node.
-     * For API v2, we use a simpler approach as the API handles boolean operators.
-     *
-     * @param searchQuery the search query node
-     * @return the query string
-     */
-    private String extractQueryString(BaseQueryNode searchQuery) {
-        if (searchQuery instanceof SearchQueryNode sqn) {
-            return sqn.term();
-        }
-        // For complex queries, return the string representation
-        // The API v2 supports AND, OR, NOT operators in the query string
-        return searchQuery.toString();
-    }
-
-    /**
-     * Parses the API v2 response and extracts BibEntry objects.
-     *
-     * @param jsonResponse the JSON response from the API
-     * @return list of BibEntry objects
-     */
-    private List<BibEntry> parseSearchResponse(JSONObject jsonResponse) {
-        List<BibEntry> entries = new ArrayList<>();
-
-        if (!jsonResponse.has("results")) {
-            if (jsonResponse.has("message")) {
-                LOGGER.warn("ScienceDirect API message: {}", jsonResponse.getString("message"));
-            }
             return entries;
-        }
-
-        JSONArray results = jsonResponse.getJSONArray("results");
-        int resultsFound = jsonResponse.optInt("resultsFound", 0);
-        LOGGER.debug("ScienceDirect returned {} total results", resultsFound);
-
-        for (int i = 0; i < results.length(); i++) {
-            try {
-                JSONObject jsonEntry = results.getJSONObject(i);
-                BibEntry entry = parseJsonEntry(jsonEntry);
-                if (entry != null) {
-                    entries.add(entry);
-                }
-            } catch (JSONException e) {
-                LOGGER.warn("Error parsing ScienceDirect entry at index {}", i, e);
-            }
-        }
-
-        return entries;
+        };
     }
 
     /**
-     * Parses a single JSON entry from the API v2 response to a BibEntry.
+     * Checks if the entry should be included based on year filtering.
+     */
+    private boolean shouldIncludeEntry(BibEntry entry) {
+        if (transformer == null) {
+            return true;
+        }
+
+        Optional<Integer> startYear = transformer.getStartYear();
+        Optional<Integer> endYear = transformer.getEndYear();
+
+        if (startYear.isEmpty() && endYear.isEmpty()) {
+            return true;
+        }
+
+        Optional<String> yearField = entry.getField(StandardField.YEAR);
+        if (yearField.isEmpty()) {
+            return true;
+        }
+
+        try {
+            int year = Integer.parseInt(yearField.get());
+            boolean afterStart = startYear.map(start -> year >= start).orElse(true);
+            boolean beforeEnd = endYear.map(end -> year <= end).orElse(true);
+            return afterStart && beforeEnd;
+        } catch (NumberFormatException e) {
+            return true;
+        }
+    }
+
+    /**
+     * Parses a single Scopus JSON entry into a BibEntry.
      *
-     * @param jsonEntry JSON object representing a single search result
+     * @param jsonEntry the JSON object representing a Scopus search result
      * @return BibEntry or null if parsing fails
      */
-    private BibEntry parseJsonEntry(JSONObject jsonEntry) {
+    private BibEntry parseScopusEntry(JSONObject jsonEntry) {
         try {
             BibEntry entry = new BibEntry();
 
-            // Default to Article type (ScienceDirect primarily contains journal articles)
-            entry.setType(StandardEntryType.Article);
+            // Determine entry type based on aggregationType and subtype
+            String aggregationType = jsonEntry.optString("prism:aggregationType", "");
+            String subtype = jsonEntry.optString("subtype", "");
+            entry.setType(determineEntryType(aggregationType, subtype));
 
-            // Title
-            if (jsonEntry.has("title")) {
-                entry.setField(StandardField.TITLE, jsonEntry.getString("title"));
+            // Title (dc:title)
+            String title = jsonEntry.optString("dc:title", "");
+            if (!title.isEmpty()) {
+                entry.setField(StandardField.TITLE, title);
             }
 
-            // Authors - API v2 returns array with {order, name} objects
-            if (jsonEntry.has("authors")) {
-                JSONArray authors = jsonEntry.getJSONArray("authors");
+            // Author (dc:creator for first author, or parse author array)
+            String creator = jsonEntry.optString("dc:creator", "");
+            if (!creator.isEmpty()) {
+                entry.setField(StandardField.AUTHOR, creator);
+            }
+            // Note: For COMPLETE view, full author list might be in "author" array
+            if (jsonEntry.has("author")) {
+                JSONArray authors = jsonEntry.getJSONArray("author");
                 List<String> authorNames = new ArrayList<>();
                 for (int j = 0; j < authors.length(); j++) {
                     JSONObject author = authors.getJSONObject(j);
-                    if (author.has("name")) {
-                        authorNames.add(author.getString("name"));
+                    String authorName = author.optString("authname", author.optString("given-name", "") + " " + author.optString("surname", "")).trim();
+                    if (!authorName.isEmpty()) {
+                        authorNames.add(authorName);
                     }
                 }
                 if (!authorNames.isEmpty()) {
@@ -378,106 +354,155 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher, P
                 }
             }
 
-            // DOI
-            if (jsonEntry.has("doi")) {
-                entry.setField(StandardField.DOI, jsonEntry.getString("doi"));
+            // DOI (prism:doi)
+            String doi = jsonEntry.optString("prism:doi", "");
+            if (!doi.isEmpty()) {
+                entry.setField(StandardField.DOI, doi);
             }
 
-            // Source title (journal/book name)
-            if (jsonEntry.has("sourceTitle")) {
-                entry.setField(StandardField.JOURNAL, jsonEntry.getString("sourceTitle"));
+            // Journal/Source title (prism:publicationName)
+            String journal = jsonEntry.optString("prism:publicationName", "");
+            if (!journal.isEmpty()) {
+                entry.setField(StandardField.JOURNAL, journal);
             }
 
-            // Publication date - format: "2018-07-17"
-            if (jsonEntry.has("publicationDate")) {
-                String pubDate = jsonEntry.getString("publicationDate");
-                if (pubDate.contains("-")) {
-                    String year = pubDate.split("-")[0];
-                    entry.setField(StandardField.YEAR, year);
+            // Volume (prism:volume)
+            String volume = jsonEntry.optString("prism:volume", "");
+            if (!volume.isEmpty()) {
+                entry.setField(StandardField.VOLUME, volume);
+            }
 
-                    // Also extract month if available
-                    String[] parts = pubDate.split("-");
-                    if (parts.length >= 2) {
-                        entry.setField(StandardField.MONTH, parts[1]);
+            // Issue (prism:issueIdentifier)
+            String issue = jsonEntry.optString("prism:issueIdentifier", "");
+            if (!issue.isEmpty()) {
+                entry.setField(StandardField.NUMBER, issue);
+            }
+
+            // Pages (prism:pageRange)
+            String pageRange = jsonEntry.optString("prism:pageRange", "");
+            if (!pageRange.isEmpty()) {
+                // Convert hyphen to double dash for BibTeX
+                entry.setField(StandardField.PAGES, pageRange.replace("-", "--"));
+            }
+
+            // Year from coverDate (prism:coverDate format: YYYY-MM-DD)
+            String coverDate = jsonEntry.optString("prism:coverDate", "");
+            if (coverDate.length() >= 4) {
+                entry.setField(StandardField.YEAR, coverDate.substring(0, 4));
+                // Extract month if available
+                if (coverDate.length() >= 7) {
+                    entry.setField(StandardField.MONTH, coverDate.substring(5, 7));
+                }
+            }
+
+            // URL - use Scopus link or DOI link
+            if (jsonEntry.has("link")) {
+                JSONArray links = jsonEntry.getJSONArray("link");
+                for (int i = 0; i < links.length(); i++) {
+                    JSONObject link = links.getJSONObject(i);
+                    String ref = link.optString("@ref", "");
+                    if ("scopus".equals(ref)) {
+                        entry.setField(StandardField.URL, link.optString("@href", ""));
+                        break;
                     }
                 }
             }
 
-            // Volume and Issue - API v2 combines them in "volumeIssue" field
-            // Format examples: "Volume 98", "Volume 4, Issue 7"
-            if (jsonEntry.has("volumeIssue")) {
-                String volumeIssue = jsonEntry.getString("volumeIssue");
-                parseVolumeIssue(volumeIssue, entry);
+            // Abstract (dc:description) - available in COMPLETE view
+            String description = jsonEntry.optString("dc:description", "");
+            if (!description.isEmpty()) {
+                entry.setField(StandardField.ABSTRACT, description);
             }
 
-            // Pages - API v2 returns object with "first" and "last" fields
-            if (jsonEntry.has("pages")) {
-                JSONObject pages = jsonEntry.getJSONObject("pages");
-                String first = pages.optString("first", "");
-                String last = pages.optString("last", "");
-                if (!first.isEmpty()) {
-                    String pageStr = first;
-                    if (!last.isEmpty() && !last.equals(first)) {
-                        pageStr += "--" + last;
+            // ISSN (prism:issn)
+            String issn = jsonEntry.optString("prism:issn", "");
+            if (!issn.isEmpty()) {
+                entry.setField(StandardField.ISSN, issn);
+            }
+
+            // eISSN (prism:eIssn)
+            String eissn = jsonEntry.optString("prism:eIssn", "");
+            if (!eissn.isEmpty() && !entry.hasField(StandardField.ISSN)) {
+                // Only set if ISSN not already set
+                entry.setField(StandardField.ISSN, eissn);
+            }
+
+            // Keywords (authkeywords) - available in COMPLETE view
+            String keywords = jsonEntry.optString("authkeywords", "");
+            if (!keywords.isEmpty()) {
+                entry.setField(StandardField.KEYWORDS, keywords);
+            }
+
+            // Open access flag
+            if (jsonEntry.has("openaccessFlag")) {
+                try {
+                    if (jsonEntry.getBoolean("openaccessFlag")) {
+                        entry.setField(StandardField.NOTE, "Open Access");
                     }
-                    entry.setField(StandardField.PAGES, pageStr);
+                } catch (JSONException e) {
+                    // openaccessFlag might be null or not a boolean
+                    LOGGER.debug("Could not parse openaccessFlag", e);
                 }
             }
 
-            // URL - use the uri field from API v2
-            if (jsonEntry.has("uri")) {
-                entry.setField(StandardField.URL, jsonEntry.getString("uri"));
+            // Cited by count
+            String citedBy = jsonEntry.optString("citedby-count", "0");
+            if (!citedBy.isEmpty() && !"0".equals(citedBy)) {
+                // Store citation count - could be useful for sorting/filtering
+                LOGGER.debug("Entry has {} citations", citedBy);
             }
 
-            // PII (Publisher Item Identifier) - ScienceDirect specific
-            if (jsonEntry.has("pii")) {
-                entry.setField(StandardField.EPRINT, jsonEntry.getString("pii"));
-            }
-
-            // Open Access flag - store as note
-            if (jsonEntry.has("openAccess") && jsonEntry.getBoolean("openAccess")) {
-                entry.setField(StandardField.NOTE, "Open Access");
+            // Scopus EID (unique identifier)
+            String eid = jsonEntry.optString("eid", "");
+            if (!eid.isEmpty()) {
+                entry.setField(StandardField.EPRINT, eid);
             }
 
             return entry;
         } catch (JSONException e) {
-            LOGGER.warn("Error parsing ScienceDirect entry", e);
+            LOGGER.warn("Error parsing Scopus entry", e);
             return null;
         }
     }
 
     /**
-     * Parses the volumeIssue string from API v2 response.
-     * Examples: "Volume 98", "Volume 4, Issue 7"
+     * Determines the BibTeX entry type based on Scopus aggregationType and subtype.
      *
-     * @param volumeIssue the combined volume/issue string
-     * @param entry the BibEntry to populate
+     * @param aggregationType the aggregation type (Journal, Book, Conference Proceeding, etc.)
+     * @param subtype the document subtype (ar, cp, re, etc.)
+     * @return appropriate StandardEntryType
      */
-    private void parseVolumeIssue(String volumeIssue, BibEntry entry) {
-        if (volumeIssue == null || volumeIssue.isEmpty()) {
-            return;
-        }
-
-        // Try to extract volume
-        if (volumeIssue.toLowerCase().contains("volume")) {
-            String[] parts = volumeIssue.split(",");
-            for (String part : parts) {
-                part = part.trim();
-                if (part.toLowerCase().startsWith("volume")) {
-                    String volume = part.replaceFirst("(?i)volume\\s*", "").trim();
-                    if (!volume.isEmpty()) {
-                        entry.setField(StandardField.VOLUME, volume);
-                    }
-                } else if (part.toLowerCase().startsWith("issue")) {
-                    String issue = part.replaceFirst("(?i)issue\\s*", "").trim();
-                    if (!issue.isEmpty()) {
-                        entry.setField(StandardField.NUMBER, issue);
-                    }
-                }
-            }
-        } else {
-            // Fallback: treat as just a volume number
-            entry.setField(StandardField.VOLUME, volumeIssue);
-        }
+    private StandardEntryType determineEntryType(String aggregationType, String subtype) {
+        return switch (subtype.toLowerCase()) {
+            case "cp" ->
+                    StandardEntryType.InProceedings;
+            case "bk" ->
+                    StandardEntryType.Book;
+            case "ch" ->
+                    StandardEntryType.InCollection;
+            case "re" ->
+                    StandardEntryType.Article;
+            case "ed" ->
+                    StandardEntryType.Article;
+            case "le" ->
+                    StandardEntryType.Article;
+            case "no" ->
+                    StandardEntryType.Misc;
+            case "sh" ->
+                    StandardEntryType.Article;
+            default ->
+                    switch (aggregationType.toLowerCase()) {
+                        case "book" ->
+                                StandardEntryType.Book;
+                        case "book series" ->
+                                StandardEntryType.InCollection;
+                        case "conference proceeding" ->
+                                StandardEntryType.InProceedings;
+                        case "trade publication" ->
+                                StandardEntryType.Article;
+                        default ->
+                                StandardEntryType.Article; // Default to Article
+                    };
+        };
     }
 }
