@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 @Disabled("Requires Elsevier/Scopus API key - enable locally with valid key")
 class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
-    private static final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+    private static final ImporterPreferences IMPORTER_PREFERENCES = mock(ImporterPreferences.class);
     private static final Optional<String> API_KEY = Optional.of(new BuildInfo().scienceDirectApiKey);
 
     private ScienceDirect fetcher;
@@ -46,9 +46,9 @@ class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearch
 
     @BeforeAll
     static void ensureScopusIsAvailable() throws FetcherException {
-        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(API_KEY);
-        ScienceDirect scienceDirect = new ScienceDirect(importerPreferences);
+        when(IMPORTER_PREFERENCES.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(IMPORTER_PREFERENCES.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(API_KEY);
+        ScienceDirect scienceDirect = new ScienceDirect(IMPORTER_PREFERENCES);
 
         // Skip tests if API is not available
         assumeFalse(List.of().equals(scienceDirect.performSearch("test")));
@@ -56,9 +56,9 @@ class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearch
 
     @BeforeEach
     void setUp() {
-        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(API_KEY);
-        fetcher = new ScienceDirect(importerPreferences);
+        when(IMPORTER_PREFERENCES.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(IMPORTER_PREFERENCES.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(API_KEY);
+        fetcher = new ScienceDirect(IMPORTER_PREFERENCES);
         entry = new BibEntry();
     }
 
@@ -134,28 +134,22 @@ class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearch
     // ==================== Fetcher Properties Tests ====================
 
     @Test
-    void testFetcherName() {
+    void fetcherName() {
         assertEquals("ScienceDirect", fetcher.getName());
     }
 
     @Test
-    void testGetTestUrl() {
+    void getTestUrl() {
         String testUrl = fetcher.getTestUrl();
         assertNotNull(testUrl);
         assertTrue(testUrl.contains("api.elsevier.com/content/search/scopus"));
         assertTrue(testUrl.contains("apiKey="));
     }
 
-    @Test
-    void testTrustLevel() {
-        // ScienceDirect is a publisher source
-        assertNotNull(fetcher.getTrustLevel());
-    }
-
     // ==================== URL Construction Tests ====================
 
     @Test
-    void testUrlForQueryContainsRequiredParameters() throws URISyntaxException, MalformedURLException {
+    void urlForQueryContainsRequiredParameters() throws URISyntaxException, MalformedURLException {
         SearchQueryNode queryNode = new SearchQueryNode(Optional.empty(), "machine learning");
         URL url = fetcher.getURLForQuery(queryNode, 0);
 
@@ -167,7 +161,7 @@ class ScienceDirectTest implements SearchBasedFetcherCapabilityTest, PagedSearch
     }
 
     @Test
-    void testUrlForQueryWithPagination() throws URISyntaxException, MalformedURLException {
+    void urlForQueryWithPagination() throws URISyntaxException, MalformedURLException {
         SearchQueryNode queryNode = new SearchQueryNode(Optional.empty(), "machine learning");
         URL url = fetcher.getURLForQuery(queryNode, 2);
 

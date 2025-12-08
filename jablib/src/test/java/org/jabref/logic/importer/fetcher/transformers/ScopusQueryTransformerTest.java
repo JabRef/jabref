@@ -84,7 +84,7 @@ class ScopusQueryTransformerTest {
     }
 
     @Test
-    void testLogicalOperators() {
+    void logicalOperators() {
         assertEquals(" AND ", transformer.getLogicalAndOperator());
         assertEquals(" OR ", transformer.getLogicalOrOperator());
         assertEquals("AND NOT ", transformer.getLogicalNotOperator());
