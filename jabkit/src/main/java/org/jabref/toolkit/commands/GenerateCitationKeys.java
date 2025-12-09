@@ -40,9 +40,9 @@ class GenerateCitationKeys implements Runnable {
 
     @Option(
             names = "--pattern",
-            description = "Override the default citation key pattern (Example: [auth][year])"
+            description = "Override the citation key pattern from the preferences"
     )
-    private String defaultPattern;
+    private String pattern;
 
     @Override
     public void run() {
@@ -70,9 +70,9 @@ class GenerateCitationKeys implements Runnable {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
         }
 
-        var preferences = parentTop.cliPreferences.getCitationKeyPatternPreferences();
+        CitationKeyPatternPreferences preferences = parentTop.cliPreferences.getCitationKeyPatternPreferences();
 
-        if (defaultPattern != null) {
+        if (pattern != null) {
             preferences = new CitationKeyPatternPreferences(
                     preferences.shouldTransliterateFieldsForCitationKey(),
                     preferences.shouldAvoidOverwriteCiteKey(),
@@ -83,7 +83,7 @@ class GenerateCitationKeys implements Runnable {
                     preferences.getKeyPatternReplacement(),
                     preferences.getUnwantedCharacters(),
                     preferences.getKeyPatterns(),
-                    defaultPattern,
+                    pattern,
                     preferences.getKeywordDelimiter()
             );
         }
