@@ -141,6 +141,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
         viewModel.addCleanup();
     }
 
+    // culprit
     public BooleanProperty cleanupsDisableProperty() {
         return viewModel.cleanupsDisableProperty();
     }
