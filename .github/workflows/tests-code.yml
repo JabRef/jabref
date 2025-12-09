@@ -92,12 +92,6 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
           java-version: 25
           distribution: 'corretto'
           check-latest: true
