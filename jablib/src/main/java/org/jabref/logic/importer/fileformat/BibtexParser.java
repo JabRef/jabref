@@ -118,6 +118,7 @@ public class BibtexParser implements Parser {
     private StringBuilder currentEntryBuffer = new StringBuilder();
 
     private GroupTreeNode bibDeskGroupTreeNode;
+    private String lastBrokenEntryText = null;
 
     public BibtexParser(@NonNull ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = importFormatPreferences;
@@ -327,10 +328,11 @@ public class BibtexParser implements Parser {
     private void parseAndAddEntry(String type) throws RecoverableParseException, IOException {
         int startLine = line;
         int startColumn = column;
+        String commentsAndEntryTypeDefinition = "";
         try {
             // collect all comments and the entry type definition in front of the actual entry
             // this is at least `@Type`
-            String commentsAndEntryTypeDefinition = dumpTextReadSoFarToString();
+            commentsAndEntryTypeDefinition = dumpTextReadSoFarToString();
 
             // remove first newline
             // this is appended by JabRef during writing automatically
@@ -341,9 +343,17 @@ public class BibtexParser implements Parser {
             }
 
             BibEntry entry = parseEntry(type);
+            String commentBeforeEntry = "";
+            if (lastBrokenEntryText != null && !lastBrokenEntryText.isEmpty()) {
+                commentBeforeEntry = lastBrokenEntryText;
+                lastBrokenEntryText = null;
+            }
+
+            commentBeforeEntry = commentBeforeEntry
+                    + commentsAndEntryTypeDefinition.substring(0, commentsAndEntryTypeDefinition.lastIndexOf('@'));
             // store comments collected without type definition
             entry.setCommentsBeforeEntry(
-                    commentsAndEntryTypeDefinition.substring(0, commentsAndEntryTypeDefinition.lastIndexOf('@')));
+                    commentBeforeEntry);
 
             // store complete parsed serialization (comments, type definition + type contents)
 
@@ -351,7 +361,7 @@ public class BibtexParser implements Parser {
             entry.setParsedSerialization(parsedSerialization);
 
             database.insertEntry(entry);
-            currentEntryBuffer.setLength(0);
+            currentEntryBuffer = new StringBuilder();
         } catch (RecoverableParseException ex) {
             // This makes the parser more robust:
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
@@ -363,6 +373,24 @@ public class BibtexParser implements Parser {
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
             int safePos = ex.getRecoveryPosition();
             int consumed = currentEntryBuffer.length();
+
+            String chunk = getPureTextFromFileSnapshot();
+            int totalLen = chunk.length();
+            int valueLen = currentEntryBuffer.length();
+            int headerLen = totalLen - valueLen;
+            if (headerLen < 0) {
+                headerLen = 0;
+            }
+
+            int cut = headerLen + safePos;
+            if (cut > totalLen) {
+                cut = totalLen;
+            }
+
+            String brokenBody = chunk.substring(0, cut);
+            String brokenEntryText = commentsAndEntryTypeDefinition + brokenBody;
+
+            lastBrokenEntryText = brokenEntryText;
 
             // roll back to the start
             for (int i = 0; i < consumed; i++) {
@@ -384,6 +412,14 @@ public class BibtexParser implements Parser {
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
         }
+    }
+
+    private String getPureTextFromFileSnapshot() {
+        StringBuilder sb = new StringBuilder();
+        for (Character c : pureTextFromFile) {
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
     private void parseJabRefComment(Map<String, String> meta) {

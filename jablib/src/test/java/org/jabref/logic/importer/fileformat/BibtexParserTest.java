@@ -2252,15 +2252,15 @@ class BibtexParserTest {
     public void unmatchedBracketsDoesNotStopParsing() throws Exception {
         String entries = """
                 @Article{ok1,
-                  title = {AAA},
+                  title = {AAA}
                 }
 
                 @Article{bad,
-                  title = {accuracy by 3 to 15{{\\%}.
+                  title = {accuracy by 3 to 15{{\\%}
                 }
 
                 @Article{ok2,
-                  title = {BBB},
+                  title = {BBB}
                 }
                 """;
 
@@ -2272,13 +2272,22 @@ class BibtexParserTest {
                 .withCitationKey("ok1")
                 .withField(StandardField.TITLE, "AAA");
 
-        BibEntry secondEntry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("ok2")
-                .withField(StandardField.TITLE, "BBB");
+        String expectedComment = """
+            @Article{bad,
+              title = {accuracy by 3 to 15{{\\%}
+            }
 
-        assertEquals(
-                List.of(firstEntry, secondEntry),
-                result.getDatabase().getEntries()
-        );
+            """;
+
+        assertEquals(2, entryList.size());
+
+        BibEntry parsedOk1 = entryList.getFirst();
+        BibEntry parsedOk2 = entryList.get(1);
+
+        assertEquals(firstEntry, parsedOk1);
+
+        assertEquals("BBB", parsedOk2.getField(StandardField.TITLE).get());
+
+        assertEquals(expectedComment, parsedOk2.getUserComments());
     }
 }
