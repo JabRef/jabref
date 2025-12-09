@@ -1,4 +1,4 @@
-//JAVA 24
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS org.jspecify:jspecify:1.0.0

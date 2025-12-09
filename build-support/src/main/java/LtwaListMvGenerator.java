@@ -1,4 +1,4 @@
-//JAVA 24
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS com.h2database:h2:2.4.240
