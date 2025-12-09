@@ -1286,5 +1286,4 @@ public class BibtexParser implements Parser {
             return recoveryPosition;
         }
     }
-
 }
