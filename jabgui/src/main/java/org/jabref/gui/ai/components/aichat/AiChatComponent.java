@@ -98,20 +98,20 @@ public class AiChatComponent extends VBox {
                            ObservableList<ChatMessage> chatHistory,
                            ObservableList<BibEntry> entries,
                            BibDatabaseContext bibDatabaseContext,
-                           TaskExecutor taskExecutor,
-                           AiPreferences aiPreferences,
                            BibEntryTypesManager entryTypesManager,
+                           AiPreferences aiPreferences,
                            FieldPreferences fieldPreferences,
-                           DialogService dialogService
+                           DialogService dialogService,
+                           TaskExecutor taskExecutor
     ) {
         this.aiService = aiService;
         this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.taskExecutor = taskExecutor;
         this.aiPreferences = aiPreferences;
         this.entryTypesManager = entryTypesManager;
         this.fieldPreferences = fieldPreferences;
         this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
 
         this.aiChatLogic = aiService.getAiChatService().makeChat(name, chatHistory, entries, bibDatabaseContext);
 

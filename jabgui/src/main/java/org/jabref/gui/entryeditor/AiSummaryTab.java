@@ -28,22 +28,21 @@ public class AiSummaryTab extends EntryEditorTab {
     private final BibEntryTypesManager entryTypesManager;
     private final FieldPreferences fieldPreferences;
 
-    public AiSummaryTab(AiService aiService,
-                        DialogService dialogService,
-                        StateManager stateManager,
-                        AdaptVisibleTabs adaptVisibleTabs,
+    public AiSummaryTab(StateManager stateManager,
+                        BibEntryTypesManager entryTypesManager,
                         GuiPreferences preferences,
-                        BibEntryTypesManager entryTypesManager) {
+                        AiService aiService,
+                        DialogService dialogService,
+                        AdaptVisibleTabs adaptVisibleTabs) {
+        this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
+        this.aiPreferences = preferences.getAiPreferences();
         this.aiService = aiService;
         this.dialogService = dialogService;
-        this.stateManager = stateManager;
         this.adaptVisibleTabs = adaptVisibleTabs;
-
-        this.aiPreferences = preferences.getAiPreferences();
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
-        this.entryTypesManager = entryTypesManager;
         this.fieldPreferences = preferences.getFieldPreferences();
 
         setText(Localization.lang("AI summary"));
@@ -64,14 +63,14 @@ public class AiSummaryTab extends EntryEditorTab {
         setContent(new SummaryComponent(
                 bibDatabaseContext,
                 entry,
-                aiService,
+                entryTypesManager,
                 aiPreferences,
+                fieldPreferences,
                 externalApplicationsPreferences,
                 citationKeyPatternPreferences,
+                aiService,
                 dialogService,
-                adaptVisibleTabs,
-                entryTypesManager,
-                fieldPreferences
+                adaptVisibleTabs
         ));
     }
 }

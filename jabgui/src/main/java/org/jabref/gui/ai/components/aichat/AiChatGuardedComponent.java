@@ -76,11 +76,11 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
                 chatHistory,
                 entries,
                 bibDatabaseContext,
-                taskExecutor,
-                aiPreferences,
                 entryTypesManager,
+                aiPreferences,
                 fieldPreferences,
-                dialogService
+                dialogService,
+                taskExecutor
         );
     }
 }

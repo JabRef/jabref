@@ -86,24 +86,24 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
     public GroupTreeViewModel(@NonNull StateManager stateManager,
+                              @NonNull BibEntryTypesManager entryTypesManager,
+                              @NonNull GuiPreferences preferences,
+                              @NonNull FieldPreferences fieldPreferences,
                               @NonNull DialogService dialogService,
                               @NonNull AiService aiService,
-                              @NonNull GuiPreferences preferences,
                               @NonNull AdaptVisibleTabs adaptVisibleTabs,
-                              @NonNull TaskExecutor taskExecutor,
                               @NonNull CustomLocalDragboard localDragboard,
-                              @NonNull BibEntryTypesManager entryTypesManager,
-                              @NonNull FieldPreferences fieldPreferences
+                              @NonNull TaskExecutor taskExecutor
     ) {
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
+        this.preferences = preferences;
+        this.fieldPreferences = fieldPreferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.preferences = preferences;
         this.adaptVisibleTabs = adaptVisibleTabs;
-        this.taskExecutor = taskExecutor;
         this.localDragboard = localDragboard;
-        this.entryTypesManager = entryTypesManager;
-        this.fieldPreferences = fieldPreferences;
+        this.taskExecutor = taskExecutor;
 
         // Register listener
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
@@ -487,14 +487,14 @@ public class GroupTreeViewModel extends AbstractViewModel {
             existingWindow.get().requestFocus();
         } else {
             AiChatWindow aiChatWindow = new AiChatWindow(
-                    aiService,
-                    preferences.getExternalApplicationsPreferences(),
-                    adaptVisibleTabs,
-                    taskExecutor,
+                    entryTypesManager,
                     preferences.getAiPreferences(),
                     fieldPreferences,
-                    entryTypesManager,
-                    dialogService
+                    preferences.getExternalApplicationsPreferences(),
+                    aiService,
+                    dialogService,
+                    adaptVisibleTabs,
+                    taskExecutor
             );
 
             aiChatWindow.setOnCloseRequest(event ->

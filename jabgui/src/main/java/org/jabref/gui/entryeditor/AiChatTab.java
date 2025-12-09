@@ -46,27 +46,25 @@ public class AiChatTab extends EntryEditorTab {
 
     private Optional<BibEntry> previousBibEntry = Optional.empty();
 
-    public AiChatTab(AiService aiService,
-                     StateManager stateManager,
-                     TaskExecutor taskExecutor,
-                     GuiPreferences preferences,
+    public AiChatTab(StateManager stateManager,
                      BibEntryTypesManager entryTypesManager,
+                     GuiPreferences preferences,
+                     AiService aiService,
                      DialogService dialogService,
-                     AdaptVisibleTabs adaptVisibleTabs) {
-        this.aiService = aiService;
-        this.stateManager = stateManager;
-        this.taskExecutor = taskExecutor;
+                     AdaptVisibleTabs adaptVisibleTabs,
+                     TaskExecutor taskExecutor) {
 
+        this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
         this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
         this.aiPreferences = preferences.getAiPreferences();
         this.fieldPreferences = preferences.getFieldPreferences();
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
-
-        this.entryTypesManager = entryTypesManager;
-
+        this.aiService = aiService;
         this.dialogService = dialogService;
         this.adaptVisibleTabs = adaptVisibleTabs;
+        this.taskExecutor = taskExecutor;
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));

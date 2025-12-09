@@ -70,7 +70,7 @@ class GroupTreeViewModelTest {
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
         when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
-        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class),  preferences, mock(FieldPreferences.class), mock(DialogService.class), mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(), taskExecutor);
     }
 
     @Test
@@ -118,7 +118,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(FieldPreferences.class), dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(),taskExecutor);
         assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -130,7 +130,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(FieldPreferences.class), dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(),taskExecutor);
         assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -142,7 +142,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(FieldPreferences.class), dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(),taskExecutor);
         assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -154,7 +154,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(FieldPreferences.class), dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(),taskExecutor);
         assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -166,7 +166,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldAddsAllSuggestedGroupsWhenNoneExist() {
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(FieldPreferences.class), dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(),taskExecutor);
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         assertFalse(rootGroup.hasAllSuggestedGroups());
 
@@ -178,7 +178,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldAddOnlyMissingGroup() {
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(FieldPreferences.class), dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(),taskExecutor);
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutFilesGroup());
         assertEquals(1, rootGroup.getChildren().size());
@@ -191,7 +191,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldNotAddSuggestedGroupsWhenAllExist() {
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(FieldPreferences.class), dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(),taskExecutor);
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutFilesGroup());
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutGroupsGroup());
@@ -208,7 +208,7 @@ class GroupTreeViewModelTest {
         preferences.getLibraryPreferences().setAddImportedEntries(true);
 
         List<GroupNodeViewModel> prevModel = groupTree.rootGroupProperty().getValue().getChildren();
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(FieldPreferences.class), dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(),taskExecutor);
         String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
 
         assertEquals(0, prevModel.size());
@@ -220,7 +220,7 @@ class GroupTreeViewModelTest {
         preferences.getLibraryPreferences().setAddImportedEntries(true);
         preferences.getLibraryPreferences().setAddImportedEntriesGroupName("Review list");
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard(), mock(BibEntryTypesManager.class), mock(FieldPreferences.class));
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, mock(FieldPreferences.class), dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(),taskExecutor);
         String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
 
         assertEquals("Review list", actualGrpName);
