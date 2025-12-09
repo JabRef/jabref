@@ -254,7 +254,7 @@ public class WebFetchers {
 }
 
 /**
- * Places "Search pre-configured" to the first of the set
+ * Places "Search pre-selected" to the first of the set
  */
 class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
     @Override

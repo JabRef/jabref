@@ -149,7 +149,7 @@ public class JabKitLauncher {
                    .getCommandSpec().usageMessage().footer(Localization.lang("The following providers are available:") + "\n"
                            + fetchers.stream()
                                      .map(WebFetcher::getName)
-                                     .filter(name -> !"Search pre-configured".equals(name))
+                                     .filter(name -> !"Search pre-selected".equals(name))
                                      .collect(Collectors.joining(", ")));
     }
 
