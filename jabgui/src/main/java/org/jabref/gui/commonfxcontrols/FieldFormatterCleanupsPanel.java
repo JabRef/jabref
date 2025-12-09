@@ -113,10 +113,11 @@ public class FieldFormatterCleanupsPanel extends VBox {
     }
 
     private void setupBindings() {
+
         BindingsHelper.bindBidirectional((ObservableValue<Boolean>) cleanupsEnabled.selectedProperty(),
                 viewModel.cleanupsDisableProperty(),
-                disabled -> cleanupsEnabled.selectedProperty().setValue(!disabled),
-                selected -> viewModel.cleanupsDisableProperty().setValue(!selected));
+                disabled -> cleanupsEnabled.setSelected(!disabled),
+                selected -> viewModel.setCleanupsDisable(!selected));
 
         cleanupsList.itemsProperty().bind(viewModel.cleanupsListProperty());
         addableFields.itemsProperty().bind(viewModel.availableFieldsProperty());

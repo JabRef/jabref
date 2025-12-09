@@ -74,6 +74,10 @@ public class FieldFormatterCleanupsPanelViewModel {
         return cleanupsDisableProperty;
     }
 
+    public void setCleanupsDisable(boolean cleanupsDisable) {
+        cleanupsDisableProperty.set(cleanupsDisable);
+    }
+
     public ListProperty<FieldFormatterCleanup> cleanupsListProperty() {
         return cleanupsListProperty;
     }

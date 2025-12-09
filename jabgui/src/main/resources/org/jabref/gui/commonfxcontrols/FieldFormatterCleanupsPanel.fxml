@@ -16,7 +16,7 @@
     <CheckBox fx:id="cleanupsEnabled" text="%Enable field formatters"/>
     <HBox spacing="4.0">
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
-            <TableView fx:id="cleanupsList" minHeight="200.0" disable="${!cleanupsEnabled.selected}">
+            <TableView fx:id="cleanupsList" minHeight="200.0">
                 <columns>
                     <TableColumn fx:id="fieldColumn" text="%Field name" reorderable="false"
                                  minWidth="100.0" prefWidth="108.0"/>
@@ -30,14 +30,14 @@
                 </columnResizePolicy>
             </TableView>
             <HBox spacing="4.0">
-                <SearchableComboBox fx:id="addableFields" editable="true" disable="${!cleanupsEnabled.selected}"
+                <SearchableComboBox fx:id="addableFields" editable="true"
                           HBox.hgrow="SOMETIMES" minWidth="100.0"/>
-                <SearchableComboBox fx:id="addableFormatters" disable="${!cleanupsEnabled.selected}"
+                <SearchableComboBox fx:id="addableFormatters"
                           HBox.hgrow="ALWAYS" minWidth="100.0" maxWidth="Infinity"/>
             </HBox>
         </VBox>
         <VBox spacing="4.0">
-            <Button onAction="#resetToRecommended" disable="${!cleanupsEnabled.selected}"
+            <Button onAction="#resetToRecommended"
                     prefHeight="25.0" prefWidth="25.0" styleClass="icon-button,narrow">
                 <graphic>
                     <JabRefIconView glyph="REFRESH"/>
@@ -46,7 +46,7 @@
                     <Tooltip text="%Reset to recommended"/>
                 </tooltip>
             </Button>
-            <Button onAction="#clearAll" disable="${!cleanupsEnabled.selected}"
+            <Button onAction="#clearAll"
                     prefHeight="25.0" prefWidth="25.0" styleClass="icon-button,narrow">
                 <graphic>
                     <JabRefIconView glyph="CLEANUP_ENTRIES"/>
@@ -56,7 +56,7 @@
                 </tooltip>
             </Button>
             <VBox VBox.vgrow="ALWAYS"/>
-            <Button onAction="#addCleanup" disable="${!cleanupsEnabled.selected}"
+            <Button onAction="#addCleanup"
                     prefHeight="25.0" prefWidth="25.0" styleClass="icon-button,narrow">
                 <graphic>
                     <JabRefIconView glyph="ADD_NOBOX"/>
