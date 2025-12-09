@@ -13,6 +13,9 @@ public enum PlausibilityComparatorFactory {
 
     public Optional<FieldValuePlausibilityComparator> getPlausibilityComparator(Field field) {
         // Similar code as [org.jabref.gui.fieldeditors.FieldEditors.getForField]
+        if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+            return Optional.of(new PersonNamesPlausibilityComparator());
+        }
         if (field.getProperties().contains(FieldProperty.YEAR)) {
             return Optional.of(new YearFieldValuePlausibilityComparator());
         }

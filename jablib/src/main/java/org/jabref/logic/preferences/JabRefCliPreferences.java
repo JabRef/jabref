@@ -554,15 +554,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(KEY_PATTERN_REGEX, "");
         defaults.put(KEY_PATTERN_REPLACEMENT, "");
 
-        // Proxy
-        defaults.put(PROXY_USE, Boolean.FALSE);
-        defaults.put(PROXY_HOSTNAME, "");
-        defaults.put(PROXY_PORT, "80");
-        defaults.put(PROXY_USE_AUTHENTICATION, Boolean.FALSE);
-        defaults.put(PROXY_USERNAME, "");
-        defaults.put(PROXY_PASSWORD, "");
-        defaults.put(PROXY_PERSIST_PASSWORD, Boolean.FALSE);
-
         // SSL
         defaults.put(TRUSTSTORE_PATH, Directories
                 .getSslDirectory()
@@ -1055,6 +1046,8 @@ public class JabRefCliPreferences implements CliPreferences {
         clearCustomFetcherKeys();
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
+
+        getProxyPreferences().setAll(ProxyPreferences.getDefault());
     }
 
     private void clearTruststoreFromCustomCertificates() {
@@ -1206,8 +1199,10 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // TODO: We need to load all CLI-preferences from the backing store
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
-    }
 
+        // in case of incomplete or corrupt xml fall back to current preferences
+        getProxyPreferences().setAll(ProxyPreferences.getDefault());
+    }
     //*************************************************************************************************************
     // ToDo: Cleanup
     //*************************************************************************************************************
@@ -1423,20 +1418,14 @@ public class JabRefCliPreferences implements CliPreferences {
         return remotePreferences;
     }
 
+    // region: Proxy Preferences
     @Override
     public ProxyPreferences getProxyPreferences() {
         if (proxyPreferences != null) {
             return proxyPreferences;
         }
 
-        proxyPreferences = new ProxyPreferences(
-                getBoolean(PROXY_USE),
-                get(PROXY_HOSTNAME),
-                get(PROXY_PORT),
-                getBoolean(PROXY_USE_AUTHENTICATION),
-                get(PROXY_USERNAME),
-                getProxyPassword(),
-                getBoolean(PROXY_PERSIST_PASSWORD));
+        proxyPreferences = getProxyPreferencesFromBackingStore(ProxyPreferences.getDefault());
 
         EasyBind.listen(proxyPreferences.useProxyProperty(), (_, _, newValue) -> putBoolean(PROXY_USE, newValue));
         EasyBind.listen(proxyPreferences.hostnameProperty(), (_, _, newValue) -> put(PROXY_HOSTNAME, newValue));
@@ -1457,6 +1446,19 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return proxyPreferences;
     }
+
+    private ProxyPreferences getProxyPreferencesFromBackingStore(ProxyPreferences defaults) {
+        return new ProxyPreferences(
+                getBoolean(PROXY_USE, defaults.shouldUseProxy()),
+                get(PROXY_HOSTNAME, defaults.getHostname()),
+                get(PROXY_PORT, defaults.getPort()),
+                getBoolean(PROXY_USE_AUTHENTICATION, defaults.shouldUseAuthentication()),
+                get(PROXY_USERNAME, defaults.getUsername()),
+                get(PROXY_PASSWORD, defaults.getPassword()),
+                getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
+        );
+    }
+    // endRegion: Proxy Preferences
 
     private String getProxyPassword() {
         if (getBoolean(PROXY_PERSIST_PASSWORD)) {
