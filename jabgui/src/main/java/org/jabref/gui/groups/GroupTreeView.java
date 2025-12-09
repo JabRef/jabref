@@ -120,24 +120,24 @@ public class GroupTreeView extends BorderPane {
     /**
      * Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
      */
-    public GroupTreeView(TaskExecutor taskExecutor,
-                         StateManager stateManager,
-                         AdaptVisibleTabs adaptVisibleTabs,
+    public GroupTreeView(StateManager stateManager,
+                         BibEntryTypesManager entryTypesManager,
                          GuiPreferences preferences,
                          DialogService dialogService,
                          AiService aiService,
                          UndoManager undoManager,
                          FileUpdateMonitor fileUpdateMonitor,
-                         BibEntryTypesManager entryTypesManager) {
-        this.taskExecutor = taskExecutor;
+                         AdaptVisibleTabs adaptVisibleTabs,
+                         TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
-        this.adaptVisibleTabs = adaptVisibleTabs;
+        this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.entryTypesManager = entryTypesManager;
+        this.adaptVisibleTabs = adaptVisibleTabs;
+        this.taskExecutor = taskExecutor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
         this.disableProperty().bind(groupsDisabledProperty());
         createNodes();
@@ -195,7 +195,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, adaptVisibleTabs, taskExecutor, localDragboard, entryTypesManager, preferences.getFieldPreferences());
+        viewModel = new GroupTreeViewModel(stateManager, entryTypesManager, preferences, preferences.getFieldPreferences(), dialogService, aiService,adaptVisibleTabs, localDragboard, taskExecutor);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

@@ -50,24 +50,25 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
 
     public SummaryComponent(BibDatabaseContext bibDatabaseContext,
                             BibEntry entry,
-                            AiService aiService,
+                            BibEntryTypesManager entryTypesManager,
                             AiPreferences aiPreferences,
+                            FieldPreferences fieldPreferences,
                             ExternalApplicationsPreferences externalApplicationsPreferences,
                             CitationKeyPatternPreferences citationKeyPatternPreferences,
+                            AiService aiService,
                             DialogService dialogService,
-                            AdaptVisibleTabs adaptVisibleTabs,
-                            BibEntryTypesManager entryTypesManager,
-                            FieldPreferences fieldPreferences
+                            AdaptVisibleTabs adaptVisibleTabs
+
     ) {
         super(aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);
 
         this.bibDatabaseContext = bibDatabaseContext;
         this.entry = entry;
+        this.entryTypesManager = entryTypesManager;
+        this.aiPreferences = aiPreferences;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
         this.aiService = aiService;
-        this.aiPreferences = aiPreferences;
         this.dialogService = dialogService;
-        this.entryTypesManager = entryTypesManager;
         this.fieldPreferences = fieldPreferences;
 
         aiService.getSummariesService().summarize(entry, bibDatabaseContext).stateProperty().addListener(o -> rebuildUi());
