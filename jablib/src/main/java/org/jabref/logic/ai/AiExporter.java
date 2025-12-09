@@ -1,9 +1,13 @@
 package org.jabref.logic.ai;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.ai.util.ErrorMessage;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
