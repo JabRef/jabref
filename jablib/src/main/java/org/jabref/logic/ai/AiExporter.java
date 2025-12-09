@@ -1,11 +1,9 @@
 package org.jabref.logic.ai;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -30,14 +28,22 @@ public class AiExporter {
     }
 
     public String buildMarkdownExport(String contentTitle, String contentBody) {
-        StringBuilder sb = new StringBuilder();
+        StringJoiner sj = new StringJoiner("\n\n");
+        sj.add("## Bibtex");
+
+        StringJoiner bibtexBlock = new StringJoiner("\n");
+        bibtexBlock.add("```bibtex");
         String bibtex = entry.getStringRepresentation(entry, BibDatabaseMode.BIBTEX, entryTypesManager, fieldPreferences);
-        sb.append("## Bibtex\n\n```bibtex\n");
-        sb.append(bibtex);
-        sb.append("\n```\n\n");
-        sb.append("## ").append(contentTitle).append("\n\n");
-        sb.append(contentBody);
-        return sb.toString();
+        bibtexBlock.add(bibtex);
+        bibtexBlock.add("```");
+        sj.add(bibtexBlock.toString());
+
+        StringJoiner contentBlock = new StringJoiner("\n\n");
+        contentBlock.add("## " + contentTitle);
+        contentBlock.add(contentBody);
+        sj.add(contentBlock.toString());
+
+        return sj.toString();
     }
 
     public String buildMarkdownForChat(List<ChatMessage> messages) {
@@ -51,9 +57,11 @@ public class AiExporter {
             } else if (msg instanceof AiMessage aiMessage) {
                 role = "AI";
                 content = aiMessage.text();
+            } else if (msg instanceof ErrorMessage errorMessage) {
+                role = "Error";
+                content = errorMessage.getText();
             } else {
-                // System messages and tool execution results are internal details
-                // and are hidden to keep the conversation readable for the user.
+                // ignored SystemMessage, ToolExecutionResultMessage as they are not part of the conversation exchange.
                 continue;
             }
             conversation.append("**").append(role).append(":**\n\n");
@@ -89,8 +97,11 @@ public class AiExporter {
             } else if (msg instanceof AiMessage aiMessage) {
                 role = "assistant";
                 content = aiMessage.text();
+            } else if (msg instanceof ErrorMessage errorMessage) {
+                role = "error";
+                content = errorMessage.getText();
             } else {
-                // I ignored SystemMessage, ToolExecutionResultMessage, ErrorMessage and ErrorMessage as they are not part of the conversation exchange.
+                // ignored SystemMessage, ToolExecutionResultMessage as they are not part of the conversation exchange.
                 continue;
             }
 
