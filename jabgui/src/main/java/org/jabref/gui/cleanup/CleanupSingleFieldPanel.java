@@ -32,6 +32,7 @@ public class CleanupSingleFieldPanel extends VBox {
     }
 
     private void bindProperties() {
+        // this breaks binding of bidrectiobal
         formatterCleanupsPanel.cleanupsDisableProperty().bind(viewModel.cleanupsEnabled.not());
         formatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanups);
     }
