@@ -115,7 +115,7 @@ public class BibtexParser implements Parser {
     private final MetaDataParser metaDataParser;
     private final Map<String, String> parsedBibDeskGroups;
 
-    private final StringBuilder currentEntryBuffer = new StringBuilder();
+    private StringBuilder currentEntryBuffer = new StringBuilder();
 
     private GroupTreeNode bibDeskGroupTreeNode;
 
@@ -324,7 +324,7 @@ public class BibtexParser implements Parser {
         database.setEpilog(dumpTextReadSoFarToString().trim());
     }
 
-    private void parseAndAddEntry(String type) throws IOException {
+    private void parseAndAddEntry(String type) throws RecoverableParseException, IOException {
         int startLine = line;
         int startColumn = column;
         try {
@@ -352,33 +352,37 @@ public class BibtexParser implements Parser {
 
             database.insertEntry(entry);
             currentEntryBuffer.setLength(0);
-        } catch (IOException ex) {
+        } catch (RecoverableParseException ex) {
             // This makes the parser more robust:
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
-            String msg = ex.getMessage();
+            LOGGER.warn("Could not parse entry", ex);
+
+            String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
+                    + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
+
+            parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
+            int safePos = ex.getRecoveryPosition();
+            int consumed = currentEntryBuffer.length();
+
+            // roll back to the start
+            for (int i = 0; i < consumed; i++) {
+                unread(currentEntryBuffer.charAt(consumed - 1 - i));
+            }
+
+            // go to safePos
+            for (int i = 0; i < safePos; i++) {
+                read();
+            }
+
+            int next = peek();
+            LOGGER.info(">>> RECOVERED NEXT CHAR = [{}] @ line {}", (char) next, line);
+            currentEntryBuffer = new StringBuilder();
+            dumpTextReadSoFarToString();
+        } catch (IOException ex) {
             LOGGER.warn("Could not parse entry", ex);
             String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
-            if (msg != null && msg.startsWith("RECOVER:")) {
-                int safePos = Integer.parseInt(msg.substring("RECOVER:".length()));
-                int consumed = currentEntryBuffer.length();
-
-                // roll back to the start
-                for (int i = 0; i < consumed; i++) {
-                    unread(currentEntryBuffer.charAt(consumed - 1 - i));
-                }
-
-                // go to safePos
-                for (int i = 0; i < safePos; i++) {
-                    read();
-                }
-
-                int next = peek();
-                LOGGER.info(">>> RECOVERED NEXT CHAR = [{}] @ line {}", (char) next, line);
-                currentEntryBuffer.setLength(0);
-                dumpTextReadSoFarToString();
-            }
         }
     }
 
@@ -1150,7 +1154,7 @@ public class BibtexParser implements Parser {
             } else if (isEOFCharacter(character)) {
                 String scanned = currentEntryBuffer.toString();
                 int pos = findRecoveryStart(scanned, scanned.length() - 1);
-                throw new IOException("RECOVER:" + pos);
+                throw new RecoverableParseException(pos);
             } else if ((character == '{') && (!isEscapeSymbol(lastCharacter))) {
                 brackets++;
             } else if (isClosingBracket) {
@@ -1268,4 +1272,19 @@ public class BibtexParser implements Parser {
                     + " but received " + (char) character);
         }
     }
+
+    private static class RecoverableParseException extends RuntimeException {
+
+        private final int recoveryPosition;
+
+        RecoverableParseException(int recoveryPosition) {
+            super("Recoverable parse error at position " + recoveryPosition);
+            this.recoveryPosition = recoveryPosition;
+        }
+
+        int getRecoveryPosition() {
+            return recoveryPosition;
+        }
+    }
+
 }
