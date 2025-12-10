@@ -248,25 +248,21 @@ class RTFCharsTest {
              \\'ec, \\`{i}
              \\'f2, \\`{o}
              \\'f9, \\`{u}
-
              \\'e1, \\'a
              \\'e9, \\'e
              \\'ed, \\'i
              \\'f3, \\'o
              \\'fa, \\'u
-
              \\'e2, \\^a
              \\'ea, \\^e
              \\'ee, \\^i
              \\'f4, \\^o
              \\'fa, \\^u
-
              \\'e4, \\\"a
              \\'eb, \\\"e
              \\'ef, \\\"i
              \\'f6, \\\"o
              \\u252u, \\\"u
-
              \\'f1, \\~n
             """)
     void rtfCharacters(String expected, String input) {
@@ -280,19 +276,16 @@ class RTFCharsTest {
             \\'cc , \\`I
             \\'d2 , \\`O
             \\'d9 , \\`U
-
             \\'c1 , \\'A
             \\'c9 , \\'E
             \\'cd , \\'I
             \\'d3 , \\'O
             \\'da , \\'U
-
             \\'c2 , \\^A
             \\'ca , \\^E
             \\'ce , \\^I
             \\'d4 , \\^O
             \\'db , \\^U
-
             \\'c4 , \\\"A
             \\'cb , \\\"E
             \\'cf , \\\"I

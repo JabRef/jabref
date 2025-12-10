@@ -33,7 +33,7 @@ class CompositeFormatTest {
         LayoutFormatter f = new CompositeFormat(new AuthorOrgSci(), new NoSpaceBetweenAbbreviations());
         LayoutFormatter first = new AuthorOrgSci();
         LayoutFormatter second = new NoSpaceBetweenAbbreviations();
-        
+
         assertEquals(second.format(first.format(inputForFirst)), f.format(inputForComposite));
     }
 }
