@@ -372,13 +372,13 @@ public class NewEntryViewModel {
         cancel();
         interpretWorker = new WorkerInterpretCitations();
 
-        interpretWorker.setOnFailed(event -> {
+        interpretWorker.setOnFailed(_ -> {
             final Throwable exception = interpretWorker.getException();
             final String exceptionMessage = exception.getMessage();
             final String parserName = interpretParser.getValue().getLocalizedName();
+            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
 
             final String dialogTitle = Localization.lang("Failed to interpret citations");
-
             if (exception instanceof FetcherException) {
                 dialogService.showInformationDialogAndWait(
                         dialogTitle,
@@ -395,8 +395,6 @@ public class NewEntryViewModel {
                                         "%0",
                                 exceptionMessage));
             }
-
-            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
 
             executing.set(false);
         });
@@ -462,7 +460,7 @@ public class NewEntryViewModel {
             final Throwable exception = interpretWorker.getException();
             final String exceptionMessage = exception.getMessage();
 
-            final String dialogTitle = Localization.lang("Failed to parse Bib(La)Tex");
+            final String dialogTitle = Localization.lang("Failed to parse Bib(La)TeX");
 
             if (exception instanceof ParseException) {
                 dialogService.showInformationDialogAndWait(
@@ -481,7 +479,7 @@ public class NewEntryViewModel {
                                 exceptionMessage));
             }
 
-            LOGGER.error("An exception occurred when parsing Bib(La)Tex entries.", exception);
+            LOGGER.error("An exception occurred when parsing Bib(La)TeX entries.", exception);
 
             executing.set(false);
         });
@@ -495,7 +493,7 @@ public class NewEntryViewModel {
                         Localization.lang(
                                 "An unknown error has occurred.\n" +
                                         "Entries may need to be added manually."));
-                LOGGER.error("An invalid result was returned when parsing Bib(La)Tex entries.");
+                LOGGER.error("An invalid result was returned when parsing Bib(La)TeX entries.");
                 executing.set(false);
                 return;
             }
