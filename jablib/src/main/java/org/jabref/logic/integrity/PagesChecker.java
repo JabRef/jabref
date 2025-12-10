@@ -17,7 +17,7 @@ public class PagesChecker implements ValueChecker {
     private static final String BIBLATEX_RANGE_SEPARATOR = "(\\+|-{1,2}|\u2013)";
 
     private static final String PAGES_EXP_BIBTEX =
-                    "\\A"                       // begin String
+            "\\A"                       // begin String
                     + SINGLE_PAGE_PATTERN
                     + "("
                     + BIBTEX_RANGE_SEPARATOR
@@ -27,7 +27,7 @@ public class PagesChecker implements ValueChecker {
 
     // See https://packages.oth-regensburg.de/ctan/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsubsection.3.15.3 for valid content
     private static final String PAGES_EXP_BIBLATEX =
-                    "\\A"                       // begin String
+            "\\A"                       // begin String
                     + SINGLE_PAGE_PATTERN
                     + "("
                     + BIBLATEX_RANGE_SEPARATOR
