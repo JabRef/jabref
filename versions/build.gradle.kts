@@ -17,7 +17,7 @@ val lucene = "10.3.2"
 val pdfbox = "3.0.6"
 
 dependencies {
-    api(platform("ai.djl:bom:0.34.0"))
+    api(platform("ai.djl:bom:0.35.1"))
     api(platform("dev.langchain4j:langchain4j-bom:1.7.1"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
@@ -112,7 +112,7 @@ dependencies.constraints {
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     api("net.bytebuddy:byte-buddy:1.18.2")
-    api("net.harawata:appdirs:1.4.0")
+    api("net.harawata:appdirs:1.5.0")
     api("net.java.dev.jna:jna-jpms:5.18.1")
     api("net.java.dev.jna:jna-platform:5.18.1")
     api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.WorkspacePreferences;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.study.Study;
@@ -22,6 +23,8 @@ class ManageStudyDefinitionViewModelTest {
     private ImportFormatPreferences importFormatPreferences;
     private ImporterPreferences importerPreferences;
     private WorkspacePreferences workspacePreferences;
+    private GitPreferences gitPreferences;
+
     private DialogService dialogService;
 
     @BeforeEach
@@ -30,12 +33,14 @@ class ManageStudyDefinitionViewModelTest {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
         dialogService = mock(DialogService.class);
     }
 
     @Test
     void emptyStudyConstructorFillsDatabasesCorrectly() {
-        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, workspacePreferences, dialogService);
+        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(
+                importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
                 new StudyCatalogItem("ArXiv", false),
@@ -113,6 +118,7 @@ class ManageStudyDefinitionViewModelTest {
                 importFormatPreferences,
                 importerPreferences,
                 workspacePreferences,
+                gitPreferences,
                 dialogService);
     }
 }

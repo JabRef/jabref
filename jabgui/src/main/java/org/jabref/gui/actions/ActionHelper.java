@@ -48,6 +48,23 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(binding);
     }
 
+    public static BooleanExpression needsGitRemoteConfigured(StateManager stateManager) {
+        return BooleanExpression.booleanExpression(
+                EasyBind.map(
+                        stateManager.activeDatabaseProperty(),
+                        contextOptional -> contextOptional
+                                .filter(context -> context.getLocation() == DatabaseLocation.LOCAL)
+                                .map(context ->
+                                        context.getDatabasePath()
+                                               // TODO: This dependency should be passed more directly. Maybe as part of StateManager - or similar to AiChatService
+                                               .flatMap(path -> Injector.instantiateModelOrService(GitHandlerRegistry.class)
+                                                                        .fromAnyPath(path))
+                                               .map(handler -> handler.hasRemote("origin"))
+                                               .orElse(false))
+                                .orElse(false))
+        );
+    }
+
     public static BooleanExpression needsEntriesSelected(StateManager stateManager) {
         return Bindings.isNotEmpty(stateManager.getSelectedEntries());
     }
@@ -105,21 +122,5 @@ public class ActionHelper {
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
                 entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));
-    }
-
-    public static BooleanExpression needsGitRemoteConfigured(StateManager stateManager) {
-        return BooleanExpression.booleanExpression(
-                EasyBind.map(stateManager.activeDatabaseProperty(), contextOptional -> {
-                    if (contextOptional.isPresent()) {
-                        return contextOptional.get().getDatabasePath()
-                                              .flatMap(path -> Injector.instantiateModelOrService(GitHandlerRegistry.class).fromAnyPath(path))
-                                              .map(handler -> handler.hasRemote("origin")
-                                              )
-                                              .orElse(false);
-                    } else {
-                        return false;
-                    }
-                })
-        );
     }
 }
