@@ -6,14 +6,17 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
 
 public class PagesChecker implements ValueChecker {
 
+    // optional prefix and number
     private static final String SINGLE_PAGE_PATTERN = "[A-Za-z]?\\d*";
 
+    // separator, must contain exactly two dashes
     private static final String BIBTEX_RANGE_SEPARATOR = "(\\+|-{2}|\u2013)";
+    // separator
     private static final String BIBLATEX_RANGE_SEPARATOR = "(\\+|-{1,2}|\u2013)";
 
     private static final String PAGES_EXP_BIBTEX =
