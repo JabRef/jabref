@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -31,12 +32,15 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.MedlineQueryTransformer;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.search.query.BaseQueryNode;
 
+import kong.unirest.core.UnirestException;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +57,6 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
     private static final int NUMBER_TO_FETCH = 50;
     private static final String ID_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
     private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
-    private static final String TEST_URL_WITHOUT_API_KEY = "https://www.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=pubmed&api_key=";
 
     private final ImporterPreferences importerPreferences;
     private int numberOfResultsFound;
@@ -225,7 +228,17 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
     }
 
     @Override
-    public String getTestUrl() {
-        return TEST_URL_WITHOUT_API_KEY;
+    public boolean isValidKey(@NotNull String apiKey) {
+        try {
+            URLDownload urlDownload = new URLDownload(getTestUrl(apiKey));
+            int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
+            return (statusCode >= 200) && (statusCode < 300);
+        } catch (IOException | UnirestException e) {
+            return false;
+        }
+    }
+
+    private String getTestUrl(String apiKey) {
+        return "https://www.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=pubmed&api_key=" + apiKey;
     }
 }

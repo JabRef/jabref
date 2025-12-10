@@ -1,7 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -15,6 +17,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
@@ -26,9 +29,11 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import com.google.common.base.Strings;
+import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +46,6 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerNatureWebFetcher.class);
 
     private static final String API_URL = "https://api.springernature.com/meta/v2/json";
-    // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
-    private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v2/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
 
     private final ImporterPreferences importerPreferences;
 
@@ -168,8 +171,19 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
     }
 
     @Override
-    public String getTestUrl() {
-        return TEST_URL_WITHOUT_API_KEY;
+    public boolean isValidKey(@NotNull String apiKey) {
+        try {
+            URLDownload urlDownload = new URLDownload(getTestUrl(apiKey));
+            int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
+            return (statusCode >= 200) && (statusCode < 300);
+        } catch (IOException | UnirestException e) {
+            return false;
+        }
+    }
+
+    private String getTestUrl(String apiKey) {
+        // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
+        return "https://api.springernature.com/meta/v2/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=" + apiKey;
     }
 
     /**
