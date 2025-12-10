@@ -1,7 +1,5 @@
 package org.jabref.gui.maintable;
 
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -16,26 +14,6 @@ public class MainTablePreferences {
         this.columnPreferences = columnPreferences;
         this.resizeColumnsToFit.set(resizeColumnsToFit);
         this.extraFileColumnsEnabled.set(extraFileColumnsEnabled);
-    }
-
-    /// Creates Object with default values
-    private MainTablePreferences() {
-        this(
-                new ColumnPreferences(List.of(), List.of()),  // Default column preferences
-                false,                                        // Default resize columns to fit
-                false                                         // Default extra file columns disabled
-        );
-    }
-
-    public static MainTablePreferences getDefault() {
-        return new MainTablePreferences();
-    }
-
-    public void setAll(MainTablePreferences preferences) {
-        this.columnPreferences.setColumns(preferences.getColumnPreferences().getColumns());
-        this.columnPreferences.setColumnSortOrder(preferences.getColumnPreferences().getColumnSortOrder());
-        this.setResizeColumnsToFit(preferences.getResizeColumnsToFit());
-        this.setExtraFileColumnsEnabled(preferences.getExtraFileColumnsEnabled());
     }
 
     public ColumnPreferences getColumnPreferences() {
