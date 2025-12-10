@@ -75,9 +75,9 @@ class LayoutEntryTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-            bla , bla
-            bla , bla
-            _bla.bla.blub , _bla.bla.blub
+            bla, bla
+            bla, bla
+            _bla.bla.blub, _bla.bla.blub
             """)
     void parseSingleMethodWithoutArguments(String expected, String input) {
         assertEquals(1, LayoutEntry.parseMethodsCalls(input).size());
@@ -95,8 +95,8 @@ class LayoutEntryTest {
 
     @ParameterizedTest
     @CsvSource(delimiterString = ";", textBlock = """
-            bla ; foo ; test ; fark ; 'bla("test"),foo("fark")'
-            bla ; foo ; test ; fark ; 'bla(test),foo(fark)'
+            bla; foo; test; fark; 'bla("test"),foo("fark")'
+            bla; foo; test; fark; 'bla(test),foo(fark)'
             """)
     void parseTwoMethodsWithArguments(String expectedName1, String expectedName2,
                                       String expectedArg1, String expectedArg2, String input) {

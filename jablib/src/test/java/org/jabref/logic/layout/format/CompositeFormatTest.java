@@ -26,8 +26,8 @@ class CompositeFormatTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-            John Flynn and Sabine Gartska , John Flynn and Sabine Gartska
-            Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee , Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee
+            John Flynn and Sabine Gartska, John Flynn and Sabine Gartska
+            Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee, Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee
             """)
     void doubleComposite(String inputForFirst, String inputForComposite) {
         LayoutFormatter f = new CompositeFormat(new AuthorOrgSci(), new NoSpaceBetweenAbbreviations());

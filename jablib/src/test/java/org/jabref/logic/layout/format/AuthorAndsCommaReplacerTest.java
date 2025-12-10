@@ -15,13 +15,13 @@ class AuthorAndsCommaReplacerTest {
     @ParameterizedTest
     @CsvSource(textBlock = """
             # Empty case
-            '' , ''
+            '', ''
             # Single Names don't change
-            'Someone, Van Something' , 'Someone, Van Something'
+            'Someone, Van Something', 'Someone, Van Something'
             # Two names just an &
-            'John von Neumann & Peter Black Brown' , 'John von Neumann and Peter Black Brown'
+            'John von Neumann & Peter Black Brown', 'John von Neumann and Peter Black Brown'
             # Three names put a comma:
-            'von Neumann, John, Smith, John & Black Brown, Peter' , 'von Neumann, John and Smith, John and Black Brown, Peter'
+            'von Neumann, John, Smith, John & Black Brown, Peter', 'von Neumann, John and Smith, John and Black Brown, Peter'
             """)
     void format(String expected, String input) {
         LayoutFormatter formatter = new AuthorAndsCommaReplacer();
