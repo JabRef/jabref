@@ -2273,11 +2273,11 @@ class BibtexParserTest {
                 .withField(StandardField.TITLE, "AAA");
 
         String expectedComment = """
-            @Article{bad,
-              title = {accuracy by 3 to 15{{\\%}
-            }
+                @Article{bad,
+                  title = {accuracy by 3 to 15{{\\%}
+                }
 
-            """;
+                """;
 
         assertEquals(2, entryList.size());
 
