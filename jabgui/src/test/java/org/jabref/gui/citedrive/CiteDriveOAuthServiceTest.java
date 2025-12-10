@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 class CiteDriveOAuthServiceTest {
 
-    private static HttpServerManager HTTP_SERVER_MANAGER = new HttpServerManager();
+    private static final HttpServerManager HTTP_SERVER_MANAGER = new HttpServerManager();
 
     @BeforeAll
     static void startServer() {
