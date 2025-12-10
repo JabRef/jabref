@@ -44,6 +44,17 @@ public class GroupsPreferences {
         }
     }
 
+    public GroupsPreferences() {
+        this(
+                false,
+                false,
+                false,
+                false,
+                false,
+                GroupHierarchyType.INDEPENDENT
+        );
+    }
+
     @VisibleForTesting
     public GroupsPreferences(EnumSet<GroupViewMode> groupViewMode,
                              boolean shouldAutoAssignGroup,
@@ -53,6 +64,17 @@ public class GroupsPreferences {
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
         this.defaultHierarchicalContext = new SimpleObjectProperty<>(defaultHierarchicalContext);
+    }
+
+    public static GroupsPreferences getDefault() {
+        return new GroupsPreferences();
+    }
+
+    public void setAll(GroupsPreferences preferences) {
+        this.groupViewMode.set(preferences.groupViewMode);
+        this.shouldAutoAssignGroup.set(preferences.shouldAutoAssignGroup());
+        this.shouldDisplayGroupCount.set(preferences.shouldDisplayGroupCount());
+        this.defaultHierarchicalContext.set(preferences.getDefaultHierarchicalContext());
     }
 
     public EnumSet<GroupViewMode> getGroupViewMode() {

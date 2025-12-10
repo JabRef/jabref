@@ -410,6 +410,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getDonationPreferences().setAll(DonationPreferences.getDefault());
+        getGroupsPreferences().setAll(GroupsPreferences.getDefault());
     }
 
     @Override
@@ -420,6 +421,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
+        getGroupsPreferences().setAll(getGroupsPreferencesfromBackingStore(getGroupsPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -820,14 +822,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return groupsPreferences;
         }
 
-        groupsPreferences = new GroupsPreferences(
-                getBoolean(GROUP_VIEW_INTERSECTION),
-                getBoolean(GROUP_VIEW_FILTER),
-                getBoolean(GROUP_VIEW_INVERT),
-                getBoolean(AUTO_ASSIGN_GROUP),
-                getBoolean(DISPLAY_GROUP_COUNT),
-                GroupHierarchyType.valueOf(get(DEFAULT_HIERARCHICAL_CONTEXT))
-        );
+        groupsPreferences = getGroupsPreferencesfromBackingStore(GroupsPreferences.getDefault());
 
         groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
             putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
@@ -839,6 +834,19 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
 
         return groupsPreferences;
+    }
+
+    private GroupsPreferences getGroupsPreferencesfromBackingStore(GroupsPreferences defaults) {
+        return new GroupsPreferences(
+                getBoolean(GROUP_VIEW_INTERSECTION, defaults.groupViewModeProperty().contains(GroupViewMode.INTERSECTION)),
+                getBoolean(GROUP_VIEW_FILTER, defaults.groupViewModeProperty().contains(GroupViewMode.FILTER)),
+                getBoolean(GROUP_VIEW_INVERT, defaults.groupViewModeProperty().contains(GroupViewMode.INVERT)),
+                getBoolean(AUTO_ASSIGN_GROUP, defaults.shouldAutoAssignGroup()),
+                getBoolean(DISPLAY_GROUP_COUNT, defaults.shouldDisplayGroupCount()),
+                GroupHierarchyType.valueOf(
+                        get(DEFAULT_HIERARCHICAL_CONTEXT, defaults.getDefaultHierarchicalContext().name())
+                )
+        );
     }
 
     public SpecialFieldsPreferences getSpecialFieldsPreferences() {
@@ -1216,7 +1224,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
 
         donationPreferences = getDonationPreferencesFromBackingStore(DonationPreferences.getDefault());
-        
+
         EasyBind.listen(donationPreferences.neverShowAgainProperty(), (_, _, newValue) -> putBoolean(DONATION_NEVER_SHOW, newValue));
         EasyBind.listen(donationPreferences.lastShownEpochDayProperty(), (_, _, newValue) -> putInt(DONATION_LAST_SHOWN_EPOCH_DAY, newValue.intValue()));
         return donationPreferences;
