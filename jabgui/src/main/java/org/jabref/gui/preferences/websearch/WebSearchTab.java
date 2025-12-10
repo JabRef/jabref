@@ -20,6 +20,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.beans.binding.Bindings;
+import javafx.scene.control.Label;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -93,6 +95,29 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         searchEngineUrlTemplate.setEditable(true);
 
         searchEngineTable.setItems(viewModel.getSearchEngines());
+
+        // Make the search engine table compact instead of letting it stretch to fill the entire preferences pane.
+        // Show a friendly placeholder when empty:
+        searchEngineTable.setPlaceholder(new Label(Localization.lang("No search engines configured")));
+
+        // Use a fixed cell size so we can compute a reliable preferred height:
+        searchEngineTable.setFixedCellSize(32); // tweak 32 if rows look too tight/loose in your UI
+
+        // Bind preferred height to header + number of rows, but cap it at a sensible max so it won't swallow the pane:
+        searchEngineTable.prefHeightProperty().bind(Bindings.createDoubleBinding(() -> {
+            int rows = Math.max(1, searchEngineTable.getItems().size());
+            double headerHeight = 28; // approximate header height; adjust if header looks clipped
+            double pref = headerHeight + (rows * searchEngineTable.getFixedCellSize());
+            double maxHeight = 300; // maximum height in px; change as desired
+            return Math.min(pref, maxHeight);
+        }, searchEngineTable.getItems()));
+
+        // Prevent parent layout from forcing the table to grow beyond the computed preferred size:
+        searchEngineTable.setMaxHeight(Region.USE_PREF_SIZE);
+        searchEngineTable.setMinHeight(Region.USE_PREF_SIZE);
+
+        // If the parent is a VBox, avoid forcing vertical grow on the table:
+        VBox.setVgrow(searchEngineTable, Priority.NEVER);
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
