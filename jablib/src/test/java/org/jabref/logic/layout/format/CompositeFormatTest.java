@@ -3,6 +3,8 @@ package org.jabref.logic.layout.format;
 import org.jabref.logic.layout.LayoutFormatter;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,15 +24,16 @@ class CompositeFormatTest {
         assertEquals("BAff", f.format("f"));
     }
 
-    @Test
-    void doubleComposite() {
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            John Flynn and Sabine Gartska, John Flynn and Sabine Gartska
+            Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee, Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee
+            """)
+    void doubleComposite(String inputForFirst, String inputForComposite) {
         LayoutFormatter f = new CompositeFormat(new AuthorOrgSci(), new NoSpaceBetweenAbbreviations());
         LayoutFormatter first = new AuthorOrgSci();
         LayoutFormatter second = new NoSpaceBetweenAbbreviations();
 
-        assertEquals(second.format(first.format("John Flynn and Sabine Gartska")),
-                f.format("John Flynn and Sabine Gartska"));
-        assertEquals(second.format(first.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee")),
-                f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
+        assertEquals(second.format(first.format(inputForFirst)), f.format(inputForComposite));
     }
 }
