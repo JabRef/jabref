@@ -95,7 +95,7 @@ class LayoutEntryTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-            bla, foo, test, fark, 'bla(test),foo(fark)'
+            bla, foo, test, fark, 'bla("test"),foo("fark")'
             bla, foo, test, fark, 'bla(test),foo(fark)'
             """)
     void parseTwoMethodsWithArguments(String expectedName1, String expectedName2,
