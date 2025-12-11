@@ -1,8 +1,16 @@
 package org.jabref.toolkit.commands;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+
+import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -60,5 +68,28 @@ public class SearchTest extends AbstractJabKitTest {
                 "--output=" + output);
 
         assertFalse(output.toFile().exists());
+    }
+
+    @Test
+    void search(@TempDir Path tempDir) throws URISyntaxException, IOException {
+        Path originBib = getClassResourceAsPath("origin.bib");
+        String originBibFile = originBib.toAbsolutePath().toString();
+
+        Path expectedBib = Path.of(
+                Objects.requireNonNull(JabKitTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
+                       .toURI()
+        );
+
+        BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+        List<BibEntry> expectedEntries = bibtexImporter.importDatabase(expectedBib).getDatabase().getEntries();
+
+        Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
+
+        List<String> args = List.of("search", "--debug", "--query", "author=Einstein", "--input", originBibFile, "--output", outputBib.toString());
+
+        commandLine.execute(args.toArray(String[]::new));
+
+        assertTrue(Files.exists(outputBib));
+        BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
     }
 }
