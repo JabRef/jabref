@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // Embedded postgres is started per test class and causes conflicts for file "libicuuc.so"
 public class SearchTest extends AbstractJabKitTest {
     @Test
+    @ResourceLock("embeddedPostgres")
     void foundSingleEntry(@TempDir Path tempDir) throws IOException {
         Path output = tempDir.resolve("output");
         Path origin = getClassResourceAsPath("origin.bib");
@@ -41,6 +43,7 @@ public class SearchTest extends AbstractJabKitTest {
     }
 
     @Test
+    @ResourceLock("embeddedPostgres")
     void foundMultipleEntries(@TempDir Path tempDir) throws IOException {
         Path output = tempDir.resolve("output");
         Path origin = getClassResourceAsPath("origin.bib");
@@ -58,6 +61,7 @@ public class SearchTest extends AbstractJabKitTest {
     }
 
     @Test
+    @ResourceLock("embeddedPostgres")
     void foundNone(@TempDir Path tempDir) throws IOException {
         Path output = tempDir.resolve("output");
         Path origin = getClassResourceAsPath("origin.bib");
@@ -72,6 +76,7 @@ public class SearchTest extends AbstractJabKitTest {
     }
 
     @Test
+    @ResourceLock("embeddedPostgres")
     void search(@TempDir Path tempDir) throws URISyntaxException, IOException {
         Path originBib = getClassResourceAsPath("origin.bib");
         String originBibFile = originBib.toAbsolutePath().toString();
