@@ -97,6 +97,17 @@ public class BibEntry {
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private final SharedBibEntryData sharedBibEntryData;
+    /**
+     * Fields that are forbidden for cross-reference inheritance
+     */
+    private static final Set<Field> FORBIDDEN_CROSSREF_FIELDS = Set.of(
+            StandardField.IDS,
+            StandardField.CROSSREF,
+            StandardField.XREF,
+            StandardField.ENTRYSET,
+            StandardField.RELATED,
+            StandardField.SORTKEY
+    );
 
     /**
      * Map to store the words in every field
@@ -203,24 +214,55 @@ public class BibEntry {
      * @param sourceEntry type of the cross-referenced BibEntry
      * @return the mapped field or null if there is no valid mapping available
      */
+    /**
+     * Map an (empty) field of a BibEntry to a field of a cross-referenced entry.
+     *
+     * @param targetField field name of the BibEntry
+     * @param targetEntry type of the BibEntry
+     * @param sourceEntry type of the cross-referenced BibEntry
+     * @return the mapped field or null if there is no valid mapping available
+     */
     private Optional<Field> getSourceField(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
-        // 1. Sort out forbidden fields
-        if ((targetField == StandardField.IDS) ||
-                (targetField == StandardField.CROSSREF) ||
-                (targetField == StandardField.XREF) ||
-                (targetField == StandardField.ENTRYSET) ||
-                (targetField == StandardField.RELATED) ||
-                (targetField == StandardField.SORTKEY)) {
+        // 1. Check forbidden fields
+        if (FORBIDDEN_CROSSREF_FIELDS.contains(targetField)) {
             return Optional.empty();
         }
 
         // 2. Handle special field mappings
-        if (((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.InBook)) ||
-                ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.BookInBook)) ||
-                ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.SuppBook)) ||
-                ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.InBook)) ||
-                ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.BookInBook)) ||
-                ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.SuppBook))) {
+        Optional<Field> authorMapping = getAuthorFieldMapping(targetField, targetEntry, sourceEntry);
+        if (authorMapping.isPresent()) {
+            return authorMapping;
+        }
+
+        Optional<Field> mvTitleMapping = getMvTitleFieldMapping(targetField, targetEntry, sourceEntry);
+        if (mvTitleMapping.isPresent()) {
+            return mvTitleMapping;
+        }
+
+        Optional<Field> bookTitleMapping = getBookTitleFieldMapping(targetField, targetEntry, sourceEntry);
+        if (bookTitleMapping.isPresent()) {
+            return bookTitleMapping;
+        }
+
+        Optional<Field> periodicalMapping = getPeriodicalFieldMapping(targetField, targetEntry, sourceEntry);
+        if (periodicalMapping.isPresent()) {
+            return periodicalMapping;
+        }
+
+        // 3. Fallback to inherit the field with the same name
+        return Optional.ofNullable(targetField);
+    }
+
+    /**
+     * Handles author field mappings for Book/MvBook -> InBook/BookInBook/SuppBook
+     */
+    private Optional<Field> getAuthorFieldMapping(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
+        boolean isValidSourceType = (sourceEntry == StandardEntryType.MvBook) || (sourceEntry == StandardEntryType.Book);
+        boolean isValidTargetType = (targetEntry == StandardEntryType.InBook) ||
+                (targetEntry == StandardEntryType.BookInBook) ||
+                (targetEntry == StandardEntryType.SuppBook);
+
+        if (isValidSourceType && isValidTargetType) {
             if (targetField == StandardField.AUTHOR) {
                 return Optional.of(StandardField.AUTHOR);
             }
@@ -229,93 +271,139 @@ public class BibEntry {
             }
         }
 
-        if (((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.Book)) ||
-                ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.InBook)) ||
-                ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.BookInBook)) ||
-                ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.SuppBook)) ||
-                ((sourceEntry == StandardEntryType.MvCollection) && (targetEntry == StandardEntryType.Collection)) ||
-                ((sourceEntry == StandardEntryType.MvCollection) && (targetEntry == StandardEntryType.InCollection)) ||
-                ((sourceEntry == StandardEntryType.MvCollection) && (targetEntry == StandardEntryType.SuppCollection)) ||
-                ((sourceEntry == StandardEntryType.MvProceedings) && (targetEntry == StandardEntryType.Proceedings)) ||
-                ((sourceEntry == StandardEntryType.MvProceedings) && (targetEntry == StandardEntryType.InProceedings)) ||
-                ((sourceEntry == StandardEntryType.MvReference) && (targetEntry == StandardEntryType.Reference)) ||
-                ((sourceEntry == StandardEntryType.MvReference) && (targetEntry == StandardEntryType.InReference))) {
-            if (targetField == StandardField.MAINTITLE) {
-                return Optional.of(StandardField.TITLE);
-            }
-            if (targetField == StandardField.MAINSUBTITLE) {
-                return Optional.of(StandardField.SUBTITLE);
-            }
-            if (targetField == StandardField.MAINTITLEADDON) {
-                return Optional.of(StandardField.TITLEADDON);
-            }
+        return Optional.empty();
+    }
 
-            // those fields are no more available for the same-name inheritance strategy
-            if ((targetField == StandardField.TITLE) ||
-                    (targetField == StandardField.SUBTITLE) ||
-                    (targetField == StandardField.TITLEADDON)) {
-                return Optional.empty();
-            }
+    /**
+     * Handles title field mappings for Mv* types (MvBook, MvCollection, MvProceedings, MvReference)
+     */
+    private Optional<Field> getMvTitleFieldMapping(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
+        boolean isValidMapping = isValidMvMapping(sourceEntry, targetEntry);
 
-            // for these fields, inheritance is not allowed for the specified entry types
-            if (targetField == StandardField.SHORTTITLE) {
-                return Optional.empty();
-            }
+        if (!isValidMapping) {
+            return Optional.empty();
         }
 
-        if (((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.InBook)) ||
-                ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.BookInBook)) ||
-                ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.SuppBook)) ||
-                ((sourceEntry == StandardEntryType.Collection) && (targetEntry == StandardEntryType.InCollection)) ||
-                ((sourceEntry == StandardEntryType.Collection) && (targetEntry == StandardEntryType.SuppCollection)) ||
-                ((sourceEntry == StandardEntryType.Reference) && (targetEntry == StandardEntryType.InReference)) ||
-                ((sourceEntry == StandardEntryType.Proceedings) && (targetEntry == StandardEntryType.InProceedings))) {
-            if (targetField == StandardField.BOOKTITLE) {
-                return Optional.of(StandardField.TITLE);
-            }
-            if (targetField == StandardField.BOOKSUBTITLE) {
-                return Optional.of(StandardField.SUBTITLE);
-            }
-            if (targetField == StandardField.BOOKTITLEADDON) {
-                return Optional.of(StandardField.TITLEADDON);
-            }
-
-            // those fields are no more available for the same-name inheritance strategy
-            if ((targetField == StandardField.TITLE) ||
-                    (targetField == StandardField.SUBTITLE) ||
-                    (targetField == StandardField.TITLEADDON)) {
-                return Optional.empty();
-            }
-
-            // for these fields, inheritance is not allowed for the specified entry types
-            if (targetField == StandardField.SHORTTITLE) {
-                return Optional.empty();
-            }
+        // Map main* fields to their base counterparts
+        if (targetField == StandardField.MAINTITLE) {
+            return Optional.of(StandardField.TITLE);
+        }
+        if (targetField == StandardField.MAINSUBTITLE) {
+            return Optional.of(StandardField.SUBTITLE);
+        }
+        if (targetField == StandardField.MAINTITLEADDON) {
+            return Optional.of(StandardField.TITLEADDON);
         }
 
-        if (((sourceEntry == IEEETranEntryType.Periodical) && (targetEntry == StandardEntryType.Article)) ||
-                ((sourceEntry == IEEETranEntryType.Periodical) && (targetEntry == StandardEntryType.SuppPeriodical))) {
-            if (targetField == StandardField.JOURNALTITLE) {
-                return Optional.of(StandardField.TITLE);
-            }
-            if (targetField == StandardField.JOURNALSUBTITLE) {
-                return Optional.of(StandardField.SUBTITLE);
-            }
-
-            // those fields are no more available for the same-name inheritance strategy
-            if ((targetField == StandardField.TITLE) ||
-                    (targetField == StandardField.SUBTITLE)) {
-                return Optional.empty();
-            }
-
-            // for these fields, inheritance is not allowed for the specified entry types
-            if (targetField == StandardField.SHORTTITLE) {
-                return Optional.empty();
-            }
+        // Block base title fields from same-name inheritance for these mappings
+        if ((targetField == StandardField.TITLE) ||
+                (targetField == StandardField.SUBTITLE) ||
+                (targetField == StandardField.TITLEADDON) ||
+                (targetField == StandardField.SHORTTITLE)) {
+            return Optional.of(null); // Explicitly block inheritance
         }
 
-        // 3. Fallback to inherit the field with the same name.
-        return Optional.ofNullable(targetField);
+        return Optional.empty();
+    }
+
+    /**
+     * Checks if source and target entry types form a valid Mv* mapping
+     */
+    private boolean isValidMvMapping(EntryType sourceEntry, EntryType targetEntry) {
+        return ((sourceEntry == StandardEntryType.MvBook) &&
+                ((targetEntry == StandardEntryType.Book) ||
+                        (targetEntry == StandardEntryType.InBook) ||
+                        (targetEntry == StandardEntryType.BookInBook) ||
+                        (targetEntry == StandardEntryType.SuppBook))) ||
+                ((sourceEntry == StandardEntryType.MvCollection) &&
+                        ((targetEntry == StandardEntryType.Collection) ||
+                                (targetEntry == StandardEntryType.InCollection) ||
+                                (targetEntry == StandardEntryType.SuppCollection))) ||
+                ((sourceEntry == StandardEntryType.MvProceedings) &&
+                        ((targetEntry == StandardEntryType.Proceedings) ||
+                                (targetEntry == StandardEntryType.InProceedings))) ||
+                ((sourceEntry == StandardEntryType.MvReference) &&
+                        ((targetEntry == StandardEntryType.Reference) ||
+                                (targetEntry == StandardEntryType.InReference)));
+    }
+
+    /**
+     * Handles book title field mappings (Book -> InBook, Collection -> InCollection, etc.)
+     */
+    private Optional<Field> getBookTitleFieldMapping(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
+        boolean isValidMapping = isValidBookTitleMapping(sourceEntry, targetEntry);
+
+        if (!isValidMapping) {
+            return Optional.empty();
+        }
+
+        // Map book* fields to their base counterparts
+        if (targetField == StandardField.BOOKTITLE) {
+            return Optional.of(StandardField.TITLE);
+        }
+        if (targetField == StandardField.BOOKSUBTITLE) {
+            return Optional.of(StandardField.SUBTITLE);
+        }
+        if (targetField == StandardField.BOOKTITLEADDON) {
+            return Optional.of(StandardField.TITLEADDON);
+        }
+
+        // Block base title fields from same-name inheritance for these mappings
+        if ((targetField == StandardField.TITLE) ||
+                (targetField == StandardField.SUBTITLE) ||
+                (targetField == StandardField.TITLEADDON) ||
+                (targetField == StandardField.SHORTTITLE)) {
+            return Optional.of(null); // Explicitly block inheritance
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Checks if source and target entry types form a valid book title mapping
+     */
+    private boolean isValidBookTitleMapping(EntryType sourceEntry, EntryType targetEntry) {
+        return ((sourceEntry == StandardEntryType.Book) &&
+                ((targetEntry == StandardEntryType.InBook) ||
+                        (targetEntry == StandardEntryType.BookInBook) ||
+                        (targetEntry == StandardEntryType.SuppBook))) ||
+                ((sourceEntry == StandardEntryType.Collection) &&
+                        ((targetEntry == StandardEntryType.InCollection) ||
+                                (targetEntry == StandardEntryType.SuppCollection))) ||
+                ((sourceEntry == StandardEntryType.Reference) &&
+                        (targetEntry == StandardEntryType.InReference)) ||
+                ((sourceEntry == StandardEntryType.Proceedings) &&
+                        (targetEntry == StandardEntryType.InProceedings));
+    }
+
+    /**
+     * Handles periodical field mappings (Periodical -> Article/SuppPeriodical)
+     */
+    private Optional<Field> getPeriodicalFieldMapping(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
+        boolean isValidMapping = (sourceEntry == IEEETranEntryType.Periodical) &&
+                ((targetEntry == StandardEntryType.Article) ||
+                        (targetEntry == StandardEntryType.SuppPeriodical));
+
+        if (!isValidMapping) {
+            return Optional.empty();
+        }
+
+        // Map journal* fields to their base counterparts
+        if (targetField == StandardField.JOURNALTITLE) {
+            return Optional.of(StandardField.TITLE);
+        }
+        if (targetField == StandardField.JOURNALSUBTITLE) {
+            return Optional.of(StandardField.SUBTITLE);
+        }
+
+        // Block base title fields from same-name inheritance for these mappings
+        if ((targetField == StandardField.TITLE) ||
+                (targetField == StandardField.SUBTITLE) ||
+                (targetField == StandardField.SHORTTITLE)) {
+            return Optional.of(null); // Explicitly block inheritance
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -406,10 +494,18 @@ public class BibEntry {
         return setField(InternalField.KEY_FIELD, newKey);
     }
 
+    /**
+     * Creates a new BibEntry with the specified citation key.
+     * This method creates a defensive copy of the current entry.
+     *
+     * @param newKey the citation key to set
+     * @return a new BibEntry instance with the citation key set and changed flag set to false
+     */
     public BibEntry withCitationKey(String newKey) {
-        setCitationKey(newKey);
-        this.setChanged(false);
-        return this;
+        BibEntry copy = new BibEntry(this);
+        copy.setCitationKey(newKey);
+        copy.setChanged(false);
+        return copy;
     }
 
     /**
@@ -732,7 +828,8 @@ public class BibEntry {
 
     /// Uses `\n` as newline separator
     ///
-    /// Method similar to [org.jabref.gui.entryeditor.SourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences)]
+    // Method similar to [org.jabref.gui.entryeditor.SourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences)]
+
     ///
     /// @return String representation - empty string in case of an error (to ease calling)
     public @NonNull String getStringRepresentation(
@@ -844,13 +941,20 @@ public class BibEntry {
     }
 
     /**
+     * Creates a new BibEntry with the changed flag set to the specified value.
+     * This method creates a defensive copy of the current entry.
+     * <p>
      * Required to trigger new serialization of the entry.
-     * Reason: We don't have a <code>build()</code> command, we don't want to create a new serialization at each call,
-     * we need to construct a BibEntry with <code>changed=false</code> (which is the default) and thus we need a workaround.
+     * Reason: We don't have a build() command, we don't want to create a new serialization at each call,
+     * we need to construct a BibEntry with changed=false (which is the default) and thus we need this method.
+     *
+     * @param changed the value to set for the changed flag
+     * @return a new BibEntry instance with the changed flag set
      */
     public BibEntry withChanged(boolean changed) {
-        this.changed = changed;
-        return this;
+        BibEntry copy = new BibEntry(this);
+        copy.changed = changed;
+        return copy;
     }
 
     public Optional<FieldChange> putKeywords(List<String> keywords, @NonNull Character delimiter) {
@@ -993,31 +1097,48 @@ public class BibEntry {
         }
     }
 
+    /**
+     * Creates a new BibEntry with the specified field set.
+     * This method creates a defensive copy of the current entry.
+     *
+     * @param field the field to set
+     * @param value the value to set
+     * @return a new BibEntry instance with the field set and changed flag set to false
+     */
     public BibEntry withField(Field field, String value) {
-        setField(field, value);
-        this.setChanged(false);
-        return this;
+        BibEntry copy = new BibEntry(this);
+        copy.setField(field, value);
+        copy.setChanged(false);
+        return copy;
     }
 
     /**
-     * A copy is made of the parameter
+     * Creates a new BibEntry with the specified fields set.
+     * This method creates a defensive copy of the current entry.
+     * A defensive copy is made of the parameter map.
+     *
+     * @param content the fields to set
+     * @return a new BibEntry instance with the fields set and changed flag set to false
      */
     public BibEntry withFields(Map<Field, String> content) {
-        this.fields = FXCollections.observableMap(new HashMap<>(content));
-        this.setChanged(false);
-        return this;
+        BibEntry copy = new BibEntry(this);
+        copy.fields = FXCollections.observableMap(new ConcurrentHashMap<>(content));
+        copy.setChanged(false);
+        return copy;
     }
 
     public BibEntry withDate(Date date) {
-        setDate(date);
-        this.setChanged(false);
-        return this;
+        BibEntry copy = new BibEntry(this);
+        copy.setDate(date);
+        copy.setChanged(false);
+        return copy;
     }
 
     public BibEntry withMonth(Month parsedMonth) {
-        setMonth(parsedMonth);
-        this.setChanged(false);
-        return this;
+        BibEntry copy = new BibEntry(this);
+        copy.setMonth(parsedMonth);
+        copy.setChanged(false);
+        return copy;
     }
 
     /*
@@ -1028,9 +1149,10 @@ public class BibEntry {
     }
 
     public BibEntry withUserComments(String commentsBeforeEntry) {
-        this.commentsBeforeEntry = commentsBeforeEntry;
-        this.setChanged(false);
-        return this;
+        BibEntry copy = new BibEntry(this);
+        copy.commentsBeforeEntry = commentsBeforeEntry;
+        copy.setChanged(false);
+        return copy;
     }
 
     public List<ParsedEntryLink> getEntryLinkList(Field field, BibDatabase database) {
@@ -1102,9 +1224,10 @@ public class BibEntry {
     }
 
     public BibEntry withFiles(List<LinkedFile> files) {
-        setFiles(files);
-        this.setChanged(false);
-        return this;
+        BibEntry copy = new BibEntry(this);
+        copy.setFiles(files);
+        copy.setChanged(false);
+        return copy;
     }
 
     /**
