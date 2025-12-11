@@ -105,6 +105,7 @@ import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +129,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
     private boolean backOrForwardNavigationActionTriggered = false;
-    private boolean bulkImportInProgress = false;
+    private NavigationHistory.@Nullable Suppression currentBulkImportSuppression;
 
     private BibDatabaseContext bibDatabaseContext;
 
@@ -826,12 +827,21 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void insertEntries(final List<BibEntry> entries) {
+        insertEntries(entries, false);
+    }
+
+    /**
+     * Inserts entries into the library.
+     *
+     * @param entries the entries to insert
+     * @param suppressNavigation if true, navigation history will not be updated for these entries
+     */
+    public void insertEntries(final List<BibEntry> entries, boolean suppressNavigation) {
         if (entries.isEmpty()) {
             return;
         }
 
-        startBulkImport();
-        try {
+        try (NavigationHistory.Suppression ignored = suppressNavigation ? navigationHistory.suppressUpdates() : NavigationHistory.Suppression.noOp()) {
             importHandler.importCleanedEntries(null, entries);
             getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
             markBaseChanged();
@@ -841,8 +851,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             } else {
                 clearAndSelect(entries.getFirst());
             }
-        } finally {
-            endBulkImport();
         }
     }
 
@@ -1038,11 +1046,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        // skip history updates if this is from a bulk import operation
-        if (bulkImportInProgress) {
-            return;
-        }
-
         navigationHistory.add(entry);
         updateNavigationState();
     }
@@ -1057,19 +1060,24 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /**
-     * Marks the start of a bulk import operation.
-     * During bulk import, selection changes will not be added to navigation history.
+     * Called by ImportHandler when starting a bulk import operation.
+     * Suppresses navigation history updates during the import.
      */
-    public void startBulkImport() {
-        bulkImportInProgress = true;
+    private void startBulkImport() {
+        if (currentBulkImportSuppression == null) {
+            currentBulkImportSuppression = navigationHistory.suppressUpdates();
+        }
     }
 
     /**
-     * Marks the end of a bulk import operation.
-     * Normal navigation history tracking resumes after this call.
+     * Called by ImportHandler when ending a bulk import operation.
+     * Resumes normal navigation history tracking.
      */
-    public void endBulkImport() {
-        bulkImportInProgress = false;
+    private void endBulkImport() {
+        if (currentBulkImportSuppression != null) {
+            currentBulkImportSuppression.close();
+            currentBulkImportSuppression = null;
+        }
     }
 
     /**
