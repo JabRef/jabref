@@ -90,7 +90,7 @@ class DatabaseSearcherWithBibFilesTest {
 
     @AfterEach
     void tearDown() {
-        postgreServer.shutdown();
+        postgreServer.close();
     }
 
     private BibDatabaseContext initializeDatabaseFromPath(String testFile) throws URISyntaxException, IOException {

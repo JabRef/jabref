@@ -58,7 +58,7 @@ public class DatabaseSearcherTest {
 
     @AfterEach
     void tearDown() {
-        postgreServer.shutdown();
+        postgreServer.close();
     }
 
     @ParameterizedTest

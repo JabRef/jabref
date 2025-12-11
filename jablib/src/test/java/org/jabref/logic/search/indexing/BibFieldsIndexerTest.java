@@ -37,7 +37,7 @@ public class BibFieldsIndexerTest {
     @AfterEach
     void tearDown() {
         if (postgreServer != null) {
-            postgreServer.shutdown();
+            postgreServer.close();
         }
     }
 
