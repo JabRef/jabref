@@ -92,7 +92,7 @@ class MVStoreBibEntryRelationRepositoryTest {
         return entry
                 .getCitationKey()
                 .map(key -> RandomGenerator.StreamableGenerator
-                        .of("L128X256MixRandom").ints(150)
+                        .of("L128X256MixRandom").ints(12) // 12 is arbitrary here. We just want some relations. We do not do any "load" testing.
                         .mapToObj(i -> new BibEntry(StandardEntryType.Book)
                                 .withField(StandardField.TITLE, "A title: " + i)
                                 .withField(StandardField.YEAR, String.valueOf(2024))
