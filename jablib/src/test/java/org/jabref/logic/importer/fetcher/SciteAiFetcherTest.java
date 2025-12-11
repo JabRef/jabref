@@ -5,12 +5,14 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.sciteTallies.TalliesResponse;
+import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.core.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@FetcherTest
 public class SciteAiFetcherTest {
     @Test
     void sciteTallyDTO() {
