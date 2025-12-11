@@ -32,26 +32,22 @@ public class AiExporter {
     }
 
     public String buildMarkdownExport(String contentTitle, String contentBody) {
-        StringJoiner sj = new StringJoiner("\n\n");
-        sj.add("## Bibtex");
-
-        StringJoiner bibtexBlock = new StringJoiner("\n");
-        bibtexBlock.add("```bibtex");
+        StringJoiner stringJoiner = new StringJoiner("\n");
+        stringJoiner.add("## Bibtex");
+        stringJoiner.add("");
+        stringJoiner.add("```bibtex");
         String bibtex = entry.getStringRepresentation(entry, BibDatabaseMode.BIBTEX, entryTypesManager, fieldPreferences);
-        bibtexBlock.add(bibtex);
-        bibtexBlock.add("```");
-        sj.add(bibtexBlock.toString());
+        stringJoiner.add(bibtex);
+        stringJoiner.add("```");
+        stringJoiner.add("");
+        stringJoiner.add("## " + contentTitle);
+        stringJoiner.add(contentBody);
 
-        StringJoiner contentBlock = new StringJoiner("\n\n");
-        contentBlock.add("## " + contentTitle);
-        contentBlock.add(contentBody);
-        sj.add(contentBlock.toString());
-
-        return sj.toString();
+        return stringJoiner.toString();
     }
 
     public String buildMarkdownForChat(List<ChatMessage> messages) {
-        StringBuilder conversation = new StringBuilder();
+        StringJoiner conversation = new StringJoiner("\n");
         for (ChatMessage msg : messages) {
             String role = "";
             String content = "";
@@ -68,8 +64,10 @@ public class AiExporter {
                 // ignored SystemMessage, ToolExecutionResultMessage as they are not part of the conversation exchange.
                 continue;
             }
-            conversation.append("**").append(role).append(":**\n\n");
-            conversation.append(content).append("\n\n");
+            conversation.add("**" + role + ":**");
+            conversation.add("");
+            conversation.add(content);
+            conversation.add("");
         }
         return buildMarkdownExport("Conversation", conversation.toString());
     }
