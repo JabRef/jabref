@@ -409,9 +409,7 @@ public class GroupTreeView extends BorderPane {
                     undoManager,
                     stateManager,
                     dialogService,
-                    taskExecutor,
-                    null,
-                    null);
+                    taskExecutor);
             List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
             stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
             importHandler.importFilesInBackground(files, event.getTransferMode())

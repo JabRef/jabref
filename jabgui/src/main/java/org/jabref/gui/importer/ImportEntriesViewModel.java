@@ -206,9 +206,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor,
-                null,
-                null);
+                taskExecutor);
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport);
     }
 

@@ -96,6 +96,16 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager,
                          DialogService dialogService,
+                         TaskExecutor taskExecutor) {
+        this(targetBibDatabaseContext, preferences, fileupdateMonitor, undoManager, stateManager, dialogService, taskExecutor, null, null);
+    }
+
+    public ImportHandler(BibDatabaseContext targetBibDatabaseContext,
+                         GuiPreferences preferences,
+                         FileUpdateMonitor fileupdateMonitor,
+                         UndoManager undoManager,
+                         StateManager stateManager,
+                         DialogService dialogService,
                          TaskExecutor taskExecutor,
                          @Nullable Runnable onBulkImportStart,
                          @Nullable Runnable onBulkImportEnd) {
