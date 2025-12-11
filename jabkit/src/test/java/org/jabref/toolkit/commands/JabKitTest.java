@@ -21,11 +21,14 @@ import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD) // Embedded postgres is started per test class and causes conflicts for file "libicuuc.so"
 class JabKitTest extends AbstractJabKitTest {
 
     @Test
