@@ -50,6 +50,7 @@ public final class LinkedFilesSearcher {
         this.filePreferences = filePreferences;
         this.parser = new MultiFieldQueryParser(LinkedFilesConstants.PDF_FIELDS.toArray(new String[0]), LinkedFilesConstants.LINKED_FILES_ANALYZER);
         parser.setDefaultOperator(QueryParser.Operator.AND);
+        parser.setAllowLeadingWildcard(true);
     }
 
     public SearchResults search(SearchQuery searchQuery) {
@@ -82,6 +83,9 @@ public final class LinkedFilesSearcher {
 
     private Optional<Query> getLuceneQuery(SearchQuery searchQuery) {
         String query = SearchQueryConversion.searchToLucene(searchQuery);
+        if (!query.contains("*") && !query.contains("?")) {
+            query = "*" + query + "*";
+        }
         try {
             return Optional.of(parser.parse(query));
         } catch (ParseException e) {
