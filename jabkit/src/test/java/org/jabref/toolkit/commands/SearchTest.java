@@ -20,6 +20,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// TODO: These tests do not work on linux with "org.gradle.workers.max" greater than 1.
 @Execution(ExecutionMode.SAME_THREAD)
 // Embedded postgres is started per test class and causes conflicts for file "libicuuc.so"
 public class SearchTest extends AbstractJabKitTest {
