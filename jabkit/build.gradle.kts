@@ -56,9 +56,9 @@ dependencies {
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.jabref.testsupport")
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
-    requires.add("org.jabref.testsupport")
     requires.add("org.mockito")
 }
 
