@@ -127,6 +127,7 @@ public class WebFetchers {
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences, importerPreferences));
+        set.add(new ScienceDirect(importerPreferences));
         set.add(new CompositeSearchBasedFetcher(set, importerPreferences, 30));
         // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         set.add(new DOABFetcher());
