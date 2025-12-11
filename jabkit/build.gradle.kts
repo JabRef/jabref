@@ -62,6 +62,10 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.mockito")
 }
 
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "4g"
+}
+
 application {
     mainClass.set("org.jabref.toolkit.JabKitLauncher")
     mainModule.set("org.jabref.jabkit")
