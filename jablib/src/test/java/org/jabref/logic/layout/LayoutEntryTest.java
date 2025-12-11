@@ -95,15 +95,15 @@ class LayoutEntryTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-            bla, foo, test, fark, 'bla("test"),foo("fark")'
-            bla, foo, test, fark, 'bla(test),foo(fark)'
+            bla, test, foo, fark, 'bla("test"),foo("fark")'
+            bla, test, foo, fark, 'bla(test),foo(fark)'
             """)
-    void parseTwoMethodsWithArguments(String expectedName1, String expectedName2,
-                                      String expectedArg1, String expectedArg2, String input) {
+    void parseTwoMethodsWithArguments(String expectedName1, String expectedArg1,
+                                      String expectedName2, String expectedArg2, String input) {
         assertEquals(2, LayoutEntry.parseMethodsCalls(input).size());
         assertEquals(expectedName1, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
-        assertEquals(expectedName2, LayoutEntry.parseMethodsCalls(input).get(1).getFirst());
         assertEquals(expectedArg1, LayoutEntry.parseMethodsCalls(input).getFirst().get(1));
+        assertEquals(expectedName2, LayoutEntry.parseMethodsCalls(input).get(1).getFirst());
         assertEquals(expectedArg2, LayoutEntry.parseMethodsCalls(input).get(1).get(1));
     }
 
