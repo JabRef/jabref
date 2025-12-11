@@ -105,6 +105,7 @@ import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +129,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
     private boolean backOrForwardNavigationActionTriggered = false;
+    private NavigationHistory.@Nullable Suppression currentBulkImportSuppression;
 
     private BibDatabaseContext bibDatabaseContext;
 
@@ -241,7 +243,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                this::startBulkImport,
+                this::endBulkImport);
 
         setupMainPanel();
         setupAutoCompletion();
@@ -823,18 +827,30 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void insertEntries(final List<BibEntry> entries) {
+        insertEntries(entries, false);
+    }
+
+    /**
+     * Inserts entries into the library.
+     *
+     * @param entries the entries to insert
+     * @param suppressNavigation if true, navigation history will not be updated for these entries
+     */
+    public void insertEntries(final List<BibEntry> entries, boolean suppressNavigation) {
         if (entries.isEmpty()) {
             return;
         }
 
-        importHandler.importCleanedEntries(null, entries);
-        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-        markBaseChanged();
-        stateManager.setSelectedEntries(entries);
-        if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-            showAndEdit(entries.getFirst());
-        } else {
-            clearAndSelect(entries.getFirst());
+        try (NavigationHistory.Suppression ignored = suppressNavigation ? navigationHistory.suppressUpdates() : NavigationHistory.Suppression.noOp()) {
+            importHandler.importCleanedEntries(null, entries);
+            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+            markBaseChanged();
+            stateManager.setSelectedEntries(entries);
+            if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+                showAndEdit(entries.getFirst());
+            } else {
+                clearAndSelect(entries.getFirst());
+            }
         }
     }
 
@@ -1041,6 +1057,27 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     public void updateNavigationState() {
         canGoBackProperty.set(canGoBack());
         canGoForwardProperty.set(canGoForward());
+    }
+
+    /**
+     * Called by ImportHandler when starting a bulk import operation.
+     * Suppresses navigation history updates during the import.
+     */
+    private void startBulkImport() {
+        if (currentBulkImportSuppression == null) {
+            currentBulkImportSuppression = navigationHistory.suppressUpdates();
+        }
+    }
+
+    /**
+     * Called by ImportHandler when ending a bulk import operation.
+     * Resumes normal navigation history tracking.
+     */
+    private void endBulkImport() {
+        if (currentBulkImportSuppression != null) {
+            currentBulkImportSuppression.close();
+            currentBulkImportSuppression = null;
+        }
     }
 
     /**
