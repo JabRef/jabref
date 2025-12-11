@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.verify;
 
 @DisabledOnCIServer("Tests fails sporadically on CI server")
 @Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("remote")
 class RemoteSetupTest {
 
     private RemoteMessageHandler messageHandler;
