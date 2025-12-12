@@ -60,6 +60,8 @@ import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.identifier.SSRN;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
@@ -109,6 +111,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private TilePane entryOther;
     @FXML private TitledPane entryCustomTitle;
     @FXML private TilePane entryCustom;
+    @FXML private TitledPane entryNonStandardTitle;
+    @FXML private TilePane entryNonStandard;
 
     @FXML private TextField idText;
     @FXML private Tooltip idTextTooltip;
@@ -236,6 +240,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         entryCustomTitle.expandedProperty().bindBidirectional(preferences.typesCustomExpandedProperty());
         entryCustom.managedProperty().bind(entryCustom.visibleProperty());
 
+        entryNonStandardTitle.managedProperty().bind(entryNonStandardTitle.visibleProperty());
+        entryNonStandard.managedProperty().bind(entryNonStandard.visibleProperty());
+
         final boolean isBiblatexMode = libraryTab.getBibDatabaseContext().isBiblatexMode();
 
         List<BibEntryType> recommendedEntries;
@@ -262,6 +269,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             entryCustomTitle.setVisible(false);
         } else {
             addEntriesToPane(entryCustom, customEntries);
+        }
+
+        if (isBiblatexMode) {
+            addEntriesToPane(entryNonStandard, BiblatexNonStandardEntryTypeDefinitions.ALL);
+        } else {
+            entryNonStandardTitle.setVisible(false);
         }
     }
 
@@ -357,8 +370,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
-            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
-            // supported Bib(La)Tex source format.
+            // TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
+            // supported Bib(La)TeX source format.
             bibtexText.setText(clipboardText);
             bibtexText.selectAll();
         }
@@ -376,7 +389,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (generateButton != null) {
             generateButton.disableProperty().unbind();
             generateButton.setDisable(true);
-            generateButton.setText("Select");
+            generateButton.setText(Localization.lang("Select"));
         }
     }
 
@@ -395,7 +408,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(idErrorInvalidText.visibleProperty().or(idErrorInvalidFetcher.visibleProperty()));
-            generateButton.setText("Search");
+            generateButton.setText(Localization.lang("Search"));
         }
     }
 
@@ -414,7 +427,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(viewModel.interpretTextValidatorProperty().not());
-            generateButton.setText("Parse");
+            generateButton.setText(Localization.lang("Parse"));
         }
     }
 
@@ -433,7 +446,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(viewModel.bibtexTextValidatorProperty().not());
-            generateButton.setText("Create");
+            generateButton.setText(Localization.lang("Create"));
         }
     }
 
@@ -458,17 +471,17 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 // We do nothing here.
                 break;
             case NewEntryDialogTab.ENTER_IDENTIFIER:
-                generateButton.setText("Searching...");
+                generateButton.setText(Localization.lang("Searching..."));
                 viewModel.executeLookupIdentifier(idLookupGuess.isSelected());
                 switchLookupIdentifier();
                 break;
             case NewEntryDialogTab.INTERPRET_CITATIONS:
-                generateButton.setText("Parsing...");
+                generateButton.setText(Localization.lang("Parsing..."));
                 viewModel.executeInterpretCitations();
                 switchInterpretCitations();
                 break;
             case NewEntryDialogTab.SPECIFY_BIBTEX:
-                generateButton.setText("Parsing...");
+                generateButton.setText(Localization.lang("Parsing..."));
                 viewModel.executeSpecifyBibtex();
                 switchSpecifyBibtex();
                 break;
@@ -506,6 +519,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private static String descriptionOfEntryType(EntryType type) {
         if (type instanceof StandardEntryType entryType) {
             return descriptionOfStandardEntryType(entryType);
+        }
+        if (type instanceof BiblatexNonStandardEntryType entryType) {
+            return descriptionOfNonStandardEntryType(entryType);
         }
         return null;
     }
@@ -579,6 +595,44 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Localization.lang("Computer software. The standard styles will treat this entry type as an alias for \"Misc\".");
             case Dataset ->
                     Localization.lang("A data set or a similar collection of (mostly) raw data.");
+        };
+    }
+
+    private static String descriptionOfNonStandardEntryType(BiblatexNonStandardEntryType type) {
+        // These descriptions are taken from subsection 2.1.3 of the biblatex package documentation.
+        // Non-standard Types (BibLaTeX only) - these use the @misc driver in standard bibliography styles.
+        // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
+        return switch (type) {
+            case Artwork ->
+                    Localization.lang("Works of the visual arts such as paintings, sculpture, and installations.");
+            case Audio ->
+                    Localization.lang("Audio recordings, typically on audio cd, dvd, audio cassette, or similar media.");
+            case Bibnote ->
+                    Localization.lang("This special entry type is not meant to be used in the bib file like other types. It is provided for third-party packages which merge notes into the bibliography.");
+            case Commentary ->
+                    Localization.lang("Commentaries which have a status different from regular books, such as legal commentaries.");
+            case Image ->
+                    Localization.lang("Images, pictures, photographs, and similar media.");
+            case Jurisdiction ->
+                    Localization.lang("Court decisions, court recordings, and similar things.");
+            case Legislation ->
+                    Localization.lang("Laws, bills, legislative proposals, and similar things.");
+            case Legal ->
+                    Localization.lang("Legal documents such as treaties.");
+            case Letter ->
+                    Localization.lang("Personal correspondence such as letters, emails, memoranda, etc.");
+            case Movie ->
+                    Localization.lang("Motion pictures.");
+            case Music ->
+                    Localization.lang("Musical recordings. This is a more specific variant of \"Audio\".");
+            case Performance ->
+                    Localization.lang("Musical and theatrical performances as well as other works of the performing arts. This type refers to the event as opposed to a recording, a score, or a printed play.");
+            case Review ->
+                    Localization.lang("Reviews of some other work. This is a more specific variant of the \"Article\" type.");
+            case Standard ->
+                    Localization.lang("National and international standards issued by a standards body such as the International Organization for Standardization.");
+            case Video ->
+                    Localization.lang("Audiovisual recordings, typically on dvd, vhs cassette, or similar media.");
         };
     }
 

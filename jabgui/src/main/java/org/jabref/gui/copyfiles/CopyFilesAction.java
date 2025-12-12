@@ -40,7 +40,7 @@ public class CopyFilesAction extends SimpleCommand {
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
         if (data.isEmpty()) {
-            dialogService.showInformationDialogAndWait(Localization.lang("Copy linked files to folder..."), Localization.lang("No linked files found for export."));
+            dialogService.showInformationDialogAndWait(Localization.lang("Copy linked file(s) to folder..."), Localization.lang("No linked files found for export."));
             return;
         }
         dialogService.showCustomDialogAndWait(new CopyFilesDialogView(new CopyFilesResultListDependency(data)));
@@ -59,8 +59,8 @@ public class CopyFilesAction extends SimpleCommand {
             Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(database, entries, path, preferences);
 
             dialogService.showProgressDialog(
-                    Localization.lang("Copy linked files to folder..."),
-                    Localization.lang("Copy linked files to folder..."),
+                    Localization.lang("Copy linked file(s) to folder..."),
+                    Localization.lang("Copy linked file(s) to folder..."),
                     exportTask);
 
             uiTaskExecutor.execute(exportTask);

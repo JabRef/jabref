@@ -56,14 +56,15 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -391,7 +392,11 @@ public class ImportHandler {
         entries.forEach(keyGenerator::generateAndSetKey);
     }
 
-    public List<BibEntry> handleBibTeXData(String entries) {
+    public @NonNull List<@NonNull BibEntry> handleBibTeXData(@NonNull String entries) {
+        if (!entries.contains("@")) {
+            LOGGER.debug("Seems not to be BibTeX data: {}", entries);
+            return List.of();
+        }
         BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor);
         try {
             List<BibEntry> result = parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
@@ -399,7 +404,8 @@ public class ImportHandler {
             importStringConstantsWithDuplicateCheck(stringConstants);
             return result;
         } catch (ParseException ex) {
-            LOGGER.error("Could not paste", ex);
+            LOGGER.info("Data could not be interpreted as Bib(La)TeX", ex);
+            dialogService.notify(Localization.lang("Failed to parse Bib(La)TeX: %0", ex.getLocalizedMessage()));
             return List.of();
         }
     }
@@ -533,14 +539,17 @@ public class ImportHandler {
 
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
-            // Only one SmartGroup
+            String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
+            // We cannot add the new group here directly because we don't have access to the group node viewmoel stuff here
+            // We would need to add the groups to the metadata first which is a bit more complicated, thus we decided against it atm
             this.targetBibDatabaseContext.getMetaData()
                                          .getGroups()
                                          .flatMap(grp -> grp.getChildren()
                                                             .stream()
-                                                            .filter(node -> node.getGroup() instanceof SmartGroup)
+                                                            .filter(node -> node.getGroup() instanceof ExplicitGroup
+                                                                    && node.getGroup().getName().equals(groupName))
                                                             .findFirst())
-                                         .ifPresent(smtGrp -> smtGrp.addEntriesToGroup(entriesToInsert));
+                                         .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
         }
     }
 }

@@ -16,11 +16,21 @@ jobs:
         id: assign
         uses: takanome-dev/assign-issue-action@edge
         with:
-          github_token: '${{ secrets.GITHUB_TOKEN }}'
+          github_token: '${{ secrets.GH_TOKEN_ASSIGN_ISSUE_ACTION  || github.token }}'
           # If this is updated, also update the number at unassign-issues.yml
-          days_until_unassign: 21
-          maintainers: 'koppor,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan,LinusDietz'
+          days_until_unassign: 14
+          # One person could have one PR opened and while waiting for feedback working on another one
+          max_assignments: 2
+          maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
+          allow_self_assign_author: false
           assigned_comment: >
+            Thank you for your continued work in JabRef.
+            At this point, you probably already know the basics and the important links.
+            If not, our [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) is the place you should go to.
+
+
+            Happy coding! 🚀
+          assigned_comment_newcomer: >
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 
 
@@ -46,6 +56,19 @@ jobs:
             It also looks like you don't know how to assign issues to yourself.
             Please read our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) to find out how.
             It will also guide you in other aspects of contributing to JabRef.
+          unassigned_comment: |
+            ### 📋 Assignment Update
+
+            Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.
+
+            <details>
+            <summary>Next steps</summary>
+
+            \
+            **If you still want to work on this:**
+            - Submit a pull request showing your current state. You will be automatically assigned again.
+            - Ask a maintainer to assign you again.
+            </details>
       - name: Move issue corresponding column in "Candidates for University Projects"
         uses: m7kvqbe1/github-action-move-issues@main
         if: ${{ steps.assign.outputs.assigned == 'yes' || steps.assign.outputs.unassigned == 'yes' }}

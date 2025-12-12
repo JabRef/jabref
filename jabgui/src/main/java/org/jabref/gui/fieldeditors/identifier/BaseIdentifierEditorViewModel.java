@@ -11,9 +11,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.AbstractEditorViewModel;
+import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -37,12 +39,13 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     protected final BooleanProperty canShortenIdentifier = new SimpleBooleanProperty(false);
     protected final BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
     protected final BooleanProperty canLookupIdentifier = new SimpleBooleanProperty(true);
-    protected final BooleanProperty canFetchBibliographyInformationById = new SimpleBooleanProperty();
+    protected final BooleanProperty canFetchBibliographyInformationById = new SimpleBooleanProperty(false);
     protected IdentifierParser identifierParser;
     protected final ObjectProperty<Optional<T>> identifier = new SimpleObjectProperty<>(Optional.empty());
     protected DialogService dialogService;
     protected TaskExecutor taskExecutor;
     protected GuiPreferences preferences;
+    protected final StateManager stateManager;
 
     public BaseIdentifierEditorViewModel(Field field,
                                          SuggestionProvider<?> suggestionProvider,
@@ -50,11 +53,13 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
                                          DialogService dialogService,
                                          TaskExecutor taskExecutor,
                                          GuiPreferences preferences,
-                                         UndoManager undoManager) {
+                                         UndoManager undoManager,
+                                         StateManager stateManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
+        this.stateManager = stateManager;
     }
 
     /**
@@ -65,8 +70,8 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
      * <b>NOTE: This method MUST be called by all the implementation view models in their principal constructor</b>
      */
     protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier, boolean canShortenIdentifier) {
-        this.canLookupIdentifier.set(canLookupIdentifier);
         this.canFetchBibliographyInformationById.set(canFetchBibliographyInformationById);
+        this.canLookupIdentifier.set(canLookupIdentifier);
         this.canShortenIdentifier.set(canShortenIdentifier);
     }
 
@@ -133,11 +138,15 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     }
 
     public void fetchBibliographyInformation(BibEntry bibEntry) {
-        LOGGER.warn("Unable to fetch bibliography information using the '{}' identifier", FieldTextMapper.getDisplayName(field));
+        stateManager.getActiveDatabase().ifPresentOrElse(
+                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager)
+                        .fetchAndMerge(entry, field),
+                () -> dialogService.notify(Localization.lang("No library selected"))
+        );
     }
 
     public void lookupIdentifier(BibEntry bibEntry) {
-        LOGGER.warn("Unable to lookup identifier for '{}'", FieldTextMapper.getDisplayName(field));
+        LOGGER.warn("Lookup not implemented yet for identifier '{}'", FieldTextMapper.getDisplayName(field));
     }
 
     public void openExternalLink() {

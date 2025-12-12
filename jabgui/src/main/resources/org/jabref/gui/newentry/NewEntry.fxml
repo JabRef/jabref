@@ -22,7 +22,7 @@
             fx:controller="org.jabref.gui.newentry.NewEntryView">
     <buttonTypes>
         <ButtonType fx:constant="CANCEL"/>
-        <ButtonType fx:id="generateButtonType" buttonData="OK_DONE" text="%Generate"/>
+        <ButtonType fx:id="generateButtonType" buttonData="OK_DONE" text="%Create"/>
     </buttonTypes>
     <content>
         <TabPane fx:id="tabs">
@@ -46,6 +46,11 @@
                     <TitledPane fx:id="entryCustomTitle" text="%Custom types" animated="false">
                         <content>
                             <TilePane fx:id="entryCustom" hgap="2.0" vgap="2.0"/>
+                        </content>
+                    </TitledPane>
+                    <TitledPane fx:id="entryNonStandardTitle" text="%Non-standard types" animated="false">
+                        <content>
+                            <TilePane fx:id="entryNonStandard" hgap="2.0" vgap="2.0"/>
                         </content>
                     </TitledPane>
                 </VBox>
