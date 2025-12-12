@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- Improved merge dialog decisions for fields containing person names (e.g., `author`, `editor`) by using a new plausibility comparator. JabRef now prefers the side with more detailed/complete author information. [#14454](https://github.com/JabRef/jabref/issues/14454)
+- We added 15 non-standard BibLaTeX entry types (Audio, Image, Legal, ...) to the group "Non-standard types" group in the New Entry dialog and in the context menu. [#12963](https://github.com/JabRef/jabref/issues/12963)
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
@@ -41,7 +43,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - After importing, now all imported entries are marked. [#13535](https://github.com/JabRef/jabref/pull/13535)
 - The URL integrity check now checks the complete URL syntax. [#14370](https://github.com/JabRef/jabref/pull/14370)
 - <kbd>Tab</kbd> in the last text field of a tab moves the focus to the next tab in the entry editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
+- When pasting invalid BibTeX data, the content is now pasted as `@Misc` with the raw data in the `comment` field. [#14520](https://github.com/JabRef/jabref/pull/14520)
 - We changed fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
+- We renamed "Search pre-configured" to "Search pre-selected" and "Web search fetchers" to "Pre-selected fetchers". [#14557](https://github.com/JabRef/jabref/issues/14557)
 
 ### Fixed
 
