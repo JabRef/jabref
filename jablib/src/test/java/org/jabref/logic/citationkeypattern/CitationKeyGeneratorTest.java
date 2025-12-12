@@ -596,21 +596,18 @@ class CitationKeyGeneratorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("firstPageData")
+    @CsvSource(textBlock = """
+                # normal range
+                7--27,      7
+                --27,       27
+                '',         ''
+                42--111,    42
+                7,41,73--97, 7
+                41,7,73--97, 7
+                43+,        43
+            """)
     void firstPage(String input, String expected) {
         assertEquals(expected, CitationKeyGenerator.firstPage(input));
-    }
-
-    static Stream<Arguments> firstPageData() {
-        return Stream.of(
-                Arguments.of("7--27", "7"),
-                Arguments.of("--27", "27"),
-                Arguments.of("", ""),
-                Arguments.of("42--111", "42"),
-                Arguments.of("7,41,73--97", "7"),
-                Arguments.of("41,7,73--97", "7"),
-                Arguments.of("43+", "43")
-        );
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -620,31 +617,27 @@ class CitationKeyGeneratorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("pagePrefixData")
+    @CsvSource(textBlock = """
+                # Tests with prefix L
+                L7--27,         L
+                L--27,          L--
+                L,              L
+                L42--111,       L
+                L7,L41,L73--97, L
+                L41,L7,L73--97, L
+                L43+,           L
+
+                # Tests with no prefix
+                7--27,          ''
+                --27,           --
+                '',             ''
+                42--111,        ''
+                7,41,73--97,    ''
+                41,7,73--97,    ''
+                43+,            ''
+            """)
     void pagePrefix(String input, String expected) {
         assertEquals(expected, CitationKeyGenerator.pagePrefix(input));
-    }
-
-    static Stream<Arguments> pagePrefixData() {
-        return Stream.of(
-                // Tests with prefix L
-                Arguments.of("L7--27", "L"),
-                Arguments.of("L--27", "L--"),
-                Arguments.of("L", "L"),
-                Arguments.of("L42--111", "L"),
-                Arguments.of("L7,L41,L73--97", "L"),
-                Arguments.of("L41,L7,L73--97", "L"),
-                Arguments.of("L43+", "L"),
-
-                // Tests with no prefix
-                Arguments.of("7--27", ""),
-                Arguments.of("--27", "--"),
-                Arguments.of("", ""),
-                Arguments.of("42--111", ""),
-                Arguments.of("7,41,73--97", ""),
-                Arguments.of("41,7,73--97", ""),
-                Arguments.of("43+", "")
-        );
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -654,23 +647,20 @@ class CitationKeyGeneratorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("lastPageData")
+    @CsvSource(textBlock = """
+                # normal range
+                7--27,       27
+                --27,        27
+                '',          ''
+                42--111,     111
+                7,41,73--97, 97
+                7,41,97--73, 97
+                43+,         43
+                00--0,       0
+                1--1,        1
+            """)
     void lastPage(String input, String expected) {
         assertEquals(expected, CitationKeyGenerator.lastPage(input));
-    }
-
-    static Stream<Arguments> lastPageData() {
-        return Stream.of(
-                Arguments.of("7--27", "27"),
-                Arguments.of("--27", "27"),
-                Arguments.of("", ""),
-                Arguments.of("42--111", "111"),
-                Arguments.of("7,41,73--97", "97"),
-                Arguments.of("7,41,97--73", "97"),
-                Arguments.of("43+", "43"),
-                Arguments.of("00--0", "0"),
-                Arguments.of("1--1", "1")
-        );
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -779,20 +769,17 @@ class CitationKeyGeneratorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("keywordNData")
+    @CsvSource(textBlock = """
+                # first keyword
+                [keyword1], w1
+                # check keywords with space
+                [keyword2], w2aw2b
+                # check out of range
+                [keyword4], ''
+            """)
     void keywordNKeywordsSeparatedBySpace(String pattern, String expected) {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
         assertEquals(expected, generateKey(entry, pattern));
-    }
-
-    static Stream<Arguments> keywordNData() {
-        return Stream.of(
-                Arguments.of("[keyword1]", "w1"),
-                // check keywords with space
-                Arguments.of("[keyword2]", "w2aw2b"),
-                // check out of range
-                Arguments.of("[keyword4]", "")
-        );
     }
 
     @Test
