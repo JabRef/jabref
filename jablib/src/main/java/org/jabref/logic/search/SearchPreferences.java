@@ -28,7 +28,6 @@ public class SearchPreferences {
 
     public SearchPreferences(SearchDisplayMode searchDisplayMode,
                              boolean isRegularExpression,
-                             //boolean isDateRange,
                              boolean isCaseSensitive,
                              boolean isFulltext,
                              boolean keepSearchString,
@@ -40,9 +39,6 @@ public class SearchPreferences {
         if (isRegularExpression) {
             searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }
-        //if (isDateRange) {
-        //    searchFlags.add(SearchFlags.DATE_RANGE);
-        //}
         if (isCaseSensitive) {
             searchFlags.add(SearchFlags.CASE_SENSITIVE);
         }

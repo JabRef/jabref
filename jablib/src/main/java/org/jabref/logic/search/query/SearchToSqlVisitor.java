@@ -21,6 +21,7 @@ import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
 import static org.jabref.model.search.SearchFlags.CASE_INSENSITIVE;
 import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
+import static org.jabref.model.search.SearchFlags.DATE_RANGE;
 import static org.jabref.model.search.SearchFlags.EXACT_MATCH;
 import static org.jabref.model.search.SearchFlags.INEXACT_MATCH;
 import static org.jabref.model.search.SearchFlags.NEGATION;
@@ -158,6 +159,16 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         return visit(ctx.comparison());
     }
 
+    private boolean isDateRange(String term) {
+        // Checks for a date range on the form [YYYY-MM]-[YYYY-MM]
+        return term.matches("\\[\\d{4}-\\d{2}\\]\\-\\[\\d{4}-\\d{2}\\]");
+    }
+
+    private String convertDateRangeToRegularExpression(String term) {
+        // TODO: Make loop that creates general reg ex based on the form [YYYY-MM]-[YYYY-MM]
+        return "200[5-9]|201[0-9]";
+    }
+
     @Override
     public SqlQueryNode visitComparison(SearchParser.ComparisonContext ctx) {
         EnumSet<SearchFlags> searchFlags = EnumSet.noneOf(SearchFlags.class);
@@ -167,7 +178,12 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         if (ctx.FIELD() == null) {
             // apply search bar flags to unfielded expressions
             boolean isCaseSensitive = searchBarFlags.contains(CASE_SENSITIVE);
-            if (searchBarFlags.contains(REGULAR_EXPRESSION)) {
+            if (searchBarFlags.contains(DATE_RANGE)) {
+                if (isDateRange(term)) {
+                    term = convertDateRangeToRegularExpression(term);
+                    setFlags(searchFlags, REGULAR_EXPRESSION, isCaseSensitive, false);
+                }
+            } else if (searchBarFlags.contains(REGULAR_EXPRESSION)) {
                 setFlags(searchFlags, REGULAR_EXPRESSION, isCaseSensitive, false);
             } else {
                 setFlags(searchFlags, INEXACT_MATCH, isCaseSensitive, false);

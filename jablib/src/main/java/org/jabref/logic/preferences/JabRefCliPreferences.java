@@ -2119,7 +2119,6 @@ public class JabRefCliPreferences implements CliPreferences {
         searchPreferences = new SearchPreferences(
                 getBoolean(SEARCH_DISPLAY_MODE) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
                 getBoolean(SEARCH_REG_EXP),
-                //getBoolean(SEARCH_DATE_RANGE),
                 getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
