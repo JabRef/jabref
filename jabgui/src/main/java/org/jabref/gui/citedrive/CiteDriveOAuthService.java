@@ -18,7 +18,6 @@ import com.nimbusds.oauth2.sdk.AuthorizationGrant;
 import com.nimbusds.oauth2.sdk.AuthorizationRequest;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.ResponseType;
-import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.TokenErrorResponse;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.TokenResponse;
@@ -40,7 +39,6 @@ public class CiteDriveOAuthService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CiteDriveOAuthService.class);
 
     private static final ClientID CLIENT_ID = new ClientID("jabref-desktop");
-    private static final Scope SCOPE = Scope.parse("read write");
 
     private static final URI AUTH_ENDPOINT;
     private static final URI TOKEN_ENDPOINT;
@@ -92,7 +90,6 @@ public class CiteDriveOAuthService {
 
         return new AuthorizationRequest.Builder(
                 new ResponseType(ResponseType.Value.CODE), CLIENT_ID)
-                .scope(SCOPE)
                 .state(new State(state))
                 .redirectionURI(getCallBackUri())
                 .endpointURI(AUTH_ENDPOINT)
