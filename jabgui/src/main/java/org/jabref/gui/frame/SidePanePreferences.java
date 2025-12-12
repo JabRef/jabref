@@ -24,6 +24,14 @@ public class SidePanePreferences {
         this.webSearchFetcherSelected = new SimpleIntegerProperty(webSearchFetcherSelected);
     }
 
+    public SidePanePreferences() {
+        this(
+                Set.of(),  // Default
+                Map.of(),  // Default
+                0          // Default
+        );
+    }
+    
     public ObservableSet<SidePaneType> visiblePanes() {
         return visiblePanes;
     }
