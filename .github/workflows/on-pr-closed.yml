@@ -96,7 +96,7 @@ jobs:
           PR_BODY: ${{ env.PR_BODY }}
         run: |
           ticketNumber=$(printf '%s\n' "$PR_BODY" \
-            | grep -Eio '(fixes|closes|resolves)[[:space:]]+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
+            | grep -Eio '(fixes|closes|resolves)\s+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
             | grep -Eo '[0-9]+' \
             | grep -Ev '^13109$' \
             | head -n1 || true)
