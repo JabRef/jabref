@@ -97,10 +97,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
         with:
           show-progress: 'false'
+      - name: Add label "📌 Pinned"
+        run: gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --add-label "📌 Pinned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Assign PR creator to issue
         run: |
           set -e
@@ -140,9 +145,5 @@ jobs:
           else
             gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Add label "📌 Pinned"
-        run: gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --add-label "📌 Pinned"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
