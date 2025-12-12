@@ -108,6 +108,7 @@ public class CiteDriveOAuthService {
     }
 
     private Optional<Tokens> exchangeCodeForToken(String code) {
+        LOGGER.trace("Received code {}", code);
         AuthorizationCode authCode = new AuthorizationCode(code);
         AuthorizationGrant codeGrant = new AuthorizationCodeGrant(authCode, getCallBackUri(), lastPkceVerifier);
         TokenRequest request = new TokenRequest(TOKEN_ENDPOINT, CLIENT_ID, codeGrant);
