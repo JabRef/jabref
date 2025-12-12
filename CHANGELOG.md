@@ -49,7 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We renamed "Search pre-configured" to "Search pre-selected" and "Web search fetchers" to "Pre-selected fetchers". [#14557](https://github.com/JabRef/jabref/issues/14557)
 
 ### Fixed
-
+- We Fixed groups not appearing in left sidebar when importing libraries. Groups from imported files are now properly extracted and merged with the current library's group tree structure, preventing duplicates while preserving hierarchy. [#13684](https://github.com/JabRef/jabref/issues/13684)
 - We fixed an issue where pressing <kbd>ESC</kbd> in the preferences dialog would not always close the dialog. [#8888](https://github.com/JabRef/jabref/issues/8888)
 - We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional. [#14224](https://github.com/JabRef/jabref/pull/14224)
 - We fixed the fallback window height (786 → 768) in JabRefGUI. [#14295](https://github.com/JabRef/jabref/pull/14295)

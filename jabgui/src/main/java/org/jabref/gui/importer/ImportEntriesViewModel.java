@@ -208,6 +208,16 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 dialogService,
                 taskExecutor);
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport);
+
+        if (parserResult != null && selectedDb != null) {
+            mergeGroupsFromImport(parserResult, selectedDb);
+
+            // Refresh group tree UI
+            stateManager.getActiveDatabase().ifPresent(db -> {
+                // Trigger metadata change event to refresh UI
+                db.getMetaData().setGroups(db.getMetaData().getGroups().orElse(null));
+            });
+        }
     }
 
     /**
