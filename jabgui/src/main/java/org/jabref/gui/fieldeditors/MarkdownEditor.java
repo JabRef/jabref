@@ -10,7 +10,6 @@ import java.util.Optional;
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.TextInputControl;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
@@ -66,7 +65,7 @@ public class MarkdownEditor extends SimpleEditor {
     }
 
     private void enableDragOver(EditorTextArea textArea) {
-        textArea.addEventFilter(DragEvent.DRAG_OVER, event -> {
+        textArea.setOnDragOver(event -> {
             if (event.getGestureSource() != textArea && event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
@@ -75,7 +74,7 @@ public class MarkdownEditor extends SimpleEditor {
     }
 
     private void enableDragDrop(EditorTextArea textArea) {
-        textArea.addEventFilter(DragEvent.DRAG_DROPPED, event -> {
+        textArea.setOnDragDropped(event -> {
             Dragboard dragboard = event.getDragboard();
             boolean success = false;
 
