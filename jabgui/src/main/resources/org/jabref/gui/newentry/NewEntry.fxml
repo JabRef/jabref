@@ -48,6 +48,11 @@
                             <TilePane fx:id="entryCustom" hgap="2.0" vgap="2.0"/>
                         </content>
                     </TitledPane>
+                    <TitledPane fx:id="entryNonStandardTitle" text="%Non-standard types" animated="false">
+                        <content>
+                            <TilePane fx:id="entryNonStandard" hgap="2.0" vgap="2.0"/>
+                        </content>
+                    </TitledPane>
                 </VBox>
             </Tab>
 

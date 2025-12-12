@@ -71,6 +71,6 @@
         </columnResizePolicy>
     </TableView>
 
-    <Label styleClass="sectionHeader" text="%Web search fetchers"/>
+    <Label styleClass="sectionHeader" text="%Pre-selected fetchers"/>
     <VBox fx:id="fetchersContainer"/>
 </fx:root>
