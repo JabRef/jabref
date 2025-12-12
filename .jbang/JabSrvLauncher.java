@@ -68,7 +68,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SelectedItemsContainer.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/oauth/OAuth.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/callback/CallbackResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/Command.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/CommandResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/SelectEntriesCommand.java
