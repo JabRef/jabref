@@ -46,7 +46,7 @@ public class GroupsPreferences {
 
     public GroupsPreferences() {
         this(
-                true,           // Default view mode intersection
+                true,                             // Default view mode intersection
                 true,                             // Default view mode filter
                 false,                            // Default view mode invert
                 true,                             // Default auto assign group
