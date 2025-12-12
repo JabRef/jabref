@@ -17,23 +17,24 @@ import org.jabref.logic.remote.RemotePreferences;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class CiteDriveOAuthServiceTest {
+class CiteDriveOAuthTest {
 
     private static final HttpServerManager HTTP_SERVER_MANAGER = new HttpServerManager();
+    private static final OAuthSessionRegistry OAUTH_SESSION_REGISTRY = new OAuthSessionRegistry();
 
     @BeforeAll
     static void startServer() {
         CliPreferences cliPreferences = mock(CliPreferences.class);
         SrvStateManager srvStateManager = mock(SrvStateManager.class);
         URI uri = URI.create("http://localhost:23119");
-        HTTP_SERVER_MANAGER.start(cliPreferences, srvStateManager, uri);
+        HTTP_SERVER_MANAGER.start(cliPreferences, srvStateManager, OAUTH_SESSION_REGISTRY, uri);
     }
 
     @AfterAll
@@ -42,7 +43,7 @@ class CiteDriveOAuthServiceTest {
     }
 
     @Test
-    @Disabled
+    @Timeout(15)
     void getToken() throws ExecutionException, InterruptedException {
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
@@ -50,8 +51,7 @@ class CiteDriveOAuthServiceTest {
         RemotePreferences remotePreferences = mock(RemotePreferences.class);
         when(remotePreferences.getHttpServerUri()).thenReturn(URI.create("http://localhost:23119"));
 
-        OAuthSessionRegistry oAuthSessionRegistry = new OAuthSessionRegistry();
-        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, oAuthSessionRegistry);
+        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, OAUTH_SESSION_REGISTRY);
 
         Optional<Tokens> actual = citeDriveOAuthService.authorizeInteractive().get();
         assertTrue(actual.isPresent());

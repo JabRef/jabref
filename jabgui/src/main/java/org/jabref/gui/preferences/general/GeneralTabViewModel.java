@@ -36,6 +36,7 @@ import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -316,7 +317,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (enableHttpServerProperty.getValue()) {
             remotePreferences.setEnableHttpServer(true);
             URI uri = remotePreferences.getHttpServerUri();
-            httpServerManager.start(preferences, stateManager, uri);
+            // TODO: Fix OAuthSessionRegistry parameter
+            httpServerManager.start(preferences, stateManager, new OAuthSessionRegistry(), uri);
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();

@@ -89,9 +89,10 @@ public class CiteDriveOAuthService {
                 .toURI();
     }
 
+    /// Redirects to [org.jabref.http.server.resources.callback.CallbackResource#citeDriveCallback]
     private @NonNull URI getCallBackUri() {
-        // The endpoint is at [org.jabref.http.server.oauth.OAuth.citeDriveCallback]
-        return remotePreferences.getHttpServerUri().resolve("/oauth/citedrive");
+        // "/callback" is standard for OAuth2 redirect URIs
+        return remotePreferences.getHttpServerUri().resolve("/callback");
     }
 
     private Optional<Tokens> exchangeCodeForToken(String code) {

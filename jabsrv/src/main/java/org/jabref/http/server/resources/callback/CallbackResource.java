@@ -1,4 +1,4 @@
-package org.jabref.http.server.oauth;
+package org.jabref.http.server.resources.callback;
 
 import org.jabref.logic.citedrive.OAuthSessionRegistry;
 
@@ -12,23 +12,23 @@ import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/oauth")
-public class OAuth {
+/// This resource is triggered by [org.jabref.gui.citedrive.CiteDriveOAuthService]
+@Path("/callback")
+public class CallbackResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OAuth.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackResource.class);
 
     @Inject
     OAuthSessionRegistry sessionRegistry;
 
     @GET
-    @Path("/citedrive")
     @Produces(MediaType.TEXT_HTML)
     public Response citeDriveCallback(@QueryParam("code") String code,
                                       @QueryParam("state") String state,
                                       @QueryParam("error") String error) {
         if (error != null && !error.isBlank()) {
-            LOGGER.warn("CiteDrive OAuth error: {} (state={})", error, state);
-            sessionRegistry.fail(state, new IllegalStateException("OAuth error: " + error));
+            LOGGER.warn("CiteDrive CallbackResource error: {} (state={})", error, state);
+            sessionRegistry.fail(state, new IllegalStateException("CallbackResource error: " + error));
             return Response.serverError().entity("<html><body>Authorization failed. You can close this window.</body></html>").build();
         }
 
