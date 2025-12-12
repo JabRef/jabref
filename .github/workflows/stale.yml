@@ -21,7 +21,7 @@ jobs:
           days-before-issue-close: -1
 
           only-pr-labels: "status: changes-required"
-          stale-pr-label: "status: changes-required"
+          stale-pr-label: "status: stale"
           remove-pr-stale-when-updated: false
 
           days-before-pr-stale: 14
