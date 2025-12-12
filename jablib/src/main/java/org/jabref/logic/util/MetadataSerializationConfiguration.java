@@ -6,7 +6,6 @@ import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 
@@ -48,11 +47,6 @@ public class MetadataSerializationConfiguration {
      * Identifier for {@link ExplicitGroup}.
      */
     public static final String EXPLICIT_GROUP_ID = "StaticGroup:";
-
-    /**
-     * Identifier for {@link SmartGroup}.
-     */
-    public static final String SMART_GROUP_ID = "SmartGroup:";
 
     /**
      * Identifier for {@link SearchGroup}.
