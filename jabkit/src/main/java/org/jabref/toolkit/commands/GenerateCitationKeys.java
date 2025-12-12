@@ -44,6 +44,54 @@ class GenerateCitationKeys implements Runnable {
     )
     private String pattern;
 
+    @Option(
+            names = "--transliterate",
+            description = "Transliterate fields for citation key generation"
+    )
+    private Boolean transliterate;
+
+    @Option(
+            names = "--warn-before-overwrite",
+            description = "Warn before overwriting existing citation keys"
+    )
+    private Boolean warnBeforeOverwrite;
+
+    @Option(
+            names = "--suffix",
+            description = "Key suffix strategy: ALWAYS, SECOND_WITH_A, SECOND_WITH_B"
+    )
+    private CitationKeyPatternPreferences.KeySuffix suffix;
+
+    @Option(
+            names = "--regex",
+            description = "Regular expression for key pattern matching"
+    )
+    private String keyPatternRegex;
+
+    @Option(
+            names = "--regex-replacement",
+            description = "Replacement string for regex matches"
+    )
+    private String keyPatternReplacement;
+
+    @Option(
+            names = "--unwanted",
+            description = "Unwanted characters to remove from generated keys"
+    )
+    private String unwantedCharacters;
+
+    @Option(
+            names = "--keyword-delimiter",
+            description = "Delimiter to use between keywords in citation key"
+    )
+    private Character keywordDelimiter;
+
+    @Option(names = "--avoid-overwrite", description = "Avoid overwriting existing citation keys")
+    private Boolean avoidOverwrite;
+
+    @Option(names = "--generate-before-saving", description = "Generate citation keys before saving")
+    private Boolean generateBeforeSaving;
+
     @Override
     public void run() {
         JabKit parentTop = parentMid.getParent();
@@ -72,19 +120,23 @@ class GenerateCitationKeys implements Runnable {
 
         CitationKeyPatternPreferences preferences = parentTop.cliPreferences.getCitationKeyPatternPreferences();
 
-        if (pattern != null) {
+        if (transliterate != null || pattern != null || avoidOverwrite != null ||
+                warnBeforeOverwrite != null || generateBeforeSaving != null || suffix != null ||
+                keyPatternRegex != null || keyPatternReplacement != null ||
+                unwantedCharacters != null || keywordDelimiter != null) {
+
             preferences = new CitationKeyPatternPreferences(
-                    preferences.shouldTransliterateFieldsForCitationKey(),
-                    preferences.shouldAvoidOverwriteCiteKey(),
-                    preferences.shouldWarnBeforeOverwriteCiteKey(),
-                    preferences.shouldGenerateCiteKeysBeforeSaving(),
-                    preferences.getKeySuffix(),
-                    preferences.getKeyPatternRegex(),
-                    preferences.getKeyPatternReplacement(),
-                    preferences.getUnwantedCharacters(),
+                    transliterate != null ? transliterate : preferences.shouldTransliterateFieldsForCitationKey(),
+                    avoidOverwrite != null ? avoidOverwrite : preferences.shouldAvoidOverwriteCiteKey(),
+                    warnBeforeOverwrite != null ? warnBeforeOverwrite : preferences.shouldWarnBeforeOverwriteCiteKey(),
+                    generateBeforeSaving != null ? generateBeforeSaving : preferences.shouldGenerateCiteKeysBeforeSaving(),
+                    suffix != null ? suffix : preferences.getKeySuffix(),
+                    keyPatternRegex != null ? keyPatternRegex : preferences.getKeyPatternRegex(),
+                    keyPatternReplacement != null ? keyPatternReplacement : preferences.getKeyPatternReplacement(),
+                    unwantedCharacters != null ? unwantedCharacters : preferences.getUnwantedCharacters(),
                     preferences.getKeyPatterns(),
-                    pattern,
-                    preferences.getKeywordDelimiter()
+                    pattern != null ? pattern : preferences.getDefaultPattern(),
+                    keywordDelimiter != null ? keywordDelimiter : preferences.getKeywordDelimiter()
             );
         }
 
