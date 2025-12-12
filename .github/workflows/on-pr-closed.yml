@@ -77,7 +77,8 @@ jobs:
     outputs:
       issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
     steps:
-      - name: echo PR data
+      - name: Determine issue number
+        id: get_issue_number
         env:
           PR_NUMBER: ${{ needs.collect_parameters.outputs.pr_number }}
           PR_URL:    ${{ needs.collect_parameters.outputs.pr_url }}
@@ -90,11 +91,6 @@ jobs:
           PR Body:
           $PR_BODY
           EOF
-      - name: Determine issue number
-        id: get_issue_number
-        env:
-          PR_BODY: ${{ env.PR_BODY }}
-        run: |
           ticketNumber=$(printf '%s\n' "$PR_BODY" \
             | grep -Eio '(fixes|closes|resolves)\s+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
             | grep -Eo '[0-9]+' \
