@@ -14,7 +14,6 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
@@ -66,8 +65,7 @@ class CheckConsistency implements Callable<Integer> {
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(databaseContext, bibEntryTypesManager, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(databaseContext, jabKit.entryTypesManager, (count, total) -> {
             if (!sharedOptions.porcelain) {
                 System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));
             }
