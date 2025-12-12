@@ -98,7 +98,9 @@ public class Server {
     }
 
     private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
+        // Add remaining services - the difference between CLI and GUI is the SrvStateManager added before
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, oAuthSessionRegistry);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences);
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 

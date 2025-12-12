@@ -25,22 +25,23 @@ public class CallbackResource {
     @Produces(MediaType.TEXT_HTML)
     public Response citeDriveCallback(@QueryParam("code") String code,
                                       @QueryParam("state") String state,
-                                      @QueryParam("error") String error) {
+                                      @QueryParam("error") String error,
+                                      @QueryParam("error_description") String errorDescription) {
         if (error != null && !error.isBlank()) {
-            LOGGER.warn("CiteDrive CallbackResource error: {} (state={})", error, state);
+            LOGGER.warn("CiteDrive CallbackResource error: {} ({}) (state={})", error, errorDescription, state);
             sessionRegistry.fail(state, new IllegalStateException("CallbackResource error: " + error));
-            return Response.serverError().entity("<html><body>Authorization failed. You can close this window.</body></html>").build();
+            return Response.serverError().build();
         }
 
         if (code == null || state == null) {
             LOGGER.warn("Missing code or state in CiteDrive callback: code={}, state={}", code, state);
             sessionRegistry.fail(state, new IllegalStateException("Missing code or state"));
-            return Response.serverError().entity("<html><body>Missing information. You can close this window.</body></html>").build();
+            return Response.serverError().build();
         }
 
         LOGGER.debug("Received CiteDrive callback: state={}, code={}", state, code);
         sessionRegistry.complete(state, code);
 
-        return Response.ok("<html><body>Authorization successful. You can close this window.</body></html>").build();
+        return Response.noContent().build();
     }
 }

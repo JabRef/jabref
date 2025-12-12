@@ -28,7 +28,6 @@ public class HttpServerThread extends Thread {
     public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, OAuthSessionRegistry oAuthSessionRegistry, URI uri) {
         this.srvStateManager = srvStateManager;
         this.uri = uri;
-        // TODO: Fix params
         this.server = new Server(cliPreferences, oAuthSessionRegistry);
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
     }
