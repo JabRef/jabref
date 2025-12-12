@@ -46,12 +46,12 @@ public class GroupsPreferences {
 
     public GroupsPreferences() {
         this(
-                true,
-                true,
-                false,
-                true,
-                true,
-                GroupHierarchyType.INDEPENDENT
+                true,           // Default view mode intersection
+                true,                             // Default view mode filter
+                false,                            // Default view mode invert
+                true,                             // Default auto assign group
+                true,                             // Default display group content
+                GroupHierarchyType.INDEPENDENT    // Default hierarchical context
         );
     }
 
