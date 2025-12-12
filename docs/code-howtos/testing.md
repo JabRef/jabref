@@ -140,7 +140,7 @@ To test that a preferences migration works successfully, use the mockito method 
 
 ## Localization in tests
 
-In case you or your called code uses `Localizatin.lang`, annotate your test with following annotation:
+In case you or your called code uses `Localization.lang`, annotate your test with following annotation:
 
 ```java
 @ResourceLock("Localization.lang")
