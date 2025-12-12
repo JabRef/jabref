@@ -24,16 +24,25 @@ public class SidePanePreferences {
         this.webSearchFetcherSelected = new SimpleIntegerProperty(webSearchFetcherSelected);
     }
 
-    public SidePanePreferences() {
+    private SidePanePreferences() {
         this(
-                Set.of(),  // Default
-                Map.of(),  // Default
-                0          // Default
+                Set.of(),  // Default visible pane
+                Map.of(),  // Default preferred positions
+                0          // Default web search fetcher index
         );
     }
-    
+
+    public static SidePanePreferences getDefault() {
+        return new SidePanePreferences();
+    }
+
     public ObservableSet<SidePaneType> visiblePanes() {
         return visiblePanes;
+    }
+
+    public void setVisiblePanes(Set<SidePaneType> panes) {
+        visiblePanes.clear();
+        visiblePanes.addAll(panes);
     }
 
     public ObservableMap<SidePaneType, Integer> getPreferredPositions() {
@@ -55,5 +64,11 @@ public class SidePanePreferences {
 
     public void setWebSearchFetcherSelected(int webSearchFetcherSelected) {
         this.webSearchFetcherSelected.set(webSearchFetcherSelected);
+    }
+
+    public void setAll(SidePanePreferences preferences) {
+        this.setVisiblePanes(preferences.visiblePanes());
+        this.setPreferredPositions(preferences.getPreferredPositions());
+        this.webSearchFetcherSelected.set(preferences.getWebSearchFetcherSelected());
     }
 }
