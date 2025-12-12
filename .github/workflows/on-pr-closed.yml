@@ -34,14 +34,15 @@ jobs:
       pr_url:    ${{ steps.pick.outputs.pr_url }}
       pr_body:   ${{ steps.pick.outputs.pr_body }}
     steps:
-      - name: From workflow_dispatch input (fetch PR)
-        id: from_dispatch
+      - id: from_dispatch
         if: github.event_name == 'workflow_dispatch'
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
         uses: actions/github-script@v7
         with:
           script: |
             const {owner, repo} = context.repo;
-            const prNumber = Number(core.getInput("pr_number"));
+            const prNumber = Number(process.env.PR_NUMBER);
             const {data: pr} = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
             core.setOutput("pr_number", String(pr.number));
             core.setOutput("pr_url", pr.html_url ?? "");
@@ -76,7 +77,8 @@ jobs:
     outputs:
       issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
     steps:
-      - name: echo PR data
+      - name: Determine issue number
+        id: get_issue_number
         env:
           PR_NUMBER: ${{ needs.collect_parameters.outputs.pr_number }}
           PR_URL:    ${{ needs.collect_parameters.outputs.pr_url }}
@@ -89,24 +91,19 @@ jobs:
           PR Body:
           $PR_BODY
           EOF
-      - name: Determine issue number
-        id: get_issue_number
-        env:
-          PR_BODY: ${{ env.PR_BODY }}
-        run: |
           ticketNumber=$(printf '%s\n' "$PR_BODY" \
-            | grep -Eio '(fixes|closes|resolves)[[:space:]]+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
+            | grep -Eio '(fixes|closes|resolves)\s+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
             | grep -Eo '[0-9]+' \
             | grep -Ev '^13109$' \
             | head -n1 || true)
 
           echo "ticketNumber=$ticketNumber" >> "$GITHUB_OUTPUT"
-          echo "Determined issue [#$ticketNumber}(https://github.com/JabRef/jabref/issues/$ticketNumber)" >> $GITHUB_STEP_SUMMARY
+          echo "Determined issue [#$ticketNumber](https://github.com/JabRef/jabref/issues/$ticketNumber)" >> $GITHUB_STEP_SUMMARY
 
   unassign_issue:
     name: Mark issue as available
     runs-on: ubuntu-latest
-    needs: determine_issue_number
+    needs: [collect_parameters, determine_issue_number]
     if: >
       (needs.determine_issue_number.outputs.issue_number != '') &&
       (github.event_name == 'workflow_dispatch' || !github.event.pull_request.merged)
@@ -173,7 +170,7 @@ jobs:
         if: steps.check_assignee.outputs.assigned == 'no'
         run: |
           echo "Commenting on PR..."
-          gh issue comment "$PR_NUMBER" -b "This pull requests was closed without merging. You have been unassigned from the respective issue #${{ needs.determine_issue_number.outputs.issue_number }}."
+          gh issue comment "${{ needs.collect_parameters.outputs.pr_number }}" -b "This pull requests was closed without merging. You have been unassigned from the respective issue #${{ needs.determine_issue_number.outputs.issue_number }}."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -182,8 +179,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: determine_issue_number
     if: >
-      (needs.determine_issue_number.outputs.issue_number != '-1') &&
-      (github.event.pull_request.merged)
+      (needs.determine_issue_number.outputs.issue_number != '') &&
+      (github.event_name != 'workflow_dispatch' && github.event.pull_request.merged)
     permissions:
       contents: read
       issues: write
