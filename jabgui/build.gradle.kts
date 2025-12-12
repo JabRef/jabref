@@ -107,6 +107,7 @@ dependencies {
     // OAuth2 for CiteDrive
     implementation("com.nimbusds:oauth2-oidc-sdk")
     implementation("net.minidev:json-smart")
+    implementation("com.nimbusds:nimbus-jose-jwt")
 
     testImplementation(project(":test-support"))
 

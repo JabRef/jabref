@@ -159,6 +159,7 @@ extraJavaModuleInfo {
         overrideModuleName()
         exportAllPackages()
     }
+    knownModule("com.nimbusds:nimbus-jose-jwt", "com.nimbusds.jose.jwt")
     module("com.nimbusds:lang-tag", "nimbusds.langtag") {
         overrideModuleName()
         exportAllPackages()
@@ -166,9 +167,7 @@ extraJavaModuleInfo {
     module("com.nimbusds:oauth2-oidc-sdk", "nimbusds.oauth2.oidc.sdk") {
         overrideModuleName()
         exportAllPackages()
-        requires("nimbusds.contenttype")
-        requires("nimbusds.langtag")
-        requires("json.smart")
+        requireAllDefinedDependencies()
     }
     // endregion
 

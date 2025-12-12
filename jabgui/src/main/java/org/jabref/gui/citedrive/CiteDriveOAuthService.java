@@ -23,6 +23,9 @@ import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.TokenResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.oauth2.sdk.pkce.CodeChallenge;
+import com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod;
+import com.nimbusds.oauth2.sdk.pkce.CodeVerifier;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
@@ -53,6 +56,8 @@ public class CiteDriveOAuthService {
         }
     }
 
+    private CodeVerifier lastPkceVerifier; // store per-login attempt (TODO: better: map by state - in OAuthSessionRegistry?)
+
     public CiteDriveOAuthService(
             ExternalApplicationsPreferences externalApplicationsPreferences,
             RemotePreferences remotePreferences,
@@ -78,6 +83,11 @@ public class CiteDriveOAuthService {
     }
 
     private URI buildAuthUrl(String state) {
+        CodeVerifier codeVerifier = new CodeVerifier();
+        lastPkceVerifier = codeVerifier;
+
+        CodeChallenge codeChallenge = CodeChallenge.compute(CodeChallengeMethod.S256, codeVerifier);
+
         return new AuthenticationRequest.Builder(
                 new ResponseType(ResponseType.Value.CODE),
                 SCOPE,
@@ -85,6 +95,7 @@ public class CiteDriveOAuthService {
                 getCallBackUri())
                 .endpointURI(AUTH_ENDPOINT)
                 .state(new State(state))
+                .codeChallenge(codeChallenge, CodeChallengeMethod.S256)
                 .build()
                 .toURI();
     }
@@ -97,7 +108,7 @@ public class CiteDriveOAuthService {
 
     private Optional<Tokens> exchangeCodeForToken(String code) {
         AuthorizationCode authCode = new AuthorizationCode(code);
-        AuthorizationGrant codeGrant = new AuthorizationCodeGrant(authCode, getCallBackUri());
+        AuthorizationGrant codeGrant = new AuthorizationCodeGrant(authCode, getCallBackUri(), lastPkceVerifier);
         TokenRequest request = new TokenRequest(TOKEN_ENDPOINT, CLIENT_ID, codeGrant, SCOPE);
         TokenResponse response;
         try {

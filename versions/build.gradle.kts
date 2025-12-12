@@ -80,6 +80,7 @@ dependencies.constraints {
     api("com.konghq:unirest-java-core:4.5.1")
     api("com.konghq:unirest-modules-gson:4.5.1")
     api("com.nimbusds:oauth2-oidc-sdk:11.30.1")
+    api("com.nimbusds:nimbus-jose-jwt:10.6")
     api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:5.1.0")
     api("com.squareup.okio:okio-jvm:3.16.0")
