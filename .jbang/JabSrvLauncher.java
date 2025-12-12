@@ -68,10 +68,10 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SelectedItemsContainer.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/Command.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/CommandResource.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/oauth/OAuth.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/Command.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/CommandResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/MapResource.java
