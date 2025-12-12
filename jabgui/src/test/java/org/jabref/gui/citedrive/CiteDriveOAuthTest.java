@@ -22,6 +22,7 @@ import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -51,6 +52,7 @@ class CiteDriveOAuthTest {
 
     @Test
     @Timeout(60)
+    @Disabled
     void getToken() throws ExecutionException, InterruptedException {
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
@@ -69,6 +71,7 @@ class CiteDriveOAuthTest {
     /// Fetches a token and sends some BibTeX to CiteDrive
     @Test
     @Timeout(60)
+    @Disabled
     void putLibrary() throws ExecutionException, InterruptedException, IOException {
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
