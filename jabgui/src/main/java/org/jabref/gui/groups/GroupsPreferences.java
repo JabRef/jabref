@@ -44,7 +44,7 @@ public class GroupsPreferences {
         }
     }
 
-    public GroupsPreferences() {
+    private GroupsPreferences() {
         this(
                 true,                             // Default view mode intersection
                 true,                             // Default view mode filter
