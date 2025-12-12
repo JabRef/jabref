@@ -15,6 +15,7 @@ import com.nimbusds.oauth2.sdk.AccessTokenResponse;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
 import com.nimbusds.oauth2.sdk.AuthorizationGrant;
+import com.nimbusds.oauth2.sdk.AuthorizationRequest;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.Scope;
@@ -28,7 +29,6 @@ import com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod;
 import com.nimbusds.oauth2.sdk.pkce.CodeVerifier;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
-import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class CiteDriveOAuthService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CiteDriveOAuthService.class);
 
     private static final ClientID CLIENT_ID = new ClientID("jabref-desktop");
-    private static final Scope SCOPE = Scope.parse("openid read write");
+    private static final Scope SCOPE = Scope.parse("read write");
 
     private static final URI AUTH_ENDPOINT;
     private static final URI TOKEN_ENDPOINT;
@@ -88,13 +88,12 @@ public class CiteDriveOAuthService {
 
         CodeChallenge codeChallenge = CodeChallenge.compute(CodeChallengeMethod.S256, codeVerifier);
 
-        return new AuthenticationRequest.Builder(
-                new ResponseType(ResponseType.Value.CODE),
-                SCOPE,
-                CLIENT_ID,
-                getCallBackUri())
-                .endpointURI(AUTH_ENDPOINT)
+        return new AuthorizationRequest.Builder(
+                new ResponseType(ResponseType.Value.CODE), CLIENT_ID)
+                .scope(SCOPE)
                 .state(new State(state))
+                .redirectionURI(getCallBackUri())
+                .endpointURI(AUTH_ENDPOINT)
                 .codeChallenge(codeChallenge, CodeChallengeMethod.S256)
                 .build()
                 .toURI();
