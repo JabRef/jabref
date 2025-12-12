@@ -34,14 +34,15 @@ jobs:
       pr_url:    ${{ steps.pick.outputs.pr_url }}
       pr_body:   ${{ steps.pick.outputs.pr_body }}
     steps:
-      - name: From workflow_dispatch input (fetch PR)
-        id: from_dispatch
+      - id: from_dispatch
         if: github.event_name == 'workflow_dispatch'
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
         uses: actions/github-script@v7
         with:
           script: |
             const {owner, repo} = context.repo;
-            const prNumber = Number(core.getInput("pr_number"));
+            const prNumber = Number(process.env.PR_NUMBER);
             const {data: pr} = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
             core.setOutput("pr_number", String(pr.number));
             core.setOutput("pr_url", pr.html_url ?? "");
