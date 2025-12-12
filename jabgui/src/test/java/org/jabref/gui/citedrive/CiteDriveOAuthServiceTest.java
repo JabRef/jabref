@@ -10,7 +10,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.http.SrvStateManager;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.RemotePreferences;

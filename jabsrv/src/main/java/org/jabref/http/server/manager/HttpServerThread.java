@@ -1,4 +1,4 @@
-package org.jabref.http.manager;
+package org.jabref.http.server.manager;
 
 import java.net.URI;
 
