@@ -30,18 +30,18 @@ public class CallbackResource {
         if (error != null && !error.isBlank()) {
             LOGGER.warn("CiteDrive CallbackResource error: {} ({}) (state={})", error, errorDescription, state);
             sessionRegistry.fail(state, new IllegalStateException("CallbackResource error: " + error));
-            return Response.serverError().build();
+            return Response.serverError().entity("<html><body>Authorization failed. You can close this window.</body></html>").build();
         }
 
         if (code == null || state == null) {
             LOGGER.warn("Missing code or state in CiteDrive callback: code={}, state={}", code, state);
             sessionRegistry.fail(state, new IllegalStateException("Missing code or state"));
-            return Response.serverError().build();
+            return Response.serverError().entity("<html><body>Missing information. You can close this window.</body></html>").build();
         }
 
         LOGGER.debug("Received CiteDrive callback: state={}, code={}", state, code);
         sessionRegistry.complete(state, code);
 
-        return Response.noContent().build();
+        return Response.ok("<html><body>Authorization successful. You can close this window.</body></html>").build();
     }
 }
