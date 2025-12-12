@@ -3,6 +3,7 @@ package org.jabref.http.server;
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
+import org.jabref.logic.importer.util.MediaTypes;
 
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -32,7 +33,7 @@ class LibraryResourceTest extends ServerTest {
                 }
 
                 @Comment{jabref-meta: databaseType:bibtex;}
-                """, target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.BIBTEX).get(String.class));
+                """, target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(MediaTypes.APPLICATION_BIBTEX).get(String.class));
     }
 
     @Test

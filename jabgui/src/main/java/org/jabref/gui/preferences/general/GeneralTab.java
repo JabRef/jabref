@@ -23,7 +23,7 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;

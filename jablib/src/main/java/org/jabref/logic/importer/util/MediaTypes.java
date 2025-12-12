@@ -1,8 +1,6 @@
 package org.jabref.logic.importer.util;
 
-/**
- * Stores MediaTypes required by JabRef (which are not availble in used libraries)
- */
+/// Stores MediaTypes required by JabRef (which are not available in used libraries)
 public class MediaTypes {
     public static final String APPLICATION_BIBTEX = "application/x-bibtex";
     public static final String APPLICATION_JABREF_DATA = "application/x-jabref";

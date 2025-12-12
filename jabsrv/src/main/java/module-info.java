@@ -1,20 +1,22 @@
 module org.jabref.jabsrv {
-    exports org.jabref.http.server;
-    exports org.jabref.http.manager;
 
+    exports org.jabref.http;
     exports org.jabref.http.dto to com.google.gson, org.glassfish.hk2.locator;
     exports org.jabref.http.dto.cayw to com.google.gson;
-
-    opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
+    exports org.jabref.http.server;
     exports org.jabref.http.server.cayw to org.glassfish.jersey.core.server;
-    exports org.jabref.http.server.command to org.glassfish.jersey.core.server;
-    opens org.jabref.http.server.cayw to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
-    opens org.jabref.http.dto to com.google.gson;
-    opens org.jabref.http.server.command to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities, tools.jackson.databind;
-    exports org.jabref.http.server.services;
-    exports org.jabref.http;
-    opens org.jabref.http.server.resources to org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
+    exports org.jabref.http.server.manager;
     exports org.jabref.http.server.resources;
+    exports org.jabref.http.server.resources.callback to org.glassfish.hk2.locator, org.glassfish.jersey.core.server;
+    exports org.jabref.http.server.resources.command to org.glassfish.jersey.core.server;
+    exports org.jabref.http.server.services;
+
+    opens org.jabref.http.dto to com.google.gson;
+    opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
+    opens org.jabref.http.server.cayw to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
+    opens org.jabref.http.server.resources.callback to org.glassfish.hk2.utilities;
+    opens org.jabref.http.server.resources to org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
+    opens org.jabref.http.server.resources.command to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities, tools.jackson.databind;
 
     requires javafx.base;
 

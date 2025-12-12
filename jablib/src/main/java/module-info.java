@@ -121,6 +121,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.merge.execution;
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;
+    exports org.jabref.logic.citedrive;
 
     requires java.base;
 
