@@ -43,6 +43,14 @@ public class PreviewPreferences {
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
     }
 
+    private PreviewPreferences() {
+
+    }
+
+    public static PreviewPreferences getDefault() {
+        return new PreviewPreferences();
+    }
+
     public ObservableList<PreviewLayout> getLayoutCycle() {
         return layoutCycle;
     }
