@@ -196,7 +196,7 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @MethodSource("firstAuthor")
-    void firstAuthor(BibEntry entry, String expected) {
+    void firstAuthor(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, "[auth]"));
     }
 
