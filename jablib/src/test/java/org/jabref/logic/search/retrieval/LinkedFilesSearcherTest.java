@@ -34,10 +34,10 @@ import static org.mockito.Mockito.when;
 
 class LinkedFilesSearcherTest {
 
+    private static final Path TEST_PDF_DIR = Path.of("src", "test", "resources", "pdfs");
+
     private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-
-    private static final Path TEST_PDF_DIR = Path.of("src", "test", "resources", "pdfs");
 
     private BibDatabaseContext context;
     private LuceneIndexer indexer;
