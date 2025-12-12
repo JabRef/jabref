@@ -3,8 +3,8 @@ package org.jabref.gui.preferences.websearch;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
