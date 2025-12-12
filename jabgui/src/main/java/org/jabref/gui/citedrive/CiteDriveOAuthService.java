@@ -22,6 +22,8 @@ import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.TokenErrorResponse;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.TokenResponse;
+import com.nimbusds.oauth2.sdk.http.HTTPRequest;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.pkce.CodeChallenge;
@@ -108,10 +110,12 @@ public class CiteDriveOAuthService {
     private Optional<Tokens> exchangeCodeForToken(String code) {
         AuthorizationCode authCode = new AuthorizationCode(code);
         AuthorizationGrant codeGrant = new AuthorizationCodeGrant(authCode, getCallBackUri(), lastPkceVerifier);
-        TokenRequest request = new TokenRequest(TOKEN_ENDPOINT, CLIENT_ID, codeGrant, SCOPE);
+        TokenRequest request = new TokenRequest(TOKEN_ENDPOINT, CLIENT_ID, codeGrant);
         TokenResponse response;
         try {
-            response = TokenResponse.parse(request.toHTTPRequest().send());
+            HTTPRequest httpRequest = request.toHTTPRequest();
+            HTTPResponse httpResponse = httpRequest.send();
+            response = TokenResponse.parse(httpResponse);
         } catch (ParseException e) {
             LOGGER.error("Could not parse response", e);
             return Optional.empty();
@@ -121,7 +125,7 @@ public class CiteDriveOAuthService {
         }
         if (!response.indicatesSuccess()) {
             TokenErrorResponse errorResponse = response.toErrorResponse();
-            LOGGER.error("Could not receive token {}", errorResponse);
+            LOGGER.error("Could not receive token {}", errorResponse.getErrorObject().toJSONObject());
             return Optional.empty();
         }
         AccessTokenResponse successResponse = response.toSuccessResponse();
