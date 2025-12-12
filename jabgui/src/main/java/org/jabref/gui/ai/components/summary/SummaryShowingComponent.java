@@ -92,12 +92,12 @@ public class SummaryShowingComponent extends VBox {
     }
 
     @FXML
-    private void onExportMarkdown() {
+    private void exportMarkdown() {
         exportMarkdownCallback.run();
     }
 
     @FXML
-    private void onExportJson() {
+    private void exportJson() {
         exportJsonCallback.run();
     }
 }
