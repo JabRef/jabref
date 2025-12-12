@@ -36,7 +36,7 @@ public class CiteDriveOAuthService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CiteDriveOAuthService.class);
 
     private static final ClientID CLIENT_ID = new ClientID("jabref-desktop");
-    private static final Scope SCOPE = new Scope(OIDCScopeValue.OPENID);
+    private static final Scope SCOPE = Scope.parse("openid read write");
 
     private static final URI AUTH_ENDPOINT;
     private static final URI TOKEN_ENDPOINT;
