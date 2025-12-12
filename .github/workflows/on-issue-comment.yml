@@ -18,7 +18,7 @@ jobs:
         with:
           github_token: '${{ secrets.GH_TOKEN_ASSIGN_ISSUE_ACTION  || github.token }}'
           # If this is updated, also update the number at unassign-issues.yml
-          days_until_unassign: 21
+          days_until_unassign: 14
           # One person should work on one issue only
           max_assignments: 1
           maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
