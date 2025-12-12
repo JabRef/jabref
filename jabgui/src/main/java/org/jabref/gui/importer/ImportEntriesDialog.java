@@ -62,37 +62,6 @@ import org.controlsfx.control.CheckListView;
 import org.fxmisc.richtext.CodeArea;
 
 
-private void mergeGroupsFromImport(ParserResult importedResult, BibDatabaseContext targetContext) {
-    if (importedResult.getMetaData().getGroups().isPresent() &&
-            targetContext.getMetaData().getGroups().isPresent()) {
-
-        GroupTreeNode importedRoot = importedResult.getMetaData().getGroups().get();
-        GroupTreeNode targetRoot = targetContext.getMetaData().getGroups().get();
-
-        mergeGroupTrees(importedRoot, targetRoot);
-        targetContext.getMetaData().setGroups(targetRoot);
-    } else if (importedResult.getMetaData().getGroups().isPresent() &&
-            !targetContext.getMetaData().getGroups().isPresent()) {
-        GroupTreeNode importedRoot = importedResult.getMetaData().getGroups().get();
-        targetContext.getMetaData().setGroups(importedRoot.copySubtree());
-    }
-}
-
-
-private void mergeGroupTrees(GroupTreeNode source, GroupTreeNode target) {
-    for (GroupTreeNode sourceChild : source.getChildren()) {
-        Optional<GroupTreeNode> existingGroup = target.getChildren().stream()
-                                                      .filter(child -> child.getGroup().getName().equals(sourceChild.getGroup().getName()))
-                                                      .findFirst();
-
-        if (existingGroup.isPresent()) {
-            mergeGroupTrees(sourceChild, existingGroup.get());
-        } else {
-            target.addChild(sourceChild.copySubtree());
-        }
-    }
-}
-
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @FXML private HBox paginationBox;
     @FXML private Label pageNumberLabel;
