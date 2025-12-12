@@ -28,10 +28,13 @@ public class Windows extends NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
-
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
+            if (filePath.length() > 260) {
+                LoggerFactory.getLogger(Windows.class).warn("filePath exceeds Windows maximum length of 260 characters: {}", filePath);
+                // It could be that PowerShell could be used as workaround with `Start-Process "URL"`
+            }
             // quote String so explorer handles URL query strings correctly
             String quotePath = "\"" + filePath + "\"";
             new ProcessBuilder("explorer.exe", quotePath).start();

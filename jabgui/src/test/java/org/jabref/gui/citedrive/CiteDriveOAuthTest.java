@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.http.SrvStateManager;
@@ -51,7 +52,9 @@ class CiteDriveOAuthTest {
         RemotePreferences remotePreferences = mock(RemotePreferences.class);
         when(remotePreferences.getHttpServerUri()).thenReturn(URI.create("http://localhost:23119"));
 
-        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, OAUTH_SESSION_REGISTRY);
+        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class));
+        // When testing with https://github.com/navikt/mock-oauth2-server
+        // CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class), URI.create("http://localhost:8080/default/authorize"), URI.create("http://localhost:8080/default/token"));
 
         Optional<Tokens> actual = citeDriveOAuthService.authorizeInteractive().get();
         assertTrue(actual.isPresent());
