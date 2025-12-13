@@ -187,10 +187,10 @@ class CitationKeyGeneratorTest {
 
     private static Stream<Arguments> firstAuthor() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "Newton"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton"),
-                Arguments.of(createABibEntryAuthor("K{\\\"o}ning"), "Koening"),
-                Arguments.of(createABibEntryAuthor(""), "")
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5),
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("Koening", createABibEntryAuthor("K{\\\"o}ning")),
+                Arguments.of("", createABibEntryAuthor(""))
         );
     }
 
