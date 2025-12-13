@@ -83,6 +83,10 @@ public class SearchPreferences {
         return searchFlags.contains(SearchFlags.REGULAR_EXPRESSION);
     }
 
+    public boolean isDateRange() {
+        return searchFlags.contains(SearchFlags.DATE_RANGE);
+    }
+
     public boolean isCaseSensitive() {
         return searchFlags.contains(SearchFlags.CASE_SENSITIVE);
     }
