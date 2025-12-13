@@ -231,7 +231,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      * @param importedResult the parser result containing imported data with groups
      * @param targetContext  the target database context to merge groups into
      */
-    private void mergeGroupsFromImport(ParserResult importedResult, BibDatabaseContext targetContext) {
+    private void mergeGroupsFromImport(ParserResult importedResult, 
+                                       BibDatabaseContext targetContext) {
         if (importedResult.getMetaData().getGroups().isPresent()
                 && targetContext.getMetaData().getGroups().isPresent()) {
             
@@ -258,7 +259,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private void mergeGroupTrees(GroupTreeNode source, GroupTreeNode target) {
         for (GroupTreeNode sourceChild : source.getChildren()) {
             Optional<GroupTreeNode> existingGroup = target.getChildren().stream()
-                    .filter(child -> child.getGroup().getName().equals(sourceChild.getGroup().getName()))
+                    .filter(child -> child.getGroup().getName()
+                            .equals(sourceChild.getGroup().getName()))
                     .findFirst();
             
             if (existingGroup.isPresent()) {
