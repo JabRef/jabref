@@ -26,10 +26,12 @@ import javafx.fxml.FXMLLoader;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jooq.lambda.Unchecked;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+@ResourceLock("Localization.lang")
 public class LocalizationParser {
 
     public static SortedSet<LocalizationEntry> findMissingKeys(LocalizationBundleForTest type) throws IOException {
