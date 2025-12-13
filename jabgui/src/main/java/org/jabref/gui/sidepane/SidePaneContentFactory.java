@@ -66,14 +66,15 @@ public class SidePaneContentFactory {
         return switch (sidePaneType) {
             case GROUPS ->
                     new GroupTreeView(
-                            taskExecutor,
                             stateManager,
-                            adaptVisibleTabs,
+                            entryTypesManager,
                             preferences,
                             dialogService,
                             aiService,
                             undoManager,
-                            fileUpdateMonitor);
+                            fileUpdateMonitor,
+                            adaptVisibleTabs,
+                            taskExecutor);
             case OPEN_OFFICE ->
                     new OpenOfficePanel(
                             tabContainer,

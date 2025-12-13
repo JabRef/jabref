@@ -9,16 +9,19 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.ingestion.IngestionService;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -92,14 +95,19 @@ class AiChatComponentTest {
     private AiChatComponent createComponent() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         final AiChatComponent[] holder = new AiChatComponent[1];
+        StateManager mockStateManager = mock(StateManager.class);
+        when(mockStateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList());
         Platform.runLater(() -> {
             holder[0] = new AiChatComponent(
                     aiService,
                     new SimpleStringProperty("entry"),
                     FXCollections.observableArrayList(),
+                    mockStateManager,
                     FXCollections.observableArrayList(),
                     bibDatabaseContext,
+                    mock(BibEntryTypesManager.class),
                     prefs,
+                    mock(FieldPreferences.class),
                     dialogService,
                     taskExecutor
             );
