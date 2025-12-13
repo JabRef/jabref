@@ -736,8 +736,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
         try {
             BackupManager.shutdown(bibDatabaseContext,
-                                   preferences.getFilePreferences().getBackupDirectory(),
-                                   preferences.getFilePreferences().shouldCreateBackup());
+                    preferences.getFilePreferences().getBackupDirectory(),
+                    preferences.getFilePreferences().shouldCreateBackup());
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
