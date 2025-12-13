@@ -14,8 +14,12 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class PreviewPreferences {
 
@@ -44,11 +48,52 @@ public class PreviewPreferences {
     }
 
     private PreviewPreferences() {
+        this(
+                // layouts
+                List.of(
+                        new TextBasedPreviewLayout(
+                                "Preview",
+                                new LayoutFormatterPreferences(),
+                                Injector.instantiateModelOrService(JournalAbbreviationRepository.class)
+                        )
+                ),
 
+                // layoutCyclePosition
+                0,
+
+                // customPreviewLayout
+                new TextBasedPreviewLayout(
+                        "Preview",
+                        new LayoutFormatterPreferences(),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)
+                ),
+
+                // defaultPreviewStyle
+                "Preview",
+
+                // showPreviewAsExtraTab (PREVIEW_AS_TAB)
+                false,
+
+                // showPreviewInEntryTableTooltip (PREVIEW_IN_ENTRY_TABLE_TOOLTIP)
+                true,
+
+                // bstPreviewLayoutPaths
+                List.of()
+        );
     }
 
     public static PreviewPreferences getDefault() {
         return new PreviewPreferences();
+    }
+
+    public void setAll(PreviewPreferences preferences) {
+        this.layoutCycle.setAll(preferences.getLayoutCycle());
+        this.setLayoutCyclePosition(preferences.getLayoutCyclePosition());
+        this.customPreviewLayout.set(preferences.getCustomPreviewLayout());
+        this.defaultCustomPreviewLayout.set(preferences.getDefaultCustomPreviewLayout());
+        this.showPreviewAsExtraTab.set(preferences.shouldShowPreviewAsExtraTab());
+        this.showPreviewEntryTableTooltip.set(preferences.shouldShowPreviewEntryTableTooltip());
+        this.bstPreviewLayoutPaths.setAll(preferences.getBstPreviewLayoutPaths());
     }
 
     public ObservableList<PreviewLayout> getLayoutCycle() {
