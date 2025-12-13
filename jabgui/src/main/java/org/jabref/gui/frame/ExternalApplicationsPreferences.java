@@ -44,6 +44,19 @@ public class ExternalApplicationsPreferences {
         this.kindleEmail = new SimpleStringProperty(kindleEmail);
     }
 
+    private ExternalApplicationsPreferences() {
+        //        this(
+        //                Language.getLanguageFor(Locale.getDefault().getLanguage()),
+        //                "",
+        //                "References",
+        //                ""
+        //        );
+    }
+
+    public static ExternalApplicationsPreferences getDefault() {
+        return new ExternalApplicationsPreferences();
+    }
+
     public String getEmailSubject() {
         return eMailSubject.get();
     }
