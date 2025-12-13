@@ -709,8 +709,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private SidePanePreferences getSidePanePreferencesFromBackingStore(SidePanePreferences defaults) {
         return new SidePanePreferences(
-                getVisibleSidePanes(),
-                getSidePanePreferredPositions(),
+                defaults.visiblePanes(),
+                defaults.getPreferredPositions(),
                 getInt(SELECTED_FETCHER_INDEX, defaults.getWebSearchFetcherSelected())
         );
     }
