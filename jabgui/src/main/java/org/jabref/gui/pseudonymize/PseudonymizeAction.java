@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public class PseudonymizeAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(PseudonymizeAction.class);
-    private static final String PSEUDO_SUFFIX = ".pseudo";
+    private static final String PSEUDO_SUFFIX = "_pseudo";
     private static final String BIB_EXTENSION = ".bib";
     private static final String CSV_EXTENSION = ".csv";
 
