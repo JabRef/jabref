@@ -12,6 +12,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 
 public class ExternalApplicationsPreferences {
 
@@ -42,6 +44,27 @@ public class ExternalApplicationsPreferences {
         this.useCustomFileBrowser = new SimpleBooleanProperty(useCustomFileBrowser);
         this.customFileBrowserCommand = new SimpleStringProperty(customFileBrowserCommand);
         this.kindleEmail = new SimpleStringProperty(kindleEmail);
+    }
+
+    private ExternalApplicationsPreferences() {
+        this(
+                Localization.lang("References"),     // eMailSubject
+                OS.WINDOWS,                          // shouldAutoOpenEmailAttachmentsFolder
+                Set.of(),                            // externalFileTypes
+                false,                               // useCustomTerminal
+                OS.WINDOWS
+                ? "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\""
+                : "",                            // customTerminalCommand
+                false,                               // useCustomFileBrowser
+                OS.WINDOWS
+                ? "explorer.exe /select, \"%DIR\""
+                : "",                            // customFileBrowserCommand
+                ""                                   // kindleEmail
+        );
+    }
+
+    public static ExternalApplicationsPreferences getDefault() {
+        return new ExternalApplicationsPreferences();
     }
 
     public String getEmailSubject() {
