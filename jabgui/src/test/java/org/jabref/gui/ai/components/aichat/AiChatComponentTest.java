@@ -84,6 +84,7 @@ class AiChatComponentTest {
         when(chatService.makeChat(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(chatLogic);
         when(aiService.getAiChatService()).thenReturn(chatService);
 
+
         IngestionService ingestionService = mock(IngestionService.class, Mockito.RETURNS_DEEP_STUBS);
         when(aiService.getIngestionService()).thenReturn(ingestionService);
 
@@ -95,12 +96,14 @@ class AiChatComponentTest {
     private AiChatComponent createComponent() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         final AiChatComponent[] holder = new AiChatComponent[1];
+        StateManager mockStateManager = mock(StateManager.class);
+        when(mockStateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList());
         Platform.runLater(() -> {
             holder[0] = new AiChatComponent(
                     aiService,
                     new SimpleStringProperty("entry"),
                     FXCollections.observableArrayList(),
-                    mock(StateManager.class),
+                    mockStateManager,
                     FXCollections.observableArrayList(),
                     bibDatabaseContext,
                     mock(BibEntryTypesManager.class),
