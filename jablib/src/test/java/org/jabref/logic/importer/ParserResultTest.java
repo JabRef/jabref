@@ -11,6 +11,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 // Other tests for reading can be found at [org.jabref.logic.importer.fileformat.BibtexImporterTest]
+@ResourceLock("Localization.lang")
 class ParserResultTest {
     @Test
     void isEmptyForNewParseResult() {

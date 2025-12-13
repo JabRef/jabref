@@ -1,31 +1,18 @@
 package org.jabref.toolkit.commands;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
-
-import javafx.collections.FXCollections;
-
-import org.jabref.logic.exporter.BibDatabaseWriter;
-import org.jabref.logic.exporter.ExportPreferences;
-import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.SaveOrder;
-import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
+/// Collects various tests
+/// Better use a more specific test class per command. See [SearchTest] for an example.
 class JabKitTest extends AbstractJabKitTest {
 
     @Test
@@ -40,54 +27,6 @@ class JabKitTest extends AbstractJabKitTest {
         commandLine.execute(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputBib));
-    }
-
-    @Test
-    void search(@TempDir Path tempDir) throws URISyntaxException, IOException {
-        Path originBib = getClassResourceAsPath("origin.bib");
-        String originBibFile = originBib.toAbsolutePath().toString();
-
-        Path expectedBib = Path.of(
-                Objects.requireNonNull(JabKitTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
-                       .toURI()
-        );
-
-        BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
-        List<BibEntry> expectedEntries = bibtexImporter.importDatabase(expectedBib).getDatabase().getEntries();
-
-        Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
-
-        List<String> args = List.of("search", "--debug", "--query", "author=Einstein", "--input", originBibFile, "--output", outputBib.toString());
-
-        commandLine.execute(args.toArray(String[]::new));
-
-        assertTrue(Files.exists(outputBib));
-        BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
-    }
-
-    @Test
-    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws URISyntaxException {
-        Path originBib = getClassResourceAsPath("origin.bib");
-        String originBibFile = originBib.toAbsolutePath().toString();
-
-        Path outputHtml = tempDir.resolve("output.html").toAbsolutePath();
-        String outputHtmlFile = outputHtml.toAbsolutePath().toString();
-
-        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
-
-        SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.TABLE, List.of());
-        ExportPreferences exportPreferences = new ExportPreferences(".html", tempDir, saveOrder, List.of());
-        when(preferences.getExportPreferences()).thenReturn(exportPreferences);
-
-        SelfContainedSaveOrder selfContainedSaveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.ORIGINAL, List.of());
-        SelfContainedSaveConfiguration selfContainedSaveConfiguration = new SelfContainedSaveConfiguration(selfContainedSaveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
-        when(preferences.getSelfContainedExportConfiguration()).thenReturn(selfContainedSaveConfiguration);
-
-        List<String> args = List.of("convert", "--input", originBibFile, "--input-format", "bibtex", "--output", outputHtmlFile, "--output-format", "tablerefsabsbib");
-
-        commandLine.execute(args.toArray(String[]::new));
-
-        assertTrue(Files.exists(outputHtml));
     }
 
     @Test

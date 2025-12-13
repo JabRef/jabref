@@ -25,6 +25,7 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.when;
  * Aspects are: selected fields, issues arising in a complete BibTeX entry, ... When testing a checker works with a certain input,
  * this test has to go to a test belonging to the respective checker. See PersonNamesCheckerTest for an example test.
  */
+@ResourceLock("Localization.lang")
 class IntegrityCheckTest {
 
     @Test

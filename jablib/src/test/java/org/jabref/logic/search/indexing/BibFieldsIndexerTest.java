@@ -17,11 +17,16 @@ import org.jabref.model.search.PostgreConstants;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("embeddedPostgres")
 public class BibFieldsIndexerTest {
 
     private PostgreServer postgreServer;
@@ -37,7 +42,7 @@ public class BibFieldsIndexerTest {
     @AfterEach
     void tearDown() {
         if (postgreServer != null) {
-            postgreServer.shutdown();
+            postgreServer.close();
         }
     }
 

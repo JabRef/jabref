@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.parallel.ResourceLock;
+
+@ResourceLock("Localization.lang")
 class JavaLocalizationEntryParser {
 
     private static final String INFINITE_WHITESPACE = "\\s*";

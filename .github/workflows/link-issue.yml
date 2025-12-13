@@ -112,6 +112,20 @@ jobs:
 
           echo "Updating issue '${{ needs.determine_issue_number.outputs.issue_number }}'"
 
+          # Check if good first/second/.. issue
+          # If yes, copy label to GitHub PR for transparency
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
+          LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
+          if [ -n "$LABEL" ]; then
+            echo "✅ Found label: $LABEL"
+            SILENT=false
+            # Apply label
+            gh issue edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
+          else
+            echo "🚫 Silent fail if not possible to add assignee"
+            SILENT=true
+          fi
+
           # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
 
           ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --jq '[.assignees[].login]')
@@ -125,18 +139,6 @@ jobs:
 
           # Append the new assignee
           UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
-
-          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
-          LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
-          if [ -n "$LABEL" ]; then
-            echo "✅ Found label: $LABEL"
-            SILENT=false
-            # Apply label
-            gh issue edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
-          else
-            echo "🚫 Silent fail if not possible to add assignee"
-            SILENT=true
-          fi
 
           # Update issue with the new assignee list
           echo "Updating issue #${{ needs.determine_issue_number.outputs.issue_number }} updated with assignees: $UPDATED_ASSIGNEES..."
