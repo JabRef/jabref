@@ -61,7 +61,6 @@ import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
 import org.fxmisc.richtext.CodeArea;
 
-
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @FXML private HBox paginationBox;
     @FXML private Label pageNumberLabel;
