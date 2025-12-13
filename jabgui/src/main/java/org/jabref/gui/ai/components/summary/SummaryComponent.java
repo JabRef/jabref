@@ -228,7 +228,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                      .ifPresent(path -> {
                          try {
                              AiExporter exporter = new AiExporter(entry, entryTypesManager, fieldPreferences);
-                             String content = exporter.buildMarkdownExport("Summary", summary.content());
+                             String content = exporter.buildMarkdownExport("AI summary","Summary", summary.content());
                              Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                              dialogService.notify(Localization.lang("Export operation finished successfully."));
                          } catch (IOException e) {

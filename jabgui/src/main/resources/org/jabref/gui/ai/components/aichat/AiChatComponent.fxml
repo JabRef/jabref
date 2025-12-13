@@ -46,7 +46,8 @@
                 <Tooltip text="%Notifications"/>
             </tooltip>
         </Button>
-        <MenuButton styleClass="icon-button,narrow">
+        <ChatPromptComponent fx:id="chatPrompt" HBox.hgrow="ALWAYS"/>
+        <MenuButton text="%Export" styleClass="icon-button,narrow">
             <graphic>
                 <JabRefIconView glyph="SAVE"/>
             </graphic>
@@ -58,7 +59,6 @@
                 <Tooltip text="%Export chat history"/>
             </tooltip>
         </MenuButton>
-        <ChatPromptComponent fx:id="chatPrompt" HBox.hgrow="ALWAYS"/>
     </HBox>
     <HBox alignment="CENTER" spacing="50">
         <Label fx:id="noticeText"

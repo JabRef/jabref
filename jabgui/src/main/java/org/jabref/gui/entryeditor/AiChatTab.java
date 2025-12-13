@@ -140,18 +140,19 @@ public class AiChatTab extends EntryEditorTab {
         entry.getCiteKeyBinding().addListener((observable, oldValue, newValue) -> chatName.setValue("entry " + newValue));
 
         setContent(new AiChatGuardedComponent(
+                aiService,
                 chatName,
                 aiService.getChatHistoryService().getChatHistoryForEntry(bibDatabaseContext, entry),
+                stateManager,
                 bibDatabaseContext,
                 FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
-                aiService,
-                taskExecutor,
+                entryTypesManager,
                 aiPreferences,
                 fieldPreferences,
-                entryTypesManager,
                 externalApplicationsPreferences,
                 dialogService,
-                adaptVisibleTabs
+                adaptVisibleTabs,
+                taskExecutor
 
         ));
     }

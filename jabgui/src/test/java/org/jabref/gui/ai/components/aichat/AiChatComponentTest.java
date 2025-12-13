@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.AiChatLogic;
@@ -99,6 +100,7 @@ class AiChatComponentTest {
                     aiService,
                     new SimpleStringProperty("entry"),
                     FXCollections.observableArrayList(),
+                    mock(StateManager.class),
                     FXCollections.observableArrayList(),
                     bibDatabaseContext,
                     mock(BibEntryTypesManager.class),

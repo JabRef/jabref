@@ -1,5 +1,7 @@
 package org.jabref.logic.ai;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,29 +23,45 @@ import dev.langchain4j.data.message.UserMessage;
 
 public class AiExporter {
 
-    private final BibEntry entry;
+    private final List<BibEntry> entries;
     private final BibEntryTypesManager entryTypesManager;
     private final FieldPreferences fieldPreferences;
 
-    public AiExporter(BibEntry entry, BibEntryTypesManager entryTypesManager, FieldPreferences fieldPreferences) {
-        this.entry = entry;
+    public AiExporter(List<BibEntry> entries, BibEntryTypesManager entryTypesManager, FieldPreferences fieldPreferences) {
+        this.entries = entries;
         this.entryTypesManager = entryTypesManager;
         this.fieldPreferences = fieldPreferences;
     }
 
-    public String buildMarkdownExport(String contentTitle, String contentBody) {
+    public AiExporter(BibEntry entry, BibEntryTypesManager entryTypesManager, FieldPreferences fieldPreferences) {
+        this(List.of(entry), entryTypesManager, fieldPreferences);
+    }
+
+    public String buildMarkdownExport(String heading, String contentTitle, String contentBody) {
         StringJoiner stringJoiner = new StringJoiner("\n");
-        stringJoiner.add("## Bibtex");
+        stringJoiner.add("# " + heading);
+        stringJoiner.add("");
+        stringJoiner.add("## BibTeX");
         stringJoiner.add("");
         stringJoiner.add("```bibtex");
-        String bibtex = entry.getStringRepresentation(entry, BibDatabaseMode.BIBTEX, entryTypesManager, fieldPreferences);
-        stringJoiner.add(bibtex);
+
+        StringJoiner bibtexJoiner = new StringJoiner("\n");
+        for (BibEntry entry : entries) {
+            String bibtex = entry.getStringRepresentation(entry, BibDatabaseMode.BIBTEX, entryTypesManager, fieldPreferences).trim();
+            if (!bibtex.isEmpty()) {
+                bibtexJoiner.add(bibtex);
+                bibtexJoiner.add("");
+            }
+        }
+        stringJoiner.add(bibtexJoiner.toString().trim());
+
         stringJoiner.add("```");
         stringJoiner.add("");
         stringJoiner.add("## " + contentTitle);
-        stringJoiner.add(contentBody);
+        stringJoiner.add("");
+        stringJoiner.add(contentBody.trim());
 
-        return stringJoiner.toString();
+        return stringJoiner + "\n";
     }
 
     public String buildMarkdownForChat(List<ChatMessage> messages) {
@@ -69,7 +87,7 @@ public class AiExporter {
             conversation.add(content);
             conversation.add("");
         }
-        return buildMarkdownExport("Conversation", conversation.toString());
+        return buildMarkdownExport("AI chat", "Conversation", conversation.toString());
     }
 
     public String buildJsonExport(String provider, String model, String timestamp, List<ChatMessage> messages) {
@@ -77,16 +95,22 @@ public class AiExporter {
 
         root.put("latest_provider", provider);
         root.put("latest_model", model);
-        root.put("timestamp", timestamp);
+        root.put("export_timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
-        Map<String, String> entryMap = new HashMap<>();
-        for (Field field : entry.getFields()) {
-            entryMap.put(field.getName(), entry.getField(field).orElse(""));
+        List<Map<String, Object>> entriesList = new ArrayList<>();
+        for (BibEntry entry : entries) {
+            Map<String, Object> entryData = new HashMap<>();
+
+            Map<String, String> fields = new HashMap<>();
+            for (Field field : entry.getFields()) {
+                fields.put(field.getName(), entry.getField(field).orElse(""));
+            }
+            entryData.put("fields", fields);
+            entryData.put("bibtex", entry.getStringRepresentation(entry, BibDatabaseMode.BIBTEX, entryTypesManager, fieldPreferences));
+
+            entriesList.add(entryData);
         }
-        root.put("entry", entryMap);
-
-        String bibtex = entry.getStringRepresentation(entry, BibDatabaseMode.BIBTEX, entryTypesManager, fieldPreferences);
-        root.put("entry_bibtex", bibtex);
+        root.put("entries", entriesList);
 
         List<Map<String, String>> conversationList = new ArrayList<>();
         for (ChatMessage msg : messages) {

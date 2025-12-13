@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.BaseWindow;
@@ -28,7 +29,7 @@ public class AiChatWindow extends BaseWindow {
     private final DialogService dialogService;
     private final AdaptVisibleTabs adaptVisibleTabs;
     private final TaskExecutor taskExecutor;
-
+    private final StateManager stateManager;
     // This field is used for finding an existing AI chat window when user wants to chat with the same group again.
     private String chatName;
 
@@ -39,7 +40,8 @@ public class AiChatWindow extends BaseWindow {
                         AiService aiService,
                         DialogService dialogService,
                         AdaptVisibleTabs adaptVisibleTabs,
-                        TaskExecutor taskExecutor
+                        TaskExecutor taskExecutor,
+                        StateManager stateManager
     ) {
         this.entryTypesManager = entryTypesManager;
         this.aiPreferences = aiPreferences;
@@ -49,6 +51,7 @@ public class AiChatWindow extends BaseWindow {
         this.dialogService = dialogService;
         this.adaptVisibleTabs = adaptVisibleTabs;
         this.taskExecutor = taskExecutor;
+        this.stateManager = stateManager;
     }
 
     public void setChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
@@ -57,18 +60,19 @@ public class AiChatWindow extends BaseWindow {
         setScene(
                 new Scene(
                         new AiChatGuardedComponent(
+                                aiService,
                                 name,
                                 chatHistory,
+                                stateManager,
                                 bibDatabaseContext,
                                 entries,
-                                aiService,
-                                taskExecutor,
+                                entryTypesManager,
                                 aiPreferences,
                                 fieldPreferences,
-                                entryTypesManager,
                                 externalApplicationsPreferences,
                                 dialogService,
-                                adaptVisibleTabs
+                                adaptVisibleTabs,
+                                taskExecutor
                         ),
                         800,
                         600
