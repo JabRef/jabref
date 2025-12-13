@@ -16,6 +16,7 @@ public class NavigationHistory {
     private final List<BibEntry> previousEntries = new ArrayList<>();
     private final List<BibEntry> nextEntries = new ArrayList<>();
     private BibEntry currentEntry;
+    private int suppressionDepth;
 
     /**
      * Sets a new entry as the current one, clearing the forward history.
@@ -24,6 +25,10 @@ public class NavigationHistory {
      * @param entry The BibEntry to add to the history.
      */
     public void add(BibEntry entry) {
+        if (isSuppressed()) {
+            return;
+        }
+
         if (Objects.equals(currentEntry, entry)) {
             return;
         }
@@ -73,5 +78,66 @@ public class NavigationHistory {
 
     public boolean canGoForward() {
         return !nextEntries.isEmpty();
+    }
+
+    /**
+     * Suppresses navigation history updates while the returned guard is open.
+     * Intended for bulk operations that perform multiple selection changes.
+     */
+    public Suppression suppressUpdates() {
+        return new Suppression(this);
+    }
+
+    /**
+     * Convenience helper to suppress updates conditionally.
+     */
+    public Suppression suppressUpdatesIf(boolean active) {
+        return active ? suppressUpdates() : Suppression.noOp();
+    }
+
+    private boolean isSuppressed() {
+        return suppressionDepth > 0;
+    }
+
+    private void beginSuppression() {
+        suppressionDepth++;
+    }
+
+    private void endSuppression() {
+        if (suppressionDepth > 0) {
+            suppressionDepth--;
+        }
+    }
+
+    public static final class Suppression implements AutoCloseable {
+        private static final Suppression NO_OP = new Suppression();
+
+        private final NavigationHistory owner;
+        private boolean closed;
+        private final boolean active;
+
+        private Suppression() {
+            this.owner = null;
+            this.active = false;
+        }
+
+        private Suppression(NavigationHistory owner) {
+            this.owner = owner;
+            this.active = true;
+            owner.beginSuppression();
+        }
+
+        @Override
+        public void close() {
+            if (closed || !active) {
+                return;
+            }
+            closed = true;
+            owner.endSuppression();
+        }
+
+        public static Suppression noOp() {
+            return NO_OP;
+        }
     }
 }
