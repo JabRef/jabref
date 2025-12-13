@@ -32,7 +32,6 @@ public class CleanupSingleFieldPanel extends VBox {
     }
 
     private void bindProperties() {
-        formatterCleanupsPanel.cleanupsDisableProperty().bind(viewModel.cleanupsEnabled.not());
         formatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanups);
     }
 
