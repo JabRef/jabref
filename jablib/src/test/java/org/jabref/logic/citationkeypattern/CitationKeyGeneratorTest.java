@@ -145,38 +145,38 @@ class CitationKeyGeneratorTest {
         assertEquals("Popovicova", CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]", new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
-    @ParameterizedTest(name = "bibtexString={0}, expectedResult={1}")
+    @ParameterizedTest(name = "expectedResult={0}, bibtexString={1}")
     @CsvSource(quoteCharacter = '"', textBlock = """
             # see https://sourceforge.net/forum/message.php?msg_id=4498555
-            "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", "Koe",
+            "Koe", "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}",
 
             # Accent ague: Á á Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
-            "@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}", "Aoe",
-            "@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}", "Eoe",
-            "@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}", "Ioe",
-            "@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}", "Loe",
-            "@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}", "Noe",
-            "@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}", "Ooe",
-            "@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}", "Roe",
-            "@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}", "Soe",
-            "@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}", "Uoe",
-            "@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}", "Yoe",
-            "@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}", "Zoe",
+            "Aoe", "@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}",
+            "Eoe", "@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}",
+            "Ioe", "@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}",
+            "Loe", "@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}",
+            "Noe", "@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}",
+            "Ooe", "@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}",
+            "Roe", "@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}",
+            "Soe", "@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}",
+            "Uoe", "@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}",
+            "Yoe", "@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}",
+            "Zoe", "@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}",
 
             # Accent grave: À È Ì Ò Ù
-            "@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}", "Aoe",
-            "@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}", "Eoe",
-            "@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}", "Ioe",
-            "@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}", "Ooe",
-            "@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}", "Uoe",
+            "Aoe", "@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}",
+            "Eoe", "@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}",
+            "Ioe", "@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}",
+            "Ooe", "@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}",
+            "Uoe", "@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}",
 
             # Special cases
             # We keep "-" in citation keys, thus Al-Ketan with three letters is "Al-"
-            "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "Al-",
-            "@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}", "DAl",
-            "@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}", "Arn"
+            "Al-", "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}",
+            "DAl", "@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}",
+            "Arn", "@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}"
             """)
-    void makeLabelAndCheckLegalKeys(String bibtexString, String expectedResult) throws ParseException {
+    void makeLabelAndCheckLegalKeys(String expectedResult, String bibtexString) throws ParseException {
         BibEntry bibEntry = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
         String citationKey = generateKey(bibEntry, "[auth3]", new BibDatabase());
 
@@ -220,30 +220,30 @@ class CitationKeyGeneratorTest {
      *
      * @see CitationKeyGenerator#cleanKey(String, String)
      */
-    @ParameterizedTest(name = "accents={0}, expectedResult={1}")
+    @ParameterizedTest(name = "expectedResult={0}, accents={1}")
     @CsvSource(quoteCharacter = '"', textBlock = """
-            "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ", "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy",
-            "ÄäËëÏïÖöÜüŸÿ", "AeaeEeIiOeoeUeueYy",
-            "ÅåŮů", "AaaaUu",
-            "Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ", "CcGgKkLlNnRrSsTt",
-            "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ", "AaEeGgIiOoUu",
-            "Ċ ċ Ė ė Ġ ġ İ ı Ż ż", "CcEeGgIiZz",
-            "Ą ą Ę ę Į į Ǫ ǫ Ų ų", "AaEeIiOoUu", # O or Q? o or q?
-            "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ", "AaEeIiOoUuYy",
-            "Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž", "AaCcDdEeIiLlNnOoRrSsTtUuZz",
-            "ÃãẼẽĨĩÑñÕõŨũỸỹ", "AaEeIiNnOoUuYy",
-            "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ", "DdHhLlLlMmNnRrRrSsTt",
-            "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    ", "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYyAeaeEeIiOeoeUeueYy",
-            "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ", "AaEeIiNnOoUuYyCcGgKkLlNnRrSsTt",
-            " Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   ", "AaCcDdEeIiLlNnOoRrSsTtUuZz",
-            "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ", "AaEeIiOoUuYy",
-            "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ   ", "AaEeGgIiOoUu",
-            "Ả ả Ẻ ẻ Ỉ ỉ Ỏ ỏ Ủ ủ Ỷ ỷ", "AaEeIiOoUuYy",
-            "Ḛ ḛ Ḭ ḭ Ṵ ṵ", "EeIiUu",
-            "Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   ", "CcEeGgIiZzAaEeIiOoUu",
-            "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   ", "DdHhLlLlMmNnRrRrSsTt"
+            "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy", "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ",
+            "AeaeEeIiOeoeUeueYy", "ÄäËëÏïÖöÜüŸÿ",
+            "AaaaUu", "ÅåŮů",
+            "CcGgKkLlNnRrSsTt", "Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ",
+            "AaEeGgIiOoUu", "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ",
+            "CcEeGgIiZz", "Ċ ċ Ė ė Ġ ġ İ ı Ż ż",
+            "AaEeIiOoUu", "Ą ą Ę ę Į į Ǫ ǫ Ų ų", # O or Q? o or q?
+            "AaEeIiOoUuYy", "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ",
+            "AaCcDdEeIiLlNnOoRrSsTtUuZz", "Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž",
+            "AaEeIiNnOoUuYy", "ÃãẼẽĨĩÑñÕõŨũỸỹ",
+            "DdHhLlLlMmNnRrRrSsTt", "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ",
+            "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYyAeaeEeIiOeoeUeueYy", "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    ",
+            "AaEeIiNnOoUuYyCcGgKkLlNnRrSsTt", "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ",
+            "AaCcDdEeIiLlNnOoRrSsTtUuZz", " Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   ",
+            "AaEeIiOoUuYy", "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ",
+            "AaEeGgIiOoUu", "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ   ",
+            "AaEeIiOoUuYy", "Ả ả Ẻ ẻ Ỉ ỉ Ỏ ỏ Ủ ủ Ỷ ỷ",
+            "EeIiUu", "Ḛ ḛ Ḭ ḭ Ṵ ṵ",
+            "CcEeGgIiZzAaEeIiOoUu", "Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   ",
+            "DdHhLlLlMmNnRrRrSsTt", "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   "
             """)
-    void checkLegalKey(String accents, String expectedResult) {
+    void checkLegalKey(String expectedResult, String accents) {
         assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -323,22 +323,22 @@ class CitationKeyGeneratorTest {
 
     private static Stream<Arguments> authIniN() {
         return Stream.of(
-                Arguments.of(AUTHOR_EMPTY, "[authIni4]", ""),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni4]", "Newt"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authIni4]", "NeMa"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authIni4]", "NeME"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "[authIni4]", "NMEB"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[authIni4]", "NMEB"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni1]", "N"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni0]", ""),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni6]", "Newton"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni7]", "Newton")
+                Arguments.of("", AUTHOR_EMPTY, "[authIni4]"),
+                Arguments.of("Newt", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni4]"),
+                Arguments.of("NeMa", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authIni4]"),
+                Arguments.of("NeME", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authIni4]"),
+                Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "[authIni4]"),
+                Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[authIni4]"),
+                Arguments.of("N", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni1]"),
+                Arguments.of("", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni0]"),
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni6]"),
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni7]")
         );
     }
 
     @ParameterizedTest
     @MethodSource("authIniN")
-    void authIniN(BibEntry entry, String pattern, String expected) {
+    void authIniN(String expected, BibEntry entry, String pattern) {
         assertEquals(expected, generateKey(entry, pattern));
     }
 
@@ -349,9 +349,9 @@ class CitationKeyGeneratorTest {
 
     static Stream<Arguments> authAuthEa() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, "Newton"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, "Newton.Maxwell"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, "Newton.Maxwell.ea")
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("Newton.Maxwell", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2),
+                Arguments.of("Newton.Maxwell.ea", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3)
         );
     }
 
@@ -360,7 +360,7 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("authAuthEa")
-    void authAuthEa(BibEntry entry, String expected) {
+    void authAuthEa(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, AUTHAUTHEA));
     }
 
@@ -371,10 +371,10 @@ class CitationKeyGeneratorTest {
 
     static Stream<Arguments> authEtAl() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTH_ETAL, "Newton.etal"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTH_ETAL, "Newton.Maxwell"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTHETAL, "NewtonEtAl"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHETAL, "NewtonMaxwell")
+                Arguments.of("Newton.etal", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTH_ETAL),
+                Arguments.of("Newton.Maxwell", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTH_ETAL),
+                Arguments.of("NewtonEtAl", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTHETAL),
+                Arguments.of("NewtonMaxwell", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHETAL)
         );
     }
 
@@ -383,16 +383,16 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("authEtAl")
-    void authEtAl(BibEntry entry, String pattern, String expected) {
+    void authEtAl(String expected, BibEntry entry, String pattern) {
         assertEquals(expected, generateKey(entry, pattern));
     }
 
     static Stream<Arguments> authShort() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "NME+"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "NME"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "NM"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton")
+                Arguments.of("NME+", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4),
+                Arguments.of("NME", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3),
+                Arguments.of("NM", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2),
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1)
         );
     }
 
@@ -401,7 +401,7 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("authShort")
-    void authShort(BibEntry entry, String expected) {
+    void authShort(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, AUTHSHORT));
     }
 
@@ -412,14 +412,14 @@ class CitationKeyGeneratorTest {
 
     static Stream<Arguments> authNM() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1, 1, "N"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3, 2, "Max"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3, 1, "New"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 2, 4, "Bo"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 6, 4, "Bohr"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, 3, 1, "Aal"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, 4, 2, "Less"),
-                Arguments.of(AUTHOR_EMPTY, 2, 4, "")
+                Arguments.of("N", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1, 1),
+                Arguments.of("Max", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3, 2),
+                Arguments.of("New", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3, 1),
+                Arguments.of("Bo", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 2, 4),
+                Arguments.of("Bohr", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 6, 4),
+                Arguments.of("Aal", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, 3, 1),
+                Arguments.of("Less", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, 4, 2),
+                Arguments.of("", AUTHOR_EMPTY, 2, 4)
         );
     }
 
@@ -428,17 +428,17 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("authNM")
-    void authNM(BibEntry entry, int n, int m, String expected) {
+    void authNM(String expected, BibEntry entry, int n, int m) {
         String pattern = AUTHNOFMTH.formatted(n, m);
         assertEquals(expected, generateKey(entry, pattern));
     }
 
     static Stream<Arguments> firstAuthorForenameInitials() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2)
+                Arguments.of("I", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("I", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2),
+                Arguments.of("I", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("I", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2)
         );
     }
 
@@ -447,14 +447,14 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("firstAuthorForenameInitials")
-    void firstAuthorForenameInitials(BibEntry entry) {
-        assertEquals("I", generateKey(entry, AUTHFOREINI));
+    void firstAuthorForenameInitials(String expected, BibEntry entry) {
+        assertEquals(expected, generateKey(entry, AUTHFOREINI));
     }
 
     static Stream<Arguments> firstAuthorVonAndLast() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, "vanderAalst"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, "vanderAalst")
+                Arguments.of("vanderAalst", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1),
+                Arguments.of("vanderAalst", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2)
         );
     }
 
@@ -463,20 +463,20 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("firstAuthorVonAndLast")
-    void firstAuthorVonAndLast(BibEntry entry, String expected) {
+    void firstAuthorVonAndLast(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, AUTHFIRSTFULL));
     }
 
     static Stream<Arguments> firstAuthorVonAndLastNoVonInName() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, "Newton"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, "Newton")
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2)
         );
     }
 
     @ParameterizedTest
     @MethodSource("firstAuthorVonAndLastNoVonInName")
-    void firstAuthorVonAndLastNoVonInName(BibEntry entry, String expected) {
+    void firstAuthorVonAndLastNoVonInName(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, AUTHFIRSTFULL));
     }
 
@@ -497,13 +497,13 @@ class CitationKeyGeneratorTest {
 
     static Stream<Arguments> lastAuthor() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "Maxwell"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "Einstein"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "Bohr"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "Unknown"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, "Aalst"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, "Lessen")
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("Maxwell", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2),
+                Arguments.of("Einstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3),
+                Arguments.of("Bohr", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4),
+                Arguments.of("Unknown", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5),
+                Arguments.of("Aalst", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1),
+                Arguments.of("Lessen", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2)
         );
     }
 
@@ -512,19 +512,19 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("lastAuthor")
-    void lastAuthor(BibEntry entry, String expected) {
+    void lastAuthor(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, AUTHORLAST));
     }
 
     static Stream<Arguments> lastAuthorForenameInitials() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "I"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "J"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "A"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "N"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "H"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, "W"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, "T")
+                Arguments.of("I", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("J", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2),
+                Arguments.of("A", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3),
+                Arguments.of("N", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4),
+                Arguments.of("H", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5),
+                Arguments.of("W", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1),
+                Arguments.of("T", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2)
         );
     }
 
@@ -533,7 +533,7 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("lastAuthorForenameInitials")
-    void lastAuthorForenameInitials(BibEntry entry, String expected) {
+    void lastAuthorForenameInitials(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, AUTHORLASTFOREINI));
     }
 
@@ -542,19 +542,19 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("oneAuthorPlusIniData")
-    void oneAuthorPlusIni(BibEntry entry, String expected) {
+    void oneAuthorPlusIni(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, AUTHORINI));
     }
 
     static Stream<Arguments> oneAuthorPlusIniData() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newto"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "NewtoM"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "NewtoME"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "NewtoMEB"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "NewtoMEBU"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, "Aalst"),
-                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, "AalstL")
+                Arguments.of("Newto", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("NewtoM", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2),
+                Arguments.of("NewtoME", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3),
+                Arguments.of("NewtoMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4),
+                Arguments.of("NewtoMEBU", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5),
+                Arguments.of("Aalst", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1),
+                Arguments.of("AalstL", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2)
         );
     }
 
@@ -563,17 +563,17 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("nAuthors1Data")
-    void nAuthors1(BibEntry entry, String expected) {
+    void nAuthors1(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, AUTHORN.formatted(1)));
     }
 
     static Stream<Arguments> nAuthors1Data() {
         return Stream.of(
-                Arguments.of(AUTHOR_EMPTY, ""),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "NewtonEtAl"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "NewtonEtAl"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "NewtonEtAl")
+                Arguments.of("", AUTHOR_EMPTY),
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("NewtonEtAl", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2),
+                Arguments.of("NewtonEtAl", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3),
+                Arguments.of("NewtonEtAl", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4)
         );
     }
 
@@ -582,33 +582,30 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("nAuthors3Data")
-    void nAuthors3(BibEntry entry, String expected) {
+    void nAuthors3(String expected, BibEntry entry) {
         assertEquals(expected, generateKey(entry, AUTHORN.formatted(3)));
     }
 
     static Stream<Arguments> nAuthors3Data() {
         return Stream.of(
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "NewtonMaxwell"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "NewtonMaxwellEinstein"),
-                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "NewtonMaxwellEinsteinEtAl")
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1),
+                Arguments.of("NewtonMaxwell", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2),
+                Arguments.of("NewtonMaxwellEinstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3),
+                Arguments.of("NewtonMaxwellEinsteinEtAl", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4)
         );
     }
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-                # normal range
-                7--27,27
-                --27,27
-                '',''
-                42--111,111
-                7,41,73--97,97
-                7,41,97--73,97
-                43+,43
-                00--0,0
-                1--1,1
-            """)
-    void firstPage(String input, String expected) {
+            7,7--27
+            27,--27
+            '',''
+            42,42--111
+            7,'7,41,73--97'
+            7,'41,7,73--97'
+            43,43+
+        """)
+    void firstPage(String expected, String input) {
         assertEquals(expected, CitationKeyGenerator.firstPage(input));
     }
 
@@ -620,25 +617,22 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-                # Tests with prefix L
-                L7--27,L
-                L--27,L--
-                L,L
-                L42--111,L
-                L7,L41,L73--97,L
-                L41,L7,L73--97,L
-                L43+,L
-
-                # Tests with no prefix
-                7--27,''
-                --27,--
-                '',''
-                42--111,''
-                7,41,73--97,''
-                41,7,73--97,''
-                43+,''
-            """)
-    void pagePrefix(String input, String expected) {
+            L,L7--27
+            L--,L--27
+            L,L
+            L,L42--111
+            L,'L7,L41,L73--97'
+            L,'L41,L7,L73--97'
+            L,L43+
+            '',7--27
+            --,--27
+            '',''
+            '',42--111
+            '','7,41,73--97'
+            '','41,7,73--97'
+            '',43+
+        """)
+    void pagePrefix(String expected, String input) {
         assertEquals(expected, CitationKeyGenerator.pagePrefix(input));
     }
 
@@ -650,18 +644,17 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-                # normal range
-                7--27,27
-                --27,27
-                '',''
-                42--111,111
-                7,41,73--97,97
-                7,41,97--73,97
-                43+,43
-                00--0,0
-                1--1,1
+            27,7--27
+            27,--27
+            '',''
+            111,42--111
+            97,'7,41,73--97'
+            97,'7,41,97--73'
+            43,43+
+            0,00--0
+            1,1--1
             """)
-    void lastPage(String input, String expected) {
+    void lastPage(String expected, String input) {
         assertEquals(expected, CitationKeyGenerator.lastPage(input));
     }
 
@@ -676,8 +669,7 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("veryShortTitleData")
-    void veryShortTitle(String titleString, String expected) {
-        // veryShortTitle is getTitleWords with "1" as count
+    void veryShortTitle(String expected, String titleString) {
         int count = 1;
         assertEquals(expected,
                 CitationKeyGenerator.getTitleWords(count,
@@ -686,14 +678,14 @@ class CitationKeyGeneratorTest {
 
     static Stream<Arguments> veryShortTitleData() {
         return Stream.of(
-                Arguments.of(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH, "application"),
-                Arguments.of(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "BPEL"),
-                Arguments.of(TITLE_STRING_CASED, "Process"),
-                Arguments.of(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD, "BPMN"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING, "Difference"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "Cloud"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD, "Towards"),
-                Arguments.of(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS, "Measurement")
+                Arguments.of("application", TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH),
+                Arguments.of("BPEL", TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON),
+                Arguments.of("Process", TITLE_STRING_CASED),
+                Arguments.of("BPMN", TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD),
+                Arguments.of("Difference", TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING),
+                Arguments.of("Cloud", TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON),
+                Arguments.of("Towards", TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD),
+                Arguments.of("Measurement", TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)
         );
     }
 
@@ -702,8 +694,7 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("shortTitleData")
-    void shortTitle(String titleString, String expected) {
-        // shortTitle is getTitleWords with "3" as count and removed small words
+    void shortTitle(String expected, String titleString) {
         int count = 3;
         assertEquals(expected,
                 CitationKeyGenerator.getTitleWords(count,
@@ -712,14 +703,14 @@ class CitationKeyGeneratorTest {
 
     static Stream<Arguments> shortTitleData() {
         return Stream.of(
-                Arguments.of(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH, "application migration effort"),
-                Arguments.of(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "BPEL conformance open"),
-                Arguments.of(TITLE_STRING_CASED, "Process Viewing Patterns"),
-                Arguments.of(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD, "BPMN Conformance Open"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING, "Difference Graph Based"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "Cloud Computing: Next"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD, "Towards Choreography based"),
-                Arguments.of(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS, "Measurement Design Time")
+                Arguments.of("application migration effort", TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH),
+                Arguments.of("BPEL conformance open", TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON),
+                Arguments.of("Process Viewing Patterns", TITLE_STRING_CASED),
+                Arguments.of("BPMN Conformance Open", TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD),
+                Arguments.of("Difference Graph Based", TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING),
+                Arguments.of("Cloud Computing: Next", TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON),
+                Arguments.of("Towards Choreography based", TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD),
+                Arguments.of("Measurement Design Time", TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)
         );
     }
 
@@ -728,21 +719,20 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("camelData")
-    void camel(String titleString, String expected) {
-        // camel capitalises and concatenates all the words of the title
+    void camel(String expected, String titleString) {
         assertEquals(expected, CitationKeyGenerator.getCamelizedTitle(titleString));
     }
 
     static Stream<Arguments> camelData() {
         return Stream.of(
-                Arguments.of(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH, "ApplicationMigrationEffortInTheCloudTheCaseOfCloudPlatforms"),
-                Arguments.of(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "BPELConformanceInOpenSourceEnginesTheCaseOfStaticAnalysis"),
-                Arguments.of(TITLE_STRING_CASED, "ProcessViewingPatterns"),
-                Arguments.of(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD, "BPMNConformanceInOpenSourceEngines"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING, "TheDifferenceBetweenGraphBasedAndBlockStructuredBusinessProcessModellingLanguages"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "CloudComputingTheNextRevolutionInIT"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD, "TowardsChoreographyBasedProcessDistributionInTheCloud"),
-                Arguments.of(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS, "OnTheMeasurementOfDesignTimeAdaptabilityForProcessBasedSystems")
+                Arguments.of("ApplicationMigrationEffortInTheCloudTheCaseOfCloudPlatforms", TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH),
+                Arguments.of("BPELConformanceInOpenSourceEnginesTheCaseOfStaticAnalysis", TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON),
+                Arguments.of("ProcessViewingPatterns", TITLE_STRING_CASED),
+                Arguments.of("BPMNConformanceInOpenSourceEngines", TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD),
+                Arguments.of("TheDifferenceBetweenGraphBasedAndBlockStructuredBusinessProcessModellingLanguages", TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING),
+                Arguments.of("CloudComputingTheNextRevolutionInIT", TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON),
+                Arguments.of("TowardsChoreographyBasedProcessDistributionInTheCloud", TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD),
+                Arguments.of("OnTheMeasurementOfDesignTimeAdaptabilityForProcessBasedSystems", TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)
         );
     }
 
@@ -751,35 +741,30 @@ class CitationKeyGeneratorTest {
      */
     @ParameterizedTest
     @MethodSource("titleData")
-    void title(String titleString, String expected) {
-        // title capitalises the significant words of the title
-        // for the title case the concatenation happens at formatting, which is tested in MakeLabelWithDatabaseTest.java
+    void title(String expected, String titleString) {
         assertEquals(expected, CitationKeyGenerator.camelizeSignificantWordsInTitle(titleString));
     }
 
     static Stream<Arguments> titleData() {
         return Stream.of(
-                Arguments.of(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH, "Application Migration Effort in the Cloud the Case of Cloud Platforms"),
-                Arguments.of(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "BPEL Conformance in Open Source Engines: the Case of Static Analysis"),
-                Arguments.of(TITLE_STRING_CASED, "Process Viewing Patterns"),
-                Arguments.of(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD, "BPMN Conformance in Open Source Engines"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING, "The Difference between Graph Based and Block Structured Business Process Modelling Languages"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "Cloud Computing: the Next Revolution in IT"),
-                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD, "Towards Choreography Based Process Distribution in the Cloud"),
-                Arguments.of(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS, "On the Measurement of Design Time Adaptability for Process Based Systems")
+                Arguments.of("Application Migration Effort in the Cloud the Case of Cloud Platforms", TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH),
+                Arguments.of("BPEL Conformance in Open Source Engines: the Case of Static Analysis", TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON),
+                Arguments.of("Process Viewing Patterns", TITLE_STRING_CASED),
+                Arguments.of("BPMN Conformance in Open Source Engines", TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD),
+                Arguments.of("The Difference between Graph Based and Block Structured Business Process Modelling Languages", TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING),
+                Arguments.of("Cloud Computing: the Next Revolution in IT", TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON),
+                Arguments.of("Towards Choreography Based Process Distribution in the Cloud", TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD),
+                Arguments.of("On the Measurement of Design Time Adaptability for Process Based Systems", TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)
         );
     }
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-                # first keyword
-                [keyword1],w1
-                # check keywords with space
-                [keyword2],w2aw2b
-                # check out of range
-                [keyword4],''
-            """)
-    void keywordNKeywordsSeparatedBySpace(String pattern, String expected) {
+            w1,[keyword1]
+            w2aw2b,[keyword2]
+            '',[keyword4]
+        """)
+    void keywordNKeywordsSeparatedBySpace(String expected, String pattern) {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
         assertEquals(expected, generateKey(entry, pattern));
     }
@@ -798,19 +783,16 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @MethodSource("keywordsNData")
-    void keywordsNKeywordsSeparatedBySpace(String pattern, String expected) {
+    void keywordsNKeywordsSeparatedBySpace(String expected, String pattern) {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
         assertEquals(expected, generateKey(entry, pattern));
     }
 
     static Stream<Arguments> keywordsNData() {
         return Stream.of(
-                // all keywords
-                Arguments.of("[keywords]", "w1w2aw2bw3"),
-                // check keywords with space
-                Arguments.of("[keywords2]", "w1w2aw2b"),
-                // check out of range
-                Arguments.of("[keywords55]", "w1w2aw2bw3")
+                Arguments.of("w1w2aw2bw3", "[keywords]"),
+                Arguments.of("w1w2aw2b", "[keywords2]"),
+                Arguments.of("w1w2aw2bw3", "[keywords55]")
         );
     }
 
@@ -827,29 +809,29 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @MethodSource("checkLegalKeyUnwantedCharactersData")
-    void checkLegalKeyUnwantedCharacters(String input, String expected) {
+    void checkLegalKeyUnwantedCharacters(String expected, String input) {
         assertEquals(expected, CitationKeyGenerator.cleanKey(input, DEFAULT_UNWANTED_CHARACTERS));
     }
 
     static Stream<Arguments> checkLegalKeyUnwantedCharactersData() {
         return Stream.of(
-                Arguments.of("AA AA", "AAAA"),
-                Arguments.of("SPECIAL CHARS#{\\\"}~,", "SPECIALCHARS"),
-                Arguments.of("\n\t\r", "")
+                Arguments.of("AAAA", "AA AA"),
+                Arguments.of("SPECIALCHARS", "SPECIAL CHARS#{\\\"}~,"),
+                Arguments.of("", "\n\t\r")
         );
     }
 
     @ParameterizedTest
     @MethodSource("checkLegalKeyNoUnwantedCharactersData")
-    void checkLegalKeyNoUnwantedCharacters(String input, String expected) {
+    void checkLegalKeyNoUnwantedCharacters(String expected, String input) {
         assertEquals(expected, CitationKeyGenerator.cleanKey(input, ""));
     }
 
     static Stream<Arguments> checkLegalKeyNoUnwantedCharactersData() {
         return Stream.of(
-                Arguments.of("AA AA", "AAAA"),
-                Arguments.of("SPECIAL CHARS#{\\\"}~,^", "SPECIALCHARS^"),
-                Arguments.of("\n\t\r", "")
+                Arguments.of("AAAA", "AA AA"),
+                Arguments.of("SPECIALCHARS^", "SPECIAL CHARS#{\\\"}~,^"),
+                Arguments.of("", "\n\t\r")
         );
     }
 
@@ -860,15 +842,15 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @MethodSource("applyModifiersData")
-    void applyModifiers(String pattern, String expected) {
+    void applyModifiers(String expected, String pattern) {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Green Scheduling of Whatever");
         assertEquals(expected, generateKey(entry, pattern, new BibDatabase()));
     }
 
     static Stream<Arguments> applyModifiersData() {
         return Stream.of(
-                Arguments.of("[shorttitleINI]", "GSo"),
-                Arguments.of("[shorttitle]", "GreenSchedulingWhatever")
+                Arguments.of("GSo", "[shorttitleINI]"),
+                Arguments.of("GreenSchedulingWhatever", "[shorttitle]")
         );
     }
 
@@ -896,10 +878,10 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "'Green Scheduling of: Whatever', 'GreenSchedulingOf:Whatever'",
-            "'Green Scheduling of `Whatever`', 'GreenSchedulingofWhatever'"
+            "'GreenSchedulingOf:Whatever', 'Green Scheduling of: Whatever'",
+            "'GreenSchedulingofWhatever', 'Green Scheduling of `Whatever`'"
     })
-    void generateKeyStripsSpecialCharsFromTitle(String title, String expected) {
+    void generateKeyStripsSpecialCharsFromTitle(String expected, String title) {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, title);
         assertEquals(expected, generateKey(entry, "[title]"));
     }
@@ -990,7 +972,7 @@ class CitationKeyGeneratorTest {
 
     @Test
     void generateKeyWithNonNormalizedUnicode() {
-        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Modèle et outil pour soutenir la scénarisation pédagogique de MOOC connectivistes");
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Modèle et outil pour soutenir la scénarisation pédagogique de MOOC connectivistes");
 
         assertEquals("Modele", generateKey(bibEntry, "[veryshorttitle]"));
     }
@@ -998,7 +980,6 @@ class CitationKeyGeneratorTest {
     @Test
     void generateKeyWithModifierContainingRegexCharacterClass() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
-
         assertEquals("WM", generateKey(bibEntry, "[title:regex(\"[a-z]+\",\"\")]"));
     }
 
@@ -1006,8 +987,7 @@ class CitationKeyGeneratorTest {
     void generateKeyDoesNotModifyTheKeyWithIncorrectRegexReplacement() {
         String pattern = "[title]";
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(pattern);
-        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(true, false, false, false, CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A, "[", // Invalid regexp
-                "", DEFAULT_UNWANTED_CHARACTERS, keyPattern, "", ',');
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(true, false, false, false, CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A, "[", "", DEFAULT_UNWANTED_CHARACTERS, keyPattern, "", ',');
 
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
         assertEquals("WickednessManaging", new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(bibEntry));
@@ -1022,7 +1002,7 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @MethodSource("generateKeyWithLowercaseAuthorData")
-    void generateKeyWithLowercaseAuthor(String author, String expected) {
+    void generateKeyWithLowercaseAuthor(String expected, String author) {
         BibEntry entry = createABibEntryAuthor(author);
         entry.setField(StandardField.YEAR, "2021");
         assertEquals(expected, generateKey(entry, "[auth][year]"));
@@ -1030,8 +1010,8 @@ class CitationKeyGeneratorTest {
 
     static Stream<Arguments> generateKeyWithLowercaseAuthorData() {
         return Stream.of(
-                Arguments.of("Stéphane d'Ascoli", "dAscoli2021"),
-                Arguments.of("Michiel van den Brekel", "Brekel2021")
+                Arguments.of("dAscoli2021", "Stéphane d'Ascoli"),
+                Arguments.of("Brekel2021", "Michiel van den Brekel")
         );
     }
 
@@ -1056,4 +1036,3 @@ class CitationKeyGeneratorTest {
         assertEquals("Karpenko2025", generateKey(entry, "[auth][year]"));
     }
 }
-
