@@ -509,7 +509,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // the initialization of the preferences in main
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
         // will never be translated.
-        Localization.setLanguage(getLanguage());
 
         defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
@@ -715,6 +714,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(VERSION_IGNORED_UPDATE, "");
         defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
+        Localization.setLanguage(getLanguage());
         setLanguageDependentDefaultValues();
 
         // region last files opened
