@@ -54,6 +54,9 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,6 +67,8 @@ import static org.mockito.Mockito.when;
 /**
  * Tests for reading can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
  */
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 class BibDatabaseWriterTest {
 
     private BibDatabaseWriter databaseWriter;

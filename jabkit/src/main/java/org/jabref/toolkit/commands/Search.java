@@ -74,66 +74,67 @@ class Search implements Runnable {
             return;
         }
 
-        PostgreServer postgreServer = new PostgreServer();
-        IndexManager.clearOldSearchIndices();
+        try (PostgreServer postgreServer = new PostgreServer()) {
+            IndexManager.clearOldSearchIndices();
 
-        SearchPreferences searchPreferences = argumentProcessor.cliPreferences.getSearchPreferences();
-        SearchQuery searchQuery = new SearchQuery(query, searchPreferences.getSearchFlags());
+            SearchPreferences searchPreferences = argumentProcessor.cliPreferences.getSearchPreferences();
+            SearchQuery searchQuery = new SearchQuery(query, searchPreferences.getSearchFlags());
 
-        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
-        List<BibEntry> matches;
-        try {
-            // extract current thread task executor from indexManager
-            matches = new DatabaseSearcher(
-                    databaseContext,
-                    new CurrentThreadTaskExecutor(),
-                    argumentProcessor.cliPreferences,
-                    postgreServer
-            ).getMatches(searchQuery);
-        } catch (IOException ex) {
-            LOGGER.error("Error occurred when searching", ex);
-            return;
-        }
-
-        // export matches
-        if (matches.isEmpty()) {
-            System.out.println(Localization.lang("No search matches."));
-            return;
-        }
-
-        if ("bibtex".equals(outputFormat)) {
-            // output a bib file as default or if
-            // provided exportFormat is "bib"
-            JabKit.saveDatabase(
-                    argumentProcessor.cliPreferences,
-                    argumentProcessor.entryTypesManager,
-                    new BibDatabase(matches),
-                    outputFile);
-            LOGGER.debug("Finished export");
-        } else {
-            // export new database
-            ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
-            Optional<Exporter> exporter = exporterFactory.getExporterByName(outputFormat);
-
-            if (exporter.isEmpty()) {
-                System.out.println(Localization.lang("Unknown export format %0", outputFormat));
+            BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+            List<BibEntry> matches;
+            try {
+                // extract current thread task executor from indexManager
+                matches = new DatabaseSearcher(
+                        databaseContext,
+                        new CurrentThreadTaskExecutor(),
+                        argumentProcessor.cliPreferences,
+                        postgreServer
+                ).getMatches(searchQuery);
+            } catch (IOException ex) {
+                LOGGER.error("Error occurred when searching", ex);
                 return;
             }
 
-            // We have an TemplateExporter instance:
-            try {
-                System.out.println(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
-                exporter.get().export(
-                        databaseContext,
-                        outputFile,
-                        matches,
-                        List.of(),
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-            } catch (IOException
-                     | SaveException
-                     | ParserConfigurationException
-                     | TransformerException ex) {
-                LOGGER.error("Could not export file '{}}'", outputFile.toAbsolutePath(), ex);
+            // export matches
+            if (matches.isEmpty()) {
+                System.out.println(Localization.lang("No search matches."));
+                return;
+            }
+
+            if ("bibtex".equals(outputFormat)) {
+                // output a bib file as default or if
+                // provided exportFormat is "bib"
+                JabKit.saveDatabase(
+                        argumentProcessor.cliPreferences,
+                        argumentProcessor.entryTypesManager,
+                        new BibDatabase(matches),
+                        outputFile);
+                LOGGER.debug("Finished export");
+            } else {
+                // export new database
+                ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
+                Optional<Exporter> exporter = exporterFactory.getExporterByName(outputFormat);
+
+                if (exporter.isEmpty()) {
+                    System.out.println(Localization.lang("Unknown export format %0", outputFormat));
+                    return;
+                }
+
+                // We have an TemplateExporter instance:
+                try {
+                    System.out.println(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
+                    exporter.get().export(
+                            databaseContext,
+                            outputFile,
+                            matches,
+                            List.of(),
+                            Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+                } catch (IOException
+                         | SaveException
+                         | ParserConfigurationException
+                         | TransformerException ex) {
+                    LOGGER.error("Could not export file '{}}'", outputFile.toAbsolutePath(), ex);
+                }
             }
         }
     }

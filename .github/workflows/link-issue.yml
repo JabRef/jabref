@@ -97,15 +97,34 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
         with:
           show-progress: 'false'
+      - name: Add label "📌 Pinned"
+        run: gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --add-label "📌 Pinned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Assign PR creator to issue
         run: |
           set -e
 
           echo "Updating issue '${{ needs.determine_issue_number.outputs.issue_number }}'"
+
+          # Check if good first/second/.. issue
+          # If yes, copy label to GitHub PR for transparency
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
+          LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
+          if [ -n "$LABEL" ]; then
+            echo "✅ Found label: $LABEL"
+            SILENT=false
+            # Apply label
+            gh issue edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
+          else
+            echo "🚫 Silent fail if not possible to add assignee"
+            SILENT=true
+          fi
 
           # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
 
@@ -121,18 +140,6 @@ jobs:
           # Append the new assignee
           UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
 
-          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
-          LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
-          if [ -n "$LABEL" ]; then
-            echo "✅ Found label: $LABEL"
-            SILENT=false
-            # Apply label
-            gh issue edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
-          else
-            echo "🚫 Silent fail if not possible to add assignee"
-            SILENT=true
-          fi
-
           # Update issue with the new assignee list
           echo "Updating issue #${{ needs.determine_issue_number.outputs.issue_number }} updated with assignees: $UPDATED_ASSIGNEES..."
           if [ "$SILENT" = true ]; then
@@ -140,9 +147,5 @@ jobs:
           else
             gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Add label "📌 Pinned"
-        run: gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --add-label "📌 Pinned"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

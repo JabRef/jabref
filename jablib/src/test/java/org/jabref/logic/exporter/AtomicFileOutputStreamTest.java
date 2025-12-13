@@ -10,6 +10,9 @@ import java.nio.file.Path;
 import com.google.common.base.Strings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,6 +21,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 class AtomicFileOutputStreamTest {
 
     private static final String FIFTY_CHARS = Strings.repeat("1234567890", 5);
