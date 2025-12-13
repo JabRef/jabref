@@ -152,14 +152,6 @@ class FileUtilTest {
     }
 
     @Test
-    void getLinkedFileNameGetOptionalEmptyIfDefaultAsPattern() {
-        String fileNamePattern = "default";
-        BibEntry entry = new BibEntry();
-
-        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
-    }
-
-    @Test
     void getLinkedFileNameByYearAuthorFirstpage() {
         String fileNamePattern = "[year]_[auth]_[firstpage]";
         BibEntry entry = new BibEntry();
@@ -234,6 +226,40 @@ class FileUtilTest {
     @Test
     void getFileNameWithMultipleDotsString() {
         assertEquals("te.st", FileUtil.getBaseName("te.st.PdF  "));
+    }
+
+    @ParameterizedTest
+    // @formatter:off
+    @CsvSource(textBlock = """
+               test.file, www.example.com/test.file
+               test.file, http://www.example.com/test.file
+               test.file, https://www.example.com/test.file
+               test.file, www.example.com/path/to/test.file
+               test.file, http://www.example.com/path/to/test.file
+               test.file, https://www.example.com/path/to/test.file
+               test.file, https://www.example.com/not\\a\\windows\\path/test.file
+               test.file, https://www.example.com////test.file
+               blank, https://www.example.com/path/to/blank
+               blank, https://www.example.com/not\\a\\windows\\path/blank
+               not\\a\\windows.file, https://www.example.com/path/to/not\\a\\windows.file
+               test.file, https://www.example.com/path/to/file.pdf?field=value
+               test.file, https://www.example.com/path/to/file.pdf?a=1&b=2
+               test.file, https://www.example.com/path/to/file.pdf?search=for+a+file
+               blank, https://www.example.com/path/to/blank?search=for+a+file
+        """)
+    // @formatter:on
+    void getFileNameFromUrlsCorrectly(String file, String url) {
+        assertEquals(file, FileUtil.getFileNameFromUrl(url).orElse("file.pdf"), "from '" + url + "'");
+    }
+
+    @Test
+    void getEmptyFileNameFromUrlCorrectly() {
+        assertEquals(Optional.empty(), FileUtil.getFileNameFromUrl("https://www.example.com/path/to/?nothing=at+all"), "from 'https://www.example.com/path/to/?nothing=at+all'");
+    }
+
+    @Test
+    void getEmptyFileNameFromEmptyUrlCorrectly() {
+        assertEquals(Optional.empty(), FileUtil.getFileNameFromUrl(""), "from ''");
     }
 
     @Test
