@@ -84,7 +84,6 @@ class AiChatComponentTest {
         when(chatService.makeChat(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(chatLogic);
         when(aiService.getAiChatService()).thenReturn(chatService);
 
-
         IngestionService ingestionService = mock(IngestionService.class, Mockito.RETURNS_DEEP_STUBS);
         when(aiService.getIngestionService()).thenReturn(ingestionService);
 
