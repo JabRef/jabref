@@ -41,7 +41,6 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
     private final BibEntryTypesManager entryTypesManager;
     private final FieldPreferences fieldPreferences;
 
-
     public AiChatGuardedComponent(AiService aiService,
                                   StringProperty name,
                                   ObservableList<ChatMessage> chatHistory,
