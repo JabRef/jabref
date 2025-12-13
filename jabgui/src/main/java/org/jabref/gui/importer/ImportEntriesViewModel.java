@@ -210,13 +210,15 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 taskExecutor);
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport);
 
+        // Merge groups from imported library
         if (parserResult != null && selectedDb != null) {
             mergeGroupsFromImport(parserResult, selectedDb);
-
-            // Refresh group tree UI
+            
+            // Trigger UI refresh
             stateManager.getActiveDatabase().ifPresent(db -> {
-                // Trigger metadata change event to refresh UI
-                db.getMetaData().setGroups(db.getMetaData().getGroups().orElse(null));
+                db.getMetaData().getGroups().ifPresent(rootNode -> {
+                    db.getMetaData().setGroups(rootNode);
+                });
             });
         }
     }
@@ -227,19 +229,20 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      * If both have groups, merges them recursively.
      *
      * @param importedResult the parser result containing imported data with groups
-     * @param targetContext the target database context to merge groups into
+     * @param targetContext  the target database context to merge groups into
      */
     private void mergeGroupsFromImport(ParserResult importedResult, BibDatabaseContext targetContext) {
-        if (importedResult.getMetaData().getGroups().isPresent() &&
-                targetContext.getMetaData().getGroups().isPresent()) {
-
+        if (importedResult.getMetaData().getGroups().isPresent()
+                && targetContext.getMetaData().getGroups().isPresent()) {
+            
             GroupTreeNode importedRoot = importedResult.getMetaData().getGroups().get();
             GroupTreeNode targetRoot = targetContext.getMetaData().getGroups().get();
-
+            
             mergeGroupTrees(importedRoot, targetRoot);
             targetContext.getMetaData().setGroups(targetRoot);
-        } else if (importedResult.getMetaData().getGroups().isPresent() &&
-                !targetContext.getMetaData().getGroups().isPresent()) {
+        } else if (importedResult.getMetaData().getGroups().isPresent()
+                && !targetContext.getMetaData().getGroups().isPresent()) {
+            
             GroupTreeNode importedRoot = importedResult.getMetaData().getGroups().get();
             targetContext.getMetaData().setGroups(importedRoot.copySubtree());
         }
@@ -255,9 +258,9 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private void mergeGroupTrees(GroupTreeNode source, GroupTreeNode target) {
         for (GroupTreeNode sourceChild : source.getChildren()) {
             Optional<GroupTreeNode> existingGroup = target.getChildren().stream()
-                                                          .filter(child -> child.getGroup().getName().equals(sourceChild.getGroup().getName()))
-                                                          .findFirst();
-
+                    .filter(child -> child.getGroup().getName().equals(sourceChild.getGroup().getName()))
+                    .findFirst();
+            
             if (existingGroup.isPresent()) {
                 mergeGroupTrees(sourceChild, existingGroup.get());
             } else {
