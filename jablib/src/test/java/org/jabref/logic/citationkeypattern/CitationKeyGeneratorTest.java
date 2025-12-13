@@ -597,14 +597,14 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-        7,7--27
-        27,--27
-        '',''
-        42,42--111
-        7,'7,41,73--97'
-        7,'41,7,73--97'
-        43,43+
-    """)
+                7,7--27
+                27,--27
+                '',''
+                42,42--111
+                7,'7,41,73--97'
+                7,'41,7,73--97'
+                43,43+
+            """)
     void firstPage(String expected, String input) {
         assertEquals(expected, CitationKeyGenerator.firstPage(input));
     }
@@ -617,21 +617,21 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-        L,L7--27
-        L--,L--27
-        L,L
-        L,L42--111
-        L,'L7,L41,L73--97'
-        L,'L41,L7,L73--97'
-        L,L43+
-        '',7--27
-        --,--27
-        '',''
-        '',42--111
-        '','7,41,73--97'
-        '','41,7,73--97'
-        '',43+
-    """)
+                L,L7--27
+                L--,L--27
+                L,L
+                L,L42--111
+                L,'L7,L41,L73--97'
+                L,'L41,L7,L73--97'
+                L,L43+
+                '',7--27
+                --,--27
+                '',''
+                '',42--111
+                '','7,41,73--97'
+                '','41,7,73--97'
+                '',43+
+            """)
     void pagePrefix(String expected, String input) {
         assertEquals(expected, CitationKeyGenerator.pagePrefix(input));
     }
@@ -760,10 +760,10 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-        w1,[keyword1]
-        w2aw2b,[keyword2]
-        '',[keyword4]
-    """)
+                w1,[keyword1]
+                w2aw2b,[keyword2]
+                '',[keyword4]
+            """)
     void keywordNKeywordsSeparatedBySpace(String expected, String pattern) {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
         assertEquals(expected, generateKey(entry, pattern));
