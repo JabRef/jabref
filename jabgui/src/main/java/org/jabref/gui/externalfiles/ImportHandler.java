@@ -85,10 +85,6 @@ public class ImportHandler {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
-    @Nullable
-    private final Runnable onBulkImportStart;
-    @Nullable
-    private final Runnable onBulkImportEnd;
 
     public ImportHandler(BibDatabaseContext targetBibDatabaseContext,
                          GuiPreferences preferences,
@@ -97,26 +93,12 @@ public class ImportHandler {
                          StateManager stateManager,
                          DialogService dialogService,
                          TaskExecutor taskExecutor) {
-        this(targetBibDatabaseContext, preferences, fileupdateMonitor, undoManager, stateManager, dialogService, taskExecutor, null, null);
-    }
-
-    public ImportHandler(BibDatabaseContext targetBibDatabaseContext,
-                         GuiPreferences preferences,
-                         FileUpdateMonitor fileupdateMonitor,
-                         UndoManager undoManager,
-                         StateManager stateManager,
-                         DialogService dialogService,
-                         TaskExecutor taskExecutor,
-                         @Nullable Runnable onBulkImportStart,
-                         @Nullable Runnable onBulkImportEnd) {
         this.targetBibDatabaseContext = targetBibDatabaseContext;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.onBulkImportStart = onBulkImportStart;
-        this.onBulkImportEnd = onBulkImportEnd;
 
         this.filePreferences = preferences.getFilePreferences();
 
@@ -149,9 +131,9 @@ public class ImportHandler {
 
                     UiTaskExecutor.runInJavaFXThread(() -> {
                         setTitle(Localization.lang("Importing files into %1 | %2 of %0 file(s) processed.",
-                                files.size(),
-                                targetBibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse(Localization.lang("untitled")),
-                                counter));
+                                                   files.size(),
+                                                   targetBibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse(Localization.lang("untitled")),
+                                                   counter));
                         updateMessage(Localization.lang("Processing %0", FileUtil.shortenFileName(file.getFileName().toString(), 68)));
                         updateProgress(counter, files.size());
                         showToUser(true);
@@ -255,31 +237,19 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries) {
-        boolean isBulkImport = entries.size() > 1;
-        if (isBulkImport && onBulkImportStart != null) {
-            onBulkImportStart.run();
-        }
-        try {
-            targetBibDatabaseContext.getDatabase().insertEntries(entries);
-            generateKeys(entries);
-            setAutomaticFields(entries);
-            addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
-            addToImportEntriesGroup(entries);
+        targetBibDatabaseContext.getDatabase().insertEntries(entries);
+        generateKeys(entries);
+        setAutomaticFields(entries);
+        addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
+        addToImportEntriesGroup(entries);
 
-            if (transferInformation != null) {
-                entries.stream().forEach(entry -> {
-                    LinkedFileTransferHelper
-                            .adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry);
-                });
-            }
-
-            // TODO: Should only be done if NOT copied from other library
-            entries.stream().forEach(entry -> downloadLinkedFiles(entry));
-        } finally {
-            if (isBulkImport && onBulkImportEnd != null) {
-                onBulkImportEnd.run();
-            }
+        if (transferInformation != null) {
+            entries.forEach(entry -> LinkedFileTransferHelper
+                                                             .adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry));
         }
+
+        // TODO: Should only be done if NOT copied from other library
+        entries.forEach(this::downloadLinkedFiles);
     }
 
     public void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry) {
@@ -331,7 +301,7 @@ public class ImportHandler {
     public Optional<BibEntry> findDuplicate(BibEntry entryToCheck) {
         // FIXME: BibEntryTypesManager needs to be passed via constructor
         return new DuplicateCheck(Injector.instantiateModelOrService(BibEntryTypesManager.class))
-                .containsDuplicate(targetBibDatabaseContext.getDatabase(), entryToCheck, targetBibDatabaseContext.getMode());
+                                                                                                 .containsDuplicate(targetBibDatabaseContext.getDatabase(), entryToCheck, targetBibDatabaseContext.getMode());
     }
 
     public Optional<BibEntry> handleDuplicates(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
@@ -367,26 +337,22 @@ public class ImportHandler {
 
     public void setAutomaticFields(List<BibEntry> entries) {
         UpdateField.setAutomaticFields(
-                entries,
-                preferences.getOwnerPreferences(),
-                preferences.getTimestampPreferences()
-        );
+                                       entries,
+                                       preferences.getOwnerPreferences(),
+                                       preferences.getTimestampPreferences());
     }
 
     public void downloadLinkedFiles(BibEntry entry) {
         if (preferences.getFilePreferences().shouldDownloadLinkedFiles()) {
             entry.getFiles().stream()
                  .filter(LinkedFile::isOnlineLink)
-                 .forEach(linkedFile ->
-                         new LinkedFileViewModel(
-                                 linkedFile,
-                                 entry,
-                                 targetBibDatabaseContext,
-                                 taskExecutor,
-                                 dialogService,
-                                 preferences
-                         ).download(false)
-                 );
+                 .forEach(linkedFile -> new LinkedFileViewModel(
+                                                                linkedFile,
+                                                                entry,
+                                                                targetBibDatabaseContext,
+                                                                taskExecutor,
+                                                                dialogService,
+                                                                preferences).download(false));
         }
     }
 
@@ -413,10 +379,10 @@ public class ImportHandler {
             return;
         }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
-                                                                                     .getKeyPatterns()),
-                targetBibDatabaseContext.getDatabase(),
-                preferences.getCitationKeyPatternPreferences());
+                                                                     targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
+                                                                                                                                          .getKeyPatterns()),
+                                                                     targetBibDatabaseContext.getDatabase(),
+                                                                     preferences.getCitationKeyPatternPreferences());
         entries.forEach(keyGenerator::generateAndSetKey);
     }
 
@@ -488,11 +454,10 @@ public class ImportHandler {
     private List<BibEntry> tryImportFormats(String data) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
-                    preferences.getImporterPreferences(),
-                    preferences.getImportFormatPreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    fileUpdateMonitor
-            );
+                                                                           preferences.getImporterPreferences(),
+                                                                           preferences.getImportFormatPreferences(),
+                                                                           preferences.getCitationKeyPatternPreferences(),
+                                                                           fileUpdateMonitor);
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
             return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
@@ -506,31 +471,21 @@ public class ImportHandler {
     }
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
-        boolean isBulkImport = entriesToAdd.size() > 1;
-        if (isBulkImport && onBulkImportStart != null) {
-            onBulkImportStart.run();
-        }
-        try {
-            boolean firstEntry = true;
-            for (BibEntry entry : entriesToAdd) {
-                if (firstEntry) {
-                    LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
-                    importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
-                    firstEntry = false;
-                    continue;
-                }
-                if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
-                    DuplicateResolverDialog.DuplicateResolverResult decision = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
-                    LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
-                    importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker);
-                } else {
-                    LOGGER.debug("not first entry, not pref flag, break will  be used");
-                    importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
-                }
+        boolean firstEntry = true;
+        for (BibEntry entry : entriesToAdd) {
+            if (firstEntry) {
+                LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
+                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
+                firstEntry = false;
+                continue;
             }
-        } finally {
-            if (isBulkImport && onBulkImportEnd != null) {
-                onBulkImportEnd.run();
+            if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+                DuplicateResolverDialog.DuplicateResolverResult decision = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
+                LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
+                importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker);
+            } else {
+                LOGGER.debug("not first entry, not pref flag, break will  be used");
+                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
             }
         }
     }
@@ -585,7 +540,7 @@ public class ImportHandler {
                                          .flatMap(grp -> grp.getChildren()
                                                             .stream()
                                                             .filter(node -> node.getGroup() instanceof ExplicitGroup
-                                                                    && node.getGroup().getName().equals(groupName))
+                                                                && node.getGroup().getName().equals(groupName))
                                                             .findFirst())
                                          .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
         }
