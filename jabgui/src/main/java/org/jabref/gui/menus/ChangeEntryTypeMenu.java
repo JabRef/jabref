@@ -3,6 +3,8 @@ package org.jabref.gui.menus;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -20,7 +22,9 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 
 public class ChangeEntryTypeMenu {
@@ -58,8 +62,22 @@ public class ChangeEntryTypeMenu {
         ObservableList<MenuItem> items = FXCollections.observableArrayList();
 
         if (bibDatabaseContext.isBiblatexMode()) {
-            // Default BibLaTeX
-            items.addAll(fromEntryTypes(entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX), entries, undoManager));
+            // Default BibLaTeX - exclude non-standard types to avoid duplicates
+            Set<EntryType> nonStandardEntryTypes = BiblatexNonStandardEntryTypeDefinitions.ALL.stream()
+                                                                                              .<EntryType>map(BibEntryType::getType)
+                                                                                              .collect(Collectors.toSet());
+            Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX);
+            Collection<BibEntryType> standardTypes = allTypes.stream()
+                                                             .filter(type -> !nonStandardEntryTypes.contains(type.getType()))
+                                                             .toList();
+            items.addAll(fromEntryTypes(standardTypes, entries, undoManager));
+
+            // Non-standard types
+            createSubMenu(Localization.lang("Non-standard types"), BiblatexNonStandardEntryTypeDefinitions.ALL, entries, undoManager)
+                    .ifPresent(subMenu -> items.addAll(
+                            new SeparatorMenuItem(),
+                            subMenu
+                    ));
 
             // Custom types
             createSubMenu(Localization.lang("Custom"), entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entries, undoManager)
