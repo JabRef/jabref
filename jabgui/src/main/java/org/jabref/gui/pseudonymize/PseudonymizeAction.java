@@ -90,14 +90,14 @@ public class PseudonymizeAction extends SimpleCommand {
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {
-                LOGGER.warn("Warning: UTF-8 could not be used to encode the following characters: " + fileWriter.getEncodingProblems());
+                LOGGER.warn("Warning: UTF-8 could not be used to encode the following characters: {}", fileWriter.getEncodingProblems());
             }
-            LOGGER.info("Saved " + pseudoBibPath);
+            LOGGER.info("Saved {}", pseudoBibPath);
         }
     }
 
     private void exportPseudonymKeyCsv(Path pseudoCsvPath, Pseudonymization.Result result) throws IOException {
         PseudonymizationResultCsvWriter.writeValuesMappingAsCsv(pseudoCsvPath, result);
-        LOGGER.info("Saved " + pseudoCsvPath);
+        LOGGER.info("Saved {}", pseudoCsvPath);
     }
 }
