@@ -494,7 +494,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     aiService,
                     dialogService,
                     adaptVisibleTabs,
-                    taskExecutor
+                    taskExecutor,
+                    stateManager
             );
 
             aiChatWindow.setOnCloseRequest(event ->

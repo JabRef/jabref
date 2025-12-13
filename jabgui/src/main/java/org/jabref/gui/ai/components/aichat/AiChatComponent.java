@@ -24,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent;
 import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent;
 import org.jabref.gui.ai.components.util.Loadable;
@@ -96,6 +97,7 @@ public class AiChatComponent extends VBox {
     public AiChatComponent(AiService aiService,
                            StringProperty name,
                            ObservableList<ChatMessage> chatHistory,
+                           StateManager stateManager,
                            ObservableList<BibEntry> entries,
                            BibDatabaseContext bibDatabaseContext,
                            BibEntryTypesManager entryTypesManager,
@@ -105,7 +107,7 @@ public class AiChatComponent extends VBox {
                            TaskExecutor taskExecutor
     ) {
         this.aiService = aiService;
-        this.entries = entries;
+        this.entries = stateManager.getSelectedEntries();
         this.bibDatabaseContext = bibDatabaseContext;
         this.aiPreferences = aiPreferences;
         this.entryTypesManager = entryTypesManager;
@@ -441,7 +443,7 @@ public class AiChatComponent extends VBox {
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(path -> {
                          try {
-                             AiExporter exporter = new AiExporter(entries.getFirst(), entryTypesManager, fieldPreferences);
+                             AiExporter exporter = new AiExporter(entries, entryTypesManager, fieldPreferences);
                              String content = exporter.buildMarkdownForChat(aiChatLogic.getChatHistory());
                              Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                              dialogService.notify(Localization.lang("Export operation finished successfully."));
@@ -468,7 +470,7 @@ public class AiChatComponent extends VBox {
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(path -> {
                          try {
-                             AiExporter exporter = new AiExporter(entries.getFirst(), entryTypesManager, fieldPreferences);
+                             AiExporter exporter = new AiExporter(entries, entryTypesManager, fieldPreferences);
                              String jsonString = exporter.buildJsonExport(
                                      aiPreferences.getAiProvider().getLabel(),
                                      aiPreferences.getSelectedChatModel(),

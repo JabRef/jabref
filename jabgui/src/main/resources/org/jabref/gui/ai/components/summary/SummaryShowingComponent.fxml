@@ -19,7 +19,7 @@
                 <Button mnemonicParsing="false" onAction="#onRegenerateButtonClick" text="%Regenerate" translateX="-40" />
             </center>
             <right>
-                <MenuButton text="Export" >
+                <MenuButton text="%Export" >
                     <graphic>
                         <JabRefIconView glyph="SAVE"/>
                     </graphic>
