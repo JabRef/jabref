@@ -287,13 +287,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
         // endregion
 
-        // region SidePanePreferences
-        defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
-        defaults.put(SELECTED_FETCHER_INDEX, 0);
-        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
-        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
-        // endregion
-
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
         // region PreviewStyle
@@ -386,6 +379,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
+        getSidePanePreferences().setAll(SidePanePreferences.getDefault());
     }
 
     @Override
@@ -401,6 +395,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
+        getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
     }
 
     // region EntryEditorPreferences
@@ -694,10 +689,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return sidePanePreferences;
         }
 
-        sidePanePreferences = new SidePanePreferences(
-                getVisibleSidePanes(),
-                getSidePanePreferredPositions(),
-                getInt(SELECTED_FETCHER_INDEX));
+        sidePanePreferences = getSidePanePreferencesFromBackingStore(SidePanePreferences.getDefault());
 
         sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
                 storeVisibleSidePanes(sidePanePreferences.visiblePanes()));
@@ -706,6 +698,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (obs, oldValue, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
 
         return sidePanePreferences;
+    }
+
+    private SidePanePreferences getSidePanePreferencesFromBackingStore(SidePanePreferences defaults) {
+        return new SidePanePreferences(
+                defaults.visiblePanes(),
+                defaults.getPreferredPositions(),
+                getInt(SELECTED_FETCHER_INDEX, defaults.getWebSearchFetcherSelected())
+        );
     }
 
     private Set<SidePaneType> getVisibleSidePanes() {
