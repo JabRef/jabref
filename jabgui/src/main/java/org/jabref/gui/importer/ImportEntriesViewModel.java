@@ -211,8 +211,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport);
 
         // Merge groups from imported library
-        if (parserResult != null && selectedDb != null) {
-            mergeGroupsFromImport(parserResult, selectedDb);
+        if (parserResult != null && selectedDb.get() != null) {
+            mergeGroupsFromImport(parserResult, selectedDb.get());
             
             // Trigger UI refresh
             stateManager.getActiveDatabase().ifPresent(db -> {
@@ -231,8 +231,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      * @param importedResult the parser result containing imported data with groups
      * @param targetContext  the target database context to merge groups into
      */
-    private void mergeGroupsFromImport(ParserResult importedResult, 
-                                       BibDatabaseContext targetContext) {
+    private void mergeGroupsFromImport(ParserResult importedResult, BibDatabaseContext targetContext) {
         if (importedResult.getMetaData().getGroups().isPresent()
                 && targetContext.getMetaData().getGroups().isPresent()) {
             
