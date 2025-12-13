@@ -40,6 +40,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -208,6 +209,65 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 dialogService,
                 taskExecutor);
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport);
+        
+        // Merge groups from imported library
+        if (parserResult != null && selectedDb.get() != null) {
+            mergeGroupsFromImport(parserResult, selectedDb.get());
+            
+            // Trigger UI refresh
+            stateManager.getActiveDatabase().ifPresent(db -> {
+                db.getMetaData().getGroups().ifPresent(rootNode -> {
+                    db.getMetaData().setGroups(rootNode);
+                });
+            });
+        }
+    }
+
+    /**
+     * Merges groups from imported library into target library.
+     * If target has no groups, copies the entire group tree from import.
+     * If both have groups, merges them recursively.
+     *
+     * @param importedResult the parser result containing imported data with groups
+     * @param targetContext  the target database context to merge groups into
+     */
+    private void mergeGroupsFromImport(ParserResult importedResult,
+                                       BibDatabaseContext targetContext) {
+        if (importedResult.getMetaData().getGroups().isPresent()
+                && targetContext.getMetaData().getGroups().isPresent()) {
+            
+            GroupTreeNode importedRoot = importedResult.getMetaData().getGroups().get();
+            GroupTreeNode targetRoot = targetContext.getMetaData().getGroups().get();
+            
+            mergeGroupTrees(importedRoot, targetRoot);
+            targetContext.getMetaData().setGroups(targetRoot);
+        } else if (importedResult.getMetaData().getGroups().isPresent()
+                && !targetContext.getMetaData().getGroups().isPresent()) {
+            
+            GroupTreeNode importedRoot = importedResult.getMetaData().getGroups().get();
+            targetContext.getMetaData().setGroups(importedRoot.copySubtree());
+        }
+    }
+
+    /**
+     * Recursively merges group trees.
+     * Groups with same name are merged, new groups are added.
+     *
+     * @param source the source group tree node to merge from
+     * @param target the target group tree node to merge into
+     */
+    private void mergeGroupTrees(GroupTreeNode source, GroupTreeNode target) {
+        for (GroupTreeNode sourceChild : source.getChildren()) {
+            Optional<GroupTreeNode> existingGroup = target.getChildren().stream()
+                    .filter(child -> child.getGroup().getName().equals(sourceChild.getGroup().getName()))
+                    .findFirst();
+            
+            if (existingGroup.isPresent()) {
+                mergeGroupTrees(sourceChild, existingGroup.get());
+            } else {
+                target.addChild(sourceChild.copySubtree());
+            }
+        }
     }
 
     /**
