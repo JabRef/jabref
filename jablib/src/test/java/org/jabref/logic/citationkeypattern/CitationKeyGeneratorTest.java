@@ -598,13 +598,15 @@ class CitationKeyGeneratorTest {
     @ParameterizedTest
     @CsvSource(textBlock = """
                 # normal range
-                7--27,      7
-                --27,       27
-                '',         ''
-                42--111,    42
-                7,41,73--97, 7
-                41,7,73--97, 7
-                43+,        43
+                7--27,27
+                --27,27
+                '',''
+                42--111,111
+                7,41,73--97,97
+                7,41,97--73,97
+                43+,43
+                00--0,0
+                1--1,1
             """)
     void firstPage(String input, String expected) {
         assertEquals(expected, CitationKeyGenerator.firstPage(input));
@@ -619,22 +621,22 @@ class CitationKeyGeneratorTest {
     @ParameterizedTest
     @CsvSource(textBlock = """
                 # Tests with prefix L
-                L7--27,         L
-                L--27,          L--
-                L,              L
-                L42--111,       L
-                L7,L41,L73--97, L
-                L41,L7,L73--97, L
-                L43+,           L
+                L7--27,L
+                L--27,L--
+                L,L
+                L42--111,L
+                L7,L41,L73--97,L
+                L41,L7,L73--97,L
+                L43+,L
 
                 # Tests with no prefix
-                7--27,          ''
-                --27,           --
-                '',             ''
-                42--111,        ''
-                7,41,73--97,    ''
-                41,7,73--97,    ''
-                43+,            ''
+                7--27,''
+                --27,--
+                '',''
+                42--111,''
+                7,41,73--97,''
+                41,7,73--97,''
+                43+,''
             """)
     void pagePrefix(String input, String expected) {
         assertEquals(expected, CitationKeyGenerator.pagePrefix(input));
@@ -649,15 +651,15 @@ class CitationKeyGeneratorTest {
     @ParameterizedTest
     @CsvSource(textBlock = """
                 # normal range
-                7--27,       27
-                --27,        27
-                '',          ''
-                42--111,     111
-                7,41,73--97, 97
-                7,41,97--73, 97
-                43+,         43
-                00--0,       0
-                1--1,        1
+                7--27,27
+                --27,27
+                '',''
+                42--111,111
+                7,41,73--97,97
+                7,41,97--73,97
+                43+,43
+                00--0,0
+                1--1,1
             """)
     void lastPage(String input, String expected) {
         assertEquals(expected, CitationKeyGenerator.lastPage(input));
@@ -771,11 +773,11 @@ class CitationKeyGeneratorTest {
     @ParameterizedTest
     @CsvSource(textBlock = """
                 # first keyword
-                [keyword1], w1
+                [keyword1],w1
                 # check keywords with space
-                [keyword2], w2aw2b
+                [keyword2],w2aw2b
                 # check out of range
-                [keyword4], ''
+                [keyword4],''
             """)
     void keywordNKeywordsSeparatedBySpace(String pattern, String expected) {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
