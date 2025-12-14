@@ -245,7 +245,7 @@ public class ImportHandler {
 
         if (transferInformation != null) {
             entries.forEach(entry -> LinkedFileTransferHelper
-                                                             .adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry));
+                    .adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry));
         }
 
         // TODO: Should only be done if NOT copied from other library
@@ -301,7 +301,7 @@ public class ImportHandler {
     public Optional<BibEntry> findDuplicate(BibEntry entryToCheck) {
         // FIXME: BibEntryTypesManager needs to be passed via constructor
         return new DuplicateCheck(Injector.instantiateModelOrService(BibEntryTypesManager.class))
-                                                                                                 .containsDuplicate(targetBibDatabaseContext.getDatabase(), entryToCheck, targetBibDatabaseContext.getMode());
+                .containsDuplicate(targetBibDatabaseContext.getDatabase(), entryToCheck, targetBibDatabaseContext.getMode());
     }
 
     public Optional<BibEntry> handleDuplicates(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
