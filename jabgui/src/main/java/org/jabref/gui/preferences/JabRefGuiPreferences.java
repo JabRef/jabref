@@ -58,7 +58,6 @@ import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
@@ -162,24 +161,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     /**
-     * Holds
-     * the
-     * horizontal
-     * divider
-     * position
-     * of
-     * the
-     * preview
-     * view
-     * when
-     * it
-     * is
-     * shown
-     * inside
-     * the
-     * entry
-     * editor
+     * Holds the horizontal divider position of the preview view when it is shown inside the entry editor
      */
+
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
 
     private static final String JOURNAL_POPUP = "journalPopup";
@@ -353,47 +337,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /**
-     * @deprecated}
-     * annotation
-     * to
-     * have
-     * IntelliJ
-     * listing
-     * this
-     * method
-     * with
-     * a
-     * strike-through.
-     * @deprecated Never
-     * ever
-     * add
-     * a
-     * call
-     * to
-     * this
-     * method.
-     * There
-     * should
-     * be
-     * only
-     * one
-     * caller.
-     * All
-     * other
-     * usages
-     * should
-     * get
-     * the
-     * preferences
-     * passed
-     * (or
-     * injected).
-     * The
-     * JabRef
-     * team
-     * leaves
-     * the
-     * {@code
+     * @deprecated Never ever add a call to this method. There should be only one caller.
+     * All other usages should get the preferences passed (or injected).
+     * The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
      */
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
@@ -491,33 +437,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /**
-     * Get
-     * a
-     * Map
-     * of
-     * defined
-     * tab
-     * names
-     * to
-     * default
-     * tab
-     * fields.
+     * Get a Map of defined tab names to default tab fields.
      *
-     * @return A
-     * map
-     * of
-     * the
-     * currently
-     * defined
-     * tabs
-     * in
-     * the
-     * entry
-     * editor
-     * from
-     * scratch
-     * to
-     * cache
+     * @return A map of the currently defined tabs in the entry editor from scratch to cache
      */
     private Map<String, Set<Field>> getEntryEditorTabs() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
@@ -537,32 +459,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /**
-     * Stores
-     * the
-     * defined
-     * tabs
-     * and
-     * corresponding
-     * fields
-     * in
-     * the
-     * preferences.
+     * Stores the defined tabs and corresponding fields in the preferences.
      *
-     * @param customTabs a
-     *                   map
-     *                   of
-     *                   tab
-     *                   names
-     *                   and
-     *                   the
-     *                   corresponding
-     *                   set
-     *                   of
-     *                   fields
-     *                   to
-     *                   be
-     *                   displayed
-     *                   in
+     * @param customTabs a map of tab names and the corresponding set of fields to be displayed in
      */
     private void storeEntryEditorTabs(Map<String, Set<Field>> customTabs) {
         String[] names = customTabs.keySet().toArray(String[]::new);
@@ -1221,19 +1120,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     /**
-     * For
-     * the
-     * export
-     * configuration,
-     * generates
-     * the
-     * SelfContainedSaveOrder
-     * having
-     * the
-     * reference
-     * to
-     * TABLE
-     * resolved.
+     * For the export configuration, generates the SelfContainedSaveOrder having the reference to TABLE resolved.
      */
     private SelfContainedSaveOrder getSelfContainedTableSaveOrder() {
         List<MainTableColumnModel> sortOrder = getMainTableColumnPreferences().getColumnSortOrder();
@@ -1343,15 +1230,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     /**
-     * In
-     * GUI
-     * mode,
-     * we
-     * can
-     * lookup
-     * the
-     * directory
-     * better
+     * In GUI mode, we can look up the directory better
      */
     @Override
     protected Path getDefaultPath() {
