@@ -25,7 +25,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a "Regenerate" button for the AI chat allowing the user to make the language model reformulate its response to the previous prompt. [#12191](https://github.com/JabRef/jabref/issues/12191)
 - We added the option to enable auto-copying and adjusting of attached files when copy and pasting (Preferences → Linked files → Attached files) [#12267](https://github.com/JabRef/jabref/issues/12267)
 - We added support for transliteration of fields to English and automatic transliteration of generated citation key. [#11377](https://github.com/JabRef/jabref/issues/11377)
-- We added pseudonymization of groups [#14117](https://github.com/JabRef/jabref/issues/14117)
 - We added the generation of follow-up questions in AI chat. [#12243](https://github.com/JabRef/jabref/issues/12243)
 - We added support for getting bibliographic information based on the arXiv ID or the ISSN. [#14458](https://github.com/JabRef/jabref/pull/14458)
 - We added support for "Search Google Scholar" and "Search Semantic Scholar" to quickly search for a selected entry's title in Google Scholar or Semantic Scholar directly from the main table's context menu [#12268](https://github.com/JabRef/jabref/issues/12268)
