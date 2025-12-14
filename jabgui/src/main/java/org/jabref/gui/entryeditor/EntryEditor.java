@@ -380,6 +380,13 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 bibEntryTypesManager,
                 searchCitationsRelationsService
         ));
+        tabs.add(new org.jabref.gui.entryeditor.citationcontexttab.CitationContextTab(
+                dialogService,
+                stateManager,
+                preferences,
+                bibEntryTypesManager,
+                taskExecutor
+        ));
         tabs.add(new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor));
         sourceTab = new SourceTab(
                 undoManager,

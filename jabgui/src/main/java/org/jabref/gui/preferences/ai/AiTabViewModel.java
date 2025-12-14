@@ -88,16 +88,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty huggingFaceApiBaseUrl = new SimpleStringProperty();
     private final StringProperty gpt4AllApiBaseUrl = new SimpleStringProperty();
 
-    private final Map<AiTemplate, StringProperty> templateSources = Map.of(
-            AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.FOLLOW_UP_QUESTIONS, new SimpleStringProperty()
+    private final Map<AiTemplate, StringProperty> templateSources = Map.ofEntries(
+            Map.entry(AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty()),
+            Map.entry(AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty()),
+            Map.entry(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, new SimpleStringProperty()),
+            Map.entry(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, new SimpleStringProperty()),
+            Map.entry(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty()),
+            Map.entry(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty()),
+            Map.entry(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty()),
+            Map.entry(AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty()),
+            Map.entry(AiTemplate.FOLLOW_UP_QUESTIONS, new SimpleStringProperty()),
+            Map.entry(AiTemplate.CITATION_CONTEXT_EXTRACTION_SYSTEM_MESSAGE, new SimpleStringProperty()),
+            Map.entry(AiTemplate.CITATION_CONTEXT_EXTRACTION_USER_MESSAGE, new SimpleStringProperty())
     );
 
     private final OptionalObjectProperty<AiTemplate> selectedTemplate = OptionalObjectProperty.empty();

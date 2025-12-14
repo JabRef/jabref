@@ -85,6 +85,17 @@ public class AiTemplatesService {
         return makeTemplate(AiTemplate.FOLLOW_UP_QUESTIONS, context);
     }
 
+    public String makeCitationContextExtractionSystemMessage() {
+        VelocityContext context = new VelocityContext(baseContext);
+        return makeTemplate(AiTemplate.CITATION_CONTEXT_EXTRACTION_SYSTEM_MESSAGE, context);
+    }
+
+    public String makeCitationContextExtractionUserMessage(String text) {
+        VelocityContext context = new VelocityContext(baseContext);
+        context.put("text", text);
+        return makeTemplate(AiTemplate.CITATION_CONTEXT_EXTRACTION_USER_MESSAGE, context);
+    }
+
     private String makeTemplate(AiTemplate template, VelocityContext context) {
         StringWriter writer = new StringWriter();
 

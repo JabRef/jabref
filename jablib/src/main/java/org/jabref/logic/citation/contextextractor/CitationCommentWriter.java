@@ -1,0 +1,251 @@
+package org.jabref.logic.citation.contextextractor;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.jabref.model.citation.CitationContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class CitationCommentWriter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationCommentWriter.class);
+    private static final String CONTEXT_SEPARATOR = "\n\n";
+    private static final String CONTEXT_FORMAT = "[%s]: %s";
+
+    private final Field commentField;
+    private final String username;
+
+    public CitationCommentWriter() {
+        this.commentField = StandardField.COMMENT;
+        this.username = null;
+    }
+
+    public CitationCommentWriter(String username) {
+        Objects.requireNonNull(username, "Username cannot be null");
+        if (username.isBlank()) {
+            throw new IllegalArgumentException("Username cannot be blank");
+        }
+        this.username = username;
+        this.commentField = new UserSpecificCommentField(username);
+    }
+
+    public Field getCommentField() {
+        return commentField;
+    }
+
+    public Optional<String> getUsername() {
+        return Optional.ofNullable(username);
+    }
+
+    public String formatContext(CitationContext context) {
+        Objects.requireNonNull(context, "Context cannot be null");
+        return CONTEXT_FORMAT.formatted(context.sourceCitationKey(), context.contextText());
+    }
+
+    public String formatContexts(List<CitationContext> contexts) {
+        if (contexts == null || contexts.isEmpty()) {
+            return "";
+        }
+        return contexts.stream()
+                .map(this::formatContext)
+                .collect(Collectors.joining(CONTEXT_SEPARATOR));
+    }
+
+    public boolean addContextToEntry(BibEntry entry, CitationContext context) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+        Objects.requireNonNull(context, "Context cannot be null");
+
+        String formattedContext = formatContext(context);
+        Optional<String> existingComment = entry.getField(commentField);
+
+        if (existingComment.isPresent() && contextAlreadyExists(existingComment.get(), context)) {
+            LOGGER.debug("Context for '{}' already exists in entry '{}'",
+                    context.sourceCitationKey(), entry.getCitationKey().orElse("(no key)"));
+            return false;
+        }
+
+        String newComment = appendToComment(existingComment.orElse(""), formattedContext);
+        entry.setField(commentField, newComment);
+
+        LOGGER.debug("Added context for '{}' to entry '{}'",
+                context.sourceCitationKey(), entry.getCitationKey().orElse("(no key)"));
+        return true;
+    }
+
+    public int addContextsToEntry(BibEntry entry, List<CitationContext> contexts) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+        if (contexts == null || contexts.isEmpty()) {
+            return 0;
+        }
+
+        int addedCount = 0;
+        for (CitationContext context : contexts) {
+            if (addContextToEntry(entry, context)) {
+                addedCount++;
+            }
+        }
+
+        LOGGER.debug("Added {} of {} contexts to entry '{}'",
+                addedCount, contexts.size(), entry.getCitationKey().orElse("(no key)"));
+        return addedCount;
+    }
+
+    private boolean contextAlreadyExists(String existingComment, CitationContext context) {
+        if (existingComment.isBlank()) {
+            return false;
+        }
+
+        String formattedContext = formatContext(context);
+        if (existingComment.contains(formattedContext)) {
+            return true;
+        }
+
+        String keyPrefix = "[" + context.sourceCitationKey() + "]:";
+        if (!existingComment.contains(keyPrefix)) {
+            return false;
+        }
+
+        String contextText = context.contextText().toLowerCase().trim();
+        String[] lines = existingComment.split("\n");
+
+        for (String line : lines) {
+            if (line.startsWith(keyPrefix)) {
+                String existingText = line.substring(keyPrefix.length()).toLowerCase().trim();
+                if (calculateSimilarity(contextText, existingText) > 0.8) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private double calculateSimilarity(String text1, String text2) {
+        if (text1.equals(text2)) {
+            return 1.0;
+        }
+
+        String[] words1 = text1.split("\\s+");
+        String[] words2 = text2.split("\\s+");
+
+        if (words1.length == 0 || words2.length == 0) {
+            return 0.0;
+        }
+
+        int matchCount = 0;
+        for (String word1 : words1) {
+            for (String word2 : words2) {
+                if (word1.equals(word2) && word1.length() > 3) {
+                    matchCount++;
+                    break;
+                }
+            }
+        }
+
+        return (double) matchCount / Math.max(words1.length, words2.length);
+    }
+
+    private String appendToComment(String existingComment, String newContent) {
+        if (existingComment.isBlank()) {
+            return newContent;
+        }
+
+        String trimmedExisting = existingComment.trim();
+        return trimmedExisting + CONTEXT_SEPARATOR + newContent;
+    }
+
+    public boolean removeContextsFromSource(BibEntry entry, String sourceCitationKey) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+        Objects.requireNonNull(sourceCitationKey, "Source citation key cannot be null");
+
+        Optional<String> existingComment = entry.getField(commentField);
+        if (existingComment.isEmpty() || existingComment.get().isBlank()) {
+            return false;
+        }
+
+        String keyPrefix = "[" + sourceCitationKey + "]:";
+        String[] paragraphs = existingComment.get().split(CONTEXT_SEPARATOR);
+
+        StringBuilder newComment = new StringBuilder();
+        boolean removedAny = false;
+
+        for (String paragraph : paragraphs) {
+            if (paragraph.trim().startsWith(keyPrefix)) {
+                removedAny = true;
+            } else if (!paragraph.isBlank()) {
+                if (!newComment.isEmpty()) {
+                    newComment.append(CONTEXT_SEPARATOR);
+                }
+                newComment.append(paragraph.trim());
+            }
+        }
+
+        if (removedAny) {
+            if (newComment.isEmpty()) {
+                entry.clearField(commentField);
+            } else {
+                entry.setField(commentField, newComment.toString());
+            }
+            LOGGER.debug("Removed contexts from source '{}' in entry '{}'",
+                    sourceCitationKey, entry.getCitationKey().orElse("(no key)"));
+        }
+
+        return removedAny;
+    }
+
+    public void clearComment(BibEntry entry) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+        entry.clearField(commentField);
+    }
+
+    public List<String> getContextsFromSource(BibEntry entry, String sourceCitationKey) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+        Objects.requireNonNull(sourceCitationKey, "Source citation key cannot be null");
+
+        Optional<String> existingComment = entry.getField(commentField);
+        if (existingComment.isEmpty() || existingComment.get().isBlank()) {
+            return List.of();
+        }
+
+        String keyPrefix = "[" + sourceCitationKey + "]:";
+        String[] paragraphs = existingComment.get().split(CONTEXT_SEPARATOR);
+
+        return Arrays.stream(paragraphs)
+                .filter(p -> p.trim().startsWith(keyPrefix))
+                .map(p -> p.trim().substring(keyPrefix.length()).trim())
+                .toList();
+    }
+
+    public boolean hasContextsFromSource(BibEntry entry, String sourceCitationKey) {
+        return !getContextsFromSource(entry, sourceCitationKey).isEmpty();
+    }
+
+    public int countContexts(BibEntry entry) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+
+        Optional<String> existingComment = entry.getField(commentField);
+        if (existingComment.isEmpty() || existingComment.get().isBlank()) {
+            return 0;
+        }
+
+        String[] paragraphs = existingComment.get().split(CONTEXT_SEPARATOR);
+        int count = 0;
+
+        for (String paragraph : paragraphs) {
+            if (paragraph.trim().matches("^\\[.+?\\]:.*")) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+}

@@ -281,6 +281,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEND_TIMEZONE_DATA = "sendTimezoneData";
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     public static final String SHOW_SCITE_TAB = "showSciteTab";
+    public static final String SHOW_CITATION_CONTEXT_TAB = "showCitationContextTab";
 
     /**
      * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for
@@ -601,6 +602,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
         defaults.put(SHOW_SCITE_TAB, Boolean.TRUE);
+        defaults.put(SHOW_CITATION_CONTEXT_TAB, Boolean.TRUE);
         defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
         defaults.put(SEND_OS_DATA, Boolean.FALSE);
         defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);

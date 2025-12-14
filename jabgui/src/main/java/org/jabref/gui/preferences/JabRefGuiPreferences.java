@@ -429,6 +429,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(AUTOLINK_FILES_ENABLED),
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
                 getBoolean(SHOW_SCITE_TAB),
+                getBoolean(SHOW_CITATION_CONTEXT_TAB),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS));
 
@@ -446,6 +447,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (_, _, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
         EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (_, _, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
         EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (_, _, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
+        EasyBind.listen(entryEditorPreferences.shouldShowCitationContextTabProperty(), (_, _, newValue) -> putBoolean(SHOW_CITATION_CONTEXT_TAB, newValue));
         EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
         return entryEditorPreferences;
