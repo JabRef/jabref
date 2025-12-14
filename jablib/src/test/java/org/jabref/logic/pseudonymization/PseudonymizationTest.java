@@ -186,7 +186,7 @@ class PseudonymizationTest {
         List<BibEntry> entries = result.bibDatabaseContext().getEntries();
         assertEquals(3, entries.size());
 
-        String myGroup1 = entries.get(0).getField(StandardField.GROUPS).orElseThrow();
+        String myGroup1 = entries.getFirst().getField(StandardField.GROUPS).orElseThrow();
         String myGroup2 = entries.get(1).getField(StandardField.GROUPS).orElseThrow();
         String otherGroup = entries.get(2).getField(StandardField.GROUPS).orElseThrow();
 
