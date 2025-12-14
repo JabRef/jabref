@@ -98,8 +98,8 @@ public class CitationContextComponent extends BorderPane {
         }
 
         List<LinkedFile> pdfFiles = entry.getFiles().stream()
-                .filter(file -> FileUtil.isPDFFile(Path.of(file.getLink())))
-                .collect(Collectors.toList());
+                                         .filter(file -> FileUtil.isPDFFile(Path.of(file.getLink())))
+                                         .collect(Collectors.toList());
 
         if (pdfFiles.isEmpty()) {
             showNoPdfFilesMessage();
@@ -268,78 +268,78 @@ public class CitationContextComponent extends BorderPane {
         );
 
         BackgroundTask.wrap(() -> {
-            List<CitationContextIntegrationService.MatchedContext> allMatched = new ArrayList<>();
+                          List<CitationContextIntegrationService.MatchedContext> allMatched = new ArrayList<>();
 
-            for (LinkedFile linkedFile : pdfFiles) {
-                if (!FileUtil.isPDFFile(Path.of(linkedFile.getLink()))) {
-                    continue;
-                }
+                          for (LinkedFile linkedFile : pdfFiles) {
+                              if (!FileUtil.isPDFFile(Path.of(linkedFile.getLink()))) {
+                                  continue;
+                              }
 
-                try {
-                    Optional<Path> resolvedPath = linkedFile.findIn(bibDatabaseContext, preferences.getFilePreferences());
-                    if (resolvedPath.isPresent()) {
-                        LOGGER.info("Processing PDF: {}", resolvedPath.get());
+                              try {
+                                  Optional<Path> resolvedPath = linkedFile.findIn(bibDatabaseContext, preferences.getFilePreferences());
+                                  if (resolvedPath.isPresent()) {
+                                      LOGGER.info("Processing PDF: {}", resolvedPath.get());
 
-                        List<CitationContextIntegrationService.MatchedContext> matched =
-                                service.previewDocument(resolvedPath.get(), sourceCitationKey);
-                        allMatched.addAll(matched);
+                                      List<CitationContextIntegrationService.MatchedContext> matched =
+                                              service.previewDocument(resolvedPath.get(), sourceCitationKey);
+                                      allMatched.addAll(matched);
 
-                        int currentSize = allMatched.size();
-                        Platform.runLater(() -> {
-                            statusLabel.setText(Localization.lang("Found %0 citation context(s)...", String.valueOf(currentSize)));
-                        });
-                    }
-                } catch (Exception e) {
-                    LOGGER.warn("Failed to process PDF {}: {}", linkedFile.getLink(), e.getMessage());
-                }
-            }
+                                      int currentSize = allMatched.size();
+                                      Platform.runLater(() -> {
+                                          statusLabel.setText(Localization.lang("Found %0 citation context(s)...", String.valueOf(currentSize)));
+                                      });
+                                  }
+                              } catch (Exception e) {
+                                  LOGGER.warn("Failed to process PDF {}: {}", linkedFile.getLink(), e.getMessage());
+                              }
+                          }
 
-            return allMatched;
-        })
-        .onSuccess(matchedContexts -> {
-            progressIndicator.setVisible(false);
+                          return allMatched;
+                      })
+                      .onSuccess(matchedContexts -> {
+                          progressIndicator.setVisible(false);
 
-            if (matchedContexts.isEmpty()) {
-                statusLabel.setText(Localization.lang("No citation contexts found in this PDF."));
-                return;
-            }
+                          if (matchedContexts.isEmpty()) {
+                              statusLabel.setText(Localization.lang("No citation contexts found in this PDF."));
+                              return;
+                          }
 
-            long matchedCount = matchedContexts.stream().filter(m -> m.isMatched()).count();
-            long unmatchedCount = matchedContexts.size() - matchedCount;
+                          long matchedCount = matchedContexts.stream().filter(m -> m.isMatched()).count();
+                          long unmatchedCount = matchedContexts.size() - matchedCount;
 
-            if (matchedCount > 0) {
-                statusLabel.setText(Localization.lang("Found %0 citation context(s): %1 matched, %2 unmatched. Select which to apply.",
-                        String.valueOf(matchedContexts.size()),
-                        String.valueOf(matchedCount),
-                        String.valueOf(unmatchedCount)));
-            } else {
-                statusLabel.setText(Localization.lang("Found %0 citation context(s), but none could be matched to library entries. " +
-                        "Ensure the cited papers are in your library with matching author names and years.",
-                        String.valueOf(matchedContexts.size())));
-            }
+                          if (matchedCount > 0) {
+                              statusLabel.setText(Localization.lang("Found %0 citation context(s): %1 matched, %2 unmatched. Select which to apply.",
+                                      String.valueOf(matchedContexts.size()),
+                                      String.valueOf(matchedCount),
+                                      String.valueOf(unmatchedCount)));
+                          } else {
+                              statusLabel.setText(Localization.lang("Found %0 citation context(s), but none could be matched to library entries. " +
+                                              "Ensure the cited papers are in your library with matching author names and years.",
+                                      String.valueOf(matchedContexts.size())));
+                          }
 
-            for (CitationContextIntegrationService.MatchedContext matched : matchedContexts) {
-                ExtractedContextRow row = new ExtractedContextRow(
-                        matched.context().citationMarker(),
-                        matched.isMatched() ? getEntryDisplayName(matched.libraryEntry()) : Localization.lang("Not found"),
-                        matched.context().contextText(),
-                        matched.isMatched()
-                                ? (matched.isNewEntry() ? Localization.lang("New entry") : Localization.lang("Existing"))
-                                : Localization.lang("Unmatched"),
-                        matched.isMatched(),
-                        matched
-                );
-                extractedResults.add(row);
-            }
+                          for (CitationContextIntegrationService.MatchedContext matched : matchedContexts) {
+                              ExtractedContextRow row = new ExtractedContextRow(
+                                      matched.context().citationMarker(),
+                                      matched.isMatched() ? getEntryDisplayName(matched.libraryEntry()) : Localization.lang("Not found"),
+                                      matched.context().contextText(),
+                                      matched.isMatched()
+                                      ? (matched.isNewEntry() ? Localization.lang("New entry") : Localization.lang("Existing"))
+                                      : Localization.lang("Unmatched"),
+                                      matched.isMatched(),
+                                      matched
+                              );
+                              extractedResults.add(row);
+                          }
 
-            resultsTable.getItems().setAll(extractedResults);
-        })
-        .onFailure(ex -> {
-            progressIndicator.setVisible(false);
-            statusLabel.setText(Localization.lang("Error during extraction: %0", ex.getMessage()));
-            LOGGER.error("Citation context extraction failed", ex);
-        })
-        .executeWith(taskExecutor);
+                          resultsTable.getItems().setAll(extractedResults);
+                      })
+                      .onFailure(ex -> {
+                          progressIndicator.setVisible(false);
+                          statusLabel.setText(Localization.lang("Error during extraction: %0", ex.getMessage()));
+                          LOGGER.error("Citation context extraction failed", ex);
+                      })
+                      .executeWith(taskExecutor);
     }
 
     private String getEntryDisplayName(BibEntry entry) {
@@ -347,16 +347,16 @@ public class CitationContextComponent extends BorderPane {
             return Localization.lang("Unknown");
         }
         return entry.getCitationKey()
-                .orElse(entry.getField(org.jabref.model.entry.field.StandardField.TITLE)
-                        .map(t -> t.length() > 30 ? t.substring(0, 30) + "..." : t)
-                        .orElse(Localization.lang("Untitled")));
+                    .orElse(entry.getField(org.jabref.model.entry.field.StandardField.TITLE)
+                                 .map(t -> t.length() > 30 ? t.substring(0, 30) + "..." : t)
+                                 .orElse(Localization.lang("Untitled")));
     }
 
     private void applySelectedContexts() {
         List<ExtractedContextRow> selectedRows = extractedResults.stream()
-                .filter(ExtractedContextRow::isSelected)
-                .filter(row -> row.getMatchedContext() != null && row.getMatchedContext().isMatched())
-                .collect(Collectors.toList());
+                                                                 .filter(ExtractedContextRow::isSelected)
+                                                                 .filter(row -> row.getMatchedContext() != null && row.getMatchedContext().isMatched())
+                                                                 .collect(Collectors.toList());
 
         if (selectedRows.isEmpty()) {
             dialogService.showInformationDialogAndWait(
@@ -424,9 +424,9 @@ public class CitationContextComponent extends BorderPane {
 
         if (applied > 0) {
             String message = newEntriesAdded > 0
-                    ? Localization.lang("Successfully added %0 citation context(s) to the cited entries' comment fields. %1 new entry(ies) were added to your library.",
-                            String.valueOf(applied), String.valueOf(newEntriesAdded))
-                    : Localization.lang("Successfully added %0 citation context(s) to the cited entries' comment fields.", String.valueOf(applied));
+                             ? Localization.lang("Successfully added %0 citation context(s) to the cited entries' comment fields. %1 new entry(ies) were added to your library.",
+                    String.valueOf(applied), String.valueOf(newEntriesAdded))
+                             : Localization.lang("Successfully added %0 citation context(s) to the cited entries' comment fields.", String.valueOf(applied));
 
             dialogService.showInformationDialogAndWait(
                     Localization.lang("Contexts applied"),

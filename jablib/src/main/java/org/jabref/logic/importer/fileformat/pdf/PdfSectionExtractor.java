@@ -120,8 +120,8 @@ public class PdfSectionExtractor {
             SectionMarker current = markers.get(i);
             int contentStart = current.endPosition();
             int contentEnd = (i + 1 < markers.size())
-                    ? markers.get(i + 1).startPosition()
-                    : fullText.length();
+                             ? markers.get(i + 1).startPosition()
+                             : fullText.length();
 
             String content = fullText.substring(contentStart, contentEnd).trim();
 
@@ -211,7 +211,7 @@ public class PdfSectionExtractor {
 
     private boolean looksLikeSentence(String text) {
         if (text.endsWith(".") || text.endsWith(",") || text.endsWith(";") ||
-            text.endsWith(":") || text.endsWith(")")) {
+                text.endsWith(":") || text.endsWith(")")) {
             return true;
         }
 
@@ -222,14 +222,14 @@ public class PdfSectionExtractor {
 
         String lowerText = text.toLowerCase();
         if (lowerText.contains(" the ") || lowerText.contains(" a ") ||
-            lowerText.contains(" an ") || lowerText.contains(" is ") ||
-            lowerText.contains(" are ") || lowerText.contains(" was ") ||
-            lowerText.contains(" were ") || lowerText.contains(" have ") ||
-            lowerText.contains(" has ") || lowerText.contains(" this ") ||
-            lowerText.contains(" that ") || lowerText.contains(" these ") ||
-            lowerText.contains(" we ") || lowerText.contains(" in ") ||
-            lowerText.contains(" on ") || lowerText.contains(" for ") ||
-            lowerText.contains(" to ") || lowerText.contains(" of ")) {
+                lowerText.contains(" an ") || lowerText.contains(" is ") ||
+                lowerText.contains(" are ") || lowerText.contains(" was ") ||
+                lowerText.contains(" were ") || lowerText.contains(" have ") ||
+                lowerText.contains(" has ") || lowerText.contains(" this ") ||
+                lowerText.contains(" that ") || lowerText.contains(" these ") ||
+                lowerText.contains(" we ") || lowerText.contains(" in ") ||
+                lowerText.contains(" on ") || lowerText.contains(" for ") ||
+                lowerText.contains(" to ") || lowerText.contains(" of ")) {
             String cleanedText = text.replaceAll("^[0-9IVXLC]+\\.?\\s*", "").trim();
             if (!isKnownSection(cleanedText)) {
                 return true;

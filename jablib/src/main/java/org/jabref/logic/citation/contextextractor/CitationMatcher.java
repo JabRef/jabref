@@ -104,10 +104,10 @@ public class CitationMatcher {
                     int start = Integer.parseInt(parts[0].trim());
                     int end = Integer.parseInt(parts[1].trim());
                     return java.util.stream.IntStream.rangeClosed(start, end)
-                            .mapToObj(i -> matchMarkerToReference("[" + i + "]", references))
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .toList();
+                                                     .mapToObj(i -> matchMarkerToReference("[" + i + "]", references))
+                                                     .filter(Optional::isPresent)
+                                                     .map(Optional::get)
+                                                     .toList();
                 } catch (NumberFormatException e) {
                     // Not a numeric range, fall through to single match
                 }
@@ -198,12 +198,12 @@ public class CitationMatcher {
         }
 
         return references.stream()
-                .filter(ref -> {
-                    String refMarker = normalizeMarker(ref.marker());
-                    Matcher refMatcher = NUMERIC_MARKER_PATTERN.matcher(refMarker);
-                    return refMatcher.matches() && Integer.parseInt(refMatcher.group(1)) == number;
-                })
-                .findFirst();
+                         .filter(ref -> {
+                             String refMarker = normalizeMarker(ref.marker());
+                             Matcher refMatcher = NUMERIC_MARKER_PATTERN.matcher(refMarker);
+                             return refMatcher.matches() && Integer.parseInt(refMatcher.group(1)) == number;
+                         })
+                         .findFirst();
     }
 
     private Optional<ReferenceEntry> matchAuthorYearMarker(String normalizedMarker, List<ReferenceEntry> references) {
@@ -216,11 +216,11 @@ public class CitationMatcher {
         String markerYear = matcher.group(2);
 
         return references.stream()
-                .filter(ref -> matchesAuthorAndYear(markerAuthor, markerYear, ref))
-                .max((r1, r2) -> Double.compare(
-                        calculateAuthorYearScore(markerAuthor, markerYear, r1),
-                        calculateAuthorYearScore(markerAuthor, markerYear, r2)
-                ));
+                         .filter(ref -> matchesAuthorAndYear(markerAuthor, markerYear, ref))
+                         .max((r1, r2) -> Double.compare(
+                                 calculateAuthorYearScore(markerAuthor, markerYear, r1),
+                                 calculateAuthorYearScore(markerAuthor, markerYear, r2)
+                         ));
     }
 
     private Optional<ReferenceEntry> matchAuthorKeyMarker(String normalizedMarker, List<ReferenceEntry> references) {
@@ -233,11 +233,11 @@ public class CitationMatcher {
         String markerYear = normalizeYear(matcher.group(2));
 
         return references.stream()
-                .filter(ref -> matchesAuthorAndYear(markerAuthor, markerYear, ref))
-                 .max((r1, r2) -> Double.compare(
-                         calculateAuthorYearScore(markerAuthor, markerYear, r1),
-                         calculateAuthorYearScore(markerAuthor, markerYear, r2)
-                 ));
+                         .filter(ref -> matchesAuthorAndYear(markerAuthor, markerYear, ref))
+                         .max((r1, r2) -> Double.compare(
+                                 calculateAuthorYearScore(markerAuthor, markerYear, r1),
+                                 calculateAuthorYearScore(markerAuthor, markerYear, r2)
+                         ));
     }
 
     private boolean matchesAuthorAndYear(String markerAuthor, String markerYear, ReferenceEntry reference) {

@@ -46,15 +46,15 @@ class ReferenceEntryTest {
     @Test
     void testBuilderPattern() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Full reference text", "[1]")
-                .authors("Smith, John and Jones, Jane")
-                .title("A Great Paper")
-                .year("2020")
-                .journal("Nature")
-                .volume("10")
-                .pages("1-15")
-                .doi("10.1234/example")
-                .url("https://example.com")
-                .build();
+                                             .authors("Smith, John and Jones, Jane")
+                                             .title("A Great Paper")
+                                             .year("2020")
+                                             .journal("Nature")
+                                             .volume("10")
+                                             .pages("1-15")
+                                             .doi("10.1234/example")
+                                             .url("https://example.com")
+                                             .build();
 
         assertEquals("[1]", entry.marker());
         assertEquals(Optional.of("Smith, John and Jones, Jane"), entry.authors());
@@ -70,11 +70,11 @@ class ReferenceEntryTest {
     @Test
     void testToBibEntry() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
-                .authors("Smith, John")
-                .title("Test Paper")
-                .year("2020")
-                .journal("Test Journal")
-                .build();
+                                             .authors("Smith, John")
+                                             .title("Test Paper")
+                                             .year("2020")
+                                             .journal("Test Journal")
+                                             .build();
 
         BibEntry bibEntry = entry.toBibEntry();
 
@@ -88,10 +88,10 @@ class ReferenceEntryTest {
     @Test
     void testToBibEntryWithoutJournal() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
-                .authors("Smith, John")
-                .title("Test Paper")
-                .year("2020")
-                .build();
+                                             .authors("Smith, John")
+                                             .title("Test Paper")
+                                             .year("2020")
+                                             .build();
 
         BibEntry bibEntry = entry.toBibEntry();
 
@@ -101,9 +101,9 @@ class ReferenceEntryTest {
     @Test
     void testToBibEntryWithUrl() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
-                .title("Online Resource")
-                .url("https://example.com")
-                .build();
+                                             .title("Online Resource")
+                                             .url("https://example.com")
+                                             .build();
 
         BibEntry bibEntry = entry.toBibEntry();
 
@@ -113,9 +113,9 @@ class ReferenceEntryTest {
     @Test
     void testGenerateCitationKey() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
-                .authors("Smith, John")
-                .year("2020")
-                .build();
+                                             .authors("Smith, John")
+                                             .year("2020")
+                                             .build();
 
         Optional<String> key = entry.generateCitationKey();
 
@@ -151,10 +151,10 @@ class ReferenceEntryTest {
     @Test
     void testGetSearchQuery() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
-                .title("Machine Learning Applications")
-                .authors("Smith, John")
-                .year("2020")
-                .build();
+                                             .title("Machine Learning Applications")
+                                             .authors("Smith, John")
+                                             .year("2020")
+                                             .build();
 
         String query = entry.getSearchQuery();
 
@@ -166,9 +166,9 @@ class ReferenceEntryTest {
     @Test
     void testGetSearchQueryWithDoi() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
-                .doi("10.1234/example")
-                .title("Some Title")
-                .build();
+                                             .doi("10.1234/example")
+                                             .title("Some Title")
+                                             .build();
 
         String query = entry.getSearchQuery();
 
@@ -178,14 +178,14 @@ class ReferenceEntryTest {
     @Test
     void testHasMinimalMetadata() {
         ReferenceEntry withTitle = ReferenceEntry.builder("[1] text", "[1]")
-                .title("A Title")
-                .build();
+                                                 .title("A Title")
+                                                 .build();
         assertTrue(withTitle.hasMinimalMetadata());
 
         ReferenceEntry withAuthorYear = ReferenceEntry.builder("[1] text", "[1]")
-                .authors("Smith")
-                .year("2020")
-                .build();
+                                                      .authors("Smith")
+                                                      .year("2020")
+                                                      .build();
         assertTrue(withAuthorYear.hasMinimalMetadata());
 
         ReferenceEntry withNothing = new ReferenceEntry("[1] text", "[1]");
@@ -195,8 +195,8 @@ class ReferenceEntryTest {
     @Test
     void testHasDoi() {
         ReferenceEntry withDoi = ReferenceEntry.builder("[1] text", "[1]")
-                .doi("10.1234/example")
-                .build();
+                                               .doi("10.1234/example")
+                                               .build();
         assertTrue(withDoi.hasDoi());
 
         ReferenceEntry withoutDoi = new ReferenceEntry("[1] text", "[1]");
@@ -230,10 +230,10 @@ class ReferenceEntryTest {
     @Test
     void testBlankFieldsAreFilteredOut() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] text", "[1]")
-                .authors("  ")
-                .title("")
-                .year("2020")
-                .build();
+                                             .authors("  ")
+                                             .title("")
+                                             .year("2020")
+                                             .build();
 
         assertTrue(entry.authors().isEmpty());
         assertTrue(entry.title().isEmpty());

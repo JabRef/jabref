@@ -35,27 +35,27 @@ public class CitationContextList {
     public List<CitationContext> findByMarker(String marker) {
         String normalizedSearch = marker.replaceAll("[\\[\\](){}]", "").trim().toLowerCase();
         return contexts.stream()
-                .filter(ctx -> ctx.getNormalizedMarker().toLowerCase().contains(normalizedSearch))
-                .toList();
+                       .filter(ctx -> ctx.getNormalizedMarker().toLowerCase().contains(normalizedSearch))
+                       .toList();
     }
 
     public List<CitationContext> findByAuthor(String authorName) {
         String lowerAuthor = authorName.toLowerCase();
         return contexts.stream()
-                .filter(ctx -> ctx.getNormalizedMarker().toLowerCase().contains(lowerAuthor))
-                .toList();
+                       .filter(ctx -> ctx.getNormalizedMarker().toLowerCase().contains(lowerAuthor))
+                       .toList();
     }
 
     public List<CitationContext> findByPage(int page) {
         return contexts.stream()
-                .filter(ctx -> ctx.pageNumber().isPresent() && ctx.pageNumber().get() == page)
-                .toList();
+                       .filter(ctx -> ctx.pageNumber().isPresent() && ctx.pageNumber().get() == page)
+                       .toList();
     }
 
     public List<String> getUniqueCitationMarkers() {
         return contexts.stream()
-                .map(CitationContext::citationMarker)
-                .distinct()
-                .toList();
+                       .map(CitationContext::citationMarker)
+                       .distinct()
+                       .toList();
     }
 }

@@ -23,20 +23,20 @@ class CitationMatcherTest {
 
         references = List.of(
                 ReferenceEntry.builder("[1] Smith reference text", "[1]")
-                        .authors("Smith, John")
-                        .title("Machine Learning Basics")
-                        .year("2020")
-                        .build(),
+                              .authors("Smith, John")
+                              .title("Machine Learning Basics")
+                              .year("2020")
+                              .build(),
                 ReferenceEntry.builder("[2] Jones reference text", "[2]")
-                        .authors("Jones, Alice")
-                        .title("Deep Learning Applications")
-                        .year("2019")
-                        .build(),
+                              .authors("Jones, Alice")
+                              .title("Deep Learning Applications")
+                              .year("2019")
+                              .build(),
                 ReferenceEntry.builder("[3] Williams reference text", "[3]")
-                        .authors("Williams, Bob")
-                        .title("Neural Networks")
-                        .year("2021")
-                        .build()
+                              .authors("Williams, Bob")
+                              .title("Neural Networks")
+                              .year("2021")
+                              .build()
         );
     }
 
@@ -76,9 +76,9 @@ class CitationMatcherTest {
     void testMatchAuthorKeyMarker() {
         List<ReferenceEntry> authorKeyRefs = List.of(
                 ReferenceEntry.builder("[Smith20] reference", "[Smith20]")
-                        .authors("Smith, John")
-                        .year("2020")
-                        .build()
+                              .authors("Smith, John")
+                              .year("2020")
+                              .build()
         );
 
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("[Smith20]", authorKeyRefs);
@@ -189,9 +189,9 @@ class CitationMatcherTest {
     void testMatchAuthorWithYear() {
         List<ReferenceEntry> refs = List.of(
                 ReferenceEntry.builder("[1] text", "[1]")
-                        .authors("Smith, John")
-                        .year("2020")
-                        .build()
+                              .authors("Smith, John")
+                              .year("2020")
+                              .build()
         );
 
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("(Smith 2020)", refs);
@@ -203,9 +203,9 @@ class CitationMatcherTest {
     void testMatchAuthorYearWithDifferentFormats() {
         List<ReferenceEntry> refs = List.of(
                 ReferenceEntry.builder("[1] text", "[1]")
-                        .authors("Johnson, Alice")
-                        .year("2019")
-                        .build()
+                              .authors("Johnson, Alice")
+                              .year("2019")
+                              .build()
         );
 
         Optional<ReferenceEntry> result1 = matcher.matchMarkerToReference("(Johnson 2019)", refs);

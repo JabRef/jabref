@@ -100,17 +100,22 @@ public class PdfReferenceParser {
         ReferenceFormat format = detectReferenceFormat(normalizedText);
 
         switch (format) {
-            case NUMERIC_BRACKETED -> references.addAll(splitByPattern(normalizedText, Pattern.compile("(?=\\[\\d{1,3}\\])")));
-            case NUMERIC_DOTTED -> references.addAll(splitByPattern(normalizedText, Pattern.compile("(?=(?:^|\\n)\\d{1,3}\\.\\s)")));
-            case AUTHOR_YEAR -> references.addAll(splitByBlankLinesOrIndentation(normalizedText));
-            case AUTHOR_KEY -> references.addAll(splitByPattern(normalizedText, Pattern.compile("(?=\\[[A-Z][a-zA-Z]+\\d{2,4}[a-z]?\\])")));
-            default -> references.addAll(splitByBlankLinesOrIndentation(normalizedText));
+            case NUMERIC_BRACKETED ->
+                    references.addAll(splitByPattern(normalizedText, Pattern.compile("(?=\\[\\d{1,3}\\])")));
+            case NUMERIC_DOTTED ->
+                    references.addAll(splitByPattern(normalizedText, Pattern.compile("(?=(?:^|\\n)\\d{1,3}\\.\\s)")));
+            case AUTHOR_YEAR ->
+                    references.addAll(splitByBlankLinesOrIndentation(normalizedText));
+            case AUTHOR_KEY ->
+                    references.addAll(splitByPattern(normalizedText, Pattern.compile("(?=\\[[A-Z][a-zA-Z]+\\d{2,4}[a-z]?\\])")));
+            default ->
+                    references.addAll(splitByBlankLinesOrIndentation(normalizedText));
         }
 
         return references.stream()
-                .map(String::trim)
-                .filter(r -> r.length() > 20)
-                .toList();
+                         .map(String::trim)
+                         .filter(r -> r.length() > 20)
+                         .toList();
     }
 
     private ReferenceFormat detectReferenceFormat(String text) {
@@ -174,7 +179,7 @@ public class PdfReferenceParser {
         int authorStartCount = 0;
         for (String line : lines) {
             if (AUTHORS_PATTERN.matcher(line.trim()).find() ||
-                NUMERIC_MARKER_PATTERN.matcher(line).find()) {
+                    NUMERIC_MARKER_PATTERN.matcher(line).find()) {
                 authorStartCount++;
             }
         }

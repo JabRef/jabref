@@ -35,10 +35,10 @@ class LibraryEntryResolverTest {
     @Test
     void testResolveReferenceCreatesNewEntry() {
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .authors("Smith, John")
-                .title("New Paper")
-                .year("2020")
-                .build();
+                                                 .authors("Smith, John")
+                                                 .title("New Paper")
+                                                 .year("2020")
+                                                 .build();
 
         LibraryEntryResolver.ResolvedEntry resolved = resolver.resolveReference(reference);
 
@@ -55,8 +55,8 @@ class LibraryEntryResolverTest {
         database.insertEntry(existingEntry);
 
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .doi("10.1234/existing")
-                .build();
+                                                 .doi("10.1234/existing")
+                                                 .build();
 
         LibraryEntryResolver.ResolvedEntry resolved = resolver.resolveReference(reference);
 
@@ -75,9 +75,9 @@ class LibraryEntryResolverTest {
         database.insertEntry(existingEntry);
 
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .authors("Smith, John")
-                .year("2020")
-                .build();
+                                                 .authors("Smith, John")
+                                                 .year("2020")
+                                                 .build();
 
         LibraryEntryResolver.ResolvedEntry resolved = resolver.resolveReference(reference);
 
@@ -92,8 +92,8 @@ class LibraryEntryResolverTest {
         database.insertEntry(existingEntry);
 
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .title("Machine Learning Applications in Healthcare")
-                .build();
+                                                 .title("Machine Learning Applications in Healthcare")
+                                                 .build();
 
         LibraryEntryResolver.ResolvedEntry resolved = resolver.resolveReference(reference);
 
@@ -110,10 +110,10 @@ class LibraryEntryResolverTest {
         database.insertEntry(existingEntry);
 
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .authors("Johnson, A.")
-                .year("2019")
-                .title("Different Title That Does Not Match")
-                .build();
+                                                 .authors("Johnson, A.")
+                                                 .year("2019")
+                                                 .title("Different Title That Does Not Match")
+                                                 .build();
 
         LibraryEntryResolver.ResolvedEntry resolved = resolver.resolveReference(reference);
 
@@ -128,12 +128,12 @@ class LibraryEntryResolverTest {
         database.insertEntry(existingEntry);
 
         ReferenceEntry existingRef = ReferenceEntry.builder("[1] text", "[1]")
-                .doi("10.1234/test")
-                .build();
+                                                   .doi("10.1234/test")
+                                                   .build();
 
         ReferenceEntry newRef = ReferenceEntry.builder("[2] text", "[2]")
-                .doi("10.5678/new")
-                .build();
+                                              .doi("10.5678/new")
+                                              .build();
 
         assertTrue(resolver.entryExists(existingRef));
         assertFalse(resolver.entryExists(newRef));
@@ -168,10 +168,10 @@ class LibraryEntryResolverTest {
     @Test
     void testResolveAndAdd() {
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .authors("NewAuthor, Test")
-                .title("Completely New Paper")
-                .year("2024")
-                .build();
+                                                 .authors("NewAuthor, Test")
+                                                 .title("Completely New Paper")
+                                                 .year("2024")
+                                                 .build();
 
         int initialSize = database.getEntries().size();
         LibraryEntryResolver.ResolvedEntry resolved = resolver.resolveAndAdd(reference);
@@ -187,8 +187,8 @@ class LibraryEntryResolverTest {
         database.insertEntry(existingEntry);
 
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .doi("10.1234/existing")
-                .build();
+                                                 .doi("10.1234/existing")
+                                                 .build();
 
         int initialSize = database.getEntries().size();
         resolver.resolveAndAdd(reference);
@@ -203,8 +203,8 @@ class LibraryEntryResolverTest {
         database.insertEntry(existingEntry);
 
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .doi("10.1234/findme")
-                .build();
+                                                 .doi("10.1234/findme")
+                                                 .build();
 
         Optional<LibraryEntryResolver.MatchedEntry> found = resolver.findExistingEntry(reference);
 
@@ -215,12 +215,12 @@ class LibraryEntryResolverTest {
     @Test
     void testCreateEntryFromReference() {
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .authors("Test, Author")
-                .title("Test Title")
-                .year("2020")
-                .journal("Test Journal")
-                .doi("10.1234/test")
-                .build();
+                                                 .authors("Test, Author")
+                                                 .title("Test Title")
+                                                 .year("2020")
+                                                 .journal("Test Journal")
+                                                 .doi("10.1234/test")
+                                                 .build();
 
         BibEntry created = resolver.createEntryFromReference(reference);
 
@@ -283,8 +283,8 @@ class LibraryEntryResolverTest {
         database.insertEntry(existingEntry);
 
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .title("Deep Learning for Natural Language Processing: A Survey")
-                .build();
+                                                 .title("Deep Learning for Natural Language Processing: A Survey")
+                                                 .build();
 
         LibraryEntryResolver.ResolvedEntry resolved = resolver.resolveReference(reference);
 
@@ -298,8 +298,8 @@ class LibraryEntryResolverTest {
         database.insertEntry(existingEntry);
 
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
-                .doi("10.1234/uppercase")
-                .build();
+                                                 .doi("10.1234/uppercase")
+                                                 .build();
 
         LibraryEntryResolver.ResolvedEntry resolved = resolver.resolveReference(reference);
 

@@ -175,7 +175,7 @@ class PdfReferenceParserTest {
 
         assertFalse(references.isEmpty());
         assertTrue(references.stream()
-                .anyMatch(r -> r.marker().contains("Smith") || r.marker().contains("2020")));
+                             .anyMatch(r -> r.marker().contains("Smith") || r.marker().contains("2020")));
     }
 
     @Test

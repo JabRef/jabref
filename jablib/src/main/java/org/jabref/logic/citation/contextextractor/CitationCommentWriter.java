@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.citation.CitationContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -20,7 +21,9 @@ public class CitationCommentWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationCommentWriter.class);
     private static final String CONTEXT_SEPARATOR = "\n\n";
     private static final String CONTEXT_FORMAT = "[%s]: %s";
+    private static final double SIMILARITY_THRESHOLD = 0.8;
 
+    private final StringSimilarity stringSimilarity = new StringSimilarity();
     private final Field commentField;
     private final String username;
 
@@ -56,8 +59,8 @@ public class CitationCommentWriter {
             return "";
         }
         return contexts.stream()
-                .map(this::formatContext)
-                .collect(Collectors.joining(CONTEXT_SEPARATOR));
+                       .map(this::formatContext)
+                       .collect(Collectors.joining(CONTEXT_SEPARATOR));
     }
 
     public boolean addContextToEntry(BibEntry entry, CitationContext context) {
@@ -114,44 +117,19 @@ public class CitationCommentWriter {
             return false;
         }
 
-        String contextText = context.contextText().toLowerCase().trim();
+        String contextText = context.contextText().trim();
         String[] lines = existingComment.split("\n");
 
         for (String line : lines) {
             if (line.startsWith(keyPrefix)) {
-                String existingText = line.substring(keyPrefix.length()).toLowerCase().trim();
-                if (calculateSimilarity(contextText, existingText) > 0.8) {
+                String existingText = line.substring(keyPrefix.length()).trim();
+                if (stringSimilarity.similarity(contextText, existingText) > SIMILARITY_THRESHOLD) {
                     return true;
                 }
             }
         }
 
         return false;
-    }
-
-    private double calculateSimilarity(String text1, String text2) {
-        if (text1.equals(text2)) {
-            return 1.0;
-        }
-
-        String[] words1 = text1.split("\\s+");
-        String[] words2 = text2.split("\\s+");
-
-        if (words1.length == 0 || words2.length == 0) {
-            return 0.0;
-        }
-
-        int matchCount = 0;
-        for (String word1 : words1) {
-            for (String word2 : words2) {
-                if (word1.equals(word2) && word1.length() > 3) {
-                    matchCount++;
-                    break;
-                }
-            }
-        }
-
-        return (double) matchCount / Math.max(words1.length, words2.length);
     }
 
     private String appendToComment(String existingComment, String newContent) {
@@ -220,9 +198,9 @@ public class CitationCommentWriter {
         String[] paragraphs = existingComment.get().split(CONTEXT_SEPARATOR);
 
         return Arrays.stream(paragraphs)
-                .filter(p -> p.trim().startsWith(keyPrefix))
-                .map(p -> p.trim().substring(keyPrefix.length()).trim())
-                .toList();
+                     .filter(p -> p.trim().startsWith(keyPrefix))
+                     .map(p -> p.trim().substring(keyPrefix.length()).trim())
+                     .toList();
     }
 
     public boolean hasContextsFromSource(BibEntry entry, String sourceCitationKey) {

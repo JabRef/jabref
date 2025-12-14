@@ -25,7 +25,7 @@ public class CitationContextExtractorTest {
 
         assertFalse(result.isEmpty());
         assertTrue(result.getContexts().stream()
-                .anyMatch(ctx -> ctx.citationMarker().contains("CIA 2021")));
+                         .anyMatch(ctx -> ctx.citationMarker().contains("CIA 2021")));
     }
 
     @Test
@@ -36,7 +36,7 @@ public class CitationContextExtractorTest {
 
         assertFalse(result.isEmpty());
         assertTrue(result.getUniqueCitationMarkers().stream()
-                .anyMatch(m -> m.equals("[1]")));
+                         .anyMatch(m -> m.equals("[1]")));
     }
 
     @Test
