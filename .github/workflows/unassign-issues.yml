@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Unassign stale assignments
         id: unassign
-        uses: koppor/assign-issue-action@patch-2
+        uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           reminder_comment: |
@@ -41,7 +41,7 @@ jobs:
               </details>
 
               We appreciate your contribution and are here to help if needed!
-          days_until_unassign: 21
+          days_until_unassign: 14
           unassigned_comment: |
             ### 📋 Assignment Update
 

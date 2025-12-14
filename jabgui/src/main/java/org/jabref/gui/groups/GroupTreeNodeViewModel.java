@@ -17,7 +17,6 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.model.groups.SmartGroup;
 
 public class GroupTreeNodeViewModel {
     private final GroupTreeNode node;
@@ -52,8 +51,6 @@ public class GroupTreeNodeViewModel {
         String shortDescription = "";
         boolean showDynamic = true;
         shortDescription = switch (group) {
-            case SmartGroup smartGroup ->
-                    GroupDescriptions.getShortDescriptionSmartGroup(smartGroup);
             case ExplicitGroup explicitGroup ->
                     GroupDescriptions.getShortDescriptionExplicitGroup(explicitGroup);
             case KeywordGroup keywordGroup ->
