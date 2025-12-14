@@ -12,7 +12,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -75,17 +77,17 @@ public class Pseudonymization {
      * If no groups exist, returns empty.
      */
     private static Optional<GroupTreeNode> pseudonymizeGroups(BibDatabaseContext bibDatabaseContext, Map<Field, Map<String, Integer>> fieldToValueToIdMap) {
-        var metadata = bibDatabaseContext.getMetaData();
-        var groupsOpt = metadata.getGroups();
+        MetaData metadata = bibDatabaseContext.getMetaData();
+        Optional<GroupTreeNode> groupsOpt = metadata.getGroups();
 
         if (groupsOpt.isEmpty()) {
             return Optional.empty();
         }
 
-        var originalRoot = groupsOpt.get();
-        var groupValueMap = fieldToValueToIdMap.computeIfAbsent(StandardField.GROUPS, _ -> new HashMap<>());
+        GroupTreeNode originalRoot = groupsOpt.get();
+        Map<String, Integer> groupValueMap = fieldToValueToIdMap.computeIfAbsent(StandardField.GROUPS, _ -> new HashMap<>());
 
-        var newRoot = pseudonymizeGroupNode(originalRoot, groupValueMap);
+        GroupTreeNode newRoot = pseudonymizeGroupNode(originalRoot, groupValueMap);
         return Optional.of(newRoot);
     }
 
@@ -94,16 +96,16 @@ public class Pseudonymization {
      * Each original group receives a generated ID, resulting in: original -> "groups-n"
      */
     private static GroupTreeNode pseudonymizeGroupNode(GroupTreeNode node, Map<String, Integer> valueToIdMap) {
-        var originalGroup = node.getGroup();
-        var groupCopy = originalGroup.deepCopy();
+        AbstractGroup originalGroup = node.getGroup();
+        AbstractGroup groupCopy = originalGroup.deepCopy();
 
-        var originalName = node.getName();
-        var id = valueToIdMap.computeIfAbsent(originalName, _ -> valueToIdMap.size() + 1);
+        String originalName = node.getName();
+        int id = valueToIdMap.computeIfAbsent(originalName, _ -> valueToIdMap.size() + 1);
         groupCopy.nameProperty().setValue(StandardField.GROUPS.getName() + "-" + id);
 
-        var newNode = new GroupTreeNode(groupCopy);
+        GroupTreeNode newNode = new GroupTreeNode(groupCopy);
         for (GroupTreeNode child : node.getChildren()) {
-            var childCopy = pseudonymizeGroupNode(child, valueToIdMap);
+            GroupTreeNode childCopy = pseudonymizeGroupNode(child, valueToIdMap);
             newNode.addChild(childCopy);
         }
 
