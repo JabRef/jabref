@@ -342,8 +342,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
 
-        defaults.put(ASK_FOR_INCLUDING_CROSS_REFERENCES, Boolean.TRUE);
-        defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
+        defaults.put(ASK_FOR_INCLUDING_CROSS_REFERENCES, CopyToPreferences.getDefault().getShouldAskForIncludingCrossReferences());
+        defaults.put(INCLUDE_CROSS_REFERENCES, CopyToPreferences.getDefault().getShouldIncludeCrossReferences());
     }
 
     /**
