@@ -12,11 +12,12 @@ public class CopyToPreferences {
         this.shouldAskForIncludingCrossReferences.set(shouldAskForIncludingCrossReferences);
     }
 
+    private CopyToPreferences() {
+        this(true, false);
+    }
+
     public static CopyToPreferences getDefault() {
-        return new CopyToPreferences(
-                true,
-                false
-        );
+        return new CopyToPreferences();
     }
 
     public boolean getShouldIncludeCrossReferences() {
@@ -41,5 +42,10 @@ public class CopyToPreferences {
 
     public BooleanProperty shouldAskForIncludingCrossReferencesProperty() {
         return shouldAskForIncludingCrossReferences;
+    }
+
+    public void setAll(CopyToPreferences other) {
+        this.shouldIncludeCrossReferences.set(other.getShouldIncludeCrossReferences());
+        this.shouldAskForIncludingCrossReferences.set(other.getShouldAskForIncludingCrossReferences());
     }
 }

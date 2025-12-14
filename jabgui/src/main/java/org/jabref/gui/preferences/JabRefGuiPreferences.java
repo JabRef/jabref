@@ -360,16 +360,19 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (copyToPreferences != null) {
             return copyToPreferences;
         }
-        CopyToPreferences defaultPreferences = CopyToPreferences.getDefault();
-        copyToPreferences = new CopyToPreferences(
-                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, defaultPreferences.getShouldAskForIncludingCrossReferences()),
-                getBoolean(INCLUDE_CROSS_REFERENCES, defaultPreferences.getShouldIncludeCrossReferences())
-        );
+        copyToPreferences = getCopyToPreferencesFromBackingStore(CopyToPreferences.getDefault());
 
         EasyBind.listen(copyToPreferences.shouldAskForIncludingCrossReferencesProperty(), (obs, oldValue, newValue) -> putBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, newValue));
         EasyBind.listen(copyToPreferences.shouldIncludeCrossReferencesProperty(), (obs, oldValue, newValue) -> putBoolean(INCLUDE_CROSS_REFERENCES, newValue));
 
         return copyToPreferences;
+    }
+
+    private CopyToPreferences getCopyToPreferencesFromBackingStore(CopyToPreferences defaults) {
+        return new CopyToPreferences(
+                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, defaults.getShouldAskForIncludingCrossReferences()),
+                getBoolean(INCLUDE_CROSS_REFERENCES, defaults.getShouldIncludeCrossReferences())
+        );
     }
 
     @Override
@@ -384,6 +387,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
+        getCopyToPreferences().setAll(CopyToPreferences.getDefault());
     }
 
     @Override
@@ -399,6 +403,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
+        getCopyToPreferences().setAll(getCopyToPreferencesFromBackingStore(getCopyToPreferences()));
     }
 
     // region EntryEditorPreferences
