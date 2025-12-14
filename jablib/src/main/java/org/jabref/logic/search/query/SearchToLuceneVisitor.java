@@ -78,8 +78,19 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             return "";
         }
 
-        field = "any".equals(field) || "anyfield".equals(field) ? "" : field + ":";
         int operator = ctx.operator().getStart().getType();
+
+        if ("content".equals(field)
+                && !isQuoted
+                && !searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)
+                && !isRegexOperator(operator)
+                && !isExactMatchOperator(operator)) {
+
+            field = field + ":";
+            return buildContentWildcardQuery(field, term, operator);
+        }
+
+        field = "any".equals(field) || "anyfield".equals(field) ? "" : field + ":";
         return buildFieldExpression(field, term, operator, isQuoted);
     }
 
@@ -99,6 +110,18 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             String expression = field + term;
             return isNegationOp ? "NOT " + expression : expression;
         }
+    }
+
+    private String buildContentWildcardQuery(String field, String term, int operator) {
+        boolean isNegationOp = isNegationOperator(operator);
+        String escapedTerm = QueryParser.escape(term);
+
+        if (!escapedTerm.contains("*") && !escapedTerm.contains("?")) {
+            escapedTerm = "*" + escapedTerm + "*";
+        }
+
+        String expression = field + escapedTerm;
+        return isNegationOp ? "NOT " + expression : expression;
     }
 
     private static String escapeQuotes(String term) {
@@ -128,6 +151,18 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
                     true;
             default ->
                     false;
+        };
+    }
+
+    private boolean isExactMatchOperator(int operator) {
+        return switch (operator) {
+            case SearchParser.EEQUAL,   // ==
+                 SearchParser.CEEQUAL,  // ==!
+                 SearchParser.NEEQUAL,  // !==
+                 SearchParser.NCEEQUAL, // !==!
+                 SearchParser.MATCHES   // MATCHES
+                    -> true;
+            default -> false;
         };
     }
 }

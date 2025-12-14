@@ -28,18 +28,25 @@ class SearchQueryLuceneConversionTest {
                 Arguments.of("\"two terms\"", "any = \"two terms\""),
                 Arguments.of("NOT (term)", "NOT term"),
 
-                Arguments.of("content:image", "content = image"),
+                Arguments.of("content:*image*", "content = image"),
+                Arguments.of("content:image", "content == image"),
                 Arguments.of("annotations:image", "annotations = image"),
                 Arguments.of("content:\"image processing\"", "content = \"image processing\""),
-                Arguments.of("content:image AND annotations:processing", "content = image AND annotations = processing"),
-                Arguments.of("(content:image OR annotations:processing) AND term", "(content = image OR annotations = processing) AND term"),
+
+                Arguments.of("content:*image* AND annotations:processing", "content = image AND annotations = processing"),
+                Arguments.of("(content:*image* OR annotations:processing) AND term", "(content = image OR annotations = processing) AND term"),
                 Arguments.of("one OR (two AND three)", "one OR (two AND three)"),
+
+                Arguments.of("content:image", "content ==! image"),
+                Arguments.of("content:image", "content MATCHES image"),
+                Arguments.of("NOT content:image", "content !== image"),
+                Arguments.of("NOT content:image", "content !==! image"),
 
                 Arguments.of("NOT term", "any != term"),
                 Arguments.of("NOT term", "any !== term"),
                 Arguments.of("NOT term", "any !=! term"),
                 Arguments.of("NOT \"two terms\"", "any != \"two terms\""),
-                Arguments.of("content:image AND NOT annotations:processing", "content = image AND annotations != processing"),
+                Arguments.of("content:*image* AND NOT annotations:processing", "content = image AND annotations != processing"),
 
                 // ignore non pdf fields
                 Arguments.of("", "title = image"),

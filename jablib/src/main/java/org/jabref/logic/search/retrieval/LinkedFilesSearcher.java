@@ -83,9 +83,6 @@ public final class LinkedFilesSearcher {
 
     private Optional<Query> getLuceneQuery(SearchQuery searchQuery) {
         String query = SearchQueryConversion.searchToLucene(searchQuery);
-        if (!query.contains("*") && !query.contains("?")) {
-            query = "*" + query + "*";
-        }
         try {
             return Optional.of(parser.parse(query));
         } catch (ParseException e) {
