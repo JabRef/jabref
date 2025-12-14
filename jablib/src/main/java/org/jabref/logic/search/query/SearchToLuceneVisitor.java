@@ -85,7 +85,6 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
                 && !searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)
                 && !isRegexOperator(operator)
                 && !isExactMatchOperator(operator)) {
-
             field = field + ":";
             return buildContentWildcardQuery(field, term, operator);
         }
@@ -154,15 +153,16 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         };
     }
 
-    private boolean isExactMatchOperator(int operator) {
+    private static boolean isExactMatchOperator(int operator) {
         return switch (operator) {
-            case SearchParser.EEQUAL,   // ==
-                 SearchParser.CEEQUAL,  // ==!
-                 SearchParser.NEEQUAL,  // !==
-                 SearchParser.NCEEQUAL, // !==!
-                 SearchParser.MATCHES   // MATCHES
-                    -> true;
-            default -> false;
+            case SearchParser.EEQUAL,
+                 SearchParser.CEEQUAL,
+                 SearchParser.NEEQUAL,
+                 SearchParser.NCEEQUAL,
+                 SearchParser.MATCHES ->
+                    true;
+            default ->
+                    false;
         };
     }
 }
