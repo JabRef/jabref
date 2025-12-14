@@ -49,7 +49,7 @@ jobs:
 
       - name: Download PR number
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         continue-on-error: true
         with:
           name: pr_number

@@ -489,7 +489,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: JabRef-${{ matrix.os }}-tbn
       - name: Notarize dmg
