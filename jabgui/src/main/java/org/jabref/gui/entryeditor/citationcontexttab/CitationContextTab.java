@@ -7,6 +7,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -15,6 +16,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 public class CitationContextTab extends EntryEditorTab {
 
+    private final AiService aiService;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
@@ -22,11 +24,13 @@ public class CitationContextTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final EntryEditorPreferences entryEditorPreferences;
 
-    public CitationContextTab(DialogService dialogService,
+    public CitationContextTab(AiService aiService,
+                              DialogService dialogService,
                               StateManager stateManager,
                               GuiPreferences preferences,
                               BibEntryTypesManager entryTypesManager,
                               TaskExecutor taskExecutor) {
+        this.aiService = aiService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -48,6 +52,7 @@ public class CitationContextTab extends EntryEditorTab {
         BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
 
         setContent(new CitationContextComponent(
+                aiService,
                 bibDatabaseContext,
                 entry,
                 dialogService,

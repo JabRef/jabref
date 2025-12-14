@@ -6,8 +6,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.citation.ReferenceEntry;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +31,19 @@ public class CitationMatcher {
             "^\\[?([A-Z][a-zA-Z]+)(\\d{2,4})[a-z]?\\]?$"
     );
 
+    private static final String BRACKETS_PATTERN = "[\\[\\](){}]";
+    private static final String WHITESPACE_PATTERN = "\\s+";
+
     private static final double AUTHOR_SIMILARITY_THRESHOLD = 0.7;
 
     private static final double TEXT_SIMILARITY_THRESHOLD = 0.6;
 
     private final StringSimilarity stringSimilarity;
+    private final AuthorListParser authorListParser;
 
     public CitationMatcher() {
         this.stringSimilarity = new StringSimilarity();
+        this.authorListParser = new AuthorListParser();
     }
 
     public Optional<ReferenceEntry> matchMarkerToReference(String citationMarker, List<ReferenceEntry> references) {
@@ -169,8 +177,8 @@ public class CitationMatcher {
 
     private String normalizeMarker(String marker) {
         return marker
-                .replaceAll("[\\[\\](){}]", "")
-                .replaceAll("\\s+", " ")
+                .replaceAll(BRACKETS_PATTERN, "")
+                .replaceAll(WHITESPACE_PATTERN, " ")
                 .trim();
     }
 
@@ -294,16 +302,32 @@ public class CitationMatcher {
     }
 
     private String extractFirstAuthorLastName(String authors) {
+        if (authors == null || authors.isBlank()) {
+            return "";
+        }
+
+        try {
+            AuthorList authorList = authorListParser.parse(authors);
+            if (!authorList.isEmpty()) {
+                Author firstAuthor = authorList.getAuthor(0);
+                return firstAuthor.getFamilyName()
+                                  .orElse("")
+                                  .toLowerCase(Locale.ROOT);
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Failed to parse author list '{}', falling back to simple extraction", authors);
+        }
+
         String cleaned = authors
-                .replaceAll("\\s+et\\s+al\\.?", "")
-                .replaceAll("\\s+and\\s+.*", "")
+                .replaceAll(WHITESPACE_PATTERN + "et" + WHITESPACE_PATTERN + "al\\.?", "")
+                .replaceAll(WHITESPACE_PATTERN + "and" + WHITESPACE_PATTERN + ".*", "")
                 .replaceAll("\\s*&\\s*.*", "")
                 .replaceAll(",.*", "")
                 .trim();
 
-        String[] parts = cleaned.split("\\s+");
+        String[] parts = cleaned.split(WHITESPACE_PATTERN);
         if (parts.length == 0) {
-            return cleaned;
+            return cleaned.toLowerCase(Locale.ROOT);
         }
 
         return parts[parts.length - 1].replaceAll("[^a-zA-Z]", "").toLowerCase(Locale.ROOT);

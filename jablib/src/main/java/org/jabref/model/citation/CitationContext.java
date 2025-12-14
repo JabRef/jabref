@@ -1,20 +1,16 @@
 package org.jabref.model.citation;
 
-import java.util.Objects;
 import java.util.Optional;
 
+import org.jspecify.annotations.NonNull;
+
 public record CitationContext(
-        String citationMarker,
-        String contextText,
-        String sourceCitationKey,
-        Optional<Integer> pageNumber
+        @NonNull String citationMarker,
+        @NonNull String contextText,
+        @NonNull String sourceCitationKey,
+        @NonNull Optional<Integer> pageNumber
 ) {
     public CitationContext {
-        Objects.requireNonNull(citationMarker, "Citation marker cannot be null");
-        Objects.requireNonNull(contextText, "Context text cannot be null");
-        Objects.requireNonNull(sourceCitationKey, "Source citation key cannot be null");
-        Objects.requireNonNull(pageNumber, "Page number optional cannot be null");
-
         if (citationMarker.isBlank()) {
             throw new IllegalArgumentException("Citation marker cannot be blank");
         }

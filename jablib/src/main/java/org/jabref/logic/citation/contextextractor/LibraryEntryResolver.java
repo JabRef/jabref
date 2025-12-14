@@ -5,10 +5,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.database.DuplicateCheck;
+import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.citation.ReferenceEntry;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
@@ -35,12 +38,14 @@ public class LibraryEntryResolver {
     private final BibDatabaseMode databaseMode;
     private final DuplicateCheck duplicateCheck;
     private final StringSimilarity stringSimilarity;
+    private final AuthorListParser authorListParser;
 
     public LibraryEntryResolver(BibDatabase database, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager) {
         this.database = Objects.requireNonNull(database, "Database cannot be null");
         this.databaseMode = Objects.requireNonNull(databaseMode, "Database mode cannot be null");
         this.duplicateCheck = new DuplicateCheck(Objects.requireNonNull(entryTypesManager, "Entry types manager cannot be null"));
         this.stringSimilarity = new StringSimilarity();
+        this.authorListParser = new AuthorListParser();
     }
 
     public ResolvedEntry resolveReference(ReferenceEntry reference) {
@@ -304,6 +309,20 @@ public class LibraryEntryResolver {
     }
 
     private String extractFirstAuthorLastName(String authors) {
+        if (authors == null || authors.isBlank()) {
+            return "";
+        }
+
+        try {
+            AuthorList authorList = authorListParser.parse(authors);
+            if (!authorList.isEmpty()) {
+                Author firstAuthor = authorList.getAuthor(0);
+                return firstAuthor.getFamilyName().orElse("");
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Failed to parse author list '{}', falling back to simple extraction", authors);
+        }
+
         String cleaned = authors
                 .replaceAll("\\s+et\\s+al\\.?", "")
                 .replaceAll("\\s+and\\s+.*", "")

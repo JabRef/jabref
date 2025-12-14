@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.fileformat.pdf.PdfSectionExtractor;
 import org.jabref.model.citation.CitationContext;
 import org.jabref.model.citation.CitationContextList;
@@ -26,7 +28,8 @@ public class CitationContextIntegrationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationContextIntegrationService.class);
 
     private final PdfSectionExtractor sectionExtractor;
-    private final CitationContextExtractor contextExtractor;
+    private final CitationContextExtractor regexContextExtractor;
+    private final LlmCitationContextExtractor llmContextExtractor;
     private final PdfReferenceParser referenceParser;
     private final CitationMatcher citationMatcher;
     private final LibraryEntryResolver entryResolver;
@@ -35,13 +38,24 @@ public class CitationContextIntegrationService {
             BibDatabase database,
             BibDatabaseMode databaseMode,
             BibEntryTypesManager entryTypesManager,
-            String username
+            String username,
+            AiService aiService,
+            AiPreferences aiPreferences
     ) {
         this.sectionExtractor = new PdfSectionExtractor();
-        this.contextExtractor = new CitationContextExtractor();
+        this.regexContextExtractor = new CitationContextExtractor();
         this.referenceParser = new PdfReferenceParser();
         this.citationMatcher = new CitationMatcher();
         this.entryResolver = new LibraryEntryResolver(database, databaseMode, entryTypesManager);
+
+        if (aiService != null && aiPreferences != null && aiPreferences.getEnableAi()) {
+            this.llmContextExtractor = new LlmCitationContextExtractor(
+                    aiService.getTemplatesService(),
+                    aiService.getChatLanguageModel()
+            );
+        } else {
+            this.llmContextExtractor = null;
+        }
     }
 
     public List<MatchedContext> previewDocument(Path pdfPath, String sourceCitationKey) throws IOException {
@@ -133,24 +147,41 @@ public class CitationContextIntegrationService {
         CitationContextList result = new CitationContextList(sourceCitationKey);
 
         List<PdfSection> relevantSections = sections.getCitationRelevantSections();
+        String textToAnalyze;
 
         if (!relevantSections.isEmpty()) {
             LOGGER.debug("Found {} citation-relevant sections", relevantSections.size());
+            StringBuilder sb = new StringBuilder();
             for (PdfSection section : relevantSections) {
-                CitationContextList sectionContexts = contextExtractor.extractContexts(
-                        section.content(), sourceCitationKey);
-                result.addAll(sectionContexts.getContexts());
+                sb.append(section.content()).append("\n\n");
             }
+            textToAnalyze = sb.toString();
+        } else {
+            LOGGER.debug("No citation-relevant sections found, using full text");
+            textToAnalyze = sections.fullText();
         }
 
-        if (result.isEmpty()) {
-            LOGGER.debug("No citation-relevant sections found, extracting from full text");
-            CitationContextList fullTextContexts = contextExtractor.extractContexts(
-                    sections.fullText(), sourceCitationKey);
-            result.addAll(fullTextContexts.getContexts());
+        if (llmContextExtractor != null) {
+            LOGGER.info("Using LLM-based citation context extraction");
+            try {
+                CitationContextList llmContexts = llmContextExtractor.extractContexts(textToAnalyze, sourceCitationKey);
+                result.addAll(llmContexts.getContexts());
+                LOGGER.info("LLM extracted {} citation contexts", llmContexts.size());
+            } catch (Exception e) {
+                LOGGER.warn("LLM extraction failed, falling back to regex: {}", e.getMessage());
+                extractWithRegex(textToAnalyze, sourceCitationKey, result);
+            }
+        } else {
+            LOGGER.info("Using regex-based citation context extraction (AI not enabled)");
+            extractWithRegex(textToAnalyze, sourceCitationKey, result);
         }
 
         return result;
+    }
+
+    private void extractWithRegex(String text, String sourceCitationKey, CitationContextList result) {
+        CitationContextList regexContexts = regexContextExtractor.extractContexts(text, sourceCitationKey);
+        result.addAll(regexContexts.getContexts());
     }
 
     public record MatchedContext(

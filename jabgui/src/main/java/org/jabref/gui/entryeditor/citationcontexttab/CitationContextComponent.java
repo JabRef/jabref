@@ -28,6 +28,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.contextextractor.CitationContextIntegrationService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -45,6 +46,7 @@ public class CitationContextComponent extends BorderPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationContextComponent.class);
 
+    private final AiService aiService;
     private final BibDatabaseContext bibDatabaseContext;
     private final BibEntry entry;
     private final DialogService dialogService;
@@ -58,12 +60,14 @@ public class CitationContextComponent extends BorderPane {
     private final Label statusLabel;
     private final List<ExtractedContextRow> extractedResults = new ArrayList<>();
 
-    public CitationContextComponent(BibDatabaseContext bibDatabaseContext,
+    public CitationContextComponent(AiService aiService,
+                                    BibDatabaseContext bibDatabaseContext,
                                     BibEntry entry,
                                     DialogService dialogService,
                                     GuiPreferences preferences,
                                     BibEntryTypesManager entryTypesManager,
                                     TaskExecutor taskExecutor) {
+        this.aiService = aiService;
         this.bibDatabaseContext = bibDatabaseContext;
         this.entry = entry;
         this.dialogService = dialogService;
@@ -264,7 +268,9 @@ public class CitationContextComponent extends BorderPane {
                 bibDatabaseContext.getDatabase(),
                 bibDatabaseContext.getMode(),
                 entryTypesManager,
-                username
+                username,
+                aiService,
+                preferences.getAiPreferences()
         );
 
         BackgroundTask.wrap(() -> {
@@ -367,12 +373,6 @@ public class CitationContextComponent extends BorderPane {
         }
 
         String username = preferences.getOwnerPreferences().getDefaultOwner();
-        CitationContextIntegrationService service = new CitationContextIntegrationService(
-                bibDatabaseContext.getDatabase(),
-                bibDatabaseContext.getMode(),
-                entryTypesManager,
-                username
-        );
 
         int applied = 0;
         int newEntriesAdded = 0;
