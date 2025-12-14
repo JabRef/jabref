@@ -73,8 +73,8 @@ class ImportHandlerTest {
                                                   new CurrentThreadTaskExecutor());
 
                 testEntry = new BibEntry(StandardEntryType.Article)
-                                                                   .withCitationKey("Test2023")
-                                                                   .withField(StandardField.AUTHOR, "Test Author");
+                        .withCitationKey("Test2023")
+                        .withField(StandardField.AUTHOR, "Test Author");
         }
 
         @Test
@@ -101,8 +101,8 @@ class ImportHandlerTest {
                         """);
 
                 BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
-                                                                                 .withCitationKey("Wen2013")
-                                                                                 .withField(StandardField.LIBRARY, "Tagungen\\2013\\KWTK45\\");
+                        .withCitationKey("Wen2013")
+                        .withField(StandardField.LIBRARY, "Tagungen\\2013\\KWTK45\\");
 
                 assertEquals(List.of(expected), bibEntries.stream().toList());
         }
@@ -124,8 +124,8 @@ class ImportHandlerTest {
         void handleDuplicatesKeepRightTest() {
                 // Arrange
                 BibEntry duplicateEntry = new BibEntry(StandardEntryType.Article)
-                                                                                 .withCitationKey("Duplicate2023")
-                                                                                 .withField(StandardField.AUTHOR, "Duplicate Author");
+                        .withCitationKey("Duplicate2023")
+                        .withField(StandardField.AUTHOR, "Duplicate Author");
 
                 BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
                 bibDatabase.insertEntry(duplicateEntry); // Simulate that the duplicate entry is already in the database
@@ -155,8 +155,8 @@ class ImportHandlerTest {
         void handleDuplicatesKeepBothTest() {
                 // Arrange
                 BibEntry duplicateEntry = new BibEntry(StandardEntryType.Article)
-                                                                                 .withCitationKey("Duplicate2023")
-                                                                                 .withField(StandardField.AUTHOR, "Duplicate Author");
+                        .withCitationKey("Duplicate2023")
+                        .withField(StandardField.AUTHOR, "Duplicate Author");
 
                 BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
                 bibDatabase.insertEntry(duplicateEntry); // Simulate that the duplicate entry is already in the database
@@ -185,12 +185,12 @@ class ImportHandlerTest {
         void handleDuplicatesKeepMergeTest() {
                 // Arrange
                 BibEntry duplicateEntry = new BibEntry(StandardEntryType.Article)
-                                                                                 .withCitationKey("Duplicate2023")
-                                                                                 .withField(StandardField.AUTHOR, "Duplicate Author");
+                        .withCitationKey("Duplicate2023")
+                        .withField(StandardField.AUTHOR, "Duplicate Author");
 
                 BibEntry mergedEntry = new BibEntry(StandardEntryType.Article)
-                                                                              .withCitationKey("Merged2023")
-                                                                              .withField(StandardField.AUTHOR, "Merged Author");
+                        .withCitationKey("Merged2023")
+                        .withField(StandardField.AUTHOR, "Merged Author");
 
                 BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
                 bibDatabase.insertEntry(duplicateEntry); // Simulate that the duplicate entry is already in the database
@@ -210,7 +210,7 @@ class ImportHandlerTest {
                 // Act
                 // create and return a default BibEntry or do other computations
                 BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK)
-                                               .orElseGet(BibEntry::new);
+                        .orElseGet(BibEntry::new);
 
                 // Assert
                 assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
