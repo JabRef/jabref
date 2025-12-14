@@ -341,9 +341,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
-
-        defaults.put(ASK_FOR_INCLUDING_CROSS_REFERENCES, CopyToPreferences.getDefault().getShouldAskForIncludingCrossReferences());
-        defaults.put(INCLUDE_CROSS_REFERENCES, CopyToPreferences.getDefault().getShouldIncludeCrossReferences());
     }
 
     /**
@@ -363,9 +360,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (copyToPreferences != null) {
             return copyToPreferences;
         }
+        CopyToPreferences defaultPreferences = CopyToPreferences.getDefault();
         copyToPreferences = new CopyToPreferences(
-                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES),
-                getBoolean(INCLUDE_CROSS_REFERENCES)
+                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, defaultPreferences.getShouldAskForIncludingCrossReferences()),
+                getBoolean(INCLUDE_CROSS_REFERENCES, defaultPreferences.getShouldIncludeCrossReferences())
         );
 
         EasyBind.listen(copyToPreferences.shouldAskForIncludingCrossReferencesProperty(), (obs, oldValue, newValue) -> putBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, newValue));
