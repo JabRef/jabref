@@ -131,9 +131,9 @@ public class ImportHandler {
 
                     UiTaskExecutor.runInJavaFXThread(() -> {
                         setTitle(Localization.lang("Importing files into %1 | %2 of %0 file(s) processed.",
-                                                   files.size(),
-                                                   targetBibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse(Localization.lang("untitled")),
-                                                   counter));
+                                files.size(),
+                                targetBibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse(Localization.lang("untitled")),
+                                counter));
                         updateMessage(Localization.lang("Processing %0", FileUtil.shortenFileName(file.getFileName().toString(), 68)));
                         updateProgress(counter, files.size());
                         showToUser(true);
@@ -337,9 +337,9 @@ public class ImportHandler {
 
     public void setAutomaticFields(List<BibEntry> entries) {
         UpdateField.setAutomaticFields(
-                                       entries,
-                                       preferences.getOwnerPreferences(),
-                                       preferences.getTimestampPreferences());
+                entries,
+                preferences.getOwnerPreferences(),
+                preferences.getTimestampPreferences());
     }
 
     public void downloadLinkedFiles(BibEntry entry) {
@@ -347,12 +347,12 @@ public class ImportHandler {
             entry.getFiles().stream()
                  .filter(LinkedFile::isOnlineLink)
                  .forEach(linkedFile -> new LinkedFileViewModel(
-                                                                linkedFile,
-                                                                entry,
-                                                                targetBibDatabaseContext,
-                                                                taskExecutor,
-                                                                dialogService,
-                                                                preferences).download(false));
+                         linkedFile,
+                         entry,
+                         targetBibDatabaseContext,
+                         taskExecutor,
+                         dialogService,
+                         preferences).download(false));
         }
     }
 
@@ -379,10 +379,10 @@ public class ImportHandler {
             return;
         }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                                                                     targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
-                                                                                                                                          .getKeyPatterns()),
-                                                                     targetBibDatabaseContext.getDatabase(),
-                                                                     preferences.getCitationKeyPatternPreferences());
+                targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
+                        .getKeyPatterns()),
+                targetBibDatabaseContext.getDatabase(),
+                preferences.getCitationKeyPatternPreferences());
         entries.forEach(keyGenerator::generateAndSetKey);
     }
 
@@ -454,10 +454,10 @@ public class ImportHandler {
     private List<BibEntry> tryImportFormats(String data) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
-                                                                           preferences.getImporterPreferences(),
-                                                                           preferences.getImportFormatPreferences(),
-                                                                           preferences.getCitationKeyPatternPreferences(),
-                                                                           fileUpdateMonitor);
+                    preferences.getImporterPreferences(),
+                    preferences.getImportFormatPreferences(),
+                    preferences.getCitationKeyPatternPreferences(),
+                    fileUpdateMonitor);
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
             return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
@@ -539,8 +539,8 @@ public class ImportHandler {
                                          .getGroups()
                                          .flatMap(grp -> grp.getChildren()
                                                             .stream()
-                                                            .filter(node -> node.getGroup() instanceof ExplicitGroup
-                                                                && node.getGroup().getName().equals(groupName))
+                                                             .filter(node -> node.getGroup() instanceof ExplicitGroup
+                                                                    && node.getGroup().getName().equals(groupName))
                                                             .findFirst())
                                          .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
         }
