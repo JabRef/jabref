@@ -81,7 +81,7 @@ dependencies.constraints {
     api("com.konghq:unirest-modules-gson:4.5.1")
     api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:5.1.0")
-    api("com.squareup.okio:okio-jvm:3.16.0")
+    api("com.squareup.okio:okio-jvm:3.16.4")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.1")
