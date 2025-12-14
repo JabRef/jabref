@@ -294,15 +294,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
         // endregion
 
-        // region GroupsPreferences
-        defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
-        defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
-        defaults.put(GROUP_VIEW_INTERSECTION, Boolean.TRUE);
-        defaults.put(GROUP_VIEW_FILTER, Boolean.TRUE);
-        defaults.put(GROUP_VIEW_INVERT, Boolean.FALSE);
-        defaults.put(DEFAULT_HIERARCHICAL_CONTEXT, GroupHierarchyType.INDEPENDENT.name());
-        // endregion
-
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
         // region PreviewStyle
@@ -390,9 +381,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getDonationPreferences().setAll(DonationPreferences.getDefault());
+        getGroupsPreferences().setAll(GroupsPreferences.getDefault());
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
+        getMainTablePreferences().setAll(MainTablePreferences.getDefault());
     }
 
     @Override
@@ -403,9 +396,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
+        getGroupsPreferences().setAll(getGroupsPreferencesfromBackingStore(getGroupsPreferences()));
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
+        getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
     }
 
     // region EntryEditorPreferences
@@ -812,14 +807,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return groupsPreferences;
         }
 
-        groupsPreferences = new GroupsPreferences(
-                getBoolean(GROUP_VIEW_INTERSECTION),
-                getBoolean(GROUP_VIEW_FILTER),
-                getBoolean(GROUP_VIEW_INVERT),
-                getBoolean(AUTO_ASSIGN_GROUP),
-                getBoolean(DISPLAY_GROUP_COUNT),
-                GroupHierarchyType.valueOf(get(DEFAULT_HIERARCHICAL_CONTEXT))
-        );
+        groupsPreferences = getGroupsPreferencesfromBackingStore(GroupsPreferences.getDefault());
 
         groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
             putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
@@ -831,6 +819,19 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
 
         return groupsPreferences;
+    }
+
+    private GroupsPreferences getGroupsPreferencesfromBackingStore(GroupsPreferences defaults) {
+        return new GroupsPreferences(
+                getBoolean(GROUP_VIEW_INTERSECTION, defaults.groupViewModeProperty().contains(GroupViewMode.INTERSECTION)),
+                getBoolean(GROUP_VIEW_FILTER, defaults.groupViewModeProperty().contains(GroupViewMode.FILTER)),
+                getBoolean(GROUP_VIEW_INVERT, defaults.groupViewModeProperty().contains(GroupViewMode.INVERT)),
+                getBoolean(AUTO_ASSIGN_GROUP, defaults.shouldAutoAssignGroup()),
+                getBoolean(DISPLAY_GROUP_COUNT, defaults.shouldDisplayGroupCount()),
+                GroupHierarchyType.valueOf(
+                        get(DEFAULT_HIERARCHICAL_CONTEXT, defaults.getDefaultHierarchicalContext().name())
+                )
+        );
     }
 
     public SpecialFieldsPreferences getSpecialFieldsPreferences() {
@@ -998,10 +999,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTablePreferences;
         }
 
-        mainTablePreferences = new MainTablePreferences(
-                getMainTableColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE),
-                getBoolean(EXTRA_FILE_COLUMNS));
+        mainTablePreferences = getMainTablePreferencesFromBackingStore(MainTablePreferences.getDefault());
 
         EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
                 (obs, oldValue, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
@@ -1009,6 +1007,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 (obs, oldValue, newValue) -> putBoolean(EXTRA_FILE_COLUMNS, newValue));
 
         return mainTablePreferences;
+    }
+
+    private MainTablePreferences getMainTablePreferencesFromBackingStore(MainTablePreferences defaults) {
+        return new MainTablePreferences(
+                getMainTableColumnPreferences(),
+                getBoolean(AUTO_RESIZE_MODE, defaults.getResizeColumnsToFit()),
+                getBoolean(EXTRA_FILE_COLUMNS, defaults.getExtraFileColumnsEnabled())
+        );
     }
 
     public ColumnPreferences getMainTableColumnPreferences() {
