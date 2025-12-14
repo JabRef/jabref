@@ -380,7 +380,7 @@ public class ImportHandler {
         }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                 targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
-                        .getKeyPatterns()),
+                                                                                     .getKeyPatterns()),
                 targetBibDatabaseContext.getDatabase(),
                 preferences.getCitationKeyPatternPreferences());
         entries.forEach(keyGenerator::generateAndSetKey);
@@ -539,7 +539,7 @@ public class ImportHandler {
                                          .getGroups()
                                          .flatMap(grp -> grp.getChildren()
                                                             .stream()
-                                                             .filter(node -> node.getGroup() instanceof ExplicitGroup
+                                                            .filter(node -> node.getGroup() instanceof ExplicitGroup
                                                                     && node.getGroup().getName().equals(groupName))
                                                             .findFirst())
                                          .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));

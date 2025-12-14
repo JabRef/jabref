@@ -210,7 +210,7 @@ class ImportHandlerTest {
         // Act
         // create and return a default BibEntry or do other computations
         BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK)
-                .orElseGet(BibEntry::new);
+                                       .orElseGet(BibEntry::new);
 
         // Assert
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
