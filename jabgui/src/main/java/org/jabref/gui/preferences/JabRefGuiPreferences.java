@@ -58,6 +58,7 @@ import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
@@ -163,7 +164,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     /**
      * Holds the horizontal divider position of the preview view when it is shown inside the entry editor
      */
-
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
 
     private static final String JOURNAL_POPUP = "journalPopup";
@@ -376,6 +376,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
+        getMergeDialogPreferences().setAll(MergeDialogPreferences.getDefault());
     }
 
     @Override
@@ -391,6 +392,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
+        getMergeDialogPreferences().setAll(getMergeDialogPreferencesFromBackingStore(getMergeDialogPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -510,16 +512,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         MergeDialogPreferences defaults = MergeDialogPreferences.getDefault();
 
-        mergeDialogPreferences = new MergeDialogPreferences(
-                DiffMode.valueOf(get(MERGE_ENTRIES_DIFF_MODE, defaults.getMergeDiffMode().name())),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaults.getMergeShouldShowDiff()),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaults.getMergeShouldShowUnifiedDiff()),
-                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, defaults.getMergeHighlightWords()),
-                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, defaults.shouldMergeShowChangedFieldsOnly()),
-                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES, defaults.shouldMergeApplyToAllEntries()),
-                DuplicateResolverDialog.DuplicateResolverResult.valueOf(
-                        get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaults.getAllEntriesDuplicateResolverDecision().name()))
-        );
+        mergeDialogPreferences = getMergeDialogPreferencesFromBackingStore(defaults);
 
         EasyBind.listen(mergeDialogPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(mergeDialogPreferences.mergeShouldShowDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, newValue));
@@ -530,6 +523,19 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), (obs, oldValue, newValue) -> put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, newValue.name()));
 
         return mergeDialogPreferences;
+    }
+
+    private MergeDialogPreferences getMergeDialogPreferencesFromBackingStore(MergeDialogPreferences defaults) {
+        return new MergeDialogPreferences(
+                DiffMode.valueOf(get(MERGE_ENTRIES_DIFF_MODE, defaults.getMergeDiffMode().name())),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaults.getMergeShouldShowDiff()),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaults.getMergeShouldShowUnifiedDiff()),
+                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, defaults.getMergeHighlightWords()),
+                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, defaults.shouldMergeShowChangedFieldsOnly()),
+                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES, defaults.shouldMergeApplyToAllEntries()),
+                DuplicateResolverDialog.DuplicateResolverResult.valueOf(
+                        get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaults.getAllEntriesDuplicateResolverDecision().name()))
+        );
     }
 
     @Override
