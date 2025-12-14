@@ -36,7 +36,7 @@ public class CitationContextExtractorTest {
 
         assertFalse(result.isEmpty());
         assertTrue(result.getUniqueCitationMarkers().stream()
-                         .anyMatch(m -> m.equals("[1]")));
+                         .anyMatch("[1]"::equals));
     }
 
     @Test

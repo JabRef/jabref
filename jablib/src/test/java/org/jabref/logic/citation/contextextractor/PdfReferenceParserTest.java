@@ -159,8 +159,8 @@ class PdfReferenceParserTest {
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertTrue(references.size() >= 2);
-        assertTrue(references.stream().anyMatch(r -> r.marker().equals("[1]")));
-        assertTrue(references.stream().anyMatch(r -> r.marker().equals("[2]")));
+        assertTrue(references.stream().anyMatch(r -> "[1]".equals(r.marker())));
+        assertTrue(references.stream().anyMatch(r -> "[2]".equals(r.marker())));
     }
 
     @Test

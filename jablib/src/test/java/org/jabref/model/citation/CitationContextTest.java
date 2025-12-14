@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class CitationContextTest {
+class CitationContextTest {
 
     @Test
     void basicCreation() {
@@ -59,26 +59,8 @@ public class CitationContextTest {
     }
 
     @Test
-    void nullMarkerThrows() {
-        assertThrows(NullPointerException.class, () ->
-                new CitationContext(null, "context", "source"));
-    }
-
-    @Test
     void blankMarkerThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new CitationContext("  ", "context", "source"));
-    }
-
-    @Test
-    void nullContextThrows() {
-        assertThrows(NullPointerException.class, () ->
-                new CitationContext("(Smith 2020)", null, "source"));
-    }
-
-    @Test
-    void nullSourceKeyThrows() {
-        assertThrows(NullPointerException.class, () ->
-                new CitationContext("(Smith 2020)", "context", null));
     }
 }

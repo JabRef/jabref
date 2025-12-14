@@ -253,7 +253,7 @@ public class PdfSectionExtractor {
         }
 
         String[] words = text.split("\\s+");
-        return !(words.length > 4);
+        return words.length <= 4;
     }
 
     private String normalizeHeading(String heading) {

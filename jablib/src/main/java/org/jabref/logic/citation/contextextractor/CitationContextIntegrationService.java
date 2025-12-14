@@ -20,6 +20,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.pdf.PdfDocumentSections;
 import org.jabref.model.pdf.PdfSection;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ public class CitationContextIntegrationService {
 
     private final PdfSectionExtractor sectionExtractor;
     private final CitationContextExtractor regexContextExtractor;
+    @Nullable
     private final LlmCitationContextExtractor llmContextExtractor;
     private final PdfReferenceParser referenceParser;
     private final CitationMatcher citationMatcher;
@@ -167,8 +169,13 @@ public class CitationContextIntegrationService {
                 CitationContextList llmContexts = llmContextExtractor.extractContexts(textToAnalyze, sourceCitationKey);
                 result.addAll(llmContexts.getContexts());
                 LOGGER.info("LLM extracted {} citation contexts", llmContexts.size());
+
+                if (llmContexts.isEmpty()) {
+                    LOGGER.info("LLM returned no results, falling back to regex extraction");
+                    extractWithRegex(textToAnalyze, sourceCitationKey, result);
+                }
             } catch (Exception e) {
-                LOGGER.warn("LLM extraction failed, falling back to regex: {}", e.getMessage());
+                LOGGER.warn("LLM extraction failed, falling back to regex", e);
                 extractWithRegex(textToAnalyze, sourceCitationKey, result);
             }
         } else {
@@ -186,7 +193,7 @@ public class CitationContextIntegrationService {
 
     public record MatchedContext(
             CitationContext context,
-            BibEntry libraryEntry,
+            @Nullable BibEntry libraryEntry,
             boolean isNewEntry
     ) {
         public boolean isMatched() {

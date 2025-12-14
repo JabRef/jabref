@@ -57,8 +57,8 @@ public class PdfSectionExtractorTest {
 
         List<PdfSection> citationSections = docSections.getCitationRelevantSections();
         assertEquals(2, citationSections.size());
-        assertTrue(citationSections.stream().anyMatch(s -> s.name().equals("Related Work")));
-        assertTrue(citationSections.stream().anyMatch(s -> s.name().equals("Literature Review")));
+        assertTrue(citationSections.stream().anyMatch(s -> "Related Work".equals(s.name())));
+        assertTrue(citationSections.stream().anyMatch(s -> "Literature Review".equals(s.name())));
     }
 
     @Test

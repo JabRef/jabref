@@ -57,7 +57,7 @@ public class LlmCitationContextExtractor {
                 result.addAll(contexts);
                 LOGGER.debug("Extracted {} contexts from chunk {}", contexts.size(), i + 1);
             } catch (Exception e) {
-                LOGGER.warn("Failed to extract contexts from chunk {}: {}", i + 1, e.getMessage());
+                LOGGER.warn("Failed to extract contexts from chunk {}", i + 1, e);
             }
         }
 
