@@ -34,6 +34,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -165,5 +166,37 @@ class PseudonymizationTest {
         assertEquals("Root", mapping.get("groups-1"));
         assertEquals("Used", mapping.get("groups-2"));
         assertEquals("Sub", mapping.get("groups-3"));
+    }
+
+    @Test
+    void pseudonymizeEntriesWithGroup() {
+        // given
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(
+                new BibEntry("first").withField(StandardField.GROUPS, "MyGroup"),
+                new BibEntry("second").withField(StandardField.GROUPS, "MyGroup"),
+                new BibEntry("third").withField(StandardField.GROUPS, "OtherGroup")
+        )));
+
+        Pseudonymization pseudonymization = new Pseudonymization();
+
+        // when
+        Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
+
+        // then
+        List<BibEntry> entries = result.bibDatabaseContext().getEntries();
+        assertEquals(3, entries.size());
+
+        String myGroup1 = entries.get(0).getField(StandardField.GROUPS).orElseThrow();
+        String myGroup2 = entries.get(1).getField(StandardField.GROUPS).orElseThrow();
+        String otherGroup = entries.get(2).getField(StandardField.GROUPS).orElseThrow();
+
+        assertEquals(myGroup1, myGroup2);
+        assertTrue(myGroup1.startsWith("groups-"));
+        assertTrue(otherGroup.startsWith("groups-"));
+        assertNotEquals(myGroup1, otherGroup);
+
+        Map<String, String> mapping = result.valueMapping();
+        assertEquals("MyGroup", mapping.get(myGroup1));
+        assertEquals("OtherGroup", mapping.get(otherGroup));
     }
 }
