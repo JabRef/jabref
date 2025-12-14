@@ -7,16 +7,16 @@ public class CopyToPreferences {
     private final BooleanProperty shouldIncludeCrossReferences = new SimpleBooleanProperty();
     private final BooleanProperty shouldAskForIncludingCrossReferences = new SimpleBooleanProperty();
 
+    public CopyToPreferences(boolean shouldAskForIncludingCrossReferences, boolean shouldIncludeCrossReferences) {
+        this.shouldIncludeCrossReferences.set(shouldIncludeCrossReferences);
+        this.shouldAskForIncludingCrossReferences.set(shouldAskForIncludingCrossReferences);
+    }
+
     public static CopyToPreferences getDefault() {
         return new CopyToPreferences(
                 true,
                 false
         );
-    }
-
-    public CopyToPreferences(boolean shouldAskForIncludingCrossReferences, boolean shouldIncludeCrossReferences) {
-        this.shouldIncludeCrossReferences.set(shouldIncludeCrossReferences);
-        this.shouldAskForIncludingCrossReferences.set(shouldAskForIncludingCrossReferences);
     }
 
     public boolean getShouldIncludeCrossReferences() {
