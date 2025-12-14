@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -31,19 +32,19 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testDefaultWriterUsesStandardCommentField() {
+    void defaultWriterUsesStandardCommentField() {
         assertEquals(StandardField.COMMENT, defaultWriter.getCommentField());
         assertTrue(defaultWriter.getUsername().isEmpty());
     }
 
     @Test
-    void testUserWriterUsesUserSpecificField() {
-        assertTrue(userWriter.getCommentField() instanceof UserSpecificCommentField);
+    void userWriterUsesUserSpecificField() {
+        assertInstanceOf(UserSpecificCommentField.class, userWriter.getCommentField());
         assertEquals(Optional.of("testuser"), userWriter.getUsername());
     }
 
     @Test
-    void testFormatContext() {
+    void formatContext() {
         CitationContext context = new CitationContext(
                 "(Smith 2020)",
                 "This paper discusses machine learning techniques.",
@@ -56,7 +57,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testFormatMultipleContexts() {
+    void formatMultipleContexts() {
         List<CitationContext> contexts = List.of(
                 new CitationContext("(Smith 2020)", "First context.", "Source1"),
                 new CitationContext("(Jones 2019)", "Second context.", "Source2")
@@ -70,7 +71,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testAddContextToEntry() {
+    void addContextToEntry() {
         CitationContext context = new CitationContext(
                 "(Smith 2020)",
                 "Important finding about neural networks.",
@@ -87,7 +88,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testAddContextToEntryWithExistingComment() {
+    void addContextToEntryWithExistingComment() {
         entry.setField(StandardField.COMMENT, "Existing comment text.");
 
         CitationContext context = new CitationContext(
@@ -104,7 +105,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testAddDuplicateContextReturnsFalse() {
+    void addDuplicateContextReturnsFalse() {
         CitationContext context = new CitationContext(
                 "(Smith 2020)",
                 "Same context text.",
@@ -119,7 +120,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testAddContextsToEntry() {
+    void addContextsToEntry() {
         List<CitationContext> contexts = List.of(
                 new CitationContext("(Smith 2020)", "First context.", "Source1"),
                 new CitationContext("(Jones 2019)", "Second context.", "Source2"),
@@ -133,7 +134,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testRemoveContextsFromSource() {
+    void removeContextsFromSource() {
         CitationContext ctx1 = new CitationContext("(A)", "Context from source A.", "SourceA");
         CitationContext ctx2 = new CitationContext("(B)", "Context from source B.", "SourceB");
 
@@ -148,13 +149,13 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testRemoveNonExistentSourceReturnsFalse() {
+    void removeNonExistentSourceReturnsFalse() {
         boolean removed = defaultWriter.removeContextsFromSource(entry, "NonExistent");
         assertFalse(removed);
     }
 
     @Test
-    void testGetContextsFromSource() {
+    void getContextsFromSource() {
         defaultWriter.addContextToEntry(entry, new CitationContext("(A)", "First from A.", "SourceA"));
         defaultWriter.addContextToEntry(entry, new CitationContext("(B)", "From B.", "SourceB"));
         defaultWriter.addContextToEntry(entry, new CitationContext("(A2)", "Second from A.", "SourceA"));
@@ -167,7 +168,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testHasContextsFromSource() {
+    void hasContextsFromSource() {
         assertFalse(defaultWriter.hasContextsFromSource(entry, "Source"));
 
         defaultWriter.addContextToEntry(entry, new CitationContext("(X)", "Context.", "Source"));
@@ -176,7 +177,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testClearComment() {
+    void clearComment() {
         defaultWriter.addContextToEntry(entry, new CitationContext("(X)", "Context.", "Source"));
         assertTrue(entry.getField(StandardField.COMMENT).isPresent());
 
@@ -186,7 +187,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testCountContexts() {
+    void countContexts() {
         assertEquals(0, defaultWriter.countContexts(entry));
 
         defaultWriter.addContextToEntry(entry, new CitationContext("(A)", "Context A.", "Source1"));
@@ -197,7 +198,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testUserSpecificFieldIsolation() {
+    void userSpecificFieldIsolation() {
         CitationCommentWriter user1Writer = new CitationCommentWriter("user1");
         CitationCommentWriter user2Writer = new CitationCommentWriter("user2");
 
@@ -212,45 +213,45 @@ class CitationCommentWriterTest {
 
         assertEquals(1, user1Contexts.size());
         assertEquals(1, user2Contexts.size());
-        assertTrue(user1Contexts.get(0).contains("User1 context"));
-        assertTrue(user2Contexts.get(0).contains("User2 context"));
+        assertTrue(user1Contexts.getFirst().contains("User1 context"));
+        assertTrue(user2Contexts.getFirst().contains("User2 context"));
     }
 
     @Test
-    void testNullUsernameThrows() {
+    void nullUsernameThrows() {
         assertThrows(NullPointerException.class, () -> new CitationCommentWriter(null));
     }
 
     @Test
-    void testBlankUsernameThrows() {
+    void blankUsernameThrows() {
         assertThrows(IllegalArgumentException.class, () -> new CitationCommentWriter("  "));
     }
 
     @Test
-    void testNullEntryThrows() {
+    void nullEntryThrows() {
         CitationContext context = new CitationContext("(X)", "Context.", "Source");
         assertThrows(NullPointerException.class, () -> defaultWriter.addContextToEntry(null, context));
     }
 
     @Test
-    void testNullContextThrows() {
+    void nullContextThrows() {
         assertThrows(NullPointerException.class, () -> defaultWriter.addContextToEntry(entry, null));
     }
 
     @Test
-    void testEmptyContextsListReturnsZero() {
+    void emptyContextsListReturnsZero() {
         int added = defaultWriter.addContextsToEntry(entry, List.of());
         assertEquals(0, added);
     }
 
     @Test
-    void testNullContextsListReturnsZero() {
+    void nullContextsListReturnsZero() {
         int added = defaultWriter.addContextsToEntry(entry, null);
         assertEquals(0, added);
     }
 
     @Test
-    void testExactDuplicateContextNotAdded() {
+    void exactDuplicateContextNotAdded() {
         // Exact same context should be detected as duplicate
         defaultWriter.addContextToEntry(entry, new CitationContext(
                 "(Smith 2020)",
@@ -268,7 +269,7 @@ class CitationCommentWriterTest {
     }
 
     @Test
-    void testDifferentContextsFromSameSourceAdded() {
+    void differentContextsFromSameSourceAdded() {
         defaultWriter.addContextToEntry(entry, new CitationContext(
                 "(Smith 2020)",
                 "First unique context about machine learning.",

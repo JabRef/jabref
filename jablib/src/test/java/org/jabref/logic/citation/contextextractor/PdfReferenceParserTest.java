@@ -21,7 +21,7 @@ class PdfReferenceParserTest {
     }
 
     @Test
-    void testParseNumericBracketedReferences() {
+    void parseNumericBracketedReferences() {
         String text = """
                 [1] Smith, J. (2020). Machine Learning Basics. Journal of AI, 10, 1-15.
 
@@ -33,13 +33,13 @@ class PdfReferenceParserTest {
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertEquals(3, references.size());
-        assertEquals("[1]", references.get(0).marker());
+        assertEquals("[1]", references.getFirst().marker());
         assertEquals("[2]", references.get(1).marker());
         assertEquals("[3]", references.get(2).marker());
     }
 
     @Test
-    void testParseNumericDottedReferences() {
+    void parseNumericDottedReferences() {
         String text = """
                 1. Smith, J. (2020). First Paper Title. Journal A, 10, 1-15.
 
@@ -49,65 +49,65 @@ class PdfReferenceParserTest {
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertEquals(2, references.size());
-        assertEquals("[1]", references.get(0).marker());
+        assertEquals("[1]", references.getFirst().marker());
         assertEquals("[2]", references.get(1).marker());
     }
 
     @Test
-    void testParseAuthorKeyReferences() {
+    void parseAuthorKeyReferences() {
         String text = "[Smith20] Smith, J. (2020). Machine Learning Basics. Journal of AI, 10, 1-15.";
 
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertFalse(references.isEmpty());
-        assertEquals("[Smith20]", references.get(0).marker());
+        assertEquals("[Smith20]", references.getFirst().marker());
     }
 
     @Test
-    void testExtractAuthors() {
+    void extractAuthors() {
         String text = "[1] Smith, J. and Jones, A. (2020). Test Paper. Journal, 10, 1-5.";
 
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertFalse(references.isEmpty());
-        assertTrue(references.get(0).authors().isPresent());
-        assertTrue(references.get(0).authors().get().contains("Smith"));
+        assertTrue(references.getFirst().authors().isPresent());
+        assertTrue(references.getFirst().authors().get().contains("Smith"));
     }
 
     @Test
-    void testExtractYear() {
+    void extractYear() {
         String text = "[1] Smith, J. (2020). Test Paper Title. Journal of Testing, 10, 1-15.";
 
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertFalse(references.isEmpty());
-        assertEquals("2020", references.get(0).year().orElse(""));
+        assertEquals("2020", references.getFirst().year().orElse(""));
     }
 
     @Test
-    void testExtractDoi() {
+    void extractDoi() {
         String text = "[1] Smith, J. (2020). Test Paper. Journal, 10, 1-5. doi:10.1234/example.2020";
 
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertFalse(references.isEmpty());
-        assertTrue(references.get(0).doi().isPresent());
-        assertTrue(references.get(0).doi().get().contains("10.1234"));
+        assertTrue(references.getFirst().doi().isPresent());
+        assertTrue(references.getFirst().doi().get().contains("10.1234"));
     }
 
     @Test
-    void testExtractUrl() {
+    void extractUrl() {
         String text = "[1] Smith, J. (2020). Online Resource. Available at: https://example.com/paper";
 
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertFalse(references.isEmpty());
-        assertTrue(references.get(0).url().isPresent());
-        assertEquals("https://example.com/paper", references.get(0).url().get());
+        assertTrue(references.getFirst().url().isPresent());
+        assertEquals("https://example.com/paper", references.getFirst().url().get());
     }
 
     @Test
-    void testExtractJournal() {
+    void extractJournal() {
         String text = "[1] Smith, J. (2020). Test Paper. Nature Reviews Machine Learning, 10, 1-15.";
 
         List<ReferenceEntry> references = parser.parseReferences(text);
@@ -116,37 +116,37 @@ class PdfReferenceParserTest {
     }
 
     @Test
-    void testExtractVolumeAndPages() {
+    void extractVolumeAndPages() {
         String text = "[1] Smith, J. Test Paper. Journal 2020; 55: 100-115.";
 
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertFalse(references.isEmpty());
-        ReferenceEntry ref = references.get(0);
+        ReferenceEntry ref = references.getFirst();
         assertFalse(ref.rawText().isEmpty());
     }
 
     @Test
-    void testEmptyTextReturnsEmptyList() {
+    void emptyTextReturnsEmptyList() {
         List<ReferenceEntry> references = parser.parseReferences("");
         assertTrue(references.isEmpty());
     }
 
     @Test
-    void testNullTextReturnsEmptyList() {
+    void nullTextReturnsEmptyList() {
         List<ReferenceEntry> references = parser.parseReferences(null);
         assertTrue(references.isEmpty());
     }
 
     @Test
-    void testShortTextFiltered() {
+    void shortTextFiltered() {
         String text = "[1] Short";
         List<ReferenceEntry> references = parser.parseReferences(text);
         assertTrue(references.isEmpty());
     }
 
     @Test
-    void testMultiLineReference() {
+    void multiLineReference() {
         String text = """
                 [1] Smith, J., Jones, A., Williams, B., Brown, C., Davis, D.,
                     Miller, E., and Wilson, F. (2020). A Very Long Paper Title
@@ -164,7 +164,7 @@ class PdfReferenceParserTest {
     }
 
     @Test
-    void testAuthorYearFormatGeneration() {
+    void authorYearFormatGeneration() {
         String text = """
                 Smith, J. (2020). First Paper Title. Journal A, 10, 1-15.
 
@@ -179,18 +179,18 @@ class PdfReferenceParserTest {
     }
 
     @Test
-    void testExtractQuotedTitle() {
+    void extractQuotedTitle() {
         String text = "[1] Smith, J. (2020). \"This is a Quoted Title\". Journal, 10, 1-5.";
 
         List<ReferenceEntry> references = parser.parseReferences(text);
 
         assertFalse(references.isEmpty());
-        assertTrue(references.get(0).title().isPresent());
-        assertEquals("This is a Quoted Title", references.get(0).title().get());
+        assertTrue(references.getFirst().title().isPresent());
+        assertEquals("This is a Quoted Title", references.getFirst().title().get());
     }
 
     @Test
-    void testMixedReferenceFormats() {
+    void mixedReferenceFormats() {
         String text = """
                 [1] Smith J. Machine Learning Today. Nature 2020;500:100-110.
 

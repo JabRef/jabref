@@ -24,7 +24,7 @@ public class PdfSectionExtractorTest {
     }
 
     @Test
-    void testPdfSectionCreation() {
+    void pdfSectionCreation() {
         PdfSection section = new PdfSection("Related Work", "Some content about related work", 1, 2);
         assertEquals("Related Work", section.name());
         assertEquals("Some content about related work", section.content());
@@ -33,7 +33,7 @@ public class PdfSectionExtractorTest {
     }
 
     @Test
-    void testPdfSectionValidation() {
+    void pdfSectionValidation() {
         assertThrows(IllegalArgumentException.class, () ->
                 new PdfSection("", "content", 1, 1));
         assertThrows(IllegalArgumentException.class, () ->
@@ -45,7 +45,7 @@ public class PdfSectionExtractorTest {
     }
 
     @Test
-    void testPdfDocumentSectionsFindsCitationRelevantSections() {
+    void pdfDocumentSectionsFindsCitationRelevantSections() {
         List<PdfSection> sections = List.of(
                 new PdfSection("Introduction", "Intro content", 1, 2),
                 new PdfSection("Related Work", "Related work content", 3, 5),
@@ -62,7 +62,7 @@ public class PdfSectionExtractorTest {
     }
 
     @Test
-    void testPdfDocumentSectionsFindSection() {
+    void pdfDocumentSectionsFindSection() {
         List<PdfSection> sections = List.of(
                 new PdfSection("Introduction", "Intro content", 1, 2),
                 new PdfSection("Related Work", "Related work content", 3, 5)
@@ -79,7 +79,7 @@ public class PdfSectionExtractorTest {
     }
 
     @Test
-    void testHasCitationRelevantSections() {
+    void hasCitationRelevantSections() {
         List<PdfSection> withRelevant = List.of(
                 new PdfSection("Background", "Content", 1, 2)
         );

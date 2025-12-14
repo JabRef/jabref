@@ -33,7 +33,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testResolveReferenceCreatesNewEntry() {
+    void resolveReferenceCreatesNewEntry() {
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
                                                  .authors("Smith, John")
                                                  .title("New Paper")
@@ -48,7 +48,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testResolveReferenceFindsExistingByDoi() {
+    void resolveReferenceFindsExistingByDoi() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setField(StandardField.DOI, "10.1234/existing");
         existingEntry.setField(StandardField.TITLE, "Existing Paper");
@@ -67,7 +67,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testResolveReferenceFindsExistingByCitationKey() {
+    void resolveReferenceFindsExistingByCitationKey() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setCitationKey("Smith2020");
         existingEntry.setField(StandardField.AUTHOR, "Smith, John");
@@ -86,7 +86,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testResolveReferenceFindsExistingByTitle() {
+    void resolveReferenceFindsExistingByTitle() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setField(StandardField.TITLE, "Machine Learning Applications in Healthcare");
         database.insertEntry(existingEntry);
@@ -102,7 +102,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testResolveReferenceFindsExistingByAuthorAndYear() {
+    void resolveReferenceFindsExistingByAuthorAndYear() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setField(StandardField.AUTHOR, "Johnson, Alice");
         existingEntry.setField(StandardField.YEAR, "2019");
@@ -122,7 +122,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testEntryExists() {
+    void entryExists() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setField(StandardField.DOI, "10.1234/test");
         database.insertEntry(existingEntry);
@@ -140,7 +140,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testAddEntryIfNotExists() {
+    void addEntryIfNotExists() {
         BibEntry newEntry = new BibEntry(StandardEntryType.Article);
         newEntry.setCitationKey("NewEntry2024");
         newEntry.setField(StandardField.TITLE, "Brand New Paper");
@@ -152,7 +152,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testAddEntryIfNotExistsReturnsFalseForDuplicate() {
+    void addEntryIfNotExistsReturnsFalseForDuplicate() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setCitationKey("Existing2024");
         database.insertEntry(existingEntry);
@@ -166,7 +166,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testResolveAndAdd() {
+    void resolveAndAdd() {
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
                                                  .authors("NewAuthor, Test")
                                                  .title("Completely New Paper")
@@ -181,7 +181,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testResolveAndAddDoesNotDuplicateExisting() {
+    void resolveAndAddDoesNotDuplicateExisting() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setField(StandardField.DOI, "10.1234/existing");
         database.insertEntry(existingEntry);
@@ -197,7 +197,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testFindExistingEntry() {
+    void findExistingEntry() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setField(StandardField.DOI, "10.1234/findme");
         database.insertEntry(existingEntry);
@@ -213,7 +213,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testCreateEntryFromReference() {
+    void createEntryFromReference() {
         ReferenceEntry reference = ReferenceEntry.builder("[1] text", "[1]")
                                                  .authors("Test, Author")
                                                  .title("Test Title")
@@ -232,7 +232,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testResolvedEntryConfidenceLevels() {
+    void resolvedEntryConfidenceLevels() {
         LibraryEntryResolver.ResolvedEntry high = new LibraryEntryResolver.ResolvedEntry(
                 new BibEntry(), false, 0.9, LibraryEntryResolver.MatchType.DOI);
         assertTrue(high.isHighConfidence());
@@ -253,31 +253,31 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testNullDatabaseThrows() {
+    void nullDatabaseThrows() {
         assertThrows(NullPointerException.class, () ->
                 new LibraryEntryResolver(null, BibDatabaseMode.BIBTEX, entryTypesManager));
     }
 
     @Test
-    void testNullDatabaseModeThrows() {
+    void nullDatabaseModeThrows() {
         assertThrows(NullPointerException.class, () ->
                 new LibraryEntryResolver(database, null, entryTypesManager));
     }
 
     @Test
-    void testNullEntryTypesManagerThrows() {
+    void nullEntryTypesManagerThrows() {
         assertThrows(NullPointerException.class, () ->
                 new LibraryEntryResolver(database, BibDatabaseMode.BIBTEX, null));
     }
 
     @Test
-    void testNullReferenceThrows() {
+    void nullReferenceThrows() {
         assertThrows(NullPointerException.class, () ->
                 resolver.resolveReference(null));
     }
 
     @Test
-    void testSimilarTitleMatch() {
+    void similarTitleMatch() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setField(StandardField.TITLE, "Deep Learning for Natural Language Processing");
         database.insertEntry(existingEntry);
@@ -292,7 +292,7 @@ class LibraryEntryResolverTest {
     }
 
     @Test
-    void testDoiCaseInsensitiveMatch() {
+    void doiCaseInsensitiveMatch() {
         BibEntry existingEntry = new BibEntry(StandardEntryType.Article);
         existingEntry.setField(StandardField.DOI, "10.1234/UPPERCASE");
         database.insertEntry(existingEntry);

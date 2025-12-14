@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PdfSectionTest {
 
     @Test
-    void testValidPdfSection() {
+    void validPdfSection() {
         PdfSection section = new PdfSection("Introduction", "Content here", 1, 3);
         assertEquals("Introduction", section.name());
         assertEquals("Content here", section.content());
@@ -17,50 +17,50 @@ class PdfSectionTest {
     }
 
     @Test
-    void testSameStartAndEndPage() {
+    void sameStartAndEndPage() {
         PdfSection section = new PdfSection("Abstract", "Short content", 1, 1);
         assertEquals(1, section.startPage());
         assertEquals(1, section.endPage());
     }
 
     @Test
-    void testBlankNameThrows() {
+    void blankNameThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new PdfSection("   ", "content", 1, 1));
     }
 
     @Test
-    void testNullNameThrows() {
+    void nullNameThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new PdfSection(null, "content", 1, 1));
     }
 
     @Test
-    void testNullContentThrows() {
+    void nullContentThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new PdfSection("Name", null, 1, 1));
     }
 
     @Test
-    void testEmptyContentAllowed() {
+    void emptyContentAllowed() {
         PdfSection section = new PdfSection("Empty Section", "", 1, 1);
         assertEquals("", section.content());
     }
 
     @Test
-    void testZeroStartPageThrows() {
+    void zeroStartPageThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new PdfSection("Name", "content", 0, 1));
     }
 
     @Test
-    void testNegativeStartPageThrows() {
+    void negativeStartPageThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new PdfSection("Name", "content", -1, 1));
     }
 
     @Test
-    void testEndPageBeforeStartPageThrows() {
+    void endPageBeforeStartPageThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new PdfSection("Name", "content", 5, 3));
     }

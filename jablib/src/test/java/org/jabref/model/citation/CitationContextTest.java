@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CitationContextTest {
 
     @Test
-    void testBasicCreation() {
+    void basicCreation() {
         CitationContext context = new CitationContext(
                 "(CIA 2021)",
                 "Colombia is a middle-income country with a population of approximately 50 million.",
@@ -24,7 +24,7 @@ public class CitationContextTest {
     }
 
     @Test
-    void testCreationWithPageNumber() {
+    void creationWithPageNumber() {
         CitationContext context = new CitationContext(
                 "[1]",
                 "Some context text",
@@ -36,7 +36,7 @@ public class CitationContextTest {
     }
 
     @Test
-    void testFormatForComment() {
+    void formatForComment() {
         CitationContext context = new CitationContext(
                 "(Smith 2020)",
                 "This paper discusses important findings.",
@@ -47,7 +47,7 @@ public class CitationContextTest {
     }
 
     @Test
-    void testGetNormalizedMarker() {
+    void getNormalizedMarker() {
         CitationContext context1 = new CitationContext("(Smith 2020)", "text", "source");
         assertEquals("Smith 2020", context1.getNormalizedMarker());
 
@@ -59,25 +59,25 @@ public class CitationContextTest {
     }
 
     @Test
-    void testNullMarkerThrows() {
+    void nullMarkerThrows() {
         assertThrows(NullPointerException.class, () ->
                 new CitationContext(null, "context", "source"));
     }
 
     @Test
-    void testBlankMarkerThrows() {
+    void blankMarkerThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new CitationContext("  ", "context", "source"));
     }
 
     @Test
-    void testNullContextThrows() {
+    void nullContextThrows() {
         assertThrows(NullPointerException.class, () ->
                 new CitationContext("(Smith 2020)", null, "source"));
     }
 
     @Test
-    void testNullSourceKeyThrows() {
+    void nullSourceKeyThrows() {
         assertThrows(NullPointerException.class, () ->
                 new CitationContext("(Smith 2020)", "context", null));
     }

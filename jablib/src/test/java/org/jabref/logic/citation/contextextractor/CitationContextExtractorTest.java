@@ -19,7 +19,7 @@ public class CitationContextExtractorTest {
     }
 
     @Test
-    void testExtractAuthorYearCitation() {
+    void extractAuthorYearCitation() {
         String text = "Colombia is a middle-income country with a population of approximately 50 million (CIA 2021), with at least 11 million people living in rural areas.";
         CitationContextList result = extractor.extractContexts(text, "LunaOstos_2024");
 
@@ -29,7 +29,7 @@ public class CitationContextExtractorTest {
     }
 
     @Test
-    void testExtractNumericCitation() {
+    void extractNumericCitation() {
         String text = "Previous research has shown significant results [1]. The methodology was later improved [2,3].";
 
         CitationContextList result = extractor.extractContexts(text, "TestPaper");
@@ -40,7 +40,7 @@ public class CitationContextExtractorTest {
     }
 
     @Test
-    void testExtractInlineAuthorCitation() {
+    void extractInlineAuthorCitation() {
         String text = "Smith et al. (2020) demonstrated that the approach works well in practice.";
 
         CitationContextList result = extractor.extractContexts(text, "Source2024");
@@ -51,7 +51,7 @@ public class CitationContextExtractorTest {
     }
 
     @Test
-    void testExtractMultipleCitations() {
+    void extractMultipleCitations() {
         String text = """
                 The field has seen significant advances (Jones 2019).
                 Building on this work, Smith and Brown (2020) proposed a new framework.
@@ -64,13 +64,13 @@ public class CitationContextExtractorTest {
     }
 
     @Test
-    void testEmptyTextReturnsEmptyList() {
+    void emptyTextReturnsEmptyList() {
         CitationContextList result = extractor.extractContexts("", "Source");
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void testTextWithNoCitationReturnsEmptyList() {
+    void textWithNoCitationReturnsEmptyList() {
         String text = "This is just regular text without any citations or references.";
 
         CitationContextList result = extractor.extractContexts(text, "Source");
@@ -79,7 +79,7 @@ public class CitationContextExtractorTest {
     }
 
     @Test
-    void testContextIncludesSurroundingSentences() {
+    void contextIncludesSurroundingSentences() {
         String text = "First sentence provides background. The main finding (Author 2020) was significant. This has implications for future work.";
 
         CitationContextList result = extractor.extractContexts(text, "Source");
@@ -90,7 +90,7 @@ public class CitationContextExtractorTest {
     }
 
     @Test
-    void testFindByMarker() {
+    void findByMarker() {
         String text = "Study A (Smith 2020) and Study B (Jones 2021) both contributed.";
 
         CitationContextList result = extractor.extractContexts(text, "Source");

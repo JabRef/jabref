@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ReferenceEntryTest {
 
     @Test
-    void testBasicCreation() {
+    void basicCreation() {
         ReferenceEntry entry = new ReferenceEntry(
                 "[1] Smith, J. (2020). Test Title. Journal of Testing, 10, 1-10.",
                 "[1]"
@@ -28,7 +28,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testCreationWithMetadata() {
+    void creationWithMetadata() {
         ReferenceEntry entry = new ReferenceEntry(
                 "[1] Smith, J. (2020). Test Title.",
                 "[1]",
@@ -44,7 +44,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testBuilderPattern() {
+    void builderPattern() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Full reference text", "[1]")
                                              .authors("Smith, John and Jones, Jane")
                                              .title("A Great Paper")
@@ -68,7 +68,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testToBibEntry() {
+    void toBibEntry() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
                                              .authors("Smith, John")
                                              .title("Test Paper")
@@ -86,7 +86,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testToBibEntryWithoutJournal() {
+    void toBibEntryWithoutJournal() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
                                              .authors("Smith, John")
                                              .title("Test Paper")
@@ -99,7 +99,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testToBibEntryWithUrl() {
+    void toBibEntryWithUrl() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
                                              .title("Online Resource")
                                              .url("https://example.com")
@@ -111,7 +111,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testGenerateCitationKey() {
+    void generateCitationKey() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
                                              .authors("Smith, John")
                                              .year("2020")
@@ -124,7 +124,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testGenerateCitationKeyFromMarker() {
+    void generateCitationKeyFromMarker() {
         ReferenceEntry entry = new ReferenceEntry(
                 "(Jones 2019) Reference text",
                 "(Jones 2019)"
@@ -137,7 +137,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testGetNormalizedMarker() {
+    void getNormalizedMarker() {
         ReferenceEntry entry1 = new ReferenceEntry("text", "[1]");
         assertEquals("1", entry1.getNormalizedMarker());
 
@@ -149,7 +149,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testGetSearchQuery() {
+    void getSearchQuery() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
                                              .title("Machine Learning Applications")
                                              .authors("Smith, John")
@@ -164,7 +164,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testGetSearchQueryWithDoi() {
+    void getSearchQueryWithDoi() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] Reference text", "[1]")
                                              .doi("10.1234/example")
                                              .title("Some Title")
@@ -176,7 +176,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testHasMinimalMetadata() {
+    void hasMinimalMetadata() {
         ReferenceEntry withTitle = ReferenceEntry.builder("[1] text", "[1]")
                                                  .title("A Title")
                                                  .build();
@@ -193,7 +193,7 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testHasDoi() {
+    void hasDoi() {
         ReferenceEntry withDoi = ReferenceEntry.builder("[1] text", "[1]")
                                                .doi("10.1234/example")
                                                .build();
@@ -204,31 +204,31 @@ class ReferenceEntryTest {
     }
 
     @Test
-    void testNullRawTextThrows() {
+    void nullRawTextThrows() {
         assertThrows(NullPointerException.class, () ->
                 new ReferenceEntry(null, "[1]"));
     }
 
     @Test
-    void testBlankRawTextThrows() {
+    void blankRawTextThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new ReferenceEntry("   ", "[1]"));
     }
 
     @Test
-    void testNullMarkerThrows() {
+    void nullMarkerThrows() {
         assertThrows(NullPointerException.class, () ->
                 new ReferenceEntry("Some text", null));
     }
 
     @Test
-    void testBlankMarkerThrows() {
+    void blankMarkerThrows() {
         assertThrows(IllegalArgumentException.class, () ->
                 new ReferenceEntry("Some text", "  "));
     }
 
     @Test
-    void testBlankFieldsAreFilteredOut() {
+    void blankFieldsAreFilteredOut() {
         ReferenceEntry entry = ReferenceEntry.builder("[1] text", "[1]")
                                              .authors("  ")
                                              .title("")

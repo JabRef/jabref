@@ -41,7 +41,7 @@ class CitationMatcherTest {
     }
 
     @Test
-    void testMatchExactNumericMarker() {
+    void matchExactNumericMarker() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("[1]", references);
 
         assertTrue(result.isPresent());
@@ -49,7 +49,7 @@ class CitationMatcherTest {
     }
 
     @Test
-    void testMatchNumericWithoutBrackets() {
+    void matchNumericWithoutBrackets() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("1", references);
 
         assertTrue(result.isPresent());
@@ -57,7 +57,7 @@ class CitationMatcherTest {
     }
 
     @Test
-    void testMatchAuthorYearMarker() {
+    void matchAuthorYearMarker() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("(Smith 2020)", references);
 
         assertTrue(result.isPresent());
@@ -65,7 +65,7 @@ class CitationMatcherTest {
     }
 
     @Test
-    void testMatchInlineAuthorYear() {
+    void matchInlineAuthorYear() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("Smith (2020)", references);
 
         assertTrue(result.isPresent());
@@ -73,7 +73,7 @@ class CitationMatcherTest {
     }
 
     @Test
-    void testMatchAuthorKeyMarker() {
+    void matchAuthorKeyMarker() {
         List<ReferenceEntry> authorKeyRefs = List.of(
                 ReferenceEntry.builder("[Smith20] reference", "[Smith20]")
                               .authors("Smith, John")
@@ -87,28 +87,28 @@ class CitationMatcherTest {
     }
 
     @Test
-    void testNoMatchReturnsEmpty() {
+    void noMatchReturnsEmpty() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("[99]", references);
 
         assertFalse(result.isPresent());
     }
 
     @Test
-    void testMatchMultipleNumericMarkers() {
+    void matchMultipleNumericMarkers() {
         List<ReferenceEntry> results = matcher.matchMultipleMarkers("[1,2]", references);
 
         assertEquals(2, results.size());
     }
 
     @Test
-    void testMatchNumericRange() {
+    void matchNumericRange() {
         List<ReferenceEntry> results = matcher.matchMultipleMarkers("[1-3]", references);
 
         assertEquals(3, results.size());
     }
 
     @Test
-    void testMatchWithDetails() {
+    void matchWithDetails() {
         Optional<CitationMatcher.MatchResult> result = matcher.matchWithDetails("[1]", references);
 
         assertTrue(result.isPresent());
@@ -117,7 +117,7 @@ class CitationMatcherTest {
     }
 
     @Test
-    void testMatchWithDetailsAuthorYear() {
+    void matchWithDetailsAuthorYear() {
         Optional<CitationMatcher.MatchResult> result = matcher.matchWithDetails("(Jones 2019)", references);
 
         assertTrue(result.isPresent());
@@ -125,68 +125,68 @@ class CitationMatcherTest {
     }
 
     @Test
-    void testCalculateMatchScore() {
-        double exactScore = matcher.calculateMatchScore("[1]", references.get(0));
-        double wrongScore = matcher.calculateMatchScore("[99]", references.get(0));
+    void calculateMatchScore() {
+        double exactScore = matcher.calculateMatchScore("[1]", references.getFirst());
+        double wrongScore = matcher.calculateMatchScore("[99]", references.getFirst());
 
         assertTrue(exactScore > wrongScore);
         assertEquals(1.0, exactScore, 0.01);
     }
 
     @Test
-    void testNoMatchForUnrelatedMarker() {
+    void noMatchForUnrelatedMarker() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("UnknownAuthor", references);
 
         assertFalse(result.isPresent());
     }
 
     @Test
-    void testNullMarkerReturnsEmpty() {
+    void nullMarkerReturnsEmpty() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference(null, references);
         assertFalse(result.isPresent());
     }
 
     @Test
-    void testEmptyMarkerReturnsEmpty() {
+    void emptyMarkerReturnsEmpty() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("", references);
         assertFalse(result.isPresent());
     }
 
     @Test
-    void testNullReferencesReturnsEmpty() {
+    void nullReferencesReturnsEmpty() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("[1]", null);
         assertFalse(result.isPresent());
     }
 
     @Test
-    void testEmptyReferencesReturnsEmpty() {
+    void emptyReferencesReturnsEmpty() {
         Optional<ReferenceEntry> result = matcher.matchMarkerToReference("[1]", List.of());
         assertFalse(result.isPresent());
     }
 
     @Test
-    void testMatchResultConfidenceLevels() {
+    void matchResultConfidenceLevels() {
         CitationMatcher.MatchResult highConfidence = new CitationMatcher.MatchResult(
-                references.get(0), 0.9, CitationMatcher.MatchType.EXACT_MARKER);
+                references.getFirst(), 0.9, CitationMatcher.MatchType.EXACT_MARKER);
         assertTrue(highConfidence.isHighConfidence());
         assertFalse(highConfidence.isMediumConfidence());
         assertFalse(highConfidence.isLowConfidence());
 
         CitationMatcher.MatchResult mediumConfidence = new CitationMatcher.MatchResult(
-                references.get(0), 0.6, CitationMatcher.MatchType.FUZZY);
+                references.getFirst(), 0.6, CitationMatcher.MatchType.FUZZY);
         assertFalse(mediumConfidence.isHighConfidence());
         assertTrue(mediumConfidence.isMediumConfidence());
         assertFalse(mediumConfidence.isLowConfidence());
 
         CitationMatcher.MatchResult lowConfidence = new CitationMatcher.MatchResult(
-                references.get(0), 0.3, CitationMatcher.MatchType.FUZZY);
+                references.getFirst(), 0.3, CitationMatcher.MatchType.FUZZY);
         assertFalse(lowConfidence.isHighConfidence());
         assertFalse(lowConfidence.isMediumConfidence());
         assertTrue(lowConfidence.isLowConfidence());
     }
 
     @Test
-    void testMatchAuthorWithYear() {
+    void matchAuthorWithYear() {
         List<ReferenceEntry> refs = List.of(
                 ReferenceEntry.builder("[1] text", "[1]")
                               .authors("Smith, John")
@@ -200,7 +200,7 @@ class CitationMatcherTest {
     }
 
     @Test
-    void testMatchAuthorYearWithDifferentFormats() {
+    void matchAuthorYearWithDifferentFormats() {
         List<ReferenceEntry> refs = List.of(
                 ReferenceEntry.builder("[1] text", "[1]")
                               .authors("Johnson, Alice")

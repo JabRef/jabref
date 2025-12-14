@@ -290,7 +290,7 @@ public class CitationContextComponent extends BorderPane {
                                       });
                                   }
                               } catch (Exception e) {
-                                  LOGGER.warn("Failed to process PDF {}: {}", linkedFile.getLink(), e.getMessage());
+                                  LOGGER.warn("Failed to process PDF {}: {}", linkedFile.getLink(), e.getMessage(), e);
                               }
                           }
 
@@ -407,7 +407,7 @@ public class CitationContextComponent extends BorderPane {
                         row.setStatus(Localization.lang("Duplicate"));
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to apply context: {}", e.getMessage());
+                    LOGGER.warn("Failed to apply context: {}", e.getMessage(), e);
                     row.setStatus(Localization.lang("Failed"));
                 }
             }
