@@ -162,7 +162,23 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     /**
-     * Holds the horizontal divider position of the preview view when it is shown inside the entry editor
+     * Holds
+     * the
+     * horizontal
+     * divider
+     * position
+     * of
+     * the
+     * preview
+     * view
+     * when
+     * it
+     * is
+     * shown
+     * inside
+     * the
+     * entry
+     * editor
      */
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
 
@@ -246,16 +262,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(JOURNAL_POPUP, EntryEditorPreferences.JournalPopupEnabled.FIRST_START.toString());
 
         defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
-
-        // region mergeDialogPreferences
-        defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
-        defaults.put(MERGE_ENTRIES_SHOULD_SHOW_DIFF, Boolean.TRUE);
-        defaults.put(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, Boolean.TRUE);
-        defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
-        defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
-        defaults.put(MERGE_APPLY_TO_ALL_ENTRIES, Boolean.FALSE);
-        defaults.put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, DuplicateResolverDialog.DuplicateResolverResult.BREAK.name());
-        // endregion
 
         // region autoCompletePreferences
         defaults.put(AUTO_COMPLETE, Boolean.FALSE);
@@ -347,9 +353,47 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /**
-     * @deprecated Never ever add a call to this method. There should be only one caller.
-     * All other usages should get the preferences passed (or injected).
-     * The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
+     * @deprecated}
+     * annotation
+     * to
+     * have
+     * IntelliJ
+     * listing
+     * this
+     * method
+     * with
+     * a
+     * strike-through.
+     * @deprecated Never
+     * ever
+     * add
+     * a
+     * call
+     * to
+     * this
+     * method.
+     * There
+     * should
+     * be
+     * only
+     * one
+     * caller.
+     * All
+     * other
+     * usages
+     * should
+     * get
+     * the
+     * preferences
+     * passed
+     * (or
+     * injected).
+     * The
+     * JabRef
+     * team
+     * leaves
+     * the
+     * {@code
      */
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
@@ -447,9 +491,33 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /**
-     * Get a Map of defined tab names to default tab fields.
+     * Get
+     * a
+     * Map
+     * of
+     * defined
+     * tab
+     * names
+     * to
+     * default
+     * tab
+     * fields.
      *
-     * @return A map of the currently defined tabs in the entry editor from scratch to cache
+     * @return A
+     * map
+     * of
+     * the
+     * currently
+     * defined
+     * tabs
+     * in
+     * the
+     * entry
+     * editor
+     * from
+     * scratch
+     * to
+     * cache
      */
     private Map<String, Set<Field>> getEntryEditorTabs() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
@@ -469,9 +537,32 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /**
-     * Stores the defined tabs and corresponding fields in the preferences.
+     * Stores
+     * the
+     * defined
+     * tabs
+     * and
+     * corresponding
+     * fields
+     * in
+     * the
+     * preferences.
      *
-     * @param customTabs a map of tab names and the corresponding set of fields to be displayed in
+     * @param customTabs a
+     *                   map
+     *                   of
+     *                   tab
+     *                   names
+     *                   and
+     *                   the
+     *                   corresponding
+     *                   set
+     *                   of
+     *                   fields
+     *                   to
+     *                   be
+     *                   displayed
+     *                   in
      */
     private void storeEntryEditorTabs(Map<String, Set<Field>> customTabs) {
         String[] names = customTabs.keySet().toArray(String[]::new);
@@ -518,14 +609,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mergeDialogPreferences;
         }
 
+        MergeDialogPreferences defaults = MergeDialogPreferences.getDefault();
+
         mergeDialogPreferences = new MergeDialogPreferences(
-                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF),
-                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS),
-                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS),
-                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES),
-                DuplicateResolverDialog.DuplicateResolverResult.parse(get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES))
+                DiffMode.valueOf(get(MERGE_ENTRIES_DIFF_MODE, defaults.getMergeDiffMode().name())),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaults.getMergeShouldShowDiff()),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaults.getMergeShouldShowUnifiedDiff()),
+                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, defaults.getMergeHighlightWords()),
+                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, defaults.shouldMergeShowChangedFieldsOnly()),
+                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES, defaults.shouldMergeApplyToAllEntries()),
+                DuplicateResolverDialog.DuplicateResolverResult.valueOf(
+                        get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaults.getAllEntriesDuplicateResolverDecision().name()))
         );
 
         EasyBind.listen(mergeDialogPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
@@ -1127,7 +1221,19 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     /**
-     * For the export configuration, generates the SelfContainedSaveOrder having the reference to TABLE resolved.
+     * For
+     * the
+     * export
+     * configuration,
+     * generates
+     * the
+     * SelfContainedSaveOrder
+     * having
+     * the
+     * reference
+     * to
+     * TABLE
+     * resolved.
      */
     private SelfContainedSaveOrder getSelfContainedTableSaveOrder() {
         List<MainTableColumnModel> sortOrder = getMainTableColumnPreferences().getColumnSortOrder();
@@ -1237,7 +1343,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     /**
-     * In GUI mode, we can lookup the directory better
+     * In
+     * GUI
+     * mode,
+     * we
+     * can
+     * lookup
+     * the
+     * directory
+     * better
      */
     @Override
     protected Path getDefaultPath() {

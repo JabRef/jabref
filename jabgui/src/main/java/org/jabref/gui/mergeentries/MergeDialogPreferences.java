@@ -16,6 +16,16 @@ public class MergeDialogPreferences {
     private final BooleanProperty mergeApplyToAllEntries;
     private final ObjectProperty<DuplicateResolverDialog.DuplicateResolverResult> allEntriesDuplicateResolverDecision;
 
+    private MergeDialogPreferences() {
+        this(DiffMode.WORD,
+                true,
+                true,
+                true,
+                false,
+                false,
+                DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+    }
+
     public MergeDialogPreferences(DiffMode mergeDiffMode,
                                   boolean mergeShouldShowDiff,
                                   boolean mergeShouldShowUnifiedDiff,
@@ -31,6 +41,20 @@ public class MergeDialogPreferences {
         this.mergeShowChangedFieldsOnly = new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
         this.mergeApplyToAllEntries = new SimpleBooleanProperty(mergeApplyToAllEntries);
         this.allEntriesDuplicateResolverDecision = new SimpleObjectProperty<>(allEntriesDuplicateResolverDecision);
+    }
+
+    public static MergeDialogPreferences getDefault() {
+        return new MergeDialogPreferences();
+    }
+
+    public void setAll(MergeDialogPreferences preferences) {
+        this.setMergeDiffMode(preferences.getMergeDiffMode());
+        this.setMergeShouldShowDiff(preferences.getMergeShouldShowDiff());
+        this.setMergeShouldShowUnifiedDiff(preferences.getMergeShouldShowUnifiedDiff());
+        this.setMergeHighlightWords(preferences.getMergeHighlightWords());
+        this.setMergeShowChangedFieldsOnly(preferences.shouldMergeShowChangedFieldsOnly());
+        this.setIsMergeApplyToAllEntries(preferences.shouldMergeApplyToAllEntries());
+        this.setAllEntriesDuplicateResolverDecision(preferences.getAllEntriesDuplicateResolverDecision());
     }
 
     public DiffMode getMergeDiffMode() {
