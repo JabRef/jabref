@@ -17,13 +17,13 @@ public class MergeDialogPreferences {
     private final ObjectProperty<DuplicateResolverDialog.DuplicateResolverResult> allEntriesDuplicateResolverDecision;
 
     private MergeDialogPreferences() {
-        this(DiffMode.WORD,
-                true,
-                true,
-                true,
-                false,
-                false,
-                DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        this(DiffMode.WORD,                                              // Default diff mode
+                true,                                                   // Default show diff
+                true,                                                   // Default show unified diff
+                true,                                                   // Default highlight words
+                false,                                                  // Default show changed fields only
+                false,                                                  // Default apply to all entries
+                DuplicateResolverDialog.DuplicateResolverResult.BREAK); // Default duplicate resolver decision
     }
 
     public MergeDialogPreferences(DiffMode mergeDiffMode,
