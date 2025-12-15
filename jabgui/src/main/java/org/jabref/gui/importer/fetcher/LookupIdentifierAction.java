@@ -77,7 +77,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
             count++;
             final String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                     fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-            UiTaskExecutor.runInJavaFXThread(() -> dialogService.notifyAll(statusMessage));
+            UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
             Optional<T> identifier = Optional.empty();
             try {
                 identifier = fetcher.findIdentifier(bibEntry);
@@ -91,7 +91,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                     foundCount++;
                     final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                             fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-                    UiTaskExecutor.runInJavaFXThread(() -> dialogService.notifyAll(nextStatusMessage));
+                    UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(nextStatusMessage));
                 }
             }
         }
