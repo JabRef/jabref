@@ -16,7 +16,6 @@ public class CitationKeyCommands implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Testing");
     }
 
     public JabKit getParent() {
