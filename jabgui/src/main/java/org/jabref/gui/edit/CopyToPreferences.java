@@ -13,7 +13,10 @@ public class CopyToPreferences {
     }
 
     private CopyToPreferences() {
-        this(true, false);
+        this(
+                true, // shouldAskForIncludingCrossReferences
+                false // shouldIncludeCrossReferences
+        );
     }
 
     public static CopyToPreferences getDefault() {
