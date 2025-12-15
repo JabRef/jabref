@@ -505,7 +505,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         chosenListProperty().add(bstPreviewLayout);
     }
 
-    public void removeCustomStyle(PreviewLayout layout){
+    public void removeCustomStyle(PreviewLayout layout) {
         if (layout instanceof BstPreviewLayout) {
             availableListProperty.remove(layout);
             chosenListProperty.remove(layout);
@@ -513,5 +513,4 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             bstStylesPaths.remove(((BstPreviewLayout) layout).getFilePath());
         }
     }
-
 }

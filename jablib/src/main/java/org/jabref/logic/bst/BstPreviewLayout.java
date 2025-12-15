@@ -119,7 +119,7 @@ public final class BstPreviewLayout implements PreviewLayout {
     public static boolean isBstStyleFile(String styleFile) {
         return StandardFileType.BST.getExtensions().stream().anyMatch(styleFile::endsWith);
     }
-    
+
     public Path getFilePath() {
         return path;
     }
