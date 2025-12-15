@@ -43,8 +43,10 @@ class ImportHandlerTest {
     private BibDatabaseContext bibDatabaseContext;
     private BibEntry testEntry;
 
-    @Mock private GuiPreferences preferences;
-    @Mock private DuplicateCheck duplicateCheck;
+    @Mock
+    private GuiPreferences preferences;
+    @Mock
+    private DuplicateCheck duplicateCheck;
 
     @BeforeEach
     void setUp() {

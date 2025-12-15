@@ -348,13 +348,16 @@ public class ImportHandler {
         if (preferences.getFilePreferences().shouldDownloadLinkedFiles()) {
             entry.getFiles().stream()
                  .filter(LinkedFile::isOnlineLink)
-                 .forEach(linkedFile -> new LinkedFileViewModel(
-                         linkedFile,
-                         entry,
-                         targetBibDatabaseContext,
-                         taskExecutor,
-                         dialogService,
-                         preferences).download(false));
+                 .forEach(linkedFile ->
+                         new LinkedFileViewModel(
+                                 linkedFile,
+                                 entry,
+                                 targetBibDatabaseContext,
+                                 taskExecutor,
+                                 dialogService,
+                                 preferences
+                         ).download(false)
+                 );
         }
     }
 
@@ -459,7 +462,8 @@ public class ImportHandler {
                     preferences.getImporterPreferences(),
                     preferences.getImportFormatPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
-                    fileUpdateMonitor);
+                    fileUpdateMonitor
+            );
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
             return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
