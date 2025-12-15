@@ -17,7 +17,7 @@ public class MergeDialogPreferences {
     private final ObjectProperty<DuplicateResolverDialog.DuplicateResolverResult> allEntriesDuplicateResolverDecision;
 
     private MergeDialogPreferences() {
-        this(DiffMode.WORD,                                              // Default diff mode
+        this(DiffMode.WORD,                                             // Default diff mode
                 true,                                                   // Default show diff
                 true,                                                   // Default show unified diff
                 true,                                                   // Default highlight words
