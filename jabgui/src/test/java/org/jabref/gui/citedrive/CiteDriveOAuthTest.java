@@ -15,9 +15,11 @@ import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.importer.util.MediaTypes;
+import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 
+import com.nimbusds.oauth2.sdk.token.AccessToken;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import org.junit.jupiter.api.AfterAll;
@@ -60,11 +62,13 @@ class CiteDriveOAuthTest {
         RemotePreferences remotePreferences = mock(RemotePreferences.class);
         when(remotePreferences.getHttpServerUri()).thenReturn(URI.create("http://localhost:23119"));
 
-        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class));
+        CiteDrivePreferences citeDrivePreferences = mock(CiteDrivePreferences.class);
+
+        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class));
         // When testing with https://github.com/navikt/mock-oauth2-server
         // CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class), URI.create("http://localhost:8080/default/authorize"), URI.create("http://localhost:8080/default/token"));
 
-        Optional<Tokens> actual = citeDriveOAuthService.authorizeInteractive().get();
+        Optional<AccessToken> actual = citeDriveOAuthService.authorizeInteractive().get();
         assertTrue(actual.isPresent());
     }
 
@@ -72,16 +76,18 @@ class CiteDriveOAuthTest {
     @Test
     @Timeout(60)
     @Disabled
-    void putLibrary() throws ExecutionException, InterruptedException, IOException {
+    void putLibraryOAuthFromScratch() throws ExecutionException, InterruptedException, IOException {
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
 
         RemotePreferences remotePreferences = mock(RemotePreferences.class);
         when(remotePreferences.getHttpServerUri()).thenReturn(URI.create("http://localhost:23119"));
 
-        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class));
+        CiteDrivePreferences citeDrivePreferences = mock(CiteDrivePreferences.class);
 
-        Optional<Tokens> actual = citeDriveOAuthService.authorizeInteractive().get();
+        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class));
+
+        Optional<AccessToken> actual = citeDriveOAuthService.authorizeInteractive().get();
         assertTrue(actual.isPresent());
 
         String bibtex = """
@@ -98,7 +104,48 @@ class CiteDriveOAuthTest {
                 """;
 
         HttpResponse<String> response = Unirest.post("https://api-dev.citedrive.com/jabref/push/")
-                                               .header("Authorization", "Bearer " + actual.get().accessToken())
+                                               .header("Authorization", "Bearer " + actual.get())
+                                               .header("Content-Type", MediaTypes.APPLICATION_BIBTEX)
+                                               .body(bibtex)
+                                               .asString();
+
+        assertEquals(200, response.getStatus());
+        // Example response: {"file_size":225,"file_size_kb":0.22,"entry_count":1,"status":"success"}
+        assertNotEquals("", response.getBody());
+    }
+
+    /// Uses the "intended" use of CiteDriveOAuthService w/ token refresh
+    @Test
+    @Timeout(60)
+    void putLibrary() throws ExecutionException, InterruptedException, IOException {
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+
+        RemotePreferences remotePreferences = mock(RemotePreferences.class);
+        when(remotePreferences.getHttpServerUri()).thenReturn(URI.create("http://localhost:23119"));
+
+        CiteDrivePreferences citeDrivePreferences = mock(CiteDrivePreferences.class);
+
+        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class));
+
+        Optional<AccessToken> actual = citeDriveOAuthService.currentOrFreshTokens().get();
+        assertTrue(actual.isPresent());
+
+        String bibtex = """
+                @article{xyz,
+                  author = {Doe, John and Smith, Jane},
+                  title = {An Example Article},
+                  journal = {Journal of Examples},
+                  year = {2024},
+                  volume = {42},
+                  number = {1},
+                  pages = {1-10},
+                  publisher = {Example Publisher}
+                }
+                """;
+
+        HttpResponse<String> response = Unirest.post("https://api-dev.citedrive.com/jabref/push/")
+                                               .header("Authorization", "Bearer " + actual.get())
                                                .header("Content-Type", MediaTypes.APPLICATION_BIBTEX)
                                                .body(bibtex)
                                                .asString();

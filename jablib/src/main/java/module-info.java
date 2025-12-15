@@ -172,6 +172,11 @@ open module org.jabref.jablib {
     requires unirest.modules.gson;
     // endregion
 
+    // region nimbusds / OAuth2
+    requires nimbusds.oauth2.oidc.sdk;
+    // requires json.smart;
+    // endregion
+
     // region: SQL databases
     requires embedded.postgres;
     requires org.tukaani.xz;

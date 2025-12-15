@@ -72,6 +72,7 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -118,8 +119,13 @@ import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
+import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -341,6 +347,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PROXY_PASSWORD = "proxyPassword";
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
 
+    // CiteDrive
+    // RefreshToken
+    private static final String CITE_DRIVE_TOKEN = "citeDriveToken";
+    private static final String CITE_DRIVE_PERSIST_TOKEN = "citeDrivePersistToken";
+
     // Web search
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
@@ -473,6 +484,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private FilePreferences filePreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
+    private CiteDrivePreferences citeDrivePreferences;
     private SSLPreferences sslPreferences;
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
@@ -1048,6 +1060,7 @@ public class JabRefCliPreferences implements CliPreferences {
         new SharedDatabasePreferences().clear();
 
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
+        getCiteDrivePreferences().setAll(CiteDrivePreferences.getDefault());
     }
 
     private void clearTruststoreFromCustomCertificates() {
@@ -1201,7 +1214,8 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt xml fall back to current preferences
-        getProxyPreferences().setAll(ProxyPreferences.getDefault());
+        getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
+        getCiteDrivePreferences().setAll(getCiteDrivePreferencesFromBackingStore(getCiteDrivePreferences()));
     }
     //*************************************************************************************************************
     // ToDo: Cleanup
@@ -1454,14 +1468,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(PROXY_PORT, defaults.getPort()),
                 getBoolean(PROXY_USE_AUTHENTICATION, defaults.shouldUseAuthentication()),
                 get(PROXY_USERNAME, defaults.getUsername()),
-                get(PROXY_PASSWORD, defaults.getPassword()),
+                getProxyPassword(defaults),
                 getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
         );
     }
-    // endRegion: Proxy Preferences
 
-    private String getProxyPassword() {
-        if (getBoolean(PROXY_PERSIST_PASSWORD)) {
+    private String getProxyPassword(ProxyPreferences defaults) {
+        if (getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())) {
             try (final Keyring keyring = Keyring.create()) {
                 return new Password(
                         keyring.getPassword("org.jabref", "proxy"),
@@ -1473,7 +1486,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 LOGGER.warn("JabRef could not open the key store", ex);
             }
         }
-        return (String) defaults.get(PROXY_PASSWORD);
+        return get(PROXY_PASSWORD, defaults.getPassword());
     }
 
     private void setProxyPassword(String password) {
@@ -1492,6 +1505,7 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
     }
+    // endRegion: Proxy Preferences
 
     @Override
     public SSLPreferences getSSLPreferences() {
@@ -1505,6 +1519,70 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return sslPreferences;
     }
+
+    // region: CiteDrive Preferences
+    @Override
+    public CiteDrivePreferences getCiteDrivePreferences() {
+        if (citeDrivePreferences != null) {
+            return citeDrivePreferences;
+        }
+
+        citeDrivePreferences = getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences.getDefault());
+
+        EasyBind.listen(citeDrivePreferences.persistRefreshTokenProperty(), (_, _, newValue) -> {
+            putBoolean(CITE_DRIVE_PERSIST_TOKEN, newValue);
+            if (!newValue) {
+                try (final Keyring keyring = Keyring.create()) {
+                    keyring.deletePassword("org.jabref", "citedrive");
+                } catch (Exception ex) {
+                    LOGGER.warn("Unable to remove citedrive token");
+                }
+            }
+        });
+
+        EasyBind.listen(citeDrivePreferences.getRefreshTokenProperty(), (_, _, newValue) -> {
+            if (citeDrivePreferences.shouldPersistRefreshToken()) {
+                put(CITE_DRIVE_TOKEN, serializeCiteDriveToken(newValue));
+            }
+        });
+
+        return citeDrivePreferences;
+    }
+
+    private String serializeCiteDriveToken(RefreshToken newValue) {
+
+    }
+
+    private CiteDrivePreferences getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences defaults) {
+        return new CiteDrivePreferences(
+                getCiteDriveToken(),
+                getBoolean(CITE_DRIVE_PERSIST_TOKEN, defaults.shouldPersistRefreshToken())
+        );
+    }
+
+    private RefreshToken getCiteDriveToken() {
+        try (final Keyring keyring = Keyring.create()) {
+            return parseCiteDriveToken(keyring.getPassword("org.jabref", "citedrive"));
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to read citedrive token");
+            return new RefreshToken();
+        }
+    }
+
+    private RefreshToken parseCiteDriveToken(@Nullable String json) {
+        if (json == null || json.isBlank()) {
+            return null;
+        }
+
+        try {
+            JSONObject jsonObject = (JSONObject) new JSONParser(JSONParser.MODE_PERMISSIVE).parse(json);
+            return RefreshToken.parse(jsonObject);
+        } catch (ParseException | net.minidev.json.parser.ParseException e) {
+            LOGGER.warn("Invalid CiteDrive refresh token JSON", e);
+            return null;
+        }
+    }
+    // endRegion: CiteDrive Preferences
 
     //*************************************************************************************************************
     // CitationKeyPatternPreferences

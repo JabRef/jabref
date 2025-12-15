@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.citedrive.OAuthSessionRegistry;
+import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.remote.RemotePreferences;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -19,16 +20,16 @@ import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
 import com.nimbusds.oauth2.sdk.AuthorizationGrant;
 import com.nimbusds.oauth2.sdk.AuthorizationRequest;
 import com.nimbusds.oauth2.sdk.ParseException;
-import com.nimbusds.oauth2.sdk.ResponseType;
- import com.nimbusds.oauth2.sdk.TokenErrorResponse;
- import com.nimbusds.oauth2.sdk.TokenRequest;
- import com.nimbusds.oauth2.sdk.TokenResponse;
 import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
- import com.nimbusds.oauth2.sdk.http.HTTPRequest;
- import com.nimbusds.oauth2.sdk.http.HTTPResponse;
- import com.nimbusds.oauth2.sdk.id.ClientID;
- import com.nimbusds.oauth2.sdk.id.State;
- import com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod;
+import com.nimbusds.oauth2.sdk.ResponseType;
+import com.nimbusds.oauth2.sdk.TokenErrorResponse;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.TokenResponse;
+import com.nimbusds.oauth2.sdk.http.HTTPRequest;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
+import com.nimbusds.oauth2.sdk.id.ClientID;
+import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod;
 import com.nimbusds.oauth2.sdk.pkce.CodeVerifier;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
@@ -60,48 +61,47 @@ public class CiteDriveOAuthService {
 
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final RemotePreferences remotePreferences;
+    private final CiteDrivePreferences citeDrivePreferences;
     private final OAuthSessionRegistry sessionRegistry;
 
     private CodeVerifier codeVerifier; // store per-login attempt (TODO: better: map by state - in OAuthSessionRegistry?)
 
-    private volatile Tokens currentTokens;
-
     public CiteDriveOAuthService(
             ExternalApplicationsPreferences externalApplicationsPreferences,
             RemotePreferences remotePreferences,
+            CiteDrivePreferences citeDrivePreferences,
             OAuthSessionRegistry sessionRegistry,
             DialogService dialogService) {
-        this(externalApplicationsPreferences, remotePreferences, sessionRegistry, dialogService, DEFAULT_AUTH_ENDPOINT, DEFAULT_TOKEN_ENDPOINT);
+        this(externalApplicationsPreferences, remotePreferences, citeDrivePreferences, sessionRegistry, dialogService, DEFAULT_AUTH_ENDPOINT, DEFAULT_TOKEN_ENDPOINT);
     }
 
     @VisibleForTesting
     public CiteDriveOAuthService(
             ExternalApplicationsPreferences externalApplicationsPreferences,
             RemotePreferences remotePreferences,
+            CiteDrivePreferences citeDrivePreferences,
             OAuthSessionRegistry sessionRegistry,
             DialogService dialogService,
             URI authEndpoint,
             URI tokenEndpoint) {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.remotePreferences = remotePreferences;
+        this.citeDrivePreferences = citeDrivePreferences;
         this.sessionRegistry = sessionRegistry;
         this.dialogService = dialogService;
         this.AUTH_ENDPOINT = authEndpoint;
         this.TOKEN_ENDPOINT = tokenEndpoint;
     }
 
-    public CompletableFuture<Optional<Tokens>> authorizeInteractive() {
+    @VisibleForTesting
+    public CompletableFuture<Optional<AccessToken>> authorizeInteractive() {
         String state = UUID.randomUUID().toString();
         CompletableFuture<String> codeFuture = sessionRegistry.register(state);
 
         URI authUrl = buildAuthUrl(state);
         org.jabref.gui.desktop.os.NativeDesktop.openBrowserShowPopup(authUrl.toASCIIString(), dialogService, externalApplicationsPreferences);
 
-        return codeFuture.thenApply(this::exchangeCodeForToken)
-                         .thenApply(tokensOpt -> {
-                             tokensOpt.ifPresent(tokens -> this.currentTokens = tokens);
-                             return tokensOpt;
-                         });
+        return codeFuture.thenApply(this::exchangeCodeForToken);
     }
 
     private URI buildAuthUrl(String state) {
@@ -125,7 +125,8 @@ public class CiteDriveOAuthService {
         return remotePreferences.getHttpServerUri().resolve("/callback");
     }
 
-    private Optional<Tokens> exchangeCodeForToken(String code) {
+    /// Also stores the refresh token
+    private Optional<AccessToken> exchangeCodeForToken(String code) {
         LOGGER.trace("Received code {}", code);
         AuthorizationCode authCode = new AuthorizationCode(code);
         LOGGER.trace("Using PKCE code verifier: {}", codeVerifier.getValue());
@@ -151,38 +152,28 @@ public class CiteDriveOAuthService {
         AccessTokenResponse successResponse = response.toSuccessResponse();
         AccessToken accessToken = successResponse.getTokens().getAccessToken();
         RefreshToken refreshToken = successResponse.getTokens().getRefreshToken();
-        return Optional.of(new Tokens(accessToken, refreshToken));
+        citeDrivePreferences.setRefreshToken(refreshToken);
+
+        return Optional.of(accessToken);
     }
 
-    /**
-     * Returns the current tokens if available; otherwise tries to obtain fresh tokens interactively.
-     * If current tokens are present and include a refresh token, attempts to refresh them first.
-     */
-    public CompletableFuture<Optional<Tokens>> currentOrFreshTokens() {
-        Tokens cached = this.currentTokens;
-        if (cached == null) {
+    /// Returns the current tokens if available; otherwise tries to obtain fresh tokens interactively.
+    /// If current tokens are present and include a refresh token, attempts to refresh them first.
+    ///
+    /// Also stores the refresh token
+    public CompletableFuture<Optional<AccessToken>> currentOrFreshTokens() {
+        RefreshToken cachedRefreshToken = citeDrivePreferences.getRefreshToken();
+        if (cachedRefreshToken == null) {
             // No tokens yet: go interactive
             return authorizeInteractive();
         }
 
-        // Try to refresh when we have a refresh token; fall back to cached tokens on failure
-        if (cached.refreshToken() != null) {
-            return CompletableFuture.supplyAsync(() -> refreshTokens(cached))
-                                    .thenApply(refreshedOpt -> {
-                                        if (refreshedOpt.isPresent()) {
-                                            this.currentTokens = refreshedOpt.get();
-                                            return refreshedOpt;
-                                        }
-                                        return Optional.of(cached);
-                                    });
-        }
-
-        return CompletableFuture.completedFuture(Optional.of(cached));
+        return CompletableFuture.supplyAsync(() -> refreshToken(cachedRefreshToken));
     }
 
-    private Optional<Tokens> refreshTokens(Tokens tokens) {
+    private Optional<AccessToken> refreshToken(RefreshToken refreshToken) {
         try {
-            AuthorizationGrant refreshGrant = new RefreshTokenGrant(tokens.refreshToken());
+            AuthorizationGrant refreshGrant = new RefreshTokenGrant(refreshToken);
             TokenRequest request = new TokenRequest(TOKEN_ENDPOINT, CLIENT_ID, refreshGrant);
             HTTPRequest httpRequest = request.toHTTPRequest();
             HTTPResponse httpResponse = httpRequest.send();
@@ -198,8 +189,10 @@ public class CiteDriveOAuthService {
             AccessToken newAccessToken = successResponse.getTokens().getAccessToken();
             RefreshToken newRefreshToken = successResponse.getTokens().getRefreshToken();
             // Some providers may omit refresh_token on refresh; keep the old one in that case
-            RefreshToken effectiveRefresh = (newRefreshToken != null) ? newRefreshToken : tokens.refreshToken();
-            return Optional.of(new Tokens(newAccessToken, effectiveRefresh));
+            if (newRefreshToken != null) {
+                citeDrivePreferences.setRefreshToken(newRefreshToken);
+            }
+            return Optional.of(newAccessToken);
         } catch (IOException | ParseException e) {
             LOGGER.error("Error refreshing token", e);
             return Optional.empty();

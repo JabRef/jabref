@@ -128,6 +128,9 @@ dependencies {
     implementation("jakarta.ws.rs:jakarta.ws.rs-api")
     // endregion
 
+    // OAuth2 for CiteDrive
+    implementation("com.nimbusds:oauth2-oidc-sdk")
+
     implementation("org.slf4j:slf4j-api")
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
     implementation("org.slf4j:jul-to-slf4j")
