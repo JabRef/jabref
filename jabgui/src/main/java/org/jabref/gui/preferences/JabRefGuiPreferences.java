@@ -746,38 +746,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     // endregion
 
-    private ExternalApplicationsPreferences getExternalApplicationsPreferencesFromBackingStore(
-            ExternalApplicationsPreferences defaults) {
+    private ExternalApplicationsPreferences getExternalApplicationsPreferencesFromBackingStore(ExternalApplicationsPreferences defaults) {
 
         return new ExternalApplicationsPreferences(
                 get(EMAIL_SUBJECT, defaults.getEmailSubject()),
-                getBoolean(
-                        OPEN_FOLDERS_OF_ATTACHED_FILES,
-                        defaults.shouldAutoOpenEmailAttachmentsFolder()
-                ),
-                ExternalFileTypes.fromString(
-                        get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaults.getExternalFileTypes()))
-                ),
-                !getBoolean(
-                        USE_DEFAULT_CONSOLE_APPLICATION,
-                        !defaults.useCustomTerminal()
-                ),
-                get(
-                        CONSOLE_COMMAND,
-                        defaults.getCustomTerminalCommand()
-                ),
-                !getBoolean(
-                        USE_DEFAULT_FILE_BROWSER_APPLICATION,
-                        !defaults.useCustomFileBrowser()
-                ),
-                get(
-                        FILE_BROWSER_COMMAND,
-                        defaults.getCustomFileBrowserCommand()
-                ),
-                get(
-                        KINDLE_EMAIL,
-                        defaults.getKindleEmail()
-                )
+                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES,defaults.shouldAutoOpenEmailAttachmentsFolder()),
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaults.getExternalFileTypes()))),
+                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaults.useCustomTerminal()),
+                get(CONSOLE_COMMAND, defaults.getCustomTerminalCommand()),
+                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaults.useCustomFileBrowser()),
+                get(FILE_BROWSER_COMMAND, defaults.getCustomFileBrowserCommand()),
+                get(KINDLE_EMAIL, defaults.getKindleEmail())
         );
     }
 
