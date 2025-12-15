@@ -1,13 +1,13 @@
 ---
 title: "\format[RemoveLatexCommands,HTMLChars]{\title}"
 collection: publications
-category: \format{\entrytype}
+category: \format[CategoryMappingForAcademicPages]{\entrytype}
 permalink: /publication/\format[RemoveLatexCommands,HTMLChars,Replace(\s,-),SafeFileName]{\title}
 excerpt: '\begin{note}\format[RemoveLatexCommands,HTMLChars]{\note}\end{note}'
 date: \format{\year}-\begin{month}\format[NumberMonth]{\month}\end{month}\begin{!month}01\end{!month}-\begin{day}\format{\day}\end{day}\begin{!day}01\end{!day}
 venue: '\format[RemoveLatexCommands,HTMLChars]{\journal}\begin{!journal}Unknown\end{!journal}'
-slidesurl: '\begin{file}\format[FileLink(pdf)]{\file}\end{file}\begin{!file}https://[insert username].github.io/files/[insert filename].pdf\end{!file}'
-paperurl: '\begin{file}\format[FileLink(pdf)]{\file}\end{file}\begin{!file}https://[insert username].github.io/files/[insert filename].pdf\end{!file}'
+slidesurl: ''
+paperurl: '\begin{file}\format[FileLink(pdf)]{\file}\end{file}'
 bibtexurl: 'https://[insert username].github.io/files/[insert filename].bib'
 citation: '\format[HTMLChars]{\author}. (\format{\year}). "&quot;\format[RemoveLatexCommands,HTMLChars]{\title}.&quot; <i>\format[RemoveLatexCommands,HTMLChars]{\journal}</i>.'
 ---
