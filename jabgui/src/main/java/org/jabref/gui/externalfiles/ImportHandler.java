@@ -244,12 +244,14 @@ public class ImportHandler {
         addToImportEntriesGroup(entries);
 
         if (transferInformation != null) {
-            entries.forEach(entry -> LinkedFileTransferHelper
-                    .adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry));
+            entries.stream().forEach(entry -> {
+                LinkedFileTransferHelper
+                        .adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry);
+            });
         }
 
         // TODO: Should only be done if NOT copied from other library
-        entries.forEach(this::downloadLinkedFiles);
+        entries.stream().forEach(entry -> downloadLinkedFiles(entry));
     }
 
     public void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry) {
