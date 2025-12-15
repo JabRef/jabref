@@ -387,6 +387,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
+        getSidePanePreferences().setAll(SidePanePreferences.getDefault());
     }
 
     @Override
@@ -401,6 +402,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
+        getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
     }
 
     // region EntryEditorPreferences
@@ -694,10 +696,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return sidePanePreferences;
         }
 
-        sidePanePreferences = new SidePanePreferences(
-                getVisibleSidePanes(),
-                getSidePanePreferredPositions(),
-                getInt(SELECTED_FETCHER_INDEX));
+        sidePanePreferences = getSidePanePreferencesFromBackingStore(SidePanePreferences.getDefault());
 
         sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
                 storeVisibleSidePanes(sidePanePreferences.visiblePanes()));
@@ -706,6 +705,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (obs, oldValue, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
 
         return sidePanePreferences;
+    }
+
+    private SidePanePreferences getSidePanePreferencesFromBackingStore(SidePanePreferences defaults) {
+        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes();
+        Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions();
+        return new SidePanePreferences(
+                backingStoreVisiblePanes.isEmpty() ? defaults.visiblePanes() : backingStoreVisiblePanes,
+                backingStorePreferredPositions.isEmpty() ? defaults.getPreferredPositions() : backingStorePreferredPositions,
+                getInt(SELECTED_FETCHER_INDEX, defaults.getWebSearchFetcherSelected())
+        );
     }
 
     private Set<SidePaneType> getVisibleSidePanes() {
