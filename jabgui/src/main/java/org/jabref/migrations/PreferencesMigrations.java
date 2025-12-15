@@ -583,30 +583,6 @@ public class PreferencesMigrations {
      * @param preferences the user's current preferences
      * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
      */
-//    static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
-//        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
-//
-//        Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
-//        if (currentGeneralPrefs != null) {
-//            Set<Field> expectedGeneralPrefs = Set.of(
-//                    StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
-//                    StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
-//                    StandardField.TIMESTAMP,
-//
-//                    SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
-//                    SpecialField.READ_STATUS, SpecialField.RELEVANCE
-//            );
-//            if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
-//                return;
-//            }
-//        }
-//
-//        entryEditorPrefs.put(
-//                Localization.lang("General"),
-//                FieldFactory.getDefaultGeneralFields().stream().collect(Collectors.toSet())
-//        );
-//        preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
-//    }
 
     static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
         Map<String, Set<Field>> entryEditorPrefs =
@@ -657,47 +633,6 @@ public class PreferencesMigrations {
      * Thus, the configuration ih the preferences is obsolete
      */
 
-    static void addEprintTypeFieldToGeneralTab(GuiPreferences preferences) {
-        Map<String, Set<Field>> entryEditorPrefs =
-                preferences.getEntryEditorPreferences().getEntryEditorTabs();
-
-        Set<Field> currentGeneralPrefs =
-                entryEditorPrefs.get(Localization.lang("General"));
-
-        if (currentGeneralPrefs == null) {
-            return;
-        }
-
-        Set<Field> expectedOldGeneralPrefs = Set.of(
-                StandardField.DOI,
-                StandardField.CROSSREF,
-                StandardField.KEYWORDS,
-                StandardField.EPRINT,
-                StandardField.URL,
-                StandardField.FILE,
-                StandardField.GROUPS,
-                StandardField.OWNER,
-                StandardField.TIMESTAMP,
-
-                SpecialField.PRINTED,
-                SpecialField.PRIORITY,
-                SpecialField.QUALITY,
-                SpecialField.RANKING,
-                SpecialField.READ_STATUS,
-                SpecialField.RELEVANCE
-        );
-
-        if (!currentGeneralPrefs.equals(expectedOldGeneralPrefs)) {
-            return;
-        }
-
-        entryEditorPrefs.put(
-                Localization.lang("General"),
-                FieldFactory.getDefaultGeneralFields().stream().collect(Collectors.toSet())
-        );
-
-        preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
-    }
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
     }
