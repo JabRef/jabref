@@ -14,8 +14,12 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class PreviewPreferences {
 
@@ -41,6 +45,41 @@ public class PreviewPreferences {
         this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
         this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
+    }
+
+    private PreviewPreferences() {
+        this(
+
+                FXCollections.observableArrayList(new TextBasedPreviewLayout(
+                        "Preview",
+                        Injector.instantiateModelOrService(LayoutFormatterPreferences.class),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)
+                )),                                 // Default layout cycle with one default layout
+                0,                                  // Default cycle position
+                new TextBasedPreviewLayout(
+                        "Preview",
+                        Injector.instantiateModelOrService(LayoutFormatterPreferences.class),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)
+                ),                                  // Default custom preview layout
+                "Preview",                          // Default style name
+                false,                              // Default show as tab
+                false,                              // Default show tooltip
+                FXCollections.observableArrayList() // Default BST paths (empty)
+        );
+    }
+
+    public static PreviewPreferences getDefault() {
+        return new PreviewPreferences();
+    }
+
+    public void setAll(PreviewPreferences preferences) {
+        this.layoutCycle.setAll(preferences.getLayoutCycle());
+        this.layoutCyclePosition.set(preferences.getLayoutCyclePosition());
+        this.customPreviewLayout.set(preferences.getCustomPreviewLayout());
+        this.defaultCustomPreviewLayout.set(preferences.getDefaultCustomPreviewLayout());
+        this.showPreviewAsExtraTab.set(preferences.shouldShowPreviewAsExtraTab());
+        this.showPreviewEntryTableTooltip.set(preferences.shouldShowPreviewEntryTableTooltip());
+        this.bstPreviewLayoutPaths.setAll(preferences.getBstPreviewLayoutPaths());
     }
 
     public ObservableList<PreviewLayout> getLayoutCycle() {
