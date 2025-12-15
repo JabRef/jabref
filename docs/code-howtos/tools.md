@@ -20,7 +20,7 @@ It can be enhanced to be even more pleasant.
 
 ### Command line tooling
 
-[ `gh` tool](https://cli.github.com/) ist GitHub's CLI tool.
+[`gh` tool](https://cli.github.com/) ist GitHub's CLI tool.
 The most important feature is to run [`gh checkout pr <number>`](https://cli.github.com/manual/gh_pr_checkout) to checkout another PR.
 This is useful for trying out other pull requests, which in turn shows community engagement.
 
