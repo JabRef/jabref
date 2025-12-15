@@ -70,7 +70,6 @@ public class PreferencesMigrations {
         moveApiKeysToKeyring(preferences);
         removeCommentsFromCustomEditorTabs(preferences);
         addICORERankingFieldToGeneralTab(preferences);
-        addEprintTypeFieldToGeneralTab(preferences);
         upgradeResolveBibTeXStringsFields(preferences);
     }
 
@@ -584,28 +583,72 @@ public class PreferencesMigrations {
      * @param preferences the user's current preferences
      * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
      */
+//    static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
+//        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
+//
+//        Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
+//        if (currentGeneralPrefs != null) {
+//            Set<Field> expectedGeneralPrefs = Set.of(
+//                    StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
+//                    StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
+//                    StandardField.TIMESTAMP,
+//
+//                    SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
+//                    SpecialField.READ_STATUS, SpecialField.RELEVANCE
+//            );
+//            if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
+//                return;
+//            }
+//        }
+//
+//        entryEditorPrefs.put(
+//                Localization.lang("General"),
+//                FieldFactory.getDefaultGeneralFields().stream().collect(Collectors.toSet())
+//        );
+//        preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
+//    }
+
     static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
-        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
+        Map<String, Set<Field>> entryEditorPrefs =
+                preferences.getEntryEditorPreferences().getEntryEditorTabs();
 
-        Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
-        if (currentGeneralPrefs != null) {
-            Set<Field> expectedGeneralPrefs = Set.of(
-                    StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
-                    StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
-                    StandardField.TIMESTAMP,
+        Set<Field> currentGeneralPrefs =
+                entryEditorPrefs.get(Localization.lang("General"));
 
-                    SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
-                    SpecialField.READ_STATUS, SpecialField.RELEVANCE
-            );
-            if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
-                return;
-            }
+        if (currentGeneralPrefs == null) {
+            return;
+        }
+
+        // old defaults BEFORE ICORE and EPRINTTYPE
+        Set<Field> oldDefaultGeneralFields = Set.of(
+                StandardField.DOI,
+                StandardField.CROSSREF,
+                StandardField.KEYWORDS,
+                StandardField.EPRINT,
+                StandardField.URL,
+                StandardField.FILE,
+                StandardField.GROUPS,
+                StandardField.OWNER,
+                StandardField.TIMESTAMP,
+
+                SpecialField.PRINTED,
+                SpecialField.PRIORITY,
+                SpecialField.QUALITY,
+                SpecialField.RANKING,
+                SpecialField.READ_STATUS,
+                SpecialField.RELEVANCE
+        );
+
+        // reset only if user still has old defaults
+        if (!currentGeneralPrefs.equals(oldDefaultGeneralFields)) {
+            return;
         }
 
         entryEditorPrefs.put(
                 Localization.lang("General"),
                 FieldFactory.getDefaultGeneralFields().stream().collect(Collectors.toSet())
         );
+
         preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
     }
 
