@@ -19,6 +19,8 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.control.MenuItem;
+
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
@@ -38,6 +40,7 @@ import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.logic.bst.BstPreviewLayout;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -145,6 +148,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
+                .withContextMenu(this::createContextMenu)
                 .install(availableListView);
         availableListView.setOnDragOver(this::dragOver);
         availableListView.setOnDragDetected(this::dragDetectedInAvailable);
@@ -160,6 +164,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
                 .setOnDragDropped(this::dragDroppedInChosenCell)
+                .withContextMenu(this::createContextMenu)
                 .install(chosenListView);
         chosenListView.setOnDragOver(this::dragOver);
         chosenListView.setOnDragDetected(this::dragDetectedInChosen);
@@ -310,5 +315,16 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             viewModel.removeFromChosen();
             event.consume();
         }
+    }
+
+    private ContextMenu createContextMenu(PreviewLayout layout) {
+        if (layout instanceof BstPreviewLayout) {
+            ContextMenu menu = new ContextMenu();
+            MenuItem deleteItem = new MenuItem(Localization.lang("Remove"));
+            deleteItem.setOnAction(event -> viewModel.removeCustomStyle(layout));
+            menu.getItems().add(deleteItem);
+            return menu;
+        }
+        return null;
     }
 }
