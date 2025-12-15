@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
-    public static final String FETCHER_NAME = "Semantic Scholar Citations Fetcher";
+    public static final String FETCHER_NAME = "SemanticScholar";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholarCitationFetcher.class);
 

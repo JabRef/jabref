@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
-import org.jabref.logic.importer.fetcher.citation.crossref.CrossRefCitationFetcher;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherFactory;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -53,7 +53,8 @@ class GetCitedWorks implements Callable<Integer> {
                         preferences.getCitationKeyPatternPreferences(),
                         LOGGER::info,
                         new CurrentThreadTaskExecutor());
-                yield new CrossRefCitationFetcher(
+                yield CitationFetcherFactory.INSTANCE.getCitationFetcher(
+                        "CrossRef",
                         preferences.getImporterPreferences(),
                         preferences.getImportFormatPreferences(),
                         preferences.getCitationKeyPatternPreferences(),

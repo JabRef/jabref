@@ -128,15 +128,22 @@ public class AiChatComponent extends VBox {
 
     private void initializeNotice() {
         this.noticeTemplate = noticeText.getText();
+        if ((noticeTemplate == null) || noticeTemplate.isBlank()) {
+            noticeTemplate = Localization.lang(
+                    "Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided."
+            );
+        }
 
         noticeText.textProperty().bind(Bindings.createStringBinding(this::computeNoticeText, noticeDependencies()));
     }
 
     @VisibleForTesting
     String computeNoticeText() {
-        String provider = aiPreferences.getAiProvider().getLabel();
-        String model = aiPreferences.getSelectedChatModel();
-        return noticeTemplate.replace("%0", provider + " " + model);
+        return "Current AI model: "
+                + aiPreferences.getAiProvider().getLabel()
+                + " "
+                + aiPreferences.getSelectedChatModel()
+                + ". The AI may generate inaccurate or inappropriate responses. Please verify any information provided.";
     }
 
     private Observable[] noticeDependencies() {

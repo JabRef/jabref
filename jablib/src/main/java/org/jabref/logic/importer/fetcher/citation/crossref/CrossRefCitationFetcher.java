@@ -61,7 +61,7 @@ public class CrossRefCitationFetcher implements CitationFetcher {
 
     @Override
     public String getName() {
-        return "Crossref";
+        return "CrossRef";
     }
 
     @Override
